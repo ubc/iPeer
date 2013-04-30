@@ -164,7 +164,7 @@ if (!empty($notInGroup)) {
     <?php
         echo "<br>";
         //Grade Released
-        if (isset($scoreRecords[$userId]['grade_released']) && $scoreRecords[$userId]['grade_released']) {?>
+        if (isset($scoreRecords[$userId]['gradeRelease']) && $scoreRecords[$userId]['gradeRelease']) {?>
 
             <input type="button" name="UnreleaseGrades" value="<?php __('Unrelease Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$userId.';'.$event['GroupEvent']['id'].';0'; ?>'">
         <?php } else {?>
@@ -172,7 +172,7 @@ if (!empty($notInGroup)) {
         <?php }
 
         //Comment Released
-        if (isset($scoreRecords[$userId]['comment_released']) && $scoreRecords[$userId]['comment_released']) {?>
+        if (isset($scoreRecords[$userId]['commentRelease']) && $scoreRecords[$userId]['commentRelease']) {?>
             <input type="button" name="UnreleaseComments" value="<?php __('Unrelease Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$userId.';'.$event['GroupEvent']['id'].';0'; ?>'">
         <?php } else { ?>
             <input type="button" name="ReleaseComments" value="<?php __('Release Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$userId.';'.$event['GroupEvent']['id'].';1'; ?>'">

@@ -404,6 +404,211 @@ class studentRubric extends SystemBaseTestCase
         $this->assertFalse($tutor->attribute('class'));
     }
     
+    public function testRelease()
+    {
+        $this->session->open($this->url.'events/edit/'.$this->eventId);
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventAutoRelease0')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventEnableDetails1')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Submit"]')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;     
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        $this->session->open($this->url.'evaluations/viewEvaluationResults/'.$this->eventId.'/1/Detail');
+
+        // mark peer evaluations as reviewed
+        $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="evalForm"]/table/tbody/tr[6]/td/input')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                $button = $session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="evalForm"]/input[6]');
+                return ($button->attribute('value') == 'Mark Peer Evaluations as Not Reviewed');
+            }
+        );
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Detail')->click();
+        
+        // release Alex's grades
+        $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/input[1]')->click();
+        $w->until(
+            function($session) {
+                $button = $session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/input[1]');
+                return ($button->attribute('value') == 'Unrelease Grades');
+            }
+        );
+    }
+    
+    public function testReleasedGrades()
+    {
+        // check Alex's results
+        $this->waitForLogoutLogin('redshirt0002');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
+        $rating = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[2]/tbody/tr[2]/td');
+        $this->assertEqual($rating->text(), '11.00 - (1.10)* = 9.90          ( )* : 10% late penalty.');
+        $red = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'font[color="red"]');
+        $this->assertEqual($red[3]->text(), 'Comments Not Released Yet.');
+        
+        $grade = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[2]');
+        $testGrades = $this->shuffled(substr($grade->text(), 15, 4));
+        // if fails - invalid grade was passed - should only be 3.00 or 5.00
+        $this->assertTrue($testGrades);
+    }
+    
+    public function testReleasedComments()
+    {
+        // unrelease Alex's grades and release Alex's comments
+        $this->waitForLogoutLogin('root');
+        $this->session->open($this->url.'evaluations/viewEvaluationResults/'.$this->eventId.'/1/Detail');
+        // unrelease Alex's grades
+        $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/input[1]')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                $button = $session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/input[1]');
+                return ($button->attribute('value') == 'Release Grades');
+            }
+        );
+        // release Alex's comments
+        $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/input[2]')->click();
+        $w->until(
+            function($session) {
+                $button = $session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/input[2]');
+                return ($button->attribute('value') == 'Unrelease Comments');
+            }
+        );
+        
+        $this->waitForLogoutLogin('redshirt0002');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
+        $rating = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[2]/tbody/tr[2]/td');
+        $this->assertEqual($rating->text(), 'Not Released');
+        $red = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'font[color="red"]');
+        $this->assertEqual($red->text(), 'Grades Not Released Yet.');
+        
+        $comment = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[2]');
+        $testComments = $this->shuffled(substr($comment->text(), 32));
+        // if fails - invalid comment was passed - should only be giraffe or very active in the group
+        $this->assertTrue($testComments);
+    }
+    
+    public function testNothingReleased()
+    {
+        // check Ed's results
+        $this->waitForLogoutLogin('redshirt0001');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
+        $rating = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[2]/tbody/tr[2]/td');
+        $this->assertEqual($rating->text(), 'Not Released');
+        $red = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'font[color="red"]');
+        $this->assertEqual($red->text(), 'Comments/Grades Not Released Yet.');
+        $commentsGrades = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td/font');
+        $this->assertEqual($commentsGrades->text(), 'Comments/Grades Not Released Yet.');
+    }
+    
+    public function testReleaseAllGrades()
+    {
+        $this->waitForLogoutLogin('root');
+        $this->session->open($this->url.'evaluations/viewEvaluationResults/'.$this->eventId.'/1/Detail');
+        // unrelease Alex's comments
+        $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/input[2]')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                $button = $session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/input[2]');
+                return ($button->attribute('value') == 'Release Comments');
+            }
+        );
+
+        $this->session->open($this->url.'evaluations/view/'.$this->eventId);
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Release All Grades')->click();
+        $w->until(
+            function($session) {
+                $cell = $session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[2]/td[7]/div');
+                return ($cell->text() == 'Some Released');
+            }
+        );
+        
+        $this->waitForLogoutLogin('redshirt0002');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
+        $rating = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[2]/tbody/tr[2]/td');
+        $this->assertEqual($rating->text(), '11.00 - (1.10)* = 9.90          ( )* : 10% late penalty.');
+        $red = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'font[color="red"]');
+        $this->assertEqual($red[3]->text(), 'Comments Not Released Yet.');
+        
+        $grade = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[2]');
+        $testGrades = $this->shuffled(substr($grade->text(), 15, 4));
+        // if fails - invalid grade was passed - should only be 3.00 or 5.00
+        $this->assertTrue($testGrades);
+        
+        $this->waitForLogoutLogin('redshirt0001');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
+        $red = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'font[color="red"]');
+        $this->assertEqual($red[3]->text(), 'Comments Not Released Yet.');
+        
+        $this->waitForLogoutLogin('redshirt0003');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
+        $red = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'font[color="red"]');
+        $this->assertEqual($red[3]->text(), 'Comments Not Released Yet.');
+    }
+    
+    public function testReleaseAllComments()
+    {
+        $this->waitForLogoutLogin('root');
+        $this->session->open($this->url.'evaluations/view/'.$this->eventId);
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Unrelease All Grades')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                $cell = $session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[2]/td[7]/div');
+                return ($cell->text() == 'Not Released');
+            }
+        );
+
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Release All Comments')->click();
+        $w->until(
+            function($session) {
+                $cell = $session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[2]/td[8]/div');
+                return ($cell->text() == 'Some Released');
+            }
+        );
+        
+        $this->waitForLogoutLogin('redshirt0002');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
+        $rating = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[2]/tbody/tr[2]/td');
+        $this->assertEqual($rating->text(), 'Not Released');
+        $red = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'font[color="red"]');
+        $this->assertEqual($red->text(), 'Grades Not Released Yet.');
+        
+        $comment = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[2]');
+        $testComments = $this->shuffled(substr($comment->text(), 32));
+        // if fails - invalid comment was passed - should only be giraffe or very active in the group
+        $this->assertTrue($testComments);
+        
+        $this->waitForLogoutLogin('redshirt0001');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
+        $red = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'font[color="red"]');
+        $this->assertEqual($red->text(), 'Grades Not Released Yet.');
+        
+        $this->waitForLogoutLogin('redshirt0003');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
+        $red = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'font[color="red"]');
+        $this->assertEqual($red->text(), 'Grades Not Released Yet.');
+        
+        $this->waitForLogoutLogin('root');
+        $this->session->open($this->url.'evaluations/view/'.$this->eventId);
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Unrelease All Comments')->click();
+        $w->until(
+            function($session) {
+                $cell = $session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[2]/td[8]/div');
+                return ($cell->text() == 'Not Released');
+            }
+        );
+    }
+    
     public function testDeleteEvent()
     {
         $this->session->open($this->url.'events/delete/'.$this->eventId);
@@ -539,5 +744,84 @@ class studentRubric extends SystemBaseTestCase
                 return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
             }
         );
+    }
+    
+    public function shuffled($text)
+    {
+        if ($text == '3.00') {
+            $ed1 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[2]')->text();
+            $this->assertEqual(substr($ed1, 0, 33), "Points:\nGrade: 3.00\nComment: n/a");
+            $ed2 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[3]')->text();
+            $this->assertEqual(substr($ed2, 0, 37), "Points:\nGrade: 3.00\nComment: n/a");
+            $ed3 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[4]')->text();
+            $this->assertEqual(substr($ed3, 0, 37), "Points:\nGrade: 3.00\nComment: n/a");
+            $edGen = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[3]/td[2]')->text();
+            $this->assertEqual(substr($edGen, 0, 20), "General Comment:\nn/a");
+            $tutor1 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[2]')->text();
+            $this->assertEqual(substr($tutor1, 0, 37), "Points:\nGrade: 5.00\nComment: n/a");
+            $tutor2 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[3]')->text();
+            $this->assertEqual(substr($tutor2, 0, 37), "Points:\nGrade: 4.00\nComment: n/a");
+            $tutor3 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[4]')->text();
+            $this->assertEqual(substr($tutor3, 0, 37), "Points:\nGrade: 4.00\nComment: n/a");
+            $edGen = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[5]/td[2]')->text();
+            $this->assertEqual(substr($edGen, 0, 20), "General Comment:\nn/a");
+            return true;
+        } else if ($text == '5.00') {
+            $tutor1 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[2]')->text();
+            $this->assertEqual(substr($tutor1, 0, 37), "Points:\nGrade: 5.00\nComment: n/a");
+            $tutor2 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[3]')->text();
+            $this->assertEqual(substr($tutor2, 0, 37), "Points:\nGrade: 4.00\nComment: n/a");
+            $tutor3 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[4]')->text();
+            $this->assertEqual(substr($tutor3, 0, 37), "Points:\nGrade: 4.00\nComment: n/a");
+            $tutorGen = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[3]/td[2]')->text();
+            $this->assertEqual(substr($tutorGen, 0, 20), "General Comment:\nn/a");
+            $ed1 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[2]')->text();
+            $this->assertEqual(substr($ed1, 0, 37), "Points:\nGrade: 3.00\nComment: n/a");
+            $ed2 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[3]')->text();
+            $this->assertEqual(substr($ed2, 0, 37), "Points:\nGrade: 3.00\nComment: n/a");
+            $ed3 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[4]')->text();
+            $this->assertEqual(substr($ed3, 0, 37), "Points:\nGrade: 3.00\nComment: n/a");
+            $edGen = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[5]/td[2]')->text();
+            $this->assertEqual(substr($edGen, 0, 20), "General Comment:\nn/a");
+            return true;
+        } else if ($text == 'giraffe') {
+            $ed1 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[2]')->text();
+            $this->assertEqual(substr($ed1, 32), "giraffe");
+            $ed2 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[3]')->text();
+            $this->assertEqual(substr($ed2, 32), "lion");
+            $ed3 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[4]')->text();
+            $this->assertEqual(substr($ed3, 32), "monkey");
+            $edGen = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[3]/td[2]')->text();
+            $this->assertEqual(substr($edGen, 0, 27), "General Comment:\nacceptable");
+            $tutor1 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[2]')->text();
+            $this->assertEqual(substr($tutor1, 32), "very active in the group");
+            $tutor2 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[3]')->text();
+            $this->assertEqual(substr($tutor2, 32), "easy to work with");
+            $tutor3 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[4]')->text();
+            $this->assertEqual(substr($tutor3, 32), "hands in their work on time");
+            $tutorGen = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[5]/td[2]')->text();
+            $this->assertEqual(substr($tutorGen, 0, 25), "General Comment:\ngood job");
+            return true;
+        } else if ($text == 'very active in the group') {
+            $tutor1 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[2]')->text();
+            $this->assertEqual(substr($tutor1, 32), "very active in the group");
+            $tutor2 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[3]')->text();
+            $this->assertEqual(substr($tutor2, 32), "easy to work with");
+            $tutor3 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[4]')->text();
+            $this->assertEqual(substr($tutor3, 32), "hands in their work on time");
+            $tutorGen = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[3]/td[2]')->text();
+            $this->assertEqual(substr($tutorGen, 0, 27), "General Comment:\ngood job");
+            $ed1 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[2]')->text();
+            $this->assertEqual(substr($ed1, 32), "giraffe");
+            $ed2 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[3]')->text();
+            $this->assertEqual(substr($ed2, 32), "lion");
+            $ed3 = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[4]')->text();
+            $this->assertEqual(substr($ed3, 32), "monkey");
+            $edGen = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[5]/td[2]')->text();
+            $this->assertEqual(substr($edGen, 0, 27), "General Comment:\nacceptable");
+            return true;
+        } else {
+            return false;
+        }
     }
 }

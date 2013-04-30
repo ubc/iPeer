@@ -379,8 +379,6 @@ class EvaluationSimple extends EvaluationResponseBase
             );
             $gradeReleased = array_product(Set::extract($results, '/EvaluationSimple/grade_release')) ||
                 $event_info['Event']['auto_release'];
-            $commentReleased = array_product(Set::extract($results, '/EvaluationSimple/comment_release')) ||
-                $event_info['Event']['auto_release'];
             // storing the timestamp of the due date/end date of the event
             $event_due = strtotime($event_info['Event']['due_date']);
             $event_end = strtotime($event_info['Event']['release_date_end']);
@@ -471,7 +469,9 @@ class EvaluationSimple extends EvaluationResponseBase
             $releasedComments = array();
             //Get Comment Release: release_status may not be the same for all evaluators
             foreach ($results as $comment) {
-                $releasedComments[] = $this->getComment($comment['EvaluationSimple']['id']);
+                if ($comment['EvaluationSimple']['release_status'] || $event_info['Event']['auto_release']) {
+                    $releasedComments[] = $this->getComment($comment['EvaluationSimple']['id']);
+                }
             }
             if (!empty($releasedComments) && shuffle($releasedComments)) {
                 $studentResult['comments'] = $releasedComments;
@@ -481,6 +481,7 @@ class EvaluationSimple extends EvaluationResponseBase
             $studentResult['penalty'] = null;
             $studentResult['avePenalty'] = null;
         }
+        $commentReleased = !empty($releasedComments) || $event_info['Event']['auto_release'];
         $studentResult['gradeReleased'] = $gradeReleased;
         $studentResult['commentReleased'] = $commentReleased;
         return $studentResult;

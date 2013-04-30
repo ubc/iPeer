@@ -386,8 +386,126 @@ class studentSimple extends SystemBaseTestCase
         $this->assertFalse($tutor->attribute('class'));
     }
     
+    public function testRelease()
+    {
+        $this->session->open($this->url.'events/edit/'.$this->eventId);
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventAutoRelease0')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventEnableDetails1')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Submit"]')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;     
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        
+        // release Ed's grades
+        $this->session->open($this->url.'evaluations/viewEvaluationResults/'.$this->eventId.'/1');
+        $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[5]/tbody/tr[13]/td[2]/button')->click();
+        $w->until(
+            function($session) {
+                $button = $session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[5]/tbody/tr[13]/td[2]/button');
+                return ($button->text() == 'Unrelease');
+            }
+        );
+        // mark peer evaluations as reviewed
+        $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="evalForm"]/input[5]')->click();
+        $w->until(
+            function($session) {
+                $button = $session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="evalForm"]/input[5]');
+                return ($button->attribute('value') == ' Mark Peer Evaluations as Not Reviewed');
+            }
+        );
+        // release one of Ed's comment to Alex
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'release5[]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Save Changes"]')->click();
+        $check = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'release5[]');
+        $this->assertTrue($check->attribute('checked'));
+        // check that the evaluation is marked reviewed
+        $this->session->open($this->url.'evaluations/view/'.$this->eventId);
+        $review = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[2]/td[6]/div');
+        $this->assertEqual($review->text(), 'Reviewed');
+        
+        // check Ed's results
+        $this->waitForLogoutLogin('redshirt0001');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Simple Evaluation')->click();
+        $rating = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td[1]');
+        $this->assertEqual($rating->text(), '97.50 - (9.75)* = 87.75          ( )* : 10% late penalty.');
+        $avg = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td[2]');
+        $this->assertEqual($avg->text(), '90.75');
+        $comment = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]/tbody/tr[1]/th');
+        $this->assertTrue(empty($comment));
+        $comment = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]/tbody/tr[2]/td');
+        $this->assertTrue(empty($comment));
+        
+        // check Alex's results
+        $this->waitForLogoutLogin('redshirt0002');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Simple Evaluation')->click();
+        $rating = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td[1]');
+        $this->assertEqual($rating->text(), 'Not Released');
+        $avg = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td[2]');
+        $this->assertEqual($avg->text(), 'Not Released');
+        $comment = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]/tbody/tr[2]/td');
+        $this->assertEqual($comment->text(), 'A very great group member');
+        $comment = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]/tbody/tr[3]/td');
+        $this->assertTrue(empty($comment));
+                
+        // check Matt's results
+        $this->waitForLogoutLogin('redshirt0003');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Simple Evaluation')->click();
+        $rating = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td[1]');
+        $this->assertEqual($rating->text(), 'Not Released');
+        $avg = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td[2]');
+        $this->assertEqual($avg->text(), 'Not Released');
+        $comment = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]/tbody/tr[1]/th');
+        $this->assertTrue(empty($comment));
+        $comment = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]/tbody/tr[2]/td');
+        $this->assertTrue(empty($comment));
+    }
+    
+    public function testReleaseAllComments()
+    {
+        $this->waitForLogoutLogin('root');
+        $this->session->open($this->url.'evaluations/viewEvaluationResults/'.$this->eventId.'/1');
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Release All"]')->click();
+        
+        $this->waitForLogoutLogin('redshirt0003');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Simple Evaluation')->click();
+        $rating = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td[1]');
+        $this->assertEqual($rating->text(), 'Not Released');
+        $avg = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td[2]');
+        $this->assertEqual($avg->text(), 'Not Released');
+        $comments[] = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]/tbody/tr[2]/td')->text();
+        $comments[] = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]/tbody/tr[3]/td')->text();
+        $comments[] = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]/tbody/tr[4]/td')->text();
+        sort($comments);
+        $this->assertEqual($comments[0], 'A great leader');
+        $this->assertEqual($comments[1], 'Does his work efficiently');
+        $this->assertEqual($comments[2], 'Very responsible.');   
+    }
+    
+    public function testUnreleaseAllComments()
+    {
+        $this->waitForLogoutLogin('root');
+        $this->session->open($this->url.'evaluations/viewEvaluationResults/'.$this->eventId.'/1');
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Unrelease All"]')->click();
+        
+        $this->waitForLogoutLogin('redshirt0003');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Simple Evaluation')->click();
+        $rating = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td[1]');
+        $this->assertEqual($rating->text(), 'Not Released');
+        $avg = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td[2]');
+        $this->assertEqual($avg->text(), 'Not Released');
+        $comment = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]/tbody/tr[1]/th');
+        $this->assertTrue(empty($comment));
+        $comment = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]/tbody/tr[2]/td');
+        $this->assertTrue(empty($comment));
+    }
+    
     public function testDeleteEvent()
     {
+        $this->waitForLogoutLogin('root');
         $this->session->open($this->url.'events/delete/'.$this->eventId);
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $session = $this->session;
