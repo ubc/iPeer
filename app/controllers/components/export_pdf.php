@@ -93,7 +93,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
               }            
            
               $mpdf->writeHTML('<h3>Evaluation Results</h3>', true, false, true, false, '');    
-              $mEvalResults = $this->_writeMixEvalResults($event, $grp_event_id, $grp_id,$params);  
+              $mEvalResults = $this->_writeMixEvalResults($event, $grp_event_id, $grp_id, $params);  
               $mpdf->writeHTML($mEvalResults, true, false, true, false, '');                   
 
               $mpdf->lastPage();
@@ -288,11 +288,10 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                  else if(count($scoreDropdownQuestions) <= 0 && count($lickertQuestions) > 0){ //Opposite of the statement/condition above
                      for($j=0; $j<sizeof($lickertQuestions); $j++){ 
                         $mRTBL = $mRTBL.'<td> N/A </td>';
-                    }
+                     }
                      $mRTBL=$mRTBL.'<td> N/A </td>'; //Additional N/A for total column
-                 }
-                 else{
-                     for($j=0;$j< count($combinedLickertScoreDD);$j++){ //If lickertQuestions and scoreDropdown questions are both greater than 0, that means the number of rows = #lickert + #scoreDropdown
+                 } else {
+                     for($j=0; $j< count($combinedLickertScoreDD); $j++){ //If lickertQuestions and scoreDropdown questions are both greater than 0, that means the number of rows = #lickert + #scoreDropdown
                         $mRTBL=$mRTBL.'<td> N/A </td>';
                      }
                       $mRTBL=$mRTBL.'<td> N/A </td>'; //Additional N/A for total column
@@ -329,7 +328,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                          $total_grade = $total_grade + $grade;  
                          $finalCumulativeTotal = $finalCumulativeTotal + $grade;                  
                          $mRTBL = $mRTBL.'<td>'.$grade.'</td>';
-                    }
+                     }
                  $scoreDropdownCount= $scoreDropdownCount + 1;
                  $mRTBL=$mRTBL.'<td>'.$total_grade.'</td>';
                  $mRTBL=$mRTBL.'</tr>';                    
@@ -351,19 +350,19 @@ Class ExportPdfComponent extends ExportBaseNewComponent
          }
     
          $mRTBL = $mRTBL.'<tr><td><b>Group Average</b></td>';
-         $evaluateeCount = number_format(count($evaluatees),2);
+         $evaluateeCount = number_format(count($evaluatees), 2);
          //Write the Group Average
          if($lickertQuestionsCount > 0 && $scoreDropdownCount <= 0){
              foreach($lickertQuestions as $question){
                 $mRTBL = $mRTBL.'<td>'.$question/$evaluateeCount.'</td>';
-            }
+             }
             $mRTBL = $mRTBL.'<td>'.$finalCumulativeTotal/$evaluateeCount.'</td>';
          }
             
          else if($scoreDropdownCount > 0 && $lickertQuestionsCount <= 0){
              foreach($scoreDropdownQuestions as $question){
                 $mRTBL = $mRTBL.'<td>'.$question/$evaluateeCount.'</td>';
-            }
+             }
             $mRTBL = $mRTBL.'<td>'.$finalCumulativeTotal/$evaluateeCount.'</td>';
          }
          
@@ -372,9 +371,9 @@ Class ExportPdfComponent extends ExportBaseNewComponent
          }
          else { //BOTH are > 0
             foreach($combinedLickertScoreDD as $question){
-                 $mRTBL = $mRTBL.'<td>'.number_format($question/$evaluateeCount,2).'</td>';
+                 $mRTBL = $mRTBL.'<td>'.number_format($question/$evaluateeCount, 2).'</td>';
             }
-             $mRTBL = $mRTBL.'<td>'.number_format($finalCumulativeTotal/$evaluateeCount,2).'</td>';
+             $mRTBL = $mRTBL.'<td>'.number_format($finalCumulativeTotal/$evaluateeCount, 2).'</td>';
          }
          $mRTBL = $mRTBL.'</tr>';              
          $mRTBL = $mRTBL.'</table>';
@@ -436,7 +435,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
               } 
                         
               $spdf->writeHTML('<h3>Evaluation Results</h3>', true, false, true, false, '');
-              $eResultsTbl = $this->_writeRubricEvalResults($event, $grp_event_id, $grp_id,$params); 
+              $eResultsTbl = $this->_writeRubricEvalResults($event, $grp_event_id, $grp_id, $params); 
               $spdf->writeHTML($eResultsTbl, true, false, true, false, '');
 
               $spdf->lastPage();
@@ -715,7 +714,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
            //Write the scores table
            if($params['include']['grade_tables'] == '1'){
                $spdf->writeHTML('<h3>Evaluation Results</h3>', true, false, true, false, '');
-               $stbl = $this->_writeScoresTbl($event, $grp_event_id, $grp_id,$params); 
+               $stbl = $this->_writeScoresTbl($event, $grp_event_id, $grp_id, $params); 
                $spdf->writeHTML($stbl, true, false, true, false, '');
            }
                      
@@ -847,10 +846,9 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             for($i=0; $i<sizeof($evaluatees); $i++){
                 if($penalty_array[$evaluatees[$i]] == '-'){
                     $tbl = $tbl.'<td>'.$totals_array[$evaluatees[$i]].'</td>';
-            }
-            else{
-                $final_mark = (100 - $penalty_array[$evaluatees[$i]]) * $totals_array[$evaluatees[$i]];
-                $tbl = $tbl.'<td>'.$final_mark.'</td>';
+                } else {
+                    $final_mark = (100 - $penalty_array[$evaluatees[$i]]) * $totals_array[$evaluatees[$i]];
+                    $tbl = $tbl.'<td>'.$final_mark.'</td>';
                 }     
             }
          $tbl = $tbl.'</tr>';  

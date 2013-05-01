@@ -237,7 +237,7 @@ class Mixeval extends AppModel
 
         // no submission - if now is after release date end then - gets final deduction
         $penalty = $this->Penalty->getPenaltyFinal($eventId);
-        $noSubmissions = array_intersect($memberIds, Set::extract($submissions, '/EvluationSubmission/submitter_id'));
+        $noSubmissions = array_diff($memberIds, Set::extract($submissions, '/EvaluationSubmission/submitter_id'));
         foreach ($noSubmissions as $userId) {
             $userPenalty[$userId] = $penalty['Penalty']['percent_penalty'];
         }
