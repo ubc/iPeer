@@ -446,20 +446,20 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                 $spdf->writeHTML($rtbl, true, false, true, false, '');
             } 
                         
-              /*$spdf->writeHTML('<h3>Evaluation Results</h3>', true, false, true, false, '');
-              $eResultsTbl = $this->_writeRubricEvalResults($event, $grp_event_id, $grp_id, $params); 
-              $spdf->writeHTML($eResultsTbl, true, false, true, false, '');*/
+            /*$spdf->writeHTML('<h3>Evaluation Results</h3>', true, false, true, false, '');
+            $eResultsTbl = $this->_writeRubricEvalResults($event, $grp_event_id, $grp_id, $params); 
+            $spdf->writeHTML($eResultsTbl, true, false, true, false, '');*/
 
-              $spdf->lastPage();
-              $spdf->addPage();
-          }
-          $spdf->deletePage($spdf->getNumPages());
+            $spdf->lastPage();
+            $spdf->addPage();
+        }
+        $spdf->deletePage($spdf->getNumPages());
 
-          if(ob_get_contents()){
-              ob_clean();
-          }
-          return $spdf -> Output($fileName, 'I');     
-      }    
+        if(ob_get_contents()){
+            ob_clean();
+        }
+        return $spdf -> Output($fileName, 'I');     
+    }    
 
     /**
      * function _writeRubricResultsTbl // MT
@@ -571,7 +571,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         //$rSTBL = $rSTBL.'</tr></table>';
         $rSTBL .= '</table>';
         return $rSTBL;
-     }        
+    }        
     
     /**
      * function _writeRubricEvalResults
@@ -807,7 +807,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         
         $comments_html = '';
         //Write the comments if they exist
-        foreach ($comments as $userId =>$evaluator) {
+        foreach ($comments as $userId => $evaluator) {
             $comments_html .= '<br><b>Evaluator: '.$names[$userId].'</b><br>'; // Evaluator
             foreach ($evaluator as $evaluatee => $com) {
                 $comments_html .= $names[$evaluatee].': '.$com.'<br>';

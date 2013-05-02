@@ -146,7 +146,8 @@ Class ExportCsvComponent extends ExportBaseNewComponent
 
         foreach ($event['Question'] as $key => $question) {
             if (isset($question['mixeval_question_type_id'])) {
-                if ((isset($params['include']['grade_tables']) && $question['mixeval_question_type_id'] == '1')) {
+                if ((isset($params['include']['grade_tables']) && 
+                    in_array($question['mixeval_question_type_id'], array(1, 4)))) {
                     $header[] = "Q".($key+1)." ( /".$question['multiplier'].")";
                 } else if (isset($params['include']['comments']) && 
                     in_array($question['mixeval_question_type_id'], array(2, 3))){
