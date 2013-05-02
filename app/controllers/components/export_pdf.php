@@ -7,6 +7,7 @@
  * @author    Pan Luo <pan.luo@ubc.ca>
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
+ * being refactored - rubrics, mixeval
  */
 Class ExportPdfComponent extends ExportBaseNewComponent
 {
@@ -376,60 +377,78 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      }
       
      /**
-      * _createRubricResultsPdf
+      * _createRubricResultsPdf // MT
       * 
       * @param mixed $params
       * @param mixed $event
       * 
       * @return void 
       */
-      function _createRubricResultsPdf($params,$event){
-          App::import('Vendor', 'xtcpdf');
-          $spdf = new XTCPDF();
-          //Construct the Filename and extension
-          $fileName = isset($params['file_name']) && !empty($params['file_name']) ? $params['file_name'] : date('m.d.y');
-          $fileName = $fileName . '.pdf';
-          $spdf -> AddPage();
+    function _createRubricResultsPdf($params,$event)
+    {
+        App::import('Vendor', 'xtcpdf');
+        $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
+        $this->User = ClassRegistry::init('User');
+        $this->EvaluationRubric = ClassRegistry::init('EvaluationRubric');
+        $spdf = new XTCPDF();
+        //Construct the Filename and extension
+        $fileName = isset($params['file_name']) && !empty($params['file_name']) ? $params['file_name'] : date('m.d.y');
+        $fileName = $fileName . '.pdf';
+        $spdf->AddPage();
           
-          //Write header text
-          $headertext = '<h2>Evaluation Event Detail for '. $event['Course']['course'].' - '.$event['Event']['title'].'</h2>';
-          $spdf->writeHTML($headertext, true, false, true, false, '');
+        $courseName = '';
+        $eventName = '';
+        //Write header text
+        if ($params['include']['course'] == '1') {
+            $courseName = ' : '.$event['Course']['course'];
+        }
+        if ($params['include']['eval_event_names'] == '1') {
+            $eventName = ' - '.$event['Event']['title'];
+        }
+        $headertext = '<h2>Evaluation Event Detail'.$courseName.$eventName.'</h2>';
+        $spdf->writeHTML($headertext, true, false, true, false, '');
          
-          $this->Group = ClassRegistry::init('Group');
-          foreach($event['GroupEvent'] as $groupevent){
-              //Get the groupevent id and the group id for each group in the evaluation
-              $grp_event_id = $groupevent['id'];
-              $grp_id = $groupevent['group_id'];
+        foreach($event['GroupEvent'] as $groupEvent) {
+            //Get the groupevent id and the group id for each group in the evaluation
+            $grp_event_id = $groupEvent['id'];
+            $grp_id = $groupEvent['group_id'];
             
-              //Call writeEvalDetails
-              $evalDetails = $this->_writeEvalDetails($event, $grp_id, $params);      
-              $spdf->writeHTML($evalDetails, true, false, true, false, '');
+            //Call writeEvalDetails
+            $evalDetails = $this->_writeEvalDetails($event, $grp_id, $params);      
+            $spdf->writeHTML($evalDetails, true, false, true, false, '');
             
-              //Write Summary 
-              $spdf->writeHTML('<br>', true, false, true, false, '');
-              $spdf->writeHTML('<h3>Summary</h3>', true, false, true, false, '');
-            
-              //Get Membersid's and Membernames who have not submitted their evaluations
-              $inComplete = $this->_getIncompleteMembers($event['Event']['id'], $grp_id);
-              $inComplete = $this->_getMemberNames($inComplete);
-              $spdf->writeHTML('<p><b>Members who have not submitted their evaluations</b></p>', true, false, true, false, '');
-              foreach ($inComplete as $name){
-                  $spdf->writeHTML($name, true, false, true, false, '');
-              }
-              $spdf->writeHTML('<br>', true, false, true, false, '');
-            
-              //Get if self evaluation is 'yes' or 'no'
-              $event['Event']['self_eval'] == '0'? $selfeval = 'No' : $selfeval = 'Yes';
+            //Get incomplete/unenrolled members
+            $submitted = $this->EvaluationRubric->findAllByGrpEventId($grp_event_id);
+            $members = Set::extract('/GroupsMembers/user_id', $this->GroupsMembers->findAllByGroupId($grp_id));
+            $evaluators = Set::extract('/EvaluationRubric/evaluator', $submitted);
+            $evaluatees = Set::extract('/EvaluationRubric/evaluatee', $submitted);
+            $inComplete = $this->User->getFullNames(array_diff($members, $evaluators));
+            $unEnrolled = $this->User->getFullNames(array_diff(array_unique(array_merge($evaluators, $evaluatees)), $members));
+
+            //Write Summary 
+            $title = (!empty($inComplete) || !empty($unEnrolled)) ? __('Summary', true) : '';
+            $spdf->writeHTML('<br><h3>'.$title.'</h3>', true, false, true, false, '');
+            $title = (!empty($inComplete)) ? __('Members who have not submitted their evaluations', true) : '';
+            $spdf->writeHTML('<p><b>'.$title.'</b></p>', true, false, true, false, '');
+            foreach ($inComplete as $name){
+                $spdf->writeHTML($name, true, false, true, false, '');
+            }
+            $title = (!empty($unEnrolled)) ? __('Left the group, but had submitted or were evaluated', true) : '';
+            $spdf->writeHTML('<p><b>'.$title.'</b></p>', true, false, true, false, '');
+            foreach ($unEnrolled as $name){
+                $spdf->writeHTML($name, true, false, true, false, '');
+            }
+            $spdf->writeHTML('<br>', true, false, true, false, '');
           
-              //Write the Rubric Scores Table And The Evaluation Results
-              if($params['include']['grade_tables'] == '1'){
-                 $rtbl = $this->_writeRubricResultsTbl($event, $grp_event_id, $grp_id); 
-                 $spdf->writeHTML($rtbl, true, false, true, false, '');
-              } 
+            //Write the Rubric Scores Table And The Evaluation Results
+            if($params['include']['grade_tables'] == '1'){
+                $rtbl = $this->_writeRubricResultsTbl($event, $grp_event_id, $grp_id); 
+                $spdf->writeHTML($rtbl, true, false, true, false, '');
+            } 
                         
-              $spdf->writeHTML('<h3>Evaluation Results</h3>', true, false, true, false, '');
+              /*$spdf->writeHTML('<h3>Evaluation Results</h3>', true, false, true, false, '');
               $eResultsTbl = $this->_writeRubricEvalResults($event, $grp_event_id, $grp_id, $params); 
-              $spdf->writeHTML($eResultsTbl, true, false, true, false, '');
+              $spdf->writeHTML($eResultsTbl, true, false, true, false, '');*/
 
               $spdf->lastPage();
               $spdf->addPage();
@@ -443,7 +462,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
       }    
 
     /**
-     * function _writeRubricResultsTbl
+     * function _writeRubricResultsTbl // MT
      * 
      * @param mixed $event
      * @param mixed $grp_event_id
@@ -452,35 +471,67 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      * @access public
      * @return void
      */
-     function _writeRubricResultsTbl($event,$grp_event_id,$grp_id){
-         $this->EvaluationRubric= ClassRegistry::init('EvaluationRubric');
-         $this->RubricsCriteria= ClassRegistry::init('RubricsCriteria');
-         $this->EvaluationRubricDetail= ClassRegistry::init('EvaluationRubricDetail');
-         $rubric = $this->EvaluationRubric->
-         find('first', array('conditions' => array('EvaluationRubric.grp_event_id' => $grp_event_id, 'EvaluationRubric.event_id' => $event['Event']['id'])));
-         $rubric_id = $rubric['EvaluationRubric']['rubric_id'];
-         $rubric_criteria_array = $this->RubricsCriteria->getCriteria($rubric_id);
+    function _writeRubricResultsTbl($event,$grp_event_id,$grp_id)
+    {
+        $this->EvaluationRubric = ClassRegistry::init('EvaluationRubric');
+        $this->RubricsCriteria = ClassRegistry::init('RubricsCriteria');
+        $this->EvaluationRubricDetail = ClassRegistry::init('EvaluationRubricDetail');
+        $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
+        $this->Rubric = ClassRegistry::init('Rubric');
+        $this->User = ClassRegistry::init('User');
+         //$rubric = $this->EvaluationRubric->
+         //find('first', array('conditions' => array('EvaluationRubric.grp_event_id' => $grp_event_id, 'EvaluationRubric.event_id' => $event['Event']['id'])));
+        $rubric_id = $event['Event']['template_id'];
+        $rubric_criteria_array = $this->RubricsCriteria->getCriteria($rubric_id);
+        //debug($rubric_criteria_array);
          
-         //Write the Table Header
-         $rSTBL = '<table border="1" align="center"><tr><th><b>Evaluatee</b></th>';
-         $total = 0;
-         foreach($rubric_criteria_array as $rubric_criteria){
-             //Get the Rubric Criteria number and the multiplier and write it to the table header
-             $criteria_num = $rubric_criteria['RubricsCriteria']['criteria_num'];
-             $multiplier = $rubric_criteria['RubricsCriteria']['multiplier'];
-             $total = $total + $multiplier;
-             $rSTBL = $rSTBL.'<th>'.$criteria_num.' (/'.number_format($multiplier, 1).' )</th>';
-         }
-         $rSTBL = $rSTBL.'<th>Total (/'.number_format($total, 2).')</th>';
-         $rSTBL = $rSTBL.'</tr>';
-         
-         $evaluators = $this->_getMembers($grp_event_id);
-         $evaluatees = $this->_filterTutors($grp_id);
-         $evaluatee_names = $this->_getMemberNames($evaluatees); 
-         $evaluator_names = $this->_getMemberNames($evaluators);
+        //Write the Table Header
+        $rSTBL = '<table border="1" align="center"><tr><th><b>Evaluatee</b></th>';
+        $total = array_sum(Set::extract('/RubricsCriteria/multiplier', $rubric_criteria_array));
+        //debug(Set::extract('/RubricsCriteria/multiplier/', $rubric_criteria_array));
+        foreach($rubric_criteria_array as $rubric_criteria) {
+            //Get the Rubric Criteria number and the multiplier and write it to the table header
+            $criteria_num = $rubric_criteria['RubricsCriteria']['criteria_num'];
+            $multiplier = $rubric_criteria['RubricsCriteria']['multiplier'];
+            $rSTBL = $rSTBL.'<th>'.$criteria_num.' (/'.$multiplier.' )</th>';
+        }
+        $rSTBL .= '<th>Total (/'.$total.')</th></tr>';
 
+        $groupMembers = $this->GroupsMembers->find('list',
+            array('conditions' => array('group_id' => $grp_id),'fields' => array('user_id', 'user_id')));
+        $eval = $this->EvaluationRubric->findAllByGrpEventId($grp_event_id);
+        $evaluators = Set::extract('/EvaluationRubric/evaluator', $eval);
+        $evaluatees = Set::extract('/EvaluationRubric/evaluatee', $eval);
+        $dropped = array_diff(array_unique(array_merge($evaluators, $evaluatees)), $groupMembers);
+        $evaluators = array_merge($groupMembers, $dropped);
+        foreach ($evaluators as $userid) {
+            $userinfo = $this->User->find('first',
+                array(
+                    'conditions' => array('User.id' => $userid),
+                    'contain' => array('Role')
+                )
+            );
+            $temp[$userid] = $userinfo;
+        }
+        $penalty = $this->Rubric->formatPenaltyArray($temp, $event['Event']['id'], $grp_id);
+        $temp = Set::extract('/Role[id='.$this->User->USER_TYPE_TA.']/RolesUser/user_id', $temp);
+        $evaluatees = array_diff($evaluators, $temp);
+        $evaluatee_names = $this->User->getFullNames($evaluatees); 
+        $evaluator_names = $this->User->getFullNames($evaluators);
+
+        $scores = Set::combine($eval, '{n}.EvaluationRubric.evaluator', '{n}.EvaluationRubricDetail', '{n}.EvaluationRubric.evaluatee');        
+        debug($scores);
+        //debug($rubric_criteria_array);
+        
+        foreach ($scores as $userId => $evaluatee) {
+            $grades[$userId] = array_combine(Set::extract('/RubricsCriteria/criteria_num', $rubric_criteria_array), array_fill(0, count($rubric_criteria_array), 0));
+            foreach ($evaluatee as $key => $evaluator) {
+                
+            }
+        }
+        // rubric score summary table
          //Write Scores For Each Evaluatee
-         $groupAvgArray = array();
+         /*$groupAvgArray = array();
          $evaluatorCount = 0;
          for($i=0; $i<sizeof($evaluatees); $i++){
              //Get the Score Given to the Evaluatee (By Criteria)
@@ -516,8 +567,9 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             }
             $rSTBL = $rSTBL.'<td>'.$grpAvg.'</td>';
         }
-        $rSTBL = $rSTBL.'<td>'.$groupAvgArray['total_score'].'</td>';
-        $rSTBL = $rSTBL.'</tr></table>';
+        $rSTBL = $rSTBL.'<td>'.$groupAvgArray['total_score'].'</td>';*/
+        //$rSTBL = $rSTBL.'</tr></table>';
+        $rSTBL .= '</table>';
         return $rSTBL;
      }        
     
@@ -687,10 +739,6 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             $evalDetails = $this->_writeEvalDetails($event, $grp_id, $params);      
             $spdf->writeHTML($evalDetails, true, false, true, false, '');
             
-            //Write Summary 
-            $spdf->writeHTML('<br>', true, false, true, false, '');
-            $spdf->writeHTML('<h3>Summary</h3>', true, false, true, false, '');
-            
             //Get incomplete/unenrolled members
             $submitted = $this->EvaluationSimple->findAllByGrpEventId($grp_event_id);
             $members = Set::extract('/GroupsMembers/user_id', $this->GroupsMembers->findAllByGroupId($grp_id));
@@ -698,19 +746,21 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             $evaluatees = Set::extract('/EvaluationSimple/evaluatee', $submitted);
             $inComplete = $this->User->getFullNames(array_diff($members, $evaluators));
             $unEnrolled = $this->User->getFullNames(array_diff(array_unique(array_merge($evaluators, $evaluatees)), $members));
-            $spdf->writeHTML('<p><b>Members who have not submitted their evaluations</b></p>', true, false, true, false, '');
+            
+            //Write Summary 
+            $title = (!empty($inComplete) || !empty($unEnrolled)) ? __('Summary', true) : '';
+            $spdf->writeHTML('<br><h3>'.$title.'</h3>', true, false, true, false, '');
+            $title = (!empty($inComplete)) ? __('Members who have not submitted their evaluations', true) : '';
+            $spdf->writeHTML('<p><b>'.$title.'</b></p>', true, false, true, false, '');
             foreach ($inComplete as $name){
                 $spdf->writeHTML($name, true, false, true, false, '');
             }
-            $spdf->writeHTML('<br>', true, false, true, false, '');
-            $spdf->writeHTML('<p><b>Left the group, but had submitted or were evaluated</b></p>', true, false, true, false, '');
+            $title = (!empty($unEnrolled)) ? __('Left the group, but had submitted or were evaluated', true) : '';
+            $spdf->writeHTML('<p><b>'.$title.'</b></p>', true, false, true, false, '');
             foreach ($unEnrolled as $name){
                 $spdf->writeHTML($name, true, false, true, false, '');
             }
             $spdf->writeHTML('<br>', true, false, true, false, '');
-            
-            //Get if self evaluation is 'yes' or 'no'
-            $selfEval = $event['Event']['self_eval'] == '0' ? 'No' : 'Yes';
 
             //Write the scores table
             if ($params['include']['grade_tables'] == '1') {

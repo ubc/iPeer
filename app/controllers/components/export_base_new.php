@@ -200,20 +200,28 @@ class ExportBaseNewComponent extends Object
             }
 
             if ($this->detailModel[$event['Event']['event_template_type_id']] && array_key_exists($this->detailModel[$event['Event']['event_template_type_id']], $response)) {
-                foreach ($response[$this->detailModel[$event['Event']['event_template_type_id']]] as $key => $result) {
-                    if (isset($event['Question'][$key]['mixeval_question_type_id'])) {
-                        if (isset($params['include']['grade_tables']) && $event['Question'][$key]['mixeval_question_type_id'] == '1') {
+                if (in_array($event['Event']['event_template_type_id'], array(1, 2))) {
+                    foreach ($response[$this->detailModel[$event['Event']['event_template_type_id']]] as $result) {
                             array_push($row, $result['grade']);
-                        } elseif (isset($params['include']['comments']) && in_array($event['Question'][$key]['mixeval_question_type_id'], array(2, 3))) {
-                            array_push($row, $result['question_comment']);
+                    }
+                } else {
+                    // mixed evaluation
+                    $results = $response[$this->detailModel[$event['Event']['event_template_type_id']]];
+                    $results = Set::combine($results, '{n}.question_number', '{n}');
+                    foreach ($event['Question'] as $key => $question) {
+                        if (!isset($results[$question['question_num']])) {
+                            array_push($row, '');
+                        } elseif (isset($params['include']['grade_tables']) && in_array($question['mixeval_question_type_id'], array(1, 4))) {
+                            array_push($row, $results[$question['question_num']]['grade']);
+                        } elseif (isset($params['include']['comments']) && in_array($question['mixeval_question_type_id'], array(2, 3))) {
+                            array_push($row, $results[$question['question_num']]['question_comment']);
                         } else {
                             array_push($row, 'N/A');
                         }
-                    } else {
-                        array_push($row, $result['grade']);
                     }
                 }
             }
+            
             array_push($row, $response[$this->responseModelName]['score']);
 
             $penalty = $this->Penalty->calculate(

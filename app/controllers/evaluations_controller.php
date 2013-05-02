@@ -247,7 +247,8 @@ class EvaluationsController extends AppController
         }
 
         $this->set('type', $type);
-        $fileTypes = array('csv' => 'csv', 'pdf' => 'pdf');
+        //$fileTypes = array('csv' => 'csv', 'pdf' => 'pdf');
+        $fileTypes = array('csv' => 'csv');
         $this->set('fileTypes', $fileTypes);
 
         if ('course' == $type) {
