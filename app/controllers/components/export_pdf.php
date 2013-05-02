@@ -1040,7 +1040,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      *
      * @return array() consisting of members who have left
      */
-    function _getUnenrolledMembers($eventId, $groupId)
+    /*function _getUnenrolledMembers($eventId, $groupId)
     {
         $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
         $this->Group = ClassRegistry::init('Group');
@@ -1049,7 +1049,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         //$memberslist = Set::extract('/Member/id', $members);
         //$submissions = $this->EvaluationSubmission->getEvalSubmissionsByEventId($eventId);
 
-    }   
+    }   */
     
     /**
      * _getMemberNames 
