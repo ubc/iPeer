@@ -98,10 +98,6 @@ class ExportBaseNewComponent extends Object
         $responsesByEvaluatee = Set::combine($results, '{n}.'.$this->responseModelName.'.evaluator', '{n}', '{n}.'.$this->responseModelName.'.evaluatee');
         $group['Member'] = array_merge($group['Member'], $dropped);
         foreach ($group['Member'] as $member) {
-            // skip the non student member, for now we assume all the evaluatees are students
-            if ($member['Role']['name'] != 'student') {
-                continue;
-            }
             $grid = array_merge($grid, $this->buildScoreTableByEvaluatee($params, $group, $member, $event, $responsesByEvaluatee));
         }
 
@@ -126,7 +122,9 @@ class ExportBaseNewComponent extends Object
             return $grid;
         }
         foreach ($event['GroupEvent'] as $ge) {
-            $grid = array_merge($grid, $this->buildEvaluationScoreTableByGroup($params, $ge, $event, $results[$ge['id']]));
+            if (isset($results[$ge['id']])) {
+                $grid = array_merge($grid, $this->buildEvaluationScoreTableByGroup($params, $ge, $event, $results[$ge['id']]));
+            }
         }
         return $grid;
     }

@@ -1015,7 +1015,6 @@ class User extends AppModel
     function getEventGroupMembersNoTutors($groupId, $selfEval, $userId)
     {
         $conditions['Group.id'] = $groupId;
-        // TODO needs to be changed to use constant instead for role id
         $conditions['Role.id'] = $this->USER_TYPE_STUDENT;
         if (!$selfEval) {
             $conditions['User.id !='] = $userId;
@@ -1203,7 +1202,7 @@ class User extends AppModel
         $groupMembers = Set::extract('/id', $group['Member']);
         $dropped = array_diff(array_unique(array_merge($evaluators, $evaluatees)), $groupMembers);
         $dropped = $this->find('all', array(
-            'conditions' => array('User.id' => $dropped, 'Role.name' => 'student'),
+            'conditions' => array('User.id' => $dropped, 'Role.id' => array($this->USER_TYPE_STUDENT, $this->USER_TYPE_TA)),
             'contain' => array('Role', 'Group'),
         ));
         foreach ($dropped as $key => $drop){

@@ -5,7 +5,7 @@ class XTCPDF  extends TCPDF
 
     var $xheadertext  = '';
     var $xheadercolor = array(0,0,200);
-    var $xfootertext  = 'IPeer, UBC';
+    var $xfootertext  = 'iPeer';
     var $xfooterfont  = PDF_FONT_NAME_MAIN ;
     var $xfooterfontsize = 8 ;
 
