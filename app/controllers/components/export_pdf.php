@@ -513,22 +513,22 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             );
             $temp[$userid] = $userinfo;
         }
-        $penalty = $this->Rubric->formatPenaltyArray($temp, $event['Event']['id'], $grp_id);
+        //$penalty = $this->Rubric->formatPenaltyArray($temp, $event['Event']['id'], $grp_id);
         $temp = Set::extract('/Role[id='.$this->User->USER_TYPE_TA.']/RolesUser/user_id', $temp);
         $evaluatees = array_diff($evaluators, $temp);
-        $evaluatee_names = $this->User->getFullNames($evaluatees); 
-        $evaluator_names = $this->User->getFullNames($evaluators);
+        //$evaluatee_names = $this->User->getFullNames($evaluatees); 
+        //$evaluator_names = $this->User->getFullNames($evaluators);
 
         $scores = Set::combine($eval, '{n}.EvaluationRubric.evaluator', '{n}.EvaluationRubricDetail', '{n}.EvaluationRubric.evaluatee');        
         debug($scores);
         //debug($rubric_criteria_array);
         
-        foreach ($scores as $userId => $evaluatee) {
+        /*foreach ($scores as $userId => $evaluatee) {
             $grades[$userId] = array_combine(Set::extract('/RubricsCriteria/criteria_num', $rubric_criteria_array), array_fill(0, count($rubric_criteria_array), 0));
             foreach ($evaluatee as $key => $evaluator) {
                 
             }
-        }
+        }*/
         // rubric score summary table
          //Write Scores For Each Evaluatee
          /*$groupAvgArray = array();
@@ -671,7 +671,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                   foreach ($resultsArrayByEvaluatee as $result) {
                     $eval_rubric_id = $result['EvaluationRubric']['id'];
                     $rSTBL = $rSTBL.'<tr><td>'.$result['EvaluationRubric']['updater'].'</td>';
-                    foreach($criteria_comments as $criteria_id => $criteria_comment){
+                    foreach(array_keys($criteria_comments) as $criteria_id){
                         $EvalRubricDtl = $this->EvaluationRubricDetail->getByEvalRubricIdCritera($eval_rubric_id, $criteria_id);
                         $grade = $comment = '--';
                         if($params['include']['comments'] == 1) {
@@ -962,7 +962,6 @@ Class ExportPdfComponent extends ExportBaseNewComponent
     {
         $this->Group = ClassRegistry::init('Group');
         $groupName = '-';
-        $evalEventType = '-';
         $eventTemplateType = '-';
         $group = $this->Group->findById($grp_id);
         //Write Group name
@@ -1047,8 +1046,8 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         $this->Group = ClassRegistry::init('Group');
 
         $members = $this->Group->getMembersByGroupId($groupId, 'all');
-        $memberslist = Set::extract('/Member/id', $members);
-        $submissions = $this->EvaluationSubmission->getEvalSubmissionsByEventId($eventId);
+        //$memberslist = Set::extract('/Member/id', $members);
+        //$submissions = $this->EvaluationSubmission->getEvalSubmissionsByEventId($eventId);
 
     }   
     

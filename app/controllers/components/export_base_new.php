@@ -208,7 +208,7 @@ class ExportBaseNewComponent extends Object
                     // mixed evaluation
                     $results = $response[$this->detailModel[$event['Event']['event_template_type_id']]];
                     $results = Set::combine($results, '{n}.question_number', '{n}');
-                    foreach ($event['Question'] as $key => $question) {
+                    foreach ($event['Question'] as $question) {
                         if (!isset($results[$question['question_num']])) {
                             array_push($row, '');
                         } elseif (isset($params['include']['grade_tables']) && in_array($question['mixeval_question_type_id'], array(1, 4))) {
