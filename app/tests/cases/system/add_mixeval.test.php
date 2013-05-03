@@ -56,6 +56,9 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         // paragraph question
         $this->addParagraph();
         
+        // score dropdown question
+        $this->addScoreDropdown();
+        
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[type="submit"]')->click();
         $session = $this->session;
         // wait for creation of template to finish
@@ -171,6 +174,18 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         $instructions->sendKeys('Please give constructive comments.');
     }
     
+    public function addScoreDropdown()
+    {
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionType"] option[value="4"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ();"]')->click();
+
+        $question = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion3Title');
+        $question->sendKeys('Distributed Marks');
+        
+        $instructions = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion3Instructions');
+        $instructions->sendKeys('Distribute the marks among your members.');
+    }
+    
     public function deleteTemplate()
     {
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Evaluation')->click();
@@ -188,13 +203,16 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         $zero = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, "html/body/div[1]/div[3]/dl/dd[4]")->text();
         $this->assertEqual($zero, 'On');
         $req = count($this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'span[class="required orangered floatright"]'));
-        $this->assertEqual($req, 2);
+        $this->assertEqual($req, 3);
         $total = $this->session->element(PHPWebDriver_WebDriverBy::CLASS_NAME, 'marks')->text();
-        $this->assertEqual($total, 'Total Marks: 8');
+        $this->assertEqual($total, 'Total Marks: 18');
     }
     
     public function editTemplate()
     {
+        // delete the score dropdown question
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="removeQ(3); return false;"]')->click();
+    
         // moving questions
         // move up the first question
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="upQ(0); return false;"]')->click();
@@ -240,13 +258,13 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         // adding question
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionType"] option[value="3"]')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ();"]')->click();
-        $quesNum = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'questionIndex3')->text();
+        $quesNum = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'questionIndex4')->text();
         $this->assertEqual($quesNum, '3.');
 
         // delete all questions
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="removeQ(1); return false;"]')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="removeQ(0); return false;"]')->click();
-        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="removeQ(3); return false;"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="removeQ(4); return false;"]')->click();
         $w->until(
             function($session) {
                 $ques = $session->elements(PHPWebDriver_WebDriverBy::CLASS_NAME, 'MixevalMakeQuestion');
@@ -257,7 +275,7 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         // adding question
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionType"] option[value="2"]')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ();"]')->click();
-        $quesNum = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'questionIndex4')->text();
+        $quesNum = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'questionIndex5')->text();
         $this->assertEqual($quesNum, '1.');
         
         // create template with one question

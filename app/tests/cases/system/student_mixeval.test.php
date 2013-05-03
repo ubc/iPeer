@@ -740,6 +740,122 @@ class studentMixeval extends SystemBaseTestCase
         $this->assignToGroup();
     }
     
+    public function testScoreDropdown()
+    {
+        // TODO - put scoredropdown question into sample mixed eval template and
+        // adjust tests accordingly
+        
+        // add template
+        $this->session->open($this->url.'mixevals/add');
+        $name = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalName');
+        $name->sendKeys('Final Project Evaluation');
+        
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionType"] option[value="4"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ();"]')->click();
+
+        $question = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion0Title');
+        $question->sendKeys('Distributed Marks');
+        
+        $instructions = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion0Instructions');
+        $instructions->sendKeys('Distribute the marks among your members.');
+
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[type="submit"]')->click();
+        $session = $this->session;
+        // wait for creation of template to finish
+        $w = new PHPWebDriver_WebDriverWait($session);
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Evaluation')->click();
+        $templateId = end(explode('/', $this->session->url()));
+
+        // add event
+        $this->session->open($this->url.'events/add/1');
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventTitle')->sendKeys('Mixed Evaluation');
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventDescription')->sendKeys('description for the evaluation');
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEventTemplateTypeId"] option[value="4"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventMixeval"] option[value="'.$templateId.'"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventAutoRelease1')->click();
+
+        //set due date and release date end to next month so that the event is opened.
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateBegin')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '4')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventResultReleaseDateBegin')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '5')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventResultReleaseDateEnd')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '28')->click();
+        
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="GroupGroup"] option[value="1"]')->click();
+
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        
+        // do the evaluation
+        $this->waitForLogoutLogin('tutor1');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Mixed Evaluation')->click();
+        // check that the select field has options 0 to 30
+        $marks = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EvaluationMixevalDropdown"] option');
+        $this->assertEqual(count($marks), 93);
+        $selects = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select');
+        $this->assertEqual(count($selects), 3);
+        
+        // do the evaluation
+        $this->waitForLogoutLogin('redshirt0001');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Mixed Evaluation')->click();
+        $marks = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EvaluationMixevalDropdown"] option');
+        $this->assertEqual(count($marks), 42);
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'submit')->click();
+        $alert = $this->session->alert_text();
+        $this->assertEqual($alert, 'Please make sure that the total of the grades in the drop-downs equals 20 and then press "Submit" again.');
+        $this->session->accept_alert();
+        // given eleven marks each
+        $eleven = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EvaluationMixevalDropdown"] option[value="11"]');
+        $eleven[0]->click();
+        $eleven[1]->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'submit')->click();
+        $alert = $this->session->alert_text();
+        $this->assertEqual($alert, 'Please make sure that the total of the grades in the drop-downs equals 20 and then press "Submit" again.');
+        $this->session->accept_alert();
+        // give ten marks each
+        $ten = $this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EvaluationMixevalDropdown"] option[value="10"]');
+        $ten[0]->click();
+        $ten[1]->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'submit')->click();
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        
+        // delete the event and template
+        $this->waitForLogoutLogin('root');
+        $this->session->open($this->url.'events/index/1');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Mixed Evaluation')->click();
+        $this->session->open(str_replace('view', 'delete', $this->session->url()));
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        $this->session->open($this->url.'mixevals/delete/'.$templateId);
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+    }
+    
     public function secondStudent()
     {
         $this->waitForLogoutLogin('redshirt0002');

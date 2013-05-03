@@ -126,7 +126,6 @@ class addEventTestCase extends SystemBaseTestCase
         $this->assertEqual($boolean[1]->attribute('id'), 'EventComReq0');
         $this->assertEqual($boolean[2]->attribute('id'), 'EventAutoRelease0');
         $this->assertEqual($boolean[3]->attribute('id'), 'EventEnableDetails1');
-        $this->assertEqual($boolean[4]->attribute('id'), 'EventEmailSchedule0');
 
         // check dates toggle
         $date = $this->session->elements(PHPWebDriver_WebDriverBy::ID, 'EventDueDate');
