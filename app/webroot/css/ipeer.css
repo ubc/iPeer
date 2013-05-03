@@ -964,6 +964,12 @@ i {
     margin-bottom: 0.5em;
 }
 
+#Events form div.email-help-text {
+    margin: 0.5em 0 1em 24em;
+    font-size: 0.8em;
+    width: 35em;
+    color: gray;
+}
 
 /* Survey Results */
 

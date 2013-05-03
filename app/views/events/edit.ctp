@@ -97,13 +97,16 @@ echo $this->Form->input('result_release_date_end',
 echo $this->Form->input(
     'email_schedule',
     array(
-        'legend' => 'Email Reminder Frequency ',
+        'label' => 'Email Reminder Frequency ',
         'options' => $emailSchedules,
         'default' => "$email_schedule",
         'div' => array('id' => 'emailSchedule')
     )
 ); 
-
+?>
+<div class='email-help-text'><?php __('Select the number of days in between each email reminder for submitting
+    evaluations. The first email is sent when the event is released.') ?></div>
+<?php
 echo $this->Form->input('Group',
     array('div' => array('id' => 'GroupsDiv'), 'label' => 'Group(s)')); ?>
 <div class='selectAll'>
