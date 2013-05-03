@@ -183,7 +183,7 @@ class addEventTestCase extends SystemBaseTestCase
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '28')->click();
         
         // set email reminder frequency to 2 days
-        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventEmailSchedule2')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[value="2"]')->click();
         // select all groups
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[id="selectAll"]')->click();
         

@@ -67,10 +67,7 @@ echo $this->Form->input(
     'email_schedule',
     array(
         'legend' => 'Email Reminder Frequency ',
-        'type' => 'radio',
-        'options' => array('0'=> 'Disable', '1' => '1 Day', '2'=>'2 Days','3'=>'3 Days','4'=>'4 Days','5'=>'5 Days','6'=>'6 Days'
-         ,'7'=>'7 Days'),
-        'default' => '0',
+        'options' => $emailSchedules,
         'div' => array('id' => 'emailSchedule')
     )
 ); 

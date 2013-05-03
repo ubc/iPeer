@@ -334,6 +334,8 @@ class EventsController extends AppController
             'rubrics',
             $this->Rubric->getBelongingOrPublic($this->Auth->user('id'))
         );
+        $emailReminders = array('0'=> 'Disable', '1' => '1 Day', '2'=>'2 Days','3'=>'3 Days','4'=>'4 Days','5'=>'5 Days','6'=>'6 Days','7'=>'7 Days');
+        $this->set('emailSchedules', $emailReminders);
         $this->set('course_id', $courseId);
 
         // Try to save the data
@@ -561,6 +563,8 @@ class EventsController extends AppController
         } else if ($typeId == 4) {
             $this->set('mixevalSelected', $event['Event']['template_id']);
         }
+        $emailReminders = array('0'=> 'Disable', '1' => '1 Day', '2'=>'2 Days','3'=>'3 Days','4'=>'4 Days','5'=>'5 Days','6'=>'6 Days','7'=>'7 Days');
+        $this->set('emailSchedules', $emailReminders);
 
         $this->set('event', $event);
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $event['Course']))->push(array('event' => $event['Event']))->push(__('Edit', true)));
