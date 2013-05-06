@@ -83,6 +83,43 @@ class massMoveTestCase extends SystemBaseTestCase
         $this->assertEqual($submitted, 2);
     }
     
+
+    public function testMassMoveError()
+    {
+        $this->session->open($this->url.'courses/import');
+        $file = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'CourseFile');
+        $file->sendKeys(dirname(__FILE__).'/files/docx.docx');
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'CourseIdentifiersUsername')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 
+            'select[id="CourseSourceCourses"] option[value="1"]')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="CourseSourceSurveys"] option')) - 1;  
+            }
+        );
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 
+            'select[id="CourseSourceSurveys"] option[value="4"]')->click();
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="CourseDestCourses"] option')) - 1;  
+            }
+        );
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR,
+            'select[id="CourseDestCourses"] option[value="'.$this->courseId.'"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'CourseAction0')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'submit')->click();
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::ID, "flashMessage"));
+            }
+        );
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'flashMessage')->text();
+        $this->assertEqual($msg, "extension is not allowed.\nFileUpload::processFile() - Unable to save temp file to file system.");
+    }
+    
     public function testImportByStudentNo()
     {
         $cId = $this->addCourse('TEST 201 101');

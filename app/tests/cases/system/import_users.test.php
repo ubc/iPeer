@@ -23,6 +23,23 @@ class ImportUsersTestCase extends SystemBaseTestCase
         $this->session->close();
     }
     
+    public function testImportUsersError()
+    {
+        $this->session->open($this->url.'users/import/2');
+        $file = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'UserFile');
+        $file->sendKeys(dirname(__FILE__).'/files/docx.docx');
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::ID, "flashMessage"));
+            }
+        );
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'flashMessage')->text();
+        $this->assertEqual($msg, "extension is not allowed.\nFileUpload::processFile() - Unable to save temp file to file system.");
+    }
+    
     public function testImportUsers()
     {
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Courses')->click();

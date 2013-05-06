@@ -388,7 +388,6 @@ class GroupsController extends AppController
                 $this->FileUpload->removeFile($uploadFile);
             } else {
                 $this->Session->setFlash($this->FileUpload->showErrors());
-                $this->redirect('import/'.$courseId);
                 return;
             }
         }

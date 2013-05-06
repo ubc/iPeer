@@ -40,6 +40,17 @@ class addSimpleTestCase extends SystemBaseTestCase
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Save"]')->click();
         $dupError = $this->session->element(PHPWebDriver_WebDriverBy::CLASS_NAME, 'error-message')->text();
         $this->assertEqual($dupError, 'Duplicate name found. Please change the name.');
+        
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'SimpleEvaluationPointPerMember')->sendKeys('-100');
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Save"]')->click();
+        $errors = $this->session->elements(PHPWebDriver_WebDriverBy::CLASS_NAME, 'error-message');
+        $this->assertEqual($errors[1]->text(), 'Please enter a positive integer.');
+        
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'SimpleEvaluationPointPerMember')->clear();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'SimpleEvaluationPointPerMember')->sendKeys('0');
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Save"]')->click();
+        $errors = $this->session->elements(PHPWebDriver_WebDriverBy::CLASS_NAME, 'error-message');
+        $this->assertEqual($errors[1]->text(), 'Please enter a positive integer.');
     }
     
     public function testAdd()

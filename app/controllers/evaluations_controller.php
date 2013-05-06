@@ -476,6 +476,13 @@ class EvaluationsController extends AppController
             $groupId = $this->params['form']['group_id'];
             $courseId = $this->params['form']['course_id'];
             $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
+            // check that all points given are not negative numbers
+            $minimum = min($this->params['form']['points']);
+            if ($minimum < 0) {
+                $this->Session->setFlash(__('One or more of your group members have negative points. Please use positive numbers.', true));
+                $this->redirect("/evaluations/makeEvaluation/$eventId/$groupId");
+                return;
+            }
 
             //Get the target event
             $this->Event->id = $eventId;

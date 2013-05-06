@@ -519,7 +519,6 @@ class CoursesController extends AppController
                 $uploadFile = $this->FileUpload->uploadDir.DS.$this->FileUpload->finalFile;
             } else {
                 $this->Session->setFlash($this->FileUpload->showErrors());
-                $this->redirect('import');
                 return;
             }
 

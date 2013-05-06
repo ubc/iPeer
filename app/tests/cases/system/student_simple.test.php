@@ -157,6 +157,20 @@ class studentSimple extends SystemBaseTestCase
         $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'Your Evaluation was submitted successfully.');
         
+        // test negative points
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Simple Evaluation')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'point6')->sendKeys($delete->key.$delete->key.$delete->key.'-100');
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'point7')->sendKeys($delete->key.$delete->key.'300');
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'comment7')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'submit0')->click();       
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::ID, "flashMessage"));
+            }
+        );
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'flashMessage')->text();
+        $this->assertEqual($msg, 'One or more of your group members have negative points. Please use positive numbers.');
+        
         $this->secondStudent();
         $this->tutor();
     }
