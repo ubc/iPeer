@@ -62,8 +62,17 @@ class Group extends AppModel
         ),
     );
     public $validate = array(
-        'group_name' => array('rule' => 'notEmpty', 'message' => 'Please insert group name')
-        );
+        'group_name' => array(
+            'empty' => array(
+                'rule' => 'notEmpty',
+                'message' => 'Please insert group name'
+            ),
+            'duplicate' => array(
+                'rule' => 'checkDuplicate',
+                'message' => 'A group with the name already exists.'
+            )
+        )
+    );
 
     /**
      * __construct
@@ -475,5 +484,24 @@ class Group extends AppModel
         }
 
         return $group;
+    }
+    
+    /**
+     * checkDuplicate checks for duplicate group name in the course
+     *
+     * @param mixed $check
+     *
+     * @access public
+     * @return void
+     */
+    function checkDuplicate($check)
+    {
+        $conditions['Group.course_id'] = $this->data['Group']['course_id'];
+        // edit groups have group id & doesn't make sense for them not being able to keep their name
+        if (isset($this->data['Group']['id'])) {
+            $conditions['Group.id !='] = $this->data['Group']['id'];
+        }
+        $names = Set::extract('/Group/group_name', $this->find('all', array('conditions' => $conditions)));;
+        return !in_array($this->data['Group']['group_name'], $names);
     }
 }

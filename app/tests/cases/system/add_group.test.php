@@ -71,7 +71,23 @@ class AddGroupTestCase extends SystemBaseTestCase
         );
         
         $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
-        $this->assertEqual($msg, 'The group was added successfully.');  
+        $this->assertEqual($msg, 'The group was added successfully.');
+        
+        // checking duplicate group name error
+        $this->session->open($this->url.'groups/add/2');
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'GroupGroupName')->sendKeys(' Amazing Group ');
+        // adding Geoff Student
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="all_groups"] option[value="30"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Assign >>"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='error-message']"));
+            }
+        );
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='error-message']");
+        $this->assertEqual($msg->text(), 'A group with the name already exists.');
+        $this->session->open($this->url.'groups/index/2');
     }
     
     public function testEditGroup()
@@ -84,6 +100,17 @@ class AddGroupTestCase extends SystemBaseTestCase
         $this->checkViewLinks();
         
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Edit this Group')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        // check that no duplicate name error appears
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+
+        $this->session->open($this->url.'groups/edit/'.$this->groupId);
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'GroupGroupName')->sendKeys(' Two');
         
         // removing Van Hong Student
