@@ -919,7 +919,7 @@ class V1Controller extends Controller {
             $students = $this->UserEnrol->find('list', array('conditions' => array('course_id' => $courseId), 'fields' => array('user_id')));
             $tutors = $this->UserTutor->find('list', array('conditions' => array('course_id' => $courseId), 'fields' => array('user_id')));
             $instructors = $this->UserCourse->find('list', array('conditions' => array('course_id' => $courseId), 'fields' => array('user_id')));
-            $members = $students + $tutors + $instructors;
+            $members = array_merge($students, $tutors, $instructors);
             $inClass = $this->User->find('list', array('conditions' => array('User.id' => $members), 'fields' => array('User.username')));
             $result = array();
 
