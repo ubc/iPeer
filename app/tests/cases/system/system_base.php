@@ -25,6 +25,11 @@ class SystemBaseTestCase extends CakeTestCase
     public function waitForLogoutLogin($username)
     {
         $this->session->open($this->url);
+        $this->logoutLogin($username);
+    }
+    
+    public function logoutLogin($username)
+    {
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Logout')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $session = $this->session;

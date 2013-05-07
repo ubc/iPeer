@@ -35,6 +35,7 @@ class studentSimple extends SystemBaseTestCase
 
         //set due date and release date end to next month so that the event is opened.
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ui-datepicker-div"]/div[3]/button[1]')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateBegin')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
@@ -515,6 +516,88 @@ class studentSimple extends SystemBaseTestCase
         $this->assertTrue(empty($comment));
         $comment = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]/tbody/tr[2]/td');
         $this->assertTrue(empty($comment));
+    }
+    
+    public function testSubmissionsAfterEvalReleased()
+    {
+        // when a submission is made after grades and comments have been released
+        // grades will become not released / only released comments will show up
+        $this->waitForLogoutLogin('root');
+        $this->session->open($this->url.'events/edit/'.$this->eventId);
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->clear();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->sendKeys(date('Y-m-d H:i:s', strtotime('+1 day')));
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        // release all comments
+        $this->session->open($this->url.'evaluations/view/'.$this->eventId);
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Release All Comments')->click();
+        $w->until(
+            function($session) {
+                $comments = $session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[2]/td[8]/div')->text();
+                return $comments == 'Some Released';
+            }
+        );
+        // release all grades
+        $this->session->open($this->url.'evaluations/view/'.$this->eventId);
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Release All Grades')->click();
+        $w->until(
+            function($session) {
+                $grades = $session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[2]/td[7]/div')->text();
+                return $grades == 'Some Released';
+            }
+        );
+
+        // Matt Student submits
+        $this->waitForLogoutLogin('redshirt0003');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Simple Evaluation')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'comment5')->sendKeys('not show up');
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'comment6')->sendKeys('never show up');
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'distr_button')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'submit0')->click();
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        
+        // check Ed Student's results - grades not released (Matt's not released)
+        // comments (only two comments are released)
+        $this->waitForLogoutLogin('redshirt0001');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Simple Evaluation')->click();
+        $rating = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td[1]');
+        $this->assertEqual($rating->text(), 'Not Released');
+        $avg = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td[2]');
+        $this->assertEqual($avg->text(), 'Not Released');
+        $comm[] = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]/tbody/tr[2]/td')->text();
+        $comm[] = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]/tbody/tr[3]/td')->text();
+        sort($comm);
+        $this->assertEqual($comm[0], 'Does his fair share of work');
+        $this->assertEqual($comm[1], 'Very hardworking');
+        // comment 'not show up' is not part of the list of comments
+        $comm3 = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]/tbody/tr[4]/td');
+        $this->assertTrue(empty($comm3));
+        
+        // Matt Student's grades are released
+        $this->waitForLogoutLogin('redshirt0003');
+        $simple = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Simple Evaluation');
+        $simple[1]->click(); // Group Reapers results
+        $rating = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td[1]');
+        $this->assertEqual($rating->text(), '95.00 - (9.5)* = 85.50          ( )* : 10% late penalty.');
+        $avg = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td[2]');
+        $this->assertEqual($avg->text(), '90.00');
+        $comm1[] = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]/tbody/tr[2]/td')->text();
+        $comm1[] = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]/tbody/tr[3]/td')->text();
+        $comm1[] = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]/tbody/tr[4]/td')->text();
+        sort($comm1);
+        $this->assertEqual($comm1[0], 'A great leader');
+        $this->assertEqual($comm1[1], 'Does his work efficiently');
+        $this->assertEqual($comm1[2], 'Very responsible.');
     }
     
     public function testDeleteEvent()

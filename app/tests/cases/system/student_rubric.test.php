@@ -36,6 +36,7 @@ class studentRubric extends SystemBaseTestCase
         
         // set due date and release date end to next month so that the event is opened.
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ui-datepicker-div"]/div[3]/button[1]')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateBegin')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
@@ -609,8 +610,115 @@ class studentRubric extends SystemBaseTestCase
         );
     }
     
+    public function testSavedAnswersNotSubmitted()
+    {
+        // unsubmitted answers should not show up in student / instructor's results views
+        $this->waitForLogoutLogin('root');
+        $this->session->open($this->url.'events/edit/'.$this->eventId);
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->clear();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->sendKeys(date('Y-m-d H:i:s', strtotime('+1 day')));
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        // release all comments
+        $this->session->open($this->url.'evaluations/view/'.$this->eventId);
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Release All Comments')->click();
+        $w->until(
+            function($session) {
+                $comments = $session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[2]/td[8]/div')->text();
+                return $comments == 'Some Released';
+            }
+        );
+        // release all grades
+        $this->session->open($this->url.'evaluations/view/'.$this->eventId);
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Release All Grades')->click();
+        $w->until(
+            function($session) {
+                $grades = $session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[2]/td[7]/div')->text();
+                return $grades == 'Some Released';
+            }
+        );
+        
+        // Matt Student submits
+        $this->waitForLogoutLogin('redshirt0003');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
+        $header = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'panel5Header');
+        $this->assertEqual($header->text(), 'Ed Student - (click to expand)');
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_5_1.value=4;"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_5_2.value=5;"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_5_3.value=5;"]')->click();
+        $comments = $this->session->elements(PHPWebDriver_WebDriverBy::NAME, '5comments[]');
+        $comments[0]->sendKeys('circle');
+        $comments[1]->sendKeys('triangle');
+        $comments[2]->sendKeys('rectangle');
+        $this->session->element(PHPWebDriver_WebDriverBy::NAME, '5gen_comment')->sendKeys('shapes');
+        $this->session->element(PHPWebDriver_WebDriverBy::NAME, '5')->click();
+        
+        // check Ed's results
+        $this->session->open($this->url);
+        $this->session->accept_alert();
+        $this->logoutLogin('redshirt0001');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
+        $rating = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[2]/tbody/tr[2]/td')->text();
+        $this->assertEqual($rating, '13.00 - (1.30)* = 11.70          ( )* : 10% late penalty.');
+        
+        // Matt's evaluation for Ed is not counted yet - it's  not submitted
+        $this->waitForLogoutLogin('root');
+        $this->session->open($this->url.'evaluations/viewEvaluationResults/'.$this->eventId.'/1/Detail');
+        $mark = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="evalForm"]/table/tbody/tr[4]/td[5]')->text();
+        $this->assertEqual($mark, '13.00 - 1.30 = 11.70 (78.00%)');
+    }
+    
+    public function testSubmissionsAfterEvalReleased()
+    {
+        $this->waitForLogoutLogin('redshirt0003');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'panel6Header')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_1.value=3;"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_2.value=4;"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_3.value=5;"]')->click();
+        $comments = $this->session->elements(PHPWebDriver_WebDriverBy::NAME, '6comments[]');
+        $comments[0]->sendKeys('math');
+        $comments[1]->sendKeys('English');
+        $comments[2]->sendKeys('history');
+        $this->session->element(PHPWebDriver_WebDriverBy::NAME, '6gen_comment')->sendKeys('subjects');
+        $this->session->element(PHPWebDriver_WebDriverBy::NAME, '6')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Submit to Complete the Evaluation"]')->click();
+
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
+        $this->assertEqual($msg, 'Your Evaluation was submitted successfully.');
+        
+        // comments and grades become unreleased for Ed Student
+        $this->waitForLogoutLogin('redshirt0001');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
+        $rating = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[2]/tbody/tr[2]/td');
+        $this->assertEqual($rating->text(), 'Not Released');
+        $header = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'font[color="red"]');
+        $this->assertEqual($header->text(), 'Comments/Grades Not Released Yet.');
+        
+        // comments and grades are still released for Matt Student - no evaluations for him
+        $this->waitForLogoutLogin('redshirt0003');
+        $rubric = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation');
+        $rubric[1]->click();
+        $rating = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[2]/tbody/tr[2]/td');
+        $this->assertEqual($rating->text(), '12.00 - (1.20)* = 10.80          ( )* : 10% late penalty.');
+    }
+    
     public function testDeleteEvent()
     {
+        $this->waitForLogoutLogin('root');
         $this->session->open($this->url.'events/delete/'.$this->eventId);
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $session = $this->session;
