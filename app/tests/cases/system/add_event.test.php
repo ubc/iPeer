@@ -42,12 +42,12 @@ class addEventTestCase extends SystemBaseTestCase
         $w->until(
             function($session) {
                 $result = $session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'td[class="total-result"]')->text();
-                return ($result == 'Total Results: 5');
+                return ($result == 'Total Results: 4');
             }
         );
         
         // check out each scheduled email
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 4; $i++) {
             $this->session->element(PHPWebDriver_WebDriverBy::PARTIAL_LINK_TEXT, 'MECH 328')->click();
             $students = count($this->session->elements(PHPWebDriver_WebDriverBy::PARTIAL_LINK_TEXT, 'Student'));
             $this->assertEqual($students, 6);
@@ -171,14 +171,19 @@ class addEventTestCase extends SystemBaseTestCase
         
         // fill in the dates
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '12')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateBegin')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '4')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '13')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventResultReleaseDateBegin')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '14')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventResultReleaseDateEnd')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '28')->click();
         
         // set email reminder frequency to 2 days
