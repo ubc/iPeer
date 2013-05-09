@@ -21,7 +21,7 @@
     'type' => 'radio',
     'options' => array('public' => __('Public', true), 'private'=>__('Private', true)),
     'label' => __('Availability', true))); ?>
-<div class="help-text"><?php __('Public Allows Surveys Sharing Amongst Instructors') ?></div>
+<div class="help-text"><?php __('Public lets you share this survey template with other instructors.') ?></div>
 
     <div style="text-align: center">
         <input type="button" name="Back" value="<?php __('Back')?>" onClick="javascript:(history.length > 1) ? history.back() : window.close();">

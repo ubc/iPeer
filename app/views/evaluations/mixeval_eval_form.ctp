@@ -8,7 +8,7 @@
 <ul>
     <?php $due = date('l, F j, Y g:i a', strtotime($event['Event']['due_date']))?>
     <li><?php echo _t('The evaluation is due on ').$due.'.' ?></li>
-    <li><?php echo _t('To resubmit a evaluation, all required questions must be answered.') ?></li>
+    <li><?php echo _t('To resubmit an evaluation, all required questions must be answered.') ?></li>
     <?php $releaseEnd = date('l, F j, Y g:i a', strtotime($event['Event']['release_date_end'])); ?>
     <li><?php echo _t('The evaluation can be repeatedly submitted until ').$releaseEnd.'.'?></li>
     <li><?php echo $html->tag('span', '*', array('class' => 'required orangered'))._t(' marks required questions.')?></li>

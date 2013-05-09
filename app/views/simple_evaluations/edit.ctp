@@ -28,6 +28,7 @@
 
 <!-- Base Point Per Member -->
 <?php echo $this->Form->input('point_per_member', array(
+            'label' => __('Points Per Member', true),
             'size'=>'5',
             'maxlength'=>'5',
             'readonly' => $readonly,
@@ -44,7 +45,7 @@
             'disabled' => $readonly
         ))
 ?>
-
+<div class="help-text"><?php __('Public lets you share this simple evaluation with other instructors.')?></div>
 <div style="text-align: center">
     <input type="button" name="Back" value="<?php __('Back')?>" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
     <?php echo $this->Form->submit(__('Save', true),  array('div' => false)); ?>

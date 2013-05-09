@@ -35,7 +35,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
     'label' => __('Availability', true),
     'separator' => '&nbsp;',
     'disabled' => $readonly));?>
-<div class="help-text"><?php __('Public Allows Rubric Sharing Amongst Instructors')?></div>
+<div class="help-text"><?php __('Public lets you share this rubric evaluation with other instructors.')?></div>
 
 <?php echo $this->Form->input('zero_mark', array('id' => 'zero_mark',
     'class'=>'self_enroll',

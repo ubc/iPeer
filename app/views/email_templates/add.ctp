@@ -11,10 +11,13 @@
             'type' => 'radio',
             'options' => array(
                 'Private' => __('Private',true),
-                'Public' => __('Public',true).' <font size="2">(Share Template Among Instructors)</font>'
+                'Public' => __('Public',true)
             )
         )
     );
+?>
+<div class="help-text"><?php __('Public lets you share this email template with other instructors.')?></div>
+<?php
     echo $this->Form->input('EmailTemplate.description');
     echo $this->Form->input(
         'Email.merge', array(

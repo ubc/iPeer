@@ -53,7 +53,8 @@ class EvaltoolsController extends AppController
         foreach ($mixevalData as &$mixeval) {
             $mixeval['Mixeval']['event_count'] = $this->Event->find('count',
                 array('conditions' => 
-                    array('event_template_type_id' => $mixeval['Mixeval']['id'])
+                    array('event_template_type_id' => 4,
+                        'template_id' => $mixeval['Mixeval']['id'])
                 )
             );
         }

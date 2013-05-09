@@ -494,7 +494,7 @@ class Group extends AppModel
      * @access public
      * @return void
      */
-    function checkDuplicate($check)
+    function checkDuplicate()
     {
         $conditions['Group.course_id'] = $this->data['Group']['course_id'];
         // edit groups have group id & doesn't make sense for them not being able to keep their name

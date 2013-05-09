@@ -47,7 +47,8 @@ class MixevalsController extends AppController
             foreach ($data as $key => $entry) {
                 $entry['Mixeval']['event_count'] = $this->Event->find('count',
                     array('conditions' => array(
-                        'event_template_type_id' => $entry['Mixeval']['id'])
+                        'event_template_type_id' => 4,
+                        'template_id' => $entry['Mixeval']['id'])
                     )
                 );
 
