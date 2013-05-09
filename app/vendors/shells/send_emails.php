@@ -13,7 +13,8 @@ require_once (CORE_PATH.'cake/libs/controller/controller.php');
  */
 class SendEmailsShell extends Shell
 {
-    public $uses = array('User', 'EmailSchedule', 'SysParameter', 'EmailMerge','Event','Group','GroupMembers');
+    public $uses = array('User', 'EmailSchedule', 'SysParameter', 'EmailMerge', 'Event', 
+        'Group', 'GroupsMembers', 'EvaluationSubmission', 'GroupEvent');
     const EMAIL_TASK_LOCK = 'tmp/email_task_lock';
     /**
      * main
@@ -57,7 +58,7 @@ class SendEmailsShell extends Shell
             $from = $this->User->getEmails($from_id);
             $from = (isset($from[$from_id]) && empty($from[$from_id])) ? $defaultFrom : $from[$from_id];
 
-			$filter_email_list = reminderFilter($event_id,$e['to'],$e['id'],$e['date']); //Returns the modifies emaillist if the list contains the 'save_reminder'
+			$filter_email_list = $this->reminderFilter($event_id, $e['to'], $e['id'], $e['date']); //Returns the modified emaillist if the list contains the 'save_reminder'
 			                                                                             //param, else returns $e['to']
 			
             $emailList = $this->User->getEmails(explode(';', $filter_email_list));
@@ -91,46 +92,47 @@ class SendEmailsShell extends Shell
    /*
     *Given an array of email addresses, delete the ones that have already submitted the evaluation with event_id
     * 
-    * @param $event_id : The event id for the concerning event
-    * @param $to : $to array
-    * @param $email_id : id for the current email schedule id
-    * @param $date : The date of the reminder with id = $email_id
+    * @param mixed $event_id
+    * @param mixed $to
+    * @param mixed $email_id
+    * @param mixed $date
     * 
     */ 
-    private function reminderFilter($event_id,$to,$email_id,$date){        
-    if(isset($event_id) && $to[0]=='save_reminder') {
-        
-        //If the date on the reminder is past the due date, delete the corresponding reminder from the table
-        $event =$this->Event->getEventById($event_id);
-        if( strtotime($event['Event']['due_date']) < strtotime($date)){
-            //Delete the corresponding row and return an empty to[] list
-            $this->EmailSchedule->delete($email_id,false);
-            $to_list_empty = array();
-            return $to_list_empty;
-        }
-        else{ 
-            $submitter_list = array();
-            $submissions = $this->EvaluationSubmission->getEvalSubmissionsByEventId($event_id);
-      
-            foreach($submissions as $s){
-                array_push($submitter_list,$s['EvaluationSubmission']['submitter_id']);
-            }
+    private function reminderFilter($event_id, $to, $email_id, $date)
+    {   
+        $to = explode(';', $to);
+        if (isset($event_id) && $to[0]=='save_reminder') {
+            //If the date on the reminder is past the due date, delete the corresponding reminder from the table
+            $event = $this->Event->findById($event_id);
+            if (strtotime($event['Event']['due_date']) < strtotime($date)) {
+                //Delete the corresponding row and return an empty to[] list
+                $this->EmailSchedule->delete($email_id, false);
+                return array();
+            } else { 
+                $submissions = $this->EvaluationSubmission->getEvalSubmissionsByEventId($event_id);
+                $submitter_list = Set::extract('/EvaluationSubmission/submitter_id', $submissions);
                 
-            
-            $new_to_list = array_values(array_diff($to, $submitter_list));
-            array_shift($new_to_list);
-            $new_to_list = implode(';', $new_to_list);
+                if ($event['Event']['event_template_type_id'] == 3) {
+                    $members = $this->User->getEnrolledStudents($event['Event']['course_id']);
+                    $members = Set::extract('/User/id', $members);
+                } else {
+                    $groups = $this->GroupEvent->findAllByEventId($event_id);
+                    $groupIds = Set::extract('/GroupEvent/group_id', $groups);
+                    $members = $this->GroupsMembers->findAllByGroupId($groupIds);
+                    $members = Set::extract('/GroupsMembers/user_id', $members);
+                }
+                $sendTo = array_diff($members, $submitter_list);
+                $sendTo = implode(';', $sendTo);
 
-            //Save the new array in the Database table email_schedules
-            $data = array('id' => $email_id,'to'=>$new_to_list);
-            $this->EmailSchedule->save($data);
-            $to_list = explode(';', $new_to_list);
+                //Save the new array in the Database table email_schedules
+                $data = array('id' => $email_id, 'to'=> $sendTo);
+                $this->EmailSchedule->save($data);
 
-            return $new_to_list;
+                return $sendTo;
+            }
+        } else { //Database entry does not correspond to reminders and so, return list as is.
+            return implode(';', $to);
         }
-    }
-    else //Database entry does not correspond to reminders and so, return list as is.
-        return $to;
     }
 
     /**
@@ -210,7 +212,7 @@ class SendEmailsShell extends Shell
         $this->Email->subject = $subject;
         $this->Email->from = $from;
         $this->Email->template = $templateName;
-        $this->Email->sendAs = 'both';
+        $this->Email->sendAs = 'text';
 
         return $this->Email->send($content);
     }
