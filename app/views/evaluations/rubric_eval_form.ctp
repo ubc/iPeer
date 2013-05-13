@@ -82,7 +82,7 @@ function alertSave(){
         <div id="accordion">
         <?php foreach($groupMembers as $row): $user = $row['User'];?>
             <input type="hidden" name="memberIDs[]" value="<?php echo $user['id']?>"/>
-            <div id="panel<?php echo $user['id']?>">
+            <div id="panel<?php echo $user['id']?>" class="panelName">
                 <div id="panel<?php echo $user['id']?>Header" class="panelheader">
                 <?php echo $user['first_name'].' '.$user['last_name'];?>
                 <?php if (isset($row['User']['Evaluation'])): ?>

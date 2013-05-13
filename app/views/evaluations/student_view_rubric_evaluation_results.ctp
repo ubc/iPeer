@@ -43,7 +43,7 @@
 
 <div id="accordion">
     <!-- Panel of Evaluations Results -->
-    <div id="panelResults">
+    <div id="panelResults" class="panelName">
         <div id="panelResultsHeader" class="panelheader">
             <?php echo __('Evaluation Results From Your Teammates. (Randomly Ordered)', true);?>
             <font color="red">
@@ -65,7 +65,7 @@
         </div>
     </div>
     <!-- Panel of Evaluations Reviews -->
-    <div id="panelReviews">
+    <div id="panelReviews" class="panelName">
         <div id="panelReviewsHeader" class="panelheader">
             <?php echo 'Review Evaluations From You.'?>
         </div>

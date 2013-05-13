@@ -718,6 +718,7 @@ class EvaluationComponent extends Object
             }
         }
 
+        $group = array();
         foreach (array_unique($criteria) as $num) {
             $grades = Set::extract($summary, '/grades/'.$num);
             $group['grades'][$num] = array_sum($grades) / count($grades);

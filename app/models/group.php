@@ -489,8 +489,6 @@ class Group extends AppModel
     /**
      * checkDuplicate checks for duplicate group name in the course
      *
-     * @param mixed $check
-     *
      * @access public
      * @return void
      */

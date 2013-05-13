@@ -201,6 +201,10 @@ strong {
     border: none;
 }
 
+.standardtable input {
+    cursor: pointer;
+}
+
 .leftalignedtable th, .leftalignedtable td {
     padding: 0.4em;
     text-align: left;
@@ -1158,6 +1162,13 @@ i {
     float: none;
 }
 
+.surveyquestions #description {
+    margin-left: 3em;
+    margin-right: 3em;
+    margin-top: 0.5em;
+    padding: 0.5em;
+}
+
 /* surveys/addQuestion */
 .SurveyAddQuestion #QuestionPrompt {
     width: 35em;
@@ -1578,6 +1589,15 @@ input[type='text'], .MixevalMakeQuestion textarea {
     border-bottom : 1px solid #24588C;
     margin-top : 6px;
     font-weight:600;
+}
+
+div.panelName, div.panelContent input,
+div.submitComplete input {
+    cursor: pointer;
+}
+
+div.panelContent {
+    cursor: auto;
 }
 
 /* Home styles */

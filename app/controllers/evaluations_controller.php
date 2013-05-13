@@ -621,6 +621,7 @@ class EvaluationsController extends AppController
 
         // Get all required data from each table for every question
         $this->set('questions', $this->Survey->getQuestions($surveyId));
+        $this->set('event', $this->Event->findById($eventId));
         $this->set('userId', $userId);
         $this->set('eventId', $event['Event']['id']);
         $this->render('survey_eval_form');

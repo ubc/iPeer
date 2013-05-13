@@ -69,7 +69,7 @@ if (!empty($notInGroup)) {
 
 <div id="accordion">
     <?php foreach ($mixevalDetails as $evaluteeId => $scores):?>
-        <div id="panel<?php echo $evaluteeId?>">
+        <div id="panel<?php echo $evaluteeId?>" class="panelName">
             <div id="panel<?php echo $evaluteeId?>Header" class="panelheader">
                 <?php echo __('Evaluatee', true).': '.$memberList[$evaluteeId]?>
             </div>

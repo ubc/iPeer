@@ -279,48 +279,50 @@ foreach ($results['evaluatees'] as $evaluatee) {
 <form name="evalForm2" id="evalForm2" method="POST" action="<?php echo $html->url('markCommentRelease') ?>">
 <?php
 // controls to release comments
-foreach ($results['Submissions'] as $evaluatorId => $evaluator) {
-    $class = "";
-    if (in_array($evaluatorId, $results['Dropped'])) {
-        $class = "class='blue'";
-    }
-    $evaluatorInfo = $results['evaluators'][$evaluatorId]['User'];
-    echo "<h3 $class>Evaluator: ".$evaluatorInfo['full_name'].'</h3>';
-    $headers = array(_('Evaluatee'), _('Comment'), _('Released'));
-    echo "<table class='standardtable'>";
-    echo $html->tableHeaders($headers);
-    $cells = array();
-    foreach ($evaluator as $evaluateeId => $evalMark) {
+if (isset($results['Submissions'])) {
+    foreach ($results['Submissions'] as $evaluatorId => $evaluator) {
         $class = "";
-        if (in_array($evaluateeId, $results['Dropped'])) {
-            $class = "blue";
+        if (in_array($evaluatorId, $results['Dropped'])) {
+            $class = "class='blue'";
         }
-        else if (in_array($evaluateeId, $results['Incomplete'])) {
-            $class = "red";
+        $evaluatorInfo = $results['evaluators'][$evaluatorId]['User'];
+        echo "<h3 $class>Evaluator: ".$evaluatorInfo['full_name'].'</h3>';
+        $headers = array(_('Evaluatee'), _('Comment'), _('Released'));
+        echo "<table class='standardtable'>";
+        echo $html->tableHeaders($headers);
+        $cells = array();
+        foreach ($evaluator as $evaluateeId => $evalMark) {
+            $class = "";
+            if (in_array($evaluateeId, $results['Dropped'])) {
+                $class = "blue";
+            }
+            else if (in_array($evaluateeId, $results['Incomplete'])) {
+                $class = "red";
+            }
+            $evaluateeInfo = $results['evaluators'][$evaluateeId]['User'];
+            $tmp = array();
+            $tmp[] = array($evaluateeInfo['full_name'], 
+                array('width' => '15%', 'class' => $class));
+            $tmp[] = isset($evalMark['comment']) ? $evalMark['comment'] : '-';
+            $releaseChk = "";
+            $releaseChkParams = array(
+                'value' => $evalMark['evaluatee'],
+                'hiddenField' => false,
+                'name' => 'release' . $evalMark['evaluator'] . '[]'
+            );
+            if ($evalMark['release_status'] == 1) {
+                $releaseChkParams['checked'] = 'checked';
+            }
+            $releaseChk = $form->checkbox($releaseChkParams['name'], 
+                $releaseChkParams);
+            $releaseChk .= $form->hidden("evaluator_ids[]", array(
+                'value' => $evalMark['evaluator'], 'name' => 'evaluator_ids[]'));
+            $tmp[] = array($releaseChk, array('width' => '5%'));
+            $cells[] = $tmp;
         }
-        $evaluateeInfo = $results['evaluators'][$evaluateeId]['User'];
-        $tmp = array();
-        $tmp[] = array($evaluateeInfo['full_name'], 
-            array('width' => '15%', 'class' => $class));
-        $tmp[] = isset($evalMark['comment']) ? $evalMark['comment'] : '-';
-        $releaseChk = "";
-        $releaseChkParams = array(
-            'value' => $evalMark['evaluatee'],
-            'hiddenField' => false,
-            'name' => 'release' . $evalMark['evaluator'] . '[]'
-        );
-        if ($evalMark['release_status'] == 1) {
-            $releaseChkParams['checked'] = 'checked';
-        }
-        $releaseChk = $form->checkbox($releaseChkParams['name'], 
-            $releaseChkParams);
-        $releaseChk .= $form->hidden("evaluator_ids[]", array(
-            'value' => $evalMark['evaluator'], 'name' => 'evaluator_ids[]'));
-        $tmp[] = array($releaseChk, array('width' => '5%'));
-        $cells[] = $tmp;
+        echo $html->tableCells($cells);
+        echo "</table>";
     }
-    echo $html->tableCells($cells);
-    echo "</table>";
 }
 ?>
 <p style="text-align: center;">

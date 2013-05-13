@@ -1,6 +1,10 @@
 <div class='surveyquestions'>
 <?php
-echo '<h2>' . $questions[0]['Survey']['name'] . '</h2>';
+if (!empty($event['Event']['description'])) { ?>
+<h2><?php echo _t('Description') ?></h2>
+<div id='description'><?php echo _t($event['Event']['description']) ?></div>
+<?php }
+echo '<h2>' . $event['Event']['title'] . '</h2>';
 echo $form->create('SurveyInput', 
     array('url' => $html->url("makeEvaluation/$eventId")));
 

@@ -396,14 +396,18 @@ class EventsController extends AppController
 
         $eventTitle = $eventData['Event']['title'];
         $courseName = $this->Course->getCourseName($courseId);
+        
+        $subject = 'Please Submit your iPeer Evaluation, '.$eventTitle.', for '.$courseName;
+        $prefix = strlen($subject) > 80 ? $subject.'. ' : '';
+        $subject = strlen($subject) > 80 ? $courseName.' - iPeer Evaluation Reminder' : $subject;
 
         //Prepare the data for pushing to the email_schedules table
         $data = array();
         $data['course_id']= $courseId;
         $data['event_id'] = $eventId;
         $data['from'] = $this->Auth->user('id');
-        $data['subject'] = 'Please Submit your iPeer Evaluation, '.$eventTitle.', for '.$courseName;
-        $data['content'] = 'You have not submitted your iPeer Evaluation, '.$eventTitle.', for '.$courseName.
+        $data['subject'] = $subject;
+        $data['content'] = $prefix.'You have not submitted your iPeer Evaluation, '.$eventTitle.', for '.$courseName.
             '. Please login to iPeer at '.Router::url('/login', true).' and click on the Submit button to '.
             'submit your iPeer Evaluation.';
         $data['to'] = 'save_reminder;'.implode(';', $to);
@@ -568,8 +572,8 @@ class EventsController extends AppController
      * checkIfChanged
      *
      * @param mixed $event
-     * @param mixed $data               for the event being modified
-     * @param int $email_frequency      the original email frequency
+     * @param mixed $data
+     * @param int $email_frequency
      *
      * @access public
      * @return bool -  return 1 if the data has been modified else returns 0

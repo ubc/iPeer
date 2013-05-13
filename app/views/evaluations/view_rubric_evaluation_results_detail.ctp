@@ -47,6 +47,7 @@ if (!empty($notInGroup)) {
     <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>" />
     <input type="hidden" name="display_format" value="Detail" />
 <br>
+<?php if (!empty($scoreRecords)) { ?>
 <table class="standardtable">
     <?php echo $html->tableHeaders($this->Evaluation->getRubricSummaryTableHeader($rubric['Rubric']['total_marks'], $rubric['RubricsCriteria']));?>
     <?php echo $html->tableCells($this->Evaluation->getRubricSummaryTable($memberList, Set::extract($notInGroup, '/User/id'), $scoreRecords, $penalties, $rubric['Rubric']['total_marks'])); ?>
@@ -60,12 +61,13 @@ if (!empty($notInGroup)) {
         ?>
     </td></tr>
 </table>
+<?php } ?>
 </form>
 
 <h3><?php __('Evaluation Results')?></h3>
 <div id='rubric_result'>
 
-
+<?php if (!empty($scoreRecords)) { ?>
 <div id="accordion">
     <?php
     $groupAve = 0;
@@ -75,7 +77,7 @@ if (!empty($notInGroup)) {
     }
     $groupAve = array_sum($scaled) / count($scaled);
     foreach($scoreRecords as $userId => $row) {?>
-        <div id="panel<?php echo $userId?>">
+        <div id="panel<?php echo $userId?>" class="panelName">
         <div id="panel<?php echo $userId?>Header" class="panelheader">
             <?php echo __('Evaluatee: ', true).$memberList[$userId];?>
         </div>
@@ -189,6 +191,9 @@ if (!empty($notInGroup)) {
 
     <?php } ?>
 </div>
+<?php } else { ?>
+<h4><?php echo __('No submissions have been made.', true); ?></h4>
+<?php } ?>
 
 <script type="text/javascript"> new Rico.Accordion( 'accordion',
                                     {panelHeight:500,
