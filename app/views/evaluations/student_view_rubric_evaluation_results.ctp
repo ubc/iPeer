@@ -15,7 +15,7 @@
         $commentReleased = 0;
     }
     if ($gradeReleased) {
-        $ave = number_format(array_sum(Set::extract($evaluateeDetails, '/EvaluationRubric/score')) / count($evaluateeDetails), 2);
+        $ave = count($evaluateeDetails) > 0 ? number_format(array_sum(Set::extract($evaluateeDetails, '/EvaluationRubric/score')) / count($evaluateeDetails), 2) : '0.00';
         $deduction = number_format($ave * $penalty / 100, 2);
         $finalAvg = number_format($ave * (100 - $penalty) / 100, 2);
         ($penalty > 0) ? ($stringAddOn = ' - '.'('.'<font color=\'red\'>'.$deduction.'</font>'.

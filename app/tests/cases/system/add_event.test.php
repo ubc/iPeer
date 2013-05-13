@@ -45,8 +45,7 @@ class addEventTestCase extends SystemBaseTestCase
                 return ($result == 'Total Results: 4');
             }
         );
-        
-        // check out each scheduled email
+
         for ($i = 0; $i < 4; $i++) {
             $this->session->element(PHPWebDriver_WebDriverBy::PARTIAL_LINK_TEXT, 'MECH 328')->click();
             $students = count($this->session->elements(PHPWebDriver_WebDriverBy::PARTIAL_LINK_TEXT, 'Student'));
@@ -208,6 +207,10 @@ class addEventTestCase extends SystemBaseTestCase
     {
         $courseId = $this->session->elements(PHPWebDriver_WebDriverBy::ID, 'EventCourseId');
         $this->assertTrue(empty($courseId));
+        
+        // test that email frequency is 2 days
+        $email = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[selected="selected"]');
+        $this->assertEqual($email->attribute('value'), 2);
 
         $eventId = end(explode('/', $this->session->url()));
         $groups = count($this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="GroupGroup"] option[selected="selected"]'));
@@ -229,5 +232,331 @@ class addEventTestCase extends SystemBaseTestCase
         $this->session->open($this->url.'events/edit/'.$eventId);
         $groups = count($this->session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="GroupGroup"] option[selected="selected"]'));
         $this->assertEqual($groups, 0);
+    }
+
+    public function testEmailRemindersForEvals()
+    {
+        // evaluations -> simple evaluations
+        $this->session->open($this->url.'events/add/1');
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventTitle')->sendKeys('Simple Evaluation with Reminders');
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventDescription')->sendKeys('w/ reminders');
+        
+        // fill in the dates
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '12')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateBegin')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '13')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventResultReleaseDateBegin')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '14')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventResultReleaseDateEnd')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '28')->click();
+        
+        $dueDate = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->attribute('value');
+        
+        // set email reminder frequency to 5 days
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[value="5"]')->click();
+        // select all groups
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[id="selectAll"]')->click();
+        
+        // submit form
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
+        $this->assertEqual($msg, 'Add event successful!');
+        
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Simple Evaluation with Reminders')->click();
+        $eventId = end(explode('/', $this->session->url()));
+        
+        // Alex Student completes the evaluations
+        $this->waitForLogoutLogin('redshirt0002');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Simple Evaluation with Reminders')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'distr_button')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'submit0')->click();
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        // remove a student from a group
+        $this->waitForLogoutLogin('root');
+        $this->removeFromGroup();
+        // send emails
+        exec('cd '.dirname(__FILE__).'/../../../ && ../cake/console/cake send_emails');
+        
+        // check recipients list
+        $this->session->open($this->url.'emailer');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'MECH 328 - iPeer Evaluation Reminder')->click();
+        $ed = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Ed Student');
+        $this->assertTrue(empty($ed)); // Ed is not listed because he was removed from the group
+        $alex = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Alex Student');
+        $this->assertTrue(empty($alex)); // Alex is not listed because he has submitted already
+        // email content
+        $content = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'email_content')->text();
+        $expected = 'Please Submit your iPeer Evaluation, Simple Evaluation with Reminders, for MECH 328. You have not '.
+            'submitted your iPeer Evaluation, Simple Evaluation with Reminders, for MECH 328. Please login to iPeer at '.
+            $this->url.'login and click on the Submit button to submit your iPeer Evaluation.';
+        $this->assertEqual($content, $expected);
+
+        // frequency calculations
+        $this->session->open($this->url.'events/edit/'.$eventId);
+        $frequency = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[selected="selected"]');
+        $this->assertEqual($frequency->attribute('value'), 5);
+
+        // update frequency
+        $dueDate = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->attribute('value');
+        $scheduled = ceil((strtotime($dueDate) - time()) / (60*60*24*4)); // number of emails scheduled
+        // set email reminder frequency to 4 days
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[value="4"]')->click();
+        // submit form
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        $this->session->open($this->url.'emailer');
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'searchInputField')->sendKeys('MECH 328 - iPeer Evaluation Reminder');
+        $emails = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'MECH 328 - iPeer Evaluation Reminder');
+        $scheduled++;
+        //includes the one that was sent and can't be deleted; test that all unsent emails are deleted
+        $this->assertEqual(count($emails), $scheduled);
+        
+        // delete unsent emails - by disabling email reminders
+        $this->session->open($this->url.'events/edit/'.$eventId);
+        $frequency = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[selected="selected"]');
+        $this->assertEqual($frequency->attribute('value'), 4); // the frequency was updated
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option')->click();       
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        
+        $this->session->open($this->url.'emailer');
+        $emails = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'MECH 328 - iPeer Evaluation Reminder');
+        $this->assertEqual(count($emails), 1);
+        $emails[0]->click();
+        // try deleting the sent email
+        $this->session->open(str_replace('view', 'cancel', $this->session->url()));
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::ID, "flashMessage"));
+            }
+        );
+        $message = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'flashMessage');
+        $this->assertEqual($message->text(), 'Cannot cancel: Email is already sent.');
+        
+        $this->session->open($this->url.'events/delete/'.$eventId);
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        $this->assignToGroup();
+    }
+
+    public function testEmailRemindersForSurveys()
+    {
+        $this->session->open($this->url.'events/add/1');
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventTitle')->sendKeys('Survey with Email Reminders');
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventDescription')->sendKeys('Email Reminders are included');
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEventTemplateTypeId"] option[value="3"]')->click();
+        
+        // fill in the dates
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '12')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateBegin')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '13')->click();
+        
+        // set email reminder frequency to 5 days
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[value="5"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
+        $this->assertEqual($msg, 'Add event successful!');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Survey with Email Reminders')->click();
+        $eventId = end(explode('/', $this->session->url()));
+        
+        // Alex Student completes the survey
+        $this->waitForLogoutLogin('redshirt0002');
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Survey with Email Reminders')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'SurveyInput0ResponseId1')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'SurveyInput1ResponseId5')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Submit"]')->click();
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        // send emails
+        exec('cd '.dirname(__FILE__).'/../../../ && ../cake/console/cake send_emails'); // send emails
+        
+        // check recipients list 
+        $this->waitForLogoutLogin('root');
+        $this->session->open($this->url.'emailer');
+
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Please Submit your iPeer Evaluation, Survey with Email Reminders, for MECH 328')->click();
+        $alex = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Alex Student');
+        $this->assertTrue(empty($alex)); // Alex is not listed because he has submitted already
+        
+        // frequency calculations
+        $this->session->open($this->url.'events/edit/'.$eventId);
+        $frequency = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[selected="selected"]');
+        $this->assertEqual($frequency->attribute('value'), 5);
+        
+        // update frequency
+        $dueDate = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->attribute('value');
+        $scheduled = ceil((strtotime($dueDate) - time()) / (60*60*24*4)); // number of emails scheduled
+        // set email reminder frequency to 4 days
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[value="4"]')->click();
+        // submit form
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        $this->session->open($this->url.'emailer');
+        $emails = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Please Submit your iPeer Evaluation, Survey with Email Reminders, for MECH 328');
+        $scheduled++;
+        //includes the one that was sent and can't be deleted; test that all unsent emails are deleted
+        $this->assertEqual(count($emails), $scheduled);
+
+        // delete unsent emails - by disabling email reminders
+        $this->session->open($this->url.'events/edit/'.$eventId);
+        $frequency = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[selected="selected"]');
+        $this->assertEqual($frequency->attribute('value'), 4); // the frequency was updated
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option')->click();       
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        
+        $this->session->open($this->url.'emailer');
+        $emails = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Please Submit your iPeer Evaluation, Survey with Email Reminders, for MECH 328');
+        $this->assertEqual(count($emails), 1);
+        $emails[0]->click();
+        // try deleting the sent email
+        $this->session->open(str_replace('view', 'cancel', $this->session->url()));
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::ID, "flashMessage"));
+            }
+        );
+        $message = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'flashMessage');
+        $this->assertEqual($message->text(), 'Cannot cancel: Email is already sent.');
+        
+        $this->session->open($this->url.'events/delete/'.$eventId);
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+    }
+    
+    public function testCornerCasesForFrequencies()
+    {
+        // one reminder - interval too big - shows up as 7 days
+        $this->session->open($this->url.'events/add/1');
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventTitle')->sendKeys('Survey with Email Reminders');
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventDescription')->sendKeys('Email Reminders are included');
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEventTemplateTypeId"] option[value="3"]')->click();
+        
+        // fill in the dates - interval is 2 days
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '12')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateBegin')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '10')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '12')->click();
+        // set email reminder frequency to 3 days
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[value="3"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Survey with Email Reminders')->click();
+        $eventId = end(explode('/', $this->session->url()));
+        $this->session->open($this->url.'events/edit/'.$eventId);
+        $selected = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[selected="selected"]');
+        $this->assertEqual($selected->attribute('value'), 7);
+        // disable email reminders
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        
+        $this->session->open($this->url.'events/delete/'.$eventId);
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+    }
+
+    public function removeFromGroup()
+    {
+        $this->session->open($this->url.'groups/edit/1');
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="selected_groups"] option[value="35"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="selected_groups"] option[value="6"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="selected_groups"] option[value="7"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="<< Remove "]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Edit Group"]')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+    }
+
+    public function assignToGroup()
+    {
+        $this->session->open($this->url.'groups/edit/1');
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="all_groups"] option[value="5"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Assign >>"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Edit Group"]')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
     }
 }

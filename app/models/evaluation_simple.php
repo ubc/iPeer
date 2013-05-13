@@ -360,6 +360,7 @@ class EvaluationSimple extends EvaluationResponseBase
         $subtractAvgScore = 0;
         $eventId = $event['Event']['id'];
         $results = $this->getResultsByEvaluatee($event['GroupEvent']['id'], $userId);
+        $event_info = $this->Event->findById($eventId);
         if ($results != null) {
             //Get total mark each member received
             $receivedTotalScore = $this->getReceivedTotalScore(
@@ -371,12 +372,6 @@ class EvaluationSimple extends EvaluationResponseBase
                     'EvaluationSimple.event_id' => $event['Event']['id'],
                     'EvaluationSimple.grp_event_id' => $event['GroupEvent']['id'])));
 
-            $event_info = $this->Event->find(
-                'first',
-                array(
-                    'conditions' => array('Event.id' => $eventId),
-                )
-            );
             $gradeReleased = array_product(Set::extract($results, '/EvaluationSimple/grade_release')) ||
                 $event_info['Event']['auto_release'];
             // storing the timestamp of the due date/end date of the event
