@@ -34,7 +34,7 @@
 
 <br />
 
-<h1 onclick="$('rpreview').toggle();" class="title">
+<h1 onclick="$('rpreview').toggle();" class="title" id="simplePreview">
     <span class="ipeer-icon"><?php __(' Simple Evaluation Preview')?></span>
 </h1>
 

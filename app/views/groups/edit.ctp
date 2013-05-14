@@ -24,8 +24,7 @@ echo $this->Form->input('group_name', array('size'=>'50', 'class'=>'input', 'lab
                       'allName' =>  __("Filtered Students", true), 'selectedName' => __('Students in Group', true)));
     ?>
      <font size="2em">
-     <?php __('Note: Students already in one or more groups are marked')?><br>
-     <?php __('with * and are listed under those without groups')?>
+     <?php __('Note: Students already in one or more groups are marked with *')?><br>
      </font>
      </div>
 </div>

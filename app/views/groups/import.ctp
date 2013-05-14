@@ -1,11 +1,11 @@
 <div id='groupsimport'>
 <h2><?php __('Instructions') ?></h2>
 <ul>
-    <li><?php __('Please make sure the column matches the username column in student import file.')?></li>
     <li><?php __('Please make sure to remove the header in CSV file.')?></li>
     <li><?php __('All fields are mandatory. The system will generate the group numbers.')?></li>
     <li><?php __('All group names must be unique within the class.')?></li>
     <li><?php __('The student identifiers that can be used are usernames or student numbers.')?></li>
+    <li><?php __("Please make sure the column matches the username/student number in the students' profile")?></li>
 </ul>
 
 <h3><?php __('Formatting:')?></h3>

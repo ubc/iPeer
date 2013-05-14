@@ -61,7 +61,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
 
 
 <?php if(!empty($data)):?>
-<h1 onclick="$('rpreview').toggle();" class="title">
+<h1 onclick="$('rpreview').toggle();" class="title" id="rubricPreview">
   <span class="ipeer-icon"><?php __('Rubric Preview')?></span>
 </h1>
 

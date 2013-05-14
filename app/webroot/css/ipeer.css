@@ -201,10 +201,6 @@ strong {
     border: none;
 }
 
-.standardtable input {
-    cursor: pointer;
-}
-
 .leftalignedtable th, .leftalignedtable td {
     padding: 0.4em;
     text-align: left;
@@ -1474,6 +1470,12 @@ input[type='text'], .MixevalMakeQuestion textarea {
 
 .MixevalQuestionDesc {
     padding-bottom: 0.1em;
+}
+
+/* rubrics view */
+
+#rubricPreview, #simplePreview {
+    cursor: pointer;
 }
 
 /* permissions editor */
