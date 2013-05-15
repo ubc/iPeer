@@ -396,20 +396,15 @@ class EventsController extends AppController
 
         $eventTitle = $eventData['Event']['title'];
         $courseName = $this->Course->getCourseName($courseId);
-        
-        $subject = 'Please Submit your iPeer Evaluation, '.$eventTitle.', for '.$courseName;
-        $prefix = strlen($subject) > 80 ? $subject.'. ' : '';
-        $subject = strlen($subject) > 80 ? $courseName.' - iPeer Evaluation Reminder' : $subject;
+        $type = ($eventData['Event']['event_template_type_id'] == 3) ? 'Survey' : 'Evaluation';
 
         //Prepare the data for pushing to the email_schedules table
         $data = array();
         $data['course_id']= $courseId;
         $data['event_id'] = $eventId;
         $data['from'] = $this->Auth->user('id');
-        $data['subject'] = $subject;
-        $data['content'] = $prefix.'You have not submitted your iPeer Evaluation, '.$eventTitle.', for '.$courseName.
-            '. Please login to iPeer at '.Router::url('/login', true).' and click on the Submit button to '.
-            'submit your iPeer Evaluation.';
+        $data['subject'] = $courseName.' - iPeer '.$type.' Reminder';
+        $data['content'] = '';
         $data['to'] = 'save_reminder;'.implode(';', $to);
 
         while (strtotime($startDate) < strtotime($dueDate)) {

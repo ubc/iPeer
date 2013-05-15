@@ -14,7 +14,7 @@ require_once (CORE_PATH.'cake/libs/controller/controller.php');
 class SendEmailsShell extends Shell
 {
     public $uses = array('User', 'EmailSchedule', 'SysParameter', 'EmailMerge', 'Event', 
-        'Group', 'GroupsMembers', 'EvaluationSubmission', 'GroupEvent');
+        'Group', 'GroupsMembers', 'EvaluationSubmission', 'GroupEvent', 'Course', 'Penalty');
     const EMAIL_TASK_LOCK = 'tmp/email_task_lock';
     /**
      * main
@@ -58,20 +58,32 @@ class SendEmailsShell extends Shell
             $from = $this->User->getEmails($from_id);
             $from = (isset($from[$from_id]) && empty($from[$from_id])) ? $defaultFrom : $from[$from_id];
 
-			$filter_email_list = $this->reminderFilter($event_id, $e['to'], $e['id'], $e['date']); //Returns the modified emaillist if the list contains the 'save_reminder'
-			                                                                             //param, else returns $e['to']
-			
+            //Returns the modified emaillist if the list contains the 'save_reminder' param, else returns $e['to']
+			$filter_email_list = $this->reminderFilter($event_id, $e['to'], $e['id'], $e['date']);
+			//If event id is set it is a event reminder.
+			$template = isset($event_id) ? 'eventReminder' : 'default';
+			if (isset($event_id)) {
+			    $event = $this->Event->findById($event_id);
+			    $type = ($event['Event']['event_template_type_id'] == 3) ? 'survey' : 'peer evaluation';
+			    $controller->set('event', $event);
+			    $controller->set('course', $this->Course->findById($event['Event']['course_id']));
+			    $controller->set('type', $type);
+			    $controller->set('penalty', $this->Penalty->findAllByEventId($event_id));
+			}
+			                                                                             
             $emailList = $this->User->getEmails(explode(';', $filter_email_list));
             foreach ($emailList as $to_id => $to) {
                 if (empty($to)) {
                     // skip the empty ones
                     continue;
                 }
-			
-			
+
                 $subject = $e['subject'];
+                if (isset($event_id)) {
+                    $controller->set('user', $this->User->findById($to_id));
+                }
                 $content = $this->doMerge($e['content'], EmailMerge::MERGE_START, EmailMerge::MERGE_END, $to_id);
-                if ($this->sendEmail($content, $subject, $from, $to)) {
+                if ($this->sendEmail($content, $subject, $from, $to, $template)) {
                     $successCount++;
                 } else {
                     echo "Failed to send email to ".$to."\n";
@@ -212,7 +224,7 @@ class SendEmailsShell extends Shell
         $this->Email->subject = $subject;
         $this->Email->from = $from;
         $this->Email->template = $templateName;
-        $this->Email->sendAs = 'text';
+        $this->Email->sendAs = 'both';
 
         return $this->Email->send($content);
     }
