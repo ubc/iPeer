@@ -149,6 +149,7 @@ class InstallController extends Controller
                     'email.port' => $this->data['InstallValidationStep4']['email_port'],
                     'email.username' => $this->data['InstallValidationStep4']['email_username'],
                     'email.password' => $this->data['InstallValidationStep4']['email_password'],
+                    'system.absolute_url' => Router::url('/login', true),
                 )
             );
             $this->installHelper->updateSystemParameters($sysparams);

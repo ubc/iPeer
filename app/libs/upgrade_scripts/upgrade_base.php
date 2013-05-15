@@ -64,6 +64,7 @@ class UpgradeBase
             // because there's no pre-existing database.version entry, 
             // upgrade_310 should properly add this back
             $sysparameter->setValue('database.version', $this->dbVersion);
+            $sysparameter->setValue('system.absolute_url', Router::url('/login', true));
         } else {
             return false;
         }

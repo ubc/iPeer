@@ -2006,7 +2006,8 @@ INSERT INTO `sys_parameters` (`parameter_code`, `parameter_value`, `parameter_ty
 ('email.password', '', 'S', 'password for email smtp option', 'A', '0', NOW(), NULL , NOW()),
 ('display.contact_info', 'noreply@ipeer.ctlt.ubc.ca', 'S', 'Contact Info', 'A', 0, NOW(), 0, NOW()),
 ('display.login.header', '', 'S', 'Login Info Header', 'A', 0, NOW(), 0, NOW()),
-('display.login.footer', '', 'S', 'Login Info Footer', 'A', 0, NOW(), 0, NOW());
+('display.login.footer', '', 'S', 'Login Info Footer', 'A', 0, NOW(), 0, NOW()),
+('system.absolute_url', '', 'S', 'base url to iPeer', 'A', 0, NOW(), 0, NOW());
 
 -- --------------------------------------------------------
 

@@ -303,6 +303,9 @@ DELETE FROM sys_parameters WHERE parameter_code = 'display.vocabulary.department
 DELETE FROM sys_parameters WHERE parameter_code = 'custom.login_control';
 DELETE FROM sys_parameters WHERE parameter_code = 'custom.login_page_pathname';
 
+INSERT INTO `sys_parameters` (`parameter_code`, `parameter_value`, `parameter_type`, `description`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
+('system.absolute_url', '', 'S', 'base url to iPeer', 'A', 0, NOW(), 0, NOW());
+
 ALTER TABLE rubrics_criteria_comments modify criteria_id int(11) NOT NULL;
 
 -- Should be fine to completely recreate the ACL completely from scratch

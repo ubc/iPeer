@@ -69,6 +69,7 @@ class SendEmailsShell extends Shell
 			    $controller->set('course', $this->Course->findById($event['Event']['course_id']));
 			    $controller->set('type', $type);
 			    $controller->set('penalty', $this->Penalty->findAllByEventId($event_id));
+			    $controller->set('url', $this->SysParameter->get('system.absolute_url'));
 			}
 			                                                                             
             $emailList = $this->User->getEmails(explode(';', $filter_email_list));

@@ -11,7 +11,8 @@ __('you in iPeer, which has yet to be completed.', true); ?>
     <li><?php echo __('Close Date', true).': '.date('l, F j, Y g:i a', strtotime($event['Event']['release_date_end'])); ?></li>
 </ul>
 <?php 
-echo __('Please complete the ', true).$type.__(' before it closes.', true);
+echo __('You can login ', true).'<a href="'.$url.'">'.__('here', true).'</a>'.__(' to complete the ', true).
+    $type.__(' before it closes', true);
 if (!empty($penalty)) {
     echo __(' There is a penalty for submitting after the due date.', true);
 }
