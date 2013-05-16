@@ -13,7 +13,7 @@ class EmailerController extends AppController
     public $name = 'Emailer';
     public $uses = array('GroupsMembers', 'UserEnrol', 'User', 'EmailTemplate', 'EmailMerge',
         'EmailSchedule', 'Personalize', 'SysParameter', 'Group', 'Course', 'UserCourse',
-        'UserTutor');
+        'UserTutor', 'Event', 'Penalty');
     public $components = array('AjaxList', 'Session', 'RequestHandler', 'Email');
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Js' => array('Prototype'));
 
@@ -316,12 +316,7 @@ class EmailerController extends AppController
     function view ($id)
     {
         // retrieving the requested email schedule
-        $email = $this->EmailSchedule->find(
-            'first',
-            array(
-                'conditions' => array('id' => $id)
-            )
-        );
+        $email = $this->EmailSchedule->findById($id);
 
         // check to see if $id is valid - numeric & is a email schedule
         if (!is_numeric($id) || empty($email)) {
@@ -338,15 +333,8 @@ class EmailerController extends AppController
                 // course ids
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
                 // instructors
-                $instructors = $this->UserCourse->find(
-                    'all',
-                    array(
-                        'conditions' => array('UserCourse.course_id' => $courseIds)
-                ));
-                $instructorIds = array();
-                foreach ($instructors as $instructor) {
-                    $instructorIds[] = $instructor['UserCourse']['user_id'];
-                }
+                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                $instructorIds = Set::extract('/UserCourse/user_id', $instructors);
                 // add the user's id
                 array_push($instructorIds, $this->Auth->user('id'));
             }
@@ -359,10 +347,20 @@ class EmailerController extends AppController
         }
 
         $email['EmailSchedule']['to'] = explode(';', $email['EmailSchedule']['to']);
+        $email['EmailSchedule']['content'] = str_replace("\n", '<br/>', $email['EmailSchedule']['content']);
         $this->User->recursive = -1;
-        $email['User'] = $this->User->find('all', array(
-            'conditions' => array('User.id'=>$email['EmailSchedule']['to'])
-        ));
+        $email['User'] = $this->User->findAllById($email['EmailSchedule']['to']);
+        // event reminders
+        if (isset($email['EmailSchedule']['event_id'])) {
+            $event = $this->Event->findById($email['EmailSchedule']['event_id']);
+            $course = $this->Course->findById($email['EmailSchedule']['course_id']);
+            $penalty = $this->Penalty->findAllByEventId($email['EmailSchedule']['event_id']);
+            $user = array('User' => array('full_name' => 'Name'));
+            $type = ($event['Event']['event_template_type_id'] == 3) ? 'survey' : 'peer evaluation';
+            $url = Router::url('/', true);
+            $this->set('params', array('event' => $event, 'course' => $course, 
+                'penalty' => $penalty, 'user' => $user, 'type' => $type, 'url' => $url));
+        }
         $this->set('data', $email);
     }
 

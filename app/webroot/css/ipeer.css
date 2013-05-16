@@ -566,6 +566,17 @@ i {
     text-align: left;
 }
 
+#emailContent {
+    text-align: left;
+    padding: 1em;
+}
+
+#emailContent ul li {
+    list-style-type: circle;
+    list-style-position: inside;
+    margin: 0.5em;
+}
+
 /* edit profile - Oauth section */
 
 .oauth {
