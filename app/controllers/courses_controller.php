@@ -221,20 +221,17 @@ class CoursesController extends AppController
             $uf = $this->UserFaculty->findAllByUserId($this->Auth->user('id'));
             // get the departments of those faculties
             $ret = $this->Department->getByUserFaculties($uf);
-            $departments = array();
-            foreach ($ret as $department) {
-                $departments[$department['Department']['id']] =
-                    $department['Department']['name'];
-            }
+            $departments = Set::combine($ret, '{n}.Department.id', '{n}.Department.name');
+            $facultyIds = Set::extract($uf, '/UserFaculty/faculty_id');
+            $instructorList = $this->User->getInstructorListByFaculty($facultyIds);
             // a hack for transition from 2.x
-            // exisintg instructors may not get assigned to any department,
+            // existing instructors may not get assigned to any department,
             // they have no way to assign course to department. So showing all
             // deparments for those who don't get any deparment
             if (empty($departments)) {
                 $departments = $this->Course->Department->find('list');
+                $instructorList = $this->User->getInstructors('list', array());
             }
-            $facultyIds = Set::extract($uf, '/UserFaculty/faculty_id');
-            $instructorList = $this->User->getInstructorListByFaculty($facultyIds);
         }
         // set the list available statuses
         $statusOptions = array( 'A' => 'Active', 'I' => 'Inactive');

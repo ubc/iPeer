@@ -25,8 +25,11 @@ $prof = $form->input('instructors', array(
     'after' => $html->link(__('Add Instructor', true),'#', array('onclick' => 'addInstructor(); return false;')),
     'empty' => '-- Select an instructor --'));
 if (isset($this->data) && isset($this->data['Instructor'])) {
+    // have names for instructors that may not be in the original list of instructors
+    // eg. admin adds an instructor from a different department to the course.
+    $profs = Set::combine($this->data['Instructor'], '{n}.id', '{n}.full_name');
     foreach($this->data['Instructor']['Instructor'] as $key => $id) {
-        $prof .= makeInstructor($key, $id, $instructors[$id], $html, $form);
+        $prof .= makeInstructor($key, $id, $profs[$id], $html, $form);
         $numInstructors = $key + 1;
         $selected[] = $id;
     }
