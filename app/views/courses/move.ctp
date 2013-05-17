@@ -3,7 +3,14 @@
 <ul>
     <li><?php echo __('All fields are mandatory.', true) ?></li>
     <li><?php echo __('When all fields have been filled, the Submit button will become available.', true) ?></li>
-    <li><?php echo __('Only students who have submitted their surveys will appear in the list.', true) ?></li>
+    <li><?php echo __('The conditions below must be met for the move to be successful.', true) ?></li>
+</ul>
+<h2><?php echo __('Conditions', true)?></h2>
+<ul>
+    <li><?php echo __('The Source Course must have a survey.', true) ?></li>
+    <li><?php echo __('The Student being moved must have made a submission to the Source Survey.', true) ?></li>
+    <li><?php echo __('The Destination Course must be accessible to you.', true) ?></li>
+    <li><?php echo __('The Source Survey needs to use the same template as the Source Survey.', true) ?></li>
 </ul>
 <h2><?php echo __('Move or Copy Student', true); ?></h2>
 <?php
@@ -19,6 +26,7 @@ echo $this->Form->input('action', array(
     'options' => array('1' => 'Move', '0' => 'Copy'),
     'default' => '1'
 ));
+echo '<div class="help-text">'.__('"Move" will unenrol the student from the Source Course.', true).'</div>';
 echo $this->Form->end(array('label' => 'Submit', 'id' => 'submit'));
 ?>
 

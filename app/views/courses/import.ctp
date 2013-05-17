@@ -4,6 +4,15 @@
     <li><?php echo __('All fields are mandatory.', true) ?></li>
     <li><?php echo __('When all fields are filled, the Submit button will become available.', true) ?></li>
     <li><?php echo __('You can choose to import into a duplicate of the source survey or choose an existing survey.', true) ?></li>
+    <li><?php echo __('The conditions below must be met for the move to be successful.', true) ?></li>
+</ul>
+<h2><?php echo __('Conditions', true)?></h2>
+<ul>
+    <li><?php echo __('Only Text (.txt) and CSV File (.csv) can be used.', true) ?></li>
+    <li><?php echo __('Only student numbers and usernames can be used in the file but not both.', true) ?></li>
+    <li><?php echo __('The Source Course must have a survey.', true) ?></li>
+    <li><?php echo __('The Destination Course must be accessible to you.', true) ?></li>
+    <li><?php echo __('The existing Destination Survey needs to use the same template as the Source Survey.', true) ?></li>
 </ul>
 <h3><?php echo __('Examples:', true)?></h3>
 <pre id='example'>
@@ -46,6 +55,7 @@ echo $this->Form->input('action', array(
     'legend' => __('Move or Copy?', true),
     'default' => '1'
 ));
+echo '<div class="help-text">'.__('"Move" will unenrol the student from the Source Course.', true).'</div>';
 echo $this->Form->end(array('label' => 'Submit', 'id' => 'submit'));
 ?>
 </div>
