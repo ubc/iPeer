@@ -67,14 +67,10 @@ class EmailerController extends AppController
             $extraFilters = '';
         } else {
             $creators = array();
-            // grab course ids of the courses admin/super admin has access to
-            $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+            // grab course ids of the courses admin/instructor has access to
+            $courseIds = User::getAccessibleCourses();
             // grab all instructors that have access to the courses above
-            $instructors = $this->UserCourse->find(
-                'all',
-                array(
-                    'conditions' => array('UserCourse.course_id' => $courseIds)
-            ));
+            $instructors = $this->UserCourse->findAllByCourseId($courseIds);
             $extraFilters = "(";
             // only admins will go through this loop
             foreach ($instructors as $instructor) {
@@ -325,19 +321,13 @@ class EmailerController extends AppController
         }
 
         if (!User::hasPermission('functions/superadmin')) {
-            // instructor
-            if (!User::hasPermission('controllers/departments')) {
-                $instructorIds = array($this->Auth->user('id'));
-            // admins
-            } else {
-                // course ids
-                $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
-                // instructors
-                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
-                $instructorIds = Set::extract('/UserCourse/user_id', $instructors);
-                // add the user's id
-                array_push($instructorIds, $this->Auth->user('id'));
-            }
+            // course ids
+            $courseIds = User::getAccessibleCourses();
+            // instructors
+            $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+            $instructorIds = Set::extract('/UserCourse/user_id', $instructors);
+            // add the user's id
+            array_push($instructorIds, $this->Auth->user('id'));
 
             // creator's id must be in the array of accessible user ids
             if (!(in_array($email['EmailSchedule']['creator_id'], $instructorIds))) {

@@ -257,6 +257,7 @@ class addEventTestCase extends SystemBaseTestCase
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '28')->click();
         
         $dueDate = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->attribute('value');
+        $releaseEnd = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->attribute('value');
         
         // set email reminder frequency to 5 days
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[value="5"]')->click();
@@ -302,11 +303,14 @@ class addEventTestCase extends SystemBaseTestCase
         $alex = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Alex Student');
         $this->assertTrue(empty($alex)); // Alex is not listed because he has submitted already
         // email content
-        $content = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'email_content')->text();
-        $expected = 'Please Submit your iPeer Evaluation, Simple Evaluation with Reminders, for MECH 328. You have not '.
-            'submitted your iPeer Evaluation, Simple Evaluation with Reminders, for MECH 328. Please login to iPeer at '.
-            $this->url.'login and click on the Submit button to submit your iPeer Evaluation.';
+        $content = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'emailContent')->text();
+        $expected = "Hello Name,\nA peer evaluation for MECH 328 is made available to you in iPeer, which".
+            " has yet to be completed.\nName: Simple Evaluation with Reminders\nDue Date: ".date('l, F j, Y g:i a', strtotime($dueDate)).
+            "\nClose Date: ".date('l, F j, Y g:i a', strtotime($releaseEnd))."\nYou can login here to complete ".
+            "the peer evaluation before it closes.\nThank you";
         $this->assertEqual($content, $expected);
+        $link = $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'here')->attribute('href');
+        $this->assertEqual($link, $this->url);
 
         // frequency calculations
         $this->session->open($this->url.'events/edit/'.$eventId);
@@ -416,7 +420,7 @@ class addEventTestCase extends SystemBaseTestCase
         $this->waitForLogoutLogin('root');
         $this->session->open($this->url.'emailer');
 
-        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Please Submit your iPeer Evaluation, Survey with Email Reminders, for MECH 328')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'MECH 328 - iPeer Survey Reminder')->click();
         $alex = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Alex Student');
         $this->assertTrue(empty($alex)); // Alex is not listed because he has submitted already
         
@@ -438,7 +442,7 @@ class addEventTestCase extends SystemBaseTestCase
             }
         );
         $this->session->open($this->url.'emailer');
-        $emails = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Please Submit your iPeer Evaluation, Survey with Email Reminders, for MECH 328');
+        $emails = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'MECH 328 - iPeer Survey Reminder');
         $scheduled++;
         //includes the one that was sent and can't be deleted; test that all unsent emails are deleted
         $this->assertEqual(count($emails), $scheduled);
@@ -456,7 +460,7 @@ class addEventTestCase extends SystemBaseTestCase
         );
         
         $this->session->open($this->url.'emailer');
-        $emails = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Please Submit your iPeer Evaluation, Survey with Email Reminders, for MECH 328');
+        $emails = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'MECH 328 - iPeer Survey Reminder');
         $this->assertEqual(count($emails), 1);
         $emails[0]->click();
         // try deleting the sent email

@@ -22,7 +22,7 @@
   </tr>
   <tr>
     <td><?php __('Scheduled on')?></td>
-    <td><?php echo $data['EmailSchedule']['date'];?>
+    <td><?php echo Toolkit::formatDate($data['EmailSchedule']['date']);?>
     </td>
   </tr>
   <tr>
@@ -43,7 +43,7 @@
   </tr>
   <tr>
     <td><?php __('Created')?></td>
-    <td><?php echo $data['EmailSchedule']['created'];?>
+    <td><?php echo Toolkit::formatDate($data['EmailSchedule']['created']);?>
     </td>
   </tr>
 </table>

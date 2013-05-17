@@ -12,7 +12,7 @@ __('you in iPeer, which has yet to be completed.', true); ?>
 </ul>
 <?php 
 echo __('You can login ', true).'<a href="'.$url.'">'.__('here', true).'</a>'.__(' to complete the ', true).
-    $type.__(' before it closes', true);
+    $type.__(' before it closes.', true);
 if (!empty($penalty)) {
     echo __(' There is a penalty for submitting after the due date.', true);
 }
