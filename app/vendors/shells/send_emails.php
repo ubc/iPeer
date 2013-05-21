@@ -103,7 +103,7 @@ class SendEmailsShell extends Shell
     }
 
    /*
-    *Given an array of email addresses, delete the ones that have already submitted the evaluation with event_id
+    * If the email is an event reminder, returns the list of users that have not submitted
     * 
     * @param mixed $event_id
     * @param mixed $to

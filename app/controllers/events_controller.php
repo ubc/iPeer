@@ -394,7 +394,6 @@ class EventsController extends AppController
         $dueDate = $eventData['Event']['due_date'];
         $emailFreq = '+' . $emailFreq . ' day';
 
-        $eventTitle = $eventData['Event']['title'];
         $courseName = $this->Course->getCourseName($courseId);
         $type = ($eventData['Event']['event_template_type_id'] == 3) ? 'Survey' : 'Evaluation';
 

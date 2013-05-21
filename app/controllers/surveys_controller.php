@@ -247,7 +247,17 @@ class SurveysController extends AppController
         }
 
         // Get the course data
-        $templates = $this->Survey->find('list');
+        if (!User::hasPermission('functions/superadmin')) {
+            $courses = User::getAccessibleCourses();
+            $instructors = Set::extract('/UserCourse/user_id', $this->UserCourse->findByCourseId($courses));
+            $instructors[] = $this->Auth->user('id');
+            $templates = $this->Survey->find('all', array(
+                'conditions' => array('OR' => array('creator_id' => $instructors, 'availability' => 'public'))
+            ));
+            $templates = Set::combine($templates, '{n}.Survey.id', '{n}.Survey.name');
+        } else {
+            $templates = $this->Survey->find('list');
+        }
         $this->set('templates', $templates);
         $this->render('edit');
     }
