@@ -377,14 +377,6 @@ class EvaluationTestCase extends CakeTestCase
 
     }
 
-    function testFormatMixevalEvaluationResult()
-    {
-
-        // $result = $this->EvaluationComponentTest->formatMixevalEvaluationResult(1, 1, 1);
-        // var_dump($result);
-
-    }
-
     //function is not used anywhere
 
     function testFormatStudentViewOfSurveyEvaluationResult()

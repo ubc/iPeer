@@ -702,7 +702,7 @@ class EvaluationsController extends AppController
             $this->set('viewData', $rubricEvalViewData);
             $this->set('title_for_layout', $this->Course->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
 
-            $rubricDetail = $this->Evaluation->loadRubricEvaluationDetail($event, $groupId);
+            $rubricDetail = $this->Evaluation->loadRubricEvaluationDetail($event);
             $this->set('groupMembers', $rubricDetail['groupMembers']);
             $this->set('evaluateeCount', $rubricDetail['evaluateeCount']);
 
@@ -1058,7 +1058,7 @@ class EvaluationsController extends AppController
             $fullNames = $this->User->getFullNames($memberList);
             $members = $this->User->findAllById($memberList);
             $rubric = $this->Rubric->findById($event['Event']['template_id']);
-            $scoreRecords = $this->Evaluation->formatRubricEvaluationResultsMatrix($rubricDetails, $rubric);
+            $scoreRecords = $this->Evaluation->formatRubricEvaluationResultsMatrix($rubricDetails);
 
             $this->set('rubric', $rubric);
             $this->set('inCompleteMembers', $inCompleteMembers);

@@ -327,7 +327,8 @@ class Rubric extends EvaluationBase
 
     /* Now, replace all the elements of this database array with the submitted array, unless there are missing */
         $submittedRubric = $tmp['Rubric'];
-        foreach ($tmp3 as $key => $value) {
+        $keys = array_keys($tmp3);
+        foreach ($keys as $key) {
 
             if (!empty($submittedRubric[$key])) {
                 //echo "<b>$key Replacing $tmp3[$key] with $submittedRubric[$key]</b><br />";
