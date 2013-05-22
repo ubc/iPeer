@@ -254,22 +254,19 @@ class EmailerController extends AppController
         }
 
         if (!User::hasPermission('functions/superadmin')) {
-            // instructor
-            if (!User::hasPermission('controllers/departments')) {
-                $instructorIds = array($this->Auth->user('id'));
-            // admins
-            } else {
-                // course ids
-                $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
-                // instructors
+            $courseIds = User::getAccessibleCourses();
+            $instructorIds = array();
+            if (User::hasPermission('controllers/departments')) {
                 $instructors = $this->UserCourse->findAllByCourseId($courseIds);
-                $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
-                // add the user's id
-                array_push($instructorIds, $this->Auth->user('id'));
+                $instructorIds = Set::extract('/UserCourse/user_id', $instructors);
             }
+            // add the user's id
+            array_push($instructorIds, $this->Auth->user('id'));
 
-            // creator's id must be in the array of accessible user ids
-            if (!(in_array($email['EmailSchedule']['creator_id'], $instructorIds))) {
+            // creator's id must be in the array of accessible user ids OR
+            // they have access to the course
+            if (!(in_array($email['EmailSchedule']['creator_id'], $instructorIds) ||
+                in_array($email['EmailSchedule']['course_id'], $courseIds))) {
                 $this->Session->setFlash(__('Error: You do not have permission to cancel this email schedule', true));
                 $this->redirect('index');
             }
