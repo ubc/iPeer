@@ -495,7 +495,7 @@ class EvaluationSimple extends EvaluationResponseBase
     function simpleEvalScore($eventId, $fields, $conditions) {
         $evalSub = ClassRegistry::init('EvaluationSubmission');
         $pen = ClassRegistry::init('Penalty');
-        $simp = ClassRegistry::init('SimpleEvaluation');
+        //$simp = ClassRegistry::init('SimpleEvaluation');
 
         $list = $this->find('all',
             array('fields' => $fields, 'conditions' => $conditions));

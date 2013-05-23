@@ -78,7 +78,7 @@ class SurveysController extends AppController
                 array('private' => 'private', 'public' => 'public')),
             array("Survey.question_count", __("Questions", true),        "6em",  "action", "Edit Questions"),
             array("Survey.creator_id",   "", "", "hidden"),
-            array("Survey.creator",  __("Created By", true),    "8em", "action", "View Creator"),
+            array("Survey.creator",  __("Creator", true),    "8em", "action", "View Creator"),
             array("Survey.created",     __("Creation Date", true), "10em", "date"));
 
         // Just list all and my evaluations for selections

@@ -145,13 +145,13 @@ class ExportBaseNewComponent extends Object
     function buildScoreTableByEvaluatee($params, $group, $evaluatee, $event, $responses)
     {
         // Build grid
-        $xPosition = 0;
-        $yPosition = 0;
+        //$xPosition = 0;
+        //$yPosition = 0;
         // Fill in grid Results
         $yInc = 0;
 
         $xDimension = $this->calcDimensionX($params, $event);
-        $yDimensions = count($group['Member']);
+        //$yDimensions = count($group['Member']);
         $grid = array();
 
         foreach ($group['Member'] as $evaluator) {

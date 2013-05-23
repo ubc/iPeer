@@ -467,12 +467,10 @@ class CoursesController extends AppController
         switch($_GET['field']) {
             case 'sCourses':
                 $options = $this->Event->getActiveSurveyEvents($_GET['courseId'], 'list');
-                $empty = 'survey';
                 break;
             case 'sSurveys':
                 $sub = $this->EvaluationSubmission->findAllByEventId($_GET['surveyId']);
                 $options = $this->User->getFullNames(Set::extract('/EvaluationSubmission/submitter_id', $sub));
-                $empty = 'student';
                 break;
             case 'submitters':
                 $event = $this->Event->findById($_GET['surveyId']);
@@ -481,18 +479,15 @@ class CoursesController extends AppController
                     $event['Event']['template_id'], 'all');
                 $options = $this->Course->getCourseList(array_unique(Set::extract('/Event/course_id', $destEvents)));
                 unset($options[$_GET['courseId']]); //remove source course
-                $empty = 'course';
                 break;
             case 'dCourses':
                 $event = $this->Event->findById($_GET['surveyId']);
                 $options = $this->Event->getSurveyByCourseIdTemplateId(
                     $_GET['courseId'], $event['Event']['template_id']);
-                $empty = 'survey';
                 break;
             case 'importDestCourses':
                 $options = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
                 unset($options[$_GET['courseId']]); // remove source course
-                $empty = 'course';
                 break;
         }
 
@@ -508,8 +503,6 @@ class CoursesController extends AppController
      */
     function import()
     {
-        $this->set('title_for_layout', __('Move Group of Students', true));
-
         if (!empty($this->data)) {
             // check that file upload worked
             if ($this->FileUpload->success) {
@@ -527,18 +520,20 @@ class CoursesController extends AppController
             $fieldText = ($field == 'student_no') ? 'student number' : 'username';
             
             // create a copy of the source survey else grab destSurveys id
-            if ($data['surveyChoices']) {
-                $event = $this->Event->findById($data['sourceSurveys']);
-                $event['Event']['id'] = null;
-                $event['Event']['course_id'] = $data['destCourses'];
-                if (!$this->Event->save($event['Event'])) {
-                    $this->Session->setFlash(__('Error: Event was unable to be created.', true));
-                    $this->redirect('import');
-                    return;
+            if (isset($data['sourceSurveys'])) {
+                if ($data['surveyChoices']) {
+                    $event = $this->Event->findById($data['sourceSurveys']);
+                    $event['Event']['id'] = null;
+                    $event['Event']['course_id'] = $data['destCourses'];
+                    if (!$this->Event->save($event['Event'])) {
+                        $this->Session->setFlash(__('Error: Event was unable to be created.', true));
+                        $this->redirect('import');
+                        return;
+                    }
+                    $destEventId = $this->Event->getLastInsertID();
+                } else {
+                    $destEventId = $data['destSurveys'];
                 }
-                $destEventId = $this->Event->getLastInsertID();
-            } else {
-                $destEventId = $data['destSurveys'];
             }
             
             $error = array();
@@ -551,63 +546,74 @@ class CoursesController extends AppController
             }
             $enrolled = $this->UserEnrol->findAllByCourseId($data['sourceCourses']);
             $enrolled = Set::extract('/UserEnrol/user_id', $enrolled);
+            $destEnrolled = $this->UserEnrol->findAllByCourseId($data['destCourses']);
+            $destEnrolled = Set::extract('/UserEnrol/user_id', $destEnrolled);
+            if($move) {
+                $event = $this->Event->findAllByCourseId($data['sourceCourses']);
+                $eventIds = Set::extract('/Event/id', $event);
+                $sub = $this->EvaluationSubmission->find('all', array(
+                    'conditions' => array('grp_event_id !=' => null, 'submitter_id' => $enrolled,
+                        'EvaluationSubmission.event_id' => $eventIds)));
+                $submission = Set::combine($sub, '{n}.EvaluationSubmission.id', '{n}.EvaluationSubmission', '{n}.EvaluationSubmission.submitter_id');
+            }
             // enrol student
             foreach ($users as $user) {
                 $identifier = $user['User'][$field];
-                // check that student is enrolled
-                if (!in_array($user['User']['id'], $enrolled)) {
-                    $error[$identifier] = __('No student with '.$fieldText.' '.$identifier.' is enrolled.', true);
-                    continue;
-                }
                 // enrol student to destination course if not already enrolled
-                $course = $this->Course->getAccessibleCourseById($data['destCourses'], $user['User']['id'], Course::FILTER_PERMISSION_ENROLLED);
-                if (!$course) {
+                if (!in_array($user['User']['id'], $destEnrolled)) {
                     if (!$this->User->addStudent($user['User']['id'], $data['destCourses'])) {
                         $error[$identifier] = __('The student could not be enrolled to the destination course.', true);
                         continue;
                     }
                 }
                 // move or copy survey submission
-                $sub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter(
-                    $data['sourceSurveys'], $user['User']['id']);
-                $destSub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter(
-                    $data['destSurveys'], $user['User']['id']);
-                if ($sub && empty($destSub)) {
-                    $inputs = $this->SurveyInput->getByEventIdUserId(
+                if (isset($data['sourceSurveys'])) {
+                    $sub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter(
                         $data['sourceSurveys'], $user['User']['id']);
-                    // if choose to copy set id to null
-                    if (!$move) {
-                        $sub['EvaluationSubmission']['id'] = null;
-                    }
-                    $sub['EvaluationSubmission']['event_id'] = $destEventId;
-                    $sInputs = array();
-                    foreach ($inputs as $input) {
-                        $tmp = $input['SurveyInput'];
+                    $destSub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter(
+                        $data['destSurveys'], $user['User']['id']);
+                    if ($sub && empty($destSub)) {
+                        $inputs = $this->SurveyInput->getByEventIdUserId(
+                            $data['sourceSurveys'], $user['User']['id']);
+                        // if choose to copy set id to null
                         if (!$move) {
-                            $tmp['id'] = null;
+                            $sub['EvaluationSubmission']['id'] = null;
                         }
-                        $tmp['event_id'] = $destEventId;
-                        $sInputs[] = $tmp;
-                    }
-                    if (!($this->EvaluationSubmission->save($sub) && $this->SurveyInput->saveAll($sInputs))) {
-                        $error[$identifier] = __("The student's survey submission could not be transferred, however they are enrolled in the destination course.", true);
-                        continue;  
+                        $sub['EvaluationSubmission']['event_id'] = $destEventId;
+                        $sInputs = array();
+                        foreach ($inputs as $input) {
+                            $tmp = $input['SurveyInput'];
+                            if (!$move) {
+                                $tmp['id'] = null;
+                            }
+                            $tmp['event_id'] = $destEventId;
+                            $sInputs[] = $tmp;
+                        }
+                        if (!($this->EvaluationSubmission->save($sub) && $this->SurveyInput->saveAll($sInputs))) {
+                            $error[$identifier] = __("The student's survey submission could not be transferred, however they are enrolled in the destination course.", true);
+                            continue;  
+                        }
                     }
                 }
-                // unenrol student if enrolled to source course
-                $course = $this->Course->getAccessibleCourseById($data['sourceCourses'], $user['User']['id'], User::getCourseFilterPermission());
-                if ($move && $course) {
+                if (!isset($error[$identifier])) {
+                    $success[$identifier] = __('Success.', true);
+                }
+
+                if ($move && in_array($user['User']['id'], $enrolled)) {
                     if (!$this->User->removeStudent($user['User']['id'], $data['sourceCourses'])) {
-                        $success[$identifier] = __('The student was successfully transferred over to the destination course, however they were unsuccessfully unenrolled from the source course.', true);
+                        $success[$identifier] .= __(' However they were unsuccessfully unenrolled from the source course.', true);
                     }
-                }
+                } else if (!in_array($user['User']['id'], $enrolled)) {
+                    $success[$identifier] .= __(' However no student with '.$fieldText.' '.$identifier.' was enrolled in the source course.', true);
+                } 
                 
-                if (!isset($error[$identifier]) && !isset($success[$identifier])) {
-                    $success[$identifier] = __('Success', true);
-                    if (!empty($destSub)) {
-                        $success[$identifier] .= __(', but the student has already submitted to the 
-                            destination survey, therefore the survey submission from the source survey was not transferred.', true);
-                    }
+                if ($move && isset($submission[$user['User']['id']])) {
+                    $success[$identifier] .= "\n".__("The student has already submitted a peer evaluation in the source course.", true);
+                } 
+                
+                if (isset($data['sourceSurveys']) && !empty($destSub) && $sub) {
+                    $success[$identifier] .= "\n".__("The student has already submitted to the 
+                        destination survey, therefore the survey submission from the source survey was not transferred.", true);
                 }
             
             }
@@ -620,8 +626,9 @@ class CoursesController extends AppController
         }
         
         $destCourses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
-        $sourceEvents = $this->Event->getActiveSurveyEvents(array_keys($destCourses));
-        $courseIds = array_unique(Set::extract('/Event/course_id', $sourceEvents));
+        //$sourceEvents = $this->Event->getActiveSurveyEvents(array_keys($destCourses));
+        //$courseIds = array_unique(Set::extract('/Event/course_id', $sourceEvents));
+        $courseIds = array_keys($destCourses);
         $sourceCourses = $this->Course->getCourseList($courseIds);
         asort($sourceCourses);
         $this->set('sourceCourses', $sourceCourses);

@@ -981,7 +981,7 @@ class UsersController extends AppController
             // send email to user
             $this->set('user_data', $user_data);
             if (!empty($user_data['User']['email'])) {
-                if ($this->_sendEmail('', 'Reset Password', null, $user_data['User']['email'], 'resetPassword')) {
+                if ($this->_sendEmail('', 'iPeer Password Reset', null, $user_data['User']['email'], 'resetPassword')) {
                     $message .= __("Email has been sent. ", true);
                 } else {
                     $message .= __("Email was <u>not</u> sent to the user. ", true) . $this->Email->smtpError;
