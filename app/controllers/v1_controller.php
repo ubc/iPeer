@@ -625,10 +625,22 @@ class V1Controller extends Controller {
             // add the list of users to the given group
             $ret = $this->body;
             $users = json_decode($ret, true);
+            $group = $this->Group->findById($groupId);
+            $courseId = $group['Group']['course_id'];
+            $students = $this->UserEnrol->find('list', array('conditions' => array('course_id' => $courseId), 'fields' => array('user_id')));
+            $tutors = $this->UserTutor->find('list', array('conditions' => array('course_id' => $courseId), 'fields' => array('user_id')));
+            $members = array_merge($students, $tutors);
+            $inClass = $this->User->find('list', array('conditions' => array('User.id' => $members), 'fields' => array('User.username')));
+            $userIds = array();
             $status = 'HTTP/1.1 200 OK';
             foreach ($users as $user) {
+                if (!in_array($user['username'], $inClass)) {
+                    $this->log('User '.$user['username'].' is not in the course '.$courseId, 'debug');
+                    continue;
+                }
                 $userId = $this->User->field('id',
                     array('username' => $user['username']));
+                $userIds[] = $userId;
                 $tmp = array('group_id' => $groupId, 'user_id' => $userId);
                 $inGroup = $this->GroupsMembers->field('id', $tmp);
                 // user already in the group
@@ -646,6 +658,15 @@ class V1Controller extends Controller {
                         $status = 'HTTP/1.1 500 Internal Server Error';
                         break;
                     }
+                }
+            }
+            $origMembers = Set::extract('/Member/id', $group);
+            $toRemove = array_diff($origMembers, $userIds);
+            if (!empty($toRemove)) {
+                if ($this->GroupsMembers->deleteAll(array('user_id' => $toRemove, 'group_id' => $groupId))) {
+                    $this->log('Removed users '.implode(', ', $toRemove).' from group '.$groupId, 'debug');
+                } else {
+                    $this->log('Failed to remove users '.implode(', ', $toRemove).' from group '.$groupId, 'debug');
                 }
             }
         } else if ($this->RequestHandler->isDelete()) {
@@ -929,6 +950,11 @@ class V1Controller extends Controller {
                 if (count(preg_grep("/^".$user['username']."$/i", $inClass)) == 0) {
                     $userId = $this->User->field('id',
                         array('username' => $user['username']));
+                    // skip users not in the system
+                    if (empty($userId)) {
+                        $this->log('Username '.$user['username'].' does not exist in the system.', 'debug');
+                        continue;
+                    }
                     $role = $this->Role->getRoleName($user['role_id']);
                     $table = null;
                     if ($role == 'student') {
@@ -958,6 +984,35 @@ class V1Controller extends Controller {
                     $result[] = $user;
                 }
             }
+            // unenrol students that are no longer in the class, this will become a problem if 
+            // only a fraction of the class list is given because the rest of the class will
+            // be unenrolled. One example is the api being used to only enrol one user.
+            $users = Set::extract('/username', $users);
+            $unEnrol = array_diff($inClass, $users);
+            foreach ($unEnrol as $user) {
+                $userId = $this->User->field('id', array('username' => $user));
+                $role = $this->User->getRoleName($userId);
+                if ($role == 'student') {
+                    $ret = $this->User->removeStudent($userId, $courseId);
+                    $this->log('Removing student '.$user['username'].' from course '.$courseId, 'debug');
+                } else if ($role == 'instructor') {
+                    $ret = $this->User->removeInstructor($userId, $courseId);
+                    $this->log('Removing instructor '.$user['username'].' from course '.$courseId, 'debug');
+                } else if ($role == 'tutor') {
+                    $ret = $this->User->removeTutor($userId, $courseId);
+                    $this->log('Removing tutor '.$user['username'].' from course '.$courseId, 'debug');
+                } else {
+                    $this->set('error', array('code' => 400, 'message' => 'Unsupported role for '.$user['username'].'. Could not unenrol.'));
+                    $this->render('error');
+                    return;
+                }
+                if (!$ret) {
+                    $this->set('error', array('code' => 401, 'message' => 'Fail to unenrol ' . $user['username']));
+                    $this->render('error');
+                    return;
+                }
+            }
+            
             $this->set('result', $result);
         } else if ($this->RequestHandler->isDelete()) {
             $this->set('statusCode', 'HTTP/1.1 200 OK');

@@ -375,6 +375,12 @@ class V1ControllerTest extends CakeTestCase {
 
         $ret = $this->_oauthReq("$url/$id");
         $this->assertEqual(substr($ret->debugInfo['headers_recv'], 0, 22), 'HTTP/1.1 404 Not Found');
+        
+        // delete another course
+        $id = $newCourse['Course']['id'];
+        $file = $this->_oauthReq("$url/$id", null, OAUTH_HTTP_METHOD_DELETE);
+        $ret = $this->_oauthReq("$url/$id");
+        $this->assertEqual(substr($ret->debugInfo['headers_recv'], 0, 22), 'HTTP/1.1 404 Not Found');
     }
 
     public function testGroups() {
@@ -463,19 +469,52 @@ class V1ControllerTest extends CakeTestCase {
 
         // HTTP POST, try to assign students to a group
         $toBeAdded = array(
-            array('username' => 'redshirt0004'),
-            array('username' => 'redshirt0005'),
-            array('username' => 'redshirt0006'));
+            array('username' => 'redshirt0001'),
+            array('username' => 'redshirt0002'),
+            array('username' => 'redshirt0003'),
+            array('username' => 'tutor1'),
+            array('username' => 'redshirt0009'),
+            array('username' => 'redshirt0011'),
+            array('username' => 'redshirt0013'),
+            array('username' => 'redshirt0014'));
         $addedMembers = $this->_oauthReq("$url", json_encode($toBeAdded), OAUTH_HTTP_METHOD_POST);
+        $expected = array(
+            array('username' => 'redshirt0001'),
+            array('username' => 'redshirt0002'),
+            array('username' => 'redshirt0003'),
+            array('username' => 'tutor1'),
+            array('username' => 'redshirt0009'),
+            array('username' => 'redshirt0011'),
+            array('username' => 'redshirt0013'));
 
-        $this->assertEqual(json_decode($addedMembers, true), $toBeAdded);
+        // redshirt0014 is not in the course therefore would be skipped
+        $this->assertEqual(json_decode($addedMembers, true), $expected);
+        
+        // test updating class list - removing students not in new list
+        $update = array(
+            array('username' => 'redshirt0001'),
+            array('username' => 'redshirt0002'),
+            array('username' => 'redshirt0003'),
+            array('username' => 'tutor1'),
+            array('username' => 'redshirt0011'),
+            array('username' => 'redshirt0013'));
+        $updated = $this->_oauthReq("$url", json_encode($update), OAUTH_HTTP_METHOD_POST);
+        $updated = $this->_oauthReq("$url");
+        $expected = array(
+            array('id' => '5', 'role_id' => '5', 'username' => 'redshirt0001', 'last_name' => 'Student', 'first_name' => 'Ed'),
+            array('id' => '6', 'role_id' => '5', 'username' => 'redshirt0002', 'last_name' => 'Student', 'first_name' => 'Alex'),
+            array('id' => '7', 'role_id' => '5', 'username' => 'redshirt0003', 'last_name' => 'Student', 'first_name' => 'Matt'),
+            array('id' => '15', 'role_id' => '5', 'username' => 'redshirt0011', 'last_name' => 'Student', 'first_name' => 'Jennifer'),
+            array('id' => '17', 'role_id' => '5', 'username' => 'redshirt0013', 'last_name' => 'Student', 'first_name' => 'Edna'),
+            array('id' => '35', 'role_id' => '4', 'username' => 'tutor1', 'last_name' => '1', 'first_name' => 'Tutor'),
+        );
+
+        $this->assertEqual(json_decode($updated, true), $expected);
 
         // HTTP DELETE, try to remove students from a group
-        $ret = $this->_oauthReq("$url/redshirt0004",null,OAUTH_HTTP_METHOD_DELETE);
+        $ret = $this->_oauthReq("$url/redshirt0011",null,OAUTH_HTTP_METHOD_DELETE);
         $this->assertEqual(json_decode($ret, true), array());
-        $ret = $this->_oauthReq("$url/redshirt0005",null,OAUTH_HTTP_METHOD_DELETE);
-        $this->assertEqual(json_decode($ret, true), array());
-        $ret = $this->_oauthReq("$url/redshirt0006",null,OAUTH_HTTP_METHOD_DELETE);
+        $ret = $this->_oauthReq("$url/redshirt0013",null,OAUTH_HTTP_METHOD_DELETE);
         $this->assertEqual(json_decode($ret, true), array());
         // confirm that the group is back to what it was before
         $ret = $this->_oauthReq("$url");
@@ -706,40 +745,87 @@ class V1ControllerTest extends CakeTestCase {
         );
         $this->assertEqual($expected, json_decode($actual, true));
 
+        // Add a non-existent user
+        $input = array(
+            array('username' => 'redshirt0004', 'role_id' => 5),
+            array('username' => 'redshirt0029', 'role_id' => 5),
+            array('username' => 'instructor3', 'role_id' => 3),
+            array('username' => 'tutor3', 'role_id' => 4),
+            array('username' => 'redshirt0099', 'role_id' => 5)
+        );
+        $actual = $this->_oauthReq(
+            $url, json_encode($input), OAUTH_HTTP_METHOD_POST);
+        $this->assertEqual(json_decode($actual, true), array());
+
         // Add a student to a course
+        $input = array(
+            array('username' => 'redshirt0004', 'role_id' => 5),
+            array('username' => 'redshirt0029', 'role_id' => 5),
+            array('username' => 'instructor3', 'role_id' => 3),
+            array('username' => 'tutor3', 'role_id' => 4),
+            array('username' => 'redshirt0005', 'role_id' => 5)
+        );
         $expected = array(array('username' => 'redshirt0005', 'role_id' => 5));
         $actual = $this->_oauthReq(
-            $url, json_encode($expected), OAUTH_HTTP_METHOD_POST);
+            $url, json_encode($input), OAUTH_HTTP_METHOD_POST);
         $this->assertEqual($expected, json_decode($actual, true));
 
         // Add a duplicate student to a course
+        $input = array_merge($input, array(array('username' => 'redshirt0029', 'role_id' => 5)));
         $expected = array();
         $actual = $this->_oauthReq(
-            $url, json_encode($expected), OAUTH_HTTP_METHOD_POST);
+            $url, json_encode($input), OAUTH_HTTP_METHOD_POST);
         $this->assertEqual($expected, json_decode($actual, true));
 
         // Add an instructor to a course
+        $input[] = array('username' => 'instructor2', 'role_id' => 3);
         $expected = array(array('username' => 'instructor2', 'role_id' => 3));
         $actual = $this->_oauthReq(
-            $url, json_encode($expected), OAUTH_HTTP_METHOD_POST);
+            $url, json_encode($input), OAUTH_HTTP_METHOD_POST);
         $this->assertEqual($expected, json_decode($actual, true));
 
         // Add an instructor with duplicate usernames to a course
-        $expected = array(
-            array('username' => 'instructor1', 'role_id' => 3),
-        );
+        $input = array_merge($input, array(array('username' => 'instructor1', 'role_id' => 3),
+            array('username' => 'INStructor1', 'role_id' => 3)));
+        $expected = array(array('username' => 'instructor1', 'role_id' => 3));
         $actual = $this->_oauthReq(
-            $url, json_encode(array(
-                array('username' => 'instructor1', 'role_id' => 3),
-                array('username' => 'INStructor1', 'role_id' => 3)
-            )), OAUTH_HTTP_METHOD_POST);
+            $url, json_encode($input), OAUTH_HTTP_METHOD_POST);
         $this->assertEqual($expected, json_decode($actual, true));
 
         // Add a tutor to a course
+        $input[] = array('username' => 'tutor2', 'role_id' => 4);
         $expected = array(array('username' => 'tutor2', 'role_id' => 4));
         $actual = $this->_oauthReq(
-            $url, json_encode($expected), OAUTH_HTTP_METHOD_POST);
+            $url, json_encode($input), OAUTH_HTTP_METHOD_POST);
         $this->assertEqual($expected, json_decode($actual, true));
+        
+        // update course enrolment - remove instructor1
+        $input = array(
+            array('username' => 'redshirt0004', 'role_id' => 5),
+            array('username' => 'redshirt0029', 'role_id' => 5),
+            array('username' => 'instructor3', 'role_id' => 3),
+            array('username' => 'tutor3', 'role_id' => 4),
+            array('username' => 'redshirt0005', 'role_id' => 5),
+            array('username' => 'redshirt0029', 'role_id' => 5),
+            array('username' => 'instructor2', 'role_id' => 3),
+            array('username' => 'tutor2', 'role_id' => 4)
+        );
+        $actual = $this->_oauthReq(
+            $url, json_encode($input), OAUTH_HTTP_METHOD_POST);
+        $this->assertEqual(json_decode($actual, true), array());
+        
+        // check enrolment
+        $actual = $this->_oauthReq("$url");
+        $expected = array(
+            array('id' => '8', 'role_id' => '5', 'username' => 'redshirt0004'),
+            array('id' => '33', 'role_id' => '5', 'username' => 'redshirt0029'),
+            array('id' => '9', 'role_id' => '5', 'username' => 'redshirt0005'),
+            array('id' => '3', 'role_id' => '3', 'username' => 'instructor2'),
+            array('id' => '4', 'role_id' => '3', 'username' => 'instructor3'),
+            array('id' => '36', 'role_id' => '4', 'username' => 'tutor2'),
+            array('id' => '37', 'role_id' => '4', 'username' => 'tutor3')
+        );
+        $this->assertEqual(json_decode($actual, true), $expected);
 
         // Remove a student from a course
         $expected = array(array('username' => 'redshirt0005', 'role_id' => 5));
