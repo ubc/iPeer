@@ -85,6 +85,16 @@ class EventsController extends AppController
             } else {
                 $entry['!Custom']['resultReleased'] = 'Manual';
             }
+            
+            // group count
+            if ($entry['Event']['event_template_type_id'] == 3) {
+                $entry['!Custom']['group_count'] = 'N/A';
+            } else if ($entry['Event']['group_count'] > 0) {
+                $entry['!Custom']['group_count'] = $entry['Event']['group_count'];
+            } else {
+                // evaluation event without any groups - warning
+                $entry['!Custom']['group_count'] = "<font color='red'>0</font>";
+            }
 
             // Write the entry back
             $data[$i] = $entry;
@@ -112,9 +122,11 @@ class EventsController extends AppController
         $columns = array(
             array("Event.id",             "",            "",     "hidden"),
             array("Course.id",            "",            "",     "hidden"),
+            array("Event.group_count", "", "", "hidden"),
             array("Course.course",        __("Course", true),      "9em", "action", "View Course"),
             array("Event.Title",          __("Title", true),       "auto", "action", "View Event"),
             array("!Custom.results",       __("View", true),       "4em", "action", "View Results"),
+            array("!Custom.group_count", __("Groups", true), "2em", "string"),
             array("Event.event_template_type_id", __("Type", true), "", "map",
             array(
                 "1" => __("Simple", true),

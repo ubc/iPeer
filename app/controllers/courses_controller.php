@@ -538,8 +538,14 @@ class CoursesController extends AppController
             
             $error = array();
             $success = array();
-            $users = ($field == 'student_no') ? $this->User->findAllByStudentNo($identifiers) :
-                $this->User->findAllByUsername($identifiers);
+            $users = array();
+            if (!empty($identifiers)) {
+                $users = $this->User->find('all', array(
+                    'conditions' => array('User.'.$field => $identifiers, 'Role.id' => $this->User->USER_TYPE_STUDENT),
+                    'contain' => array('Role')
+                ));
+            }
+            
             $invalid = array_diff($identifiers, Set::extract('/User/'.$field, $users));
             foreach ($invalid as $inv) {
                 $error[$inv] = __('No student with '.$fieldText.' '.$inv.' exists.', true);
