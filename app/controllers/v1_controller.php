@@ -922,10 +922,14 @@ class V1Controller extends Controller {
             $tutors = $this->UserTutor->find('list', array('conditions' => array('course_id' => $courseId), 'fields' => array('user_id')));
             $instructors = $this->UserCourse->find('list', array('conditions' => array('course_id' => $courseId), 'fields' => array('user_id')));
             $members = $students + $tutors + $instructors;
-            $inClass = $this->User->find('list', array('conditions' => array('User.id' => $members), 'fields' => array('User.username')));
+            $inClass = array();
+            if (!empty($members)) {
+                $inClass = $this->User->find('list', array('conditions' => array('User.id' => $members), 'fields' => array('User.username')));
+            }
             $result = array();
 
             foreach ($users as $user) {
+                $this->log('processing user '.$user['username'].' to course '.$courseId, 'api');
                 // check if the user is already in the course using case
                 // insensitive username
                 if (count(preg_grep("/^".$user['username']."$/i", $inClass)) == 0) {
