@@ -34,7 +34,7 @@ isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = nu
         </th>
 
         <?php foreach($data['RubricsLom'] as $lom): ?>
-        <?php $mark_value = round( ($criteria['multiplier']/(count($data['RubricsLom']) - ('on' == $zero_mark ? 1 : 0))*($lom['lom_num'] - ('on' == $zero_mark ? 1 : 0))) , 2);?>
+        <?php $mark_value = round( ($criteria['multiplier']/(count($data['RubricsLom']) - ('1' == $zero_mark ? 1 : 0))*($lom['lom_num'] - ('1' == $zero_mark ? 1 : 0))) , 2);?>
         <td>
             <div class="green"><?php echo (!empty($criteria['RubricsCriteriaComment'][$lom['lom_num']-1]['criteria_comment']) ? $criteria['RubricsCriteriaComment'][$lom['lom_num']-1]['criteria_comment'] : '')?></div>
             <?php
