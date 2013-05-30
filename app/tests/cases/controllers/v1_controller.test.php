@@ -504,23 +504,29 @@ class V1ControllerTest extends CakeTestCase {
             array('id' => '5', 'role_id' => '5', 'username' => 'redshirt0001', 'last_name' => 'Student', 'first_name' => 'Ed'),
             array('id' => '6', 'role_id' => '5', 'username' => 'redshirt0002', 'last_name' => 'Student', 'first_name' => 'Alex'),
             array('id' => '7', 'role_id' => '5', 'username' => 'redshirt0003', 'last_name' => 'Student', 'first_name' => 'Matt'),
+            array('id' => '35', 'role_id' => '4', 'username' => 'tutor1', 'last_name' => '1', 'first_name' => 'Tutor'),
             array('id' => '15', 'role_id' => '5', 'username' => 'redshirt0011', 'last_name' => 'Student', 'first_name' => 'Jennifer'),
             array('id' => '17', 'role_id' => '5', 'username' => 'redshirt0013', 'last_name' => 'Student', 'first_name' => 'Edna'),
-            array('id' => '35', 'role_id' => '4', 'username' => 'tutor1', 'last_name' => '1', 'first_name' => 'Tutor'),
         );
 
         $this->assertEqual(json_decode($updated, true), $expected);
 
         // test adding non existing user to a group
         $toBeAdded = array(
+            array('username' => 'redshirt0001'),
+            array('username' => 'redshirt0002'),
+            array('username' => 'redshirt0003'),
+            array('username' => 'tutor1'),
+            array('username' => 'redshirt0011'),
+            array('username' => 'redshirt0013'),
             array('username' => 'nonexistinguser'),
         );
         $addedMembers = $this->_oauthReq($url, json_encode($toBeAdded), OAUTH_HTTP_METHOD_POST);
 
-        $this->assertEqual(json_decode($addedMembers, true), array());
+        $this->assertEqual(json_decode($addedMembers, true), $update);
         // make user nothing is added
         $actualGroup = $this->_oauthReq("$url");
-        $this->assertEqual(count(json_decode($actualGroup, true)), 7);
+        $this->assertEqual(count(json_decode($actualGroup, true)), 6);
 
         // HTTP DELETE, try to remove students from a group
         $ret = $this->_oauthReq("$url/redshirt0011",null,OAUTH_HTTP_METHOD_DELETE);

@@ -651,15 +651,22 @@ class V1Controller extends Controller {
                 }
                 $userIds[] = $userId;
                 $tmp = array('group_id' => $groupId, 'user_id' => $userId);
-                // try to add this user to group
-                $this->GroupsMembers->create();
-                if ($this->GroupsMembers->save($tmp)) {
-                    $userId = $this->GroupsMembers->read('user_id');
-                    $this->GroupsMembers->id = null;
+                $inGroup = $this->GroupsMembers->field('id', $tmp);
+                // user already in group
+                if ($inGroup) {
                     $groupMembers[] = $user;
+                // tries to add the user to the group
                 } else {
-                    $status = 'HTTP/1.1 500 Internal Server Error';
-                    break;
+                    // try to add this user to group
+                    $this->GroupsMembers->create();
+                    if ($this->GroupsMembers->save($tmp)) {
+                        $userId = $this->GroupsMembers->read('user_id');
+                        $this->GroupsMembers->id = null;
+                        $groupMembers[] = $user;
+                    } else {
+                        $status = 'HTTP/1.1 500 Internal Server Error';
+                        break;
+                    }
                 }
             }
             $origMembers = Set::extract('/Member/id', $group);
