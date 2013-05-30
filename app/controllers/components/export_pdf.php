@@ -38,79 +38,96 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         }
     }  
      
-     /**
-      *_createMixResultsPdf
-      * 
-      * @param mixed $params
-      * @param mixed $event 
-      * 
-      * @return void
-      */
-      function _createMixResultsPdf($params,$event){
-          App::import('Vendor', 'xtcpdf');
-          $mpdf = new XTCPDF();
-        
-          //Construct the Filename and extension
-          $fileName = isset($params['file_name']) && !empty($params['file_name']) ? $params['file_name']:date('m.d.y');
-          $fileName = $fileName . '.pdf';
-          $mpdf -> AddPage();
+    /**
+     *_createMixResultsPdf // MT
+     * 
+     * @param mixed $params
+     * @param mixed $event 
+     * 
+     * @return void
+     */
+    function _createMixResultsPdf($params, $event)
+    {
+        App::import('Vendor', 'xtcpdf');
+        $this->Group = ClassRegistry::init('Group');
+        $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
+        $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
+        $this->User = ClassRegistry::init('User');
+        $mpdf = new XTCPDF();
+        //Construct the Filename and extension
+        $fileName = isset($params['file_name']) && !empty($params['file_name']) ? $params['file_name']:date('m.d.y');
+        $fileName = $fileName . '.pdf';
+        $mpdf->AddPage();
           
-          //Write header text
-          $headertext = '<h2>Evaluation Event Detail for '. $event['Course']['course'].' - '.$event['Event']['title'].'</h2>';
-          $mpdf->writeHTML($headertext, true, false, true, false, '');
+        $courseName = '';
+        $eventName = '';
+        //Write header text
+        if ($params['include']['course'] == '1') {
+            $courseName = ' : '.$event['Course']['course'];
+        }
+        if ($params['include']['eval_event_names'] == '1') {
+            $eventName = ' - '.$event['Event']['title'];
+        }
+        $headertext = '<h2>Evaluation Event Detail'.$courseName.$eventName.'</h2>';
+        $mpdf->writeHTML($headertext, true, false, true, false, '');
          
-          $this->Group = ClassRegistry::init('Group');
-          $page_count = 0;
-          foreach($event['GroupEvent'] as $groupevent){
-              //Get the groupevent id and the group id for each group in the evaluation
-              $grp_event_id = $groupevent['id'];
-              $grp_id = $groupevent['group_id'];
+        $page_count = 0;
+        foreach($event['GroupEvent'] as $groupEvent) {
+            //Get the groupevent id and the group id for each group in the evaluation
+            $grp_event_id = $groupEvent['id'];
+            $grp_id = $groupEvent['group_id'];
             
-              //Call writeEvalDetails
-              $evalDetails = $this->_writeEvalDetails($event, $grp_id, $params);      
-              $mpdf->writeHTML($evalDetails, true, false, true, false, '');
+            //Call writeEvalDetails
+            $evalDetails = $this->_writeEvalDetails($event, $grp_id, $params);      
+            $mpdf->writeHTML($evalDetails, true, false, true, false, '');
             
-              //Write Summary 
-              $mpdf->writeHTML('<br>', true, false, true, false, '');
-              $mpdf->writeHTML('<h3>Summary</h3>', true, false, true, false, '');
-            
-              //Get Membersid's and Membernames who have not submitted their evaluations
-              $inComplete = $this->_getIncompleteMembers($event['Event']['id'], $grp_id);
-              $inComplete = $this->_getMemberNames($inComplete);
-              // MT
-              $mpdf->writeHTML('<p><b>Members who have not submitted their evaluations</b></p>', true, false, true, false, '');
-              foreach ($inComplete as $name){
-                  $mpdf->writeHTML($name, true, false, true, false, '');
-              }
-              $mpdf->writeHTML('<br>', true, false, true, false, '');
-            
-              //Get if self evaluation is 'yes' or 'no'
-              $event['Event']['self_eval'] == '0'? $selfeval = 'No' : $selfeval = 'Yes';
-          
-              //Write the Mixeval Scores Table And The Evaluation Results
-              if($params['include']['grade_tables'] == '1'){
-                  $rtbl = $this->_writeMixResultsTbl($event, $grp_event_id, $grp_id); 
-                  $mpdf->writeHTML($rtbl, true, false, true, false, '');
-              }            
-           
-              $mpdf->writeHTML('<h3>Evaluation Results</h3>', true, false, true, false, '');    
-              $mEvalResults = $this->_writeMixEvalResults($event, $grp_event_id, $grp_id, $params);  
-              $mpdf->writeHTML($mEvalResults, true, false, true, false, '');                   
+            //Get incomplete/unenrolled members
+            $submitted = $this->EvaluationMixeval->findAllByGrpEventId($grp_event_id);
+            $members = Set::extract('/GroupsMembers/user_id', $this->GroupsMembers->findAllByGroupId($grp_id));
+            $evaluators = Set::extract('/EvaluationMixeval/evaluator', $submitted);
+            $evaluatees = Set::extract('/EvaluationMixeval/evaluatee', $submitted);
+            $inComplete = $this->User->getFullNames(array_diff($members, $evaluators));
+            $unEnrolled = $this->User->getFullNames(array_diff(array_unique(array_merge($evaluators, $evaluatees)), $members));
 
-              $mpdf->lastPage();
-              $mpdf->addPage();
-              $page_count++;
-          }
-          $mpdf->deletePage($mpdf->getNumPages());
-          
-          if(ob_get_contents()){
-              ob_clean();
-          }
-          return $mpdf -> Output($fileName, 'I');     
-      }
+            //Write Summary 
+            $title = (!empty($inComplete) || !empty($unEnrolled)) ? __('Summary', true) : '';
+            $mpdf->writeHTML('<br><h3>'.$title.'</h3>', true, false, true, false, '');
+            $title = (!empty($inComplete)) ? __('Members who have not submitted their evaluations', true) : '';
+            $mpdf->writeHTML('<p><b>'.$title.'</b></p>', true, false, true, false, '');
+            foreach ($inComplete as $name){
+                $mpdf->writeHTML($name, true, false, true, false, '');
+            }
+            $title = (!empty($unEnrolled)) ? __('Left the group, but had submitted or were evaluated', true) : '';
+            $mpdf->writeHTML('<p><b>'.$title.'</b></p>', true, false, true, false, '');
+            foreach ($unEnrolled as $name){
+                $mpdf->writeHTML($name, true, false, true, false, '');
+            }
+            $mpdf->writeHTML('<br>', true, false, true, false, '');
+            
+            if ($params['include']['grade_tables'] == '1') {
+                $mtbl = $this->_writeMixResultsTbl($event, $grp_event_id, $grp_id, $params);
+                $mpdf->writeHTML($mtbl, true, false, true, false, '');
+            }
+           
+            $mpdf->writeHTML('<h3>Evaluation Results</h3>', true, false, true, false, '');    
+            $mEvalResults = $this->_writeMixEvalResults($event, $grp_event_id, $grp_id, $params);  
+            $mpdf->writeHTML($mEvalResults, true, false, true, false, '');                
+
+            $mpdf->lastPage();
+            $mpdf->addPage();
+            $page_count++;
+        }
+        $mpdf->deletePage($mpdf->getNumPages());
+ 
+        if (ob_get_contents()) {
+            ob_clean();
+        }
+        
+        return $mpdf->Output($fileName, 'I');     
+    }
 
     /**
-     * _writeMixEvalResults
+     * _writeMixEvalResults // MT
      * 
      * @param mixed $event
      * @param mixed $grp_event_id
@@ -119,261 +136,214 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      * 
      * @return HTML Table containing the results
      */
-     function _writeMixEvalResults($event,$grp_event_id,$grp_id,$params){
-         $evaluators = $this->_getMembers($grp_event_id);
-         $evaluatees = $this->_filterTutors($grp_id);
-         $evaluatee_names = $this->_getMemberNames($evaluatees); 
-         $evaluator_names = $this->_getMemberNames($evaluators);
-         $this->MixevalQuestion = ClassRegistry::init('MixevalQuestion');
-         $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
-         
-         $mEvalResults = '<p>';
-         $mixEvalId = $event['Event']['template_id'];
-         $mixevalQuestions = $this->MixevalQuestion->getQuestion($mixEvalId, null);         
-         
-         //Get the final group average
-         $totalGroupAverage = 0;
-         $count = 0;
-         for($i=0; $i<sizeof($evaluatees); $i++){
-             $receivedAverageScore = $this->EvaluationMixeval->getReceivedAvgScore($grp_event_id, $evaluatees[$i]);
-             $receivedAverageScore = $receivedAverageScore[0][0]['received_avg_score'];             
-             if(!isset($receivedAverageScore)){
-                 continue;
-             }
-             $count++;    
-             $totalGroupAverage = ($totalGroupAverage + $receivedAverageScore);
-         }
+    function _writeMixEvalResults($event, $grp_event_id, $grp_id, $params)
+    {
+        $this->MixevalQuestion = ClassRegistry::init('MixevalQuestion');
+        $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
+        $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
+        $this->Mixeval = ClassRegistry::init('Mixeval');
         
-         $totalGroupAverage = $count > 0 ? $totalGroupAverage/$count : null;
-         
-         for($i=0; $i<sizeof($evaluatees); $i++){
-             $aver = $this->EvaluationMixeval->getReceivedAvgScore($grp_event_id, $evaluatees[$i]);
-             $receivedAverageScore = $this->EvaluationMixeval->getReceivedAvgScore($grp_event_id, $evaluatees[$i]);
-             $receivedAverageScore = $receivedAverageScore[0][0]['received_avg_score'];
-               
-             //Get the average score for each evaluatee if the evaluatee has one
-             //And also indicate if it is above, below or equal to the average
-             $scoreComment = '';
-             if(!isset($receivedAverageScore)){
-                 $receivedAverageScore = 'N/A';
-             }
-             else{
-                $receivedAverageScore = number_format($receivedAverageScore, 2);
-                if($receivedAverageScore > $totalGroupAverage) {
-                    $scoreComment = ' -- Above Average --';
-                } else if($receivedAverageScore < $totalGroupAverage) {
-                    $scoreComment = ' -- Below Average --';
+        $skipQues = array(); // for filtering out questions
+        $skipQues = $params['include']['grade_tables'] ? $skipQues : array_merge($skipQues, array(1, 4));
+        $skipQues = $params['include']['comments'] ? $skipQues : array_merge($skipQues, array(2, 3));
+        
+        $mixevalQuestions = $this->MixevalQuestion->find('all', array(
+            'conditions' => array('mixeval_id' => $event['Event']['template_id']),
+            'order' => array('question_num')
+        ));
+        $mixevalQuestions = Set::combine($mixevalQuestions, '{n}.MixevalQuestion.question_num', '{n}');
+        $mixeval = $this->Mixeval->findById($event['Event']['template_id']);
+        
+        $groupMembers = $this->GroupsMembers->find('list',
+            array('conditions' => array('group_id' => $grp_id),'fields' => array('user_id', 'user_id')));
+        $submitted = $this->EvaluationSubmission->findAllByGrpEventId($grp_event_id);
+        $submitted = Set::extract('/EvaluationSubmission/submitter_id', $submitted);
+        $evaluation = $this->EvaluationMixeval->find('all', array(
+            'conditions' => array('grp_event_id' => $grp_event_id, 'evaluator' => $submitted),
+        ));
+
+        $evaluators = Set::extract('/EvaluationMixeval/evaluator', $evaluation);
+        $evaluatees = Set::extract('/EvaluationMixeval/evaluatee', $evaluation);
+        $dropped = array_diff(array_unique(array_merge($evaluators, $evaluatees)), $groupMembers);
+        $names = $this->User->getFullNames(array_merge($evaluators, $evaluatees));
+        $penalties = $this->Mixeval->formatPenaltyArray($names, $event['Event']['id'], $grp_id);
+        
+        $totalScores = array_fill_keys($evaluatees, 0);
+        $evalCount = $totalScores;
+        $indivEval = array_fill_keys($evaluatees, array());
+        foreach ($evaluation as $eval) {
+            $evaluator = $eval['EvaluationMixeval']['evaluator'];
+            $evaluatee = $eval['EvaluationMixeval']['evaluatee'];
+            $totalScores[$evaluatee] += $eval['EvaluationMixeval']['score'];
+            $evalCount[$evaluatee]++;
+            foreach ($eval['EvaluationMixevalDetail'] as $ques) {
+                $type = $mixevalQuestions[$ques['question_number']]['MixevalQuestion']['mixeval_question_type_id'];
+                if ($type == 1 || $type == 4) {
+                    $indivEval[$evaluatee][$ques['question_number']][$evaluator] = $ques['grade'];
                 } else {
-                    $scoreComment = ' -- Average --';
+                    $indivEval[$evaluatee][$ques['question_number']][$evaluator] = $ques['question_comment'];
                 }
-             }
-             $mEvalResults = $mEvalResults.'<br><u><b>Evaluatee: </b>'.$evaluatee_names[$i].'</u><br>';
-             $break = '<br>';
-             if($params['include']['final_marks'] == '1'){
-                 $mEvalResults = $mEvalResults.'Final Total: '.$receivedAverageScore.$scoreComment.$break;   
-             }
- 
-             
-             //Write down the Questions and the responses given by each evaluator
-             foreach($mixevalQuestions as $question){
-                 //For each question write down the question_num and the title
-                 $question_num = $question['MixevalQuestion']['question_num'];
-                 $title = $question['MixevalQuestion']['title'];
-                                
-                 //For each question, write down the response of the evaluator in a single bullet point
-                $question_text = $question_num.'.'.$title;
-                $questionWrittenBool = 0;
-                   
-                for($j=0; $j<sizeof($evaluators); $j++){
-                    $result = $this->EvaluationMixeval->getResultDetailByQuestion($grp_event_id, $evaluatees[$i], $evaluators[$j], $question_num);
-                    if(empty($result)){
-                        continue;
-                    }
-                    else{
-                        if($questionWrittenBool==0){ //Checks if the question has already been written
-                            $mEvalResults = $mEvalResults.$question_text.'<br>'; 
-                            $questionWrittenBool = 1; //The question has now been written so set Boolean to 1
+            }
+        }
+        $avgScores = array_fill_keys($evaluatees, array());
+        foreach ($totalScores as $userId => $score) {
+            $avgScores[$userId]['total'] = ($evalCount[$userId]) ? $score / $evalCount[$userId] : 0;
+            $avgScores[$userId]['deduct'] =  $avgScores[$userId]['total'] * $penalties[$userId] / 100;
+            $avgScores[$userId]['subtotal'] = $avgScores[$userId]['total'] - $avgScores[$userId]['deduct'];
+        }
+        $average = Set::extract('/subtotal', $avgScores);
+        $avg = count($average) ? array_sum($average) / count($average) : 0;
+        
+        $mEval = '';
+        $questionNums = array_keys($mixevalQuestions);
+        foreach ($indivEval as $userId => $questions) {
+            $drop = in_array($userId, $dropped) ? ' *' : '';
+            $mEval .= '<u><b>'.__('Evaluatee', true).': '.'</b>'.$names[$userId].$drop.'</u>';
+            if($avgScores[$userId]['subtotal'] > $avg) {
+                $scoreComment = ' - Above Average';
+            } else if ($avgScores[$userId]['subtotal'] < $avg) {
+                $scoreComment = ' - Below Average';
+            } else {
+                $scoreComment = ' - Average';
+            }
+            if ($params['include']['final_marks']) {
+                $penalty = ($penalties[$userId]) ? ' - '.number_format($avgScores[$userId]['deduct'], 2).
+                    ' = '.number_format($avgScores[$userId]['subtotal'], 2) : '';
+                $mEval .= '<br>'.__('Final Total', true).': '.number_format($avgScores[$userId]['total'], 2).$penalty.
+                    ' ('.number_format($avgScores[$userId]['subtotal'] / $mixeval['Mixeval']['total_marks'] * 100, 2).'%)'.$scoreComment;
+                $mEval .= ($penalties[$userId]) ? '<br>Note: '.$penalties[$userId].'% Late Penalty' : '';
+            }
+            foreach ($questionNums as $num) {
+                $mixQues = $mixevalQuestions[$num]['MixevalQuestion'];
+                // filter out questions of question types we don't want
+                if (in_array($mixQues['mixeval_question_type_id'], $skipQues)) {
+                    continue;
+                }
+                $mEval .= '<div nobr="true"><h4>'.$num.'. '.$mixQues['title'].'</h4>';
+                $mEval .= '<ul>';
+                if (isset($questions[$num])) {
+                    foreach ($questions[$num] as $evaluator => $answer) {
+                        // Likert questions or ScoreDropdown
+                        if (in_array($mixQues['mixeval_question_type_id'], array(1, 4))) {
+                            $answer = number_format($answer, 2).' / '.$mixQues['multiplier'];
                         }
-                        $grade = $comment = ' --';
-                        $mEvalResults = $mEvalResults.'<b>&#160;&#160;&#160;&#160;&#160;&#160;'.$evaluator_names[$j].' : </b>';
-                        if($question['MixevalQuestionType']['id'] != '1' && $question['MixevalQuestionType']['id'] != '4'){
-                            if($params['include']['comments'] == '1'){
-                                $comment = 'Comment : '.$result['EvaluationMixevalDetail']['question_comment'];
-                            }
-                            $mEvalResults = $mEvalResults.$comment;
-                        }
-                        else{
-                            if($params['include']['grade_tables'] == '1'){
-                                $grade = 'Grade : '.$result['EvaluationMixevalDetail']['grade'];
-                            }
-                            $mEvalResults = $mEvalResults. $grade;
-                        }    
-                        $mEvalResults = $mEvalResults.'<br>';      
+                        $drop = in_array($evaluator, $dropped) ? ' *' : '';
+                        $mEval .= '<li><b>'.$names[$evaluator].$drop.': </b>'.$answer.'</li>';
                     }
-                }                     
-             }
-         }
-         $mEvalResults = $mEvalResults.'</p>';
-         return $mEvalResults;
+                } else {
+                    $mEval .= '<li>N/A</li>';
+                }
+                $mEval .= '</ul></div>';
+            }
+        }
+
+        return $mEval;
      }
  
     /**
-     * _writeMixResultsTbl
+     * _writeMixResultsTbl // MT
      * 
      * @param mixed $event
      * @param mixed $grp_event_id
      * @param mixed $grp_id
+     * @param mixed $params
      * 
      * @return HTML Table containing the results
      */
-     function _writeMixResultsTbl($event,$grp_event_id,$grp_id){
-         $evaluators = $this->_getMembers($grp_event_id);
-         $evaluatees = $this->_filterTutors($grp_id);
-         $evaluatee_names = $this->_getMemberNames($evaluatees); 
-         $evaluator_names = $this->_getMemberNames($evaluators);
-         $this->MixevalQuestion = ClassRegistry::init('MixevalQuestion');
-         $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
+    function _writeMixResultsTbl($event, $grp_event_id, $grp_id, $params)
+    {
+        $this->MixevalQuestion = ClassRegistry::init('MixevalQuestion');
+        $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
+        $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
+        $this->Mixeval = ClassRegistry::init('Mixeval');
          
-         $mixEvalId = $event['Event']['template_id'];
-         $mixevalQuestions = $this->MixevalQuestion->getQuestion($mixEvalId, null);
-         
-         //Write the Table Header
-         $mRTBL = '<table border="1" align="center"><tr><th><b>Evaluatee</b></th>';
-         $total = 0;
-         $lickertQuestions = array();
-         $lickertQuestionsCount=0;
-         $scoreDropdownQuestions = array();
-         $scoreDropdownCount = 0;
-         $finalCumulativeTotal=0;
-         foreach($mixevalQuestions as $question){
-             //Check if the Question has a multiplier (it should be a likert MixEvalQuestionType.id=1)
-             if($question['MixevalQuestionType']['id']!=1 && $question['MixevalQuestionType']['id']!=4){
-                 continue;
-             }
-             $question_num = $question['MixevalQuestion']['question_num'];
-             $multiplier = $question['MixevalQuestion']['multiplier'];
-             if($question['MixevalQuestionType']['id']==1){
-                 $lickertQuestions[$question_num]=0;
-             } 
-             else{
-                 $scoreDropdownQuestions[$question_num]=0;
-             }
-             $mRTBL = $mRTBL.'<th>'.$question_num.' (/'.number_format($multiplier, 2).')</th>';
-             $total = $total + $multiplier;                         
-         }
-         $mRTBL = $mRTBL.'<th>Total (/'.number_format($total, 2).')</th>';
-         $mRTBL = $mRTBL.'</tr>';
-         //Table Header End
-         
-          //Since a question cannot be BOTH lickert and scoreDropdown at the same time, an array_merge on the 2 arrays should work fine.
-          $combinedLickertScoreDD = $lickertQuestions + $scoreDropdownQuestions;
-         for($i=0; $i<sizeof($evaluatees); $i++){
-             $total_grade=0;
-             $mRTBL = $mRTBL.'<tr><td>'.$evaluatee_names[$i].'</td>';
-             $evalMixevalDetail = $this->EvaluationMixeval->getResultsDetailByEvaluatee($grp_event_id, $evaluatees[$i], false);  
-             if(empty($evalMixevalDetail)){
-                 if(count($combinedLickertScoreDD) <= 0){
-                     $mRTBL = $mRTBL. '<td> N/A </td>'; //If there are no lickert or score dropdown questions, the total is N/A
-                 }
-                 else if(count($lickertQuestions) <= 0 && count($scoreDropdownQuestions) > 0){  //If there are no lickert questions and the count of score dropdown is greater than 0 that means all the questions are of the type score dropdown  
-                    for($j=0; $j<sizeof($scoreDropdownQuestions); $j++){
-                        $mRTBL = $mRTBL.'<td> N/A </td>';
-                    }
-                    $mRTBL=$mRTBL.'<td> N/A </td>'; //Additional N/A for total column
-                 }
-                 else if(count($scoreDropdownQuestions) <= 0 && count($lickertQuestions) > 0){ //Opposite of the statement/condition above
-                     for($j=0; $j<sizeof($lickertQuestions); $j++){ 
-                        $mRTBL = $mRTBL.'<td> N/A </td>';
-                     }
-                     $mRTBL=$mRTBL.'<td> N/A </td>'; //Additional N/A for total column
-                 } else {
-                     for($j=0; $j< count($combinedLickertScoreDD); $j++){ //If lickertQuestions and scoreDropdown questions are both greater than 0, that means the number of rows = #lickert + #scoreDropdown
-                        $mRTBL=$mRTBL.'<td> N/A </td>';
-                     }
-                      $mRTBL=$mRTBL.'<td> N/A </td>'; //Additional N/A for total column
-                 }    
-                 $mRTBL=$mRTBL.'</tr>';
-             }
-             else{ //The evaluation detail does exist. Need to handle the same cases as above
-                 $evalMixevalDetail = $evalMixevalDetail['0']['EvaluationMixevalDetail'];
-                 //Get the scores for the lickert or scoreDropdown or both type questions and put them in the table
-                 
-                 //If the count of BOTH lickert type and score dropdown type <= 0, the case is the same as the one handled above, which is as follows
-                 if(count($combinedLickertScoreDD) <= 0){
-                     $mRTBL = $mRTBL. '<td> N/A </td>'; //If there are no lickert or score dropdown questions, the total is N/A
-                 }
-                 
-                 else if(count($scoreDropdownQuestions) <= 0 && count($lickertQuestions) > 0){ //If there are no score dropdown questions, and the count(lickertQuestions) > 0, that means all the questions are lickert
-                     foreach($lickertQuestions as $questionNum => $value){
-                         $grade = $evalMixevalDetail[$questionNum-1]['grade']; //$questionNum-1 is necessary since array numbering starts from 0 not 1
-                         $lickertQuestions[$questionNum] = $lickertQuestions[$questionNum] + $grade;
-                         $total_grade = $total_grade + $grade;  
-                         $finalCumulativeTotal = $finalCumulativeTotal + $grade;                  
-                         $mRTBL = $mRTBL.'<td>'.$grade.'</td>';
-                     }
-                 $lickertQuestionsCount = $lickertQuestionsCount + 1;
-                 $mRTBL=$mRTBL.'<td>'.$total_grade.'</td>';
-                 $mRTBL=$mRTBL.'</tr>';                    
-                 }
-                 
-                 else if(count($scoreDropdownQuestions) > 0 && count($lickertQuestions) <= 0){ //Opposite of the above condition
-                     foreach($scoreDropdownQuestions as $questionNum => $value){
-                         $grade = $evalMixevalDetail[$questionNum-1]['grade']; //$questionNum-1 is necessary since array numbering starts from 0 not 1
-                         $scoreDropdownQuestions[$questionNum] = $scoreDropdownQuestions[$questionNum] + $grade;
-                         $total_grade = $total_grade + $grade;  
-                         $finalCumulativeTotal = $finalCumulativeTotal + $grade;                  
-                         $mRTBL = $mRTBL.'<td>'.$grade.'</td>';
-                     }
-                 $scoreDropdownCount= $scoreDropdownCount + 1;
-                 $mRTBL=$mRTBL.'<td>'.$total_grade.'</td>';
-                 $mRTBL=$mRTBL.'</tr>';                    
-                 }
-                 
-                else{ //BOTH count(lickertQuestions) AND count(scoreDropdownQuestions) > 0, so we need to consider them both
-                    foreach($combinedLickertScoreDD as $questionNum => $value){
-                         $grade = $evalMixevalDetail[$questionNum-1]['grade']; //$questionNum-1 is necessary since array numbering starts from 0 not 1
-                         $combinedLickertScoreDD[$questionNum] = $combinedLickertScoreDD[$questionNum] + $grade;
-                         $total_grade = $total_grade + $grade;  
-                         $finalCumulativeTotal = $finalCumulativeTotal + $grade;                  
-                         $mRTBL = $mRTBL.'<td>'.$grade.'</td>';
-                    }
-                 $mRTBL=$mRTBL.'<td>'.$total_grade.'</td>';
-                 $mRTBL=$mRTBL.'</tr>';                      
+        $mixevalQuestions = $this->MixevalQuestion->find('all', array(
+            'conditions' => array('mixeval_id' => $event['Event']['template_id'], 
+                'mixeval_question_type_id' => array(1, 4), 'required' => 1),
+            'order' => array('question_num')
+        ));
+        //Write the Table Header
+        $mRTBL = '<table border="1" align="center"><tr><th><b>Evaluatee</b></th>';
+        $total = 0;
+        $ques = array();
+        foreach($mixevalQuestions as $question) {
+            $question_num = $question['MixevalQuestion']['question_num'];
+            $multiplier = $question['MixevalQuestion']['multiplier'];
+            $mRTBL .= '<th>'.$question_num.' (/'.number_format($multiplier, 1).')</th>';
+            $total += $multiplier;   
+            $quesNums[] = $question_num;                      
+        }
+        if ($params['include']['final_marks']) {
+            $mRTBL .= '<th>Total (/'.number_format($total, 2).')</th>';
+        }
+        $mRTBL .= '</tr>';
+
+        $groupMembers = $this->GroupsMembers->find('list',
+            array('conditions' => array('group_id' => $grp_id),'fields' => array('user_id', 'user_id')));
+        $submitted = $this->EvaluationSubmission->findAllByGrpEventId($grp_event_id);
+        $submitted = Set::extract('/EvaluationSubmission/submitter_id', $submitted);
+        $eval = $this->EvaluationMixeval->find('all', array(
+            'conditions' => array('grp_event_id' => $grp_event_id, 'evaluator' => $submitted),
+            'contain' => array('EvaluationMixevalDetail' => 
+                array('conditions' => array('EvaluationMixevalDetail.question_number' => $quesNums)))
+        ));
+
+        $evaluators = Set::extract('/EvaluationMixeval/evaluator', $eval);
+        $evaluatees = Set::extract('/EvaluationMixeval/evaluatee', $eval);
+        $dropped = array_diff(array_unique(array_merge($evaluators, $evaluatees)), $groupMembers);
+        $evaluateeNames = $this->User->getFullNames($evaluatees);
+        $scores = Set::combine($eval, '{n}.EvaluationMixeval.evaluator', '{n}.EvaluationMixevalDetail', '{n}.EvaluationMixeval.evaluatee');        
+
+        $grades = array();
+        $numEval = array();
+        foreach ($scores as $evaluateeId => $evaluators) {
+            $grades[$evaluateeId] = array_combine($quesNums, array_fill(0, count($quesNums), 0));
+            $numEval[$evaluateeId] = $grades[$evaluateeId];
+            foreach ($evaluators as $evaluator) {
+                foreach ($evaluator as $mark) {
+                    $grades[$evaluateeId][$mark['question_number']] += $mark['grade'];
+                    $numEval[$evaluateeId][$mark['question_number']]++;
                 }
-             }
-             
-         }
-    
-         $mRTBL = $mRTBL.'<tr><td><b>Group Average</b></td>';
-         $evaluateeCount = number_format(count($evaluatees), 2);
-         //Write the Group Average
-         if($lickertQuestionsCount > 0 && $scoreDropdownCount <= 0){
-             foreach($lickertQuestions as $question){
-                $mRTBL = $mRTBL.'<td>'.$question/$evaluateeCount.'</td>';
-             }
-            $mRTBL = $mRTBL.'<td>'.$finalCumulativeTotal/$evaluateeCount.'</td>';
-         }
-            
-         else if($scoreDropdownCount > 0 && $lickertQuestionsCount <= 0){
-             foreach($scoreDropdownQuestions as $question){
-                $mRTBL = $mRTBL.'<td>'.$question/$evaluateeCount.'</td>';
-             }
-            $mRTBL = $mRTBL.'<td>'.$finalCumulativeTotal/$evaluateeCount.'</td>';
-         }
-         
-         else if($combinedLickertScoreDD <= 0){
-             $mRTBL = $mRTBL.'<td> N/A </td>';
-         }
-         else { //BOTH are > 0
-            foreach($combinedLickertScoreDD as $question){
-                 $mRTBL = $mRTBL.'<td>'.number_format($question/$evaluateeCount, 2).'</td>';
             }
-             $mRTBL = $mRTBL.'<td>'.number_format($finalCumulativeTotal/$evaluateeCount, 2).'</td>';
-         }
-         $mRTBL = $mRTBL.'</tr>';              
-         $mRTBL = $mRTBL.'</table>';
-         return $mRTBL;
-     }
+        }
+        
+        $quesAvg = array_combine($quesNums, array_fill(0, count($quesNums), 0));
+        $evalNum = $quesAvg;
+        $evaluateeAvg = array_combine(array_keys($grades), array_fill(0, count($grades), 0));
+        $penalties = $this->Mixeval->formatPenaltyArray($evaluateeNames, $event['Event']['id'], $grp_id);
+        //debug($evaluateeAvg);
+        foreach ($grades as $evaluateeId => $questions) {
+            $suffix = in_array($evaluateeId, $dropped) ? ' *' : '';
+            $mRTBL .= '<tr><td>'.$evaluateeNames[$evaluateeId].$suffix.'</td>';
+            foreach ($questions as $num => $mark) {
+                $avg = ($numEval[$evaluateeId][$num] == 0) ? 0 : $mark / $numEval[$evaluateeId][$num];
+                $mRTBL .= '<td>'.number_format($avg, 2).'</td>';
+                $quesAvg[$num] += $avg;
+                $evalNum[$num]++;
+                $evaluateeAvg[$evaluateeId] += $avg;
+            }
+            if ($params['include']['final_marks']) {
+                $deduct = $evaluateeAvg[$evaluateeId] * $penalties[$evaluateeId] / 100;
+                $subtotal = $evaluateeAvg[$evaluateeId] - $deduct;
+                $percent = ($total == 0) ? 0 : $subtotal / $total * 100;
+                $penalty = ($penalties[$evaluateeId]) ? ' - '.number_format($deduct, 2).' = '.number_format($subtotal, 2) : '';
+                $mRTBL .= '<td>'.number_format($evaluateeAvg[$evaluateeId], 2).$penalty.' ('.number_format($percent, 2).'%)'.'</td>';
+                $evaluateeAvg[$evaluateeId] = $subtotal;
+            }
+            $mRTBL .= '</tr>';
+        }
+
+        $mRTBL .= '<tr><td>'.__('Group Average', true).'</td>';
+        foreach ($quesAvg as $num => $sum) {
+            $avg = ($evalNum[$num] == 0) ? 0 : $sum / $evalNum[$num];
+            $mRTBL .='<td>'.number_format($avg, 2).'</td>';
+        }
+        $grpAvg = (count($evaluateeAvg) == 0) ? 0 : array_sum($evaluateeAvg) / count($evaluateeAvg);
+        $mRTBL .= $params['include']['final_marks'] ? '<td>'.number_format($grpAvg, 2).'</td>' : '';
+        $mRTBL .= '</tr></table>';
+                   
+        return $mRTBL;
+    }
       
      /**
       * _createRubricResultsPdf // MT
@@ -440,7 +410,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             $spdf->writeHTML('<br>', true, false, true, false, '');
           
             //Write the Rubric Scores Table And The Evaluation Results
-            if ($params['include']['grade_tables'] == '1'){
+            if ($params['include']['grade_tables'] == '1') {
                 $rtbl = $this->_writeRubricResultsTbl($event, $grp_event_id, $grp_id, $params); 
                 $spdf->writeHTML($rtbl, true, false, true, false, '');
             } 
@@ -457,7 +427,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         if(ob_get_contents()){
             ob_clean();
         }
-        return $spdf -> Output($fileName, 'I');     
+        return $spdf->Output($fileName, 'I');     
     }    
 
     /**
@@ -878,46 +848,6 @@ Class ExportPdfComponent extends ExportBaseNewComponent
     }
     
     /**
-     * _getPenaltyArray
-     * 
-     * @param mixed $event
-     * @param mixed $evaluatees 
-     * 
-     * @return array() - an associative array consisting of the penalties for the evaluatees or '-' if no penalty
-     */
-    function _getPenaltyArray($event,$evaluatees){
-        $this->Penalty= ClassRegistry::init('Penalty');
-        $this->EvaluationSubmission= ClassRegistry::init('EvaluationSubmission');
-        $penalty_array = array();
-        for($i=0; $i<sizeof($evaluatees); $i++){
-            $evalsub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($event['Event']['id'], $evaluatees[$i]);
-            $days_late = $this->EvaluationSubmission->daysLate($event['Event']['id'], $evalsub['EvaluationSubmission']['date_submitted']);
-            $penalty = $this->Penalty->getPenaltyByEventAndDaysLate($event['Event']['id'], $days_late);
-            isset($penalty)? $percent_penalty = $penalty['Penalty']['percent_penalty'] : $percent_penalty = '-';
-            $penalty_array[$evaluatees[$i]] = $percent_penalty;
-        }
-        
-        return $penalty_array;
-    }
-    
-    /**
-     * _filterTutors
-     * 
-     * @param mixed $grp_id
-     * 
-     * @return array() consisting of groupmembers no tutors
-     */
-    function _filterTutors($grp_id){
-        $this->User = ClassRegistry::init('User');
-        $grpMembersNoTutors = $this->User->getEventGroupMembersNoTutors($grp_id, true, null);
-        $evaluatees = array();
-        foreach($grpMembersNoTutors as $members){
-            array_push($evaluatees, $members['User']['id']);
-        }
-        return $evaluatees;
-    }
-    
-    /**
      * _writeEvalDetails // MT
      * 
      * @param mixed $event
@@ -956,109 +886,4 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         
         return ($group.$selfEval.$eventName.$eventTemplateType.$dueDate.$description);             
     }
-    
-    /**
-     * _getScoreGiven
-     * 
-     * @param mixed $evaluator
-     * @param mixed $evaluatee
-     * @param mixed $grpEventId
-     * 
-     * @return Integer - Score Given by evaluator to evaluatee or '-' if no score given 
-     */
-    function _getScoreGiven($evaluator,$evaluatee,$grpEventId){
-         $this->EvaluationSimple = ClassRegistry::init('EvaluationSimple');
-         $results = $this->EvaluationSimple->getEvalMarkByGrpEventIdEvaluatorEvaluatee($grpEventId, $evaluator, $evaluatee);
-         $scores = array();
-         isset($results['EvaluationSimple']['score'])? $mark = $results['EvaluationSimple']['score'] : $mark= '-';
-         array_push($scores, $mark);
-         isset($results['EvaluationSimple']['comment'])? $comment = $results['EvaluationSimple']['comment'] : $comment= '-';
-         array_push($scores, $comment);
-         return $scores;
-    }
-
-    /**
-     * _getIncompleteMembers // MT
-     * 
-     * @param mixed $eventId
-     * @param mixed $groupId
-     * 
-     * @return array() consisting of members who have not completed the evaluation
-     */    
-    function _getIncompleteMembers($eventId, $groupId)
-    {
-        //Get the evaluation submissions for the given $eventId
-        //Do an array_diff on members in $groupId
-        $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
-        $this->Group = ClassRegistry::init('Group');
-        
-        $members = $this->Group->getMembersByGroupId($groupId, 'all');
-        $memberslist = Set::extract('/Member/id', $members);
-        $submissions = $this->EvaluationSubmission->getEvalSubmissionsByEventId($eventId);
-        $submitter_list = Set::extract('/EvaluationSubmission/submitter_id', $submissions);
-        $inComplete = array_diff($memberslist, $submitter_list);
-        
-        return $inComplete;
-    }
-    
-    /**
-     * _getUnenrolledMembers // MT
-     *
-     * @param mixed $eventId
-     * @param mixed $groupId
-     *
-     * @return array() consisting of members who have left
-     */
-    /*function _getUnenrolledMembers($eventId, $groupId)
-    {
-        $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
-        $this->Group = ClassRegistry::init('Group');
-
-        $members = $this->Group->getMembersByGroupId($groupId, 'all');
-        //$memberslist = Set::extract('/Member/id', $members);
-        //$submissions = $this->EvaluationSubmission->getEvalSubmissionsByEventId($eventId);
-
-    }   */
-    
-    /**
-     * _getMemberNames 
-     * 
-     * @param mixed $members
-     * 
-     * @return array() consisting of member's names 
-     */
-    function _getMemberNames($members){
-        $nameslist = array();
-         $this->User = ClassRegistry::init('User');
-        for($i = 0; $i < sizeof($members); $i++){
-            array_push($nameslist, $this->User->getFullNames($members[$i]));
-        }
-        
-        $names = array();
-        foreach($nameslist as $name){
-            foreach($name as $n){
-                array_push($names, $n);
-            }
-     
-        }
-        return $names; 
-    }
-    
-    /**
-     * _getMembers 
-     * @param mixed $grp_event_Id
-     * 
-     * @return array() consisting of member's belonging to the group
-     */
-    function _getMembers($grp_event_Id){
-        $this->GroupEvent = ClassRegistry::init('GroupEvent');
-  
-        $members = $this->GroupEvent->getGroupMembers($grp_event_Id);
-        $memberslist = array();
-        foreach($members as $m){
-            array_push($memberslist, $m['GroupsMembers']['user_id']);
-        }
-        return $memberslist;       
-    }
-    
 }
