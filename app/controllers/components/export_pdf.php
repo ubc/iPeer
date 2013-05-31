@@ -654,6 +654,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             }
             $tbl .= '</tr>';
         }
+
         return ($tbl.'</table>');
     }
     
@@ -661,39 +662,32 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      * _writeEvalDetails // MT
      * 
      * @param mixed $event
-     * @param mixed $grp_id
+     * @param mixed $grpId
      * @param mixed $params
      *
      * @access private
      * @return html string
      */
-    function _writeEvalDetails($event, $grp_id, $params)
+    function _writeEvalDetails($event, $grpId, $params)
     {
         $this->Group = ClassRegistry::init('Group');
-        $groupName = '-';
-        $eventTemplateType = '-';
-        $group = $this->Group->findById($grp_id);
+        $group = $this->Group->findById($grpId);
         //Write Group name
-        if ($params['include']['group_names'] == '1') {
-            $groupName = $group['Group']['group_name'];
-        }
-        $group = '<p>Group: '.$groupName.'<br>';
+        $groupName = $params['include']['group_names'] ? $group['Group']['group_name'] : '-';
+        $groupName = '<p><b>'.__('Group', true).': </b>'.$groupName.'<br>';
         //Write if self-eval is 'yes' or 'no'
-        $selfEval = $event['Event']['self_eval'] == '0' ? 'No' : 'Yes';
-        $selfEval = 'Self-Evaluation: '.$selfEval.'<br>';
+        $selfEval = $event['Event']['self_eval'] ? 'Yes' : 'No';
+        $selfEval = '<b>'.__('Self-Evaluation', true).': </b>'.$selfEval.'<br>';
         //Write Event Name
-        $eventName = $event['Event']['title'];
-        $eventName = 'Event Name: '.$eventName.'<br>';
-        if ($params['include']['eval_event_type'] == '1') {
-            $eventTemplateType = ucwords(strtolower($event['EventTemplateType']['type_name']));
-        }
-        $eventTemplateType = 'Evaluation Type: '.$eventTemplateType.'<br>';
+        $eventName = $params['include']['eval_event_names'] ? $event['Event']['title'] : '-';
+        $eventName = '<b>'.__('Event Name', true).': </b>'.$eventName.'<br>';
+        $eventTemplateType = $params['include']['eval_event_type'] ? 
+            ucwords(strtolower($event['EventTemplateType']['type_name'])) : '-';
+        $eventTemplateType = '<b>'.__('Evaluation Type', true).': </b>'.$eventTemplateType.'<br>';
         //Write due date and description
-        $dueDate = $event['Event']['due_date'];      
-        $dueDate = 'Due Date: '.date("D, F j, Y g:i a", strtotime($dueDate)).'<br>';
-        $description = $event['Event']['description'];
-        $description = 'Description: '.$description.'</p>';
+        $dueDate = '<b>'.__('Due Date', true).': </b>'.date("D, F j, Y g:i a", strtotime($event['Event']['due_date'])).'<br>';
+        $description = '<b>'.__('Description', true).': </b>'.$event['Event']['description'].'</p>';
         
-        return ($group.$selfEval.$eventName.$eventTemplateType.$dueDate.$description);             
+        return ($groupName.$selfEval.$eventName.$eventTemplateType.$dueDate.$description);             
     }
 }
