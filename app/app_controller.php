@@ -112,6 +112,12 @@ class AppController extends Controller
             $this->_checkDatabaseVersion();
         }
 
+        // for setting up google analytics
+        $trackingId = $this->SysParameter->findByParameterCode('google_analytics.tracking_id');
+        $domain = $this->SysParameter->findByParameterCode('google_analytics.domain');
+        $this->set('trackingId', $trackingId);
+        $this->set('domain', $domain);
+
         parent::beforeFilter();
     }
 
