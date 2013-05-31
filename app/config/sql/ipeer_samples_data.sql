@@ -2007,7 +2007,9 @@ INSERT INTO `sys_parameters` (`parameter_code`, `parameter_value`, `parameter_ty
 ('display.contact_info', 'noreply@ipeer.ctlt.ubc.ca', 'S', 'Contact Info', 'A', 0, NOW(), 0, NOW()),
 ('display.login.header', '', 'S', 'Login Info Header', 'A', 0, NOW(), 0, NOW()),
 ('display.login.footer', '', 'S', 'Login Info Footer', 'A', 0, NOW(), 0, NOW()),
-('system.absolute_url', '', 'S', 'base url to iPeer', 'A', 0, NOW(), 0, NOW());
+('system.absolute_url', '', 'S', 'base url to iPeer', 'A', 0, NOW(), 0, NOW()),
+('google_analytics.tracking_id', '', 'S', 'tracking id for Google Analytics', 'A', 0, NOW(), 0, NOW()),
+('google_analytics.domain', '', 'S', 'domain name for Google Analytics', 'A', 0, NOW(), 0, NOW());
 
 -- --------------------------------------------------------
 

@@ -134,6 +134,7 @@ class SysParametersController extends AppController
     function add()
     {
         if (!empty($this->data)) {
+            $this->data['SysParameter'] = array_map('trim', $this->data['SysParameter']);
             if ($this->SysParameter->save($this->data)) {
                 $this->Session->setFlash(__('The record is saved successfully', true), 'good');
                 $this->redirect('index');
@@ -158,6 +159,7 @@ class SysParametersController extends AppController
     function edit($id)
     {
         if (!empty($this->data)) {
+            $this->data['SysParameter'] = array_map('trim', $this->data['SysParameter']);
             if ($this->SysParameter->save($this->data)) {
                 $this->Session->setFlash(__('The record is edited successfully.', true), 'good');
                 $this->redirect('index');
