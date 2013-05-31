@@ -5,6 +5,6 @@
         $result = array();
     }
     $json = json_encode($result);
-    $this->log("Return: $json", 'debug');
+    $this->log("Return: $json", 'api');
     echo $json;
 

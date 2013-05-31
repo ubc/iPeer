@@ -691,6 +691,7 @@ i {
 }
 
 #UserForm .select .checkbox label {
+    float: none;
     width: 30em;
     text-align: left;
 }

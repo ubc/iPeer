@@ -20,9 +20,9 @@
  ********************************/
 
 var EvalViewer = Class.create({
-  initialize: function(container, questions) {
+  initialize: function(container, questions, zero) {
     var defaults = {
-      zero_mark: "zero_mark"
+      zero_mark: zero
     };
 
     this.options = Object.extend(defaults, arguments[2] || { });
@@ -271,7 +271,7 @@ var EvalViewer = Class.create({
   },
 
   _calculateWeight: function(e) {
-    var zero_mark_value = this.options.zero_mark.checked ? 1 : 0;
+    var zero_mark_value = this.options.zero_mark ? 1 : 0;
     
   //  alert $("data[Question][0][multiplier]").value);
     var weight = $(e).innerHTML / ($(e).up(1).select('.criteria-mark').length - zero_mark_value);

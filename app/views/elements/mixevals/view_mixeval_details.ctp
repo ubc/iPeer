@@ -39,8 +39,7 @@ $details = Set::combine($evaluation['EvaluationDetail'], '{n}.EvaluationMixevalD
         echo '<div style="margin: 1em">';
         for ($j=1; $j<=count($mixevalQuestion['Description']); $j++) {
             //isset($mixevalQuestion['multiplier']) ? $multiplier = $mixevalQuestion['multiplier'] : $multiplier = 1;
-
-            if ( $zero_mark == "on" ) {
+            if ($zero_mark) {
                 $mark_value = round(($multiplier/(count($mixevalQuestion['Description'])-1)*($j-1)), 2);
             } else {
                 $mark_value = round(($multiplier/count($mixevalQuestion['Description'])*$j), 2);
