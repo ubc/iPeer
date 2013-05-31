@@ -1,3 +1,17 @@
+iPeer 3.0.6
+---------------------------
+This is a maintenance release. It fixes a few bugs related to the building block API and web interface.
+* Fixed a bug in the api
+* Modified groupMembers and enrolment in the api
+* Updated guard plugin
+* Fixed a bug when adding 0 member to course using API
+* Fixed zero_mark bug for rubric view and rubric evaluation forms
+* Fixed non-existing users added to group as id 0 by API
+* Fixed #480, removed auth error on login page when redirect from app root
+* Moved API log into logs/api.log
+* Fixed a style issue
+* Fixed failed to add user when user data has tab (\t) in API
+
 iPeer 3.0.5
 ---------------------------
 This is a maintenance release. It fixes a few bugs related to the building block API and web interface.

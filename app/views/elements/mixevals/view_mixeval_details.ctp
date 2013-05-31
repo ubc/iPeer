@@ -16,7 +16,7 @@ foreach ($questions as $ques) {
     $title = $ques['MixevalQuestion']['title'];
     $title = $html->tag('h3', "$num. $title $required");
     $class = $ques['MixevalQuestion']['required'] ? 'must' : '';
-    
+
     if ($type == 'Paragraph') {
         $value = (isset($details[$num])) ? $details[$num]['question_comment'] : '';
         $output = $html->div('MixevalQuestion',
@@ -87,9 +87,8 @@ foreach ($questions as $ques) {
             $form->input('dropdown',
                  array('label' => false, 'default' => $value,'options' => range(0, $max), 'class' => $class,
                 'name' => 'data['.$user['id'].'][EvaluationMixeval]['.$num.'][grade]'))
-        );   
+        );
     }
-    
+
     echo $output;
 }
-?>

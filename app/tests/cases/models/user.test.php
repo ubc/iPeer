@@ -34,7 +34,7 @@ class UserTestCase extends CakeTestCase {
     {
     }
 
-	function testFindUserByidWithField() {
+    function testFindUserByidWithField() {
         // no field restrictions, should be a flat array of
         // only data from the user field, no associations
         $ret = $this->User->findUserByidWithFields(4);
@@ -46,9 +46,9 @@ class UserTestCase extends CakeTestCase {
         $this->assertEqual(count($ret['User']), 2);
         $this->assertEqual($ret['User']['username'], 'instructor3');
         $this->assertEqual($ret['User']['id'], 4);
-	}
+    }
 
-	function testGetByUsername() {
+    function testGetByUsername() {
         $empty=null;
 
         //Test on valid student input
@@ -72,9 +72,9 @@ class UserTestCase extends CakeTestCase {
         //null input
         $nullInput = $this->User->getByUserName(null);
         $this->assertEqual($nullInput['username'], $empty);
-	}
+    }
 
-	function testGetEnrolledStudent() {
+    function testGetEnrolledStudent() {
         //Run tests
         $enrolledStudentList = $this->User->getEnrolledStudents(1);
         $actual = array();
@@ -94,19 +94,21 @@ class UserTestCase extends CakeTestCase {
             'redshirt0001',
             'redshirt0009',
             'redshirt0015',
-            'redshirt0003'
+            'redshirt0003',
         );
         $this->assertTrue(count(array_diff($actual, $expect)) == 0);
 
         //Test an invalid corse, course_id==231321 (invalid)
         $invalidCourse = $this->User->getEnrolledStudents(231321);
         $this->assertEqual($invalidCourse, null);
-	}
+    }
 
-	function testGetEnrolledStudentsForList() {
+    function testGetEnrolledStudentsForList()
+    {
         //Test on a valid course with some student enrollment
-        //Set up test data
         $ret = $this->User->getEnrolledStudentsForList(1);
+        // should return an array with ids as key and student number + firstname +
+        // last name as value
         $expected = array(
             '31' => '10186039 Hui Student',
             '26' => '19524032 Bill Student',
@@ -123,16 +125,18 @@ class UserTestCase extends CakeTestCase {
             '7' => '98985481 Matt Student'
         );
         $this->assertTrue(count(array_diff_assoc($ret, $expected)) == 0);
-	}
+    }
 
-	function testHashPassword() {
+    function testHashPassword()
+    {
         $input = array('User' => array('password' => 'frogleg'));
         $ret = $this->User->hashPasswords($input);
         $this->assertEqual($ret['User']['password'],
             '6f40a1a25eec7d325310dea310949005');
-	}
+    }
 
-	function testGetRoleName() {
+    function testGetRoleName()
+    {
         //user_id==1 : role(superadmin)
         $superAdminRole=$this->User->getRoleName(1);
         $this->assertEqual($superAdminRole, 'superadmin');
@@ -152,9 +156,9 @@ class UserTestCase extends CakeTestCase {
         //user_id==9999 : role(unassigned)
         $unassignedRole = $this->User->getRoleName(9999);
         $this->assertEqual($unassignedRole, null);
-	}
+    }
 
-	function testGetRoleId() {
+    function testGetRoleId() {
         //user_id==1 : role(superadmin)
         $superAdminRole = $this->User->getRoleId(1);
         $this->assertEqual($superAdminRole, '1');
@@ -174,30 +178,30 @@ class UserTestCase extends CakeTestCase {
         //user_id==9999 : role(unassigned)
         $unassignedRole = $this->User->getRoleId(9999);
         $this->assertEqual($unassignedRole, null);
-	}
+    }
 
-	function testGetRole() {
+    function testGetRole() {
         // NOTE: that we don't officially support multiple roles for
         // one user yet, so that's not tested.
 
         // test single user's role
         $ret = $this->User->getRoles(1);
         $this->assertEqual($ret[1], 'superadmin');
-	}
+    }
 
-	function testGetInstructor() {
+    function testGetInstructor() {
         $actual = $this->User->GetInstructors('all', array());
         $actual = Set::extract('/User/id', $actual);
         $expected = array('0' => 4, '1' => 2, '2' => 3);
         $this->assertTrue(count(array_diff_assoc($actual, $expected) == 0));
-	}
+    }
 
-	function testLoadRole() {
+    function testLoadRole() {
         $ret = $this->User->loadRoles(1);
         $this->assertEqual($ret['1'], 'superadmin');
         $ret = $this->User->loadRoles(2);
         $this->assertEqual($ret['3'], 'instructor');
-	}
+    }
 
     /*
      * Test adding a student to a course.
@@ -541,27 +545,27 @@ class UserTestCase extends CakeTestCase {
     function testAddUserByArray() {
         // TODO
     }
-    
+
     function testremoveOldStudents() {
         // TODO
     }
-    
+
     function testGetEnrolledCourses() {
         //Test valid student enrolled in 2 courses
         $courses = $this->User->getEnrolledCourses(7);
         $this->assertEqual($courses, array(1,2));
-        
+
         //Test valid user not enrolled in courses
         $this->User->removeStudent(20,2);
         $courses = $this->User->getEnrolledCourses(20);
         $this->assertEqual($courses, null);
         $this->User->addStudent(20, 2);
-        
+
         //Test invalid user
         $courses = $this->User->getEnrolledCourses(999);
         $this->assertEqual($courses, null);
     }
-    
+
     function testGetEventGroupMembersNoTutors ()
     {
         //Test group, selfeval
@@ -580,11 +584,11 @@ class UserTestCase extends CakeTestCase {
         $members = $this->User->getEventGroupMembersNoTutors(999, false, 3);
         $this->assertEqual(Set::extract('/User/username', $members), null);
     }
-    
+
     function testgetFullNames() {
         // TODO
     }
-    
+
     function testgetUsers() {
         // TODO
     }
