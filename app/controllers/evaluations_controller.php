@@ -704,6 +704,31 @@ class EvaluationsController extends AppController
             $rubricDetail = $this->Evaluation->loadRubricEvaluationDetail($event);
             $this->set('groupMembers', $rubricDetail['groupMembers']);
             $this->set('evaluateeCount', $rubricDetail['evaluateeCount']);
+            
+            $evaluated = 0; // # of group members evaluated
+            $commentsNeeded = false;
+            foreach ($rubricDetail['groupMembers'] as $row) {
+                $user = $row['User'];
+                if (isset($user['Evaluation'])) {
+                    foreach ($user['Evaluation']['EvaluationRubricDetail'] as $eval) {
+                        if (!$commentsNeeded && empty($eval['criteria_comment'])) {
+                            $commentsNeeded = true;
+                        }
+                    }
+                    // only check if $commentsNeeded is false
+                    if (!$commentsNeeded && empty($user['Evaluation']['EvaluationRubric']['comment'])) {
+                        $commentsNeeded = true;
+                    }
+                    $evaluated++;
+                } else {
+                    $commentsNeeded = true; // not evaluated = comments needed
+                }
+            }
+            $allDone = ($evaluated == $rubricDetail['evaluateeCount']);
+            $comReq = ($commentsNeeded && $event['Event']['com_req']);
+            $this->set('allDone', $allDone);
+            $this->set('comReq', $comReq);
+            
 
             $this->render('rubric_eval_form');
         } else {

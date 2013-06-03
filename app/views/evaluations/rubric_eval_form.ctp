@@ -60,21 +60,20 @@ function alertSave(){
 
             <div style="text-align:left; margin-left:3em;"><a href="#" onClick="javascript:$('penalty').toggle();return false;">( <?php __('Show/Hide late penalty policy')?> )</a></div>
                 <div id ="penalty" style ="border:1px solid red; margin: 0.5em 0 0 3em; width: 450px; padding:0.5em; color:darkred; display:none">
-<?php if(!empty($penalty)){
-    foreach($penalty as $day){
-        $mult = ($day['Penalty']['days_late']>1)?'s':'';
-        echo $day['Penalty']['days_late'].' day'.$mult.' late: '.$day['Penalty']['percent_penalty'].'% deduction. </br>';
-    }
-    echo $penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';
-} else {
-    echo 'No penalty is specified for this evaluation.';
-}
-?>
-            </div>
+                <?php if(!empty($penalty)){
+                    foreach($penalty as $day){
+                        $mult = ($day['Penalty']['days_late']>1)?'s':'';
+                        echo $day['Penalty']['days_late'].' day'.$mult.' late: '.$day['Penalty']['percent_penalty'].'% deduction. </br>';
+                    }
+                    echo $penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';
+                } else {
+                    echo 'No penalty is specified for this evaluation.';
+                }
+                ?>
+                </div>
         </td>
     </tr>
 </table>
-
 
 <table class="standardtable">
     <tr>
@@ -118,79 +117,37 @@ function alertSave(){
 </table>
 </form>
 <table class="standardtable">
-  <tr>
-    <td colspan="4" align="center">
+    <tr><td colspan="4" align="center">
 <form name="submitForm" id="submitForm" method="POST" action="<?php echo $html->url('completeEvaluationRubric') ?>">
-  <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
-  <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>"/>
-  <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>"/>
-  <input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id']?>"/>
-  <input type="hidden" name="rubric_id" value="<?php echo $viewData['id']?>"/>
-  <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo User::get('id')?>"/>
-  <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/>
-  <?php
-  $count = 0;
-  foreach($groupMembers as $row) {
-    $user = $row['User'];
-    if (isset($user['Evaluation'])) {
-      $count++;
-    }
-  }
-    $mustCompleteUsers = ($count != $evaluateeCount);
-    $commentsNeeded = false;
-    // Check if any comment fields were left empty.
-    if ($event['Event']['com_req'] && isset($data['questions'])) {
-        foreach($groupMembers as $row) {
-            $user = $row['User'];
-            if (empty($user['Evaluation'])) {
-                $commentsNeeded = true;      // Not evaluated? Then we need comments for sure
-            } else {
-                    $evaluation = $user['Evaluation']['EvaluationRubric'];
-                    $evaluationDetails = $user['Evaluation']['EvaluationRubricDetail'];
-                    foreach ($evaluationDetails as $detail)
-                        if ($data['questions'][$detail['question_number']]['mixeval_question_type_id'] !='1' &&   // if the questing in not a selection one.
-                            empty($detail['criteria_comment'])) {
-                            $commentsNeeded = true;      // A criteria comment is missing
-                            break;
-                        }
-                if (empty($evaluation['comment'])) {
-                    $commentsNeeded = true;   // General comment missing
-                }
-            }
-
-            if ($commentsNeeded) {
-                break; // avoid too much looping. If we need comments, that's it, we need comments!
-            }
-
-        }
+    <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
+    <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>"/>
+    <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>"/>
+    <input type="hidden" name="course_id" value="<?php echo $event['Event']['course_id']?>"/>
+    <input type="hidden" name="rubric_id" value="<?php echo $viewData['id']?>"/>
+    <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo User::get('id')?>"/>
+    <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/>
+    <?php
+    if ($allDone && !$comReq) {
+        echo $form->submit(__('Submit to Complete the Evaluation', true), array('div'=>'submitComplete','onClick'=>'setSub()'));
     } else {
-        $commentsNeeded = false;
+        echo $form->submit(__('Submit to Complete the Evaluation', true), array('disabled'=>'true','div'=>'submitComplete','onClick'=>'setSub()')); echo "<br />";
+        echo !$allDone ? "<div style='color: red'>".__("Please complete the questions for all group members, pressing 'Save This Section' button for each one.</div>", true) : "";
+        echo $comReq ? "<div style='color: red'>".__('Please Enter all the comments for all the group members before submitting.</div>', true) : "";
     }
-
-  if (!$mustCompleteUsers && !$commentsNeeded) {
-    echo $form->submit(__('Submit to Complete the Evaluation', true), array('div'=>'submitComplete','onClick'=>'setSub()'));
-  } else {
-    echo $form->submit(__('Submit to Complete the Evaluation', true), array('disabled'=>'true','div'=>'submitComplete','onClick'=>'setSub()')); echo "<br />";
-    echo $mustCompleteUsers ? "<div style='color: red'>".__("Please complete the questions for all group members, pressing 'Save This Section' button for each one.</div>", true) : "";
-    echo $commentsNeeded ? "<div style='color: red'>".__('Please Enter all the comments for all the group members before submitting.</div>', true) : "";
-  }
-  ?>
-
-    </form></td>
-    </tr>
+    ?>
+</form></td></tr>
 </table>
-    <script type="text/javascript">
+<script type="text/javascript">
     new Rico.Accordion( 'accordion',
-  {panelHeight: 600,
-      hoverClass: 'mdHover',
-      selectedClass: 'mdSelected',
-      clickedClass: 'mdClicked',
-      unselectedClass: 'panelheader',
-      onShowTab: 'panel6' });
+        {panelHeight: 600,
+        hoverClass: 'mdHover',
+        selectedClass: 'mdSelected',
+        clickedClass: 'mdClicked',
+        unselectedClass: 'panelheader',
+        onShowTab: 'panel6' });
       
 jQuery(window).on("beforeunload",function() {
     if(sub !=1 && save !=1)
         return 'Please click on the "Submit to Complete the Evaluation" button before exiting.' ;
 });
-
-  </script>
+</script>
