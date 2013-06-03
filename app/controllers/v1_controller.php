@@ -1058,6 +1058,16 @@ class V1Controller extends Controller {
         $this->render('json');
     }
 
+    /**
+     * getRequestInfo
+     * get the user's request
+     *
+     * @param mixed $request
+     * @param mixed $body
+     *
+     * @access protected
+     * @return void
+     */
     protected function getRequestInfo($request, $body)
     {
         $ret = '';

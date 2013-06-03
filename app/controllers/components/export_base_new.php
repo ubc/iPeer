@@ -156,33 +156,33 @@ class ExportBaseNewComponent extends Object
 
         foreach ($group['Member'] as $evaluator) {
             $row = array();
-            if (!empty($params['include']['course'])) {
+            if ($params['include']['course']) {
                 array_push($row, $event['Course']['course']);
             }
-            if (!empty($params['include']['eval_event_names'])) {
+            if ($params['include']['eval_event_names']) {
                 array_push($row, $event['Event']['title']);
             }
-            if (!empty($params['include']['eval_event_type'])) {
+            if ($params['include']['eval_event_type']) {
                 array_push($row, $this->eventType[$event['Event']['event_template_type_id']]);
             }
-            if (!empty($params['include']['group_names'])) {
+            if ($params['include']['group_names']) {
                 array_push($row, $group['Group']['group_name']);
             }
-            if (!empty($params['include']['student_email'])) {
+            /*if ($params['include']['student_email']) {
                 array_push($row, $evaluatee['email']);
-            }
-            if (!empty($params['include']['student_name'])) {
+            }*/
+            if ($params['include']['student_name']) {
                 $dropped = isset($evaluatee['GroupsMember']) ? '' : '*';
                 array_push($row, $dropped.$evaluatee['full_name']);
             }
-            if (!empty($params['include']['student_id'])) {
+            if ($params['include']['student_id']) {
                 array_push($row, $evaluatee['student_no']);
             }
-            if (!empty($params['include']['student_name'])) {
+            if ($params['include']['student_name']) {
                 $dropped = isset($evaluator['GroupsMember']) ? '' : '*';
                 array_push($row, $dropped.$evaluator['full_name']);
             }
-            if (!empty($params['include']['student_id'])) {
+            if ($params['include']['student_id']) {
                 array_push($row, $evaluator['student_no']);
             }
 
@@ -195,14 +195,16 @@ class ExportBaseNewComponent extends Object
             $response = $responses[$evaluatee['id']][$evaluator['id']];
 
             // comments for Rubric and Simple Evaluation
-            if ($event['Event']['event_template_type_id'] != 4 && isset($params['include']['comments'])) {
+            if ($event['Event']['event_template_type_id'] != 4 && $params['include']['comments']) {
                 array_push($row, $response[$this->responseModelName]['comment']);
             }
 
             if ($this->detailModel[$event['Event']['event_template_type_id']] && array_key_exists($this->detailModel[$event['Event']['event_template_type_id']], $response)) {
                 if (in_array($event['Event']['event_template_type_id'], array(1, 2))) {
-                    foreach ($response[$this->detailModel[$event['Event']['event_template_type_id']]] as $result) {
+                    if ($params['include']['grade_tables']) {
+                        foreach ($response[$this->detailModel[$event['Event']['event_template_type_id']]] as $result) {
                             array_push($row, $result['grade']);
+                        }
                     }
                 } else {
                     // mixed evaluation
@@ -211,9 +213,9 @@ class ExportBaseNewComponent extends Object
                     foreach ($event['Question'] as $question) {
                         if (!isset($results[$question['question_num']])) {
                             array_push($row, '');
-                        } elseif (isset($params['include']['grade_tables']) && in_array($question['mixeval_question_type_id'], array(1, 4))) {
+                        } elseif ($params['include']['grade_tables'] && in_array($question['mixeval_question_type_id'], array(1, 4))) {
                             array_push($row, $results[$question['question_num']]['grade']);
-                        } elseif (isset($params['include']['comments']) && in_array($question['mixeval_question_type_id'], array(2, 3))) {
+                        } elseif ($params['include']['comments'] && in_array($question['mixeval_question_type_id'], array(2, 3))) {
                             array_push($row, $results[$question['question_num']]['question_comment']);
                         } else {
                             array_push($row, 'N/A');
@@ -239,7 +241,7 @@ class ExportBaseNewComponent extends Object
                 $finalGrade = $response[$this->responseModelName]['score'];
             }
 
-            if (isset($params['include']['final_marks'])) {
+            if ($params['include']['final_marks']) {
                 array_push($row, $finalGrade);
             }
             $grid[] = $row;

@@ -110,32 +110,32 @@ Class ExportCsvComponent extends ExportBaseNewComponent
     {
         $header = array();
 
-        if (!empty($params['include']['course'])) {
+        if ($params['include']['course']) {
             $header[] = "Course Name";
         }
-        if (!empty($params['include']['eval_event_names'])) {
+        if ($params['include']['eval_event_names']) {
             $header[] = "Event";
         }
-        if (!empty($params['include']['eval_event_type'])) {
+        if ($params['include']['eval_event_type']) {
             $header[] = "Evaluation Type";
         }
 
-        if (!empty($params['include']['group_names'])) {
+        if ($params['include']['group_names']) {
             $header[] = "Group Name";
         }
-        if (!empty($params['include']['student_email'])) {
+        /*if ($params['include']['student_email']) {
             $header[] = "Email";
-        }
-        if (!empty($params['include']['student_name'])) {
+        }*/
+        if ($params['include']['student_name']) {
             $header[] = "Evaluatee";
         }
-        if (!empty($params['include']['student_id'])) {
+        if ($params['include']['student_id']) {
             $header[] = "Evaluatee S#";
         }
-        if (!empty($params['include']['student_name'])) {
+        if ($params['include']['student_name']) {
             $header[] = "Evaluator";
         }
-        if (!empty($params['include']['student_id'])) {
+        if ($params['include']['student_id']) {
             $header[] = "Evaluator S#";
         }
 
@@ -146,21 +146,21 @@ Class ExportCsvComponent extends ExportBaseNewComponent
 
         foreach ($event['Question'] as $key => $question) {
             if (isset($question['mixeval_question_type_id'])) {
-                if ((isset($params['include']['grade_tables']) && 
-                    in_array($question['mixeval_question_type_id'], array(1, 4)))) {
+                if (in_array($question['mixeval_question_type_id'], array(1, 4))) {
                     $header[] = "Q".($key+1)." ( /".$question['multiplier'].")";
-                } else if (isset($params['include']['comments']) && 
-                    in_array($question['mixeval_question_type_id'], array(2, 3))){
+                } else if (in_array($question['mixeval_question_type_id'], array(2, 3))){
                     $header[] = "Q".($key+1);
                 }
             } else {
-                $header[] = "Q".($key+1)." ( /".$question['multiplier'].")";
+                if ($params['include']['grade_tables']) {
+                    $header[] = "Q".($key+1)." ( /".$question['multiplier'].")";
+                }
             }
         }
         $header[] = "Raw Score";
         $header[] = "Late Penalty";
 
-        if (isset($params['include']['final_marks'])) {
+        if ($params['include']['final_marks']) {
             $header[] = "Final Score";
         }
 

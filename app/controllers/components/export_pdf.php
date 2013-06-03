@@ -12,7 +12,7 @@
 Class ExportPdfComponent extends ExportBaseNewComponent
 {
     /**
-     * createPdf // MT
+     * createPdf
      *
      * @param mixed $params params
      * @param mixed $event  event
@@ -117,7 +117,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
     }
 
     /**
-     * _writeMixEvalResults // MT
+     * _writeMixEvalResults
      * 
      * @param mixed $event
      * @param mixed $grp_event_id
@@ -228,10 +228,10 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         }
 
         return $mEval;
-     }
+    }
  
     /**
-     * _writeMixResultsTbl // MT
+     * _writeMixResultsTbl
      * 
      * @param mixed $event
      * @param mixed $grp_event_id
@@ -255,7 +255,6 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         //Write the Table Header
         $mRTBL = '<table border="1" align="center"><tr><th><b>Evaluatee</b></th>';
         $total = 0;
-        $ques = array();
         foreach($mixevalQuestions as $question) {
             $question_num = $question['MixevalQuestion']['question_num'];
             $multiplier = $question['MixevalQuestion']['multiplier'];
@@ -301,7 +300,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         $evalNum = $quesAvg;
         $evaluateeAvg = array_fill_keys(array_keys($grades), 0);
         $penalties = $this->Mixeval->formatPenaltyArray($evaluateeNames, $event['Event']['id'], $grp_id);
-        //debug($evaluateeAvg);
+
         foreach ($grades as $evaluateeId => $questions) {
             $suffix = in_array($evaluateeId, $dropped) ? ' *' : '';
             $mRTBL .= '<tr><td>'.$evaluateeNames[$evaluateeId].$suffix.'</td>';
@@ -336,7 +335,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
     }
 
     /**
-     * function _writeRubricResultsTbl // MT
+     * _writeRubricResultsTbl
      * 
      * @param mixed $event
      * @param mixed $grp_event_id
@@ -433,7 +432,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
     }        
     
     /**
-     * function _writeRubricEvalResults // MT
+     * _writeRubricEvalResults
      * 
      * @param mixed $event
      * @param mixed $grp_event_id
@@ -536,11 +535,11 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             $rSTBL .= '</table></div>';
         }
 
-        return $rSTBL;       
+        return $rSTBL;
     }      
 
     /**
-     * _writeComments // MT
+     * _writeComments
      * 
      * @param mixed $grp_event_id
      * 
@@ -568,7 +567,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
     }
     
     /**
-     * _writeScoresTbl // MT
+     * _writeScoresTbl
      * 
      * @param mixed $event
      * @param mixed $grp_event_id
@@ -659,7 +658,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
     }
     
     /**
-     * _writeEvalDetails // MT
+     * _writeEvalDetails
      * 
      * @param mixed $event
      * @param mixed $grpId
@@ -688,6 +687,6 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         $dueDate = '<b>'.__('Due Date', true).': </b>'.date("D, F j, Y g:i a", strtotime($event['Event']['due_date'])).'<br>';
         $description = '<b>'.__('Description', true).': </b>'.$event['Event']['description'].'</p>';
         
-        return ($groupName.$selfEval.$eventName.$eventTemplateType.$dueDate.$description);             
+        return ($groupName.$selfEval.$eventName.$eventTemplateType.$dueDate.$description);
     }
 }
