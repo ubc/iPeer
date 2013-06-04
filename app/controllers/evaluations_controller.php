@@ -927,10 +927,10 @@ class EvaluationsController extends AppController
                 $eventId = $eval['Evaluation']['event_id'];
                 $groupId = $eval['Evaluation']['group_id'];
                 $evaluatee = $eval['Evaluation']['evaluatee_id'];
-                if (!$this->validMixevalEvalComplete($this->params['form'])) {
+                /*if (!$this->validMixevalEvalComplete($this->params['form'])) {
                     $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
                     return;
-                }
+                }*/
                 if (!$this->Evaluation->saveMixevalEvaluation($eval)) {
                     $failures[] = $userId;
                 }
@@ -1004,11 +1004,11 @@ class EvaluationsController extends AppController
      * @access public
      * @return void
      */
-    function validMixevalEvalComplete ($form=null)
+    /*function validMixevalEvalComplete ($form=null)
     {
         $status = true;
         return $status;
-    }
+    }*/
 
 
     /**
@@ -1769,7 +1769,7 @@ class EvaluationsController extends AppController
      * @access public
      * @return void
      */
-    function export_rubic($eventId, $rubicEvalId)
+    /*function export_rubic($eventId, $rubicEvalId)
     {
         $this->autoRender=false;
         $this->autoLayout=false;
@@ -1906,7 +1906,7 @@ class EvaluationsController extends AppController
 
 
 
-    }
+    }*/
 
 
     /**
@@ -1918,7 +1918,7 @@ class EvaluationsController extends AppController
      * @access public
      * @return void
      */
-    function export_test($eventId=null, $groupID=null)
+    /*function export_test($eventId=null, $groupID=null)
     {
         $this->autoLayout=false;
         $this->autoRender=false;
@@ -2036,5 +2036,5 @@ class EvaluationsController extends AppController
 
 
 
-    }
+    }*/
 }
