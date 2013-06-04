@@ -650,7 +650,8 @@ class EvaluationsController extends AppController
 
             // if group id provided does not match the group id the user belongs to or
             // template type is not rubric - they are redirected
-            if (!is_numeric($groupId) || !$this->GroupsMembers->checkMembershipInGroup($groupId, User::get('id'))) {
+            if (!is_numeric($groupId) || !in_array($groupId, $groups) ||
+                !$this->GroupsMembers->checkMembershipInGroup($groupId, User::get('id'))) {
                 $this->Session->setFlash(__('Error: Invalid Id', true));
                 $this->redirect('/home/index');
                 return;
@@ -737,13 +738,20 @@ class EvaluationsController extends AppController
                 return;
             }*/
 
-            if ($this->Evaluation->saveRubricEvaluation($this->params, $targetEvaluatee)) {
+            if ($this->Evaluation->saveRubricEvaluation($targetEvaluatee, $this->params)) {
                 // check whether comments are given, if not and it is required, send msg
                 $comments = $this->params['form'][$targetEvaluatee.'comments'];
                 $filter = array_filter(array_map('trim', $comments)); // filter out blank comments
+                $msg = array();
+                $sub = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
                 if ($event['Event']['com_req'] && (count($filter) < count($comments))) {
-                    $this->Session->setFlash(__('Your evaluation has been saved, but some comments are missing', true));
+                    $msg[] = 'some comments are missing';
                 }
+                if (empty($sub)) {
+                    $msg[] = 'you still have to submit the evaluation with the Submit button below';
+                }
+                $suffix = empty($msg) ? '.' : ', but '.implode(' and ', $msg).'.';
+                $this->Session->setFlash(__('Your evaluation has been saved'.$suffix, true));
                 $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
                 return;
             } else {

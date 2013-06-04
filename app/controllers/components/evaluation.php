@@ -525,20 +525,19 @@ class EvaluationComponent extends Object
     /**
      * saveRubricEvaluation
      *
-     * @param bool $params
      * @param mixed $targetEvaluatee
+     * @param mixed $params
      *
      * @access public
      * @return void
      */
-    function saveRubricEvaluation($params=null, $targetEvaluatee)
+    function saveRubricEvaluation($targetEvaluatee, $params=null)
     {
         $this->Event = ClassRegistry::init('Event');
         $this->Rubric = ClassRegistry::init('Rubric');
         $this->EvaluationRubric = ClassRegistry::init('EvaluationRubric');
 
         // assuming all are in the same order and same size
-        $evaluatees = $params['form']['memberIDs'];
         $evaluator = $params['data']['Evaluation']['evaluator_id'];
         $groupEventId = $params['form']['group_event_id'];
         $rubricId = $params['form']['rubric_id'];
