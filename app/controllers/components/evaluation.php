@@ -526,11 +526,12 @@ class EvaluationComponent extends Object
      * saveRubricEvaluation
      *
      * @param bool $params
+     * @param mixed $targetEvaluatee
      *
      * @access public
      * @return void
      */
-    function saveRubricEvaluation($params=null)
+    function saveRubricEvaluation($params=null, $targetEvaluatee)
     {
         $this->Event = ClassRegistry::init('Event');
         $this->Rubric = ClassRegistry::init('Rubric');
@@ -554,12 +555,6 @@ class EvaluationComponent extends Object
 
         // Save evaluation data
         // total grade for evaluatee from evaluator
-        $targetEvaluatee = null;
-        for ($i=0; $i<count($evaluatees); $i++) {
-            if (isset($params['form'][$evaluatees[$i]]) && $params['form'][$evaluatees[$i]] = 'Save This Section') {
-                $targetEvaluatee = $evaluatees[$i];
-            }
-        }
         $evalRubric = $this->EvaluationRubric->getEvalRubricByGrpEventIdEvaluatorEvaluatee($groupEventId, $evaluator, $targetEvaluatee);
         if (empty($evalRubric)) {
             //Save the master Evalution Rubric record if empty

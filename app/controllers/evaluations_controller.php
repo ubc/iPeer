@@ -642,29 +642,15 @@ class EvaluationsController extends AppController
         $eventId = $event['Event']['id'];
 
         if (empty($this->params['data'])) {
-
-            // invalid group id
-            if (!is_numeric($groupId)) {
-                $this->Session->setFlash(__('Error: Invalid Id', true));
-                $this->redirect('/home/index');
-                return;
-            }
-
             $rubricId = $event['Event']['template_id'];
             $courseId = $event['Event']['course_id'];
 
-            $group = array();
-            $group_events = $this->GroupEvent->getGroupEventByEventId($eventId);
-            $userId = User::get('id');
-            foreach ($group_events as $events) {
-                if ($this->GroupsMembers->checkMembershipInGroup($events['GroupEvent']['group_id'], $userId) !== 0) {
-                    $group[] = $events['GroupEvent']['group_id'];
-                }
-            }
+            $groupEvents = $this->GroupEvent->findAllByEventId($eventId);
+            $groups = Set::extract('/GroupEvent/group_id', $groupEvents);
 
             // if group id provided does not match the group id the user belongs to or
             // template type is not rubric - they are redirected
-            if (!in_array($groupId, $group)) {
+            if (!is_numeric($groupId) || !$this->GroupsMembers->checkMembershipInGroup($groupId, User::get('id'))) {
                 $this->Session->setFlash(__('Error: Invalid Id', true));
                 $this->redirect('/home/index');
                 return;
@@ -735,26 +721,39 @@ class EvaluationsController extends AppController
             $eventId = $this->params['form']['event_id'];
             $groupId = $this->params['form']['group_id'];
 
-            $courseId = $this->params['form']['course_id'];
+            $event = $this->Event->findById($eventId);
+            // find out whose evaluation is submitted
+            foreach ($this->params['form']['memberIDs'] as $userId) {
+                if (isset($this->params['form'][$userId])) {
+                    $targetEvaluatee = $userId;
+                    break;
+                }
+            }
 
-            if (!$this->validRubricEvalComplete($this->params['form'])) {
+            // validation has been modified to only return true
+            /*if (!$this->validRubricEvalComplete($this->params['form'])) {
                 $this->Session->setFlash(__('validRubricEvalCompleten failure', true));
                 $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
                 return;
-            }
+            }*/
 
-            if ($this->Evaluation->saveRubricEvaluation($this->params)) {
+            if ($this->Evaluation->saveRubricEvaluation($this->params, $targetEvaluatee)) {
+                // check whether comments are given, if not and it is required, send msg
+                $comments = $this->params['form'][$targetEvaluatee.'comments'];
+                $filter = array_filter(array_map('trim', $comments)); // filter out blank comments
+                if ($event['Event']['com_req'] && (count($filter) < count($comments))) {
+                    $this->Session->setFlash(__('Your evaluation has been saved, but some comments are missing', true));
+                }
                 $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
                 return;
-            }
-            //Found error
-            else {
+            } else {
+                //Found error
                 //Validate the error why the Event->save() method returned false
                 $this->validateErrors($this->Event);
                 $this->Session->setFlash(__('Your evaluation was not saved successfully', true));
                 $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
                 return;
-            }//end if
+            }
         }
     }
 
@@ -767,11 +766,11 @@ class EvaluationsController extends AppController
      * @access public
      * @return void
      */
-    function validRubricEvalComplete ($form=null)
+    /*function validRubricEvalComplete ($form=null)
     {
         $status = true;
         return $status;
-    }
+    }*/
 
 
     /**
