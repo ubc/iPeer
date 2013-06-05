@@ -72,15 +72,15 @@ class studentRubric extends SystemBaseTestCase
         $this->waitForLogoutLogin('redshirt0001');
         $pending = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[class="eventSummary pending"]')->text();
         // check that there is at least one pending event
-        $this->assertEqual(substr($pending, -20), 'Pending Events Total');
+        $this->assertEqual(substr($pending, -22), 'Pending Event(s) Total');
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
         
         // check saving answers alert
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Home')->click();
-        $this->session->dismiss_alert();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
         
         $comments = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'font[color="red"]');
-        $this->assertEqual($comments->text(), 'Must');
+        $this->assertEqual($comments->text(), 'Required');
         
         // check penalty note
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, '( Show/Hide late penalty policy )')->click();
@@ -90,19 +90,65 @@ class studentRubric extends SystemBaseTestCase
         $submit = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Submit to Complete the Evaluation"]');
         $this->assertTrue($submit->attribute('disabled'));
         
+        // check the questions are not in red
+        $ques1 = $this->session->element(PHPWebDriver_WebDriverBy::ID, '6criteria1');
+        $ques2 = $this->session->element(PHPWebDriver_WebDriverBy::ID, '6criteria2');
+        $ques3 = $this->session->element(PHPWebDriver_WebDriverBy::ID, '6criteria3');
+        $this->assertFalse($ques1->attribute('color'));
+        $this->assertFalse($ques2->attribute('color'));
+        $this->assertFalse($ques3->attribute('color'));
+        
         // Alex Student
         $header = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'panel6Header');
         $this->assertEqual($header->text(), 'Alex Student - (click to expand)');
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_1.value=4;"]')->click();
-        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_2.value=5;"]')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_3.value=5;"]')->click();
         $comments = $this->session->elements(PHPWebDriver_WebDriverBy::NAME, '6comments[]');
-        $comments[0]->sendKeys('participated lots');
         $comments[1]->sendKeys('very co-operative');
         $comments[2]->sendKeys('very punctual');
         $this->session->element(PHPWebDriver_WebDriverBy::NAME, '6gen_comment')->sendKeys('awesome');
         $this->session->element(PHPWebDriver_WebDriverBy::NAME, '6')->click();
         
+        // check that only the second ques is marked red
+        $ques1 = $this->session->element(PHPWebDriver_WebDriverBy::ID, '6criteria1');
+        $ques2 = $this->session->element(PHPWebDriver_WebDriverBy::ID, '6criteria2');
+        $ques3 = $this->session->element(PHPWebDriver_WebDriverBy::ID, '6criteria3');
+        $this->assertFalse($ques1->attribute('color'));
+        $this->assertEqual($ques2->attribute('color'), 'red');
+        $this->assertFalse($ques3->attribute('color'));
+        // warning message
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::ID, '6likert');
+        $this->assertEqual($msg->text(), 'Please complete all the questions marked red before saving.');
+        
+        // answer question 2 + save
+        $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_2.value=5;"]')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::NAME, '6')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::ID, "flashMessage"));
+            }
+        );
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'flashMessage')->text();
+        $expect = 'Your evaluation has been saved, but some comments are missing and you still '.
+            'have to submit the evaluation with the Submit button below.';
+        $this->assertEqual($msg, $expect);
+        $this->session->open($this->session->url()); // clear message by refreshing the page
+
+        // fill in first comment
+        $comment = $this->session->element(PHPWebDriver_WebDriverBy::NAME, '6comments[]');
+        $comment->sendKeys('participated lots');
+        $this->session->element(PHPWebDriver_WebDriverBy::NAME, '6')->click();
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::ID, "flashMessage"));
+            }
+        );
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'flashMessage')->text();
+        $expect = 'Your evaluation has been saved, but you still have to submit the evaluation with the Submit button below.';
+        $this->assertEqual($msg, $expect);
+
         // check the evaluation for Alex is saved
         $header = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'panel6Header');
         $this->assertEqual($header->text(), 'Alex Student ( Saved )');
@@ -132,8 +178,6 @@ class studentRubric extends SystemBaseTestCase
         $this->session->element(PHPWebDriver_WebDriverBy::NAME, '7')->click();
         $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Submit to Complete the Evaluation"]')->click();
 
-        $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elements(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -153,15 +197,35 @@ class studentRubric extends SystemBaseTestCase
         $comments[0]->clear();
         $comments[0]->sendKeys('very active in the group');
         $comments[1]->clear();
-        $comments[1]->sendKeys('easy to work with');
         $comments[2]->clear();
         $comments[2]->sendKeys('hands in their work on time');
         $this->session->element(PHPWebDriver_WebDriverBy::NAME, '6gen_comment')->clear();
         $this->session->element(PHPWebDriver_WebDriverBy::NAME, '6gen_comment')->sendKeys('good job');
         $this->session->element(PHPWebDriver_WebDriverBy::NAME, '6')->click();
         
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $session = $this->session;
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::ID, "flashMessage"));
+            }
+        );
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'flashMessage')->text();
+        $this->assertEqual($msg, 'Your evaluation has been saved, but some comments are missing.');
+        $this->session->open($this->session->url());
+
+        $comments = $this->session->elements(PHPWebDriver_WebDriverBy::NAME, '6comments[]');
+        $comments[1]->sendKeys('easy to work with');
+        $this->session->element(PHPWebDriver_WebDriverBy::NAME, '6')->click();
+        $w->until(
+            function($session) {
+                return count($session->elements(PHPWebDriver_WebDriverBy::ID, "flashMessage"));
+            }
+        );
+        $msg = $this->session->element(PHPWebDriver_WebDriverBy::ID, 'flashMessage')->text();
+        $this->assertEqual($msg, 'Your evaluation has been saved.');
+        
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Home')->click();
-        $this->session->accept_alert();
         
         $this->secondStudent();
         $this->tutor();
@@ -661,7 +725,6 @@ class studentRubric extends SystemBaseTestCase
         
         // check Ed's results
         $this->session->open($this->url);
-        $this->session->accept_alert();
         $this->logoutLogin('redshirt0001');
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
         $rating = $this->session->element(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[2]/tbody/tr[2]/td')->text();

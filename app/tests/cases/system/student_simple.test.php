@@ -74,7 +74,7 @@ class studentSimple extends SystemBaseTestCase
         
         $pending = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[class="eventSummary pending"]')->text();
         // check that there is at least one pending event
-        $this->assertEqual(substr($pending, -20), 'Pending Events Total');
+        $this->assertEqual(substr($pending, -22), 'Pending Event(s) Total');
         
         $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Simple Evaluation')->click();
         

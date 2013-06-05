@@ -36,7 +36,7 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         $title = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
         $this->assertEqual($title, 'Mixed Evaluations');
         
-        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Add Mix Evaluation')->click();
+        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Add Mixed Evaluation')->click();
         $title = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
         $this->assertEqual($title, 'Mixed Evaluations > Add');
         

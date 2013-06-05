@@ -6,7 +6,7 @@ $rubric_type = $data['Rubric']['template'];
 $zero_mark = $data['Rubric']['zero_mark'];
 isset($user)? $userId = $user['id'] : $userId = '';
 isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = null;
-$reqCom = $event['Event']['com_req'] ? '<br><font color="red">('.__('required', true).')</font>' : '';
+$reqCom = isset($event) && $event['Event']['com_req'] ? '<br><font color="red">('.__('required', true).')</font>' : '';
 ?>
 <table class="standardtable">
     <tr>

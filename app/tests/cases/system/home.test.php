@@ -1,7 +1,7 @@
 <?php
 require_once('system_base.php');
 
-class addEventTestCase extends SystemBaseTestCase
+class homeTestCase extends SystemBaseTestCase
 {    
     public function startCase()
     {
