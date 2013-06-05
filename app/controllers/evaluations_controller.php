@@ -690,6 +690,7 @@ class EvaluationsController extends AppController
 
             $rubricDetail = $this->Evaluation->loadRubricEvaluationDetail($event);
             $this->set('groupMembers', $rubricDetail['groupMembers']);
+            $this->set('userIds', implode(',', Set::extract('/User/id', $rubricDetail['groupMembers'])));
             $this->set('evaluateeCount', $rubricDetail['evaluateeCount']);
             
             $evaluated = 0; // # of group members evaluated

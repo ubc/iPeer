@@ -1,3 +1,24 @@
+<script type="text/javascript">
+var numQues = <?php echo count($data['RubricsCriteria']) ?>;
+function saveButtonVal(userId) {
+    var complete = true;
+    for (var i=1; i <= numQues; i++) {
+        var value = jQuery('input[name='+userId+'criteria_points_'+i+']:checked').val();
+        if (value == null) {
+            jQuery('#'+userId+'criteria'+i).attr('color', 'red');
+            complete = false;
+        } else {
+            jQuery('#'+userId+'criteria'+i).removeAttr('color');
+        }
+    }
+    if (complete) {
+        jQuery('#'+userId+'likert').hide();
+    } else {
+        jQuery('#'+userId+'likert').show();
+    }
+    return complete;
+}
+</script>
 <?php echo $html->script('ricobase')?>
 <?php echo $html->script('ricoeffects')?>
 <?php echo $html->script('ricoanimation')?>
@@ -35,8 +56,8 @@
             <span class="instruction-icon"><?php __(' Instructions')?>:</span>
             <ul class="instructions">
             <li><?php __('Click <font color ="#FF6666"><i>EACH</i></font> of your peer\'s name to rate his/her performance.')?></li>
-            <li><?php __('Enter Comments')?> (<?php echo $event['Event']['com_req']? '<font color="red">'.__('Must', true).'</font>' : __('Optional', true) ;?>).</li>
-            <li><?php __('Press "Save This Section" or "Edit This Section" once to save the evaluation on individual peer.')?></li>
+            <li><?php __('Enter Comments')?> (<?php echo $event['Event']['com_req']? '<font color="red">'.__('Required', true).'</font>' : __('Optional', true) ;?>).</li>
+            <li><?php __('Press "Save This Section" to save the evaluation for each group member.')?></li>
             <li><?php __('Press "Submit to Complete the Evaluation" to submit your evaluation to all peers.')?> </li>
             <li><?php __('<i>NOTE:</i> You can click the "Submit to Complete the Evaluation" button only <font color ="#FF6666">AFTER</font> all evaluations are completed.')?></li>
             <?php $releaseEnd = date('l, F j, Y g:i a', strtotime($event['Event']['release_date_end'])); ?>
@@ -76,19 +97,17 @@
                 <?php endif; ?>
                 </div>
                 <div style="height: 200px;" id="panel1Content" class="panelContent">
-                    <?php if ($event['Event']['com_req']) { ?>
-                    <br><?php __('Important! Comments are required in this evaluation.')?>
-                    <?php } ?>
                     <br>
                     <?php
-                    $params = array('controller'=>'rubrics', $viewData , 'evaluate'=>1, 'user'=>$user);
+                    $params = array('controller'=>'rubrics', $viewData , 'evaluate'=>1, 'user'=>$user, 'event'=>$event);
                     echo $this->element('rubrics/ajax_rubric_view', $params);
                     ?>
                     <table align="center" width=100% >
                     <tr>
                         <td align="center">
                         <?php echo $form->submit('Save This Section', array('name'=>$user['id'], 'div'=>'saveThisSection'));
-                        echo "<br />".__('Make sure you save this section before moving on to the other ones!', true)." <br /><br />";
+                        echo "<br><div style='color: red' id='".$user['id']."likert'>".__('Please complete all the questions marked red before saving.</div>', true)."</div>";
+                        echo __('Make sure you save this section before moving on to the other ones!', true)." <br /><br />";
                         ?>
                     </tr>
                     </table>
@@ -122,11 +141,14 @@
 </form></td></tr>
 </table>
 <script type="text/javascript">
-    new Rico.Accordion( 'accordion',
-        {panelHeight: 600,
-        hoverClass: 'mdHover',
-        selectedClass: 'mdSelected',
-        clickedClass: 'mdClicked',
-        unselectedClass: 'panelheader',
-        onShowTab: 'panel6' });
+new Rico.Accordion( 'accordion',
+    {panelHeight: 600,
+    hoverClass: 'mdHover',
+    selectedClass: 'mdSelected',
+    clickedClass: 'mdClicked',
+    unselectedClass: 'panelheader'});
+var userIds = [<?php echo $userIds ?>];
+jQuery.each(userIds, function(index, userId) {
+    jQuery('#'+userId+'likert').hide();
+});
 </script>
