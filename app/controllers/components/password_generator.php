@@ -44,7 +44,7 @@ class PasswordGeneratorComponent extends Object {
     }
 
     // fall back password algorithm
-    return $this->defaultAlgorithm(5);
+    return $this->defaultAlgorithm($len);
   }
 
   /** 
