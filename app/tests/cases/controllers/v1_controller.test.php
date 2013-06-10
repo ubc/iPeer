@@ -569,7 +569,7 @@ class V1ControllerTest extends CakeTestCase {
 
         // test get specific event from a course
         $actualEvent = $this->_oauthReq("$url/1/events/3");
-        $expectedEvent = array("title" => "Project Evaluation", "course_id" => "1", "event_template_type_id" => "4", "due_date" => "2013-07-02 09:00:28", "id" => "3");
+        $expectedEvent = array("title" => "Project Evaluation", "course_id" => "1", "event_template_type_id" => "4", "due_date" => date('Y', strtotime("+1 year"))."-07-02 09:00:28", "id" => "3");
         $this->assertEqual($actualEvent, json_encode($expectedEvent));
         $this->assertEqual(json_decode($actualEvent, true), $expectedEvent);
     }
@@ -692,7 +692,7 @@ class V1ControllerTest extends CakeTestCase {
                 'title' => 'Term 1 Evaluation',
                 'course_id' => '1',
                 'event_template_type_id' => '1',
-                'due_date' => '2013-07-02 16:34:43',
+                'due_date' => date('Y', strtotime("+1 year")).'-07-02 16:34:43',
                 'id' => '1',
                 'release_date_begin' => "2011-06-16 16:34:49",
                 'release_date_end' => "2023-07-22 16:34:53",
@@ -703,7 +703,7 @@ class V1ControllerTest extends CakeTestCase {
                 'title' => 'Term Report Evaluation',
                 'course_id' => '1',
                 'event_template_type_id' => '2',
-                'due_date' => '2013-06-08 08:59:29',
+                'due_date' => date('Y', strtotime("+1 year")).'-06-08 08:59:29',
                 'id' => '2',
                 'release_date_begin' => "2011-06-06 08:59:35",
                 'release_date_end' => "2023-07-02 08:59:41",
@@ -714,7 +714,7 @@ class V1ControllerTest extends CakeTestCase {
                 'title' => 'Project Evaluation',
                 'course_id' => '1',
                 'event_template_type_id' => '4',
-                'due_date' => '2013-07-02 09:00:28',
+                'due_date' => date('Y', strtotime("+1 year")).'-07-02 09:00:28',
                 'id' => '3',
                 'release_date_begin' => "2011-06-07 09:00:35",
                 'release_date_end' => "2023-07-09 09:00:39",
@@ -725,10 +725,10 @@ class V1ControllerTest extends CakeTestCase {
                 'title' => 'Team Creation Survey',
                 'course_id' => '1',
                 'event_template_type_id' => '3',
-                'due_date' => '2013-07-31 11:20:00',
+                'due_date' => date('Y', strtotime("+1 year")).'-07-31 11:20:00',
                 'id' => '4',
                 'release_date_begin' => "2012-07-01 11:20:00",
-                'release_date_end' => "2013-12-31 11:20:00",
+                'release_date_end' => "2014-12-31 11:20:00",
                 'is_released' => true,
                 'is_ended' => false,
             ),
@@ -736,10 +736,10 @@ class V1ControllerTest extends CakeTestCase {
                 'title' => 'Survey, all Q types',
                 'course_id' => '1',
                 'event_template_type_id' => '3',
-                'due_date' => '2013-07-31 11:20:00',
+                'due_date' => date('Y', strtotime("+1 year")).'-07-31 11:20:00',
                 'id' => '5',
                 'release_date_begin' => "2012-07-01 11:20:00",
-                'release_date_end' => "2013-12-31 11:20:00",
+                'release_date_end' => "2014-12-31 11:20:00",
                 'is_released' => true,
                 'is_ended' => false,
             )
