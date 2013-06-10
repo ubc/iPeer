@@ -79,6 +79,7 @@ if (!file_exists(CONFIGS.'database.php')) {
   fclose($fd);
 }
 
+require_once(CONFIGS.'database.php');
 if (!defined('DB_PREDEFINED')) {
     define('DB_PREDEFINED', false);
 }
