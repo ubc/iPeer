@@ -8,6 +8,7 @@ class MoveStudentTestCase extends SystemBaseTestCase
     public function startCase()
     {
         $this->getUrl();
+        echo "Start MoveStudent system test.\n";
         $wd_host = 'http://localhost:4444/wd/hub';
         $this->web_driver = new PHPWebDriver_WebDriver($wd_host);
         $this->session = $this->web_driver->session('firefox');
