@@ -69,7 +69,6 @@ class addSimpleTestCase extends SystemBaseTestCase
         
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -92,7 +91,6 @@ class addSimpleTestCase extends SystemBaseTestCase
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -150,7 +148,6 @@ class addSimpleTestCase extends SystemBaseTestCase
         
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Save"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -176,7 +173,6 @@ class addSimpleTestCase extends SystemBaseTestCase
         
         $this->session->open(str_replace('view', 'delete', $this->session->url()));
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -190,7 +186,6 @@ class addSimpleTestCase extends SystemBaseTestCase
     {
         $this->session->open($this->url.'simpleevaluations/delete/'.$this->simpleId);
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));

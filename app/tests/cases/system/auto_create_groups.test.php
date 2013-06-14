@@ -43,7 +43,6 @@ class autoCreateGroupsTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="event_select"] option[value="4"]')->click();
         
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 $step = $session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'th');
@@ -87,7 +86,6 @@ class autoCreateGroupsTestCase extends SystemBaseTestCase
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Save Groups"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -101,7 +99,6 @@ class autoCreateGroupsTestCase extends SystemBaseTestCase
     {
         $this->session->open($this->url.'surveygroups/release/'.$this->surveyGroupId);
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -118,7 +115,6 @@ class autoCreateGroupsTestCase extends SystemBaseTestCase
     public function testDeleteGroups()
     {
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         // delete the 6 groups
         for ($i=0; $i<6; $i++) {
             $this->session->elementWithWait(PHPWebDriver_WebDriverBy::PARTIAL_LINK_TEXT, 'Great Group Team #')->click();

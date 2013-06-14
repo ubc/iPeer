@@ -56,7 +56,6 @@ class studentMixeval extends SystemBaseTestCase
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -116,7 +115,6 @@ class studentMixeval extends SystemBaseTestCase
         // submit
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'submit')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::ID, "flashMessage"));
@@ -151,7 +149,6 @@ class studentMixeval extends SystemBaseTestCase
         // submit
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'submit')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -181,8 +178,7 @@ class studentMixeval extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventResultReleaseDateBegin')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ui-datepicker-div"]/div[3]/button[1]')->click(); // today
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Submit"]')->click();
-        $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;     
+        $w = new PHPWebDriver_WebDriverWait($this->session);     
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -491,7 +487,6 @@ class studentMixeval extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventEnableDetails0')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -527,7 +522,6 @@ class studentMixeval extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventEnableDetails1')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -560,7 +554,6 @@ class studentMixeval extends SystemBaseTestCase
         $this->session->open($this->url.'evaluations/viewEvaluationResults/'.$this->eventId.'/1/Detail');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="evalForm"]/input[6]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 $review = $session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="evalForm"]/input[6]');
@@ -577,7 +570,6 @@ class studentMixeval extends SystemBaseTestCase
         $this->session->open($this->url.'evaluations/viewEvaluationResults/'.$this->eventId.'/1/Detail');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/input[1]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 $button = $session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/input[1]');
@@ -604,7 +596,6 @@ class studentMixeval extends SystemBaseTestCase
         $this->session->open($this->url.'evaluations/viewEvaluationResults/'.$this->eventId.'/1/Detail');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/input[1]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 $button = $session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/input[1]');
@@ -648,7 +639,6 @@ class studentMixeval extends SystemBaseTestCase
         $this->session->open($this->url.'evaluations/view/'.$this->eventId);
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Release All Comments')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 $comments = $session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[2]/td[8]/div');
@@ -686,7 +676,6 @@ class studentMixeval extends SystemBaseTestCase
     {
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Release All Grades')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 $comments = $session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[2]/td[7]/div');
@@ -735,7 +724,6 @@ class studentMixeval extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->sendKeys(date('Y-m-d H:i:s', strtotime('+1 day')));
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -774,7 +762,6 @@ class studentMixeval extends SystemBaseTestCase
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'submit')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::ID, "flashMessage"));
@@ -809,7 +796,6 @@ class studentMixeval extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, '66EvaluationMixeval6QuestionComment')->sendKeys('obtuse');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'submit')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -838,7 +824,6 @@ class studentMixeval extends SystemBaseTestCase
         $this->waitForLogoutLogin('root');
         $this->session->open($this->url.'events/delete/'.$this->eventId);
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -869,7 +854,6 @@ class studentMixeval extends SystemBaseTestCase
         $instructions->sendKeys('Distribute the marks among your members.');
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[type="submit"]')->click();
-        $session = $this->session;
         // wait for creation of template to finish
         $w = new PHPWebDriver_WebDriverWait($session);
         $w->until(
@@ -989,7 +973,6 @@ class studentMixeval extends SystemBaseTestCase
         // submit
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'submit')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -1032,7 +1015,6 @@ class studentMixeval extends SystemBaseTestCase
         // submit
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'submit')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -1051,7 +1033,6 @@ class studentMixeval extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="<< Remove "]')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Edit Group"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -1066,7 +1047,6 @@ class studentMixeval extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Assign >>"]')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Edit Group"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));

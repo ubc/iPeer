@@ -99,7 +99,6 @@ class MergeUsersTestCase extends SystemBaseTestCase
 
         // wait for primary account search results
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserPrimaryAccount"] option')) - 1;
@@ -161,7 +160,6 @@ class MergeUsersTestCase extends SystemBaseTestCase
 
         // wait for primary account search results
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserPrimaryAccount"] option')) - 1;
@@ -207,7 +205,6 @@ class MergeUsersTestCase extends SystemBaseTestCase
         
         // wait for primary account search results
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 $option = $session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserPrimaryAccount"] option');
@@ -235,7 +232,6 @@ class MergeUsersTestCase extends SystemBaseTestCase
         $secondary->sendKeys($return->key);
         
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserPrimaryAccount"] option')) - 1;  
@@ -279,7 +275,6 @@ class MergeUsersTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'UserSecondarySearchValue')->sendKeys($return->key);
         
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserPrimaryAccount"] option')) - 1;  
@@ -317,7 +312,6 @@ class MergeUsersTestCase extends SystemBaseTestCase
         // wait for primary account search results
         // will not find root (super admin) because it is not an accessible role for admins
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 $option = $session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserPrimaryAccount"] option');

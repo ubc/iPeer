@@ -113,7 +113,6 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
         $this->session->open($this->url.'evaltools');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Mixed Evaluations')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::ID, 'flashMessage'));
@@ -171,7 +170,6 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
         
         // open the table row for options
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 $count = count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'tr[class="odd"]'));
@@ -186,7 +184,6 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
     {
         $this->session->accept_alert();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));

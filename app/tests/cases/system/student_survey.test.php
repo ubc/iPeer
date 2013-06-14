@@ -43,7 +43,6 @@ class studentSurvey extends SystemBaseTestCase
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -68,7 +67,6 @@ class studentSurvey extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'SurveyInput3ResponseText')->sendKeys('multi line answer');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -184,7 +182,6 @@ class studentSurvey extends SystemBaseTestCase
         // 3 results
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[aria-controls="individualResponses"]')->sendKeys('Result');
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 $filter = $session->elementWithWait(PHPWebDriver_WebDriverBy::ID, "individualResponses_info")->text();
@@ -240,7 +237,6 @@ class studentSurvey extends SystemBaseTestCase
     {
         $this->session->open($this->url.'events/delete/'.$this->eventId);
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -260,7 +256,6 @@ class studentSurvey extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'SurveyInput2ResponseText')->sendKeys('this is a short answer');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -280,7 +275,6 @@ class studentSurvey extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'SurveyInput3ResponseText')->sendKeys('long long long');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));

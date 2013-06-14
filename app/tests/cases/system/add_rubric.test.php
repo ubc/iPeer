@@ -102,7 +102,6 @@ class addRubricTestCase extends SystemBaseTestCase
         
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'submit-rubric')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -181,7 +180,6 @@ class addRubricTestCase extends SystemBaseTestCase
         
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'submit-rubric')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -332,7 +330,6 @@ class addRubricTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'submit-rubric')->click();
         
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -352,7 +349,6 @@ class addRubricTestCase extends SystemBaseTestCase
     {
         $this->session->open($this->url.'rubrics/delete/'.$this->rubricId);
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));

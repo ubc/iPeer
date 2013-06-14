@@ -31,7 +31,6 @@ class ImportGroupsTestCase extends SystemBaseTestCase
         $file->sendKeys(dirname(__FILE__).'/files/docx.docx');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::ID, "flashMessage"));
@@ -48,7 +47,6 @@ class ImportGroupsTestCase extends SystemBaseTestCase
         $file->sendKeys(dirname(__FILE__).'/files/importGroup.csv');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[id='title']"));
@@ -88,7 +86,6 @@ class ImportGroupsTestCase extends SystemBaseTestCase
         $file->sendKeys(dirname(__FILE__).'/files/invalidGroupMembers.csv');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[id='title']"));
@@ -137,7 +134,6 @@ class ImportGroupsTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'GroupIdentifiersStudentNo')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[id='title']"));

@@ -31,7 +31,6 @@ class ImportUsersTestCase extends SystemBaseTestCase
         $file->sendKeys(dirname(__FILE__).'/files/docx.docx');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::ID, "flashMessage"));
@@ -51,7 +50,6 @@ class ImportUsersTestCase extends SystemBaseTestCase
         $file->sendKeys(dirname(__FILE__).'/files/newClass_APSC201.csv');        
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 $h3 = $session->elementWithWait(PHPWebDriver_WebDriverBy::TAG_NAME, 'h3');

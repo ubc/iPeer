@@ -61,7 +61,6 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         $this->addScoreDropdown();
         
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[type="submit"]')->click();
-        $session = $this->session;
         // wait for creation of template to finish
         $w = new PHPWebDriver_WebDriverWait($session);
         $w->until(
@@ -136,7 +135,6 @@ class AddMixEvalTestCase extends SystemBaseTestCase
             $add->click();
         }
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return (count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="DescsDiv0"] div')) - 4);
@@ -226,7 +224,6 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         // move down the first question
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="downQ(0); return false;"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 $quesNum = $session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex0')->text();
@@ -354,7 +351,6 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         
         // save
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[type="submit"]')->click();
-        $session = $this->session;
         $w = new PHPWebDriver_WebDriverWait($session);
         $w->until(
             function($session) {

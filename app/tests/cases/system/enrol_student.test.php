@@ -34,7 +34,6 @@ class EnrolStudentTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'UserUsername')->sendKeys('redshirt0004');
         // wait for "username already exist" warning
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return $session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="usernameErr"]')->text();
@@ -64,7 +63,6 @@ class EnrolStudentTestCase extends SystemBaseTestCase
         $this->session->open($this->url.'users/goToClassList/2');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[aria-controls="table_id"]')->sendKeys('Chris');
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 $count = count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'tr[class="odd"]'));
@@ -89,7 +87,6 @@ class EnrolStudentTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'UserUsername')->sendKeys('tutor3');
         // wait for "username already exist" warning
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return $session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="usernameErr"]')->text();
@@ -121,7 +118,6 @@ class EnrolStudentTestCase extends SystemBaseTestCase
         $x[3]->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Save"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
@@ -137,7 +133,6 @@ class EnrolStudentTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'UserUsername')->sendKeys('redshirt0003');
         // wait for "username already exist" warning
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return $session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="usernameErr"]')->text();
@@ -156,7 +151,6 @@ class EnrolStudentTestCase extends SystemBaseTestCase
         $this->session->open($this->url.'users/add/1');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'UserUsername')->sendKeys('root');
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return $session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="usernameErr"]')->text();
@@ -184,7 +178,6 @@ class EnrolStudentTestCase extends SystemBaseTestCase
         $this->session->open($this->url.'users/add/1');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'UserUsername')->sendKeys('redshirt0001');
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return $session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="usernameErr"]')->text();
@@ -212,7 +205,6 @@ class EnrolStudentTestCase extends SystemBaseTestCase
         $this->session->open($this->url.'users/add/1');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'UserUsername')->sendKeys('tutor1');
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $session = $this->session;
         $w->until(
             function($session) {
                 return $session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="usernameErr"]')->text();
