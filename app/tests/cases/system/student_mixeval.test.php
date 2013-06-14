@@ -855,7 +855,7 @@ class studentMixeval extends SystemBaseTestCase
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[type="submit"]')->click();
         // wait for creation of template to finish
-        $w = new PHPWebDriver_WebDriverWait($session);
+        $w = new PHPWebDriver_WebDriverWait($this->session);
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
