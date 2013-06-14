@@ -11,7 +11,7 @@ class LoginTestCase extends SystemBaseTestCase
         $this->getUrl();
         echo "Start Login system test.\n";
         $wd_host = 'http://localhost:4444/wd/hub';
-        $this->web_driver = new PHPWebDriver_WebDriver($wd_host);
+        $this->web_driver = new SystemWebDriver($wd_host);
         //$this->session = $this->web_driver->session('ie', array('version' => '8'));
         $this->session = $this->web_driver->session('firefox');
         $this->session->open($this->url);
@@ -37,7 +37,7 @@ class LoginTestCase extends SystemBaseTestCase
 
         while ($timerUp > time()) {
             try {
-                if ($this->session->element($type, $locator)->displayed()) {
+                if ($this->session->elementWithWait($type, $locator)->displayed()) {
                     return;
                 }
             }
@@ -73,7 +73,7 @@ class LoginTestCase extends SystemBaseTestCase
 
         $returnValue = null;
         try {
-            $returnValue = $session->elements($selectorType, $location);
+            $returnValue = $session->elementsWithWait($selectorType, $location);
         } catch (NoSuchElementWebDriverError $e) {
             $returnValue = null;
         }
@@ -89,7 +89,7 @@ class LoginTestCase extends SystemBaseTestCase
        $home = $login->login('root', 'ipeeripeer');
        $this->assertEqual($this->session->url(), $this->url);
        // make sure we are landed on home page
-       $title = $this->session->element(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
+       $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
        $this->assertEqual($title, 'Home');
     }
 }

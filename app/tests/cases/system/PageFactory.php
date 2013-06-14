@@ -32,7 +32,7 @@ class PageFactory
         foreach ($page->elements as $method => $vars) {
             foreach ($vars as $key => $var) {
                 $search = is_numeric($key) ? $var : $key;
-                $page->$var = $session->element($method, $search);
+                $page->$var = $session->elementWithWait($method, $search);
             }
         }
     }

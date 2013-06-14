@@ -1,4 +1,6 @@
 <?php
+require_once('SystemWebDriver.php');
+require_once('SystemWebDriverSession.php');
 require_once('PHPWebDriver/WebDriver.php');
 require_once('PHPWebDriver/WebDriverBy.php');
 require_once('PHPWebDriver/WebDriverWait.php');
@@ -30,7 +32,7 @@ class SystemBaseTestCase extends CakeTestCase
     
     public function logoutLogin($username)
     {
-        $this->session->element(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Logout')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Logout')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $session = $this->session;
         $w->until(
