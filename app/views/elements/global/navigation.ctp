@@ -65,7 +65,7 @@ if (User::isLoggedIn()) {
     echo $this->Html->link(
         'Logout',
         Router::url('/logout', true),
-        array('class' => 'miniLinks floatright')
+        array('class' => 'miniLinks')
     );
     echo "</li>";
 
@@ -73,7 +73,7 @@ if (User::isLoggedIn()) {
     echo $this->Html->link(
         User::get('full_name'),
         '/users/editProfile',
-        array('class' => 'miniLinks floatright')
+        array('class' => 'miniLinks')
     );
     echo "</li>";
 

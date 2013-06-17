@@ -219,41 +219,54 @@ div.ui-datepicker { font-size: 0.85em; }
 .banner {
     border-top-left-radius: 8px; 
     border-top-right-radius: 8px; 
-    border: 1px solid #ddd;
     border-bottom: none;
-    background-color: #f4f4f4;
+    background-color: #fff;
 }
 
 #bannerLarge {
-    height: 98px;
-    background-image: url('../img/layout/banner_back_noborder.gif');
-    background-repeat: repeat-x;
+    height: 40px;
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+}
+
+#customLogo {
+    float: right;
+    margin-right: 1em;
 }
 
 #bannerLogoImgLeft {
-    padding-left: 1.5em;
+    padding-right: 0.5em;
 }
 
-#bannerLogoImgRight {
-    padding-right: 1.5em;
+#ipeerLogo {
+    float: left;
+    margin-left: 1em;
 }
 
 #bannerLogoText {
-    padding-top: 50px; 
     font-size: 1em; 
-    font-weight: 600; color: white;
-    text-shadow: 0 0 7px #222
+    font-weight: 200; color: black;
+    font-style: italic;
+}
+
+#ipeerI {
+    font-size: 32px;
+}
+
+#ipeerText {
+    font-size: 36px;
 }
 
 /* NAVIGATION */
 #navigationOuter {
-    border: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
     border-top: none;
 }
 
 .navigation ul {
     padding: 0.5em 0; /* needed to expand the div, keep a from overflowing the ul */
-    background-color: #0a2a64;
+    background-color: white;
 }
 
 .navigation li {
@@ -269,8 +282,10 @@ div.ui-datepicker { font-size: 0.85em; }
     font-weight: 600;
     text-align: center;
     padding: 0.5em;
+    padding-bottom: 0.45em;
     padding-left: 0.6em;
     text-decoration: none;
+    background-color: #0a2a64;
 }
 
 .navigation a:hover,a:active {
@@ -286,9 +301,8 @@ div.ui-datepicker { font-size: 0.85em; }
 .navigation .miniLinks {
     font-family: 'Open Sans', serif;
     font-size: 0.8em;
-    border: none;
-    margin-right: 0.5em;
-    padding: 0.5em 1em;
+    padding: 0.4em 1em;
+    float: right;
 }
 
 /* CONTENT CONTAINER */

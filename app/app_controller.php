@@ -115,8 +115,10 @@ class AppController extends Controller
         // for setting up google analytics
         $trackingId = $this->SysParameter->findByParameterCode('google_analytics.tracking_id');
         $domain = $this->SysParameter->findByParameterCode('google_analytics.domain');
+        $customLogo = $this->SysParameter->findByParameterCode('banner.custom_logo');
         $this->set('trackingId', $trackingId);
         $this->set('domain', $domain);
+        $this->set('customLogo', $customLogo);
 
         parent::beforeFilter();
     }

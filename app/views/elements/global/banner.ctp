@@ -1,13 +1,23 @@
 <div id='bannerLarge' class='banner'>
+<div id='ipeerLogo'>
 <?php
-echo $html->image('layout/ipeer_banner_noborder.gif',
-    array('id' => 'bannerLogoImgLeft', 'alt' => 'banner')
+echo $html->image('layout/ipeer_logo.png',
+    array('id'=>'bannerLogoImgLeft', 'alt'=>'logo')
 );
 ?>
-      <span id='bannerLogoText'><?php echo IPEER_VERSION?> with TeamMaker</span>
+<span id="ipeerI">i</span><span id="ipeerText">Peer</span> <span id='bannerLogoText'><?php echo IPEER_VERSION?> with TeamMaker</span>
 <?php
-echo $html->image('layout/blocks_noborder.gif',
-    array('id'=>'bannerLogoImgRight', 'alt'=>'logo', 'class'=>'floatright')
-);
+
 ?>
+</div>
+<div id='customLogo'>
+<?php
+// eg. university logo
+if (isset($customLogo) && !empty($customLogo) && !empty($customLogo['SysParameter']['parameter_value'])) {
+    echo $html->image('layout/'.$customLogo['SysParameter']['parameter_value'],
+        array('alt' => 'custom')
+    );
+}
+?>
+</div>
 </div>
