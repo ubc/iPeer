@@ -142,16 +142,21 @@ class SendEmailsShell extends Shell
      */
     protected function sendEmail($content, $subject, $from, $toAddress, $templateName = 'default', $ccAddress = array(), $bcc= array())
     {
-        $this->SysParameter->reload();
-        $smtp['port'] = $this->SysParameter->get('email.port');
-        $smtp['host'] = $this->SysParameter->get('email.host');
-        $smtp['username'] = $this->SysParameter->get('email.username');
-        $smtp['password'] = $this->SysParameter->get('email.password');
-        $smtp['timeout'] = 30;
         $this->Email->reset();
 
-        $this->Email->smtpOptions = $smtp;
-        $this->Email->delivery = 'smtp';
+        $smtpHost = $this->SysParameter->get('email.host');
+        if (!empty($smtpHost)) {
+            $smtp['port'] = $this->SysParameter->get('email.port');
+            $smtp['host'] = $this->SysParameter->get('email.host');
+            $smtp['username'] = $this->SysParameter->get('email.username');
+            $smtp['password'] = $this->SysParameter->get('email.password');
+            $smtp['timeout'] = 30;
+            $this->Email->delivery = 'smtp';
+            $this->Email->smtpOptions = $smtp;
+        } else {
+            $this->Email->delivery = 'mail';
+        }
+
         $this->Email->to = $toAddress;
         $this->Email->cc = $ccAddress;
         $this->Email->bcc = $bcc;
