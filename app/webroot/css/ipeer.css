@@ -238,6 +238,10 @@ div.ui-datepicker { font-size: 0.85em; }
     padding-right: 0.5em;
 }
 
+#bannerLogoImgRight {
+    height: 40px;
+}
+
 #ipeerLogo {
     float: left;
     margin-left: 1em;

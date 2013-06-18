@@ -14,8 +14,13 @@ echo $html->image('layout/ipeer_logo.png',
 <?php
 // eg. university logo
 if (isset($customLogo) && !empty($customLogo) && !empty($customLogo['SysParameter']['parameter_value'])) {
-    echo $html->image('layout/'.$customLogo['SysParameter']['parameter_value'],
-        array('alt' => 'custom')
+    if (substr($customLogo['SysParameter']['parameter_value'], 0, 4) == 'http') {
+        // image from another server
+        $url = $customLogo['SysParameter']['parameter_value'];
+    } else {
+        $url = 'layout/'.$customLogo['SysParameter']['parameter_value'];
+    }
+    echo $html->image($url, array('id'=>'bannerLogoImgRight', 'alt' => 'custom')
     );
 }
 ?>

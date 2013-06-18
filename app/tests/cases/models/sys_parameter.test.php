@@ -60,4 +60,18 @@ class SysParameterTestCase extends CakeTestCase
         $result = $this->SysParameter->get('non.existing.key', 'default');
         $this->assertEqual($result, 'default');
     }
+    
+    function testNumberSysParam()
+    {
+        $result = $this->SysParameter->find('count');
+        $this->assertEqual($result, 16);
+        
+        $result = $this->SysParameter->find('list', array('fields' => array('SysParameter.parameter_code')));
+        $expected = array(
+            'system.super_admin', 'system.admin_email', 'display.date_format', 'system.version',
+            'database.version', 'email.port', 'email.host', 'email.username', 'email.password',
+            'display.contact_info', 'display.login.header', 'display.login.footer', 'system.absolute_url',
+            'google_analytics.tracking_id', 'google_analytics.domain', 'banner.custom_logo');
+        $this->assertEqual(array_values($result), $expected);
+    }
 }
