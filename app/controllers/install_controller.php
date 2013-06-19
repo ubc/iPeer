@@ -163,7 +163,7 @@ class InstallController extends Controller
                     'email.username' => $this->data['InstallValidationStep4']['email_username'],
                     'email.password' => $this->data['InstallValidationStep4']['email_password'],
                     'system.absolute_url' => Router::url('/login', true),
-                    'system.timezone' => $this->data['InstallValidationStep4']['timezone'],
+                    'system.timezone' => $this->data['InstallValidationStep4']['time_zone'],
                 )
             );
             $this->installHelper->updateSystemParameters($sysparams);

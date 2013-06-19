@@ -161,13 +161,24 @@ class Event extends AppModel
      */
     function __construct($id = false, $table = null, $ds = null)
     {
+        $this->SysParameter = ClassRegistry::init('SysParameter');
+        $timezone = $this->SysParameter->findByParameterCode('system.timezone');
+        // default to UTC if no timezone is set
+        $timezone = empty($timezone) || empty($timezone['SysParameter']['parameter_value']) ? 'UTC' :
+            $timezone['SysParameter']['parameter_value'];
+        // check that the timezone is valid
+        $validTZ = $this->_generateValidTimezones();
+        if (!isset($validTZ[$timezone])) {
+            $timezone = 'UTC';
+        }
+        date_default_timezone_set($timezone);
         parent::__construct($id, $table, $ds);
         $this->virtualFields['response_count'] = sprintf('SELECT count(*) as count FROM evaluation_submissions as sub WHERE sub.event_id = %s.id', $this->alias);
         $this->virtualFields['to_review_count'] = sprintf('SELECT count(*) as count FROM group_events as ge WHERE ge.event_id = %s.id AND marked LIKE "to review"', $this->alias);
         $this->virtualFields['student_count'] = sprintf('SELECT count(*) as count FROM group_events as vge RIGHT JOIN groups_members as vgm ON vge.group_id = vgm.group_id WHERE vge.event_id = %s.id', $this->alias);
         $this->virtualFields['group_count'] = sprintf('SELECT count(*) as count FROM group_events as vge WHERE vge.event_id = %s.id', $this->alias);
         $this->virtualFields['completed_count'] = sprintf('SELECT count(*) as count FROM evaluation_submissions as ves WHERE ves.submitted = 1 AND ves.event_id = %s.id', $this->alias);
-        $this->virtualFields['due_in'] = 'TIMESTAMPDIFF(SECOND,NOW(),due_date)';
+        $this->virtualFields['due_in'] = sprintf('TIMESTAMPDIFF(SECOND,"%s",due_date)', date('Y-m-d H:i:s'));
     }
 
     /**
@@ -472,7 +483,7 @@ class Event extends AppModel
         }
         return true;
     }
-
+    
     /**
      * Check if event is late
      *
