@@ -364,6 +364,8 @@ class GroupEvent extends AppModel
 
     function getLate($eventId)
     {
+        // use the php date to get php time with timezone instead of now() in
+        // mysql, just in case the DB has different timezone setting with php
         return $this->query('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked
             FROM group_events as GroupEvent
             LEFT JOIN events as Event ON GroupEvent.event_id = Event.id
@@ -382,7 +384,7 @@ class GroupEvent extends AppModel
             GROUP BY evaluation_submissions.grp_event_id) AS tb2
             ON tb1.id=tb2.grp_event_id
             WHERE count1 > count2 OR count2 IS NULL)
-            AND GroupEvent.group_id != 0 AND (Event.due_date < now() OR date_submitted > due_date)'
+            AND GroupEvent.group_id != 0 AND (Event.due_date < '.date("Y-m-d H:i:s").' OR date_submitted > due_date)'
         );
     }
 

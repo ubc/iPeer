@@ -22,6 +22,8 @@ class EmailSchedule extends AppModel
     function getEmailsToSend()
     {
         $this->recursive = -1;
+        // use the php date to get php time with timezone instead of now() in
+        // mysql, just in case the DB has different timezone setting with php
         return $this->find('all', array(
             'conditions' => array('EmailSchedule.date <=' => date('Y-m-d H:i:s'), 'EmailSchedule.sent' => '0'),
         ));
