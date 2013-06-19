@@ -45,6 +45,7 @@ class AppController extends Controller
     public $access     = array ();
     public $actionList = array ();
     public $breadcrumb;
+    public $validTZ;
 
     /**
      * if this request has session transfer data
@@ -66,6 +67,7 @@ class AppController extends Controller
     public function __construct()
     {
         parent::__construct();
+        $this->validTZ = $this->_generateValidTimezones();
     }
 
     /**
@@ -76,6 +78,17 @@ class AppController extends Controller
      */
     public function beforeFilter()
     {
+        $timezone = $this->SysParameter->findByParameterCode('system.timezone');
+        // default to UTC if no timezone is set
+        $timezone = empty($timezone) || empty($timezone['SysParameter']['parameter_value']) ? 'UTC' :
+            $timezone['SysParameter']['parameter_value'];
+        // check that the timezone is valid
+        if (!isset($this->validTZ[$timezone])) {
+            $timezone = 'UTC';
+            $this->Session->setFlash(__('An invalid timezone is provided, please edit "system.timezone"', true));
+        }
+        date_default_timezone_set($timezone);
+
         $this->Auth->autoRedirect = false;
         // backward compatible with original ipeer hash  method
         Security::setHash('md5');
@@ -308,5 +321,26 @@ class AppController extends Controller
         $this->log('User '.$this->sessionTransferData['username'].' is logged in with session transfer.', 'debug');
 
         return true;
+    }
+    
+    /**
+     * generate a full list of timezones
+     * including some backward compatible timezones
+     * that DateTimeZone::listIdentifiers does not return
+     *
+     * @access public
+     * @return void
+     */
+    function _generateValidTimezones() {
+        $timezones = array();
+        $tzAbbr = DateTimeZone::listAbbreviations();
+        foreach ($tzAbbr as $zone) {
+            foreach ($zone as $item) {
+                $timezones[$item['timezone_id']] = 1;
+            }
+        }
+        unset($timezones['']);
+        ksort($timezones);
+        return $timezones;
     }
 }

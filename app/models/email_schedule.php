@@ -23,7 +23,7 @@ class EmailSchedule extends AppModel
     {
         $this->recursive = -1;
         return $this->find('all', array(
-            'conditions' => array('now() >= EmailSchedule.date', 'EmailSchedule.sent' => '0'),
+            'conditions' => array('EmailSchedule.date <=' => date('Y-m-d H:i:s'), 'EmailSchedule.sent' => '0'),
         ));
     }
 

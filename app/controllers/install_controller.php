@@ -39,6 +39,17 @@ class InstallController extends Controller
     }
 
     /**
+     * beforeFilter function called before filter
+     *
+     * @access public
+     * @return void
+     */
+    public function beforeFilter()
+    {
+        date_default_timezone_set('UTC');
+    }
+
+    /**
      * Check prereqs for installing iPeer
      * */
     function index()
@@ -122,10 +133,12 @@ class InstallController extends Controller
                 return;
             }
         }
+        
+        $timezones = DateTimeZone::listIdentifiers();
+        $this->set('timezones', array_combine($timezones, $timezones));
 
         if ($this->data) {
             // we have data submitted
-
             $this->InstallValidationStep4->set($this->data);
             if (!$this->InstallValidationStep4->validates()) {
                 // fails validation
@@ -150,6 +163,7 @@ class InstallController extends Controller
                     'email.username' => $this->data['InstallValidationStep4']['email_username'],
                     'email.password' => $this->data['InstallValidationStep4']['email_password'],
                     'system.absolute_url' => Router::url('/login', true),
+                    'system.timezone' => $this->data['InstallValidationStep4']['timezone'],
                 )
             );
             $this->installHelper->updateSystemParameters($sysparams);

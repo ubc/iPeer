@@ -44,6 +44,11 @@ class SendEmailsShell extends Shell
          * Goes through scheduled emails that have not yet been sent,
          * send them if they're due and mark them them as sent.
          */
+        $timezone = $this->SysParameter->findByParameterCode('system.timezone');
+        // default to UTC if no timezone is set
+        $timezone = empty($timezone) || empty($timezone['SysParameter']['parameter_value']) ? 'UTC' :
+            $timezone['SysParameter']['parameter_value'];
+        date_default_timezone_set($timezone);
         $emails = $this->EmailSchedule->getEmailsToSend();
         $defaultFrom = $this->SysParameter->get('display.contact_info');
 
