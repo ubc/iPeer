@@ -35,8 +35,8 @@ class studentSimple extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventAutoRelease1')->click();
 
         //set due date and release date end to next month so that the event is opened.
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ui-datepicker-div"]/div[3]/button[1]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->clear();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->sendKeys(date('Y-m-d H:i:s'));
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateBegin')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
@@ -186,10 +186,10 @@ class studentSimple extends SystemBaseTestCase
         // edit event's release date end to test final penalty
         // edit event's result release date begin to test student view of the results
         $this->session->open($this->url.'events/edit/'.$this->eventId);
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ui-datepicker-div"]/div[3]/button[1]')->click(); // today
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventResultReleaseDateBegin')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ui-datepicker-div"]/div[3]/button[1]')->click(); // today
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->clear();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->sendKeys(date('Y-m-d H:i:s'));
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventResultReleaseDateBegin')->clear();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventResultReleaseDateBegin')->sendKeys(date('Y-m-d H:i:s'));
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);     
         $w->until(
@@ -347,7 +347,7 @@ class studentSimple extends SystemBaseTestCase
         $this->waitForLogoutLogin('redshirt0003');
         $this->session->open($this->url.'evaluations/studentViewEvaluationResult/'.$this->eventId.'/1');
         $rating = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td[1]')->text();
-        $this->assertEqual($rating, '95.00 - (9.5)* = 85.50          ( )* : 10% late penalty.');
+        $this->assertEqual($rating, '95.00 - (9.50)* = 85.50          ( )* : 10% late penalty.');
         $groupAve = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td[2]')->text();
         $this->assertEqual($groupAve, '90.75');
         $comments[] = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]/tbody/tr[2]/td')->text();
@@ -374,7 +374,7 @@ class studentSimple extends SystemBaseTestCase
         $this->waitForLogoutLogin('redshirt0002');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Simple Evaluation')->click();
         $rating = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td')->text();
-        $this->assertEqual($rating, '110.00 - (11)* = 99.00          ( )* : 10% late penalty.');
+        $this->assertEqual($rating, '110.00 - (11.00)* = 99.00          ( )* : 10% late penalty.');
         $groupAve = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td[2]');
         $this->assertTrue(empty($groupAve));
         $comments = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]');
@@ -582,7 +582,7 @@ class studentSimple extends SystemBaseTestCase
         $simple = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Simple Evaluation');
         $simple[1]->click(); // Group Reapers results
         $rating = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td[1]');
-        $this->assertEqual($rating->text(), '95.00 - (9.5)* = 85.50          ( )* : 10% late penalty.');
+        $this->assertEqual($rating->text(), '95.00 - (9.50)* = 85.50          ( )* : 10% late penalty.');
         $avg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[3]/tbody/tr[2]/td[2]');
         $this->assertEqual($avg->text(), '90.00');
         $comm1[] = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[4]/tbody/tr[2]/td')->text();

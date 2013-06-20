@@ -173,10 +173,10 @@ class studentMixeval extends SystemBaseTestCase
         // edit event's release date end to test final penalty
         // edit event's result release date begin to test student view of the results
         $this->session->open($this->url.'events/edit/'.$this->eventId);
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ui-datepicker-div"]/div[3]/button[1]')->click(); // today
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventResultReleaseDateBegin')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ui-datepicker-div"]/div[3]/button[1]')->click(); // today
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->clear();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->sendKeys(date('Y-m-d H:i:s'));
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventResultReleaseDateBegin')->clear();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventResultReleaseDateBegin')->sendKeys(date('Y-m-d H:i:s'));
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);     
         $w->until(
@@ -500,15 +500,15 @@ class studentMixeval extends SystemBaseTestCase
         $ques1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/h3[1]')->text();
         $this->assertEqual($ques1, '1. Participated in Team Meetings *');
         $avg1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[1]/li')->text();
-        $this->assertEqual($avg1, 'Average: 0.9 / 1');
+        $this->assertEqual($avg1, 'Average: 0.90 / 1');
         $ques2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/h3[2]')->text();
         $this->assertEqual($ques2, '2. Was Helpful and co-operative *');
         $avg2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[2]/li')->text();
-        $this->assertEqual($avg2, 'Average: 1 / 1');
+        $this->assertEqual($avg2, 'Average: 1.00 / 1');
         $ques3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/h3[3]')->text();
         $this->assertEqual($ques3, '3. Submitted work on time *');
         $avg3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[3]/li')->text();
-        $this->assertEqual($avg3, 'Average: 0.9 / 1');
+        $this->assertEqual($avg3, 'Average: 0.90 / 1');
         
         $required = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'span[class="required orangered"]');
         $this->assertEqual(count($required), 3);
@@ -873,8 +873,8 @@ class studentMixeval extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventAutoRelease1')->click();
 
         //set due date and release date end to next month so that the event is opened.
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ui-datepicker-div"]/div[3]/button[1]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->clear();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->sendKeys(date('Y-m-d H:i:s'));
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateBegin')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
