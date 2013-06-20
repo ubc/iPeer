@@ -438,6 +438,11 @@ i {
     padding-right: 0;
 }
 
+/* Datepicker */
+.ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current {
+    display: none;
+}
+
 /* HOME */
 /* for admins and instructors */
 .course {
