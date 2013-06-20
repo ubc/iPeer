@@ -95,10 +95,11 @@ class ExportBaseNewComponent extends Object
         $dropped = $this->User->getDroppedStudentsWithRole($this->responseModelName, $results, $group);
         
         $grid = array();
+        $subDate = Set::combine($results, '{n}.EvaluationSubmission.submitter_id', '{n}.EvaluationSubmission.date_submitted');
         $responsesByEvaluatee = Set::combine($results, '{n}.'.$this->responseModelName.'.evaluator', '{n}', '{n}.'.$this->responseModelName.'.evaluatee');
         $group['Member'] = array_merge($group['Member'], $dropped);
         foreach ($group['Member'] as $member) {
-            $grid = array_merge($grid, $this->buildScoreTableByEvaluatee($params, $group, $member, $event, $responsesByEvaluatee));
+            $grid = array_merge($grid, $this->buildScoreTableByEvaluatee($params, $group, $member, $event, $responsesByEvaluatee, $subDate));
         }
 
         return $grid;
@@ -131,18 +132,19 @@ class ExportBaseNewComponent extends Object
 
 
     /**
-     * buildMixedEvalScoreTableByEvaluatee
+     * buildScoreTableByEvaluatee
      *
      * @param mixed $params    params
      * @param mixed $group     group
      * @param mixed $evaluatee evaluatee
      * @param mixed $event     event
      * @param mixed $responses responses
+     * @param mixed $subDate   submission dates
      *
      * @access public
      * @return void
      */
-    function buildScoreTableByEvaluatee($params, $group, $evaluatee, $event, $responses)
+    function buildScoreTableByEvaluatee($params, $group, $evaluatee, $event, $responses, $subDate)
     {
         // Build grid
         //$xPosition = 0;
@@ -225,11 +227,12 @@ class ExportBaseNewComponent extends Object
             }
             
             array_push($row, $response[$this->responseModelName]['score']);
+            $date = isset($subDate[$evaluatee['id']]) ? $subDate[$evaluatee['id']] : false;
 
             $penalty = $this->Penalty->calculate(
                 $event['Event']['due_date'],
                 $event['Event']['release_date_end'],
-                $response['EvaluationSubmission']['date_submitted'],
+                $date,
                 $event['Penalty']
             );
 

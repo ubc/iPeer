@@ -36,7 +36,7 @@
     <td>
         <?php if ($gradeReleased) {
             $finalAvg = $studentResult['aveScore'] - $studentResult['avePenalty'];
-            ($studentResult['avePenalty'] > 0) ? ($stringAddOn = ' - '.'('.'<font color=\'red\'>'.$studentResult['avePenalty'].'</font>'.
+            ($studentResult['avePenalty'] > 0) ? ($stringAddOn = ' - '.'('.'<font color=\'red\'>'.number_format($studentResult['avePenalty'], 2).'</font>'.
                 ')'.'<font color=\'red\'>*</font>'.' = '.number_format($finalAvg, 2)) : $stringAddOn = '';
 
             echo number_format($studentResult['aveScore'], 2).$stringAddOn;
@@ -52,7 +52,7 @@
     <td>
         <?php
             if ($gradeReleased) {
-                isset($studentResult['groupAve'])? $groupAve = $studentResult['groupAve']: $groupAve = 0;
+                $groupAve = isset($studentResult['groupAve']) ? $studentResult['groupAve']: 0;
                 echo number_format($groupAve, 2);
             } else {
                 echo __('Not Released', true);

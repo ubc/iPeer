@@ -67,7 +67,7 @@ class AppController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->validTZ = $this->_generateValidTimezones();
+        $this->validTZ = array_flip(DateTimeZone::listIdentifiers(DateTimeZone::ALL_WITH_BC));
     }
 
     /**
@@ -321,26 +321,5 @@ class AppController extends Controller
         $this->log('User '.$this->sessionTransferData['username'].' is logged in with session transfer.', 'debug');
 
         return true;
-    }
-    
-    /**
-     * generate a full list of timezones
-     * including some backward compatible timezones
-     * that DateTimeZone::listIdentifiers does not return
-     *
-     * @access public
-     * @return void
-     */
-    function _generateValidTimezones() {
-        $timezones = array();
-        $tzAbbr = DateTimeZone::listAbbreviations();
-        foreach ($tzAbbr as $zone) {
-            foreach ($zone as $item) {
-                $timezones[$item['timezone_id']] = 1;
-            }
-        }
-        unset($timezones['']);
-        ksort($timezones);
-        return $timezones;
     }
 }

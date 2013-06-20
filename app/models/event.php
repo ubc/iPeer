@@ -167,7 +167,7 @@ class Event extends AppModel
         $timezone = empty($timezone) || empty($timezone['SysParameter']['parameter_value']) ? 'UTC' :
             $timezone['SysParameter']['parameter_value'];
         // check that the timezone is valid
-        $validTZ = $this->_generateValidTimezones();
+        $validTZ = array_flip(DateTimeZone::listIdentifiers(DateTimeZone::ALL_WITH_BC));
         if (!isset($validTZ[$timezone])) {
             $timezone = 'UTC';
         }
@@ -496,7 +496,7 @@ class Event extends AppModel
     {
         if (is_numeric($eventID)) {
             $count = $this->find('count', array(
-                'conditions' => array('Event.due_date < NOW()', 'Event.id' => $eventID)
+                'conditions' => array('Event.due_date < ' => date('Y-m-d H:i:s'), 'Event.id' => $eventID)
             ));
             return ($count>0);
         } else {

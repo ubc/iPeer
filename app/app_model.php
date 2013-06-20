@@ -69,27 +69,5 @@ class AppModel extends Model
     {
         return $this->errorMessage;
     }
-
-    
-    /**
-     * generate a full list of timezones
-     * including some backward compatible timezones
-     * that DateTimeZone::listIdentifiers does not return
-     *
-     * @access public
-     * @return void
-     */
-    function _generateValidTimezones() {
-        $timezones = array();
-        $tzAbbr = DateTimeZone::listAbbreviations();
-        foreach ($tzAbbr as $zone) {
-            foreach ($zone as $item) {
-                $timezones[$item['timezone_id']] = 1;
-            }
-        }
-        unset($timezones['']);
-        ksort($timezones);
-        return $timezones;
-    }
 }
 

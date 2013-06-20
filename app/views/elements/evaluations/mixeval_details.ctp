@@ -77,7 +77,7 @@ if ($details) {
                 }
                 $grades = Set::extract('/grade', $ques['Submissions']);
                 $average = array_sum($grades) / count($grades);
-                echo '<li>Average: '.$average.' / '.$ques['multiplier'].'</li></ul>';
+                echo '<li>Average: '.number_format($average, 2).' / '.$ques['multiplier'].'</li></ul>';
             } else {
                 echo '<ul><li>N/A</li></ul>';
             }

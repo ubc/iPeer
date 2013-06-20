@@ -203,9 +203,11 @@ class Mixeval extends AppModel
 
         $memberIds = array_keys($groupMembers);
         $userPenalty = array_fill_keys($memberIds, 0);
+        $now = time();
 
         // find the event
         $event = $this->Event->findById($eventId);
+        $end = strtotime($event['Event']['release_date_end']);
 
         // not due yet. no penalty
         if ($event['Event']['due_in'] >= 0) {
@@ -237,9 +239,11 @@ class Mixeval extends AppModel
 
         // no submission - if now is after release date end then - gets final deduction
         $penalty = $this->Penalty->getPenaltyFinal($eventId);
-        $noSubmissions = array_diff($memberIds, Set::extract($submissions, '/EvaluationSubmission/submitter_id'));
-        foreach ($noSubmissions as $userId) {
-            $userPenalty[$userId] = $penalty['Penalty']['percent_penalty'];
+        if ($now >= $end) {
+            $noSubmissions = array_diff($memberIds, Set::extract($submissions, '/EvaluationSubmission/submitter_id'));
+            foreach ($noSubmissions as $userId) {
+                $userPenalty[$userId] = $penalty['Penalty']['percent_penalty'];
+            }
         }
 
         return $userPenalty;
