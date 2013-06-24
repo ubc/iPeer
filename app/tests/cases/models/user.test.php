@@ -13,7 +13,7 @@ class UserTestCase extends CakeTestCase {
         'app.course_department', 'app.user_faculty', 'app.role', 'app.roles_user',
         'app.penalty', 'app.evaluation_simple', 'app.survey_input', 'app.oauth_token',
         'app.evaluation_rubric', 'app.evaluation_rubric_detail', 'app.evaluation_mixeval',
-        'app.evaluation_mixeval_detail'
+        'app.evaluation_mixeval_detail', 'app.sys_parameter'
     );
 
     function startCase()
