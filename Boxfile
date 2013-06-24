@@ -17,6 +17,8 @@ web1:
   after_build:
     - "mv app/config/database.pagoda.php app/config/database.php"
     - "mv app/plugins/guard/config/guard.php app/config/guard.php"
+  cron:
+    - "*/15 * * * *": "cake/console/cake send_emails"
 db1:
   name: ipeerdb
   type: mysql
