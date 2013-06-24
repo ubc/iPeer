@@ -996,6 +996,9 @@ class User extends AppModel
      * @return users
      */
     function getUsers($userIds, $models=array(), $fields=array()) {
+        if (empty($userIds)) {
+            return array();
+        }
         return $this->find('all', array(
             'conditions' => array('User.id' => $userIds),
             'contain' => $models,
