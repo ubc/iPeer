@@ -1,3 +1,10 @@
+iPeer 3.0.7
+---------------------------
+This is a maintenance release.
+* Change mysql NOW() to php date
+* Add "mail" as default email sending method in scheduled email
+* Fixed #504
+
 iPeer 3.0.6
 ---------------------------
 This is a maintenance release. It fixes a few bugs related to the building block API and web interface.
