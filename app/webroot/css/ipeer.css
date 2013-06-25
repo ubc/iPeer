@@ -1079,6 +1079,27 @@ i {
     margin: 0.5em;
 }
 
+/* survey summary bar graph*/
+.graph {
+    float:left;
+    background-color:#D8FAD7;
+    position:relative;
+    width:280px;
+    padding:0;
+    border: #ccc 1px solid;
+}
+
+.graph .bar {
+    display:block;
+    position:relative;
+    background-color:#4dc14f;
+    background-position:right center;
+    background-repeat:repeat-x;
+    border-right:#538e02 1px solid;
+    text-align:center;
+    height:1em;
+}
+
 /* ajax pagination */
 
 .ajax_paginate {
