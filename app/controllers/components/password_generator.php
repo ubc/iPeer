@@ -43,8 +43,8 @@ class PasswordGeneratorComponent extends Object {
       return $ret;
     }
 
-    throw new Exception("No secure password generation method found." .
-        " Please install the PHP OpenSSL extension.");
+    // fall back password algorithm
+    return $this->defaultAlgorithm($len);
   }
 
   /** 
@@ -102,6 +102,7 @@ class PasswordGeneratorComponent extends Object {
     // /dev/urandom will try to make do with what it has. However, we're using
     // urandom since the blocking random call is unpredictable and may take 
     // from minutes to hours for it to get enough randomness.
+    $ret = '';
     if (@is_readable('/dev/urandom')) {
       $f = fopen('/dev/urandom', 'r');
       $ret = fread($f, $len);
@@ -148,4 +149,17 @@ class PasswordGeneratorComponent extends Object {
     return $pr_bits;
   }
 
+  /**
+   * defaultAlgorithm
+   * fallback password generating algorithm
+   *
+   * @param mixed $length
+   * @param mixed $chars
+   *
+   * @access private
+   * @return void
+   */
+  private function defaultAlgorithm( $length = 8, $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' ) {
+    return substr( str_shuffle( $chars ), 0, $length );
+  } 
 }
