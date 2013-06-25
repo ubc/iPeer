@@ -27,6 +27,13 @@ class SurveyGroup extends AppModel
         ),
     );
 
+    public $validate = array(
+        'file_name' => array(
+            'rule' => 'notEmpty',
+            'message' => 'The file name is required.'
+        )
+    );
+
     public $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable');
 
     /**

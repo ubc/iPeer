@@ -61,6 +61,10 @@ switch($submenu) {
         $items,
         array('name' => 'List Survey Group Sets', 'link' => "/surveygroups/index/$course_id")
     );
+    array_push(
+        $items,
+        array('name' => 'Export Survey Group Sets', 'link' => "/surveygroups/export/$course_id")
+    );
     break;
 }
 ?>

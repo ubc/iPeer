@@ -1063,6 +1063,22 @@ i {
     margin-left: 24em;
 }
 
+/* SurveyGroups Export */
+
+#exportSurveyGroup .text label, #exportSurveyGroup .select label {
+    width: 18em;
+}
+
+#exportSurveyGroup .text input {
+    width: 20em;
+}
+
+#exportSurveyGroup ul li {
+    list-style-type: circle;
+    list-style-position: inside;
+    margin: 0.5em;
+}
+
 /* ajax pagination */
 
 .ajax_paginate {

@@ -13,7 +13,8 @@ class SurveyGroupsController extends AppController
     public $uses =  array('Course', 'Survey', 'User', 'Question', 'SurveyQuestion', 'Response', 'Personalize', 'Event', 'EvaluationSubmission', 'UserEnrol', 'SurveyInput', 'SurveyGroupMember', 'SurveyGroupSet', 'SurveyGroup', 'Group', 'GroupsMembers', 'Event');
     public $name = 'SurveyGroups';
     public $helpers = array('Html', 'Ajax', 'Javascript');
-    public $components = array('Output', 'userPersonalize', 'framework', 'XmlHandler', 'AjaxList');
+    public $components = array('Output', 'userPersonalize', 'framework', 'XmlHandler', 'AjaxList',
+        'ExportBaseNew', 'ExportCsv');
 
     /**
      * __construct
@@ -300,6 +301,7 @@ class SurveyGroupsController extends AppController
     }
 
 
+
     /**
      * release
      *
@@ -482,6 +484,74 @@ class SurveyGroupsController extends AppController
 
         $this->Session->setFlash(__('Group set changed successfully.', true), 'good');
         $this->redirect('index/'.$event['Event']['course_id']);
+    }
+
+    /**
+     * export
+     *
+     * @param mixed $courseId
+     *
+     * @access public
+     * @return void
+     */
+    function export($courseId)
+    {
+        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
+        if (!$course) {
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
+            $this->redirect('index');
+            return;
+        }
+        $surveys = $this->Event->find('all', array(
+            'conditions' => array('course_id' => $courseId, 'event_template_type_id' => 3)
+        ));
+        $surveyGrp = $this->SurveyGroupSet->find('list', array(
+            'conditions' => array('survey_id' => Set::extract('/Event/id', $surveys)),
+            'fields' => array('set_description')
+        ));
+        $header = array(
+            'group_no' => __('Group #', true),
+            'username' => __('Username', true),
+            'student_no' => __('Student No', true),
+            'first_name' => __('First Name', true),
+            'last_name' =>__('Last Name', true)
+        );
+        $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))
+            ->push(__('Export Survey Groups', true)));
+        $this->set('survey_group_set', $surveyGrp);
+        $this->set('fields', $header);
+        if ($this->data) {
+            if (!$this->SurveyGroup->save($this->data, array('validate' => 'only'))) {
+                // check a filename is provided
+                return;
+            } else if (!isset($this->data['SurveyGroup']['survey_group_set'])) {
+                // check that a survey group set is selected
+                $this->Session->setFlash(__('Please select a survey group set to export.', true));
+                return;
+            } else if (empty($this->data['SurveyGroup']['fields'])) {
+                // check that a survey group set is selected
+                $this->Session->setFlash(__('Please select at least one export field.', true));
+                return;
+            }
+            $this->autoRender = false;
+            $fields = array_flip($this->data['SurveyGroup']['fields']);
+            $header = array_intersect_key($header, $fields);
+            $group_no = false;
+            if (in_array('group_no', $this->data['SurveyGroup']['fields'])) {
+                unset($fields['group_no']);
+                $group_no = true;
+            }
+            $groups = $this->SurveyGroup->find('all', array(
+                'conditions' => array('group_set_id' => $this->data['SurveyGroup']['survey_group_set']),
+                'contain' => array('Member' => array('fields' => array_keys($fields)))
+            ));
+            $members = array_merge(array(implode(',', $header)), 
+                $this->ExportCsv->buildSurveyGroupSet($groups, $fields, $group_no));
+            $members = implode("\n", $members);
+            header('Content-Type: application/csv');
+            header('Content-Disposition: attachment; filename=' .$this->data['SurveyGroup']['file_name']. '.csv');
+            echo $members;
+        }
     }
 
     /**

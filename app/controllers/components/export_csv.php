@@ -296,6 +296,35 @@ Class ExportCsvComponent extends ExportBaseNewComponent
             return true;
         }
     }
+    
+    /**
+     * buildSurveyGroupSet
+     *
+     * @param mixed $surveyGrps
+     * @param mixed $fields
+     * @param mixed $groupNo
+     *
+     * @access public
+     * @return void
+     */
+    function buildSurveyGroupSet($surveyGrps, $fields, $groupNo)
+    {
+        $members = array();
+        foreach ($surveyGrps as $surveyGrp) {
+            $num = $surveyGrp['SurveyGroup']['group_number'];
+            foreach ($surveyGrp['Member'] as $member) {
+                $mem = array();
+                unset($member['SurveyGroupMember']);
+                if ($groupNo) {
+                    $mem[] = $num;
+                }
+                $member = empty($fields) ? array() : $member;
+                $mem += $member;
+                $members[] = implode(',', $mem);
+            }
+        }
+        return $members;
+    }
 
     /**
      * render
