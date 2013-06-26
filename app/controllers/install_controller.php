@@ -46,7 +46,8 @@ class InstallController extends Controller
      */
     public function beforeFilter()
     {
-        date_default_timezone_set('UTC');
+        $timezone = ini_get('date.timezone') ? ini_get('date.timezone') : 'UTC';
+        date_default_timezone_set($timezone); // set the default time zone
     }
 
     /**
