@@ -117,6 +117,7 @@ class AjaxListComponent extends Object
         // Got it okay?
         if (!$state) {
             // No state is session? Well, set it up then!
+            $state = new Object();
             $state->sortBy = $this->sortBy;
             $state->sortAsc = true;
             $state->pageSize = 15;
