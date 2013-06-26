@@ -131,14 +131,14 @@ class studentSurvey extends SystemBaseTestCase
         $this->assertEqual($c, '-');
         $this->assertEqual($d, '33%');
         
-        $a = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table/tbody/tr[2]/td[4]/img');
-        $b = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table/tbody/tr[3]/td[4]/img');
-        $c = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table/tbody/tr[4]/td[4]/img');
-        $d = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table/tbody/tr[5]/td[4]/img');
-        $this->assertEqual($a->attribute('alt'), '33');
-        $this->assertEqual($b->attribute('alt'), '33');
-        $this->assertEqual($c->attribute('alt'), '0');
-        $this->assertEqual($d->attribute('alt'), '33');
+        $a = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table/tbody/tr[2]/td[4]/div/div');
+        $b = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table/tbody/tr[3]/td[4]/div/div');
+        $c = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table/tbody/tr[4]/td[4]/div/div');
+        $d = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table/tbody/tr[5]/td[4]/div/div');
+        $this->assertEqual($a->attribute('style'), 'width: 33%;');
+        $this->assertEqual($b->attribute('style'), 'width: 33%;');
+        $this->assertEqual($c->attribute('style'), 'width: 0%;');
+        $this->assertEqual($d->attribute('style'), 'width: 33%;');
         
         // multiple answers
         $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table/tbody/tr[6]/th')->text();
@@ -158,12 +158,12 @@ class studentSurvey extends SystemBaseTestCase
         $this->assertEqual($b, '17%');
         $this->assertEqual($c, '33%');
         
-        $a = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table/tbody/tr[7]/td[4]/img');
-        $b = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table/tbody/tr[8]/td[4]/img');
-        $c = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table/tbody/tr[9]/td[4]/img');
-        $this->assertEqual($a->attribute('alt'), '50');
-        $this->assertEqual($b->attribute('alt'), '17');
-        $this->assertEqual($c->attribute('alt'), '33');
+        $a = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table/tbody/tr[7]/td[4]/div/div');
+        $b = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table/tbody/tr[8]/td[4]/div/div');
+        $c = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table/tbody/tr[9]/td[4]/div/div');
+        $this->assertEqual($a->attribute('style'), 'width: 50%;');
+        $this->assertEqual($b->attribute('style'), 'width: 17%;');
+        $this->assertEqual($c->attribute('style'), 'width: 33%;');
         
         // single line answers
         $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table/tbody/tr[10]/th')->text();

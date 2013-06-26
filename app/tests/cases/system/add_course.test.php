@@ -197,6 +197,8 @@ class AddCourseTestCase extends SystemBaseTestCase
         $this->assertTrue(empty($link));
         $link = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'List Survey Group Sets');
         $this->assertTrue(!empty($link));
+        $link = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Export Survey Group Sets');
+        $this->assertTrue(!empty($link));
     }
     
     public function testDeleteCourse()
@@ -310,5 +312,9 @@ class AddCourseTestCase extends SystemBaseTestCase
         
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'List Survey Group Sets')->click();
         $this->assertEqual($this->url.'surveygroups/index/1', $this->session->url());
+        $this->session->open($this->url.'courses/home/1');
+
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Export Survey Group Sets')->click();
+        $this->assertEqual($this->url.'surveygroups/export/1', $this->session->url());
     }
 }
