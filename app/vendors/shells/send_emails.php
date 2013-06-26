@@ -46,8 +46,12 @@ class SendEmailsShell extends Shell
          */
         $timezone = $this->SysParameter->findByParameterCode('system.timezone');
         // default to UTC if no timezone is set
-        $timezone = empty($timezone) || empty($timezone['SysParameter']['parameter_value']) ? 'UTC' :
-            $timezone['SysParameter']['parameter_value'];
+        if (ini_get('date.timezone')) {
+            $timezone = ini_get('date.timezone');
+        } else {
+            $timezone = empty($timezone) || empty($timezone['SysParameter']['parameter_value']) ? 'UTC' :
+                $timezone['SysParameter']['parameter_value'];
+        }
         date_default_timezone_set($timezone);
         $emails = $this->EmailSchedule->getEmailsToSend();
         $defaultFrom = $this->SysParameter->get('display.contact_info');

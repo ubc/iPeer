@@ -164,8 +164,12 @@ class Event extends AppModel
         $this->SysParameter = ClassRegistry::init('SysParameter');
         $timezone = $this->SysParameter->findByParameterCode('system.timezone');
         // default to UTC if no timezone is set
-        $timezone = empty($timezone) || empty($timezone['SysParameter']['parameter_value']) ? 'UTC' :
-            $timezone['SysParameter']['parameter_value'];
+        if (ini_get('date.timezone')) {
+            $timezone = ini_get('date.timezone');
+        } else {
+            $timezone = empty($timezone) || empty($timezone['SysParameter']['parameter_value']) ? 'UTC' :
+                $timezone['SysParameter']['parameter_value'];
+        }
         // check that the timezone is valid
         $validTZ = array_flip(DateTimeZone::listIdentifiers(DateTimeZone::ALL_WITH_BC));
         if (!isset($validTZ[$timezone])) {
