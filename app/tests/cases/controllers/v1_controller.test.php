@@ -729,7 +729,7 @@ class V1ControllerTest extends CakeTestCase {
                 'due_date' => date('Y', strtotime("+1 year")).'-07-31 11:20:00',
                 'id' => '4',
                 'release_date_begin' => "2012-07-01 11:20:00",
-                'release_date_end' => "2014-12-31 11:20:00",
+                'release_date_end' => date('Y', strtotime("+1 year"))."-12-31 11:20:00",
                 'is_released' => true,
                 'is_ended' => false,
             ),
@@ -740,7 +740,7 @@ class V1ControllerTest extends CakeTestCase {
                 'due_date' => date('Y', strtotime("+1 year")).'-07-31 11:20:00',
                 'id' => '5',
                 'release_date_begin' => "2012-07-01 11:20:00",
-                'release_date_end' => "2014-12-31 11:20:00",
+                'release_date_end' => date('Y', strtotime("+1 year"))."-12-31 11:20:00",
                 'is_released' => true,
                 'is_ended' => false,
             )
