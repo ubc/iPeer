@@ -93,7 +93,7 @@ class EvaluationSubmissionTestCase extends CakeTestCase
 
     function testDaysLate()
     {
-        $result = $this->EvaluationSubmission->daysLate(1, '2013-07-03 00:00:01');
+        $result = $this->EvaluationSubmission->daysLate(1, date('Y', strtotime("+1 year")).'-07-03 00:00:01');
         $this->assertEqual($result, 1);
     }
 
