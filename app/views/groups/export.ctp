@@ -18,9 +18,11 @@
         <tr>
           <td width="60%">Include Group Name(s):</td><td><input type="checkbox" name="include_group_names" checked /></td>
         </tr>
-        <tr>
-          <td width="60%">Include Username(s):</td><td><input type="checkbox" name="include_usernames" checked /></td>
-        </tr>
+        <?php if (User::hasPermission('functions/viewusername')) { ?>
+            <tr>
+              <td width="60%">Include Username(s):</td><td><input type="checkbox" name="include_usernames" checked /></td>
+            </tr>
+        <?php } ?>
         <tr>
           <td width="60%">Include Student Id #:</td><td><input type="checkbox" name="include_student_id" checked /></td>
         </tr>

@@ -516,6 +516,11 @@ class SurveyGroupsController extends AppController
             'first_name' => __('First Name', true),
             'last_name' =>__('Last Name', true)
         );
+
+        if (!User::hasPermission('functions/viewusername')) {
+            unset($header['username']);
+        }
+
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))
             ->push(__('Export Survey Groups', true)));
         $this->set('survey_group_set', $surveyGrp);
