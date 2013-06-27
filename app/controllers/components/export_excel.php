@@ -725,7 +725,8 @@ Class ExportExcelComponent extends ExportBaseNewComponent
             }
             break;
 
-        default: throw new Exception("Event id input seems to be invalid!");
+        default:
+            throw new Exception("Event id input seems to be invalid!");
         }
         //return $CSV;
         $this->_output($params['file_name']);

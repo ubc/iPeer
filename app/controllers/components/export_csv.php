@@ -57,9 +57,9 @@ Class ExportCsvComponent extends ExportBaseNewComponent
      * @access public
      * @return void
      */
-    function createCsvSubHeader($params, $questions, $evalType)
+    /*function createCsvSubHeader($params, $questions, $evalType)
     {
-    }
+    }*/
 
 
     /**
@@ -308,7 +308,6 @@ Class ExportCsvComponent extends ExportBaseNewComponent
      */
     function render($header, $grid)
     {
-        $target = array();
         $resource = fopen('php://output', 'a');
         fputcsv($resource, $header);
         foreach ($grid as $row) {

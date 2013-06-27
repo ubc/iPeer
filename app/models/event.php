@@ -222,12 +222,10 @@ class Event extends AppModel
     /**
      * beforeValidate
      *
-     * @param array $options options
-     *
      * @access public
      * @return void
      */
-    function beforeValidate(array $options)
+    function beforeValidate()
     {
         if ($this->data['Event']['event_template_type_id'] == 3) {
             // remove the result release validation
