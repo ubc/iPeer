@@ -110,6 +110,26 @@ ALTER TABLE user_courses MODIFY created datetime, MODIFY modified datetime;
 ALTER TABLE user_enrols MODIFY created datetime, MODIFY modified datetime;
 ALTER TABLE user_tutors MODIFY created datetime, MODIFY modified datetime;
 
+-- clean up some wired characters, the conversion below doesn't like them
+UPDATE users SET first_name = TRIM(REPLACE(first_name, "ï¿½", ' ')) WHERE  `first_name` LIKE  '%ï¿½%';
+UPDATE users SET last_name = TRIM(REPLACE(last_name, "ï¿½", ' ')) WHERE  `last_name` LIKE  '%ï¿½%';
+UPDATE users SET first_name = TRIM(REPLACE(first_name, concat(0x89,0xF7,0xBC), ' ')) WHERE  `first_name` LIKE  concat('%',0x89,0xF7,0xBC,'%');
+UPDATE users SET last_name = TRIM(REPLACE(last_name, concat(0x89,0xF7,0xBC), ' ')) WHERE  `last_name` LIKE  concat('%',0x89,0xF7,0xBC,'%');
+UPDATE users SET first_name = TRIM(REPLACE(first_name, 0xa0, ' ')) WHERE  `first_name` LIKE  concat('%',0xa0,'%');
+UPDATE users SET last_name = TRIM(REPLACE(last_name, 0xa0, ' ')) WHERE  `last_name` LIKE  concat('%',0xa0,'%');
+UPDATE users SET first_name = TRIM(REPLACE(first_name, 0xf8, ' ')) WHERE  `first_name` LIKE  concat('%',0xf8,'%');
+UPDATE users SET last_name = TRIM(REPLACE(last_name, 0xf8, ' ')) WHERE  `last_name` LIKE  concat('%',0xf8,'%');
+UPDATE users SET first_name = TRIM(REPLACE(first_name, 0x81, ' ')) WHERE  `first_name` LIKE  concat('%',0x81,'%');
+UPDATE users SET last_name = TRIM(REPLACE(last_name, 0x81, ' ')) WHERE  `last_name` LIKE  concat('%',0x81,'%');
+UPDATE users SET first_name = TRIM(REPLACE(first_name, 0xff, ' ')) WHERE  `first_name` LIKE  concat('%',0xff,'%');
+UPDATE users SET last_name = TRIM(REPLACE(last_name, 0xff, ' ')) WHERE  `last_name` LIKE  concat('%',0xff,'%');
+UPDATE users SET first_name = TRIM(REPLACE(first_name, 0xe5, '')) WHERE  `first_name` LIKE  concat('%',0xe5,'%');
+UPDATE users SET last_name = TRIM(REPLACE(last_name, 0xe5, '')) WHERE  `last_name` LIKE  concat('%',0xe5,'%');
+UPDATE users SET first_name = TRIM(REPLACE(first_name, 0xe6, '')) WHERE  `first_name` LIKE  concat('%',0xe6,'%');
+UPDATE users SET last_name = TRIM(REPLACE(last_name, 0xe6, '')) WHERE  `last_name` LIKE  concat('%',0xe6,'%');
+UPDATE users SET first_name = TRIM(REPLACE(first_name, 0xe9, '')) WHERE  `first_name` LIKE  concat('%',0xe9,'%');
+UPDATE users SET last_name = TRIM(REPLACE(last_name, 0xe9, '')) WHERE  `last_name` LIKE  concat('%',0xe9,'%');
+
 -- Missed one table's char set conversion during the last upgrade
 -- Do this here or MySQL will complain about invalid dates.
 ALTER TABLE sys_parameters CHARACTER SET utf8;
@@ -149,7 +169,7 @@ ALTER TABLE evaluation_submissions CHANGE record_status record_status BINARY(1);
 ALTER TABLE evaluation_submissions CHANGE record_status record_status CHAR(1) CHARACTER SET utf8 NOT NULL DEFAULT 'A';
 ALTER TABLE events CHANGE title title VARBINARY(255);
 ALTER TABLE events CHANGE title title VARCHAR(255) CHARACTER SET utf8 NOT NULL DEFAULT '';
-ALTER TABLE events CHANGE description description VARBINARY(255);
+ALTER TABLE events CHANGE description description BLOB;
 ALTER TABLE events CHANGE description description TEXT CHARACTER SET utf8;
 ALTER TABLE events CHANGE self_eval self_eval VARBINARY(11);
 ALTER TABLE events CHANGE self_eval self_eval VARCHAR(11) CHARACTER SET utf8 NOT NULL DEFAULT '0';
