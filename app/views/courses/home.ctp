@@ -1,9 +1,9 @@
 <div id='CourseHome'>
-<?php $studentCount = $data['Course']['student_count']; 
+<?php $studentCount = $data['Course']['student_count'];
 $groupCount = count($data['Group']);
 $eventCount = count($data['Event']);
 if ($data['Course']['record_status'] == 'I') {
-    echo "<div class='invalid'>Invalid Course</div><br>";
+    echo "<div class='invalid'>Inactive Course (Limited Access)</div><br>";
 } ?>
 <table class='standardtable'>
   <tr>
