@@ -12,7 +12,7 @@
 /* Each question type can have unique options for the user to configure, this 
  * section creates the html template needed for each question type. 
  */
-function makeQ($view, $qType, $i, $qTypes, $required=true)
+function makeQ($view, $qType, $i, $qTypes, $selfEval, $quesNum, $required=true)
 {
     $html = $view->Html;
     $form = $view->Form;
@@ -47,21 +47,21 @@ function makeQ($view, $qType, $i, $qTypes, $required=true)
     $removeLink = $html->link('x', '#', 
         array(
             'class' => 'removeQ', 
-            'onclick' => "removeQ($i); return false;",
+            'onclick' => "removeQ($i, $selfEval); return false;",
             'escape' => false
         )
     );
     $upLink = $html->link('▲', '#', 
         array(
             'class' => 'upQ', 
-            'onclick' => "upQ($i); return false;",
+            'onclick' => "upQ($i, $selfEval); return false;",
             'escape' => false
         )
     );
     $downLink = $html->link('▼', '#', 
         array(
             'class' => 'downQ', 
-            'onclick' => "downQ($i); return false;",
+            'onclick' => "downQ($i, $selfEval); return false;",
             'escape' => false
         )
     );
@@ -72,9 +72,9 @@ function makeQ($view, $qType, $i, $qTypes, $required=true)
     if (isset($view->data['MixevalQuestion'][$i]['id'])) {
         $hiddenIdField = $form->hidden("MixevalQuestion.$i.id");
     }
-    
+
     // give an ID to the question number for easy renumbering later on
-    $qNum = $html->tag('span', $i + 1 . ". ", array('id' => "questionIndex$i"));
+    $qNum = $html->tag('span', $quesNum . ". ", array('id' => "questionIndex$i"));
     $requiredTxt = ($qType != 'Likert') ? '' :
         $html->div("help-text", _t('Unrequired Likert questions are not counted toward the total rating.'));
     $ret = $html->div('MixevalMakeQuestion',
@@ -84,6 +84,7 @@ function makeQ($view, $qType, $i, $qTypes, $required=true)
             array("type" => "text", "label" => "Question")) .
         $form->input("MixevalQuestion.$i.instructions") .
         $form->input("MixevalQuestion.$i.required", array('checked' => $required)) .
+        $form->hidden("MixevalQuestion.$i.self_eval", array('value' => $selfEval)) .
         $requiredTxt .
         $form->hidden("MixevalQuestion.$i.mixeval_question_type_id",
             array('value' => $qTypeId)) .
@@ -170,15 +171,28 @@ function makeDesc($view, $qNum, $descNum) {
  * from a failed submit, we need to reload all the questions they've already 
  * configured, so they don't have to enter them all over again. 
  */
-$numQ = 0; // for initializing the javascript counter that track questions
+$numQ = 0; // for initializing the javascript counter that track question
+$numPeer = 1; // for initializing the question number for peer evaluation questions
+$numSelf = 1; // for initializing the question number for self evaluation questions
 $numQArray = ""; // for initializing the javascript array that tracks questions
+$numPeerQArray = ""; // for initializing the javascript array that tracks peer questions
+$numSelfQArray = ""; // for initializing the javascript array that tracks self questions
 $reloadedQ = "";
+$reloadedSelfQ = "";
 if (isset($this->data) && isset($this->data['MixevalQuestion'])) {
     $prevQs = $this->data['MixevalQuestion'];
     foreach ($prevQs as $q) {
         $required = $q['required'] ? true : false;
         $qType = $qTypes[$q['mixeval_question_type_id']];
-        $reloadedQ .= makeQ($this, $qType, $numQ, $qTypes, $required);
+        if ($q['self_eval']) {
+            $reloadedSelfQ .= makeQ($this, $qType, $numQ, $qTypes, $q['self_eval'], $numSelf, $required);
+            $numSelfQArray .= "$numQ,";
+            $numSelf++;
+        } else {
+            $reloadedQ .= makeQ($this, $qType, $numQ, $qTypes, $q['self_eval'], $numPeer, $required);
+            $numPeerQArray .= "$numQ,";
+            $numPeer++;
+        }
         $numQArray .= "$numQ,";
         $numQ++;
     }
@@ -193,32 +207,53 @@ if (isset($this->data['MixevalQuestionDesc'])) {
     $numDesc = count($this->data['MixevalQuestionDesc']);
 }
 
-// Finally, we create the div that will hold all these questions
-echo $html->div('', $reloadedQ, array('id' => 'questions'));
+
+// peer evaluation questions section
+echo $html->tag('h3', __('Peer Evaluation Questions', true));
+$addQButton = $form->button(__('Add', true),
+    array('type' => 'button', 'onclick' => "insertQ(false);"));
+echo $form->input('MixevalQuestionTypePeer', array('after' => $addQButton,
+    'options' => $qTypes));
+echo $html->div('', $reloadedQ, array('id' => 'questions', 'class' => 'questions'));
+
+// self evaluation questions section
+echo '<div id="self-eval-ques">';
+echo $html->tag('h3', __('Self-Evaluation Questions', true));
+$addQButton = $form->button(__('Add', true), 
+    array('type' => 'button', 'onclick' => "insertQ(true);"));
+echo $form->input('MixevalQuestionTypeSelf', array('after' => $addQButton,
+    'options' => $qTypes));
+echo $html->div('', $reloadedSelfQ, array('id' => 'selfQues', 'class' => 'questions'));
+echo '</div>';
 ?>
 
 <script type="text/javascript">
 // tracking variables that tells us what ID to give to the next question or desc
 var numQ = <?php echo $numQ; ?>; // the total number of questions
+var numPeer = <?php echo $numPeer ?>; // next question number for peer evaluation ques
+var numSelf = <?php echo $numSelf ?>; // next question number for self evaluation ques
 // the total number of descriptors
 var numDesc = <?php echo $numDesc; ?>; 
 // keeps track of currently valid user ids, cause users can remove questions
 var questionIds = [<?php echo $numQArray; ?>];
+var peerQuesIds = [<?php echo $numPeerQArray; ?>]; // for peer evaluation section
+var selfQuesIds = [<?php echo $numSelfQArray; ?>]; // for self-evaluation section
 // templates for each question type, the negative numbers will be replaced
 // with an appropriate ID (from the tracking variables)
 // -1 is for numQ, -2 is for numDesc
 // Note that we're using negative numbers because of problems with quote
 // escaping in strings with cakephp generated onclick attributes.
-var likertQ = '<?php echo makeQ($this, 'Likert', -1, $qTypes); ?>';
-var sentenceQ = '<?php echo makeQ($this, 'Sentence', -1, $qTypes); ?>';
-var paragraphQ = '<?php echo makeQ($this, 'Paragraph', -1, $qTypes); ?>';
-var scoredropdownQ = '<?php echo makeQ($this, 'ScoreDropdown', -1, $qTypes); ?>';
+var likertQ = '<?php echo makeQ($this, 'Likert', -1, $qTypes, -2, -3); ?>';
+var sentenceQ = '<?php echo makeQ($this, 'Sentence', -1, $qTypes, -2, -3); ?>';
+var paragraphQ = '<?php echo makeQ($this, 'Paragraph', -1, $qTypes, -2, -3); ?>';
+var scoredropdownQ = '<?php echo makeQ($this, 'ScoreDropdown', -1, $qTypes, -2, -3); ?>';
 var desc = '<?php echo makeDesc($this, -1, -2); ?>';
 
 
 // Add a question
-function insertQ() {
-    var type = jQuery('#MixevalMixevalQuestionType option:selected').text();
+function insertQ(self_eval) {
+    var sub = self_eval ? 'Self' : 'Peer';
+    var type = jQuery('#MixevalMixevalQuestionType'+sub+' option:selected').text();
     var q = "";
     switch (type) {
     case "Likert":
@@ -236,46 +271,73 @@ function insertQ() {
     default:
         return "";
     }
+    var section = self_eval ? '#selfQues' : '#questions';
+    if (self_eval) {
+        self = 1;
+        num = numPeer;
+        numPeer++;
+    } else {
+        self = 0;
+        num = numSelf;
+        numSelf++;
+    }
     q = q.replace(/-1/g, numQ);
-    jQuery(q).hide().appendTo('#questions').fadeIn(600);
+    q = q.replace(/-2/g, self);
+    q = q.replace(/-3/g, num);
+    jQuery(q).hide().appendTo(section).fadeIn(600);
     questionIds.push(numQ);
+    if (self_eval) {
+        selfQuesIds.push(numQ);
+    } else {
+        peerQuesIds.push(numQ);
+    }
     numQ++;
     reorderQ();
 }
 
 // Remove a question
-function removeQ(qNum) {
+function removeQ(qNum, self_eval) {
     var target = jQuery('#question' + qNum);
     target.addClass('remove');
     target.hide('blind', 600, function() { target.remove(); });
-    questionIds.splice(questionIds.indexOf(qNum), 1);
+    questions = self_eval ? selfQuesIds : peerQuesIds;
+    questions.splice(questions.indexOf(qNum), 1); // remove from the section's list
+    questionIds.splice(questionIds.indexOf(qNum), 1); // remove from main list
+    reassignQuesArray(self_eval, questions);
     reorderQ();
 }
 
 // Move question up one, e.g.: swap position with question above it
-function upQ(qNum) {
-    var i = questionIds.indexOf(qNum);
-    // make sure not to move topmost question
+function upQ(qNum, self_eval) {
+    questions = self_eval ? selfQuesIds : peerQuesIds;
+    var i = questions.indexOf(qNum);
+    var j = questionIds.indexOf(qNum);
+    // make sure not to move topmost question of the section
     if (i != 0) {
-        aboveDiv = jQuery('#question' + questionIds[i - 1]);
+        aboveDiv = jQuery('#question' + questions[i - 1]);
         thisDiv = jQuery('#question' + qNum);
         // swap places with the question above us
         thisDiv.hide('drop', 300, function() {
             thisDiv.insertBefore(aboveDiv).show('drop', 500);
             reorderQ();
         });
-        // make sure the change is reflected in the js array
-        questionIds[i] = questionIds[i - 1];
-        questionIds[i - 1] = qNum;
+        // make sure the change is reflected in the js arrays
+        questions[i] = questions[i - 1];
+        questions[i - 1] = qNum;
+        questionIds[j] = questionIds[j - 1];
+        questionIds[j - 1] = qNum;
     }
+    reassignQuesArray(self_eval, questions);
 }
 
 // Move question down one, e.g.: swap position with question below it
-function downQ(qNum) {
-    var i = questionIds.indexOf(qNum);
+function downQ(qNum, self_eval) {
+    questions = self_eval ? selfQuesIds : peerQuesIds;
+    var i = questions.indexOf(qNum);
+    var j = questionIds.indexOf(qNum);
     // make sure not to move bottommost question
-    if (i < questionIds.length - 1) {
-        belowDiv = jQuery('#question' + questionIds[i + 1]);
+    if (i < questions.length - 1) {
+        belowDiv = jQuery('#question' + questions[i + 1]);
         thisDiv = jQuery('#question' + qNum);
         // swap places with the question below us
         thisDiv.hide('drop', 300, function() {
@@ -283,20 +345,35 @@ function downQ(qNum) {
             reorderQ();
         });
         // make sure the change is reflected in the js array
-        questionIds[i] = questionIds[i + 1];
-        questionIds[i + 1] = qNum;
+        questions[i] = questions[i + 1];
+        questions[i + 1] = qNum;
+        questionIds[j] = questionIds[j + 1];
+        questionIds[j + 1] = qNum;
     }
+    reassignQuesArray(self_eval, questions);
 }
 
 // After we've deleted a question, we should renumber the questions so that
 // they're sequential again
 function reorderQ() {
-    for (var i = 0; i < questionIds.length; i++) {
-        var staticId = questionIds[i];
+    // reorder peer evaluation questions
+    j = 0; // overall questions order
+    for (var i = 0; i < peerQuesIds.length; i++) {
+        var staticId = peerQuesIds[i];
         jQuery("#questionIndex" + staticId).text(i + 1 + '. ');
-        jQuery("#MixevalQuestion" + staticId + "QuestionNum").val(i + 1);
+        jQuery("#MixevalQuestion" + staticId + "QuestionNum").val(j + 1);
         console.log(".MixevalQuestionDesc" + staticId);
-        jQuery(".MixevalQuestionDesc" + staticId).val(i + 1);
+        jQuery(".MixevalQuestionDesc" + staticId).val(j + 1);
+        j++;
+    }
+    // reorder self evaluation questions
+    for (i = 0; i < selfQuesIds.length; i++) {
+        var staticId = selfQuesIds[i];
+        jQuery("#questionIndex" + staticId).text(i + 1 + '. ');
+        jQuery("#MixevalQuestion" + staticId + "QuestionNum").val(j + 1);
+        console.log(".MixevalQuestionDesc" + staticId);
+        jQuery(".MixevalQuestionDesc" + staticId).val(j + 1);
+        j++;
     }
 }
 
@@ -314,6 +391,15 @@ function removeDesc(qNum, numDesc) {
     var target = jQuery('#question' + qNum + 'desc' + numDesc);
     target.addClass('remove');
     target.hide('blind', 350, function() { target.remove(); });
+}
+
+// update the appropriate question array
+function reassignQuesArray(self_eval, questions) {
+    if (self_eval) {
+        selfQuesIds = questions;
+    } else {
+        peerQuesIds = questions;
+    }
 }
 
 </script>

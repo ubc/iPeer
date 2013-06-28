@@ -294,6 +294,7 @@ class MixevalsController extends AppController
     public function _dataSavePrep() {
         // Add a creation date
         $this->data['Mixeval']['created'] = date('Y-m-d H:i:s');
+        $selfEval = $this->data['Mixeval']['self_eval'];
 
         // Reorder the questions so that they're contiguous starting from 0.
         // This is necessary because the question indexes can be missing
@@ -305,10 +306,16 @@ class MixevalsController extends AppController
         $newOrder = array(); // maps old index to new index, this is for
         // fixing the QuestionDesc indexes, which
         // is still referring to the old index
+        $deleteSelfEval = array();
         if (isset($this->data['MixevalQuestion'])) {
             $contiguousQs = array();
             foreach ($this->data['MixevalQuestion'] as $oldIndex => $q) {
                 $newIndex = $q['question_num'] - 1;
+                if (!$selfEval && $q['self_eval']) {
+                    // skip self evaluation when they are "deleted"
+                    $deleteSelfEval[$oldIndex] = 1;
+                    continue;
+                }
                 $contiguousQs[$newIndex] = $q;
                 $newOrder[$oldIndex] = $newIndex;
             }
@@ -333,6 +340,10 @@ class MixevalsController extends AppController
             $descScale = array();
             foreach ($this->data['MixevalQuestionDesc'] as $desc) {
                 $oldIndex = $desc['question_index'];
+                if (isset($deleteSelfEval[$oldIndex])) {
+                    // skip desc for deleted self evaluation questions
+                    continue;
+                }
                 // fix the index
                 $desc['question_index'] = $newOrder[$oldIndex];
                 // assign the appropriate scale
@@ -392,7 +403,7 @@ class MixevalsController extends AppController
 
             // Declare all the functions used by array_map. Note that
             // we check if the function_exists only because the test cases
-            // keep complaining about these functions being redeclared, wtf php.
+            // keep complaining about these functions being redeclared.
             if (!function_exists('getExistingQId')) {
                 /**
                  * getExistingQId
@@ -646,6 +657,10 @@ class MixevalsController extends AppController
 
         // Load other stuff for the view
         $mixeval_question_types = $this->MixevalQuestionType->find('list');
+        $selfQues = $this->MixevalQuestion->find('count', array(
+            'conditions' => array('mixeval_id' => $id, 'self_eval' => 1)
+        ));
+        $this->set('selfQ', $selfQues);
         $this->set('mixevalQuestionTypes', $mixeval_question_types);
         $this->set('breadcrumb',
             $this->breadcrumb->push('mixevals')->
@@ -727,6 +742,10 @@ class MixevalsController extends AppController
         }
         $this->autoRender = false;
         $mixeval_question_types = $this->MixevalQuestionType->find('list');
+        $selfQues = $this->MixevalQuestion->find('count', array(
+            'conditions' => array('mixeval_id' => $id, 'self_eval' => 1)
+        ));
+        $this->set('selfQ', $selfQues);
         $this->set('mixevalQuestionTypes', $mixeval_question_types);
         $this->set('breadcrumb',
             $this->breadcrumb->push('mixevals')->

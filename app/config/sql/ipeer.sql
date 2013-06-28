@@ -1062,6 +1062,7 @@ CREATE TABLE IF NOT EXISTS `mixeval_questions` (
   `instructions` text,
   `mixeval_question_type_id` int(11) NOT NULL,
   `required` tinyint(1) NOT NULL DEFAULT '1',
+  `self_eval` tinyint(1) NOT NULL DEFAULT '0',
   `multiplier` int(11) NOT NULL DEFAULT '0',
   `scale_level` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),

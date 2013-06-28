@@ -57,6 +57,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
                 "name" => 'TestMixevalForTestCase',
                 "availability" => 'private',
                 "zero_mark" => 0,
+                "self_eval" => 0,
                 "MixevalQuestionType" => 3
             ),
             "MixevalQuestion" => array(
@@ -64,6 +65,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
                     "title" => 'Likert Question',
                     "instructions" => 'Likert Instructions',
                     "required" => 1,
+                    "self_eval" => 0,
                     "mixeval_question_type_id" => 1,
                     "question_num" => 1,
                     "multiplier" => 1
@@ -72,6 +74,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
                     "title" => 'Paragraph Question',
                     "instructions" => 'Paragraph Instructions',
                     "required" => 0,
+                    "self_eval" => 0,
                     "mixeval_question_type_id" => 2,
                     "question_num" => 2
                 ),
@@ -79,6 +82,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
                     "title" => 'Sentence Question',
                     "instructions" => 'Sentence Instructions',
                     "required" => 1,
+                    "self_eval" => 0,
                     "mixeval_question_type_id" => 3,
                     "question_num" => 3
                 ),
@@ -173,6 +177,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
                 "name" => 'TestMixevalForTestCase2',
                 "availability" => 'private',
                 "zero_mark" => 0,
+                "self_eval" => 0,
                 "MixevalQuestionType" => 3
             ),
             "MixevalQuestion" => array(
@@ -180,6 +185,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
                     "title" => 'Likert Question 1',
                     "instructions" => 'Likert Instructions 1',
                     "required" => 0,
+                    "self_eval" => 0,
                     "mixeval_question_type_id" => 1,
                     "question_num" => 1,
                     "multiplier" => 1
@@ -188,6 +194,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
                     "title" => 'Likert Question 2',
                     "instructions" => 'Likert Instructions 2',
                     "required" => 0,
+                    "self_eval" => 0,
                     "mixeval_question_type_id" => 1,
                     "question_num" => 2,
                     "multiplier" => 1
@@ -271,6 +278,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
         // Assuming that $actul passes all the tests, we can now use it as
         // a base for data submissions to edit
         $expected = $actual;
+        $expected['Mixeval']['self_eval'] = 0;
         unset($expected['Event']);
         // Add 2 likert questions
         echo "Add likert questions, ";
@@ -279,6 +287,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
                 "title" => 'Likert Question 1',
                 "instructions" => 'Likert Instructions 1',
                 "required" => 0,
+                "self_eval" => 0,
                 "mixeval_question_type_id" => 1,
                 "question_num" => 4,
                 "multiplier" => 1
@@ -289,6 +298,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
                 "title" => 'Likert Question 2',
                 "instructions" => 'Likert Instructions 2',
                 "required" => 0,
+                "self_eval" => 0,
                 "mixeval_question_type_id" => 1,
                 "question_num" => 5,
                 "multiplier" => 1
@@ -344,6 +354,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
         unset($expected['MixevalQuestion'][3]); // rm a likert question
         unset($expected['MixevalQuestionDesc'][3]); // the likert's desc 1
         unset($expected['MixevalQuestionDesc'][4]); // the likert's desc 2
+        $expected['Mixeval']['self_eval'] = 0; // set the self_eval field
         // Try to save these changes
         $result = $this->testAction(
             "/mixevals/edit/$mixevalId",
@@ -368,6 +379,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
         // Remove all Likert Scale 1 desc
         unset($expected['MixevalQuestionDesc'][0]);
         unset($expected['MixevalQuestionDesc'][3]);
+        $expected['Mixeval']['self_eval'] = 0;
         // Try to save these changes
         $result = $this->testAction(
             "/mixevals/edit/$mixevalId",
@@ -390,6 +402,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
         $expected = $actual;
         unset($expected['Event']);
         // assign the existing questions to new indexes and new orders
+        $expected['Mixeval']['self_eval'] = 0;
         $expected['MixevalQuestion'][3] = $expected['MixevalQuestion'][2];
         $expected['MixevalQuestion'][3]['question_num'] = 2;
         $expected['MixevalQuestion'][5] = $expected['MixevalQuestion'][0];

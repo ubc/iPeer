@@ -1472,42 +1472,42 @@ div.MixevalQuestion {
 
 /* mixevals/add */
 
-.MixevalAdd #questions div a.removeQ, .MixevalAdd #questions div a.upQ,
-.MixevalAdd #questions div a.downQ {
+.MixevalAdd .questions div a.removeQ, .MixevalAdd .questions div a.upQ,
+.MixevalAdd .questions div a.downQ {
     font-size: 1.2em;
     padding: 0.3em;
     margin: 0;
 }
 
-.MixevalAdd #questions div a.removeQ {
+.MixevalAdd .questions div a.removeQ {
     color: crimson;
 }
 
-.MixevalAdd #questions div a.upQ {
+.MixevalAdd .questions div a.upQ {
     color: orangered;
 }
 
-.MixevalAdd #questions div a.downQ {
+.MixevalAdd .questions div a.downQ {
     margin-right: 1em;
     color: dodgerblue;
 }
 
-.MixevalAdd #questions div a.removeQ:hover {
+.MixevalAdd .questions div a.removeQ:hover {
     color: white;
     text-decoration: none;
 }
 
-.MixevalAdd #questions div a.removeQ:hover, .MixevalAdd #questions div.remove {
+.MixevalAdd .questions div a.removeQ:hover, .MixevalAdd .questions div.remove {
     background-color: crimson;
 }
 
-.MixevalAdd #questions div a.upQ:hover {
+.MixevalAdd .questions div a.upQ:hover {
     background-color: orangered;
     color: white;
     text-decoration: none;
 }
 
-.MixevalAdd #questions div a.downQ:hover {
+.MixevalAdd .questions div a.downQ:hover {
     background-color: dodgerblue;
     color: white;
     text-decoration: none;

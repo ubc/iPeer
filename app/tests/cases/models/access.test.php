@@ -41,8 +41,8 @@ class AccessTestCase extends CakeTestCase {
         $this->Aco = ClassRegistry::init('Aco');
         $this->Aro = ClassRegistry::init('Aro');
         
-        $allow = array('create' => 1, 'read' => 1, 'update' => 1, 'delete' => 1, 'id' => 258);
-        $deny = array('create' => -1, 'read' => -1, 'update' => -1, 'delete' => -1, 'id' => 258);
+        $allow = array('create' => 1, 'read' => 1, 'update' => 1, 'delete' => 1, 'id' => 259);
+        $deny = array('create' => -1, 'read' => -1, 'update' => -1, 'delete' => -1, 'id' => 259);
         $acos = $this->Aco->find('threaded');
 
         // Testing for super admin role

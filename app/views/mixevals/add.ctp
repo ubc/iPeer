@@ -12,21 +12,27 @@
 
 /* Create the Form */
 echo $form->create('Mixeval');
-echo $html->tag('h3', _t('Info'));
+echo $html->tag('h3', __('Info', true));
 echo $form->input('name');
 echo $form->input(
     'availability', 
     array(
         'type' => 'radio',
         'default' => 'private',
-        'options' => array('public' => _t('Public'), 'private' => _t('Private'))
+        'options' => array('public' => __('Public', true), 'private' => __('Private', true))
     )
 );
 echo $html->div("help-text", 
-    _t('Public lets you share this mixed evaluation with other instructors.'));
+    __('Public lets you share this mixed evaluation with other instructors.', true));
 echo $form->input('zero_mark');
 echo $html->div("help-text", 
-    _t('Start marks from zero for all Likert questions.'));
+    __('Start marks from zero for all Likert questions.', true));
+$check = (isset($selfQ) && $selfQ) ? true : false;
+echo $form->input('self_eval', 
+    array('type' => 'checkbox', 'id' => 'self_eval', 'label' => __('Self-Evaluation', true),
+    'checked' => $check));
+echo $html->div("help-text", 
+    __('Add questions in the Self-Evaluation Section below.', true));
 
 // If we're editing a previously saved mixeval, will need to have an id for
 // the mixeval.
@@ -34,20 +40,35 @@ if (isset($this->data['Mixeval']['id'])) {
     echo $form->hidden('id');
 }
 
-// Question section
-echo $html->tag('h3', _t('Questions'));
-$addQButton = $form->button(_t('Add'), 
-    array('type' => 'button', 'onclick' => "insertQ();"));
-echo $form->input('MixevalQuestionType', array('after' => $addQButton));
+// Questions
 echo $this->element('mixevals/questions_editor', 
     array('qTypes' => $mixevalQuestionTypes));
 
 // Submit
 echo $html->div('center', 
-    $form->button(_t('Save')) .
-    $form->button(_t('Cancel'), array('name' => 'cancel'))
+    $form->button(__('Save', true)) .
+    $form->button(__('Cancel', true), array('name' => 'cancel'))
 );
 
 echo $this->Form->end();
 ?>
 </div>
+
+<script type="text/javascript">
+selfEval();
+jQuery().ready(function() {
+    jQuery('#self_eval').change(function() {
+        selfEval();
+    });
+});
+
+function selfEval() {
+    var checked = jQuery('#self_eval').is(":checked");
+    // if self eval is checked - show self eval ques section
+    if (checked) {
+        jQuery('#self-eval-ques').show();
+    } else {
+        jQuery('#self-eval-ques').hide();
+    }
+}
+</script>

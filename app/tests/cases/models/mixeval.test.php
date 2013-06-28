@@ -122,6 +122,7 @@ class MixevalTestCase extends CakeTestCase
                     'instructions' => null,
                     'mixeval_question_type_id' => '1',
                     'required' => 1,
+                    'self_eval' => 0,
                     'multiplier' => 1,
                     'scale_level' => 0,
                 ),
@@ -134,6 +135,7 @@ class MixevalTestCase extends CakeTestCase
                     'instructions' => 'c1i1',
                     'mixeval_question_type_id' => '2',
                     'required' => 1,
+                    'self_eval' => 0,
                     'multiplier' => 0,
                     'scale_level' => 0,
                 ),
@@ -146,6 +148,7 @@ class MixevalTestCase extends CakeTestCase
                     'instructions' => 'c2i1',
                     'mixeval_question_type_id' => '2',
                     'required' => 1,
+                    'self_eval' => 0,
                     'multiplier' => 0,
                     'scale_level' => 0,
                 )

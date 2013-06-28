@@ -267,6 +267,7 @@ INSERT INTO `mixeval_question_types` (`id`, `type`) VALUES
 
 ALTER TABLE mixevals_questions RENAME mixeval_questions;
 ALTER TABLE mixeval_questions ADD mixeval_question_type_id int(11) NOT NULL;
+ALTER TABLE mixeval_questions ADD self_eval tinyint(1) NOT NULL DEFAULT '0';
 ALTER TABLE mixeval_questions ADD FOREIGN KEY (`mixeval_question_type_id`) 
 	REFERENCES `mixeval_question_types` (`id`) ON DELETE CASCADE;
 ALTER TABLE mixeval_questions ADD FOREIGN KEY (`mixeval_id`) REFERENCES 
