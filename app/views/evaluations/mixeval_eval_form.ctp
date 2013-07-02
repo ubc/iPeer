@@ -42,19 +42,34 @@
         <?php  $evaluatee_count = count($groupMembers);
                $total_marksTbl= 10*$evaluatee_count; //10 is encoded as a constant for TBL evaluation types in order to avoid adding marks for Likert              
         ?>       
-        <?php foreach($groupMembers as $row): $user = $row['User']; ?>
-            <center><h2><?php echo $user['full_name']?></h2></center>
-            <?php
-            $params = array(  'controller'            => 'mixevals',
-                            'zero_mark'             => $mixeval['Mixeval']['zero_mark'],
-                            'questions'             => $questions,
-                            'event'                 => $event,
-                            'user'                  => $user,
-                            'evaluatee_count'       => $evaluatee_count
-                            );
+        <?php 
+        if ($mixeval['Mixeval']['peer_question'] > 0 ) {
+            foreach($groupMembers as $row): $user = $row['User']; ?>
+                <center><h2><?php echo $user['full_name']?></h2></center>
+                <?php
+                $params = array(  'controller'            => 'mixevals',
+                                'zero_mark'             => $mixeval['Mixeval']['zero_mark'],
+                                'questions'             => $questions,
+                                'event'                 => $event,
+                                'user'                  => $user,
+                                'evaluatee_count'       => $evaluatee_count,
+                                'self_eval'             => 0,
+                                'eval'                  => 'Evaluation'
+                                );
+                echo $this->element('mixevals/view_mixeval_details', $params);
+                ?><br>
+            <?php endforeach; 
+        }?>
+        <?php if ($mixeval['Mixeval']['self_eval'] > 0) { ?>
+        <center><h2><?php echo __('Self-Evaluation', true)?></h2></center>
+        <?php
+            $params['self_eval'] = 1;
+            $params['eval'] = 'Self-Evaluation';
+            $params['user'] = array('id' => User::get('id'));
+            $params['self'] = $self;
             echo $this->element('mixevals/view_mixeval_details', $params);
-            ?><br>
-        <?php endforeach; ?>
+        }
+        ?><br>
         <center><?php echo $form->submit(__('Submit the Evaluation', true), array('div' => 'editSection', 'id' => 'submit')); ?></center>
         <?php echo $form->end(); ?>
         </td>

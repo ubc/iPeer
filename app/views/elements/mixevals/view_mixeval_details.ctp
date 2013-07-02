@@ -1,12 +1,17 @@
 <?php
 $evaluation = isset($user['Evaluation']) ? $user['Evaluation'] : null;
+$evaluation = $self_eval ? $self : $evaluation;
 $details = Set::combine($evaluation['EvaluationMixevalDetail'], '{n}.question_number', '{n}');
-echo "<input type='hidden' name=data[$user[id]][Evaluation][evaluatee_id] value='$user[id]'/>";
-echo "<input type='hidden' name=data[$user[id]][Evaluation][evaluator_id] value='".User::get('id')."'/>";
-echo "<input type='hidden' name=data[$user[id]][Evaluation][event_id] value='".$event['Event']['id']."'/>";
-echo "<input type='hidden' name=data[$user[id]][Evaluation][group_event_id] value='".$event['GroupEvent']['id']."'/>";
-echo "<input type='hidden' name=data[$user[id]][Evaluation][group_id] value='".$event['Group']['id']."'/>";
+$peerNum = 1;
+echo "<input type='hidden' name=data[$user[id]][".$eval."][evaluatee_id] value='$user[id]'/>";
+echo "<input type='hidden' name=data[$user[id]][".$eval."][evaluator_id] value='".User::get('id')."'/>";
+echo "<input type='hidden' name=data[$user[id]][".$eval."][event_id] value='".$event['Event']['id']."'/>";
+echo "<input type='hidden' name=data[$user[id]][".$eval."][group_event_id] value='".$event['GroupEvent']['id']."'/>";
+echo "<input type='hidden' name=data[$user[id]][".$eval."][group_id] value='".$event['Group']['id']."'/>";
 foreach ($questions as $ques) {
+    if ($ques['MixevalQuestion']['self_eval'] != $self_eval) {
+        continue; // skip questions not in this section (eg. self eval, peer eval)
+    }
     $type = $ques['MixevalQuestionType']['type'];
     $num = $ques['MixevalQuestion']['question_num'];
     $instruct = $ques['MixevalQuestion']['instructions'];
@@ -14,8 +19,9 @@ foreach ($questions as $ques) {
     $required = (!$ques['MixevalQuestion']['required']) ? '' :
         $html->tag('span', '*', array('class' => 'required orangered floatright'));
     $title = $ques['MixevalQuestion']['title'];
-    $title = $html->tag('h3', "$num. $title $required");
+    $title = $html->tag('h3', "$peerNum. $title $required");
     $class = $ques['MixevalQuestion']['required'] ? 'must' : '';
+    $peerNum++;
 
     if ($type == 'Paragraph') {
         $value = (isset($details[$num])) ? $details[$num]['question_comment'] : '';

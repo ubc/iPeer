@@ -916,6 +916,10 @@ class EvaluationsController extends AppController
             $this->set('courseId', $event['Event']['course_id']);
             $this->set('title_for_layout', $this->Course->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
             $this->set('groupMembers', $this->Evaluation->loadMixEvaluationDetail($event));
+            $self = $this->EvaluationMixeval->find('first', array(
+                'conditions' => array('evaluator' => User::get('id'), 'evaluatee' => User::get('id'), 'event_id' => $eventId)
+            ));
+            $this->set('self', $self);
             $questions = $this->MixevalQuestion->findAllByMixevalId($event['Event']['template_id']);
             $mixeval = $this->Mixeval->find('first', array(
                 'conditions' => array('id' => $event['Event']['template_id']), 'contain' => false, 'recursive' => 2));
@@ -932,23 +936,48 @@ class EvaluationsController extends AppController
             $required = true;
             $failures = array();            
 
-            foreach ($this->data as $userId => $eval) {
-                $eventId = $eval['Evaluation']['event_id'];
-                $groupId = $eval['Evaluation']['group_id'];
-                $evaluatee = $eval['Evaluation']['evaluatee_id'];
-                /*if (!$this->validMixevalEvalComplete($this->params['form'])) {
-                    $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
-                    return;
-                }*/
-                if (!$this->Evaluation->saveMixevalEvaluation($eval)) {
-                    $failures[] = $userId;
+            // check peer evaluation questions
+            if ($mixeval['Mixeval']['peer_question'] > 0) {
+                foreach ($this->data as $userId => $eval) {
+                    $eventId = $eval['Evaluation']['event_id'];
+                    $groupId = $eval['Evaluation']['group_id'];
+                    $evaluatee = $eval['Evaluation']['evaluatee_id'];
+                    /*if (!$this->validMixevalEvalComplete($this->params['form'])) {
+                        $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
+                        return;
+                    }*/
+                    if (!$this->Evaluation->saveMixevalEvaluation($eval)) {
+                        $failures[] = $userId;
+                    }
+                    $evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee(
+                        $groupEventId, $evaluator, $evaluatee);
+                    $evaluation = !empty($evalMixeval['EvaluationMixevalDetail']) ? $evalMixeval['EvaluationMixevalDetail'] : null;
+                    $details = Set::combine($evaluation, '{n}.question_number', '{n}');
+                    foreach ($mixeval['MixevalQuestion'] as $ques) {
+                        if ($ques['required'] && !$ques['self_eval'] && !isset($details[$ques['question_num']])) {
+                            $required = false;
+                        }
+                    }
+                }
+            }
+            // check self evaluation questions
+            if ($mixeval['Mixeval']['self_eval'] > 0) {
+                $evaluatee = User::get('id');
+                $eventId = $this->data[$evaluatee]['Self-Evaluation']['event_id'];
+                $groupId = $this->data[$evaluatee]['Self-Evaluation']['group_id'];
+                // only try saving if the evaluator did not have to do self eval with the
+                // peer eval questions which we can tell by checking whether "Evaluation"
+                // is set under the evaluator's user id - reason: already tried saving above
+                if (!isset($this->data[$evaluatee]['Evaluation']) &&
+                    !$this->Evaluation->saveMixevalEvaluation($this->data[$evaluatee])) {
+                    $failures[] = $evaluatee;
                 }
                 $evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee(
                     $groupEventId, $evaluator, $evaluatee);
                 $evaluation = !empty($evalMixeval['EvaluationMixevalDetail']) ? $evalMixeval['EvaluationMixevalDetail'] : null;
                 $details = Set::combine($evaluation, '{n}.question_number', '{n}');
                 foreach ($mixeval['MixevalQuestion'] as $ques) {
-                    if ($ques['required'] && !isset($details[$ques['question_num']])) {
+                    if ($ques['required'] && $ques['self_eval'] && !isset($details[$ques['question_num']])) {
                         $required = false;
                     }
                 }

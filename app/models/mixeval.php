@@ -66,8 +66,10 @@ class Mixeval extends AppModel
     function __construct($id = false, $table = null, $ds = null)
     {
         parent::__construct($id, $table, $ds);
+        $this->virtualFields['peer_question'] = sprintf('SELECT count(*) as peer_question FROM mixeval_questions as q WHERE q.mixeval_id = %s.id AND q.self_eval = 0', $this->alias);
         $this->virtualFields['total_question'] = sprintf('SELECT count(*) as total_question FROM mixeval_questions as q WHERE q.mixeval_id = %s.id', $this->alias);
-        $this->virtualFields['total_marks'] = sprintf('SELECT IFNULL(SUM(multiplier),0) as sum FROM mixeval_questions as q WHERE q.mixeval_id = %s.id AND q.required = 1', $this->alias);
+        $this->virtualFields['total_marks'] = sprintf('SELECT IFNULL(SUM(multiplier),0) as sum FROM mixeval_questions as q WHERE q.mixeval_id = %s.id AND q.required = 1 AND q.self_eval = 0', $this->alias);
+        $this->virtualFields['self_eval'] = sprintf('SELECT count(*) as count FROM mixeval_questions as q WHERE q.mixeval_id = %s.id AND q.self_eval = 1', $this->alias);
     }
 
     /**

@@ -908,7 +908,7 @@ class EvaluationComponent extends Object
                     $evalMixevalDetail['EvaluationMixevalDetail']['selected_lom'] = $data[$num]['selected_lom'];   
                 }
                 $evalMixevalDetail['EvaluationMixevalDetail']['grade'] = $data[$num]['grade'];
-                if ($ques['required']) {
+                if ($ques['required'] && !$ques['self_eval']) {
                     $totalGrade += $data[$num]['grade'];
                 }
             } else {

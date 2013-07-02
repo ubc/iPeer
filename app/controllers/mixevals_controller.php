@@ -78,7 +78,8 @@ class MixevalsController extends AppController
             array("!Custom.inUse",         __("In Use", true),       "4em",  "number"),
             array("Mixeval.availability",  __("Availability", true), "6em",  "map",
                 array('private' => 'private', 'public' => 'public')),
-            array("Mixeval.total_question",  __("Questions", true),    "4em", "number"),
+            array("Mixeval.peer_question", __("Peer Evaluation Questions", true), "6em", "number"),
+            array("Mixeval.self_eval", __("Self Evaluation Questions", true), "6em", "number"),
             array("Mixeval.total_marks",  __("Total Marks", true),    "4em", "number"),
             array("Mixeval.creator_id",           "",               "",    "hidden"),
             array("Mixeval.creator",     __("Creator", true),        "8em", "action", "View Creator"),
@@ -244,7 +245,12 @@ class MixevalsController extends AppController
                 return;
             }
         }
-        $questions = $this->MixevalQuestion->findAllByMixevalId($id);
+        // the questions may be saved in a slightly different order
+        // this causes the order to be different between edit/copy and view.
+        $questions = $this->MixevalQuestion->find('all', array(
+            'conditions' => array('mixeval_id' => $id),
+            'order' => 'question_num'
+        ));
         $mixeval = $this->Mixeval->find('first',
             array('conditions' => array('id' => $id), 'contain' => false));
 
@@ -657,10 +663,6 @@ class MixevalsController extends AppController
 
         // Load other stuff for the view
         $mixeval_question_types = $this->MixevalQuestionType->find('list');
-        $selfQues = $this->MixevalQuestion->find('count', array(
-            'conditions' => array('mixeval_id' => $id, 'self_eval' => 1)
-        ));
-        $this->set('selfQ', $selfQues);
         $this->set('mixevalQuestionTypes', $mixeval_question_types);
         $this->set('breadcrumb',
             $this->breadcrumb->push('mixevals')->
@@ -727,7 +729,7 @@ class MixevalsController extends AppController
 
             $title = __('Copy of ', true).$mixeval['Mixeval']['name'];
             $copy['Mixeval'] = array('name' => $title, 'availability' => $mixeval['Mixeval']['availability'],
-                'zero_mark' => $mixeval['Mixeval']['zero_mark']);
+                'zero_mark' => $mixeval['Mixeval']['zero_mark'], 'self_eval' => $mixeval['Mixeval']['self_eval']);
             foreach ($mixeval['MixevalQuestion'] as $index => $ques) {
                 $desc = $ques['MixevalQuestionDesc'];
                 unset($ques['id'], $ques['MixevalQuestionType'], $ques['mixeval_id'],
@@ -742,10 +744,6 @@ class MixevalsController extends AppController
         }
         $this->autoRender = false;
         $mixeval_question_types = $this->MixevalQuestionType->find('list');
-        $selfQues = $this->MixevalQuestion->find('count', array(
-            'conditions' => array('mixeval_id' => $id, 'self_eval' => 1)
-        ));
-        $this->set('selfQ', $selfQues);
         $this->set('mixevalQuestionTypes', $mixeval_question_types);
         $this->set('breadcrumb',
             $this->breadcrumb->push('mixevals')->

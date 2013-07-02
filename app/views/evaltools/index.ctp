@@ -52,6 +52,7 @@ $mixevalheaders = array(
     __('Name', true),
     __('In Use', true),
     __('Public', true),
+    __('Reflective Questions', true),
     __('Total Marks', true)
 );
 $mixevalcells = array();
@@ -63,6 +64,9 @@ foreach ($mixevalData as $data) {
         $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
         $html->image('icons/red_x.gif', array('alt'=>'red_x'));
     $row[] = $mixeval['availability'] == "public" ?
+        $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
+        $html->image('icons/red_x.gif', array('alt'=>'red_x'));
+    $row[] = $mixeval['self_eval'] > 0 ?
         $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
         $html->image('icons/red_x.gif', array('alt'=>'red_x'));
     $row[] = $mixeval['total_marks'];
