@@ -19,8 +19,9 @@
  * @since         CakePHP(tm) v 0.2.9
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
- 
-date_default_timezone_set('UTC'); // set the timezone to UTC
+
+$timezone = ini_get('date.timezone') ? ini_get('date.timezone') : 'UTC';
+date_default_timezone_set($timezone); // set the default time zone
  
 /**
  * Use the DS to separate the directories in other defines

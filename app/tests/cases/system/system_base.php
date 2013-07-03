@@ -18,7 +18,8 @@ class SystemBaseTestCase extends CakeTestCase
      * helper function to get the testing server url
      **/
     public function getURL() {
-        date_default_timezone_set('UTC'); // set the timezone to UTC
+        $timezone = ini_get('date.timezone') ? ini_get('date.timezone') : 'UTC';
+        date_default_timezone_set($timezone); // set the default time zone
         if (!($server = getenv('SERVER_TEST'))) {
             $server = 'http://localhost:2000/';
         }

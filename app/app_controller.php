@@ -80,14 +80,15 @@ class AppController extends Controller
     {
         $timezone = $this->SysParameter->findByParameterCode('system.timezone');
         // default to UTC if no timezone is set
-        $timezone = empty($timezone) || empty($timezone['SysParameter']['parameter_value']) ? 'UTC' :
-            $timezone['SysParameter']['parameter_value'];
-        // check that the timezone is valid
-        if (!isset($this->validTZ[$timezone])) {
-            $timezone = 'UTC';
-            $this->Session->setFlash(__('An invalid timezone is provided, please edit "system.timezone"', true));
+        if (!(empty($timezone) || empty($timezone['SysParameter']['parameter_value']))) {
+            $timezone = $timezone['SysParameter']['parameter_value'];
+            // check that the timezone is valid
+            if (isset($this->validTZ[$timezone])) {
+                date_default_timezone_set($timezone);
+            } else {
+                $this->Session->setFlash(__('An invalid timezone is provided, please edit "system.timezone"', true));
+            }
         }
-        date_default_timezone_set($timezone);
 
         $this->Auth->autoRedirect = false;
         // backward compatible with original ipeer hash  method
