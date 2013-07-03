@@ -1,5 +1,6 @@
 <?php
 $evaluation = isset($user['Evaluation']) ? $user['Evaluation'] : null;
+$self = isset($self) ? $self : null;
 $evaluation = $self_eval ? $self : $evaluation;
 $details = Set::combine($evaluation['EvaluationMixevalDetail'], '{n}.question_number', '{n}');
 $peerNum = 1;

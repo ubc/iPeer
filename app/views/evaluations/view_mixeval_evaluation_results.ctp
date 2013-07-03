@@ -39,10 +39,33 @@ if (!empty($notInGroup)) {
 }
 ?>
 </table>
+
+<?php
+$grades = array();
+foreach ($groupByQues as $ques) {
+    if ($ques['self_eval'] && $ques['MixevalQuestionType']['type'] == 'Likert') {
+        $grades[$ques['question_num']] = Set::extract('/Submissions/grade', $ques);
+    }
+}
+if (!empty($grades)) { ?>
+    <h3><?php echo __('Self-Evaluation', true) ?></h3>
+    <table class="standardtable">
+        <tr>
+            <th><?php echo __('Question', true) ?></th>
+            <th><?php echo __('Average Grade Per Question', true) ?></th>
+        </tr>
+        <?php foreach ($grades as $num => $grade) { ?>
+            <tr><td><?php echo $groupByQues[$num]['title'] ?></td>
+            <td><?php echo number_format(array_sum($grade), 2) / count($grade) .
+                ' / '. $groupByQues[$num]['multiplier']?></td></tr>
+        <?php } ?>
+    </table>
+<?php } ?>
+
 <h3><?php __('Evaluation Results')?></h3>
 <table class="standardtable">
     <tr>
-        <th valign="middle"><?php __('Student Name:')?></th>
+        <th><?php __('Student Name:')?></th>
         <th> <?php __('Total:')?>( /<?php echo number_format($mixeval['Mixeval']['total_marks'], 2)?>)</th>
     </tr>
 

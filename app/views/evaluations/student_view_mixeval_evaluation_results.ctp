@@ -49,9 +49,18 @@ foreach ($evalResult[User::get('id')] as $eval) {
         $questions[$detail['question_number']]['Submissions'][] = $detail;
     }
 }
+if ($mixeval['Mixeval']['peer_question'] > 0) {
+    $params = array('controller'=>'evaluations', 'questions'=>$questions, 'zero_mark'=>$zero_mark, 'evaluatee' => User::get('id'),
+        'gradeReleased'=>$gradeReleased, 'commentReleased'=>$commentReleased, 'details'=>$event['Event']['enable_details'],
+        'peer_eval' => 1, 'title' => 'Questions');
+    echo $this->element('evaluations/mixeval_details', $params);
+}
 
-$params = array('controller'=>'evaluations', 'questions'=>$questions, 'zero_mark'=>$zero_mark, 'evaluatee' => User::get('id'),
-    'gradeReleased'=>$gradeReleased, 'commentReleased'=>$commentReleased, 'details'=>$event['Event']['enable_details']);
-echo $this->element('evaluations/mixeval_details', $params);
+if ($mixeval['Mixeval']['self_eval'] > 0) {
+    $params = array('controller'=>'evaluations', 'questions'=>$questions, 'zero_mark'=>$zero_mark, 'evaluatee' => User::get('id'),
+        'gradeReleased'=>$gradeReleased, 'commentReleased'=>$commentReleased, 'details'=>$event['Event']['enable_details'],
+        'peer_eval' => 0, 'title' => 'Self-Evaluation');
+    echo $this->element('evaluations/mixeval_details', $params);
+}
 ?>
 </div>

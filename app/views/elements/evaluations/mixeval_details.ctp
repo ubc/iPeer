@@ -7,11 +7,15 @@ if (!$gradeReleased && !$commentReleased && $details) {
 } else if (!$commentReleased && $details) {
     $addOn = ' - <font color="red">'._t(' Comments Not Released Yet').'</font>';
 }
-$header = _t('Questions').$addOn;
+$header = _t($title).$addOn;
 
 echo $html->tag('h2', $header);
+$qnum = 1;
 if ($details) {
-    foreach ($questions as $qnum => $ques) {
+    foreach ($questions as $ques) {
+        if ($ques['self_eval'] == $peer_eval) {
+            continue; // skip questions not in the desired section
+        }
         $required = (!$ques['required']) ? '' :
             $html->tag('span', '*', array('class' => 'required orangered'));
         echo $html->tag('h3', "$qnum. $ques[title] $required");
@@ -61,10 +65,14 @@ if ($details) {
         } else {
             echo '<ul><li>N/A</li></ul>';
         }
+        $qnum++;
     }
     echo '<br>';
 } else {
-    foreach ($questions as $qnum => $ques) {
+    foreach ($questions as $ques) {
+        if ($ques['self_eval'] == $peer_eval) {
+            continue; // skip questions not in the desired section
+        }
         if ($ques['mixeval_question_type_id'] == '1') {
             $required = (!$ques['required']) ? '' :
                 $html->tag('span', '*', array('class' => 'required orangered'));
@@ -77,11 +85,13 @@ if ($details) {
                 }
                 $grades = Set::extract('/grade', $ques['Submissions']);
                 $average = array_sum($grades) / count($grades);
-                echo '<li>Average: '.number_format($average, 2).' / '.$ques['multiplier'].'</li></ul>';
+                $text = $ques['self_eval'] ?  'Grade: ' : 'Average: ';
+                echo '<li>'.$text.number_format($average, 2).' / '.$ques['multiplier'].'</li></ul>';
             } else {
                 echo '<ul><li>N/A</li></ul>';
             }
         }
+        $qnum++; // increments whether the question has a grade or not - to keep the question numbers constant
     }
     echo '<br>';
 }

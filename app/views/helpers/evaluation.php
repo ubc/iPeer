@@ -46,10 +46,8 @@ class EvaluationHelper extends AppHelper
     function getSummaryTableHeader($totalMark, $questions)
     {
         $questions = array('MixevalQuestion' => $questions);
-        $numberQuestions = Set::extract($questions, '/MixevalQuestion[mixeval_question_type_id=1]');
-        $numberQuestionsDD = Set::extract($questions, '/MixevalQuestion[mixeval_question_type_id=4]');
-        $numberQuestions = Set::extract($numberQuestions, '/MixevalQuestion[required=1]');
-        $numberQuestionsDD = Set::extract($numberQuestionsDD, '/MixevalQuestion[required=1]');
+        $numberQuestions = Set::extract($questions, '/MixevalQuestion[mixeval_question_type_id=1][required=1][self_eval=0]');
+        $numberQuestionsDD = Set::extract($questions, '/MixevalQuestion[mixeval_question_type_id=4][required=1][self_eval=0]');
         $header = array(__('Evaluatee', true));
         foreach ($numberQuestions as $question) {
             $header[] = sprintf('%d (/%.1f)', $question['MixevalQuestion']['question_num'], $question['MixevalQuestion']['multiplier']);
@@ -82,7 +80,9 @@ class EvaluationHelper extends AppHelper
         $table = array();
 
         $required = Set::combine($numberQuestions, '{n}.question_num', '{n}.required');
-        $required = array_keys(array_filter($required));
+        $peerQues = Set::combine($numberQuestions, '{n}.question_num', '{n}.self_eval');
+        // only required peer evaluation questions are counted toward the averages
+        $required = array_intersect(array_keys($required, 1), array_keys($peerQues, 0));
 
         foreach ($scoreRecords as $evaluteeId => $scores) {
             $tr = array();

@@ -68,6 +68,25 @@ if (!empty($notInGroup)) {
 <h3><?php __('Evaluation Results')?></h3>
 
 <div id="accordion">
+    <?php if ($mixeval['Mixeval']['self_eval'] > 0) { ?>
+    <div id="panelSelf" class="panelName">
+        <div id="panelSelfHeader" class="panelheader">
+            <?php echo __('Self-Evaluation', true)?>
+        </div>
+        <div style="height: 200px;text-align: center;" id="panel1Content" class="panelContent">
+            <div id='mixeval_result'>
+            <?php
+            $zero_mark = $mixeval['Mixeval']['zero_mark'];
+            $params = array('controller'=>'evaluations', 'questions'=>$groupByQues, 'zero_mark'=>$zero_mark,
+                'gradeReleased'=>1, 'commentReleased'=>1, 'details'=>1, 'evaluatee'=>0, 
+                'names'=>$memberList, 'notInGroup'=>$notInGroup, 'peer_eval' => 0, 'title' => 'Questions');
+            echo $this->element('evaluations/mixeval_details', $params);
+            ?>
+            </div>
+        </div>
+    </div>
+    <?php } ?>
+    <?php if ($mixeval['Mixeval']['peer_question'] > 0) { ?>
     <?php foreach ($mixevalDetails as $evaluteeId => $scores):?>
         <div id="panel<?php echo $evaluteeId?>" class="panelName">
             <div id="panel<?php echo $evaluteeId?>Header" class="panelheader">
@@ -128,7 +147,7 @@ if (!empty($notInGroup)) {
 
             $params = array('controller'=>'evaluations', 'questions'=>$questions, 'zero_mark'=>$zero_mark,
                 'gradeReleased'=>1, 'commentReleased'=>1, 'details'=>1, 'evaluatee'=>$evaluteeId, 
-                'names'=>$memberList, 'notInGroup'=>$notInGroup);
+                'names'=>$memberList, 'notInGroup'=>$notInGroup, 'peer_eval' => 1, 'title' => 'Questions');
             echo $this->element('evaluations/mixeval_details', $params);
             ?>
             </div>
@@ -159,6 +178,7 @@ if (!empty($notInGroup)) {
         </div>
     </div>
 <?php endforeach; ?>
+<?php } ?>
 </div>
 
 <script type="text/javascript"> new Rico.Accordion( 'accordion',
@@ -167,6 +187,5 @@ if (!empty($notInGroup)) {
             selectedClass: 'mdSelected',
             clickedClass: 'mdClicked',
             unselectedClass: 'panelheader'});
-
 </script>
 </div>
