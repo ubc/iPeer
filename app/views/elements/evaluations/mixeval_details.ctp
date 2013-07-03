@@ -22,7 +22,7 @@ if ($details) {
         if (isset($ques['Submissions'])) {
             echo '<ul>';
             foreach ($ques['Submissions'] as $num => $sub) {
-                if ($type == '1' && !$gradeReleased) {
+                if (in_array($type, array(1, 4)) && !$gradeReleased) {
                     echo '<li>'._t('Grades Not Released Yet').'</li>';
                     break;
                 } else if (in_array($type, array(2, 3)) && !$commentReleased) {
@@ -65,7 +65,8 @@ if ($details) {
     echo '<br>';
 } else {
     foreach ($questions as $qnum => $ques) {
-        if ($ques['mixeval_question_type_id'] == '1') {
+        $typeId = $ques['mixeval_question_type_id'];
+        if ($typeId == '1' || $type == '4') {
             $required = (!$ques['required']) ? '' :
                 $html->tag('span', '*', array('class' => 'required orangered'));
             echo $html->tag('h3', "$qnum. $ques[title] $required");
