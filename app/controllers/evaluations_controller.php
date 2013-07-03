@@ -906,6 +906,9 @@ class EvaluationsController extends AppController
             $penalty = $this->Penalty->getPenaltyByEventId($eventId);
             $penaltyDays = $this->Penalty->getPenaltyDays($eventId);
             $penaltyFinal = $this->Penalty->getPenaltyFinal($eventId);
+            $enrol = $this->UserEnrol->find('count', array(
+                'conditions' => array('user_id' => User::get('id'), 'course_id' => $courseId)
+            ));
             $this->set('penaltyFinal', $penaltyFinal);
             $this->set('penaltyDays', $penaltyDays);
             $this->set('penalty', $penalty);
@@ -925,6 +928,7 @@ class EvaluationsController extends AppController
                 'conditions' => array('id' => $event['Event']['template_id']), 'contain' => false, 'recursive' => 2));
             $this->set('questions', $questions);
             $this->set('mixeval', $mixeval);
+            $this->set('enrol' , $enrol);
 
             $this->render('mixeval_eval_form');
         } else {
@@ -1338,7 +1342,8 @@ class EvaluationsController extends AppController
             $required = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}.required');
             $peerQues = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}.self_eval');
             // only required peer evaluation questions are counted toward the averages
-            $required = array_flip(array_intersect(array_keys($required, 1), array_keys($peerQues, 0)));            $score[$userId]['received_ave_score'] = array_sum(array_intersect_key($details['scoreRecords'][$userId], $required));
+            $required = array_flip(array_intersect(array_keys($required, 1), array_keys($peerQues, 0)));
+            $score[$userId]['received_ave_score'] = array_sum(array_intersect_key($details['scoreRecords'][$userId], $required));
             $avePenalty = $score[$userId]['received_ave_score'] * ($penalty / 100);
 
             $this->set('mixeval', $mixeval);

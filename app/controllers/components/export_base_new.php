@@ -82,11 +82,12 @@ class ExportBaseNewComponent extends Object
      * @param mixed $groupEvent group event
      * @param mixed $event      event
      * @param mixed $results    results
+     * @param mixed $peerEval   boolean for self/peer eval
      *
      * @access public
      * @return void
      */
-    function buildEvaluationScoreTableByGroup($params, $groupEvent, $event, $results)
+    function buildEvaluationScoreTableByGroup($params, $groupEvent, $event, $results, $peerEval)
     {
         $this->Group = ClassRegistry::init('Group');
         $this->User = ClassRegistry::init('User');
@@ -99,7 +100,7 @@ class ExportBaseNewComponent extends Object
         $responsesByEvaluatee = Set::combine($results, '{n}.'.$this->responseModelName.'.evaluator', '{n}', '{n}.'.$this->responseModelName.'.evaluatee');
         $group['Member'] = array_merge($group['Member'], $dropped);
         foreach ($group['Member'] as $member) {
-            $grid = array_merge($grid, $this->buildScoreTableByEvaluatee($params, $group, $member, $event, $responsesByEvaluatee, $subDate));
+            $grid = array_merge($grid, $this->buildScoreTableByEvaluatee($params, $group, $member, $event, $responsesByEvaluatee, $subDate, $peerEval));
         }
 
         return $grid;
@@ -109,14 +110,15 @@ class ExportBaseNewComponent extends Object
     /**
      * buildEvaluationScoreTableByEvent
      *
-     * @param mixed $params  params
-     * @param mixed $event   event
-     * @param mixed $results results
+     * @param mixed $params   params
+     * @param mixed $event    event
+     * @param mixed $results  results
+     * @param mixed $peerEval boolean for self/peer eval
      *
      * @access public
      * @return void
      */
-    function buildEvaluationScoreTableByEvent($params, $event, $results)
+    function buildEvaluationScoreTableByEvent($params, $event, $results, $peerEval = 1)
     {
         $grid = array();
         if (empty($event['GroupEvent'])) {
@@ -124,7 +126,7 @@ class ExportBaseNewComponent extends Object
         }
         foreach ($event['GroupEvent'] as $ge) {
             if (isset($results[$ge['id']])) {
-                $grid = array_merge($grid, $this->buildEvaluationScoreTableByGroup($params, $ge, $event, $results[$ge['id']]));
+                $grid = array_merge($grid, $this->buildEvaluationScoreTableByGroup($params, $ge, $event, $results[$ge['id']], $peerEval));
             }
         }
         return $grid;
@@ -140,11 +142,12 @@ class ExportBaseNewComponent extends Object
      * @param mixed $event     event
      * @param mixed $responses responses
      * @param mixed $subDate   submission dates
+     * @param mixed $peerEval  boolean for self/peer eval
      *
      * @access public
      * @return void
      */
-    function buildScoreTableByEvaluatee($params, $group, $evaluatee, $event, $responses, $subDate)
+    function buildScoreTableByEvaluatee($params, $group, $evaluatee, $event, $responses, $subDate, $peerEval)
     {
         // Build grid
         //$xPosition = 0;
@@ -157,6 +160,9 @@ class ExportBaseNewComponent extends Object
         $grid = array();
 
         foreach ($group['Member'] as $evaluator) {
+            if (!$peerEval && $evaluator['id'] != $evaluatee['id']) {
+                continue; // skip peer evaluations for self-evaluation
+            }
             $row = array();
             if ($params['include']['course']) {
                 array_push($row, $event['Course']['course']);
@@ -164,7 +170,7 @@ class ExportBaseNewComponent extends Object
             if ($params['include']['eval_event_names']) {
                 array_push($row, $event['Event']['title']);
             }
-            if ($params['include']['eval_event_type']) {
+            if ($peerEval && $params['include']['eval_event_type']) {
                 array_push($row, $this->eventType[$event['Event']['event_template_type_id']]);
             }
             if ($params['include']['group_names']) {
@@ -180,11 +186,11 @@ class ExportBaseNewComponent extends Object
             if ($params['include']['student_id']) {
                 array_push($row, $evaluatee['student_no']);
             }
-            if ($params['include']['student_name']) {
+            if ($peerEval && $params['include']['student_name']) {
                 $dropped = isset($evaluator['GroupsMember']) ? '' : '*';
                 array_push($row, $dropped.$evaluator['full_name']);
             }
-            if ($params['include']['student_id']) {
+            if ($peerEval && $params['include']['student_id']) {
                 array_push($row, $evaluator['student_no']);
             }
 
@@ -213,6 +219,9 @@ class ExportBaseNewComponent extends Object
                     $results = $response[$this->detailModel[$event['Event']['event_template_type_id']]];
                     $results = Set::combine($results, '{n}.question_number', '{n}');
                     foreach ($event['Question'] as $question) {
+                        if ($question['self_eval'] == $peerEval) {
+                            continue; // skip questions that don't belong in the desired section
+                        }
                         if (!isset($results[$question['question_num']])) {
                             array_push($row, '');
                         } elseif ($params['include']['grade_tables'] && in_array($question['mixeval_question_type_id'], array(1, 4))) {
@@ -224,6 +233,12 @@ class ExportBaseNewComponent extends Object
                         }
                     }
                 }
+            }
+            
+            if (!$peerEval) {
+                $grid[] = $row;
+                $yInc++;
+                continue; // skip final marks/penalty for self-evaluation
             }
             
             array_push($row, $response[$this->responseModelName]['score']);

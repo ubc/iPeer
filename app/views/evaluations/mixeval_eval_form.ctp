@@ -60,7 +60,7 @@
                 ?><br>
             <?php endforeach; 
         }?>
-        <?php if ($mixeval['Mixeval']['self_eval'] > 0) { ?>
+        <?php if ($mixeval['Mixeval']['self_eval'] > 0 && $enrol > 0) { ?>
         <center><h2><?php echo __('Self-Evaluation', true)?></h2></center>
         <?php
             $params['self_eval'] = 1;

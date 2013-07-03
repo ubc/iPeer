@@ -221,6 +221,7 @@ echo '<div id="self-eval-ques">';
 echo $html->tag('h3', __('Self-Evaluation Questions', true));
 $addQButton = $form->button(__('Add', true), 
     array('type' => 'button', 'onclick' => "insertQ(true);"));
+unset($qTypes[4]); // remove score dropdown from self-evaluation
 echo $form->input('MixevalQuestionTypeSelf', array('after' => $addQButton,
     'options' => $qTypes));
 echo $html->div('', $reloadedSelfQ, array('id' => 'selfQues', 'class' => 'questions'));

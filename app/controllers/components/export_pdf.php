@@ -67,7 +67,6 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             foreach ($unEnrolled as $name){
                 $epdf->writeHTML($name, true, false, true, false, '');
             }
-            $epdf->writeHTML('<br>', true, false, true, false, '');
             
             $header = '<h3>'.__('Evaluation Results', true).'<h3>';
             
@@ -84,6 +83,9 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                     case 4:
                         $table = $this->_writeMixResultsTbl($event, $grpEventId, $grpId, $params);
                         break;
+                }
+                if (!empty($table)) {
+                    $epdf->writeHTML('<br>', true, false, true, false, '');
                 }
                 $epdf->writeHTML($table, true, false, true, false, '');
             }
@@ -196,21 +198,34 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             } else {
                 $scoreComment = ' - Average';
             }
-            if ($params['include']['final_marks']) {
+            // only include if total marks is greater than zero
+            // doesn't make sense to show it when everyone has zero
+            if ($params['include']['final_marks'] && $mixeval['Mixeval']['total_marks']) {
                 $penalty = ($penalties[$userId]) ? ' - '.number_format($avgScores[$userId]['deduct'], 2).
                     ' = '.number_format($avgScores[$userId]['subtotal'], 2) : '';
                 $mEval .= '<br>'.__('Final Total', true).': '.number_format($avgScores[$userId]['total'], 2).$penalty.
                     ' ('.number_format($avgScores[$userId]['subtotal'] / $mixeval['Mixeval']['total_marks'] * 100, 2).'%)'.$scoreComment;
                 $mEval .= ($penalties[$userId]) ? '<br>Note: '.$penalties[$userId].'% Late Penalty' : '';
             }
+            $pNum = 0;
+            $sNum = 0;
+            $pEval = '';
+            $sEval = '';
             foreach ($questionNums as $num) {
                 $mixQues = $mixevalQuestions[$num]['MixevalQuestion'];
                 // filter out questions of question types we don't want
+                if ($mixQues['self_eval']) {
+                    $sNum++;
+                } else {
+                    $pNum++;
+                }
                 if (in_array($mixQues['mixeval_question_type_id'], $skipQues)) {
                     continue;
                 }
-                $mEval .= '<div nobr="true"><h4>'.$num.'. '.$mixQues['title'].'</h4>';
-                $mEval .= '<ul>';
+                $tempEval = '';
+                $qNum = $mixQues['self_eval'] ? $sNum : $pNum;
+                $tempEval .= '<span nobr="true"><h4>'.$qNum.'. '.$mixQues['title'].'</h4>';
+                $tempEval .= '<ul>';
                 if (isset($questions[$num])) {
                     foreach ($questions[$num] as $evaluator => $answer) {
                         // Likert questions or ScoreDropdown
@@ -218,13 +233,20 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                             $answer = number_format($answer, 2).' / '.$mixQues['multiplier'];
                         }
                         $drop = in_array($evaluator, $dropped) ? ' *' : '';
-                        $mEval .= '<li><b>'.$names[$evaluator].$drop.': </b>'.$answer.'</li>';
+                        $tempEval .= '<li><b>'.$names[$evaluator].$drop.': </b>'.$answer.'</li>';
                     }
                 } else {
-                    $mEval .= '<li>N/A</li>';
+                    $tempEval .= '<li>N/A</li>';
                 }
-                $mEval .= '</ul></div>';
+                $tempEval .= '</ul></span>';
+                if ($mixQues['self_eval']) {
+                    $sEval .= $tempEval;
+                } else {
+                    $pEval .= $tempEval;
+                }
             }
+            $mEval .= $mixeval['Mixeval']['peer_question'] ? $pEval : '';
+            $mEval .= $mixeval['Mixeval']['self_eval'] ? '<h3><u>'.__('Self-Evaluation', true)."</u></h3>\n".$sEval : '';
         }
 
         return $mEval;
@@ -249,18 +271,26 @@ Class ExportPdfComponent extends ExportBaseNewComponent
          
         $mixevalQuestions = $this->MixevalQuestion->find('all', array(
             'conditions' => array('mixeval_id' => $event['Event']['template_id'], 
-                'mixeval_question_type_id' => array(1, 4), 'required' => 1),
+                'required' => 1, 'self_eval' => 0),
             'order' => array('question_num')
         ));
         //Write the Table Header
         $mRTBL = '<table border="1" align="center"><tr><th><b>Evaluatee</b></th>';
         $total = 0;
+        $num = 1;
+        $quesNums = array();
         foreach($mixevalQuestions as $question) {
-            $question_num = $question['MixevalQuestion']['question_num'];
-            $multiplier = $question['MixevalQuestion']['multiplier'];
-            $mRTBL .= '<th>'.$question_num.' (/'.number_format($multiplier, 1).')</th>';
-            $total += $multiplier;   
-            $quesNums[] = $question_num;                      
+            if (in_array($question['MixevalQuestion']['mixeval_question_type_id'], array(1, 4))) {
+                $question_num = $question['MixevalQuestion']['question_num'];
+                $multiplier = $question['MixevalQuestion']['multiplier'];
+                $mRTBL .= '<th>'.$num.' (/'.number_format($multiplier, 1).')</th>';
+                $total += $multiplier;   
+                $quesNums[] = $question_num;     
+            }
+            $num++;                 
+        }
+        if (empty($quesNums)) {
+            return '';
         }
         if ($params['include']['final_marks']) {
             $mRTBL .= '<th>Total (/'.number_format($total, 2).')</th>';

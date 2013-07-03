@@ -88,25 +88,46 @@ Class ExportCsvComponent extends ExportBaseNewComponent
             $evaluation['Question'] = $evaluation['MixevalQuestion'];
             unset($evaluation['MixevalQuestion']);
         }
+        // if it is a mixed evaluation
+        if ($event['Event']['event_template_type_id'] == 4) {
+            $this->Mixeval = ClassRegistry::init('Mixeval');
+            $mixeval = $this->Mixeval->findById($event['Event']['template_id']);
+        }
+        $peerEval = isset($mixeval) ? $mixeval['Mixeval']['peer_question'] : true;
+        $selfEval = isset($mixeval) ? $mixeval['Mixeval']['self_eval'] : false;
         $event = array_merge($event, $evaluation);
 
-        $header = $this->generateHeader($params, $event);
+        $grid = array();
+        if ($peerEval) {
+            $grid[] = $this->generateHeader($params, $event);
+            $table = $this->buildEvaluationScoreTableByEvent($params, $event, $results);
+            $grid = array_merge($grid, $table);
+            if ($selfEval) {
+                $grid[] = array(); // newline
+            }
+        }
+        if ($selfEval) {
+            $selfHeader = $this->generateHeader($params, $event, 0);
+            $selfTable = $this->buildEvaluationScoreTableByEvent($params, $event, $results, 0);
+            $grid[] = array('Self-Evaluation');
+            $grid[] = $selfHeader;
+            $grid = array_merge($grid, $selfTable);
+        }
 
-        $grid = $this->buildEvaluationScoreTableByEvent($params, $event, $results);
-
-        $this->render($header, $grid);
+        $this->render($grid);
     }
 
     /**
      * generateHeader
      *
-     * @param mixed $params params
-     * @param mixed $event  event
+     * @param mixed $params   params
+     * @param mixed $event    event
+     * @param mixed $peerEval boolean for self/peer eval
      *
      * @access public
      * @return void
      */
-    function generateHeader($params, $event)
+    function generateHeader($params, $event, $peerEval = 1)
     {
         $header = array();
 
@@ -116,7 +137,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         if ($params['include']['eval_event_names']) {
             $header[] = "Event";
         }
-        if ($params['include']['eval_event_type']) {
+        if ($peerEval && $params['include']['eval_event_type']) {
             $header[] = "Evaluation Type";
         }
 
@@ -132,10 +153,10 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         if ($params['include']['student_id']) {
             $header[] = "Evaluatee S#";
         }
-        if ($params['include']['student_name']) {
+        if ($peerEval && $params['include']['student_name']) {
             $header[] = "Evaluator";
         }
-        if ($params['include']['student_id']) {
+        if ($peerEval && $params['include']['student_id']) {
             $header[] = "Evaluator S#";
         }
 
@@ -144,28 +165,37 @@ Class ExportCsvComponent extends ExportBaseNewComponent
             $header[] = 'Comment';
         }
 
+        $num = 1;
         foreach ($event['Question'] as $key => $question) {
             if (isset($question['mixeval_question_type_id'])) {
-                if (in_array($question['mixeval_question_type_id'], array(1, 4))) {
-                    $header[] = "Q".($key+1)." ( /".$question['multiplier'].")";
-                } else if (in_array($question['mixeval_question_type_id'], array(2, 3))){
-                    $header[] = "Q".($key+1);
+                if ($question['self_eval']) {
+                    continue; // skip self-evaluation questions
                 }
+                if (in_array($question['mixeval_question_type_id'], array(1, 4))) {
+                    $header[] = "Q".$num." ( /".$question['multiplier'].")";
+                } else if (in_array($question['mixeval_question_type_id'], array(2, 3))){
+                    $header[] = "Q".$num;
+                }
+                $num++;
             } else {
                 if ($params['include']['grade_tables']) {
                     $header[] = "Q".($key+1)." ( /".$question['multiplier'].")";
                 }
             }
         }
-        $header[] = "Raw Score";
-        $header[] = "Late Penalty";
+        
+        if ($peerEval) {
+            $header[] = "Raw Score";
+            $header[] = "Late Penalty";
 
-        if ($params['include']['final_marks']) {
-            $header[] = "Final Score";
+            if ($params['include']['final_marks']) {
+                $header[] = "Final Score";
+            }
         }
 
         return $header;
     }
+
 
     /**
      * checkAll
@@ -329,17 +359,15 @@ Class ExportCsvComponent extends ExportBaseNewComponent
     /**
      * render
      *
-     * @param mixed $header csv header
      * @param mixed $grid   data grid
      *
      * @access public
      * @return void
      */
-    function render($header, $grid)
+    function render($grid)
     {
         $target = array();
         $resource = fopen('php://output', 'a');
-        fputcsv($resource, $header);
         foreach ($grid as $row) {
             fputcsv($resource, $row);
         }
