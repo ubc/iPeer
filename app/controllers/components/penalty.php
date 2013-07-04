@@ -35,6 +35,9 @@ class PenaltyComponent extends Object
 
         // prepare penalty array in reverse order, hight -> low
         $penalties = Set::combine($penalties, '{n}.days_late', '{n}.percent_penalty');
+        if (empty($penalties)) {
+            return __('N/A', true);
+        }
         krsort($penalties);
         $keys = array_keys($penalties);
 
