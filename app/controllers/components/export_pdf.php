@@ -52,8 +52,10 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             $members = Set::extract('/GroupsMembers/user_id', $this->GroupsMembers->findAllByGroupId($grpId));
             $evaluators = Set::extract('/'.$this->responseModelName.'/evaluator', $submitted);
             $evaluatees = Set::extract('/'.$this->responseModelName.'/evaluatee', $submitted);
-            $inComplete = $this->User->getFullNames(array_diff($members, $evaluators));
-            $unEnrolled = $this->User->getFullNames(array_diff(array_unique(array_merge($evaluators, $evaluatees)), $members));
+            $inComplete = array_diff($members, $evaluators);
+            $inComplete = empty($inComplete) ? array() : $this->User->getFullNames($inComplete);
+            $unEnrolled = array_diff(array_unique(array_merge($evaluators, $evaluatees)), $members);
+            $unEnrolled = empty($unEnrolled) ? array() : $this->User->getFullNames($unEnrolled);
         
             $title = (!empty($inComplete) || !empty($unEnrolled)) ? __('Summary', true) : '';
             $epdf->writeHTML('<br><h3>'.$title.'</h3>', true, false, true, false, '');
@@ -68,7 +70,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                 $epdf->writeHTML($name, true, false, true, false, '');
             }
             
-            $header = '<h3>'.__('Evaluation Results', true).'<h3>';
+            $header = '<h3>'.__('Evaluation Results', true).'</h3><br>';
             
             // broke the summary table and details section into two switch blocks
             // would be more efficient if the user is filtering out sections
@@ -92,7 +94,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             switch($event['Event']['event_template_type_id']) {
                 case 1:
                     $results = $params['include']['comments'] ? $this->_writeComments($grpEventId) : '';
-                    $header = $params['include']['comments'] ? '<h3>'.__('Comments', true).'<h3>' : '';
+                    $header = $params['include']['comments'] ? '<h3>'.__('Comments', true).'</h3><br>' : '';
                     break;
                 case 2:
                     $results = $this->_writeRubricEvalResults($event, $grpEventId, $grpId, $params);
@@ -245,8 +247,11 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                     $pEval .= $tempEval;
                 }
             }
-            $mEval .= $mixeval['Mixeval']['peer_question'] ? $pEval : '';
-            $mEval .= $mixeval['Mixeval']['self_eval'] ? '<h3><u>'.__('Self-Evaluation', true)."</u></h3>\n".$sEval : '';
+            
+            // only print if questions exist in the section after filtering if any were done
+            $mEval .= ($mixeval['Mixeval']['peer_question'] && $pEval) ? $pEval : '';
+            $mEval .= ($mixeval['Mixeval']['self_eval'] && $sEval) ? '<h3><u>'.__('Self-Evaluation', true)."</u></h3>\n".$sEval : '';
+            $mEval .= (!$pEval && !$sEval) ? '<br><br>' : ''; // if no questions are printed add some line breaks
         }
 
         return $mEval;

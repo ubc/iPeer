@@ -359,7 +359,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
     /**
      * render
      *
-     * @param mixed $grid   data grid
+     * @param mixed $grid data grid
      *
      * @access public
      * @return void

@@ -928,7 +928,7 @@ class EvaluationsController extends AppController
                 'conditions' => array('id' => $event['Event']['template_id']), 'contain' => false, 'recursive' => 2));
             $this->set('questions', $questions);
             $this->set('mixeval', $mixeval);
-            $this->set('enrol' , $enrol);
+            $this->set('enrol', $enrol);
 
             $this->render('mixeval_eval_form');
         } else {
@@ -943,6 +943,9 @@ class EvaluationsController extends AppController
             // check peer evaluation questions
             if ($mixeval['Mixeval']['peer_question'] > 0) {
                 foreach ($this->data as $userId => $eval) {
+                    if (!isset($eval['Evaluation'])) {
+                        continue; // only has self-evaluation so skip
+                    }
                     $eventId = $eval['Evaluation']['event_id'];
                     $groupId = $eval['Evaluation']['group_id'];
                     $evaluatee = $eval['Evaluation']['evaluatee_id'];
@@ -965,15 +968,13 @@ class EvaluationsController extends AppController
                 }
             }
             // check self evaluation questions
-            if ($mixeval['Mixeval']['self_eval'] > 0) {
+            // second condition to exclude tutors
+            if ($mixeval['Mixeval']['self_eval'] > 0 && isset($this->data[$evaluator]['Self-Evaluation'])) {
                 $evaluatee = User::get('id');
                 $eventId = $this->data[$evaluatee]['Self-Evaluation']['event_id'];
                 $groupId = $this->data[$evaluatee]['Self-Evaluation']['group_id'];
-                // only try saving if the evaluator did not have to do self eval with the
-                // peer eval questions which we can tell by checking whether "Evaluation"
-                // is set under the evaluator's user id - reason: already tried saving above
-                if (!isset($this->data[$evaluatee]['Evaluation']) &&
-                    !$this->Evaluation->saveMixevalEvaluation($this->data[$evaluatee])) {
+                $this->data[$evaluatee]['Evaluation'] = $this->data[$evaluatee]['Self-Evaluation'];
+                if (!$this->Evaluation->saveMixevalEvaluation($this->data[$evaluatee])) {
                     $failures[] = $evaluatee;
                 }
                 $evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee(
@@ -1188,7 +1189,7 @@ class EvaluationsController extends AppController
             // only required peer evaluation questions are counted toward the averages
             $required = array_flip(array_intersect(array_keys($required, 1), array_keys($peerQues, 0)));
             $questions = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}');
-            foreach ($details['evalResult'] as $evaluateeId => $result) {
+            foreach ($details['evalResult'] as $result) {
                 foreach ($result as $eval) {
                     $evaluator = $eval['EvaluationMixeval']['evaluator'];
                     foreach ($eval['EvaluationMixevalDetail'] as $detail) {

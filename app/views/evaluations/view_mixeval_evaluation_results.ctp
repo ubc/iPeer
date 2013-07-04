@@ -56,7 +56,8 @@ if (!empty($grades)) { ?>
         </tr>
         <?php foreach ($grades as $num => $grade) { ?>
             <tr><td><?php echo $groupByQues[$num]['title'] ?></td>
-            <td><?php echo number_format(array_sum($grade), 2) / count($grade) .
+            <?php $avg = count($grade) ? array_sum($grade) / count($grade) : 0; ?>
+            <td><?php echo number_format($avg, 2) .
                 ' / '. $groupByQues[$num]['multiplier']?></td></tr>
         <?php } ?>
     </table>
