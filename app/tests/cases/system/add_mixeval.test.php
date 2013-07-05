@@ -3,6 +3,9 @@ require_once('system_base.php');
 
 class AddMixEvalTestCase extends SystemBaseTestCase
 {   
+
+    protected $mixeval = '';
+
     public function startCase()
     {
         $this->getUrl();
@@ -47,77 +50,9 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalAvailabilityPublic')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalZeroMark')->click();
-        
-        // likert question
-        $this->addLikert();
-        
-        // sentence question
-        $this->addSentence();
-        
-        // paragraph question
-        $this->addParagraph();
-        
-        // score dropdown question
-        $this->addScoreDropdown();
-        
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[type="submit"]')->click();
-        // wait for creation of template to finish
-        $w = new PHPWebDriver_WebDriverWait($this->session);
-        $w->until(
-            function($session) {
-                return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
-            }
-        );
-        
-        $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
-        $this->assertEqual($msg, 'The mixed evaluation was saved successfully.');
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Default Mix Evaluation')->click();
-        $url = $this->session->url();
-        $this->session->open(str_replace('view', 'delete', $url));
-        $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'flashMessage')->text();
-        $this->assertEqual(substr($msg, 0, 30), 'This evaluation is now in use,');
-        $this->session->open(str_replace('view', 'edit', $url));
-        $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'flashMessage')->text();
-        $this->assertEqual($msg, 'Default Mix Evaluation cannot be edited now that submissions have been made. Please make a copy.');
-        
-        $this->session->open($this->url.'evaltools');
-        $eval = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Evaluation');
-        $this->assertTrue(!empty($eval));
-        
-        $this->waitForLogoutLogin('instructor1');
-        $this->session->open($this->url.'mixevals/index');
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Evaluation')->click();
-        $url = $this->session->url();
-        $this->session->open(str_replace('view', 'delete', $url));
-        $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'flashMessage')->text();
-        $this->assertEqual($msg, 'Error: You do not have permission to delete this evaluation');
-        $this->session->open(str_replace('view', 'edit', $url));
-        $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'flashMessage')->text();
-        $this->assertEqual($msg, 'Error: You do not have permission to edit this evaluation');
-        $this->session->open($this->url.'evaltools');
-        $eval = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Evaluation');
-        $this->assertTrue(empty($eval));
-        $this->session->open(str_replace('view', 'copy', $url));
-        // copying public template
-        $this->copyTemplate();
-        $this->waitForLogoutLogin('root');
-        
-        $this->session->open($url);
-        // view the template
-        $this->viewTemplate();
-        
-        $this->session->open(str_replace('view', 'edit', $url));
-        // edit the template
-        $this->editTemplate();
-        
-        $this->session->open($this->url.'mixevals/index');        
-        // delete the template
-        $this->deleteTemplate();
-        $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
-        $this->assertEqual($msg, 'The Mixed Evaluation was removed successfully.');
     }
-    
-    public function addLikert() 
+        
+    public function testAddLikert() 
     {
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[type="button"]')->click();
         
@@ -146,11 +81,11 @@ class AddMixEvalTestCase extends SystemBaseTestCase
             $desc->sendKeys($mark.' marks');
         }
     }
-    
-    public function addSentence()
+        
+    public function testAddSentence()
     {
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionType"] option[value="3"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ();"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionTypePeer"] option[value="3"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ(false);"]')->click();
         
         $question = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion1Title');
         $question->sendKeys('Which part of the project was their greatest contribution?');
@@ -160,11 +95,11 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion1Required')->click();
     }
-    
-    public function addParagraph()
+        
+    public function testAddParagraph()
     {
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionType"] option[value="2"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ();"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionTypePeer"] option[value="2"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ(false);"]')->click();
         
         $question = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion2Title');
         $question->sendKeys('What have they done well? How can they improve?');
@@ -173,10 +108,10 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         $instructions->sendKeys('Please give constructive comments.');
     }
     
-    public function addScoreDropdown()
+    public function testAddScoreDropdown()
     {
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionType"] option[value="4"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ();"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionTypePeer"] option[value="4"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ(false);"]')->click();
 
         $question = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion3Title');
         $question->sendKeys('Distributed Marks');
@@ -185,123 +120,50 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         $instructions->sendKeys('Distribute the marks among your members.');
     }
     
-    public function deleteTemplate()
-    {
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Evaluation')->click();
-        $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
-        $this->assertEqual($title, 'Mixed Evaluations > View > Final Project Evaluation');
-        
-        $templateId = end(explode('/', $this->session->url()));
-        $this->session->open($this->url.'mixevals/delete/'.$templateId);
-    }
-    
-    public function viewTemplate()
-    {
-        $avail = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, "html/body/div[1]/div[3]/dl/dd[2]")->text();
-        $this->assertEqual($avail, 'Public');
-        $zero = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, "html/body/div[1]/div[3]/dl/dd[4]")->text();
-        $this->assertEqual($zero, 'On');
-        $req = count($this->session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'span[class="required orangered floatright"]'));
-        $this->assertEqual($req, 3);
-        $total = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CLASS_NAME, 'marks')->text();
-        $this->assertEqual($total, 'Total Marks: 18');
-    }
-    
-    public function editTemplate()
-    {
-        // delete the score dropdown question
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="removeQ(3); return false;"]')->click();
-    
-        // moving questions
-        // move up the first question
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="upQ(0); return false;"]')->click();
-        $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex0')->text();
-        $this->assertEqual($quesNum, '1.'); // didn't move
-        // move down the last question
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="downQ(2); return false;"]')->click();
-        $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex2')->text();
-        $this->assertEqual($quesNum, '3.'); // didn't move
-        // move down the first question
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="downQ(0); return false;"]')->click();
-        $w = new PHPWebDriver_WebDriverWait($this->session);
-        $w->until(
-            function($session) {
-                $quesNum = $session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex0')->text();
-                return ($quesNum == '2.');
-            }
-        );
-        $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex1')->text();
-        $this->assertEqual($quesNum, '1.');
-        // move up the last question
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="upQ(2); return false;"]')->click();
-        $w->until(
-            function($session) {
-                $quesNum = $session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex2')->text();
-                return ($quesNum == '2.');
-            }
-        );
-        $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex0')->text();
-        $this->assertEqual($quesNum, '3.');
-        // delete the middle question
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="removeQ(2); return false;"]')->click();
-        $w->until(
-            function($session) {
-                $quesNum = $session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex0')->text();
-                return ($quesNum == '2.');
-            }
-        );
-        $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex1')->text();
-        $this->assertEqual($quesNum, '1.');
-        
-        // adding question
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionType"] option[value="3"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ();"]')->click();
-        $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex4')->text();
-        $this->assertEqual($quesNum, '3.');
-
-        // delete all questions
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="removeQ(1); return false;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="removeQ(0); return false;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="removeQ(4); return false;"]')->click();
-        $w->until(
-            function($session) {
-                $ques = $session->elements(PHPWebDriver_WebDriverBy::CLASS_NAME, 'MixevalMakeQuestion');
-                return empty($ques);
-            }
-        );
-        
-        // adding question
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionType"] option[value="2"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ();"]')->click();
-        $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex5')->text();
-        $this->assertEqual($quesNum, '1.');
-        
-        // create template with one question
-        $this->session->open($this->url.'mixevals/add');
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionType"] option[value="2"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ();"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalName')->sendKeys('test');
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion0Title')->sendKeys('test question');
+    public function testSubmitAndError()
+    {        
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[type="submit"]')->click();
+        // wait for creation of template to finish
+        $w = new PHPWebDriver_WebDriverWait($this->session);
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
             }
         );
+        
         $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'The mixed evaluation was saved successfully.');
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'test')->click();
-        $this->session->open(str_replace('view', 'edit', $this->session->url()));
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ();"]')->click();
-        $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex1')->text();
-        $this->assertEqual($quesNum, '2.');
-        $this->session->open(str_replace('edit', 'delete', $this->session->url()));
-        $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
-        $this->assertEqual($msg, 'The Mixed Evaluation was removed successfully.');
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Default Mix Evaluation')->click();
+        $this->mixeval = $this->session->url();
+        $this->session->open(str_replace('view', 'delete', $this->mixeval));
+        $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'flashMessage')->text();
+        $this->assertEqual(substr($msg, 0, 30), 'This evaluation is now in use,');
+        $this->session->open(str_replace('view', 'edit', $this->mixeval));
+        $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'flashMessage')->text();
+        $this->assertEqual($msg, 'Default Mix Evaluation cannot be edited now that submissions have been made. Please make a copy.');
+        
+        $this->session->open($this->url.'evaltools');
+        $eval = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Evaluation');
+        $this->assertTrue(!empty($eval));
+        
+        $this->waitForLogoutLogin('instructor1');
+        $this->session->open($this->url.'mixevals/index');
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Evaluation')->click();
+        $this->mixeval = $this->session->url();
+        $this->session->open(str_replace('view', 'delete', $this->mixeval));
+        $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'flashMessage')->text();
+        $this->assertEqual($msg, 'Error: You do not have permission to delete this evaluation');
+        $this->session->open(str_replace('view', 'edit', $this->mixeval));
+        $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'flashMessage')->text();
+        $this->assertEqual($msg, 'Error: You do not have permission to edit this evaluation');
+        $this->session->open($this->url.'evaltools');
+        $eval = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Evaluation');
+        $this->assertTrue(empty($eval));
     }
-    
-    public function copyTemplate()
+
+    public function testCopyTemplate()
     {
+        $this->session->open(str_replace('view', 'copy', $this->mixeval));
         $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalName')->attribute('value');
         $this->assertEqual($title, 'Copy of Final Project Evaluation');
         $avail = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalAvailabilityPublic');
@@ -366,6 +228,320 @@ class AddMixEvalTestCase extends SystemBaseTestCase
            
         // delete
         $this->session->open(str_replace('view', 'delete', $this->session->url()));
+        $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
+        $this->assertEqual($msg, 'The Mixed Evaluation was removed successfully.');
+        $this->waitForLogoutLogin('root');
+    }
+            
+    public function testViewTemplate()
+    {
+        $this->session->open($this->mixeval);
+        $avail = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, "html/body/div[1]/div[3]/dl/dd[2]")->text();
+        $this->assertEqual($avail, 'Public');
+        $zero = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, "html/body/div[1]/div[3]/dl/dd[4]")->text();
+        $this->assertEqual($zero, 'On');
+        $req = count($this->session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'span[class="required orangered floatright"]'));
+        $this->assertEqual($req, 3);
+        $total = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CLASS_NAME, 'marks')->text();
+        $this->assertEqual($total, 'Total Marks: 18');
+    }
+        
+    public function testEditTemplate()
+    {
+        $this->session->open(str_replace('view', 'edit', $this->mixeval));
+        // delete the score dropdown question
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="removeQ(3, 0); return false;"]')->click();
+    
+        // moving questions
+        // move up the first question
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="upQ(0, 0); return false;"]')->click();
+        $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex0')->text();
+        $this->assertEqual($quesNum, '1.'); // didn't move
+        // move down the last question
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="downQ(2, 0); return false;"]')->click();
+        $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex2')->text();
+        $this->assertEqual($quesNum, '3.'); // didn't move
+        // move down the first question
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="downQ(0, 0); return false;"]')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $w->until(
+            function($session) {
+                $quesNum = $session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex0')->text();
+                return ($quesNum == '2.');
+            }
+        );
+        $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex1')->text();
+        $this->assertEqual($quesNum, '1.');
+        // move up the last question
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="upQ(2, 0); return false;"]')->click();
+        $w->until(
+            function($session) {
+                $quesNum = $session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex2')->text();
+                return ($quesNum == '2.');
+            }
+        );
+        $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex0')->text();
+        $this->assertEqual($quesNum, '3.');
+        // delete the middle question
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="removeQ(2, 0); return false;"]')->click();
+        $w->until(
+            function($session) {
+                $quesNum = $session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex0')->text();
+                return ($quesNum == '2.');
+            }
+        );
+        $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex1')->text();
+        $this->assertEqual($quesNum, '1.');
+        
+        // adding question
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionTypePeer"] option[value="3"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ(false);"]')->click();
+        $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex4')->text();
+        $this->assertEqual($quesNum, '3.');
+
+        // delete all questions
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="removeQ(1, 0); return false;"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="removeQ(0, 0); return false;"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="removeQ(4, 0); return false;"]')->click();
+        $w->until(
+            function($session) {
+                $ques = $session->elements(PHPWebDriver_WebDriverBy::CLASS_NAME, 'MixevalMakeQuestion');
+                return empty($ques);
+            }
+        );
+        
+        // adding question
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionTypePeer"] option[value="2"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ(false);"]')->click();
+        $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex5')->text();
+        $this->assertEqual($quesNum, '1.');
+        
+        // create template with one question
+        $this->session->open($this->url.'mixevals/add');
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionTypePeer"] option[value="2"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ(false);"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalName')->sendKeys('test');
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion0Title')->sendKeys('test question');
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[type="submit"]')->click();
+        $w->until(
+            function($session) {
+                return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
+        $this->assertEqual($msg, 'The mixed evaluation was saved successfully.');
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'test')->click();
+        $this->session->open(str_replace('view', 'edit', $this->session->url()));
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ(false);"]')->click();
+        $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex1')->text();
+        $this->assertEqual($quesNum, '2.');
+        $this->session->open(str_replace('edit', 'delete', $this->session->url()));
+        $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
+        $this->assertEqual($msg, 'The Mixed Evaluation was removed successfully.');
+    }
+    
+    public function testDeleteTemplate()
+    {
+        $this->session->open($this->url.'mixevals/index');        
+
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Evaluation')->click();
+        $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
+        $this->assertEqual($title, 'Mixed Evaluations > View > Final Project Evaluation');
+        
+        $templateId = end(explode('/', $this->session->url()));
+        $this->session->open($this->url.'mixevals/delete/'.$templateId);
+
+        $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
+        $this->assertEqual($msg, 'The Mixed Evaluation was removed successfully.');
+    }
+    
+    public function testSelfEvaluation()
+    {
+        $this->session->open($this->url.'mixevals/add');
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalName')->sendKeys('With Self-Evaluation');
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'self_eval')->click();
+        $selfType = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalMixevalQuestionTypeSelf');
+        $this->assertTrue(!empty($selfType));
+    }
+    
+    public function testAddPeerQuestions()
+    {
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ(false);"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ(false);"]')->click();
+        // question numbers
+        $ques1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex0')->text();
+        $this->assertEqual($ques1, '1.');
+        $ques2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex1')->text();
+        $this->assertEqual($ques2, '2.');
+        
+        // question titles
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion0Title')->sendKeys('Peer optional');
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion1Title')->sendKeys('Peer required');
+        // set 1st question to optional
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion0Required')->click();
+        // set marks
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, "MixevalQuestion0Multiplier")->sendKeys('6');
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion1Multiplier')->sendKeys('4');
+        // add dec
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="addDesc(0);"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="addDesc(0);"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="addDesc(1);"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="addDesc(1);"]')->click();
+    }
+    
+    public function testAddSelfQuestions()
+    {
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ(true);"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionTypeSelf"] option[value="3"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ(true);"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ(true);"]')->click();
+
+        // question numbers
+        $ques1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex2')->text();
+        $this->assertEqual($ques1, '1.');
+        $ques2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex3')->text();
+        $this->assertEqual($ques2, '2.');
+        $ques3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex4')->text();
+        $this->assertEqual($ques3, '3.');
+
+        // question titles
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion2Title')->sendKeys('Self 1');
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion3Title')->sendKeys('Self 2');
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion4Title')->sendKeys('Self 3');
+        // set mark
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, "MixevalQuestion2Multiplier")->sendKeys('8');
+        // add dec
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="addDesc(2);"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="addDesc(2);"]')->click();
+
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[type="submit"]')->click();
+        // wait for creation of template to finish
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $w->until(
+            function($session) {
+                return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+    }
+    
+    public function testViewSelfEvaluation()
+    {
+        $peer = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[3]/td[4]/div');
+        $this->assertEqual($peer->text(), '2');
+        $self = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[3]/td[5]/div');
+        $this->assertEqual($self->text(), '3');
+        $total = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[3]/td[6]/div');
+        $this->assertEqual($total->text(), '4');
+        
+        // view evaluation
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'With Self-Evaluation')->click();
+        $this->mixeval = $this->session->url();
+        // check self-evaluation field
+        $self = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/dl/dd[6]');
+        $this->assertEqual($self->text(), 'On');
+        // check section headings
+        $peer = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/h2[2]');
+        $this->assertEqual($peer->text(), 'Peer Evaluation Questions');
+        $self = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/h2[3]');
+        $this->assertEqual($self->text(), 'Self-Evaluation Questions');
+        // check questions' order & numbering
+        $peer1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/div[1]/h3');
+        $this->assertEqual($peer1->text(), '1. Peer optional');
+        $peer2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/div[2]/h3');
+        $this->assertEqual($peer2->text(), "2. Peer required\n*");
+        $self1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/div[3]/h3');
+        $this->assertEqual($self1->text(), "1. Self 1\n*");
+        $self2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/div[4]/h3');
+        $this->assertEqual($self2->text(), "2. Self 2\n*");
+        $self3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/div[5]/h3');
+        $this->assertEqual($self3->text(), "3. Self 3\n*");
+        // check total marks - should only include required peer evaluation questions
+        $mark = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CLASS_NAME, 'marks');
+        $this->assertEqual($mark->text(), 'Total Marks: 4');
+    }
+    
+    public function testEditSelfEvaluation()
+    {
+        $this->session->open(str_replace('view', 'edit', $this->mixeval));
+        $selfEval = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'self_eval');
+        $this->assertTrue($selfEval->attribute('checked'));
+        // check questions
+        $peer1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion0Title');
+        $this->assertEqual($peer1->attribute('value'), 'Peer optional');
+        $peer2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion1Title');
+        $this->assertEqual($peer2->attribute('value'), 'Peer required');
+        $self1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion2Title');
+        $this->assertEqual($self1->attribute('value'), 'Self 1');
+        $self2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion3Title');
+        $this->assertEqual($self2->attribute('value'), 'Self 2');
+        $self3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion4Title');
+        $this->assertEqual($self3->attribute('value'), 'Self 3');
+    }
+    
+    public function testEditReorderSelfEvaluation()
+    {
+        // test first peer evaluation question going up
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="upQ(0, 0); return false;"]')->click();
+        $num = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex0')->text();
+        $this->assertEqual($num, '1.');
+        // test last peer evaluation question going down
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="downQ(1, 0); return false;"]')->click();
+        $num = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex1')->text();
+        $this->assertEqual($num, '2.');
+        // test first self-evaluation question going up
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="upQ(2, 1); return false;"]')->click();
+        $num = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex2')->text();
+        $this->assertEqual($num, '1.');
+        // test last self-evaluation question going down
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="downQ(4, 1); return false;"]')->click();
+        $num = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex4')->text();
+        $this->assertEqual($num, '3.');
+        
+        // test moving questions around
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="downQ(0, 0); return false;"]')->click();
+        $w = new PHPWebDriver_WebDriverWait($this->session);
+        $w->until(
+            function($session) {
+                $quesNum = $session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex0')->text();
+                return ($quesNum == '2.');
+            }
+        );
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="downQ(2, 1); return false;"]')->click();
+        $w->until(
+            function($session) {
+                $quesNum = $session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex2')->text();
+                return ($quesNum == '2.');
+            }
+        );
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="upQ(4, 1); return false;"]')->click();
+        $w->until(
+            function($session) {
+                $quesNum = $session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex4')->text();
+                return ($quesNum == '2.');
+            }
+        );
+
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[type="submit"]')->click();
+        $w->until(
+            function($session) {
+                return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
+            }
+        );
+        
+        $this->session->open($this->mixeval);
+        $peer1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/div[1]/h3');
+        $this->assertEqual($peer1->text(), "1. Peer required\n*");
+        $peer2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/div[2]/h3');
+        $this->assertEqual($peer2->text(), "2. Peer optional");
+        $self1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/div[3]/h3');
+        $this->assertEqual($self1->text(), "1. Self 2\n*");
+        $self2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/div[4]/h3');
+        $this->assertEqual($self2->text(), "2. Self 3\n*");
+        $self3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/div[5]/h3');
+        $this->assertEqual($self3->text(), "3. Self 1\n*");
+
+        // delete mixeval
+        $this->session->open(str_replace('view', 'delete', $this->mixeval));
         $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'The Mixed Evaluation was removed successfully.');
     }

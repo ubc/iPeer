@@ -844,8 +844,8 @@ class studentMixeval extends SystemBaseTestCase
         $name = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalName');
         $name->sendKeys('Final Project Evaluation');
         
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionType"] option[value="4"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ();"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionTypePeer"] option[value="4"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ(false);"]')->click();
 
         $question = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'MixevalQuestion0Title');
         $question->sendKeys('Distributed Marks');
