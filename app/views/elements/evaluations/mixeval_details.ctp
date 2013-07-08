@@ -71,7 +71,7 @@ if ($details) {
 } else {
     foreach ($questions as $qnum => $ques) {
         $typeId = $ques['mixeval_question_type_id'];
-        if ($typeId == '1' || $type == '4') {
+        if ($typeId == '1' || $typeId == '4') {
             $required = (!$ques['required']) ? '' :
                 $html->tag('span', '*', array('class' => 'required orangered'));
             echo $html->tag('h3', "$qnum. $ques[title] $required");
