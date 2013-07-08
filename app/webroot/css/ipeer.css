@@ -249,7 +249,7 @@ div.ui-datepicker { font-size: 0.85em; }
 
 #bannerLogoText {
     font-size: 1em; 
-    font-weight: 200; color: black;
+    font-weight: 200;
     font-style: italic;
 }
 
@@ -259,6 +259,12 @@ div.ui-datepicker { font-size: 0.85em; }
 
 #ipeerText {
     font-size: 36px;
+}
+
+a#home, a#home:hover, a#home:active {
+    text-decoration: none;
+    color: black;
+    background-color: transparent;
 }
 
 /* NAVIGATION */

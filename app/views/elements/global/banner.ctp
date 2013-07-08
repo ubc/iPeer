@@ -1,14 +1,13 @@
 <div id='bannerLarge' class='banner'>
 <div id='ipeerLogo'>
+<a href='/' id='home'>
 <?php
 echo $html->image('layout/ipeer_logo.png',
     array('id'=>'bannerLogoImgLeft', 'alt'=>'logo')
 );
 ?>
 <span id="ipeerI">i</span><span id="ipeerText">Peer</span> <span id='bannerLogoText'><?php echo IPEER_VERSION?> with TeamMaker</span>
-<?php
-
-?>
+</a>
 </div>
 <div id='customLogo'>
 <?php
