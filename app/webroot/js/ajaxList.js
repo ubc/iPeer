@@ -726,8 +726,8 @@ AjaxList.prototype.renderFooter = function(div) {
 
     // Display the time of the search
     var td = new Element("td", {"class":"timestamp" });
-    var date = new Date();
-    td.appendChild(document.createTextNode(date.toString()));
+    //var date = new Date();
+    //td.appendChild(document.createTextNode(date.toString()));
     tr.appendChild(td);
 
     // Display the number of results
