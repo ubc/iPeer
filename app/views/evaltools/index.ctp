@@ -52,7 +52,7 @@ $mixevalheaders = array(
     __('Name', true),
     __('In Use', true),
     __('Public', true),
-    __('Reflective Questions', true),
+    __('Self-Evaluation Questions', true),
     __('Total Marks', true)
 );
 $mixevalcells = array();

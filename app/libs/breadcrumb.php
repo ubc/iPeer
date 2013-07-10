@@ -51,6 +51,14 @@ class Breadcrumb
             'url' => '/home',
             'display' => 'Home',
         ),
+        'simple_evaluations' => array(
+            'display' => 'Simple Evaluations',
+            'url' => '/simpleevaluations'
+        ),
+        'rubrics' => array(
+            'display' => 'Rubrics',
+            'url' => '/rubrics'
+        ),
     );
 
     /**

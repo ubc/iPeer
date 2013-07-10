@@ -258,6 +258,10 @@ class SurveysController extends AppController
         } else {
             $templates = $this->Survey->find('list');
         }
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('surveys')->
+            push(Inflector::humanize(Inflector::underscore($this->action)))
+        );
         $this->set('templates', $templates);
         $this->render('edit');
     }
@@ -309,6 +313,11 @@ class SurveysController extends AppController
         } else {
             $this->data = $survey;
         }
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('surveys')->
+            push(Inflector::humanize(Inflector::underscore($this->action)))->
+            push($survey['Survey']['name'])
+        );
     }
 
 

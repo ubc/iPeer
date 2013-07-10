@@ -249,6 +249,11 @@ class SimpleevaluationsController extends AppController
         $this->set('data', $data);
         $user = $this->Auth->user();
         $this->set('user', $user['User']);
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('simple_evaluations')->
+            push(Inflector::humanize(Inflector::underscore($this->action)))->
+            push($data['SimpleEvaluation']['name'])
+        );
     }
 
     /**
@@ -259,7 +264,10 @@ class SimpleevaluationsController extends AppController
      */
     function add()
     {
-        $this->set('title_for_layout', __('Simple Evaluations > Add Template', true));
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('simple_evaluations')->
+            push(Inflector::humanize(Inflector::underscore($this->action)))
+        );
         if (!empty($this->data)) {
             if ($this->__processForm()) {
                 $this->Session->setFlash(__("The evaluation was added successfully.", true), 'good');
@@ -358,7 +366,11 @@ class SimpleevaluationsController extends AppController
             $this->Output->br2nl($this->data);
         }
 
-        $this->set('title_for_layout', __('Simple Evaluations > Edit Template', true));
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('simple_evaluations')->
+            push(Inflector::humanize(Inflector::underscore($this->action)))->
+            push($this->data['SimpleEvaluation']['name'])
+        );
     }
 
     /**
@@ -404,6 +416,10 @@ class SimpleevaluationsController extends AppController
             }
         }
 
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('simple_evaluations')->
+            push(Inflector::humanize(Inflector::underscore($this->action)))
+        );
         $this->render = false;
         $this->data = $this->SimpleEvaluation->read(null, $id);
         $this->data['SimpleEvaluation']['id'] = null;

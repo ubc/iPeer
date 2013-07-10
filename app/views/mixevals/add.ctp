@@ -32,7 +32,7 @@ echo $form->input('self_eval',
     array('type' => 'checkbox', 'id' => 'self_eval', 'label' => __('Self-Evaluation', true),
     'checked' => $check));
 echo $html->div("help-text", 
-    __('Add questions in the Self-Evaluation Section below.', true));
+    __('Adds a reflective questions section for evaluators.', true));
 
 // If we're editing a previously saved mixeval, will need to have an id for
 // the mixeval.

@@ -249,6 +249,11 @@ class RubricsController extends AppController
         $this->set('readonly', true);
         $this->set('evaluate', false);
         $this->set('action', __('View Rubric', true));
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('rubrics')->
+            push(Inflector::humanize(Inflector::underscore($this->action)))->
+            push($this->data['Rubric']['name'])
+        );
         $this->render('edit');
     }
 
@@ -261,6 +266,10 @@ class RubricsController extends AppController
      */
     function add()
     {
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('rubrics')->
+            push(Inflector::humanize(Inflector::underscore($this->action)))
+        );
         if (!empty($this->data)) {
             $this->set('action', __('Add Rubric (Step 2)', true));
             $this->set('data', $this->data);
@@ -359,6 +368,11 @@ class RubricsController extends AppController
                 }
             }
         }
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('rubrics')->
+            push(Inflector::humanize(Inflector::underscore($this->action)))->
+            push($this->data['Rubric']['name'])
+        );
         $this->set('action', __('Edit Rubric', true));
     }
 
@@ -432,6 +446,10 @@ class RubricsController extends AppController
         $this->data = $this->Rubric->copy($id);
         $this->set('data', $this->data);
         $this->set('action', __('Copy Rubric', true));
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('rubrics')->
+            push(Inflector::humanize(Inflector::underscore($this->action)))
+        );
         $this->render('edit');
     }
 
