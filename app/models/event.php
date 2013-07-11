@@ -149,7 +149,7 @@ class Event extends AppModel
         $this->virtualFields['to_review_count'] = sprintf('SELECT count(*) as count FROM group_events as ge WHERE ge.event_id = %s.id AND marked LIKE "to review"', $this->alias);
         $this->virtualFields['student_count'] = sprintf('SELECT count(*) as count FROM group_events as vge RIGHT JOIN groups_members as vgm ON vge.group_id = vgm.group_id WHERE vge.event_id = %s.id', $this->alias);
         $this->virtualFields['completed_count'] = sprintf('SELECT count(*) as count FROM evaluation_submissions as ves WHERE ves.submitted = 1 AND ves.event_id = %s.id', $this->alias);
-        $this->virtualFields['due_in'] = 'TIMESTAMPDIFF(SECOND,NOW(),due_date)';
+        $this->virtualFields['due_in'] = sprintf('TIMESTAMPDIFF(SECOND,"%s",due_date)', date('Y-m-d H:i:s'));
     }
 
     /**
@@ -422,7 +422,7 @@ class Event extends AppModel
     {
         if (is_numeric($eventID)) {
             $count = $this->find('count', array(
-                'conditions' => array('Event.due_date < NOW()', 'Event.id' => $eventID)
+                'conditions' => array('Event.due_date < ' => date('Y-m-d H:i:s'), 'Event.id' => $eventID)
             ));
             return ($count>0);
         } else {
