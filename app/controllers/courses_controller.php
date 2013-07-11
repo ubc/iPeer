@@ -185,9 +185,11 @@ class CoursesController extends AppController
     /**
      * Set all the necessary variables for the Add and Edit form elements.
      *
+     * @params mixed $courseId courseId - default null (eg. add)
+     *
      * @return void
      * */
-    public function _initFormEnv() {
+    public function _initFormEnv($courseId = 0) {
         // set the list of departments
         if (User::hasPermission('functions/user/superadmin')) {
             // superadmin permission means you see all departments regardless
@@ -219,6 +221,10 @@ class CoursesController extends AppController
         $this->set('statusOptions', $statusOptions);
 
         $this->set('departments', $departments);
+        
+        $currentProf = $this->User->getInstructorsByCourse($courseId);
+        $currentProf = Set::combine($currentProf, '{n}.User.id', '{n}.User.full_name');
+        $instructorList = $currentProf + array_diff($instructorList, $currentProf);
 
         // set the list of instructors
         $this->set('instructors', $instructorList);
@@ -263,7 +269,7 @@ class CoursesController extends AppController
      */
     public function edit($courseId)
     {
-        $this->_initFormEnv();
+        $this->_initFormEnv($courseId);
 
         $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission(), array('Instructor', 'Department'));
         if (!$course) {
