@@ -324,6 +324,17 @@ class EventTestCase extends CakeTestCase
         // event 6 has two occurrences as user in two groups
         $this->assertEqual($ids, array(1,2,3,5,6,6));
     }
+    
+    function testTimezone()
+    {
+        $now = time(); // current php time (eg. not sql time)
+        $event = $this->Event->findById(1);
+        $dueDate = strtotime($event['Event']['due_date']);
+        $dueIn = $dueDate - $now;
+        // the difference between the our calculuation and the model's calcualtion
+        // should be within 5 seconds
+        $this->assertWithinMargin($event['Event']['due_in'], $dueIn, 5);
+    }
 
     #####################################################################################################################################################
     ###############################################     HELPER FUNCTIONS     ############################################################################
