@@ -829,6 +829,12 @@ class User extends AppModel
     {
         $id = $this->UserTutor->field('id',
             array('user_id' => $user_id, 'course_id' => $course_id));
+        
+        $members = $this->Group->find('all', array('conditions' => array('Member.id' => $user_id, 'course_id' => $course_id)));
+        foreach ($members as $member) {
+            $this->GroupsMember->delete($member['GroupsMember']['id']);
+        }
+
         return $this->UserTutor->delete($id);
     }
 
@@ -880,6 +886,38 @@ class User extends AppModel
             'contain' => array('Enrolment')
         ));
         return Set::extract($user, '/Enrolment/id');
+    }
+
+    /**
+     * Get courses a tutor is enrolled in
+     *
+     * @param mixed $userId user id
+     *
+     * @return list of course ids
+     */
+    function getTutorCourses($userId='')
+    {
+        $user = $this->find('first', array(
+            'conditions' => array('User.id' => $userId), 
+            'contain' => array('Tutor')
+        ));
+        return Set::extract($user, '/Tutor/id');
+    }
+
+    /**
+     * Get courses an instructor is enrolled in
+     *
+     * @param mixed $userId user id
+     *
+     * @return list of course ids
+     */
+    function getInstructorCourses($userId='')
+    {
+        $user = $this->find('first', array(
+            'conditions' => array('User.id' => $userId), 
+            'contain' => array('Course')
+        ));
+        return Set::extract($user, '/Course/id');
     }
 
     /*********************************

@@ -613,6 +613,8 @@ class UsersController extends AppController
     public function edit($userId = null, $courseId = null) {
         $this->set('title_for_layout', 'Edit User');
         $enrolCourses = $this->User->getEnrolledCourses($userId);
+        $tutorCourses = $this->User->getTutorCourses($userId);
+        $instructors = $this->User->getInstructorCourses($userId);
         $role = $this->User->getRoleName($userId);
 
         if (!User::hasPermission('functions/user')) {
@@ -637,6 +639,18 @@ class UsersController extends AppController
             foreach ($enrolCourses as $course) {
                 if (!in_array($course, $this->data['Courses']['id'])) {
                     $this->User->removeStudent($userId, $course);
+                }
+            }
+            // unenrol tutor from course, group
+            foreach ($tutorCourses as $course) {
+                if (!in_array($course, $this->data['Courses']['id'])) {
+                    $this->User->removeTutor($userId, $course);
+                }
+            }
+            // unenrol instructor from course
+            foreach ($instructors as $course) {
+                if (!in_array($course, $this->data['Courses']['id'])) {
+                    $this->User->removeInstructor($userId, $course);
                 }
             }
 
