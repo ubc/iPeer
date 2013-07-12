@@ -416,6 +416,9 @@ class UsersController extends AppController
         foreach ($user['Enrolment'] as $course) {
             $coursesId[] = $course['id'];
         }
+        foreach ($user['Tutor'] as $course) {
+            $coursesId[] = $course['id'];
+        }
         $this->set('coursesSelected', $coursesId);
     }
 
@@ -609,7 +612,7 @@ class UsersController extends AppController
      */
     public function edit($userId = null, $courseId = null) {
         $this->set('title_for_layout', 'Edit User');
-
+        $enrolCourses = $this->User->getEnrolledCourses($userId);
         $role = $this->User->getRoleName($userId);
 
         if (!User::hasPermission('functions/user')) {
@@ -619,6 +622,24 @@ class UsersController extends AppController
 
         // save the data which involves:
         if ($this->data) {
+            if (!is_array($this->data['Courses']['id'])) {
+                $this->data['Courses']['id'] = array();
+            }
+
+            // add list of courses the user is enrolled in but the logged
+            // in user does not have access to so that the user would not
+            // be unenrolled from the course when their profile is edited.
+            $append = $this->_notUnenrolCourses($this->Auth->user('id'), $userId);
+            $this->data['Courses']['id'] = array_merge($this->data['Courses']['id'], $append);
+
+            // unenrol student from course, group, surveygroup
+            // only students will go in because only they have records in Enrolment
+            foreach ($enrolCourses as $course) {
+                if (!in_array($course, $this->data['Courses']['id'])) {
+                    $this->User->removeStudent($userId, $course);
+                }
+            }
+
             // create the enrolment entry depending on if instructor or student
             // and also convert it into a CakePHP dark magic friendly format
             $enrolments = $this->_convertCourseEnrolment(
@@ -1120,4 +1141,37 @@ class UsersController extends AppController
             notification: ". $this->Email->smtpError ."</div>";
     }
 
+    /**
+     * helper function for users/edit, to not unenrol the user being edited from
+     * courses the logged user don't have access to
+     *
+     * @param int $editor
+     * @param int $userId
+     *
+     * @return array of courses to not unenrol
+     */
+    private function _notUnenrolCourses($editor, $userId)
+    {
+        $editor = $this->User->findById($editor);
+        $user = $this->User->findById($userId);
+        $editorCourses = array();
+        $userCourses = array();
+        
+        // user's list of courses
+        foreach ($user['Course'] as $course) {
+            $userCourses[] = $course['id'];
+        }
+        foreach ($user['Enrolment'] as $course) {
+            $userCourses[] = $course['id'];
+        }
+        foreach ($user['Tutor'] as $course) {
+            $userCourses[] = $course['id'];
+        }
+
+        // get editor's list of courses
+        $editorCourses = $this->Course->getAccessibleCourses(User::get('id'), 
+            User::getCourseFilterPermission(), 'list');
+        
+        return array_diff($userCourses, array_keys($editorCourses));
+    }
 }

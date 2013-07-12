@@ -45,6 +45,10 @@ class User extends AppModel
             'className' => 'SurveyInput',
             'dependent' => true,
         ),
+        'SurveyGroupMember' => array(
+            'className' => 'SurveyGroupMember',
+            'foreignKey' => 'user_id',
+        ),
     );
 
     public $hasAndBelongsToMany = array(
@@ -728,8 +732,29 @@ class User extends AppModel
      */
     public function removeStudent($user_id, $course_id)
     {
+        $this->Event = ClassRegistry::init('Event');
         $id = $this->UserEnrol->field('id',
             array('user_id' => $user_id, 'course_id' => $course_id));
+        // query all survey events of the course
+        $surveys = $this->Event->find('list', array(
+            'conditions' => array(
+                'course_id' => $course_id, 
+                'event_template_type_id' => 3), 
+            'fields' => array('Event.id')));
+        /* query any surveyGroupMember records created based on the above
+        survey events for the user */
+        $members = $this->SurveyGroupMember->find('all', array(
+            'conditions' => array(
+                'SurveyGroupMember.user_id' => $user_id, 
+                'SurveyGroupSet.survey_id' => $surveys)));
+        // remove the records found
+        foreach ($members as $member) {
+            $this->SurveyGroupMember->delete($member['SurveyGroupMember']['id']);
+        }
+        $members = $this->Group->find('all', array('conditions' => array('Member.id' => $user_id, 'course_id' => $course_id)));
+        foreach ($members as $member) {
+            $this->GroupsMember->delete($member['GroupsMember']['id']);
+        }
         return $this->UserEnrol->delete($id);
     }
 
@@ -839,6 +864,22 @@ class User extends AppModel
                 )
             ),
         ));
+    }
+    
+    /**
+     * Get courses a user is enrolled in
+     *
+     * @param mixed $userId user id
+     *
+     * @return list of course ids
+     */
+    function getEnrolledCourses($userId='')
+    {
+        $user = $this->find('first', array(
+            'conditions' => array('User.id' => $userId), 
+            'contain' => array('Enrolment')
+        ));
+        return Set::extract($user, '/Enrolment/id');
     }
 
     /*********************************
