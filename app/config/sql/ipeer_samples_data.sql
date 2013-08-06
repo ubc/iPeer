@@ -333,7 +333,7 @@ CREATE TABLE IF NOT EXISTS `email_schedules` (
 --
 
 INSERT INTO `email_schedules` (`id`, `subject`, `content`, `date`, `from`, `to`, `course_id`, `event_id`, `grp_id`, `sent`, `creator_id`, `created`) VALUES
-(1, 'Email Template', 'Hello, {{{FIRSTNAME}}}', '2013-07-18 16:52:31', '1', '5;6;7;13;15;17;19;21;26;28;31;32;33', NULL, NULL, NULL, 0, 1, '2012-07-16 16:52:50'),
+(1, 'Email Template', 'Hello, {{{FIRSTNAME}}}', CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 1 YEAR)), '-07-18 16:52:31'), '1', '5;6;7;13;15;17;19;21;26;28;31;32;33', NULL, NULL, NULL, 0, 1, '2012-07-16 16:52:50'),
 (2, 'Email Template', 'Hello, {{{USERNAME}}}', '2011-07-18 16:52:31', '1', '5;6;7;13;15;17;19;21;26;28;31;32;33', NULL, NULL, NULL, 0, 1, '2010-07-16 16:57:50'),
 (3, 'Email Template', 'Hi, {{{USERNAME}}}', '2011-07-18 17:52:31', '1', '5;6;7;13;15;17;19;21;26;28;31;32;33', NULL, NULL, NULL, 1, 1, '2010-07-16 16:57:50');
 
@@ -698,7 +698,8 @@ INSERT INTO events (id, title, course_id, description, event_template_type_id, t
 (6, 'simple evaluation 2', 1, '2nd simple evaluation', 1, 1, '0', 0, '2012-11-28 00:00:00', '2012-11-20 00:00:00', '2022-11-29 00:00:00', '2022-11-30 00:00:00', '2022-12-12 00:00:00', 'A', 1, '2012-11-21 12:23:13', 1, '2012-11-21 12:23:13'),
 (7, 'simple evaluation 3', 1, '3rd simple evaluation for testing overdue event', 1, 1, '0', 0, '2012-11-28 00:00:00', '2012-11-20 00:00:00', '2012-11-29 00:00:00', '2022-11-30 00:00:00', '2022-12-12 00:00:00', 'A', 1, '2012-11-21 12:23:13', 1, '2012-11-21 12:23:13'),
 (8, 'simple evaluation 4', 1, 'result released with submission', 1, 1, '0', 0, '2012-11-28 00:00:00', '2012-11-20 00:00:00', '2012-11-29 00:00:00', '2012-11-30 00:00:00', '2022-12-12 00:00:00', 'A', 1, '2012-11-21 12:23:13', 1, '2012-11-21 12:23:13'),
-(9, 'simple evaluation 5', 1, 'result released with no submission', 1, 1, '0', 0, '2012-11-28 00:00:00', '2012-11-20 00:00:00', '2012-11-29 00:00:00', '2012-11-30 00:00:00', '2022-12-12 00:00:00', 'A', 1, '2012-11-21 12:23:13', 1, '2012-11-21 12:23:13');
+(9, 'simple evaluation 5', 1, 'result released with no submission', 1, 1, '0', 0, '2012-11-28 00:00:00', '2012-11-20 00:00:00', '2012-11-29 00:00:00', '2012-11-30 00:00:00', '2022-12-12 00:00:00', 'A', 1, '2012-11-21 12:23:13', 1, '2012-11-21 12:23:13'),
+(10, 'simple evaluation 6', 1, 'result released with no submission', 1, 1, '0', 0, CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 2 YEAR)), '-07-31 11:20:00'), CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 1 YEAR)), '-07-31 11:20:00'), CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 2 YEAR)), '-07-31 11:20:00'), CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 2 YEAR)), '-07-31 11:20:00'), CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 3 YEAR)), '-07-31 11:20:00'), 'A', 1, '2012-11-21 12:23:13', 1, '2012-11-21 12:23:13');
 
 -- --------------------------------------------------------
 
@@ -739,6 +740,8 @@ INSERT INTO `group_events` VALUES (8, 2, 6, 'not reviewed', NULL, 'None', 'None'
 INSERT INTO `group_events` VALUES (9, 1, 7, 'not reviewed', NULL, 'None', 'None', 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
 INSERT INTO `group_events` VALUES (10, 1, 8, 'not reviewed', NULL, 'None', 'None', 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
 INSERT INTO `group_events` VALUES (11, 1, 9, 'not reviewed', NULL, 'None', 'None', 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
+INSERT INTO `group_events` VALUES (12, 1, 10, 'not reviewed', NULL, 'None', 'None', 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
+
 -- --------------------------------------------------------
 
 --

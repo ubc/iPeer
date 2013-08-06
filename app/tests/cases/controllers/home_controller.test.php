@@ -81,7 +81,7 @@ class HomeControllerTest extends ExtendedAuthTestCase
         $activeCourses = Set::sort($result['course_list']['A'], '{n}.Course.id', 'asc');
         $inactiveCourses = $result['course_list']['I'];
         $this->assertEqual(count($activeCourses[0]['Instructor']), 1);
-        $this->assertEqual(count($activeCourses[0]['Event']), 9);
+        $this->assertEqual(count($activeCourses[0]['Event']), 10);
         $this->assertEqual(count($activeCourses[1]['Instructor']), 2);
         $this->assertEqual(count($activeCourses[1]['Event']), 0);
         $this->assertEqual(count($inactiveCourses[0]['Instructor']), 1);
@@ -101,7 +101,7 @@ class HomeControllerTest extends ExtendedAuthTestCase
         $this->assertFalse(isset($result['course_list']['I']));
         $activeCourses = $result['course_list']['A'];
         $this->assertEqual(count($activeCourses[0]['Instructor']), 1);
-        $this->assertEqual(count($activeCourses[0]['Event']), 9);
+        $this->assertEqual(count($activeCourses[0]['Event']), 10);
     }
 
     function testIndexStudent()
