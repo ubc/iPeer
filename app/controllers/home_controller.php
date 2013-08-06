@@ -180,7 +180,9 @@ class HomeController extends AppController
             }
             else if (empty($event['EvaluationSubmission']) &&
                 strtotime('NOW') <
-                strtotime($event['Event']['result_release_date_end'])
+                strtotime($event['Event']['result_release_date_end']) &&
+                strtotime('NOW') >
+                strtotime($event['Event']['release_date_end'])
             ) { // student did not do the survey within the allowed time
                 // but we should still let them view results
                 $expired[] = $event;
