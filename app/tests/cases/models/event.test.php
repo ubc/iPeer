@@ -89,7 +89,7 @@ class EventTestCase extends CakeTestCase
 
         //Test a valid course number
         $course = $this->Event->getCourseEventCount(1);
-        $this->assertEqual($course, 9);
+        $this->assertEqual($course, 10);
 
         //Test an invalid course number
         $course = $this->Event->getCourseEventCount(999);
@@ -279,7 +279,7 @@ class EventTestCase extends CakeTestCase
         // normal student
         $events = $this->Event->getEventsByUserId(5);
         $evaluations = $events['Evaluations'];
-        $this->assertEqual(count($evaluations), 7);
+        $this->assertEqual(count($evaluations), 8);
         $surveys = $events['Surveys'];
         $this->assertEqual(count($surveys), 2);
 
@@ -293,14 +293,14 @@ class EventTestCase extends CakeTestCase
         // normal student with fields
         $events = $this->Event->getEventsByUserId(5, array('id', 'title'));
         $evaluations = $events['Evaluations'];
-        $this->assertEqual(count($evaluations), 7);
+        $this->assertEqual(count($evaluations), 8);
         $surveys = $events['Surveys'];
         $this->assertEqual(count($surveys), 2);
 
         // student within two groups in the same event
         $events = $this->Event->getEventsByUserId(7);
         $evaluations = $events['Evaluations'];
-        $this->assertEqual(count($evaluations), 11);
+        $this->assertEqual(count($evaluations), 12);
         $surveys = $events['Surveys'];
         $this->assertEqual(count($surveys), 2);
     }
