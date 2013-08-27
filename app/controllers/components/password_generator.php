@@ -1,6 +1,6 @@
 <?php
-/** 
- * Low entrophy recovery passwords may be guessed relatively easily by an 
+/**
+ * Low entrophy recovery passwords may be guessed relatively easily by an
  * attacker, this module attempts to generate more secure recovery passwords.
  *
  * Both of the built in PHP random number generators, rand() and mt_rand()
@@ -12,7 +12,7 @@ class PasswordGeneratorComponent extends Object {
 
   public $name = 'PasswordGenerator';
 
-  /** 
+  /**
    * Generate a secure password by first generating a random number of $len
    * bytes and then converting the resulting binary string into something
    * printable.
@@ -47,8 +47,8 @@ class PasswordGeneratorComponent extends Object {
     return $this->defaultAlgorithm($len);
   }
 
-  /** 
-   * Convert a binary string into a printable string. Basically performs a 
+  /**
+   * Convert a binary string into a printable string. Basically performs a
    * base64 conversion and then remove the trailing '=' delimiters.
    *
    * @param string $bin - the binary string
@@ -61,9 +61,9 @@ class PasswordGeneratorComponent extends Object {
     return $ret;
   }
 
-  /** 
-   * Use the OpenSSL PHP extension to generate a secure password. We 
-   * basically generate a random number of $len bytes and convert the 
+  /**
+   * Use the OpenSSL PHP extension to generate a secure password. We
+   * basically generate a random number of $len bytes and convert the
    * resulting binary string to something user readable.
    *
    * Helper for generate().
@@ -85,9 +85,9 @@ class PasswordGeneratorComponent extends Object {
     return $this->binconvert($output);
   }
 
-  /** 
-   * Uses built-in Linux special files to generate a secure password. We 
-   * basically generate a random number of $len bytes and convert the 
+  /**
+   * Uses built-in Linux special files to generate a secure password. We
+   * basically generate a random number of $len bytes and convert the
    * resulting binary string to something user readable.
    *
    * Helper for generate().
@@ -100,7 +100,7 @@ class PasswordGeneratorComponent extends Object {
     // Note that /dev/urandom is less secure than /dev/random as /dev/random
     // will block in order to collect more entrophy if necessary while
     // /dev/urandom will try to make do with what it has. However, we're using
-    // urandom since the blocking random call is unpredictable and may take 
+    // urandom since the blocking random call is unpredictable and may take
     // from minutes to hours for it to get enough randomness.
     $ret = '';
     if (@is_readable('/dev/urandom')) {
@@ -111,7 +111,7 @@ class PasswordGeneratorComponent extends Object {
     return $this->binconvert($ret);
   }
 
-  /** 
+  /**
    * Uses Windows API to generate a secure password. We basically generate
    * a random number of $len bytes and convert the resulting binary string
    * to something user readable.
@@ -119,7 +119,7 @@ class PasswordGeneratorComponent extends Object {
    * This relies on the now obsolete CAPICOM library from MS:
    * http://www.microsoft.com/en-us/download/details.aspx?id=25281
    * Which is no longer supported after Vista. It was replaced with the
-   * .net x509 crypto lib. 
+   * .net x509 crypto lib.
    *
    * Helper for generate().
    *
@@ -138,8 +138,8 @@ class PasswordGeneratorComponent extends Object {
         // if we ask for binary data PHP munges it, so we
         // request base64 return value.  We squeeze out the
         // redundancy and useless ==CRLF by hashing...
-        if ($pr_bits) { 
-            $pr_bits = $this->binconvert($pr_bits, true); 
+        if ($pr_bits) {
+            $pr_bits = $this->binconvert($pr_bits, true);
         }
       } catch (Exception $ex) {
         return "";
@@ -159,7 +159,7 @@ class PasswordGeneratorComponent extends Object {
    * @access private
    * @return void
    */
-  private function defaultAlgorithm($length = 8, $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') {
-    return substr(str_shuffle($chars), 0, $length);
-  } 
+  private function defaultAlgorithm( $length = 8, $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' ) {
+    return substr( str_shuffle( $chars ), 0, $length );
+  }
 }

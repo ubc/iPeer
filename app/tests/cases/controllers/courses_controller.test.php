@@ -280,7 +280,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
             $this->fixtureIndex[2],
             $this->fixtureIndex[0],
         );
-        $this->assertEqual($result['paramsForList']['data']['entries'], 
+        $this->assertEqual($result['paramsForList']['data']['entries'],
             $expected);
     }
 
@@ -354,7 +354,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->assertEqual($result['data']['Course']['course'], $this->fixtureView['Course'][0]['course']);
         $this->assertEqual($result['data']['Course']['title'], $this->fixtureView['Course'][0]['title']);
         $this->assertEqual(count($result['data']['Group']), 2);
-        $this->assertEqual(count($result['data']['Event']), 9);
+        $this->assertEqual(count($result['data']['Event']), 10);
         $this->assertEqual($result['title_for_layout'], $this->fixtureView['Course'][0]['course'].' - '.$this->fixtureView['Course'][0]['title']);
     }
 
@@ -584,7 +584,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $message = $this->controller->Session->read('Message.flash');
         $this->assertEqual($message['message'], 'The course was deleted successfully.');
     }
-    
+
     /*function testMove()
     {
         //TODO
