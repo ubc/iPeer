@@ -32,7 +32,7 @@ class User extends AppModel
     const IMPORT_EMAIL = '4';
     const IMPORT_PASSWORD = '5';
     const GENERATED_PASSWORD = '6';
-    
+
     const MERGE_MODEL = '0';
     const MERGE_TABLE = '1';
     const MERGE_FIELD = '2';
@@ -171,7 +171,7 @@ class User extends AppModel
         'full_name' => 'IF(CONCAT(first_name, last_name)>"", CONCAT_WS(" ", first_name, last_name), username)',
         'student_no_with_full_name' => 'CONCAT_WS(" ", student_no,CONCAT_WS(" ", first_name, last_name))'
     );
-    
+
     /** validate the faculty field for user form
      * if user is a faculty admin, or instructor,
      * faculty field must not be empty
@@ -384,7 +384,7 @@ class User extends AppModel
     {
         $this->displayField = 'student_no_with_full_name';
         return $this->find(
-            'list', 
+            'list',
             array(
                 'conditions' => array(
                     'Enrolment.id' => $course_id,
@@ -554,7 +554,7 @@ class User extends AppModel
 
         return $this->find($type, $params);
     }
-    
+
     /**
      * Get list of tutors
      *
@@ -783,14 +783,14 @@ class User extends AppModel
         // query all survey events of the course
         $surveys = $this->Event->find('list', array(
             'conditions' => array(
-                'course_id' => $course_id, 
-                'event_template_type_id' => 3), 
+                'course_id' => $course_id,
+                'event_template_type_id' => 3),
             'fields' => array('Event.id')));
         /* query any surveyGroupMember records created based on the above
         survey events for the user */
         $members = $this->SurveyGroupMember->find('all', array(
             'conditions' => array(
-                'SurveyGroupMember.user_id' => $user_id, 
+                'SurveyGroupMember.user_id' => $user_id,
                 'SurveyGroupSet.survey_id' => $surveys)));
         // remove the records found
         foreach ($members as $member) {
@@ -802,7 +802,7 @@ class User extends AppModel
         }
         return $this->UserEnrol->delete($id);
     }
-    
+
     /**
      * unenrolStudent
      *
@@ -890,6 +890,12 @@ class User extends AppModel
     {
         $id = $this->UserTutor->field('id',
             array('user_id' => $user_id, 'course_id' => $course_id));
+
+        $members = $this->Group->find('all', array('conditions' => array('Member.id' => $user_id, 'course_id' => $course_id)));
+        foreach ($members as $member) {
+            $this->GroupsMember->delete($member['GroupsMember']['id']);
+        }
+
         return $this->UserTutor->delete($id);
     }
 
@@ -897,7 +903,7 @@ class User extends AppModel
      * getEmails
      *
      * @param mixed $id id
-     * 
+     *
      * @access public
      * @return void
      */
@@ -934,10 +940,10 @@ class User extends AppModel
             ),
         ));
     }
-    
+
     /**
      * removeOldStudents
-     * 
+     *
      * @param mixed $newList  new list of students
      * @param mixed $courseId course id
      *
@@ -953,7 +959,7 @@ class User extends AppModel
             }
         }
     }
-    
+
     /**
      * Get courses a user is enrolled in
      *
@@ -964,12 +970,12 @@ class User extends AppModel
     function getEnrolledCourses($userId='')
     {
         $user = $this->find('first', array(
-            'conditions' => array('User.id' => $userId), 
+            'conditions' => array('User.id' => $userId),
             'contain' => array('Enrolment')
         ));
         return Set::extract($user, '/Enrolment/id');
     }
-    
+
     /**
      * getFullNames
      * Get first and last names of user(s)
@@ -985,7 +991,7 @@ class User extends AppModel
             'fields' => array('User.full_name')
         ));
     }
-    
+
     /**
      * getUsers
      *
@@ -1005,7 +1011,7 @@ class User extends AppModel
             'fields' => $fields,
         ));
     }
-    
+
     /**
      * Get members in a group in event (not including tutors)
 	 *
@@ -1027,7 +1033,7 @@ class User extends AppModel
             'conditions' => $conditions,
             'contain' => array('Role', 'Group')
         ));
-        
+
         $groupMembers = array();
         foreach($members as $member) {
             $tmp = array();
@@ -1187,7 +1193,7 @@ class User extends AppModel
             return array_keys(User::getMyCourseList());
         }
     }
-    
+
     /**
      * getDroppedStudentsWithRole
      *
@@ -1211,7 +1217,7 @@ class User extends AppModel
         foreach ($dropped as $key => $drop){
             $dropped[$key] = $dropped[$key] + $drop['User'];
         }
-        
+
         return $dropped;
     }
 

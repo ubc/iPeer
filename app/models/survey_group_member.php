@@ -11,7 +11,7 @@
 class SurveyGroupMember extends AppModel
 {
     public $name = 'SurveyGroupMember';
-    
+
     public $belongsTo = array(
         'User' => array(
             'className'    => 'User',
