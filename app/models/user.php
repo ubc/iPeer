@@ -961,22 +961,6 @@ class User extends AppModel
     }
 
     /**
-     * Get courses a user is enrolled in
-     *
-     * @param mixed $userId user id
-     *
-     * @return list of course ids
-     */
-    function getEnrolledCourses($userId='')
-    {
-        $user = $this->find('first', array(
-            'conditions' => array('User.id' => $userId),
-            'contain' => array('Enrolment')
-        ));
-        return Set::extract($user, '/Enrolment/id');
-    }
-
-    /**
      * getFullNames
      * Get first and last names of user(s)
      *
@@ -1043,6 +1027,54 @@ class User extends AppModel
         }
 
         return $groupMembers;
+    }
+
+    /**
+     * Get courses a user is enrolled in
+     *
+     * @param mixed $userId user id
+     *
+     * @return list of course ids
+     */
+    function getEnrolledCourses($userId='')
+    {
+        $user = $this->find('first', array(
+            'conditions' => array('User.id' => $userId),
+            'contain' => array('Enrolment')
+        ));
+        return Set::extract($user, '/Enrolment/id');
+    }
+
+    /**
+     * Get courses a tutor is enrolled in
+     *
+     * @param mixed $userId user id
+     *
+     * @return list of course ids
+     */
+    function getTutorCourses($userId='')
+    {
+        $user = $this->find('first', array(
+            'conditions' => array('User.id' => $userId),
+            'contain' => array('Tutor')
+        ));
+        return Set::extract($user, '/Tutor/id');
+    }
+
+    /**
+     * Get courses an instructor is enrolled in
+     *
+     * @param mixed $userId user id
+     *
+     * @return list of course ids
+     */
+    function getInstructorCourses($userId='')
+    {
+        $user = $this->find('first', array(
+            'conditions' => array('User.id' => $userId),
+            'contain' => array('Course')
+        ));
+        return Set::extract($user, '/Course/id');
     }
 
     /*********************************

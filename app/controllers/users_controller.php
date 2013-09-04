@@ -1323,7 +1323,6 @@ class UsersController extends AppController
     }
 
     /**
-<<<<<<< HEAD
      * _updateCreatorUpdaterId
      *
      * @param mixed $updated   updated
