@@ -5,17 +5,17 @@ foreach ($questions as $i => $q) {
     $prompt = $q['Question']['prompt'];
     echo $html->div('prompt', "$i. " . $prompt);
     if ($q['Question']['type'] == 'M') {
-        echo $form->input($i, 
+        echo $form->input($i,
             array(
                 'type' => 'radio',
-                'options' => $q['ResponseOptions'], 
+                'options' => $q['ResponseOptions'],
                 'separator' => '<br />'
             )
         );
     } else if ($q['Question']['type'] == 'C') {
-        echo $form->input('blah', 
+        echo $form->input('blah',
             array(
-                'options' => $q['ResponseOptions'], 
+                'options' => $q['ResponseOptions'],
                 'multiple' => 'checkbox',
                 'label' => false
             )
@@ -28,28 +28,28 @@ foreach ($questions as $i => $q) {
     // question editing links
     $qId = $q['Question']['id'];
     echo $html->div('Operators',
-        $html->link(_('Edit'), "editQuestion/$qId/$survey_id",
+        $html->link(__('Edit', true), "editQuestion/$qId/$survey_id",
             array('class' => 'edit-button')).
-        $html->link(_('Delete'), "removeQuestion/$survey_id/$qId",
+        $html->link(__('Delete', true), "removeQuestion/$survey_id/$qId",
             array('escape' => false, 'class' => 'delete-button'),
-            _('Are you sure you want to delete') . " &ldquo;$prompt&rdquo;?").
+            __('Are you sure you want to delete', true) . " &ldquo;$prompt&rdquo;?").
         $html->div('MoveQuestion',
-            $html->link(_('Top'), "moveQuestion/$survey_id/$qId/TOP",
+            $html->link(__('Top', true), "moveQuestion/$survey_id/$qId/TOP",
                 array('escape' => false, 'class' => 'top-button')).
-            $html->link(_('Up'), "moveQuestion/$survey_id/$qId/UP",
+            $html->link(__('Up', true), "moveQuestion/$survey_id/$qId/UP",
                 array('escape' => false, 'class' => 'up-button')).
-            $html->link(_('Down'), "moveQuestion/$survey_id/$qId/DOWN",
+            $html->link(__('Down', true), "moveQuestion/$survey_id/$qId/DOWN",
                 array('escape' => false, 'class' => 'down-button')).
-            $html->link(_('Bottom'), "moveQuestion/$survey_id/$qId/BOTTOM",
+            $html->link(__('Bottom', true), "moveQuestion/$survey_id/$qId/BOTTOM",
                 array('escape' => false, 'class' => 'bottom-button'))
         )
     );
 }
 
-echo $html->div('center', 
-    $form->button(_('Add Question'), 
+echo $html->div('center',
+    $form->button(__('Add Question', true),
        array('onclick' => "window.location='/surveys/addQuestion/$survey_id'")).
-    $form->button(_('Done'), 
+    $form->button(__('Done', true),
        array('onclick' => "window.location='/surveys/index'"))
 );
 ?>

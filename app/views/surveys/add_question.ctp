@@ -1,38 +1,38 @@
 <div class='SurveyAddQuestion'>
 <?php
-echo $this->Form->create('Question', 
+echo $this->Form->create('Question',
     array('url' => '/'.$this->params['url']['url']));
-echo $form->input('template_id', 
+echo $form->input('template_id',
     array(
-        'empty' => _('(Select Question to Load)'),
+        'empty' => __('(Select Question to Load)', true),
         'options' => $templates,
-        'after' => $form->submit(_('Load'), 
+        'after' => $form->submit(__('Load', true),
             array('div' => false, 'name' => 'load'))
     )
 );
-echo $html->div('help-text', _('Load a master question as your template.'));
-echo $form->input('Question.master', 
+echo $html->div('help-text', __('Load a master question as your template.', true));
+echo $form->input('Question.master',
     array('options' => array('no' => 'No', 'yes' => 'Yes')));
-echo $html->div('help-text', 
-    _('Whether this question can be used as a template for new questions.'));
+echo $html->div('help-text',
+    __('Whether this question can be used as a template for new questions.', true));
 echo $form->input('Question.prompt');
-echo $form->input('Question.type', 
+echo $form->input('Question.type',
     array(
         'options' => array(
-            'M' => _('Multiple Choice (Single Answer)'),
-            'C' => _('Choose Any Of... (Multiple Answers)'),
-            'S' => _('Single Line Text Input'),
-            'L' => _('Long Answer Text Input')
+            'M' => __('Multiple Choice (Single Answer)', true),
+            'C' => __('Choose Any Of... (Multiple Answers)', true),
+            'S' => __('Single Line Text Input', true),
+            'L' => __('Long Answer Text Input', true)
         )
     )
 );
 
 // Response section, has to be custom due to no cakephp automagic for doing this
 // Most of the complication is due to the need to implement form restoration
-// on submit error. 
+// on submit error.
 function makeResp($i, $val, $html, $form) {
     // make the response text box
-    $input = $form->text("Response.$i.response") . $html->link('X', '#', 
+    $input = $form->text("Response.$i.response") . $html->link('X', '#',
                 array('onclick' => "rmResponseInput($i); return false;"));
     if (isset($val['id'])) { # for editing form, need to know response id
         $input .= $form->hidden("Response.$i.id");
@@ -40,13 +40,13 @@ function makeResp($i, $val, $html, $form) {
     $ret = $html->div('input text', $input, array('id' => "responseInput$i"));
     return $ret;
 }
-$numResponses = 0; 
+$numResponses = 0;
 $responseTemplate = makeResp(-1, array(), $html, $form);
 $existingResponses = $form->label('Responses') . $html->link('Add Response',
     '#', array('onclick' => "addResponseInput(); return false;"));
 // restore previously submitted responses, if any
 if (isset($this->data) && isset($this->data['Response'])) {
-    foreach($this->data['Response'] as $key => $val) { 
+    foreach($this->data['Response'] as $key => $val) {
         $existingResponses .= makeResp($key, $val, $html, $form);
         $numResponses = $key + 1;
     }
@@ -56,8 +56,8 @@ echo $html->div('input text', $existingResponses, array('id' => 'responseInput')
 
 // Submit buttons
 echo $html->div('center',
-    $form->submit(_('Save Question'), array('div' => false)) .
-    $form->submit(_('Cancel'), array('div' => false, 'name' => 'cancel'))
+    $form->submit(__('Save Question', true), array('div' => false)) .
+    $form->submit(__('Cancel', true), array('div' => false, 'name' => 'cancel'))
 );
 echo $form->end();
 ?>
