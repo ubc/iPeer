@@ -45,12 +45,13 @@ foreach ($questions as $i => $q) {
         )
     );
 }
-
+$addURL = $this->webroot.'surveys/addQuestion/'.$survey_id;
+$doneURL = $this->webroot.'surveys/index';
 echo $html->div('center',
     $form->button(__('Add Question', true),
-       array('onclick' => "window.location='/surveys/addQuestion/$survey_id'")).
+       array('onclick' => "window.location='$addURL'")).
     $form->button(__('Done', true),
-       array('onclick' => "window.location='/surveys/index'"))
+       array('onclick' => "window.location='$doneURL'"))
 );
 ?>
 </div>
