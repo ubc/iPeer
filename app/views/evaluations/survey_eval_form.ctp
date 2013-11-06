@@ -6,7 +6,7 @@ if (!empty($event['Event']['description'])) { ?>
 <?php }
 echo '<h2>' . $event['Event']['title'] . '</h2>';
 echo $form->create('SurveyInput', 
-    array('url' => $html->url("makeEvaluation/$eventId")));
+    array('url' => "makeEvaluation/$eventId"));
 
 foreach ($questions as $i => $q) {
     echo $html->div('prompt', $i + 1 .' '. $q['Question']['prompt']);
