@@ -43,29 +43,26 @@ foreach ($classList as $person) {
 function fnFormatDetails ( oTable, nTr )
 {
     var aData = oTable.fnGetData( nTr );
-    var sOut = '<div class="userActionPanel"><ul>';
 
-    sOut += '<li>';
-    sOut += '<a href="<?php echo $this->base; ?>/users/view/'+aData[0]+'">View</a>';
-    sOut += '</li>';
+    var sOut = '<a href="<?php echo $this->base; ?>/users/view/'+aData[0]+'">';
+    sOut += '<div style="cursor: default; padding: 4px; font-weight: bold; color: black;">View';
+    sOut += '</div></a>';
 
-    sOut += '<li>';
-    sOut += '<a href="<?php echo $this->base; ?>/users/edit/'+aData[0]+'/<?php echo $courseId?>">Edit</a>';
-    sOut += '</li>';
+    sOut += '<a href="<?php echo $this->base; ?>/users/edit/'+aData[0]+'/<?php echo $courseId?>">';
+    sOut += '<div style="cursor: default; padding: 4px; font-weight: bold; color: black;">Edit';
+    sOut += '</div></a>';
 
-    sOut += '<li>';
-    sOut += '<a href="<?php echo $this->base; ?>/emailer/write/U/'+aData[0]+'">Email</a>';
-    sOut += '</li>';
+    sOut += '<a href="<?php echo $this->base; ?>/emailer/write/U/'+aData[0]+'">';
+    sOut += '<div style="cursor: default; padding: 4px; font-weight: bold; color: black;">Email';
+    sOut += '</div></a>';
 
-    sOut += '<li>';
-    sOut += '<a href="<?php echo $this->base; ?>/users/resetPassword/'+aData[0]+'/<?php echo $courseId?>" onclick="return resetConfirmed()">Reset Password</a>';
-    sOut += '</li>';
+    sOut += '<a href="<?php echo $this->base; ?>/users/resetPassword/'+aData[0]+'/<?php echo $courseId?>" onclick="return resetConfirmed()">';
+    sOut += '<div style="cursor: default; padding: 4px; font-weight: bold; color: black;">Reset Password';
+    sOut += '</div></a>';
 
-    sOut += '<li>';
-    sOut += '<a href="<?php echo $this->base; ?>/users/delete/'+aData[0]+'/<?php echo $courseId?>" onclick="return dropConfirmed(&quot;'+aData[2]+'&quot;)">Drop</a>';
-    sOut += '</li>';
-
-    sOut += '</ul></div>';
+    sOut += '<a href="<?php echo $this->base; ?>/users/delete/'+aData[0]+'/<?php echo $courseId?>" onclick="return dropConfirmed(&quot;'+aData[2]+'&quot;)">';
+    sOut += '<div style="cursor: default; padding: 4px; font-weight: bold; color: black;">Drop';
+    sOut += '</div></a>';
 
     return sOut;
 }
@@ -83,6 +80,7 @@ function resetConfirmed()
 }
 
 jQuery(document).ready(function() {
+	var elmnt = null;
     /*
      * Initialise DataTables, with no sorting on the 'details' column
      */
@@ -93,23 +91,39 @@ jQuery(document).ready(function() {
         ],
         "aaSorting" : [[1, 'asc']]
     });
-
+    
     /* Add event listener for opening and closing details
      * Note that the indicator for showing which row is open is not controlled by DataTables,
      * rather it is done here
      */
-    jQuery('#table_id tbody td').live('click', function () {
-        var nTr = jQuery(this).parents('tr')[0];
-        if ( oTable.fnIsOpen(nTr) )
-        {
-            /* This row is already open - close it */
-            oTable.fnClose( nTr );
+    jQuery('#table_id tbody td').on('click', function (ev) {
+        if (elmnt) {
+        	elmnt.remove();
+        	elmnt = null;
         }
-        else
-        {
-            /* Open this row */
-            oTable.fnOpen( nTr, fnFormatDetails(oTable, nTr), 'userActionPanel' );
+        else {
+	        var nTr = jQuery(this).parents('tr')[0];
+	        elmnt = jQuery('<div>');
+	        elmnt.html(fnFormatDetails(oTable, nTr));
+	        elmnt.css({"background-color": "rgb(255, 255, 224)", "margin": "0px", "padding": "5px", "border": "1px solid", "position": "absolute"});
+			elmnt.css("top", ev.pageY);
+			elmnt.css("left", ev.pageX);
+			elmnt.find("a").css({"text-decoration":"none", "color": "black"});
+			elmnt.find("div").mouseover(function(){
+				jQuery(this).css({"background-color": "rgb(173, 216, 230)"});
+			});
+			elmnt.find("div").mouseout(function(){
+				jQuery(this).css({"background-color": "rgb(255, 255, 224)"});
+			});
+			jQuery(document.body).append(elmnt);
         }
+        ev.stopPropagation();
     } );
+    jQuery(document).on('click', function () {
+    	if (elmnt) {
+        	elmnt.remove();
+        	elmnt = null;
+        }
+    });
 } );
 </script>
