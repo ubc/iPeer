@@ -347,7 +347,9 @@ class V1Controller extends Controller {
                 $data = array();
                 // rearrange the data
                 foreach ($decode as $person) {
-                    $pRole = array('Role' => array('RolesUser' => array('role_id' => $person['role_id'])));
+                	// set the userId so the user data gets updats with values from BB
+                	$person['id'] = $this->User->field('id', array('username' => $person['username']));
+                	$pRole = array('Role' => array('RolesUser' => array('role_id' => $person['role_id'])));
                     unset($person['role_id']);
                     // do some clean up before we insert the values
                     array_walk($person, create_function('&$val', '$val = trim($val);'));
@@ -995,6 +997,56 @@ class V1Controller extends Controller {
                     $inClass[] = $user['username'];
 
                     $result[] = $user;
+                }
+                // check if any user's role changed
+                else {
+                	$userId = $this->User->field('id', array('username' => $user['username']));
+                	if (!empty($userId)) {
+	                	$role = $this->Role->getRoleName($user['role_id']);
+	                	
+	                	if ($role == 'instructor') {
+	                		if(in_array($userId, $students)) {
+	                			$this->User->removeStudent($userId, $courseId);
+	                			$this->log('Removing student '.$user['username'].' from course '.$courseId, 'debug');
+	                			$ret = $this->User->addInstructor($userId, $courseId);
+	                			$this->log('Adding instructor '.$user['username'].' to course '.$courseId, 'api');
+	                		}
+	                		else if(in_array($userId, $tutors)) {
+	                			$this->User->removeTutor($userId, $courseId);
+	                			$this->log('Removing tutor '.$user['username'].' from course '.$courseId, 'debug');
+	                			$ret = $this->User->addInstructor($userId, $courseId);
+	                			$this->log('Adding instructor '.$user['username'].' to course '.$courseId, 'api');
+	                		}
+	                	}
+	                	else if ($role == 'tutor') {
+	                		if(in_array($userId, $students)) {
+	                			$this->User->removeStudent($userId, $courseId);
+	                			$this->log('Removing student '.$user['username'].' from course '.$courseId, 'debug');
+	                			$ret = $this->User->addTutor($userId, $courseId);
+	                			$this->log('Adding tutor '.$user['username'].' to course '.$courseId, 'api');
+	                		}
+	                		else if(in_array($userId, $instructors)) {
+	                			$this->User->removeInstructor($userId, $courseId);
+	                			$this->log('Removing instructor '.$user['username'].' from course '.$courseId, 'debug');
+	                			$ret = $this->User->addTutor($userId, $courseId);
+	                			$this->log('Adding tutor '.$user['username'].' to course '.$courseId, 'api');
+	                		}
+	                	}
+	                	else if ($role == 'student') {
+	                		if(in_array($userId, $tutors)) {
+	                			$this->User->removeTutor($userId, $courseId);
+	                			$this->log('Removing tutor '.$user['username'].' from course '.$courseId, 'debug');
+	                			$ret = $this->User->addStudent($userId, $courseId);
+	                			$this->log('Adding student '.$user['username'].' to course '.$courseId, 'api');
+	                		}
+	                		else if(in_array($userId, $instructors)) {
+	                			$this->User->removeInstructor($userId, $courseId);
+	                			$this->log('Removing instructor '.$user['username'].' from course '.$courseId, 'debug');
+	                			$ret = $this->User->addStudent($userId, $courseId);
+	                			$this->log('Adding student '.$user['username'].' to course '.$courseId, 'api');
+	                		}
+	                	}
+                	}
                 }
             }
             // unenrol students that are no longer in the class, this will become a problem if
