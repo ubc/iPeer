@@ -210,6 +210,8 @@ var EvalEditor = Class.create({
     var descriptors = Builder.node("div", {className: "descriptors"});
 
     // generate multiplier element
+    var multiplier  = Builder.node("input", {type: "text", name: "data[Question]["+options.index+"][multiplier]", className: "multiplier", value: options.multiplier, size: "10"});
+    /*
     var multiplier  = Builder.node("select", {name: "data[Question]["+options.index+"][multiplier]",
                                               className: "multiplier"});
     for(var i = 1; i <= 15; i ++) {
@@ -219,6 +221,7 @@ var EvalEditor = Class.create({
         $(multiplier).appendChild(Builder.node("option", {value: i}, i));
       }
     }
+    */
 
     // generate question body
     var question_body = Builder.node("div", {className: "question-body"}, [

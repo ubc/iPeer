@@ -46,7 +46,7 @@ var EvalViewer = Class.create({
     this.section = Builder.node('div', {className: "section"});
     this.summary = Builder.node('div', {id: "summary"}, [
       "Total Marks: ",
-      Builder.node('div', {type: "text", name: "total_marks", id: "total", className: "input", readonly: "true", style: "float:right; width:20px; padding-right:15px"})
+      Builder.node('div', {type: "text", name: "total_marks", id: "total", className: "", readonly: "true", style: "float:right; width:20px; padding-right:15px"})
     ]);
   
 
