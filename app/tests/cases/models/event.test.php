@@ -91,7 +91,7 @@ class EventTestCase extends CakeTestCase
 
         //Test a valid course number
         $course = $this->Event->getCourseEventCount(1);
-        $this->assertEqual($course, 10);
+        $this->assertEqual($course, 15);
 
         //Test an invalid course number
         $course = $this->Event->getCourseEventCount(999);
@@ -339,9 +339,18 @@ class EventTestCase extends CakeTestCase
         $event = $this->Event->findById(1);
         $dueDate = strtotime($event['Event']['due_date']);
         $dueIn = $dueDate - $now;
+        $serverTZ = date_default_timezone_get(); // saves the server's timezone
         // the difference between the our calculuation and the model's calcualtion
         // should be within 5 seconds
         $this->assertWithinMargin($event['Event']['due_in'], $dueIn, 5);
+        // switch to timezone without daylight savings
+        date_default_timezone_set('America/Regina');
+        $this->assertWithinMargin($event['Event']['due_in'], $dueIn, 5);
+        // switch to timezone with daylight savings
+        date_default_timezone_set('America/Vancouver');
+        $this->assertWithinMargin($event['Event']['due_in'], $dueIn, 5);
+        // switch timezone back to original
+        date_default_timezone_set($serverTZ);
     }
 
     #####################################################################################################################################################
