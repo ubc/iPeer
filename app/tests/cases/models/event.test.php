@@ -91,7 +91,7 @@ class EventTestCase extends CakeTestCase
 
         //Test a valid course number
         $course = $this->Event->getCourseEventCount(1);
-        $this->assertEqual($course, 15);
+        $this->assertEqual($course, 17);
 
         //Test an invalid course number
         $course = $this->Event->getCourseEventCount(999);
