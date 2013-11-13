@@ -137,6 +137,8 @@ echo "</div>";
 echo $this->Form->submit();
 echo $this->Form->end();
 
+// Removed for enhancement #516 - "Allow duplicate event title"
+/*
 echo $ajax->observeField(
     'EventTitle',
     array(
@@ -147,6 +149,7 @@ echo $ajax->observeField(
         'complete'=>"Element.hide('loading');stripe();"
     )
 );
+*/
 ?>
 </div>
 
