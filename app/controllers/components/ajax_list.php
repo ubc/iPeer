@@ -120,7 +120,7 @@ class AjaxListComponent extends Object
             $state = new Object();
             $state->sortBy = $this->sortBy;
             $state->sortAsc = true;
-            $state->pageSize = 15;
+            $state->pageSize = 20;
             $state->pageShown = 1;
             $state->searchValue = "";
             $state->searchBy = $this->searchBy;
