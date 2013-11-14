@@ -1331,6 +1331,7 @@ CREATE TABLE IF NOT EXISTS `mixeval_questions` (
   `self_eval` tinyint(1) NOT NULL DEFAULT '0',
   `multiplier` int(11) NOT NULL DEFAULT '0',
   `scale_level` int(11) NOT NULL DEFAULT '0',
+  `show_marks` int(1) DEFAULT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`mixeval_question_type_id`) REFERENCES `mixeval_question_types` 
 	(`id`) ON DELETE CASCADE,
@@ -1342,13 +1343,13 @@ CREATE TABLE IF NOT EXISTS `mixeval_questions` (
 -- Dumping data for table `mixeval_questions`
 --
 
-INSERT INTO `mixeval_questions` (`id`, `mixeval_id`, `question_num`, `title`, `instructions`, `mixeval_question_type_id`, `required`, `self_eval`, `multiplier`, `scale_level`) VALUES
-(1, 1, 1, 'Participated in Team Meetings', "Please rate performance.", 1, 1, 0, 1, 5),
-(2, 1, 2, 'Was Helpful and co-operative', NULL, 1, 1, 0, 1, 5),
-(3, 1, 3, 'Submitted work on time', NULL, 1, 1, 0, 1, 5),
-(4, 1, 4, 'Produced efficient work?', NULL, 3, 1, 0, 0, 5),
-(5, 1, 5, 'Contributed?', "Please give a paragraph answer.", 2, 1, 0, 0, 5),
-(6, 1, 6, 'Easy to work with?', NULL, 3, 0, 0, 0, 5);
+INSERT INTO `mixeval_questions` (`id`, `mixeval_id`, `question_num`, `title`, `instructions`, `mixeval_question_type_id`, `required`, `self_eval`, `multiplier`, `scale_level`, `show_marks`) VALUES
+(1, 1, 1, 'Participated in Team Meetings', "Please rate performance.", 1, 1, 0, 1, 5, 1),
+(2, 1, 2, 'Was Helpful and co-operative', NULL, 1, 1, 0, 1, 5, 0),
+(3, 1, 3, 'Submitted work on time', NULL, 1, 1, 0, 1, 5, 1),
+(4, 1, 4, 'Produced efficient work?', NULL, 3, 1, 0, 0, 5, NULL),
+(5, 1, 5, 'Contributed?', "Please give a paragraph answer.", 2, 1, 0, 0, 5, NULL),
+(6, 1, 6, 'Easy to work with?', NULL, 3, 0, 0, 0, 5, NULL);
 
 -- --------------------------------------------------------
 
@@ -1747,6 +1748,7 @@ CREATE TABLE IF NOT EXISTS `rubrics_criterias` (
   `criteria_num` int(11) NOT NULL DEFAULT '999',
   `criteria` varchar(255) DEFAULT NULL,
   `multiplier` int(11) NOT NULL DEFAULT '0',
+  `show_marks` int(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
@@ -1754,9 +1756,9 @@ CREATE TABLE IF NOT EXISTS `rubrics_criterias` (
 -- Dumping data for table `rubrics_criterias`
 --
 
-INSERT INTO `rubrics_criterias` VALUES (1, 1, 1, 'Participated in Team Meetings', 5);
-INSERT INTO `rubrics_criterias` VALUES (2, 1, 2, 'Was Helpful and Co-operative', 5);
-INSERT INTO `rubrics_criterias` VALUES (3, 1, 3, 'Submitted Work on Time', 5);
+INSERT INTO `rubrics_criterias` VALUES (1, 1, 1, 'Participated in Team Meetings', 5, 0);
+INSERT INTO `rubrics_criterias` VALUES (2, 1, 2, 'Was Helpful and Co-operative', 5, 1);
+INSERT INTO `rubrics_criterias` VALUES (3, 1, 3, 'Submitted Work on Time', 5, 1);
 
 -- --------------------------------------------------------
 
@@ -2010,7 +2012,7 @@ INSERT INTO `sys_parameters` (`parameter_code`, `parameter_value`, `parameter_ty
 ('system.admin_email', 'Please enter the iPeer administrator\\''s email address.', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 ('display.date_format', 'D, M j, Y g:i a', 'S', 'date format preference', 'A', 0, NOW(), NULL, NOW()),
 ('system.version', '3.1.0', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
-('database.version', '6', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
+('database.version', '7', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
 ('email.port', '25', 'S', 'port number for email smtp option', 'A', '0', NOW(), NULL , NOW()),
 ('email.host', 'localhost', 'S', 'host address for email smtp option', 'A', '0', NOW(), NULL , NOW()),
 ('email.username', '', 'S', 'username for email smtp option', 'A', '0', NOW(), NULL , NOW()),

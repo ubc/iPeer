@@ -129,6 +129,10 @@ function likertFields($view, $i) {
         array('label' => 'Marks'));
     $ret .= $html->div("help-text", 
         _t('This mark will be scaled according to the response. E.g.: If there are 5 scale levels and this is set at 1, the lowest scale will be worth 0.2 marks, the second lowest 0.4 marks, and so on with the highest scale being worth the full 1 mark.'));
+    $ret .= $form->input("MixevalQuestion.$i.show_marks",
+        array('label' => 'Show Marks', 'type' => 'checkbox'));
+    $ret .= $html->div("help-text",
+        _t('This setting will hide/show the mark distribution to those taking the evaluation.'));
     $ret .= $html->div('',
         $form->label(null, 'Scale', array('class' => 'defLabel')) .
         $form->button("Add", array('type' => 'button', 

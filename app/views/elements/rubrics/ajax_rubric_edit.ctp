@@ -41,6 +41,9 @@ $default_options = array('type' => 'text',
     <div><?php echo $this->Form->input('RubricsCriteria.'.$i.'.criteria', $default_options)?>
          <?php echo $this->Form->input('RubricsCriteria.'.$i.'.id', array('type' => 'hidden'))?>
          <?php echo $this->Form->input('RubricsCriteria.'.$i.'.criteria_num', array('type' => 'hidden', 'value' => $i+1))?>
+         <?php $helptext = "Selecting this will enable the marks to be visible/hidden from the user."?>
+         <div title = "<?php echo $helptext ?>"><?php __('Show Marks')?></div>
+         <?php echo $this->Form->input('RubricsCriteria.'.$i.'.show_marks', array('label' => '', 'type' => 'checkbox', 'title' => $helptext))?>
     </div>
     </th>
 
