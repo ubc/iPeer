@@ -5,8 +5,14 @@ if (!empty($event['Event']['description'])) { ?>
 <div id='description'><?php echo _t($event['Event']['description']) ?></div>
 <?php }
 echo '<h2>' . $event['Event']['title'] . '</h2>';
-echo $form->create('SurveyInput', 
-    array('url' => "makeEvaluation/$eventId"));
+if (empty($studentId)) {
+	echo $form->create('SurveyInput', 
+	    array('url' => "makeEvaluation/$eventId"));
+}
+else {
+	echo $form->create('SurveyInput',
+			array('url' => "makeEvaluation/$eventId/0/$studentId"));
+}
 
 foreach ($questions as $i => $q) {
     echo $html->div('prompt', $i + 1 .' '. $q['Question']['prompt']);

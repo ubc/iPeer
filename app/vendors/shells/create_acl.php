@@ -530,6 +530,7 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Oauthtokens/add');
         $this->Acl->allow($role, 'controllers/Oauthtokens/delete');
         $this->Acl->deny($role, 'controllers/Users/merge');
+        $this->Acl->allow($role, 'controllers/Users/showEvents');
         $this->Acl->deny($role, 'functions');
         $this->Acl->allow($role, 'functions/evaluation');
         $this->Acl->deny($role, 'functions/evaluation', 'update');

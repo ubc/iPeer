@@ -63,6 +63,15 @@ function fnFormatDetails ( oTable, nTr )
     sOut += '<a href="<?php echo $this->base; ?>/users/delete/'+aData[0]+'/<?php echo $courseId?>" onclick="return dropConfirmed(&quot;'+aData[2]+'&quot;)">';
     sOut += '<div style="cursor: default; padding: 4px; font-weight: bold; color: black;">Drop';
     sOut += '</div></a>';
+    <?php
+    if (User::hasPermission('controllers/Users/showEvents')) {
+    ?>
+       	sOut += '<a href="<?php echo $this->base; ?>/users/showEvents/'+aData[0]+'">';
+	    sOut += '<div style="cursor: default; padding: 4px; font-weight: bold; color: black;">Show user\'s events';
+	    sOut += '</div></a>';
+	<?php }
+    ?>
+    
 
     return sOut;
 }
@@ -96,7 +105,7 @@ jQuery(document).ready(function() {
      * Note that the indicator for showing which row is open is not controlled by DataTables,
      * rather it is done here
      */
-    jQuery('#table_id tbody td').on('click', function (ev) {
+    jQuery('#table_id tbody').on('click', 'td', function (ev) {
         if (elmnt) {
         	elmnt.remove();
         	elmnt = null;

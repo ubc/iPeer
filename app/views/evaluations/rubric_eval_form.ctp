@@ -25,7 +25,7 @@ function saveButtonVal(userId) {
 <?php echo $html->script('ricopanelcontainer')?>
 <?php echo $html->script('ricoaccordion')?>
 <?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
-<form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeEvaluation/'.$event['Event']['id'].'/'.$event['Group']['id']) ?>">
+<form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeEvaluation/'.$event['Event']['id'].'/'.$event['Group']['id'].'/'.$studentId) ?>">
 <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
 <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>"/>
 <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>"/>
@@ -129,6 +129,7 @@ function saveButtonVal(userId) {
     <input type="hidden" name="rubric_id" value="<?php echo $viewData['id']?>"/>
     <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo User::get('id')?>"/>
     <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/>
+    <input type="hidden" name="student_id" value="<?php echo $studentId?>"/>
     <?php
     if ($allDone && !$comReq) {
         echo $form->submit(__('Submit to Complete the Evaluation', true), array('div'=>'submitComplete'));

@@ -479,7 +479,7 @@ class EvaluationComponent extends Object
      * @access public
      * @return void
      */
-    function loadRubricEvaluationDetail($event)
+    function loadRubricEvaluationDetail($event, $sutdentId = null)
     {
         $this->EvaluationRubric = new EvaluationRubric;
         $this->GroupsMembers = new GroupsMembers;
@@ -489,7 +489,7 @@ class EvaluationComponent extends Object
         
         $Session = new SessionComponent();
         $user = $Session->read('Auth.User');//User or Admin or
-        $evaluator = $user['id'];
+        $evaluator = empty($sutdentId) ? $user['id'] : $sutdentId;
         $result = array();
         //Get Members for this evaluation
         $groupMembers = $this->User->getEventGroupMembersNoTutors(
@@ -801,12 +801,12 @@ class EvaluationComponent extends Object
      * @access public
      * @return void
      */
-    function loadMixEvaluationDetail ($event)
+    function loadMixEvaluationDetail ($event, $studentId = null)
     {
         $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
         $this->User = ClassRegistry::init('User');
 
-        $evaluator = $this->Auth->user('id');
+        $evaluator = empty($studentId) ? $this->Auth->user('id') : $studentId;
 
         //Get Members for this evaluation
         $groupMembers = $this->User->getEventGroupMembersNoTutors(
