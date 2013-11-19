@@ -48,8 +48,10 @@ $reqCom = isset($event) && $event['Event']['com_req'] ? '<br><font color="red">(
                 onClick="document.evalForm.selected_lom_<?php echo $userId."_".$i?>.value=<?php echo $lom['lom_num']?>;" <?php echo $check?>/>
             </div>
 
-            <?php if (!$evaluate): ?>
-                <div><?php __('Mark')?>: <?php echo $mark_value?></div>
+            <?php if ($criteria['show_marks'] == 1): ?>
+                <?php if (!$evaluate): ?>
+                    <div><?php __('Mark')?>: <?php echo $mark_value?></div>
+                <?php endif; ?>
             <?php endif; ?>
         </td>
         <?php endforeach ?>

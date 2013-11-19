@@ -1067,6 +1067,7 @@ CREATE TABLE IF NOT EXISTS `mixeval_questions` (
   `self_eval` tinyint(1) NOT NULL DEFAULT '0',
   `multiplier` int(11) NOT NULL DEFAULT '0',
   `scale_level` int(11) NOT NULL DEFAULT '0',
+  `show_marks` int(1) DEFAULT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`mixeval_question_type_id`) REFERENCES `mixeval_question_types` 
 	(`id`) ON DELETE CASCADE,
@@ -1308,6 +1309,7 @@ CREATE TABLE IF NOT EXISTS `rubrics_criterias` (
   `criteria_num` int(11) NOT NULL DEFAULT '999',
   `criteria` varchar(255) DEFAULT NULL,
   `multiplier` int(11) NOT NULL DEFAULT '0',
+  `show_marks` int(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
@@ -1482,7 +1484,7 @@ INSERT INTO `sys_parameters` (`parameter_code`, `parameter_value`, `parameter_ty
 ('system.admin_email', 'Please enter the iPeer administrator\\''s email address.', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 ('display.date_format', 'D, M j, Y g:i a', 'S', 'date format preference', 'A', 0, NOW(), NULL, NOW()),
 ('system.version', '3.1.0', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
-('database.version', '6', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
+('database.version', '7', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
 ('email.port', '25', 'S', 'port number for email smtp option', 'A', '0', NOW(), NULL , NOW()),
 ('email.host', 'localhost', 'S', 'host address for email smtp option', 'A', '0', NOW(), NULL , NOW()),
 ('email.username', '', 'S', 'username for email smtp option', 'A', '0', NOW(), NULL , NOW()),

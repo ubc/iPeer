@@ -56,9 +56,13 @@ class EvaluationBase extends AppModel
             str_replace("'", "", $this->data[$this->name]['name']);
 
         //check the duplicate name
+        // Removed for enhancement #516 - "Allow duplicate event title"
+        /*
         if (empty($this->data[$this->name]['id']) && !$this->__checkDuplicateName()) {
             return false;
         }
+        */
+        
         //check if questions are entered
         if (!empty($this->data['Question'])&&$this->name =='Mixeval') {
             foreach ($this->data['Question'] as $row) {

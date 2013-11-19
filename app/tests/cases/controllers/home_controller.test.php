@@ -90,7 +90,7 @@ class HomeControllerTest extends ExtendedAuthTestCase
         $this->assertEqual(count($activeCourses[0]['Instructor']), 2);
         $this->assertEqual(count($activeCourses[0]['Event']), 0);
         $this->assertEqual(count($activeCourses[1]['Instructor']), 1);
-        $this->assertEqual(count($activeCourses[1]['Event']), 15);
+        $this->assertEqual(count($activeCourses[1]['Event']), 17);
         $this->assertEqual(count($inactiveCourses[0]['Instructor']), 1);
         $this->assertEqual(count($inactiveCourses[0]['Event']), 0);
     }
@@ -108,7 +108,7 @@ class HomeControllerTest extends ExtendedAuthTestCase
         $this->assertFalse(isset($result['course_list']['I']));
         $activeCourses = $result['course_list']['A'];
         $this->assertEqual(count($activeCourses[0]['Instructor']), 1);
-        $this->assertEqual(count($activeCourses[0]['Event']), 15);
+        $this->assertEqual(count($activeCourses[0]['Event']), 17);
 
         // make sure the inactive courses are listed correctly
         $this->login = array(
@@ -144,7 +144,7 @@ class HomeControllerTest extends ExtendedAuthTestCase
         // test that course information is correct for MECH 328
         $activeCourses = $result['course_list']['A'];
         $this->assertEqual(count($activeCourses[1]['Instructor']), 1);
-        $this->assertEqual(count($activeCourses[1]['Event']), 15);
+        $this->assertEqual(count($activeCourses[1]['Event']), 17);
     }
 
     function testIndexStudent()

@@ -72,13 +72,30 @@ foreach ($questions as $ques) {
         }
         $lom = (isset($details[$num])) ? $details[$num]['selected_lom'] : '';
         $selected = "<input type='hidden' id='selected_lom".$num."_".$user['id']."' name=data[$user[id]][EvaluationMixeval][$num][selected_lom] value='".$lom."' />";
+        
+        // Enhancement #520 - "hide" numerical designations of categories
+        // Depending on setting shows/hides marks
+        if($ques['MixevalQuestion']['show_marks'] == 0){
+            $showMarks = false;
+        }
+        else{
+            $showMarks = true;
+        }
+        $questionContent = $html->tableCells($descs) . $html->tableCells($options);
+        if($showMarks){
+            $questionContent .= $html->tableCells($marks);
+        }
+        
         $output = $html->div('MixevalQuestion',
             $title .
             $instruct .
             $html->tag('table',
+                $questionContent
+                /*
                 $html->tableCells($descs) .
                 $html->tableCells($options) .
                 $html->tableCells($marks)
+                */
             )
         );
         $output = $output.$selected;
