@@ -45,6 +45,37 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
     'disabled' => $readonly));?>
 <div class="help-text"><?php __('No Marks Given for Level of Mastery of 1')?></div>
 
+<?php echo $this->Form->input('view_mode', array('id' => 'view_mode',
+    'type' => 'radio',
+    'options' => array('criteria'=>__('Criteria', true),'student'=>__('Student', true)),
+    'label' => __('View Mode', true),
+    'separator' => '&nbsp;',
+    'disabled' => $readonly));?>
+<div class="help-text">
+    <?php __('View mode determines the rubric layout that will be visible to the students.'); ?>
+    <br><br>
+    <?php __('"Criteria" mode separates the rubric into sections for each criteria. Under each section, all users will be listed for that particular criteria. This mode is useful as it provides easy comparisons between students.'); ?>
+    <br><br>
+    <?php __('"Student" mode separates the rubric into sections for each student. Under each section, all criteria will be listed for that particular student. This mode is useful as students can be evaluated one at a time.'); ?>
+    <br><br>
+    <a href="#" onClick="javascript:$('showCriteria').toggle(); return false;">( <?php __('Show/Hide Criteria mode example')?> )</a>
+    <a href="#" onClick="javascript:$('showStudent').toggle(); return false;">( <?php __('Show/Hide Student mode example')?> )</a>
+</div>
+<div id="showCriteria" style="border:1px solid black; display:none; width:80%; margin-left:auto; margin-right:auto;">
+    <div style="margin: 0.5em; text-align:center;">
+    <?php echo __('<strong>Criteria Example</strong><br><br>'); ?>
+    <?php echo $html->image('rubric/Sort_by_Criteria.jpg', array('width'=>'100%')); ?>
+    </div>
+</div>
+<br>
+<div id="showStudent" style="border:1px solid black; display:none; width:80%; margin-left:auto; margin-right:auto;">
+    <div style="margin: 0.5em; text-align:center;">
+    <?php echo __('<strong>Student Example</strong><br><br>'); ?>
+    <?php echo $html->image('rubric/Sort_by_Student.jpg', array('width'=>'100%')); ?>
+    </div>
+</div>
+<br>
+
 <div style="text-align: center">
         <input type="button" name="Back" value="<?php echo __('Back')?>" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
         <?php switch($action) {

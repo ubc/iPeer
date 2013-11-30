@@ -715,7 +715,9 @@ class EvaluationsController extends AppController
                     if (!$commentsNeeded && empty($user['Evaluation']['EvaluationRubric']['comment'])) {
                         $commentsNeeded = true;
                     }
-                    $evaluated++;
+                    if (count($user['Evaluation']['EvaluationRubricDetail']) == count($rubricDetail['rubric']['RubricsCriteria'])){
+                        $evaluated++;
+                    }
                 } else {
                     $commentsNeeded = true; // not evaluated = comments needed
                 }
@@ -734,43 +736,98 @@ class EvaluationsController extends AppController
             $groupId = $this->params['form']['group_id'];
 
             $event = $this->Event->findById($eventId);
-            // find out whose evaluation is submitted
-            foreach ($this->params['form']['memberIDs'] as $userId) {
-                if (isset($this->params['form'][$userId])) {
-                    $targetEvaluatee = $userId;
-                    break;
+            
+            // Student View Mode
+            if(isset($this->params['form']['memberIDs'])){
+                // find out whose evaluation is submitted
+                foreach ($this->params['form']['memberIDs'] as $userId) {
+                    if (isset($this->params['form'][$userId])) {
+                        $targetEvaluatee = $userId;
+                        break;
+                    }
+                }
+
+                // validation has been modified to only return true
+                /*if (!$this->validRubricEvalComplete($this->params['form'])) {
+                    $this->Session->setFlash(__('validRubricEvalCompleten failure', true));
+                    $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
+                    return;
+                }*/
+
+                if ($this->Evaluation->saveRubricEvaluation($targetEvaluatee, 0, $this->params)) {
+                    // check whether comments are given, if not and it is required, send msg
+                    $comments = $this->params['form'][$targetEvaluatee.'comments'];
+                    $filter = array_filter(array_map('trim', $comments)); // filter out blank comments
+                    $msg = array();
+                    $sub = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
+                    if ($event['Event']['com_req'] && (count($filter) < count($comments))) {
+                        $msg[] = 'some comments are missing';
+                    }
+                    if (empty($sub)) {
+                        $msg[] = 'you still have to submit the evaluation with the Submit button below';
+                    }
+                    $suffix = empty($msg) ? '.' : ', but '.implode(' and ', $msg).'.';
+                    $this->Session->setFlash(__('Your evaluation has been saved'.$suffix, true));
+                    $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
+                    return;
+                } else {
+                    //Found error
+                    //Validate the error why the Event->save() method returned false
+                    $this->validateErrors($this->Event);
+                    $this->Session->setFlash(__('Your evaluation was not saved successfully', true));
+                    $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
+                    return;
                 }
             }
-
-            // validation has been modified to only return true
-            /*if (!$this->validRubricEvalComplete($this->params['form'])) {
-                $this->Session->setFlash(__('validRubricEvalCompleten failure', true));
-                $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
-                return;
-            }*/
-
-            if ($this->Evaluation->saveRubricEvaluation($targetEvaluatee, $this->params)) {
-                // check whether comments are given, if not and it is required, send msg
-                $comments = $this->params['form'][$targetEvaluatee.'comments'];
-                $filter = array_filter(array_map('trim', $comments)); // filter out blank comments
-                $msg = array();
-                $sub = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
-                if ($event['Event']['com_req'] && (count($filter) < count($comments))) {
-                    $msg[] = 'some comments are missing';
+            // Criteria View Mode
+            elseif(isset($this->params['form']['criteriaIDs'])){
+                // find out the criteria submitted
+                // general comments section should be given value of null
+                $targetCriteria = null;
+                foreach ($this->params['form']['criteriaIDs'] as $criteriaId) {
+                    if (isset($this->params['form'][$criteriaId])) {
+                        $targetCriteria = $criteriaId;
+                        break;
+                    }
                 }
-                if (empty($sub)) {
-                    $msg[] = 'you still have to submit the evaluation with the Submit button below';
-                }
-                $suffix = empty($msg) ? '.' : ', but '.implode(' and ', $msg).'.';
-                $this->Session->setFlash(__('Your evaluation has been saved'.$suffix, true));
                 
-                $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId.'/'.$studentId);
-                return;
-            } else {
-                //Found error
-                //Validate the error why the Event->save() method returned false
-                $this->validateErrors($this->Event);
-                $this->Session->setFlash(__('Your evaluation was not saved successfully', true));
+                $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
+                $groupMembers = $this->User->getEventGroupMembersNoTutors($groupId, $event['Event']['self_eval'], $evaluator);
+                
+                // Criteria will be null if the submitted section was 'General Comments'
+                if ($targetCriteria != null) {
+                    $viewMode = 1;
+                }
+                else {
+                    $viewMode = 0;
+                }
+                
+                // Loop through and save every group member for specified criteria
+                foreach ($groupMembers as $groupMember){
+                    $targetEvaluatee = $groupMember['User']['id'];
+                
+                    if ($this->Evaluation->saveRubricEvaluation($targetEvaluatee, $viewMode, $this->params, $targetCriteria)) {
+                        // check whether comments are given, if not and it is required, send msg
+                        $comments = $this->params['form'][$targetEvaluatee.'comments'];
+                        $filter = array_filter(array_map('trim', $comments)); // filter out blank comments
+                        $msg = array();
+                        $sub = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
+                        if ($event['Event']['com_req'] && (count($filter) < count($comments))) {
+                            $msg[] = 'some comments are missing';
+                        }
+                        if (empty($sub)) {
+                            $msg[] = 'you still have to submit the evaluation with the Submit button below';
+                        }
+                        $suffix = empty($msg) ? '.' : ', but '.implode(' and ', $msg).'.';
+                        $this->Session->setFlash(__('Your evaluation has been saved'.$suffix, true));
+                    } else {
+                        //Found error
+                        //Validate the error why the Event->save() method returned false
+                        $this->validateErrors($this->Event);
+                        $this->Session->setFlash(__('Your evaluation was not saved successfully', true));
+                        break;
+                    }
+                }
                 $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
                 return;
             }

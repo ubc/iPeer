@@ -66,6 +66,10 @@ class Rubric extends EvaluationBase
             'rule' => 'notEmpty',
             'message' => 'Please select the number of Criteria.'
         ),
+        'view_mode' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Please select a view mode.'
+        ),
     );
 
     /**
