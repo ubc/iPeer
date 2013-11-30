@@ -526,12 +526,14 @@ class EvaluationComponent extends Object
      * saveRubricEvaluation
      *
      * @param mixed $targetEvaluatee
+     * @param mixed $viewMode
      * @param mixed $params
+     * @param mixed $targetCriteria
      *
      * @access public
      * @return void
      */
-    function saveRubricEvaluation($targetEvaluatee, $params=null)
+    function saveRubricEvaluation($targetEvaluatee, $viewMode, $params=null, $targetCriteria=null)
     {
         $this->Event = ClassRegistry::init('Event');
         $this->Rubric = ClassRegistry::init('Rubric');
@@ -540,6 +542,7 @@ class EvaluationComponent extends Object
         // assuming all are in the same order and same size
         $evaluator = $params['data']['Evaluation']['evaluator_id'];
         $groupEventId = $params['form']['group_event_id'];
+        $groupId = $params['form']['group_id'];
         $rubricId = $params['form']['rubric_id'];
 
         //Get the target event
@@ -572,7 +575,7 @@ class EvaluationComponent extends Object
 
         $evalRubric['EvaluationRubric']['comment'] = $params['form'][$targetEvaluatee.'gen_comment'];
         $score = $this->saveNGetEvalutionRubricDetail(
-            $evalRubric['EvaluationRubric']['id'], $rubric, $targetEvaluatee, $params['form']);
+            $evalRubric['EvaluationRubric']['id'], $rubric, $targetEvaluatee, $params['form'], $viewMode, $targetCriteria);
         $evalRubric['EvaluationRubric']['score'] = $score;
 
         if (!$this->EvaluationRubric->save($evalRubric)) {
@@ -590,37 +593,76 @@ class EvaluationComponent extends Object
      * @param mixed $rubric          rubric
      * @param mixed $targetEvaluatee target evaluatee
      * @param mixed $form            form
+     * @param mixed $viewMode        view mode
+     * $param mixed $targetCriteria  target criteria
      *
      * @access public
      * @return void
      */
-    function saveNGetEvalutionRubricDetail ($evalRubricId, $rubric, $targetEvaluatee, $form)
+    function saveNGetEvalutionRubricDetail ($evalRubricId, $rubric, $targetEvaluatee, $form, $viewMode, $targetCriteria=null)
     {
         $this->EvaluationRubricDetail = ClassRegistry::init('EvaluationRubricDetail');
         $totalGrade = 0;
-        $pos = 0;
+        
+        if ($viewMode == 0) {
+            $pos = 0;
+            for ($i=1; $i <= $rubric['Rubric']['criteria']; $i++) {
+                $this->EvaluationRubricDetail = ClassRegistry::init('EvaluationRubricDetail');
+                //TODO: LOM = 1
+                if ($rubric['Rubric']['lom_max'] == 1) {
+                    $form[$targetEvaluatee."selected$i"] = ($form[$targetEvaluatee."selected$i"] ? $form[$targetEvaluatee."selected$i"] : 0);
+                }
 
-        for ($i=1; $i <= $rubric['Rubric']['criteria']; $i++) {
+                // get total possible grade for the criteria number ($i)
+                isset($form[$targetEvaluatee.'criteria_points_'.$i]) ? $grade = $form[$targetEvaluatee.'criteria_points_'.$i] : $grade = "";
+                $selectedLom = $form['selected_lom_'.$targetEvaluatee.'_'.$i];
+                $evalRubricDetail = $this->EvaluationRubricDetail->getByEvalRubricIdCritera($evalRubricId, $i);
+                if (isset($evalRubricDetail)) {
+                    $this->EvaluationRubricDetail->id=$evalRubricDetail['EvaluationRubricDetail']['id'] ;
+                }
+                $evalRubricDetail['EvaluationRubricDetail']['evaluation_rubric_id'] = $evalRubricId;
+                $evalRubricDetail['EvaluationRubricDetail']['criteria_number'] = $i;
+                $evalRubricDetail['EvaluationRubricDetail']['criteria_comment'] = $form[$targetEvaluatee."comments"][$pos++];
+                $evalRubricDetail['EvaluationRubricDetail']['selected_lom'] = $selectedLom;
+                $evalRubricDetail['EvaluationRubricDetail']['grade'] = $grade;
+                
+                if($selectedLom != NULL){
+                    $this->EvaluationRubricDetail->save($evalRubricDetail);
+                }
+                $this->EvaluationRubricDetail->id=null;
+                
+                $totalGrade += $grade;
+            }
+        }
+        elseif ($viewMode == 1) {
+            $this->EvaluationRubricDetail = ClassRegistry::init('EvaluationRubricDetail');
             //TODO: LOM = 1
             if ($rubric['Rubric']['lom_max'] == 1) {
-                $form[$targetEvaluatee."selected$i"] = ($form[$targetEvaluatee."selected$i"] ? $form[$targetEvaluatee."selected$i"] : 0);
+                $form[$targetEvaluatee."selected$targetCriteria"] = ($form[$targetEvaluatee."selected$targetCriteria"] ? $form[$targetEvaluatee."selected$targetCriteria"] : 0);
             }
 
-            // get total possible grade for the criteria number ($i)
-            $grade = $form[$targetEvaluatee.'criteria_points_'.$i];
-            $selectedLom = $form['selected_lom_'.$targetEvaluatee.'_'.$i];
-            $evalRubricDetail = $this->EvaluationRubricDetail->getByEvalRubricIdCritera($evalRubricId, $i);
+            isset($form[$targetEvaluatee.'criteria_points_'.$targetCriteria]) ? $grade = $form[$targetEvaluatee.'criteria_points_'.$targetCriteria] : $grade = "";
+            $selectedLom = $form['selected_lom_'.$targetEvaluatee.'_'.$targetCriteria];
+            
+            // Set up and save EvaluationRubricDetail
+            $evalRubricDetail = $this->EvaluationRubricDetail->getByEvalRubricIdCritera($evalRubricId, $targetCriteria);
             if (isset($evalRubricDetail)) {
                 $this->EvaluationRubricDetail->id=$evalRubricDetail['EvaluationRubricDetail']['id'] ;
             }
             $evalRubricDetail['EvaluationRubricDetail']['evaluation_rubric_id'] = $evalRubricId;
-            $evalRubricDetail['EvaluationRubricDetail']['criteria_number'] = $i;
-            $evalRubricDetail['EvaluationRubricDetail']['criteria_comment'] = $form[$targetEvaluatee."comments"][$pos++];
+            $evalRubricDetail['EvaluationRubricDetail']['criteria_number'] = $targetCriteria;
+            $evalRubricDetail['EvaluationRubricDetail']['criteria_comment'] = $form[$targetEvaluatee."comments"][$targetCriteria-1];
             $evalRubricDetail['EvaluationRubricDetail']['selected_lom'] = $selectedLom;
             $evalRubricDetail['EvaluationRubricDetail']['grade'] = $grade;
             $this->EvaluationRubricDetail->save($evalRubricDetail);
             $this->EvaluationRubricDetail->id=null;
-            $totalGrade += $grade;
+            
+            // Loop through all criteria to get total grade
+            foreach ($rubric['RubricsCriteria'] as $rubricCriteria) {
+                $criteriaNum = $rubricCriteria['criteria_num'];
+                isset($form[$targetEvaluatee.'criteria_points_'.$criteriaNum]) ? $grade = $form[$targetEvaluatee.'criteria_points_'.$criteriaNum] : $grade = 0;
+                $totalGrade += $grade;
+            }
         }
         return $totalGrade;
     }

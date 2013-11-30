@@ -92,7 +92,9 @@ class RubricsController extends AppController
             array("Rubric.event_count",   "",       "",        "hidden"),
             array("Rubric.creator_id",         "",            "",      "hidden"),
             array("Rubric.creator",   __("Creator", true),     "8em",   "action", "View Creator"),
-            array("Rubric.created",     __("Creation Date", true), "10em", "date"));
+            array("Rubric.created",     __("Creation Date", true), "10em", "date"),
+            array("Rubric.view_mode", __("View Mode", true), "4em", "number")
+            );
 
         // Just list all and my evaluations for selections
         $userList = array($this->Auth->user('id') => "My Evaluations");
@@ -273,7 +275,14 @@ class RubricsController extends AppController
         if (!empty($this->data)) {
             $this->set('action', __('Add Rubric (Step 2)', true));
             $this->set('data', $this->data);
-
+            
+            //Sets initial values for radio buttons
+            if($this->data['Rubric']['availability'] == ""){
+                $this->data['Rubric']['availability'] = 'private';
+            }
+            if($this->data['Rubric']['view_mode'] == ""){
+                $this->data['Rubric']['view_mode'] = 'student';
+            }
             if (isset($this->params['form']['submit'])) {
                 if ($this->__processForm()) {
                     $this->Session->setFlash(__('The rubric was added successfully.', true), 'good');

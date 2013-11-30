@@ -1,22 +1,47 @@
 <script type="text/javascript">
 var numQues = <?php echo count($data['RubricsCriteria']) ?>;
-function saveButtonVal(userId) {
+var numUsers = <?php echo count($groupMembers) ?>;
+
+function saveButtonVal(userId, viewMode) {
     var complete = true;
-    for (var i=1; i <= numQues; i++) {
-        var value = jQuery('input[name='+userId+'criteria_points_'+i+']:checked').val();
-        if (value == null) {
-            jQuery('#'+userId+'criteria'+i).attr('color', 'red');
-            complete = false;
-        } else {
-            jQuery('#'+userId+'criteria'+i).removeAttr('color');
+    
+    if(viewMode == 0){
+        for (var i=1; i <= numQues; i++) {
+            var value = jQuery('input[name='+userId+'criteria_points_'+i+']:checked').val();
+            if (value == null) {
+                jQuery('#'+userId+'criteria'+i).attr('color', 'red');
+                complete = false;
+            } else {
+                jQuery('#'+userId+'criteria'+i).removeAttr('color');
+            }
         }
+        if (complete) {
+            jQuery('#'+userId+'likert').hide();
+        } else {
+            jQuery('#'+userId+'likert').show();
+        }
+        return complete;
     }
-    if (complete) {
-        jQuery('#'+userId+'likert').hide();
-    } else {
-        jQuery('#'+userId+'likert').show();
+    else if(viewMode == 1){
+        var criteriaId = userId;
+        for (var i=0; i < numUsers; i++) {
+            var groupMembers = <?php echo json_encode($groupMembers); ?>;
+            var user = groupMembers[i]['User']['id'];
+            var value = jQuery('input[name='+user+'criteria_points_'+criteriaId+']:checked').val();
+            if (value == null) {
+                jQuery('#'+user+'criteria'+criteriaId).attr('color', 'red');
+                complete = false;
+            } else {
+                jQuery('#'+user+'criteria'+criteriaId).removeAttr('color');
+            }
+        }
+        if (complete) {
+            jQuery('#'+criteriaId+'likert').hide();
+        } else {
+            jQuery('#'+criteriaId+'likert').show();
+        }
+        return complete;
     }
-    return complete;
 }
 </script>
 <?php echo $html->script('ricobase')?>
@@ -81,7 +106,18 @@ function saveButtonVal(userId) {
     </tr>
 </table>
 
-<table class="standardtable">
+<?php
+    if($data['Rubric']['view_mode'] == 'criteria') {
+        $viewMode = 1;
+    }
+    else {
+        $viewMode = 0;
+    }
+?>
+<?php if($viewMode == 0): ?>
+<!-- Group rubric by student -->
+<table class="standardtable" id="view-mode-student">
+    <?php $viewMode = 0; ?>
     <tr>
         <td>
         <div id="accordion">
@@ -90,7 +126,22 @@ function saveButtonVal(userId) {
             <div id="panel<?php echo $user['id']?>" class="panelName">
                 <div id="panel<?php echo $user['id']?>Header" class="panelheader">
                 <?php echo $user['first_name'].' '.$user['last_name'];?>
-                <?php if (isset($row['User']['Evaluation'])): ?>
+                <?php
+                    $allSaved = 0;
+                    if(isset($user['Evaluation']['EvaluationDetail'])){
+                        $savedCriteria = $totalCriteria = 0;
+                        $totalCriteria = count($data['RubricsCriteria']);
+                        foreach($user['Evaluation']['EvaluationDetail'] as $evalDetail){
+                            if($evalDetail['EvaluationRubric']['evaluatee'] == $user['id']){
+                                $savedCriteria++;
+                            };
+                        }
+                        if($totalCriteria == $savedCriteria){
+                            $allSaved = 1;
+                        }
+                    }
+                ?>
+                <?php if ($allSaved == 1): ?>
                     <font color="#259500"> ( Saved )</font>
                 <?php else: ?>
                     <blink><font color="#FF6666"> - </font></blink><?php __('(click to expand)')?>
@@ -99,16 +150,17 @@ function saveButtonVal(userId) {
                 <div style="height: 200px;" id="panel1Content" class="panelContent">
                     <br>
                     <?php
-                    $params = array('controller'=>'rubrics', $viewData , 'evaluate'=>1, 'user'=>$user, 'event'=>$event);
+                    $params = array('controller'=>'rubrics', $viewData , 'evaluate'=>1, 'user'=>$user, 'event'=>$event, 'viewMode'=>$viewMode);
                     echo $this->element('rubrics/ajax_rubric_view', $params);
                     ?>
                     <table align="center" width=100% >
                     <tr>
                         <td align="center">
                         <?php echo $form->submit('Save This Section', array('name'=>$user['id'], 'div'=>'saveThisSection'));
-                        echo "<br><div style='color: red' id='".$user['id']."likert'>".__('Please complete all the questions marked red before saving.</div>', true)."</div>";
+                        echo "<br><div style='color: red' id='".$user['id']."likert'>".__('Please complete all the questions marked red before saving.</div>', true);
                         echo __('Make sure you save this section before moving on to the other ones!', true)." <br /><br />";
                         ?>
+                        </td>
                     </tr>
                     </table>
                 </div>
@@ -118,6 +170,125 @@ function saveButtonVal(userId) {
         </td>
     </tr>
 </table>
+
+<?php elseif($viewMode == 1): ?>
+<!-- Group rubric by criteria -->
+<table class="standardtable" id="view-mode-criteria">
+<?php $viewMode = 1; ?>
+<?php $totalSaved = 0; ?>
+    <tr>
+        <td>
+        <div id="accordion">
+        <?php foreach($data['RubricsCriteria'] as $row):?>
+            <input type="hidden" name="criteriaIDs[]" value="<?php echo $row['id']?>"/>
+            <div id="panel<?php echo $row['id']?>" class="panelName">
+                <div id="panel<?php echo $row['id']?>Header" class="panelheader">
+                <?php echo $row['criteria'];?>
+                <?php
+                    $allSaved = 0;
+                    $savedUsers = $totalUsers = 0;
+                    $totalUsers = count($groupMembers);
+                    foreach($groupMembers as $users){
+                        if(isset($users['User']['Evaluation']['EvaluationRubricDetail'])){
+                            foreach($users['User']['Evaluation']['EvaluationRubricDetail'] as $evalDetail){
+                                if($evalDetail['criteria_number'] == $row['criteria_num']){
+                                    $savedUsers++;
+                                };
+                            }
+                        }
+                    }
+                    if($totalUsers == $savedUsers){
+                        $allSaved = 1;
+                        $totalSaved++;
+                    }
+                ?>
+                <?php if ($allSaved == 1): ?>
+                    <font color="#259500"> ( Saved )</font>
+                <?php else: ?>
+                    <blink><font color="#FF6666"> - </font></blink><?php __('(click to expand)')?>
+                <?php endif; ?>
+                </div>
+                <div style="height: 200px;" id="panel1Content" class="panelContent">
+                    <br>
+                    <?php
+                    $params = array('controller'=>'rubrics', $viewData , 'evaluate'=>1, 'criteria'=>$row, 'event'=>$event, 'viewMode'=>$viewMode);
+                    echo $this->element('rubrics/ajax_rubric_view', $params);
+                    ?>
+                    <table align="center" width=100% >
+                    <tr>
+                        <td align="center">
+                        <?php echo $form->submit('Save This Section', array('name'=>$row['criteria_num'], 'div'=>'saveThisSection'));
+                        echo "<br><div style='color: red' id='".$row['criteria_num']."likert'>".__('Please complete all the questions marked red before saving.</div>', true);
+                        echo __('Make sure you save this section before moving on to the other ones!', true)." <br /><br />";
+                        ?>
+                        </td>
+                        <script>jQuery("#<?php echo $row['criteria_num'].'likert';?>").hide();</script>
+                    </tr>
+                    </table>
+                </div>
+            </div>
+        <?php endforeach; ?>
+            <div id="panel<?php echo $row['criteria_num']+1?>" class="panelName">
+                <div id="panel<?php echo $row['criteria_num']+1?>Header" class="panelheader">
+                    <?php echo "General Comments"?>
+                    <?php
+                        $allSaved = 1;
+                        $savedUsers = $totalUsers = 0;
+                        $totalUsers = count($groupMembers);
+                        foreach($groupMembers as $users){
+                            if(isset($users['User']['Evaluation']['EvaluationRubric']['comment'])){
+                                if(!empty($users['User']['Evaluation']['EvaluationRubric']['comment'])){
+                                        $savedUsers++;
+                                }
+                            }
+                        }
+                        if($totalUsers != $savedUsers){
+                            $allSaved = 0;
+                        }
+                    ?>
+                    <?php if ($allSaved == 1): ?>
+                        <font color="#259500"> ( Saved )</font>
+                    <?php else: ?>
+                        <blink><font color="#FF6666"> - </font></blink><?php __('(click to expand)')?>
+                    <?php endif; ?>
+                </div>
+                <div style="height: 200px;" id="panel1Content" class="panelContent">
+                    <br>
+                    <table align="center" width=100% >
+                    <?php foreach($groupMembers as $index): $user = $index['User'];?>
+                        <tr>
+                            <th><?php echo $user['first_name'].' '.$user['last_name']; ?></th>
+                            <td align="center">
+                                <textarea cols="80" rows="2" name="<?php echo $user['id']?>gen_comment" ><?php echo (isset($user['Evaluation']) ? $user['Evaluation']['EvaluationRubric']['comment'] : '')?></textarea>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    <tr>
+                        <td align="center" colspan="2">
+                        <?php
+                        $value = $row['criteria_num'] + 1;
+                        if($totalSaved == count($data['RubricsCriteria'])){
+                            echo $form->submit('Save This Section', array('name'=>$value, 'div'=>'saveThisSection'));
+                        }
+                        else{
+                            echo $form->submit('Save This Section', array('name'=>$value, 'disabled'=>true, 'div'=>'saveThisSection'));
+                            echo "<br><div style='color: red'>".__('This section will be available once the previous sections are completed.</div>', true);
+                        }
+                        echo "<br><div style='color: red' id='". $value ."likert'>".__('Please complete all the questions marked red before saving.</div>', true);
+                        echo "<br /><br />";
+                        ?>
+                        </td>
+                        <script>jQuery("#<?php echo $value.'likert';?>").hide();</script>
+                    </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        </td>
+    </tr>
+</table>
+<?php endif; ?>
+
 </form>
 <table class="standardtable">
     <tr><td colspan="4" align="center">

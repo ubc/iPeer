@@ -1683,6 +1683,7 @@ CREATE TABLE IF NOT EXISTS `rubrics` (
   `zero_mark` tinyint(1) NOT NULL DEFAULT '0',
   `lom_max` int(11) DEFAULT NULL,
   `criteria` int(11) DEFAULT NULL,
+  `view_mode` varchar(10) NOT NULL DEFAULT 'student',
   `availability` varchar(10) NOT NULL DEFAULT 'public',
   `template` varchar(20) NOT NULL DEFAULT 'horizontal',
   `creator_id` int(11) NOT NULL DEFAULT '0',
@@ -1696,7 +1697,7 @@ CREATE TABLE IF NOT EXISTS `rubrics` (
 -- Dumping data for table `rubrics`
 --
 
-INSERT INTO `rubrics` VALUES (1, 'Term Report Evaluation', 0, 5, 3, 'public', 'horizontal', 1, '2006-06-20 15:21:50', NULL, '2006-06-20 15:21:50');
+INSERT INTO `rubrics` VALUES (1, 'Term Report Evaluation', 0, 5, 3, 'student', 'public', 'horizontal', 1, '2006-06-20 15:21:50', NULL, '2006-06-20 15:21:50');
 
 -- --------------------------------------------------------
 
@@ -2012,7 +2013,7 @@ INSERT INTO `sys_parameters` (`parameter_code`, `parameter_value`, `parameter_ty
 ('system.admin_email', 'Please enter the iPeer administrator\\''s email address.', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 ('display.date_format', 'D, M j, Y g:i a', 'S', 'date format preference', 'A', 0, NOW(), NULL, NOW()),
 ('system.version', '3.1.0', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
-('database.version', '7', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
+('database.version', '8', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
 ('email.port', '25', 'S', 'port number for email smtp option', 'A', '0', NOW(), NULL , NOW()),
 ('email.host', 'localhost', 'S', 'host address for email smtp option', 'A', '0', NOW(), NULL , NOW()),
 ('email.username', '', 'S', 'username for email smtp option', 'A', '0', NOW(), NULL , NOW()),
