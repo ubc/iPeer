@@ -1105,6 +1105,7 @@ class EvaluationsController extends AppController
                         $this->redirect('/home');
                     }
                 } else {
+                    // Supposed to go here
                     $this->Session->setFlash(_t('Your answers have been saved. Please answer all the required questions before it can be considered submitted.'));
                 }
             } else {

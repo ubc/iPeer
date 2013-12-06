@@ -170,9 +170,9 @@ class EvaluationRubricTestCase extends CakeTestCase
     function testGetOppositeGradeReleaseStatus()
     {
         $ret = $this->EvaluationRubric->getOppositeGradeReleaseStatus(4, 0);
-        $this->assertEqual($ret, 0);
+        $this->assertEqual($ret, 1);
         $ret = $this->EvaluationRubric->getOppositeGradeReleaseStatus(4, 1);
-        $this->assertEqual($ret, 2);
+        $this->assertEqual($ret, 1);
         $ret = $this->EvaluationRubric->getOppositeGradeReleaseStatus(3, 0);
         $this->assertEqual($ret, 0);
     }
@@ -185,7 +185,7 @@ class EvaluationRubricTestCase extends CakeTestCase
         $ret = $this->EvaluationRubric->getOppositeCommentReleaseStatus(3, 1);
         $this->assertEqual($ret, 2);
         $ret = $this->EvaluationRubric->getOppositeCommentReleaseStatus(4, 0);
-        $this->assertEqual($ret, 0);
+        $this->assertEqual($ret, 1);
     }
 
     function testGetTeamReleaseStatus()

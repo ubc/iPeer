@@ -992,7 +992,7 @@ CREATE TABLE IF NOT EXISTS `evaluation_rubrics` (
 
 INSERT INTO evaluation_rubrics (id, evaluator, evaluatee, comment, score, comment_release, grade_release, grp_event_id, event_id, record_status, creator_id, created, updater_id, modified, rubric_id) VALUES
 (1, 31, 32, 'We work well together.', 15.00, 0, 0, 4, 2, 'A', 31, '2012-07-13 10:26:47', 31, '2012-07-13 10:26:47', 1),
-(2, 31, 33, 'He did a great job.', 14.00, 0, 0, 4, 2, 'A', 31, '2012-07-13 10:29:14', 31, '2012-07-13 10:29:15', 1),
+(2, 31, 33, 'He did a great job.', 14.00, 1, 1, 4, 2, 'A', 31, '2012-07-13 10:29:14', 31, '2012-07-13 10:29:15', 1),
 (3, 7, 5, 'Good group member.', 14.00, 0, 0, 3, 2, 'A', 7, '2012-07-13 10:30:29', 7, '2012-07-13 10:30:29', 1),
 (4, 7, 6, 'Good job.', 15.00, 0, 0, 3, 2, 'A', 7, '2012-07-13 10:31:19', 7, '2012-07-13 10:31:19', 1);
 
@@ -2027,7 +2027,8 @@ INSERT INTO `sys_parameters` (`parameter_code`, `parameter_value`, `parameter_ty
 ('google_analytics.tracking_id', '', 'S', 'tracking id for Google Analytics', 'A', 0, NOW(), 0, NOW()),
 ('google_analytics.domain', '', 'S', 'domain name for Google Analytics', 'A', 0, NOW(), 0, NOW()),
 ('banner.custom_logo', '', 'S', 'custom logo that appears on the left side of the banner', 'A', 0, NOW(), 0, NOW()),
-('system.timezone', '', 'S', 'timezone', 'A', 0, NOW(), 0, NOW());
+('system.timezone', '', 'S', 'timezone', 'A', 0, NOW(), 0, NOW()),
+('system.student_number', 'true', 'B', 'allow students to change their student number', 'A', 0, NOW(), 0, NOW());
 
 -- --------------------------------------------------------
 

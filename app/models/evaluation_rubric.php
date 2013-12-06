@@ -67,17 +67,33 @@ class EvaluationRubric extends EvaluationResponseBase
     {
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
         $includeEvaluator ? $user = 'User.*' : $user = '';
-        return $this->find('all', array(
-            'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
-            'joins' => array(
-                array(
-                    'table' => 'users',
-                    'alias' => 'User',
-                    'type' => 'LEFT',
-                    'conditions' => array('User.id = EvaluationRubric.evaluator'))),
-            'fields' => array('EvaluationRubric.*', $user),
-            'order' => array('EvaluationRubric.evaluator' => 'ASC')
-        ));
+        // If specified evaluatee is null, select all users for that event
+        if ($evaluatee == null) {
+            return $this->find('all', array(
+                'conditions' => array('grp_event_id' => $grpEventId),
+                'joins' => array(
+                    array(
+                        'table' => 'users',
+                        'alias' => 'User',
+                        'type' => 'LEFT',
+                        'conditions' => array('User.id = EvaluationRubric.evaluator'))),
+                'fields' => array('EvaluationRubric.*', $user),
+                'order' => array('EvaluationRubric.evaluator' => 'ASC')
+            ));
+        }
+        else {
+            return $this->find('all', array(
+                'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
+                'joins' => array(
+                    array(
+                        'table' => 'users',
+                        'alias' => 'User',
+                        'type' => 'LEFT',
+                        'conditions' => array('User.id = EvaluationRubric.evaluator'))),
+                'fields' => array('EvaluationRubric.*', $user),
+                'order' => array('EvaluationRubric.evaluator' => 'ASC')
+            ));
+        }
 
     }
 

@@ -75,7 +75,7 @@ class SysparametersControllerTest extends ExtendedAuthTestCase {
     // This code may be copied from SysParameter, need to be changed
     function testIndex() {
         $result = $this->testAction('/sysparameters/index', array('return' => 'vars'));
-        $this->assertEqual(count($result['paramsForList']['data']['entries']), 17);
+        $this->assertEqual(count($result['paramsForList']['data']['entries']), 18);
         $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysParameter']['parameter_code'], 'system.super_admin');
         $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysParameter']['parameter_value'], 'root');
         $this->assertEqual($result['paramsForList']['data']['entries'][0]['SysParameter']['parameter_type'], 'S');

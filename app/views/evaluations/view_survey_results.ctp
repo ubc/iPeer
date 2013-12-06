@@ -59,7 +59,7 @@ foreach ($questions as $ques) {
         if (isset($answers[$ques['id']]) &&
             !empty($answers[$ques['id']]['0']['SurveyInput']['response_text'])
         ) {
-            echo '<pre>'.$answers[$ques['id']]['0']['SurveyInput']['response_text'].'</pre>';
+            echo '<pre wrap="hard">'.$answers[$ques['id']]['0']['SurveyInput']['response_text'].'</pre>';
         // no response
         } else {
             echo '<p class="noanswer">-- No Answer --</p>';
@@ -81,7 +81,7 @@ function boldSelected($choices, $selected) {
             $answers[] = $select['SurveyInput']['response_text'];
         } else {
             // otherwise use response id
-            $answers[] = $options[$select['SurveyInput']['response_id']];
+            $answers[] = isset($select['SurveyInput']['response_id']) ? $options[$select['SurveyInput']['response_id']] : "";
         }
     }
 

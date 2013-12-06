@@ -50,6 +50,7 @@ function saveButtonVal(userId, viewMode) {
 <?php echo $html->script('ricopanelcontainer')?>
 <?php echo $html->script('ricoaccordion')?>
 <?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
+<?php $studentId = User::get('id');?>
 <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('makeEvaluation/'.$event['Event']['id'].'/'.$event['Group']['id'].'/'.$studentId) ?>">
 <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>"/>
 <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>"/>
