@@ -149,6 +149,10 @@ class ExportBaseNewComponent extends Object
      */
     function buildScoreTableByEvaluatee($params, $group, $evaluatee, $event, $responses, $subDate, $peerEval)
     {
+        // Export all determines whether or not to export all results
+        // including those that don't have values.
+        ($params['include']['export_all'] == 1) ? $exportAll = true : $exportAll = false;
+    
         // Build grid
         //$xPosition = 0;
         //$yPosition = 0;
@@ -163,6 +167,11 @@ class ExportBaseNewComponent extends Object
             if (!$peerEval && $evaluator['id'] != $evaluatee['id']) {
                 continue; // skip peer evaluations for self-evaluation
             }
+            
+            if ($evaluatee['Role']['name'] == 'tutor') {
+                continue; // skip evaluations where the tutor is the evaluatee
+            }
+            
             $row = array();
             if ($params['include']['course']) {
                 array_push($row, $event['Course']['course']);
@@ -195,9 +204,23 @@ class ExportBaseNewComponent extends Object
             }
 
             // check if we have a reponse for this evaluator
-            if (!isset($responses[$evaluatee['id']]) || !array_key_exists($evaluator['id'], $responses[$evaluatee['id']])) {
-                array_push($row, array_fill(0, $xDimension - count($row), ''));
-                continue;
+            if ($exportAll == true) {
+            // Show all users
+                if (!isset($responses[$evaluatee['id']]) || !array_key_exists($evaluator['id'], $responses[$evaluatee['id']])) {
+                $emptyCount = $xDimension - count($row);
+                    for ($i = 0; $i < $emptyCount; $i++) {
+                        array_push($row, '');
+                    }
+                    $grid[] = $row;
+                    $yInc++;
+                    continue;
+                }
+            }
+            else {
+                // Don't show all users
+                if (!isset($responses[$evaluatee['id']]) || !array_key_exists($evaluator['id'], $responses[$evaluatee['id']])) {
+                    continue;
+                }
             }
 
             $response = $responses[$evaluatee['id']][$evaluator['id']];

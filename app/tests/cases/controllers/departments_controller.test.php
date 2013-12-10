@@ -38,7 +38,7 @@ class DepartmentsControllerTestCase extends ExtendedAuthTestCase {
 
     function startCase()
     {
-        echo "Start Evaluation controller test.\n";
+        echo "Start Departments controller test.\n";
         $this->defaultLogin = array(
             'User' => array(
                 'username' => 'root',
@@ -72,11 +72,59 @@ class DepartmentsControllerTestCase extends ExtendedAuthTestCase {
     }
 
 	function testIndex() {
-
+        $result = $this->testAction('/departments/index', array( 'return' => 'contents'));
+        $this->assertEqual($result['departments'][0]['id'], 1);
+        $this->assertEqual($result['departments'][0]['Name'], 'MECH');
+        $this->assertEqual($result['departments'][0]['Faculty'], 'Applied Science');
+        $this->assertEqual($result['departments'][1]['id'], 2);
+        $this->assertEqual($result['departments'][1]['Name'], 'APSC');
+        $this->assertEqual($result['departments'][1]['Faculty'], 'Applied Science');
+        $this->assertEqual($result['departments'][2]['id'], 3);
+        $this->assertEqual($result['departments'][2]['Name'], 'CPSC');
+        $this->assertEqual($result['departments'][2]['Faculty'], 'Science');
 	}
 
 	function testView() {
-
+        $result = $this->testAction('/departments/view/1', array( 'return' => 'vars'));
+        $this->assertEqual($result['title_for_layout'], 'View Department');
+        $this->assertEqual($result['department'], 'MECH');
+        $this->assertEqual($result['faculty'], 'Applied Science');
+        $courses = $result['courses'][0];
+        $courses['Department']['created'] = null;
+        $expected = array(
+            'Course' => array(
+                'id' => 1,
+                'course' => 'MECH 328',
+                'title' => 'Mechanical Engineering Design Project',
+                'homepage' => 'http://www.mech.ubc.ca',
+                'self_enroll' => 'off',
+                'password' => null,
+                'record_status' => 'A',
+                'creator_id' => 1,
+                'created' => '2006-06-20 14:14:45',
+                'updater_id' => null,
+                'modified' => '2006-06-20 14:14:45',
+                'creator' => 'Super Admin',
+                'updater' => null,
+                'student_count' => 13,
+                'full_name' => 'MECH 328 - Mechanical Engineering Design Project',
+            ),
+            'CourseDepartment' => array(
+                'id' => 2,
+                'course_id' => 1,
+                'department_id' => 1,
+            ),
+            'Department' => array(
+                'id' => 1,
+                'name' => 'MECH',
+                'faculty_id' => 1,
+                'creator_id' => 0,
+                'created' => null,
+                'updater_id' => null,
+                'modified' => '2012-05-23 11:30:41',
+            ),
+        );
+        $this->assertEqual($courses, $expected);
 	}
 
 	function testAdd() {

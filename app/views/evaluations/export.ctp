@@ -40,6 +40,10 @@ echo $this->Form->input('eval_type', array(
     'type' => 'checkbox', 'name' => 'include[eval_event_type]', 'checked' => true,
     'label' => __('Include Evaluation Type', true)
 ));
+echo $this->Form->input('export_all', array(
+    'type' => 'checkbox', 'name' => 'include[export_all]', 'checked' => true,
+    'label' => __('Include All Evaluations', true)
+));
 ?>
 <h3><?php echo __('Group and Result', true) ?></h3>
 <?php
