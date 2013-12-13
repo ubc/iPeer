@@ -640,7 +640,7 @@ class V1Controller extends Controller {
             $status = 'HTTP/1.1 200 OK';
             foreach ($users as $user) {
                 if (!in_array($user['username'], $inClass)) {
-                    $this->log('User '.$user['username'].' is not in the course '.$courseId, 'debug');
+                    $this->log('User '.$user['username'].' is not in the course '.$courseId.' or user is an instructor in the course.', 'debug');
                     continue;
                 }
                 $userId = $this->User->field('id',
@@ -663,6 +663,7 @@ class V1Controller extends Controller {
                         $userId = $this->GroupsMembers->read('user_id');
                         $this->GroupsMembers->id = null;
                         $groupMembers[] = $user;
+                        $this->log('Added user '.$tmp['user_id'].' to group '.$groupId, 'debug');
                     } else {
                         $status = 'HTTP/1.1 500 Internal Server Error';
                         break;
@@ -1007,20 +1008,20 @@ class V1Controller extends Controller {
                 $role = $this->User->getRoleName($userId);
                 if ($role == 'student') {
                     $ret = $this->User->removeStudent($userId, $courseId);
-                    $this->log('Removing student '.$user['username'].' from course '.$courseId, 'debug');
+                    $this->log('Removing student '.$user.' from course '.$courseId, 'debug');
                 } else if ($role == 'instructor') {
                     $ret = $this->User->removeInstructor($userId, $courseId);
-                    $this->log('Removing instructor '.$user['username'].' from course '.$courseId, 'debug');
+                    $this->log('Removing instructor '.$user.' from course '.$courseId, 'debug');
                 } else if ($role == 'tutor') {
                     $ret = $this->User->removeTutor($userId, $courseId);
-                    $this->log('Removing tutor '.$user['username'].' from course '.$courseId, 'debug');
+                    $this->log('Removing tutor '.$user.' from course '.$courseId, 'debug');
                 } else {
-                    $this->set('error', array('code' => 400, 'message' => 'Unsupported role for '.$user['username'].'. Could not unenrol.'));
+                    $this->set('error', array('code' => 400, 'message' => 'Unsupported role for '.$user.'. Could not unenrol.'));
                     $this->render('error');
                     return;
                 }
                 if (!$ret) {
-                    $this->set('error', array('code' => 401, 'message' => 'Fail to unenrol ' . $user['username']));
+                    $this->set('error', array('code' => 401, 'message' => 'Fail to unenrol ' . $user));
                     $this->render('error');
                     return;
                 }
@@ -1043,12 +1044,12 @@ class V1Controller extends Controller {
                 } else if ($role == 'tutor') {
                     $ret = $this->User->removeTutor($userId, $courseId);
                 } else {
-                    $this->set('error', array('code' => 400, 'message' => 'Unsupported role for '.$user['username']));
+                    $this->set('error', array('code' => 400, 'message' => 'Unsupported role for '.$user));
                     $this->render('error');
                     return;
                 }
                 if (!$ret) {
-                    $this->set('error', array('code' => 401, 'message' => 'Fail to enrol ' . $user['username']));
+                    $this->set('error', array('code' => 401, 'message' => 'Fail to enrol ' . $user));
                     $this->render('error');
                     return;
                 }
