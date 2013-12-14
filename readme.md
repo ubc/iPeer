@@ -1,3 +1,13 @@
+iPeer 3.0.8
+---------------------------
+This is a maintenance release.
+* Fixed reported bug in student index
+* Fixed courses edit for instructors and tutors
+* Modified courses/edit for instructor in no faculties
+* Fixed a timezone bug.
+* Added a small event model test
+* Fixed survey group member model tests
+
 iPeer 3.0.7
 ---------------------------
 This is a maintenance release.

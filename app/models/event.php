@@ -184,7 +184,20 @@ class Event extends AppModel
         $this->virtualFields['student_count'] = sprintf('SELECT count(*) as count FROM group_events as vge RIGHT JOIN groups_members as vgm ON vge.group_id = vgm.group_id WHERE vge.event_id = %s.id', $this->alias);
         $this->virtualFields['group_count'] = sprintf('SELECT count(*) as count FROM group_events as vge WHERE vge.event_id = %s.id', $this->alias);
         $this->virtualFields['completed_count'] = sprintf('SELECT count(*) as count FROM evaluation_submissions as ves WHERE ves.submitted = 1 AND ves.event_id = %s.id', $this->alias);
-        $this->virtualFields['due_in'] = sprintf('TIMESTAMPDIFF(SECOND,"%s",due_date)', date('Y-m-d H:i:s'));
+
+        /**
+         * The following does time correction for daylight savings.
+         * SQL does not recognize daylight savings, therefore when not in a daylight savings period, the timezone is 1hr (3600s) behind the actual time.
+         * NOTE: UNIX_TIMESTAMP() appears to work, but online sources say otherwise.
+         */
+        $dueIn = "";
+        if(date('I') == 1){
+            $dueIn = date('Y-m-d H:i:s', time());
+        }
+        else{
+            $dueIn = date('Y-m-d H:i:s', time() + 3600);
+        }
+        $this->virtualFields['due_in'] = sprintf('TIMESTAMPDIFF(SECOND,"%s",due_date)', $dueIn);
     }
 
     /**

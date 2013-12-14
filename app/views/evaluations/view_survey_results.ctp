@@ -59,7 +59,7 @@ foreach ($questions as $ques) {
         if (isset($answers[$ques['id']]) &&
             !empty($answers[$ques['id']]['0']['SurveyInput']['response_text'])
         ) {
-            echo '<pre>'.$answers[$ques['id']]['0']['SurveyInput']['response_text'].'</pre>';
+            echo '<pre wrap>'.$answers[$ques['id']]['0']['SurveyInput']['response_text'].'</pre>';
         // no response
         } else {
             echo '<p class="noanswer">-- No Answer --</p>';
