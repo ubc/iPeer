@@ -41,7 +41,7 @@
       echo "else if (totalPoints > parseFloat(allPoints)) {";
       echo "  diff = totalPoints - parseFloat(allPoints);";
       echo "  if (commentsRequired == 0) {";
-      echo "    $('statusMsg').innerHTML = '".__('Too many points, need to unallocate', true)." <font color=red>' + diff + '</font> ".__('points.')." ';";
+      echo "    $('statusMsg').innerHTML = '".__('Too many points, need to unallocate', true)." <font color=red>' + diff + '</font> ".__('points.', true)." ';";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments != 0) {";
       echo "    $('statusMsg').innerHTML = '".__('Too many points, need to unallocate', true)." <font color=red>' + diff + '</font> ".__('points.<br />There are still', true)." <font color=red>' + emptyComments + '</font> ".__(' comments to be filled.', true)." ';";

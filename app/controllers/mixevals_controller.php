@@ -322,6 +322,13 @@ class MixevalsController extends AppController
                     $deleteSelfEval[$oldIndex] = 1;
                     continue;
                 }
+                $scaleLevel = 0;
+                if (isset($this->data['MixevalQuestionDesc'])) {
+                    foreach ($this->data['MixevalQuestionDesc'] as $desc) {
+                        $scaleLevel++;
+                    }
+                }
+                $q['scale_level'] = $scaleLevel;
                 $contiguousQs[$newIndex] = $q;
                 $newOrder[$oldIndex] = $newIndex;
             }

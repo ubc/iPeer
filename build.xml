@@ -220,6 +220,8 @@
 
     <target name="test-win" description="Run unit tests" depends="init-test-db">
         <exec command="cake\console\cake.bat -app app testsuite app group component" passthru="true"/>
+        <exec command="cake\console\cake.bat -app app testsuite app group model" passthru="true"/>
+        <exec command="cake\console\cake.bat -app app testsuite app group controller" passthru="true"/>
         <!-- v1_controller test must be last one as it will change the database --> 
         <phingcall target="post-test"/>
     </target>

@@ -188,6 +188,8 @@ class EvaluationComponent extends Object
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
         $this->Penalty = ClassRegistry::init('Penalty');
         $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
+        $this->SimpleEvaluation = ClassRegistry::init('SimpleEvaluation');
+        $this->Event = ClassRegistry::init('Event');
 
         // assuming all are in the same order and same size
         $evaluatees = $params['form']['memberIDs'];
@@ -196,6 +198,21 @@ class EvaluationComponent extends Object
         $evaluator = $params['data']['Evaluation']['evaluator_id'];
         isset($params['form']['group_id']) ? $evaluators = $this->GroupsMembers->findAllByGroupId($params['form']['group_id']) : $evaluators = "";
         $evaluators = Set::extract('/GroupsMembers/user_id', $evaluators);
+
+        // If value is not within range, then don't save.
+        $pos = 0;
+        $totalPoints = 0;
+        foreach ($evaluatees as $value) {
+            $totalPoints += $points[$pos];
+            $pos ++;
+        }
+        $event = $this->Event->getEventById($params['form']['event_id']);
+        $simpleEval = $this->SimpleEvaluation->getEvaluation($event['Event']['template_id']);
+        $required = $simpleEval['SimpleEvaluation']['point_per_member'] * count($evaluatees);
+        echo $required;
+        if ($totalPoints != $required) {
+            return false;
+        }
 
         // create Evaluations for each evaluator-evaluatee pair
         $pos = 0;
@@ -211,6 +228,7 @@ class EvaluationComponent extends Object
                 $evalMarkRecord['EvaluationSimple']['grade_release'] = 0;
             }
             $evalMarkRecord['EvaluationSimple']['score'] = $points[$pos];
+            $totalPoints += $points[$pos];
             $evalMarkRecord['EvaluationSimple']['comment'] = $comments[$pos];
             $evalMarkRecord['EvaluationSimple']['date_submitted'] = date('Y-m-d H:i:s');
 
@@ -603,6 +621,7 @@ class EvaluationComponent extends Object
     {
         $this->EvaluationRubricDetail = ClassRegistry::init('EvaluationRubricDetail');
         $totalGrade = 0;
+        $totalLom = count($rubric['RubricsLom']);
         
         if ($viewMode == 0) {
             $pos = 0;
@@ -614,7 +633,14 @@ class EvaluationComponent extends Object
                 }
 
                 // get total possible grade for the criteria number ($i)
-                isset($form[$targetEvaluatee.'criteria_points_'.$i]) ? $grade = $form[$targetEvaluatee.'criteria_points_'.$i] : $grade = "";
+                foreach ($rubric['RubricsCriteria'] as $criteria) {
+                    if ($criteria['criteria_num'] == $i) {
+                        $multiplier = $criteria['multiplier'];
+                        break;
+                    }
+                }
+                $grade = isset($form['selected_lom_'.$targetEvaluatee.'_'.$i])? $form['selected_lom_'.$targetEvaluatee.'_'.$i] * ($multiplier/$totalLom) : "";
+                
                 $selectedLom = $form['selected_lom_'.$targetEvaluatee.'_'.$i];
                 $evalRubricDetail = $this->EvaluationRubricDetail->getByEvalRubricIdCritera($evalRubricId, $i);
                 if (isset($evalRubricDetail)) {
@@ -641,7 +667,14 @@ class EvaluationComponent extends Object
                 $form[$targetEvaluatee."selected$targetCriteria"] = ($form[$targetEvaluatee."selected$targetCriteria"] ? $form[$targetEvaluatee."selected$targetCriteria"] : 0);
             }
 
-            isset($form[$targetEvaluatee.'criteria_points_'.$targetCriteria]) ? $grade = $form[$targetEvaluatee.'criteria_points_'.$targetCriteria] : $grade = "";
+            foreach ($rubric['RubricsCriteria'] as $criteria) {
+                if ($criteria['criteria_num'] == $targetCriteria) {
+                    $multiplier = $criteria['multiplier'];
+                    break;
+                }
+            }
+            $grade = isset($form['selected_lom_'.$targetEvaluatee.'_'.$targetCriteria])? $form['selected_lom_'.$targetEvaluatee.'_'.$targetCriteria] * ($multiplier/$totalLom) : "";
+            
             $selectedLom = $form['selected_lom_'.$targetEvaluatee.'_'.$targetCriteria];
             
             // Set up and save EvaluationRubricDetail
@@ -660,7 +693,7 @@ class EvaluationComponent extends Object
             // Loop through all criteria to get total grade
             foreach ($rubric['RubricsCriteria'] as $rubricCriteria) {
                 $criteriaNum = $rubricCriteria['criteria_num'];
-                isset($form[$targetEvaluatee.'criteria_points_'.$criteriaNum]) ? $grade = $form[$targetEvaluatee.'criteria_points_'.$criteriaNum] : $grade = 0;
+                $grade = isset($form['selected_lom_'.$targetEvaluatee.'_'.$criteriaNum])? $form['selected_lom_'.$targetEvaluatee.'_'.$criteriaNum]/$totalLom : 0;
                 $totalGrade += $grade;
             }
         }
@@ -959,7 +992,8 @@ class EvaluationComponent extends Object
                 if ($ques['mixeval_question_type_id'] == '1') {
                     $evalMixevalDetail['EvaluationMixevalDetail']['selected_lom'] = $data[$num]['selected_lom'];   
                 }
-                $evalMixevalDetail['EvaluationMixevalDetail']['grade'] = $data[$num]['grade'];
+                // Do not grab grade directly as users can edit the HTML to submit illegitimate answers
+                $evalMixevalDetail['EvaluationMixevalDetail']['grade'] = $data[$num]['selected_lom'] * ($ques['multiplier']/$ques['scale_level']);
                 if ($ques['required'] && !$ques['self_eval']) {
                     $totalGrade += $data[$num]['grade'];
                 }

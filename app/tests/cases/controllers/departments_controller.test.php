@@ -128,15 +128,28 @@ class DepartmentsControllerTestCase extends ExtendedAuthTestCase {
 	}
 
 	function testAdd() {
-
+        $result = $this->testAction('/departments/add', array('return' => 'vars'));
+        $this->assertEqual($result['faculties'][1], 'Applied Science');
+        $this->assertEqual($result['faculties'][2], 'Science');
+        $this->assertEqual($result['title_for_layout'], 'Add Department');
 	}
 
 	function testEdit() {
-
+        $result = $this->testAction('/departments/edit/1', array('return' => 'vars'));
+        $this->assertEqual($result['faculties'][1], 'Applied Science');
+        $this->assertEqual($result['faculties'][2], 'Science');
+        $this->assertEqual($result['title_for_layout'], 'Edit Department');
 	}
 
 	function testDelete() {
-
+        $this->testAction('/departments/delete/1');
+        $result = $this->testAction('/departments/index', array( 'return' => 'contents'));
+        $this->assertEqual($result['departments'][0]['id'], 2);
+        $this->assertEqual($result['departments'][0]['Name'], 'APSC');
+        $this->assertEqual($result['departments'][0]['Faculty'], 'Applied Science');
+        $this->assertEqual($result['departments'][1]['id'], 3);
+        $this->assertEqual($result['departments'][1]['Name'], 'CPSC');
+        $this->assertEqual($result['departments'][1]['Faculty'], 'Science');
 	}
 
 }
