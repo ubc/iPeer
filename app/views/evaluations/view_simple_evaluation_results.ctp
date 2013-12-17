@@ -30,7 +30,7 @@
 <?php
 if (!empty($results['Incomplete'])) {
     echo $html->tableHeaders(
-        array(_('Have not submitted their evaluations')),
+        array(__('Have not submitted their evaluations', true)),
         null,
         array('class' => 'red')
     );
@@ -50,7 +50,7 @@ if (!empty($results['Incomplete'])) {
 <?php
 if (!empty($results['Dropped'])) {
     echo $html->tableHeaders(
-        array(_('Left the group, but had submitted or were evaluated')),
+        array(__('Left the group, but had submitted or were evaluated', true)),
         null,
         array('class' => 'blue')
     );
@@ -66,10 +66,10 @@ if (!empty($results['Dropped'])) {
 </table>
 
 <h3><?php __('Evaluation Results')?></h3>
-<?php 
+<?php
 if ($event['Event']['auto_release']) {
     echo "<div id='autoRelease_msg' class='green'>";
-    echo __("Auto Release is ON, you do not need to manually release the grades and comments", true); 
+    echo __("Auto Release is ON, you do not need to manually release the grades and comments", true);
     echo "</div><br>";
 }
 ?>
@@ -117,7 +117,7 @@ foreach ($results['evaluators'] as $evaluatorId => $evaluator) {
             $score = $results['Submissions'][$evaluatorId]
                 [$evaluateeId]['score'];
             $score = is_numeric($score) ? number_format($score, 2) : $score;
-        } 
+        }
         echo "<td>$score</td>";
     }
     echo '</tr>';
@@ -219,7 +219,7 @@ foreach ($results['evaluatees'] as $evaluatee) {
 // controls to initiate grade release
 foreach ($results['evaluatees'] as $evaluatee) {
     $evaluateeId = $evaluatee['User']['id'];
-    $button = $form->button(_('N/A'), array('disabled' => 'disabled'));
+    $button = $form->button(__('N/A', true), array('disabled' => 'disabled'));
     if (array_key_exists($evaluateeId, $results['ReleaseStatus'])) {
         $status = $results['ReleaseStatus'][$evaluateeId];
         $buttonName = "Release";
@@ -252,10 +252,10 @@ foreach ($results['evaluatees'] as $evaluatee) {
     <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>" />
     <?php
     if ($event['GroupEvent']['marked'] == "reviewed") {
-        echo "<input type='submit' name='mark_not_reviewed' value=' "._('Mark Peer Evaluations as Not Reviewed')."' />";
+        echo "<input type='submit' name='mark_not_reviewed' value=' ".__('Mark Peer Evaluations as Not Reviewed', true)."' />";
     }
     else {
-        echo "<input type='submit' name='mark_reviewed' value=' "._('Mark Peer Evaluations as Reviewed')."' />";
+        echo "<input type='submit' name='mark_reviewed' value=' ".__('Mark Peer Evaluations as Reviewed', true)."' />";
     }
     ?>
     </form>
@@ -287,7 +287,7 @@ if (isset($results['Submissions'])) {
         }
         $evaluatorInfo = $results['evaluators'][$evaluatorId]['User'];
         echo "<h3 $class>Evaluator: ".$evaluatorInfo['full_name'].'</h3>';
-        $headers = array(_('Evaluatee'), _('Comment'), _('Released'));
+        $headers = array(__('Evaluatee', true), __('Comment', true), __('Released', true));
         echo "<table class='standardtable'>";
         echo $html->tableHeaders($headers);
         $cells = array();
@@ -301,7 +301,7 @@ if (isset($results['Submissions'])) {
             }
             $evaluateeInfo = $results['evaluators'][$evaluateeId]['User'];
             $tmp = array();
-            $tmp[] = array($evaluateeInfo['full_name'], 
+            $tmp[] = array($evaluateeInfo['full_name'],
                 array('width' => '15%', 'class' => $class));
             $tmp[] = isset($evalMark['comment']) ? $evalMark['comment'] : '-';
             $releaseChk = "";
@@ -313,7 +313,7 @@ if (isset($results['Submissions'])) {
             if ($evalMark['release_status'] == 1) {
                 $releaseChkParams['checked'] = 'checked';
             }
-            $releaseChk = $form->checkbox($releaseChkParams['name'], 
+            $releaseChk = $form->checkbox($releaseChkParams['name'],
                 $releaseChkParams);
             $releaseChk .= $form->hidden("evaluator_ids[]", array(
                 'value' => $evalMark['evaluator'], 'name' => 'evaluator_ids[]'));

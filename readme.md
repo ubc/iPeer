@@ -1,3 +1,19 @@
+Running Tests
+---------------------------
+Integration Tests
+
+Requirements:
+* Selenium Server 2.38+
+* PHP Webdriver (https://github.com/Element-34/php-webdriver)
+* Firfox
+
+Ruuning the tests:
+
+    cd iPeer
+    cake/console/cake -app app testsuite app group system
+
+It is better not to touch the mouse or keyboard during the tests.
+
 iPeer 3.0.8
 ---------------------------
 This is a maintenance release.
