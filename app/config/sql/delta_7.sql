@@ -509,5 +509,4 @@ ALTER TABLE rubrics_criterias ADD show_marks INT(1) AFTER multiplier;
 
 -- Update database version, done as the very last operation as a sign that
 -- the update went well.
-INSERT INTO `sys_parameters` (`parameter_code`, `parameter_value`, `parameter_type`, `description`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
-('database.version', '7', 'I', 'database version', 'A', 0, NOW(), NULL, NOW());
+UPDATE `sys_parameters` SET `parameter_value` = '7' WHERE `parameter_code` = 'database.version';
