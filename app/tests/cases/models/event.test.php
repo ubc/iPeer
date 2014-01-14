@@ -46,7 +46,7 @@ class EventTestCase extends CakeTestCase
         $this->Event = & ClassRegistry::init('Event');
 
         //Test a valid course number
-        $course = $this->Event->getCourseEvent(1);
+        $course = Set::sort($this->Event->getCourseEvent(1), '{n}.Event.id', 'asc');
         $this->assertEqual($course[0]['Event']['title'], 'Term 1 Evaluation');
         $this->assertEqual($course[1]['Event']['title'], 'Term Report Evaluation');
         $this->assertEqual($course[2]['Event']['title'], 'Project Evaluation');
@@ -71,7 +71,7 @@ class EventTestCase extends CakeTestCase
 
         //Test a valid course number
 
-        $course = $this->Event->GetCourseEvalEvent(1);
+        $course = Set::sort($this->Event->GetCourseEvalEvent(1), '{n}.Event.id', 'asc');
         $events = $this->toEventNameArray($course);
         $this->assertEqual($events['0'], 'Term 1 Evaluation');
         $this->assertEqual($events['1'], 'Term Report Evaluation');
