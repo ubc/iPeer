@@ -333,7 +333,7 @@ class EventTestCase extends CakeTestCase
         //TODO
     }
 
-    /*function testTimezone()
+    function testTimezone()
     {
         $now = time(); // current php time (eg. not sql time)
         $event = $this->Event->findById(1);
@@ -341,17 +341,19 @@ class EventTestCase extends CakeTestCase
         $dueIn = $dueDate - $now;
         $serverTZ = date_default_timezone_get(); // saves the server's timezone
         // the difference between the our calculuation and the model's calcualtion
-        // should be within 5 seconds
-        $this->assertWithinMargin($event['Event']['due_in'], $dueIn, 5);
+        // should be within 10 seconds
+        $this->assertWithinMargin($event['Event']['due_in'], $dueIn, 10);
         // switch to timezone without daylight savings
         date_default_timezone_set('America/Regina');
-        $this->assertWithinMargin($event['Event']['due_in'], $dueIn, 5);
+        $dueIn = $dueDate - time();
+        $this->assertWithinMargin($event['Event']['due_in'], $dueIn, 10);
         // switch to timezone with daylight savings
         date_default_timezone_set('America/Vancouver');
-        $this->assertWithinMargin($event['Event']['due_in'], $dueIn, 5);
+        $dueIn = $dueDate - time();
+        $this->assertWithinMargin($event['Event']['due_in'], $dueIn, 10);
         // switch timezone back to original
         date_default_timezone_set($serverTZ);
-    }*/
+    }
 
     #####################################################################################################################################################
     ###############################################     HELPER FUNCTIONS     ############################################################################

@@ -706,12 +706,12 @@ class Event extends AppModel
 
             $groupEventIds = Set::extract('/GroupEvent/id', $groups);
         } else {
-	        // get the groups that this user is in
-	        $groups = $this->Group->find('all', array(
-	            'fields' => 'id',
-	            'conditions' => array('Member.id' => $userId),
-	            'contain' => array('Member', 'GroupEvent.id')));
-	        $groupEventIds = Set::extract('/GroupEvent/id', $groups);
+            // get the groups that this user is in
+            $groups = $this->Group->find('all', array(
+                'fields' => 'id',
+                'conditions' => array('Member.id' => $userId),
+                'contain' => array('Member', 'GroupEvent.id')));
+            $groupEventIds = Set::extract('/GroupEvent/id', $groups);
         }
         // find evaluation events based on the groups this user is in
         $evaluationEvents = $this->find('all', array(

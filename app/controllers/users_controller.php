@@ -1583,11 +1583,11 @@ class UsersController extends AppController
             $minutes = (int) ($seconds / 60);
             $seconds = $seconds % 60;
             $ret = $minutes . __(' minutes ', true) . $seconds . __(' seconds', true);
-    	} else {
-    	    $hours = (int) ($seconds / 3600);
+        } else {
+            $hours = (int) ($seconds / 3600);
             $minutes = (int) ($seconds % 3600 / 60);
             $ret = $hours . __(' hours ', true) . $minutes . __(' minutes', true);
-    	}
+        }
 
         return $ret;
     }
@@ -1649,7 +1649,7 @@ class UsersController extends AppController
     /**
      * showEvents
      *
-     * @param mixed $id       - user id
+     * @param mixed $id - user id
      *
      * @access public
      * @return void

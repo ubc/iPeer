@@ -543,7 +543,7 @@ class EvaluationsController extends AppController
                 array('course_id' => $courseId, 'user_id' => $userId ));
         } else {
             // Make sure user is an instructor in this course
-        	$ret = $this->UserCourse->field('id',
+            $ret = $this->UserCourse->field('id',
                 array('course_id' => $courseId, 'user_id' => $userId ));
         }
         if (!$ret) {
