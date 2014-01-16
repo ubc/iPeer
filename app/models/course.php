@@ -14,6 +14,8 @@ class Course extends AppModel
     const FILTER_PERMISSION_FACULTY = 1;
     const FILTER_PERMISSION_OWNER = 2;
     const FILTER_PERMISSION_ENROLLED = 3;
+    
+    const IDENTIFIER = 0;
 
     public $name = 'Course';
     public $displayField = 'full_name';
@@ -34,15 +36,6 @@ class Course extends AppModel
             'className'   => 'Event',
             'conditions'  => 'Event.record_status = "A"',
             'order'       => 'Event.created DESC',
-            'foreignKey'  => 'course_id',
-            'dependent'   => true,
-            'exclusive'   => false,
-            'finderSql'   => ''
-        ),
-        'Survey' => array(
-            'className'   => 'Survey',
-            'conditions'  => '',
-            'order'       => '',
             'foreignKey'  => 'course_id',
             'dependent'   => true,
             'exclusive'   => false,
@@ -91,7 +84,8 @@ class Course extends AppModel
             'dependent'    => false,
         ),
         'Department' => array(
-            'joinTable' => 'course_departments'
+            'with' => 'CourseDepartment',
+            'joinTable' => 'course_departments',
         ),
     );
 
@@ -112,6 +106,16 @@ class Course extends AppModel
             'courseRule2' => array(
                 'rule' => 'notEmpty',
                 'message' => 'The course name is required.'
+            )
+        ),
+        'homepage' => array(
+            'http' => array(
+                'rule' => 'includeHttp'
+            ),
+            'url' => array(
+                'rule' => 'url',
+                'allowEmpty' => true,
+                'message' => 'The homepage is not a valid URL.'
             )
         )
     );
@@ -134,6 +138,23 @@ class Course extends AppModel
                 'Please select a department.');
         }
     }*/
+    
+    /**
+     * include http to the beginning of the url if it is not already there
+     *
+     * @param mixed $check homepage field
+     *
+     * @access public
+     * @return void
+     */
+    function includeHttp($check)
+    {
+        $prefix = substr($check['homepage'], 0, 4);
+        if ($prefix != 'http' && !empty($check['homepage'])) {
+            $this->data['Course']['homepage'] = 'http://'.$this->data['Course']['homepage'];
+        }
+        return true;
+    }
 
     /**
      * __construct
@@ -305,7 +326,15 @@ class Course extends AppModel
             $conditions['id'] = $courseIds;
         }
         // find courses with instructor and other models specified in contain
-        $courses = $this->find($type, array('conditions' => $conditions, 'contain' => $contain));
+        // sort courses alphabetically
+        $courses = $this->find(
+            $type, 
+            array(
+                'conditions' => $conditions, 
+                'contain' => $contain,
+                'order' => 'Course.course'
+            )
+        );
 
         return $courses;
     }
@@ -325,10 +354,10 @@ class Course extends AppModel
     /**
      * Get course data by student id
      *
-     * @param mixed $instructorId instructor id
-     * @param bool  $type         type
-     * @param int   $contain      contained models
-     * @param array $conditions   conditions for find
+     * @param mixed $studentId  student id
+     * @param bool  $type       type
+     * @param int   $contain    contained models
+     * @param array $conditions conditions for find
      *
      * @return course data
      */
@@ -430,30 +459,44 @@ class Course extends AppModel
      */
     function getByDepartmentIds($departmentIds, $findType = "all", $options = array())
     {
-        $options['conditions']['Department.id'] = $departmentIds;
+        $options['group'] = 'Course.id'; // prevent dups when a course is in
+                                        // multiple faculties
+        $options['order'] = 'Course.course'; // sort courses alphabetically
+        if ($findType != 'first') {
+            $options['conditions']['Department.id'] = $departmentIds;
+        }
         if(isset($options['contain'])) { 
-        	$options['contain'] = array_merge(array('Department'), $options['contain']);
+            $options['contain'] = array_merge(array('Department'), $options['contain']);
         } else {
-        	$options['contain'] = array('Department');
+            $options['contain'] = array('Department');
         }
         if ($findType == 'list') {
             $courses = $this->find('all', $options);
             return Set::combine($courses, '{n}.'.$this->alias.'.id', '{n}.'.$this->alias.'.'.$this->displayField);
         }
-        return $this->find($findType, $options);
+        
+        $course = $this->find($findType, $options);
+        $xDept = array_intersect(Set::extract('/Department/id', $course), $departmentIds);
+        
+        if (!empty($xDept)) {
+            return $course;
+        } else {
+            return array();
+        }
     }
 
     /**
      * getCourseList
      *
+     * @param mixed $courseIds course id
+     *
      * @access public
      * @return void
      */
-    function getCourseList()
+    function getCourseList($courseIds)
     {
-        $this->displayField = 'course';
         return $this->find('list', array(
-            'conditions' => array()
+            'conditions' => array('Course.id' => $courseIds)
         ));
     }
 
@@ -474,7 +517,7 @@ class Course extends AppModel
     }
 
     /**
-     * getCourseById
+     * getCourseWithInstructorsById
      *
      * @param mixed $courseId course id
      *
@@ -509,9 +552,10 @@ class Course extends AppModel
         ));
 
         // some clean up
-        foreach ($course['Enrol'] as $key => $student) {
-            unset($course['Enrol'][$key]['UserEnrol']);
+        foreach ($course['Enrol'] as &$student) {
+            unset($student['UserEnrol']);
         }
+        unset($student);
 
         return $course;
     }
@@ -548,6 +592,8 @@ class Course extends AppModel
     {
         switch($permission) {
         case Course::FILTER_PERMISSION_SUPERADMIN:
+            // sort courses alphabetically
+            $options['order'] = 'Course.course';
             $courses = $this->find($type, $options);
             break;
         case Course::FILTER_PERMISSION_FACULTY:
@@ -620,4 +666,20 @@ class Course extends AppModel
     {
         return $this->getAccessibleCourses($userId, $permission, 'first', array('conditions' => array($this->alias.'.id' => $courseId), 'contain' => $contain));
     }
+    
+    /**
+     * Get list of users enrolled in a course
+     *
+     * @param mixed $course_id
+     *
+     * @return list of user ids
+     */
+    function getUserListbyCourse($course_id) {
+        $users = $this->find('first', array(
+            'conditions' => array('Course.id' => $course_id),
+            'contain' => array('Enrol')
+        ));
+        return Set::extract($users, '/Enrol/id');
+    }
+     
 }

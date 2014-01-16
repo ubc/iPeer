@@ -16,13 +16,6 @@ class Survey extends EvaluationBase
     public $useTable = null;
     const TEMPLATE_TYPE_ID = 3;
 
-    public $belongsTo = array('Course' =>
-        array('className'  =>  'Course',
-            'conditions' =>  '',
-            'order'      =>  '',
-            'foreignKey' =>  'course_id'),
-    );
-
     public $hasMany = array('SurveyGroupSet' =>
         array('className'    =>  'SurveyGroupSet',
             'conditions'    => '',
@@ -75,8 +68,16 @@ class Survey extends EvaluationBase
             'unique' => array(
                 'rule' => 'isUnique',
                 'message' => 'Duplicate name found. Please select another.'
-            )
+            ),
+            'required' => array(
+                'rule' => 'notEmpty',
+                'message' => 'Please fill in the name of the survey template.'
+            ),
         ),
+        'availability' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Please select an availability option.'
+        )
     );
 
     /**
@@ -96,25 +97,6 @@ class Survey extends EvaluationBase
     }
 
     /**
-     * getSurveyIdByCourseIdTitle
-     *
-     * @param bool $courseId course id
-     * @param bool $title    title
-     *
-     * @access public
-     * @return void
-     */
-    function getSurveyIdByCourseIdTitle($courseId=null, $title=null)
-    {
-        //$tmp = $this->find('course_id='.$courseId.' AND name=\''.$title.'\'', 'id');
-        $tmp = $this->find('first', array(
-            'conditions' => array('course_id' => $courseId, 'name' => $title),
-            'fields' => array('id')
-        ));
-        return $tmp['Survey']['id'];
-    }
-
-    /**
      * getSurveyWithQuestionsById
      *
      * @param mixed $surveyId
@@ -128,5 +110,39 @@ class Survey extends EvaluationBase
             'conditions' => array('id' => $surveyId),
             'contain' => array('Question' => array('order' => 'SurveyQuestion.number ASC', 'Response'))
         ));
+    }
+
+    /**
+     * Get the questions and responses for a given survey. This method will
+     * format the responses into a format that's easier for cakephp's form
+     * helper to use.
+     *
+     * @param int $surveyId - The id of the survey to get questions for
+     *
+     * @return An array of the questions, responses, and response options
+     */
+    public function getQuestions($surveyId)
+    {
+        // Get all required data from each table for every question
+        $questions = $this->Question->find('all', 
+            array(
+                'conditions' => array('Survey.id' => $surveyId),
+                'order' => 'SurveyQuestion.number'
+            )
+        );
+
+        // Convert the response array into a flat options array for
+        // the form input helper
+        foreach ($questions as &$q) {
+            if (isset($q['Response'])) {
+                $options = array();
+                foreach ($q['Response'] as $resp) {
+                    $options[$resp['id']] = $resp['response'];
+                }
+                $q['ResponseOptions'] = $options;
+            }
+        }
+
+        return $questions;
     }
 }

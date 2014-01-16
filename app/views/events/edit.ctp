@@ -10,6 +10,7 @@ echo $this->Form->input('id');
 <label class="courseLabel"><?php __('Course')?></label>
 <label class="course"><?php echo $event['Course']['full_name'] ?></label>
 <?php echo $this->Form->input('title', array('label' => 'Event Title'));
+echo "<div id='titleWarning' class='red'></div>";
 echo $this->Form->input('description', array('type' => 'textarea'));
 echo $this->Form->input('event_template_type_id');
 
@@ -63,7 +64,28 @@ echo $this->Form->input(
         'options' => array('1' => 'Enabled', '0' => 'Disabled'),
         'default' => '0'
     )
+); ?>
+<div class='help-text'><?php __("Doesn't apply to Mix Evaluation. Required questions are set in the template.") ?></div>
+<?php echo $this->Form->input(
+    'auto_release',
+    array(
+        'legend' => 'Auto-Release Results',
+        'type' => 'radio',
+        'options' => array('1' => 'Enabled', '0' => 'Disabled'),
+        'default' => '0'
+    )
 );
+echo $this->Form->input(
+    'enable_details',
+    array(
+        'legend' => 'Student Result Mode',
+        'type' => 'radio',
+        'options' => array('0'=> 'Basic', '1' => 'Detailed'),
+        'default' => '1'
+    )
+); ?>
+<div class='help-text'><?php echo _t('Basic view only show averages of questions') ?></div>
+<?php
 echo $this->Form->input('due_date', array('type' => 'text'));
 echo $this->Form->input('release_date_begin', array('label' => 'Evaluation Released From', 'type' => 'text'));
 echo $this->Form->input('release_date_end', array('label' => 'Until', 'type' => 'text'));
@@ -71,9 +93,29 @@ echo $this->Form->input('result_release_date_begin',
     array('div' => array('id' => 'ResultReleaseBeginDiv'), 'label' => 'Results Released From', 'type' => 'text'));
 echo $this->Form->input('result_release_date_end',
     array('div' => array('id' => 'ResultReleaseEndDiv'), 'label' => 'Until', 'type' => 'text'));
-echo $this->Form->input('Group',
-    array('div' => array('id' => 'GroupsDiv'), 'label' => 'Group(s)'));
 
+echo $this->Form->input(
+    'email_schedule',
+    array(
+        'label' => 'Email Reminder Frequency ',
+        'options' => $emailSchedules,
+        'default' => "$email_schedule",
+        'div' => array('id' => 'emailSchedule')
+    )
+); 
+?>
+<div class='email-help-text'><?php __('Select the number of days in between each email reminder for submitting
+    evaluations. The first email is sent when the event is released.') ?></div>
+<?php
+echo $this->Form->input('Group',
+    array('div' => array('id' => 'GroupsDiv'), 'label' => 'Group(s)')); ?>
+<div class='selectAll'>
+<?php echo $this->Form->button('Select All', array('type' => 'button', 'id' => 'selectAll'));
+echo $this->Form->button('Unselect All', array('type' => 'button', 'id' => 'unselectAll'));?>
+</div>
+<div class='help-text'><?php __('Holding "ctrl" or "command" key to select multiple groups.') ?></div>
+
+<?php
 // No nice way of inserting new penalty entries using CakePHP, doing it
 // manually.
 echo "<div id='penaltyInputs'>";
@@ -128,6 +170,17 @@ echo "</div>";
 
 echo $this->Form->submit();
 echo $this->Form->end();
+
+echo $ajax->observeField(
+    'EventTitle',
+    array(
+        'update'=>'titleWarning',
+        'url'=>'checkDuplicateName/'.$event['Course']['id'].'/'.$event['Event']['id'],
+        'frequency'=>1,
+        'loading'=>"Element.show('loading');",
+        'complete'=>"Element.hide('loading');stripe();"
+    )
+);
 ?>
 </div>
 
@@ -143,6 +196,14 @@ jQuery("#EventSimpleEvaluation").change(updatePreview);
 jQuery("#EventRubric").change(updatePreview);
 jQuery("#EventSurvey").change(updatePreview);
 jQuery("#EventMixeval").change(updatePreview);
+// select all groups
+jQuery("#selectAll").click(function() {
+    jQuery("#GroupGroup option").prop('selected', true);
+});
+// unselect all groups
+jQuery("#unselectAll").click(function() {
+    jQuery("#GroupGroup option").prop('selected', false);
+});
 // keep track of the number of penalties entered.
 var penaltyCount = <?php echo $numPenalties; ?>;
 
@@ -189,6 +250,8 @@ function toggleEventTemplate() {
         jQuery("#ResultReleaseBeginDiv").show(); // no result release for survey
         jQuery("#ResultReleaseEndDiv").show(); // no result release for survey
         jQuery("#GroupsDiv").show();
+        jQuery("div.help-text").show();
+        jQuery("div.selectAll").show();
         updatePreview();
     }
     else if (eventType == '2') {
@@ -201,6 +264,8 @@ function toggleEventTemplate() {
         jQuery("#ResultReleaseBeginDiv").show(); // no result release for survey
         jQuery("#ResultReleaseEndDiv").show(); // no result release for survey
         jQuery("#GroupsDiv").show();
+        jQuery("div.help-text").show();
+        jQuery("div.selectAll").show();
         updatePreview();
     }
     else if (eventType == '3') {
@@ -213,6 +278,8 @@ function toggleEventTemplate() {
         jQuery("#ResultReleaseBeginDiv").hide(); // no result release for survey
         jQuery("#ResultReleaseEndDiv").hide(); // no result release for survey
         jQuery("#GroupsDiv").hide(); // no groups in surveys
+        jQuery("div.help-text").hide(); // no groups in surveys
+        jQuery("div.selectAll").hide(); // no groups in surveys
         updatePreview();
     }
     else if (eventType == '4') {
@@ -225,8 +292,11 @@ function toggleEventTemplate() {
         jQuery("#ResultReleaseBeginDiv").show(); // no result release for survey
         jQuery("#ResultReleaseEndDiv").show(); // no result release for survey
         jQuery("#GroupsDiv").show();
+        jQuery("div.help-text").show();
+        jQuery("div.selectAll").show();
         updatePreview();
     }
+    jQuery('#emailSchedule').show(); // shows email reminder frequency at all times
 }
 
 // update event id for the preview link

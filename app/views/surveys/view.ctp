@@ -10,11 +10,11 @@
     </tr>
     <tr>
       <th><?php __('Created')?>:</th>
-      <td><?php echo $survey['Survey']['created']; ?></td>
+      <td><?php echo Toolkit::formatDate($survey['Survey']['created']); ?></td>
     </tr>
     <tr>
       <th><?php __('Modified')?>:</th>
-      <td><?php echo $survey['Survey']['modified']; ?></td>
+      <td><?php echo Toolkit::formatDate($survey['Survey']['modified']); ?></td>
     </tr>
 </table>
 

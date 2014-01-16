@@ -15,7 +15,7 @@ class EvaltoolsController extends AppController
      *
      * @public $uses
      */
-    public $uses =  array('SimpleEvaluation', 'Rubric', 'Mixeval', 'Survey', 'EmailTemplate');
+    public $uses =  array('SimpleEvaluation', 'Rubric', 'Mixeval', 'Survey', 'EmailTemplate', 'Event');
     public $page;
     public $Sanitize;
     public $functionCode = 'EVAL_TOOL';
@@ -38,66 +38,32 @@ class EvaltoolsController extends AppController
     /**
      * index
      *
-     * @param bool $evaltool
-     *
      * @access public
      * @return void
      */
-    function index($evaltool = null)
+    function index()
     {
-        //Disable the autorender, base the role to render the custom home
-        $this->autoRender = false;
-
-        //General Evaluation Tools Rendering for Admin and Instructor
-        switch ($evaltool) {
-        case "simpleevaluations" :
-            $this->redirect('/simpleevaluations/index/');
-            break;
-
-        case "rubrics" :
-            $this->redirect('/rubrics/index/');
-            break;
-
-        case "surveys" :
-            $this->redirect('/surveys/index/');
-            break;
-
-        case "emailtemplates" :
-            $this->redirect('/emailtemplates/index/');
-            break;
-
-        default:
-            $this->showAll();
-            $this->render('index');
-            break;
-        }
-    }
-
-
-    /**
-     * showAll
-     *
-     *
-     * @access public
-     * @return void
-     */
-    function showAll()
-    {
-        $simpleEvalData = $this->SimpleEvaluation->find('all', array('conditions' => array('creator_id' => $this->Auth->user('id'))));
+        $simpleEvalData = $this->SimpleEvaluation->findAllByCreatorId($this->Auth->user('id'));
         $this->set('simpleEvalData', $simpleEvalData);
 
-        $rubricData = $this->Rubric->find('all', array('conditions' => array('creator_id' => $this->Auth->user('id'))));
+        $rubricData = $this->Rubric->findAllByCreatorId($this->Auth->user('id'));
         $this->set('rubricData', $rubricData);
 
-        $mixevalData = $this->Mixeval->find('all', array('conditions' => array('creator_id' => $this->Auth->user('id'))));
+        $mixevalData = $this->Mixeval->findAllByCreatorId($this->Auth->user('id'));
+        foreach ($mixevalData as &$mixeval) {
+            $mixeval['Mixeval']['event_count'] = $this->Event->find('count',
+                array('conditions' => 
+                    array('event_template_type_id' => 4,
+                        'template_id' => $mixeval['Mixeval']['id'])
+                )
+            );
+        }
         $this->set('mixevalData', $mixevalData);
 
-        $surveyData = $this->Survey->find('all', array('conditions' => array('Survey.creator_id' => $this->Auth->user('id')),
-            'contain' => false));
+        $surveyData = $this->Survey->findAllByCreatorId($this->Auth->user('id'));
         $this->set('surveyData', $surveyData);
 
-        $emailTemplates = $this->EmailTemplate->getMyEmailTemplate($this->Auth->user('id'));
+        $emailTemplates = $this->EmailTemplate->findAllbyCreatorId($this->Auth->user('id'));
         $this->set('emailTemplates', $emailTemplates);
     }
-
 }

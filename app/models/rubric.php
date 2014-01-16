@@ -42,6 +42,31 @@ class Rubric extends EvaluationBase
             'finderSql'   => ''
         ),
     );
+    
+    public $validate = array(
+        'availability' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Please select an availability option.'
+        ),
+        'name' => array(
+            'unique' => array(
+                'rule' => 'isUnique',
+                'message' => 'Duplicate name found. Please change the name.'
+            ),
+            'required' => array(
+                'rule' => 'notEmpty',
+                'message' => 'Please give the evaluation template a name.'
+            )
+        ),
+        'lom_max' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Please select a Level of Mastery.'
+        ),
+        'criteria' => array(
+            'rule' => 'notEmpty',
+            'message' => 'Please select the number of Criteria.'
+        ),
+    );
 
     /**
      * __construct
@@ -256,7 +281,7 @@ class Rubric extends EvaluationBase
     /**
      * getRubricById
      *
-     * @param Integer $id : Rubric id
+     * @param mixed $id rubric id
      *
      * @access public
      * @return returns Rubric and all of its associated models
@@ -302,7 +327,8 @@ class Rubric extends EvaluationBase
 
     /* Now, replace all the elements of this database array with the submitted array, unless there are missing */
         $submittedRubric = $tmp['Rubric'];
-        foreach ($tmp3 as $key => $value) {
+        $keys = array_keys($tmp3);
+        foreach ($keys as $key) {
 
             if (!empty($submittedRubric[$key])) {
                 //echo "<b>$key Replacing $tmp3[$key] with $submittedRubric[$key]</b><br />";
@@ -313,26 +339,13 @@ class Rubric extends EvaluationBase
     }
 
     /**
-     * getSelectionList
+     * getEvaluation
      *
-     * @param mixed $userid
-     *
+     * @param mixed $id id
+     * 
      * @access public
-     * @return returns related selection list
+     * @return void
      */
-    public function getSelectionList($userid) {
-        $ret = $this->find(
-            'list',
-            array(
-                'conditions' => array(
-                    'Rubric.availability' => 'public',
-                    'Rubric.creator_id' => $userid
-                )
-            )
-        );
-        return $ret;
-    }
-
     public function getEvaluation($id)
     {
         $eval = $this->find('first', array('conditions' => array($this->alias.'.id' => $id), 'contain' => 'RubricsCriteria'));

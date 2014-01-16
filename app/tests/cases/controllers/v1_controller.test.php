@@ -11,7 +11,8 @@ class V1ControllerTest extends CakeTestCase {
         'app.faculty', 'app.department', 'app.course_department',
         'app.user_faculty', 'app.user_tutor',
         'app.penalty', 'app.oauth_client', 'app.oauth_token',
-        'app.survey_input',
+        'app.survey_input', 'app.evaluation_rubric_detail', 'app.evaluation_mixeval_detail',
+        'app.sys_parameter'
     );
 
     public function startCase() {
@@ -99,19 +100,26 @@ class V1ControllerTest extends CakeTestCase {
      **/
     private function _getURL($path) {
         $url = Router::url($path, true);
+        // check if we're running the tests from the command line, if so,
+        // we have to manually construct a proper URL
         if (substr($url,0,4) != "http") {
             // read the server from environment var first
             // so that this can be configured from outside
             if (!($server = getenv('SERVER_TEST'))) {
                 $server = 'http://localhost:2000';
             }
-            return $server."/$path";
+            // since the Router isn't handling relative URLs for us, make sure
+            // to convert the path to an absolute URL
+            if (substr($path,0,1) != '/') {
+                $path = "/$path";
+            }
+            return $server.$path;
         }
         return $url;
     }
 
     public function testCheckRequiredParams() {
-        $url = $this->_getURL('v1/oauth');
+        $url = $this->_getURL('/v1/oauth');
         // Test required parameters checking
         // missing oauth_consumer_key
         $params = "oauth_signature_method=HMAC-SHA1&oauth_nonce=7&oauth_timestamp=1&oauth_version=1.0&oauth_token=1&oauth_signature=4";
@@ -158,7 +166,7 @@ class V1ControllerTest extends CakeTestCase {
     }
 
     public function testCheckSignature() {
-        $url = $this->_getURL('v1/oauth');
+        $url = $this->_getURL('/v1/oauth');
 
         // No errors thrown
         $this->assertEqual('', $this->_oauthReq($url));
@@ -195,7 +203,7 @@ class V1ControllerTest extends CakeTestCase {
     }
 
     public function testCheckNonce() {
-        $url = $this->_getURL('v1/oauth');
+        $url = $this->_getURL('/v1/oauth');
         // invalid timestamp
         $oauth = $this->_oauthReq($url, null, null, null, 1344974674);
         $this->assertEqual(
@@ -212,7 +220,7 @@ class V1ControllerTest extends CakeTestCase {
 
     public function testUsers()
     {
-        $url = $this->_getURL('v1/users');
+        $url = $this->_getURL('/v1/users');
         // GET - all users
         $users = $this->_fixtures['app.user']->records;
         $expected = array();
@@ -312,11 +320,11 @@ class V1ControllerTest extends CakeTestCase {
 
     public function testCourses()
     {
-        $url = $this->_getURL('v1/courses');
+        $url = $this->_getURL('/v1/courses');
         $courses = $this->_fixtures['app.course']->records;
         $expectedList = array();
 
-        $enrol = array('13', '15', '2');
+        $enrol = array('13', '15', '2', '0');
 
         foreach ($courses as $key => $course) {
             $tmp = array();
@@ -384,7 +392,7 @@ class V1ControllerTest extends CakeTestCase {
     }
 
     public function testGroups() {
-        $url = $this->_getURL('v1/courses');
+        $url = $this->_getURL('/v1/courses');
         // GET - list of groups in course
         $expected = array();
         $groups = $this->_fixtures['app.group']->records;
@@ -454,7 +462,7 @@ class V1ControllerTest extends CakeTestCase {
 
     public function testGroupMembers()
     {
-        $url = $this->_getURL('v1/groups/1/users');
+        $url = $this->_getURL('/v1/groups/1/users');
 
         // HTTP GET, get a list of group members
         $expectedGroup = array(
@@ -504,9 +512,9 @@ class V1ControllerTest extends CakeTestCase {
             array('id' => '5', 'role_id' => '5', 'username' => 'redshirt0001', 'last_name' => 'Student', 'first_name' => 'Ed'),
             array('id' => '6', 'role_id' => '5', 'username' => 'redshirt0002', 'last_name' => 'Student', 'first_name' => 'Alex'),
             array('id' => '7', 'role_id' => '5', 'username' => 'redshirt0003', 'last_name' => 'Student', 'first_name' => 'Matt'),
-            array('id' => '35', 'role_id' => '4', 'username' => 'tutor1', 'last_name' => '1', 'first_name' => 'Tutor'),
             array('id' => '15', 'role_id' => '5', 'username' => 'redshirt0011', 'last_name' => 'Student', 'first_name' => 'Jennifer'),
             array('id' => '17', 'role_id' => '5', 'username' => 'redshirt0013', 'last_name' => 'Student', 'first_name' => 'Edna'),
+            array('id' => '35', 'role_id' => '4', 'username' => 'tutor1', 'last_name' => '1', 'first_name' => 'Tutor'),
         );
 
         $this->assertEqual(json_decode($updated, true), $expected);
@@ -540,7 +548,7 @@ class V1ControllerTest extends CakeTestCase {
 
     public function testEvents()
     {
-        $url = $this->_getURL('v1/courses');
+        $url = $this->_getURL('/v1/courses');
         $events = $this->_fixtures['app.event']->records;
 
         $expectedEvents = array();
@@ -569,7 +577,7 @@ class V1ControllerTest extends CakeTestCase {
 
     public function testGrades()
     {
-        $url = $this->_getURL('v1/events');
+        $url = $this->_getURL('/v1/events');
 
         // prep expected results
         $events = $this->_fixtures['app.event']->records;
@@ -646,7 +654,7 @@ class V1ControllerTest extends CakeTestCase {
 
 
     public function testDepartments() {
-        $url = $this->_getURL('v1/departments');
+        $url = $this->_getURL('/v1/departments');
 
         $expectedDepartments = array(
             array('id' => '1', 'name' => 'MECH'),
@@ -664,7 +672,7 @@ class V1ControllerTest extends CakeTestCase {
 
     public function testCourseDepartments()
     {
-        $url = $this->_getURL('v1/courses/1/departments');
+        $url = $this->_getURL('/v1/courses/1/departments');
 
         // POST - Add a course to a department
         $file = $this->_oauthReq("$url/2", '', OAUTH_HTTP_METHOD_POST);
@@ -738,20 +746,21 @@ class V1ControllerTest extends CakeTestCase {
             )
         );
 
-        $url = $this->_getURL('v1/users/redshirt0001/events');
+        $url = $this->_getURL('/v1/users/redshirt0001/events');
         $actualEvents = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($actualEvents, true), '{n}.id', 'asc');
         $this->assertequal($expectedEvents, $events);
 
-        $url = $this->_getURL('v1/courses/1/users/redshirt0001/events');
+        $url = $this->_getURL('/v1/courses/1/users/redshirt0001/events');
         $courseUserEvents = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($courseUserEvents, true), '{n}.id', 'asc');
         $this->assertequal($expectedEvents, $events);
     }
 
+
     function testEnrolments() {
         // Get the ids of students enrolled in course id 3
-        $url = $this->_getURL('v1/courses/3/users');
+        $url = $this->_getURL('/v1/courses/3/users');
         $actual = $this->_oauthReq("$url");
         $expected = array(
             array('id' => '8', 'role_id' => '5', 'username' => 'redshirt0004'),
@@ -814,6 +823,34 @@ class V1ControllerTest extends CakeTestCase {
         $actual = $this->_oauthReq(
             $url, json_encode($input), OAUTH_HTTP_METHOD_POST);
         $this->assertEqual($expected, json_decode($actual, true));
+
+        // update course enrolment - remove instructor1
+        $input = array(
+            array('username' => 'redshirt0004', 'role_id' => 5),
+            array('username' => 'redshirt0029', 'role_id' => 5),
+            array('username' => 'instructor3', 'role_id' => 3),
+            array('username' => 'tutor3', 'role_id' => 4),
+            array('username' => 'redshirt0005', 'role_id' => 5),
+            array('username' => 'redshirt0029', 'role_id' => 5),
+            array('username' => 'instructor2', 'role_id' => 3),
+            array('username' => 'tutor2', 'role_id' => 4)
+        );
+        $actual = $this->_oauthReq(
+            $url, json_encode($input), OAUTH_HTTP_METHOD_POST);
+        $this->assertEqual(json_decode($actual, true), array());
+
+        // check enrolment
+        $actual = $this->_oauthReq("$url");
+        $expected = array(
+            array('id' => '8', 'role_id' => '5', 'username' => 'redshirt0004'),
+            array('id' => '33', 'role_id' => '5', 'username' => 'redshirt0029'),
+            array('id' => '9', 'role_id' => '5', 'username' => 'redshirt0005'),
+            array('id' => '3', 'role_id' => '3', 'username' => 'instructor2'),
+            array('id' => '4', 'role_id' => '3', 'username' => 'instructor3'),
+            array('id' => '36', 'role_id' => '4', 'username' => 'tutor2'),
+            array('id' => '37', 'role_id' => '4', 'username' => 'tutor3')
+        );
+        $this->assertEqual(json_decode($actual, true), $expected);
 
         // update course enrolment - remove instructor1
         $input = array(

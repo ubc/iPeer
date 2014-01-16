@@ -6,10 +6,11 @@ $rubric_type = $data['Rubric']['template'];
 $zero_mark = $data['Rubric']['zero_mark'];
 isset($user)? $userId = $user['id'] : $userId = '';
 isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = null;
+$reqCom = isset($event) && $event['Event']['com_req'] ? '<br><font color="red">('.__('required', true).')</font>' : '';
 ?>
 <table class="standardtable">
     <tr>
-        <th width=150 valign="top"><?php __('Rubric View')?></th>
+        <th width=150 valign="top"></th>
         <!-- // horizontal template type -->
         <?php if ( $rubric_type == "horizontal" ):?>
             <?php foreach($data['RubricsLom'] as $lom): ?>
@@ -17,7 +18,7 @@ isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = nu
             <?php endforeach ?>
             <!-- //Comment for Evaluation Form -->
             <?php if ($evaluate):?>
-                <th><?php __('Comments')?></th>
+                <th><?php echo __('Comments', true).$reqCom ?></th>
             <?php endif ?>
     </tr>
 
@@ -25,11 +26,11 @@ isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = nu
         <?php if (isset($evaluation)) :?>
             <input type="hidden" name="selected_lom_<?php echo $userId.'_'.$i?>" value="<?php echo $evaluation['EvaluationDetail'][$i-1]['EvaluationRubricDetail']['selected_lom']?>">
         <?php else: ?>
-            <input type="hidden" name="selected_lom_<?php echo $userId.'_'.$i?>" value="1" size="4" >
+            <input type="hidden" name="selected_lom_<?php echo $userId.'_'.$i?>" value="" size="4" >
         <?php endif ?>
     <tr>
         <th style="text-align: left; padding: 0.5em;">
-            <?php echo $criteria['criteria']?><br /><br />
+            <?php echo '<font id="'.$userId.'criteria'.$i.'">'.$criteria['criteria']?></font><br><br>
             <i><?php echo $criteria['multiplier']?><?php __(' mark(s)')?></i>
         </th>
 
@@ -41,8 +42,6 @@ isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = nu
             $check = '';
             if (isset($evaluation)) {
                 if ($evaluation['EvaluationDetail'][$i-1]['EvaluationRubricDetail']['selected_lom'] == $lom['lom_num']) $check = "checked";
-            } else {
-                if ($lom['lom_num'] == 1) $check = "checked";
             }?>
             <div>
                 <input name="<?php echo $userId.'criteria_points_'.$i?>" type="radio" value="<?php echo $mark_value?>"
@@ -74,3 +73,11 @@ isset($user['Evaluation'])? $evaluation = $user['Evaluation'] : $evaluation = nu
     </tr>
 </table>
 <!-- elements::ajax_rubric_preview end -->
+<script type="text/javascript">
+jQuery().ready(function() {
+    var userId = <?php echo $userId ?>;
+    jQuery("input[type='submit'][name='"+userId+"']").click(function() {
+        return saveButtonVal(userId);
+    });
+});
+</script>

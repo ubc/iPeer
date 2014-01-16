@@ -15,6 +15,8 @@ class EventTestCase extends CakeTestCase
         'app.faculty', 'app.user_faculty', 'app.department',
         'app.course_department', 'app.sys_parameter', 'app.user_tutor',
         'app.penalty', 'app.evaluation_simple', 'app.survey_input',
+        'app.oauth_token', 'app.evaluation_rubric', 'app.evaluation_rubric_detail',
+        'app.evaluation_mixeval', 'app.evaluation_mixeval_detail'
     );
     public $Course = null;
 
@@ -114,6 +116,7 @@ class EventTestCase extends CakeTestCase
 
     function testGetActiveSurveyEvents()
     {
+        //TODO - test for second parameter
         $empty = null;
         $this->Event = & ClassRegistry::init('Event');
 
@@ -270,7 +273,7 @@ class EventTestCase extends CakeTestCase
         $this->assertEqual($event['title'], 'Term 1 Evaluation');
 
         // instructor cannot access other course's event
-        $event = $this->Event->getAccessibleEventById(1, 3, Course::FILTER_PERMISSION_FACULTY);
+        $event = $this->Event->getAccessibleEventById(1, 3, Course::FILTER_PERMISSION_OWNER);
         $this->assertFalse($event);
     }
 
@@ -324,7 +327,12 @@ class EventTestCase extends CakeTestCase
         // event 6 has two occurrences as user in two groups
         $this->assertEqual($ids, array(1,2,3,5,6,6));
     }
-    
+
+    function testGetEventSubmission()
+    {
+        //TODO
+    }
+
     function testTimezone()
     {
         $now = time(); // current php time (eg. not sql time)

@@ -22,8 +22,7 @@ foreach ($questions as $question) {
             $cells[] = $response['response'];
             $cells[] = $count;
             $cells[] = $percent == 0 ? "-" : "$percent%";
-            $cells[] = $html->image(
-                "evaluations/bar.php?per=" . $percent, array('alt'=>$percent));
+            $cells[] = '<div class="graph"><div class="bar" style="width:'.$percent.'%;"></div></div>';
             $tmp['cells'][] = $cells;
         }
     } else {
@@ -132,7 +131,7 @@ jQuery(document).ready(function() {
     var oTable= jQuery('#individualResponses').dataTable( {
         "sPaginationType" : "full_numbers",
         "aoColumnDefs" : [
-            {"bSearchable": false, "bVisible": false, "bSortable": false, "aTargets": [0] },
+            {"bSearchable": false, "bVisible": false, "bSortable": false, "aTargets": [0] }
         ],
         "aaSorting" :[[1, 'asc']]
     });

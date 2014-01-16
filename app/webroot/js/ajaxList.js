@@ -58,8 +58,7 @@ var ACTION_URL_PARTS_START = 4;
 var ListUsage =  "<div id='short_help'><h6>How to use Lists in iPeer:</h6>";
     ListUsage += "<ol><li><i>Left-Clicking</i> on a ";
     ListUsage += "link will take you to that item's display.</li>";
-    ListUsage += "<li><i>Left-Clicking</i> the gray ";
-    ListUsage += "(<span style='background:#DDDDDD'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>) ";
+    ListUsage += "<li><i>Left-Clicking</i> the light yellow ";
     ListUsage += "background of an item will open the <b>pop-up menu.</b></li>";
     ListUsage += "<li>The <b>pop-up menu</b> displays all available actions for this item, ";
     ListUsage += "like 'View', 'Edit', 'Copy', 'Delete', etc...</li>";
@@ -352,11 +351,16 @@ AjaxList.prototype.renderSelectionMaps = function (div) {
             }
             // Get the proper plural
             var text = column[DESC_COL];
-            text += (text.length > 1 && text.charAt(text.length - 1) == 's') ? "es" : "s";
+            //starting to create weird words (eg. Availabilitys)
+            //text += (text.length > 1 && text.charAt(text.length - 1) == 's') ? "es" : "s";
 
             div.appendChild(document.createTextNode(" " + text));
             atLeastOneMapAdded = true;
         }
+    }
+    if (atLeastOneMapAdded) {
+        // adding a period to separate the maps with the next section
+        div.appendChild(document.createTextNode(". "));
     }
     return atLeastOneMapAdded;
 }
@@ -722,8 +726,8 @@ AjaxList.prototype.renderFooter = function(div) {
 
     // Display the time of the search
     var td = new Element("td", {"class":"timestamp" });
-    var date = new Date();
-    td.appendChild(document.createTextNode(date.toString()));
+    //var date = new Date();
+    //td.appendChild(document.createTextNode(date.toString()));
     tr.appendChild(td);
 
     // Display the number of results
@@ -836,6 +840,9 @@ AjaxList.prototype.renderTableBody = function(tbody) {
                     div.update(contents);
                 } else if (column[TYPE_COL] == "action") {
                     // If this is an "action" type entry, we need to create a link for it
+                    if (contents && contents.length > 161) {
+                        contents = contents.substring(0, 159).concat(' ...');
+                    }
                     var link = new Element("a").update(contents);
                     link.href="";
                     link.onclick = ajaxListLibrary.createDelegateWithParams(this,
@@ -862,6 +869,11 @@ AjaxList.prototype.renderTableBody = function(tbody) {
                     div.update(contents);
                 } else {
                     // Normal Text create and add
+                    // if the string is too long, it is very inconvenient for
+                    // users to scroll through to see all the entries
+                    if (contents && contents.length >161) {
+                        contents = contents.substring(0, 159).concat(' ...');
+                    }
                     div.update(contents);
                 }
             } else {

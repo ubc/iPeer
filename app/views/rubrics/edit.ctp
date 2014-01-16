@@ -11,10 +11,9 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
 <?php echo $this->Form->input('template', array('type' => 'hidden', 'value' => 'horizontal'))?>
 
 <?php echo $this->Form->input('name', array('id' => 'name', 'size'=>'30',
-    'class'=>'validate required TEXT_FORMAT username_msg Invalid_Text._At_Least_One_Word_Is_Required.',
     'readonly' => $readonly, 'label' => __('Name', true)));?>
 
-<?php echo $this->Form->input('lom_max', array('id' => 'LOM', 'class'=>'validate required TEXT_FORMAT username_msg Invalid_Text._At_Least_One_Word_Is_Required.',
+<?php echo $this->Form->input('lom_max', array('id' => 'LOM',
     'options' => array_combine(range(2,10), range(2,10)),
     'default' => 5,
     'label' => __('Level of Mastery:', true),
@@ -22,7 +21,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
     'disabled' => $readonly));?>
 <div class="help-text"><?php __('aka LOM, Evaluation Range (Max 10)')?></div>
 
-<?php echo $this->Form->input('criteria', array('id' => 'criteria', 'class'=>'validate required TEXT_FORMAT username_msg Invalid_Text._At_Least_One_Word_Is_Required.',
+<?php echo $this->Form->input('criteria', array('id' => 'criteria',
     'options' => array_combine(range(1,25), range(1,25)),
     'default' => 3,
     'label' => __('Number of Criteria:', true),
@@ -36,7 +35,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
     'label' => __('Availability', true),
     'separator' => '&nbsp;',
     'disabled' => $readonly));?>
-<div class="help-text"><?php __('Public Allows Rubric Sharing Amongst Instructors')?></div>
+<div class="help-text"><?php __('Public lets you share this rubric evaluation with other instructors.')?></div>
 
 <?php echo $this->Form->input('zero_mark', array('id' => 'zero_mark',
     'class'=>'self_enroll',
@@ -53,8 +52,6 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
             echo $this->Form->submit(__('Next', true), array('Name'=>'preview', 'div' => false));
             break;
           case 'View Rubric':
-            echo $this->Form->button(__('Edit Rubric', true), array('type' => 'button',
-                                                                    'onClick' => 'javascript:location.href=\''.$this->Html->url('edit/'.$data['Rubric']['id'], true).'\';'));
             break;
           default:
             echo $this->Form->submit(__('Preview (Update Format)', true), array('Name'=>'preview', 'div' => false));
@@ -64,7 +61,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
 
 
 <?php if(!empty($data)):?>
-<h1 onclick="$('rpreview').toggle();" class="title">
+<h1 onclick="$('rpreview').toggle();" class="title" id="rubricPreview">
   <span class="ipeer-icon"><?php __('Rubric Preview')?></span>
 </h1>
 

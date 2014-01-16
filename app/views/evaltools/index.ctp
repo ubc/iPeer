@@ -52,8 +52,7 @@ $mixevalheaders = array(
     __('Name', true),
     __('In Use', true),
     __('Public', true),
-    __('Lickert Scale Questions', true),
-    __('Prefill Questions', true),
+    __('Self-Evaluation Questions', true),
     __('Total Marks', true)
 );
 $mixevalcells = array();
@@ -67,8 +66,9 @@ foreach ($mixevalData as $data) {
     $row[] = $mixeval['availability'] == "public" ?
         $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
         $html->image('icons/red_x.gif', array('alt'=>'red_x'));
-    $row[] = $mixeval['lickert_question_max'];
-    $row[] = $mixeval['prefill_question_max'];
+    $row[] = $mixeval['self_eval'] > 0 ?
+        $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
+        $html->image('icons/red_x.gif', array('alt'=>'red_x'));
     $row[] = $mixeval['total_marks'];
     $mixevalcells[] = $row;
 }
@@ -77,14 +77,18 @@ foreach ($mixevalData as $data) {
 $surveyheaders = array(
     __('Name', true),
     __('In Use', true),
+    __('Public', true),
     __('Questions', true),
 );
 $surveycells = array();
 foreach($surveyData as $data) {
     $survey = $data['Survey'];
     $row = array();
-    $row[] = $html->link($survey['name'], '/surveys/questionssummary/'.$survey['id']);
+    $row[] = $html->link($survey['name'], '/surveys/view/'.$survey['id']);
     $row[] = $survey['event_count'] > 0 ?
+        $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
+        $html->image('icons/red_x.gif', array('alt'=>'red_x'));
+    $row[] = $survey['availability'] == "public" ?
         $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
         $html->image('icons/red_x.gif', array('alt'=>'red_x'));
     $row[] = $survey['question_count'];
@@ -94,6 +98,7 @@ foreach($surveyData as $data) {
 // data processing for email templates
 $templateheaders = array(
     __('Name', true),
+    __('Public', true),
     __('Subject', true),
     __('Description', true)
 );
@@ -103,6 +108,9 @@ foreach($emailTemplates as $data) {
     $row = array();
     $row[] = $html->link($emailTemplate['name'],
         '/emailtemplates/view/'.$emailTemplate['id']);
+    $row[] = $emailTemplate['availability'] == "1" ?
+        $html->image('icons/green_check.gif', array('alt'=>'green_check')) :
+        $html->image('icons/red_x.gif', array('alt'=>'red_x'));
     $row[] = $emailTemplate['subject'];
     $row[] = $emailTemplate['description'];
     $templatecells[] = $row;

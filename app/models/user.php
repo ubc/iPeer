@@ -33,6 +33,10 @@ class User extends AppModel
     const IMPORT_PASSWORD = '5';
     const GENERATED_PASSWORD = '6';
 
+    const MERGE_MODEL = '0';
+    const MERGE_TABLE = '1';
+    const MERGE_FIELD = '2';
+
     public $actsAs = array('ExtendAssociations', 'Containable', 'Habtamable', 'Traceable');
 
     public $hasMany = array(
@@ -155,7 +159,11 @@ class User extends AppModel
         'send_email_notification' => array(
             'rule' => array('requiredWith', 'email'),
             'message' => 'Email notification requires an email address.'
-        )
+        ),
+        'temp_password' => array(
+            'rule' => array('minLength', 6),
+            'message' => 'Passwords must have a minimum of 6 characters.'
+        ),
     );
 
 
@@ -163,6 +171,28 @@ class User extends AppModel
         'full_name' => 'IF(CONCAT(first_name, last_name)>"", CONCAT_WS(" ", first_name, last_name), username)',
         'student_no_with_full_name' => 'CONCAT_WS(" ", student_no,CONCAT_WS(" ", first_name, last_name))'
     );
+
+    /** validate the faculty field for user form
+     * if user is a faculty admin, or instructor,
+     * faculty field must not be empty
+     */
+    public function beforeValidate() {
+        /* array structure is different between add & edit and reset password &
+        adding superadmin during installation */
+        if (array_key_exists('Faculty', $this->data) && array_key_exists('Role', $this->data)) {
+            (isset($this->data['Faculty']['Faculty'])) ? $faculty = $this->data['Faculty']['Faculty'] :
+                $faculty = $this->data['Faculty'];
+            (isset($this->data['Role']['RolesUser']['role_id'])) ? $role = $this->data['Role']['RolesUser']['role_id'] :
+                $role = $this->data['Role']['0']['RolesUser']['role_id'];
+            if (empty($faculty) && in_array($role, array(2,3))) {
+                // make sure this model fails when saving without faculty
+                $this->invalidate('Faculty');
+                // make the error message appear in the right place
+                $this->Faculty->invalidate('Faculty',
+                    'Please select a faculty.');
+            }
+        }
+    }
 
     /* public afterSave($created) {{{ */
     /**
@@ -305,12 +335,12 @@ class User extends AppModel
     }
 
     /**
-     * Get student enrolled in a course
+     * Get instructors enrolled in a course
      *
      * @param int $course_id course id
      *
      * @access public
-     * @return students enrolled in a course
+     * @return instructors enrolled in a course
      * */
     function getInstructorsByCourse($course_id)
     {
@@ -353,14 +383,16 @@ class User extends AppModel
     function getEnrolledStudentsForList($course_id)
     {
         $this->displayField = 'student_no_with_full_name';
-        return $this->find('list', array(
-            'conditions' => array('UserEnrol.course_id' => $course_id),
-            'joins' => array(array('table' => 'user_enrols',
-                'alias' => 'UserEnrol',
-                'type'  => 'LEFT',
-                'conditions' => array('User.id = UserEnrol.user_id'))
-            ),
-            'order' => 'User.student_no'));
+        return $this->find(
+            'list',
+            array(
+                'conditions' => array(
+                    'Enrolment.id' => $course_id,
+                ),
+                'recursive' => 1,
+                'order' => 'User.student_no'
+            )
+        );
     }
 
     /**
@@ -524,6 +556,19 @@ class User extends AppModel
     }
 
     /**
+     * Get list of tutors
+     *
+     * @access public
+     * @return void
+     */
+    function getTutors()
+    {
+        $tutorList = $this->find('all', array(
+            'conditions' => array('Role.id' => $this->USER_TYPE_TA)));
+        return Set::combine($tutorList, '{n}.User.id', '{n}.User.'.$this->displayField);
+    }
+
+    /**
      * getInstructorListByFaculty
      * get instructors within faculty
      *
@@ -535,7 +580,7 @@ class User extends AppModel
     function getInstructorListByFaculty($facultyId)
     {
         $users = $this->find('all', array(
-            'conditions' => array('Role.id' => 3, 'Faculty.id' => $facultyId),
+            'conditions' => array('Role.id' => $this->USER_TYPE_INSTRUCTOR, 'Faculty.id' => $facultyId),
             'fields' => array($this->alias.'.id', $this->displayField),
             'contain' => array('Faculty', 'Role'),
             'order' => $this->alias.'.last_name',
@@ -738,14 +783,14 @@ class User extends AppModel
         // query all survey events of the course
         $surveys = $this->Event->find('list', array(
             'conditions' => array(
-                'course_id' => $course_id, 
-                'event_template_type_id' => 3), 
+                'course_id' => $course_id,
+                'event_template_type_id' => 3),
             'fields' => array('Event.id')));
         /* query any surveyGroupMember records created based on the above
         survey events for the user */
         $members = $this->SurveyGroupMember->find('all', array(
             'conditions' => array(
-                'SurveyGroupMember.user_id' => $user_id, 
+                'SurveyGroupMember.user_id' => $user_id,
                 'SurveyGroupSet.survey_id' => $surveys)));
         // remove the records found
         foreach ($members as $member) {
@@ -755,6 +800,22 @@ class User extends AppModel
         foreach ($members as $member) {
             $this->GroupsMember->delete($member['GroupsMember']['id']);
         }
+        return $this->UserEnrol->delete($id);
+    }
+
+    /**
+     * unenrolStudent
+     *
+     * @param mixed $userId   user id
+     * @param mixed $courseId course id
+     *
+     * @access public
+     * @return void
+     */
+    function unenrolStudent($userId, $courseId)
+    {
+        $id = $this->UserEnrol->field('id',
+            array('user_id' => $userId, 'course_id' => $courseId));
         return $this->UserEnrol->delete($id);
     }
 
@@ -829,7 +890,7 @@ class User extends AppModel
     {
         $id = $this->UserTutor->field('id',
             array('user_id' => $user_id, 'course_id' => $course_id));
-        
+
         $members = $this->Group->find('all', array('conditions' => array('Member.id' => $user_id, 'course_id' => $course_id)));
         foreach ($members as $member) {
             $this->GroupsMember->delete($member['GroupsMember']['id']);
@@ -838,6 +899,14 @@ class User extends AppModel
         return $this->UserTutor->delete($id);
     }
 
+    /**
+     * getEmails
+     *
+     * @param mixed $id id
+     *
+     * @access public
+     * @return void
+     */
     public function getEmails($id)
     {
         return $this->find('list', array(
@@ -871,7 +940,95 @@ class User extends AppModel
             ),
         ));
     }
-    
+
+    /**
+     * removeOldStudents
+     *
+     * @param mixed $newList  new list of students
+     * @param mixed $courseId course id
+     *
+     * @access public
+     * @return void
+     */
+    public function removeOldStudents($newList, $courseId) {
+        //match usernames
+        $oldList = $this->getEnrolledStudents($courseId);
+        foreach ($oldList as $student) {
+            if (!in_array($student['User']['username'], $newList)) {
+                $this->removeStudent($student['User']['id'], $courseId);
+            }
+        }
+    }
+
+    /**
+     * getFullNames
+     * Get first and last names of user(s)
+     *
+     * @param mixed $userId user id
+     *
+     * @return list of usernames
+     */
+    function getFullNames($userId)
+    {
+        return $this->find('list', array(
+            'conditions' => array('User.id' => $userId),
+            'fields' => array('User.full_name')
+        ));
+    }
+
+    /**
+     * getUsers
+     *
+     * @param mixed $userIds user ids
+     * @param mixed $models  models
+     * @param mixed $fields  fields
+     *
+     * @return users
+     */
+    function getUsers($userIds, $models=array(), $fields=array()) {
+        if (empty($userIds)) {
+            return array();
+        }
+        return $this->find('all', array(
+            'conditions' => array('User.id' => $userIds),
+            'contain' => $models,
+            'fields' => $fields,
+        ));
+    }
+
+    /**
+     * Get members in a group in event (not including tutors)
+	 *
+	 * @param mixed $groupId group id
+	 * @param bool $selfEval check whether self evaluation is allowed or not
+	 * @param mixed $userId  user id
+	 *
+	 * @return group members
+	 */
+    function getEventGroupMembersNoTutors($groupId, $selfEval, $userId)
+    {
+        $conditions['Group.id'] = $groupId;
+        $conditions['Role.id'] = $this->USER_TYPE_STUDENT;
+        if (!$selfEval) {
+            $conditions['User.id !='] = $userId;
+        }
+
+        $members = $this->find('all', array(
+            'conditions' => $conditions,
+            'contain' => array('Role', 'Group')
+        ));
+
+        $groupMembers = array();
+        foreach($members as $member) {
+            $tmp = array();
+            $tmp['User'] = $member['User'];
+            $tmp['Role']['0'] = $member['Role'];
+            $groupMembers[] = $tmp;
+        }
+
+        return $groupMembers;
+    }
+
     /**
      * Get courses a user is enrolled in
      *
@@ -882,7 +1039,7 @@ class User extends AppModel
     function getEnrolledCourses($userId='')
     {
         $user = $this->find('first', array(
-            'conditions' => array('User.id' => $userId), 
+            'conditions' => array('User.id' => $userId),
             'contain' => array('Enrolment')
         ));
         return Set::extract($user, '/Enrolment/id');
@@ -898,7 +1055,7 @@ class User extends AppModel
     function getTutorCourses($userId='')
     {
         $user = $this->find('first', array(
-            'conditions' => array('User.id' => $userId), 
+            'conditions' => array('User.id' => $userId),
             'contain' => array('Tutor')
         ));
         return Set::extract($user, '/Tutor/id');
@@ -914,7 +1071,7 @@ class User extends AppModel
     function getInstructorCourses($userId='')
     {
         $user = $this->find('first', array(
-            'conditions' => array('User.id' => $userId), 
+            'conditions' => array('User.id' => $userId),
             'contain' => array('Course')
         ));
         return Set::extract($user, '/Course/id');
@@ -1053,6 +1210,47 @@ class User extends AppModel
         $ret = $this->Course->getByDepartments($d, $findType);
 
         return $ret;
+    }
+    /**
+     * getAccessibleCourses
+     *
+     * @access public
+     * @return list of course ids
+     */
+    function getAccessibleCourses()
+    {
+        if (User::hasPermission('functions/user/admin')) {
+            return array_keys(User::getMyDepartmentsCourseList('list'));
+        } else {
+            return array_keys(User::getMyCourseList());
+        }
+    }
+
+    /**
+     * getDroppedStudentsWithRole
+     *
+     * @param mixed $model
+     * @param mixed $results
+     * @param mixed $group
+     *
+     * @access public
+     * @return array of dropped students
+     */
+    function getDroppedStudentsWithRole($model, $results, $group)
+    {
+        $evaluators = Set::extract('/'.$model.'/evaluator', $results);
+        $evaluatees = Set::extract('/'.$model.'/evaluatee', $results);
+        $groupMembers = Set::extract('/id', $group['Member']);
+        $dropped = array_diff(array_unique(array_merge($evaluators, $evaluatees)), $groupMembers);
+        $dropped = $this->find('all', array(
+            'conditions' => array('User.id' => $dropped, 'Role.id' => array($this->USER_TYPE_STUDENT, $this->USER_TYPE_TA)),
+            'contain' => array('Role', 'Group'),
+        ));
+        foreach ($dropped as $key => $drop){
+            $dropped[$key] = $dropped[$key] + $drop['User'];
+        }
+
+        return $dropped;
     }
 
     /**

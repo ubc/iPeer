@@ -29,7 +29,7 @@
       echo "    submitButton.disabled = false;";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments != 0) {";
-      echo "    $('statusMsg').innerHTML = '".__('All points are allocated.<br />There are still ', true)."<font color=red>' + emptyComments + '</font> ".__('comments to be filled.', true)." ';";
+      echo "    $('statusMsg').innerHTML = '".__('All points are allocated.<br />There are still ', true)."<font color=red>' + emptyComments + '</font> ".__(' comments to be filled.', true)." ';";
       echo "    submitButton.disabled = true;";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments == 0) {";
@@ -44,7 +44,7 @@
       echo "    $('statusMsg').innerHTML = '".__('Too many points, need to unallocate', true)." <font color=red>' + diff + '</font> ".__('points.')." ';";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments != 0) {";
-      echo "    $('statusMsg').innerHTML = '".__('Too many points, need to unallocate', true)." <font color=red>' + diff + '</font> ".__('points.<br />There are still', true)." <font color=red>' + emptyComments + '</font> ".__('comments to be filled.', true)." ';";
+      echo "    $('statusMsg').innerHTML = '".__('Too many points, need to unallocate', true)." <font color=red>' + diff + '</font> ".__('points.<br />There are still', true)." <font color=red>' + emptyComments + '</font> ".__(' comments to be filled.', true)." ';";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments == 0) {";
       echo "    $('statusMsg').innerHTML = '".__('Too many points, need to unallocate', true)." <font color=red>' + diff + '</font ".__('points.<br />All comments are filled.', true)." ';";
@@ -58,7 +58,7 @@
       echo "    $('statusMsg').innerHTML = '".__('Please allocate', true)." <font color=green>' + diff + '</font> ".__('more points.', true)."';";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments != 0) {";
-      echo "    $('statusMsg').innerHTML = '".__('Please allocate', true)." <font color=green>' + diff + '</font>".__(' more points.<br />There are still', true)." <font color=red>' + emptyComments+ '</font>".__('comments to be filled.', true)."';";
+      echo "    $('statusMsg').innerHTML = '".__('Please allocate', true)." <font color=green>' + diff + '</font>".__(' more points.<br />There are still', true)." <font color=red>' + emptyComments+ '</font>".__(' comments to be filled.', true)."';";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments == 0) {";
       echo "    $('statusMsg').innerHTML = '".__('Please allocate', true)." <font color=green>' + diff + '</font>".__(' more points.<br />All comments are filled.', true)."';";
@@ -154,6 +154,9 @@
             <li><?php __('Allocate any remaining point.')?></li>
             <li><?php __('Enter Comments')?> <?php echo  $event['Event']['com_req']? '<font color="red"> (Must) </font>' : '(Optional)' ;?> .</li>
             <li><font color="red"><?php __('NOTE:')?></font> <?php __('"Submit Evaluation" button will only be enabled when all points, and comments (if required), are filled!')?></li>
+            <?php $releaseEnd = !isset($event['Event']['release_date_end']) ? '<i>'._t("Evaluation's release end date").'</i>' :
+                date('l, F j, Y g:i a', strtotime($event['Event']['release_date_end'])); ?>
+            <li><?php echo _t('The evaluation can be repeatedly submitted until ').$releaseEnd.'.'?></li>
             </ul>
 
             <div style="text-align:left; margin-left:3em;"><a href="#" onClick="javascript:$('penalty').toggle();return false;">( <?php __('Show/Hide late penalty policy')?> )</a></div>

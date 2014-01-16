@@ -12,9 +12,12 @@ class CoursesController extends AppController
 {
     public $name = 'Courses';
     public $uses =  array('GroupEvent', 'Course', 'Personalize', 'UserCourse',
-        'UserEnrol', 'Group', 'Event', 'User', 'UserFaculty', 'Department');
-    public $helpers = array('Html', 'Ajax', 'excel', 'Javascript', 'Time', 'Js' => array('Prototype'));
-    public $components = array('ExportBaseNew', 'AjaxList', 'ExportCsv', 'ExportExcel');
+        'UserEnrol', 'Group', 'Event', 'User', 'UserFaculty', 'Department',
+        'CourseDepartment', 'EvaluationSubmission', 'SurveyInput', 'UserTutor');
+    public $helpers = array('Html', 'Ajax', 'excel', 'Javascript', 'Time',
+        'Js' => array('Prototype'), 'FileUpload.FileUpload');
+    public $components = array('ExportBaseNew', 'AjaxList', 'ExportCsv', 'ExportExcel',
+        'FileUpload.FileUpload', 'RequestHandler');
 
     /**
      * __construct
@@ -26,6 +29,30 @@ class CoursesController extends AppController
     {
         $this->set('title_for_layout', 'Courses');
         parent::__construct();
+    }
+    
+    /**
+     * beforeFilter
+     *
+     * @access public
+     * @return void
+     */
+    function beforeFilter()
+    {
+        parent::beforeFilter();
+
+        $allowTypes = array(
+            'text/plain', 'text/csv', 'application/csv',
+            'application/csv.ms-excel', 'application/octet-stream',
+            'text/comma-separated-values', 'text/anytext');
+        $this->FileUpload->allowedTypes(array(
+            'txt' => null,
+            'csv' => null,
+        ));
+        $this->FileUpload->uploadDir(TMP);
+        $this->FileUpload->fileModel(null);
+        $this->FileUpload->attr('required', true);
+        $this->FileUpload->attr('forceWebroot', false);
     }
 
     /**
@@ -39,7 +66,6 @@ class CoursesController extends AppController
         // Set up Columns
         $columns = array(
             array("Course.id",            "",            "",      "hidden"),
-            array("Course.homepage",      __("Web", true),         "4em",  "link",   "home.gif"),
             array("Course.course",        __("Course", true),      "15em",  "action", "Course Home"),
             array("Course.title",         __("Title", true),       "auto", "action", "Course Home"),
             array("Course.creator_id",           "",            "",     "hidden"),
@@ -146,6 +172,7 @@ class CoursesController extends AppController
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('index');
+            return;
         }
 
         $this->set('data', $course);
@@ -165,15 +192,10 @@ class CoursesController extends AppController
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('index');
+            return;
         }
 
         $this->set('data', $course);
-        $this->set('course_id', $id);
-
-        $this->set('studentCount', $course['Course']['student_count']);
-        $this->set('groupCount', count($course['Group']));
-        $this->set('eventCount', count($course['Event']));
-
         $this->set('title_for_layout', $course['Course']['full_name']);
 
         //Setup the courseId to session
@@ -201,20 +223,17 @@ class CoursesController extends AppController
             $uf = $this->UserFaculty->findAllByUserId($this->Auth->user('id'));
             // get the departments of those faculties
             $ret = $this->Department->getByUserFaculties($uf);
-            $departments = array();
-            foreach ($ret as $department) {
-                $departments[$department['Department']['id']] =
-                    $department['Department']['name'];
-            }
+            $departments = Set::combine($ret, '{n}.Department.id', '{n}.Department.name');
+            $facultyIds = Set::extract($uf, '/UserFaculty/faculty_id');
+            $instructorList = $this->User->getInstructorListByFaculty($facultyIds);
             // a hack for transition from 2.x
-            // exisintg instructors may not get assigned to any department,
+            // existing instructors may not get assigned to any department,
             // they have no way to assign course to department. So showing all
             // deparments for those who don't get any deparment
             if (empty($departments)) {
                 $departments = $this->Course->Department->find('list');
+                $instructorList = $this->User->getInstructors('list', array());
             }
-            $facultyIds = Set::extract($uf, '/UserFaculty/faculty_id');
-            $instructorList = $this->User->getInstructorListByFaculty($facultyIds);
         }
         // set the list available statuses
         $statusOptions = array( 'A' => 'Active', 'I' => 'Inactive');
@@ -226,8 +245,10 @@ class CoursesController extends AppController
         $currentProf = Set::combine($currentProf, '{n}.User.id', '{n}.User.full_name');
         $instructorList = $currentProf + array_diff($instructorList, $currentProf);
 
-        // set the list of instructors
+        // set the list of instructors/tutors
+        $tutorList = $this->User->getTutors();
         $this->set('instructors', $instructorList);
+        $this->set('tutors', $tutorList);
     }
 
     /**
@@ -243,11 +264,20 @@ class CoursesController extends AppController
         $this->set('instructorSelected', User::get('id'));
 
         if (!empty($this->data)) {
+            $this->data['Course'] = array_map('trim', $this->data['Course']);
             if ($this->Course->save($this->data)) {
                 // add current user to the new course if the user is not an admin
                 if (!User::hasPermission('controllers/departments')) {
                     $this->Course->addInstructor($this->Course->id,
                         $this->Auth->user('id'));
+                }
+                // assign departments to the course if none were selected
+                // based on the faculties the instructor(s)' are in
+                if (empty($this->data['Department']['Department'])) {
+                    $instructors = $this->UserCourse->findAllByCourseId($this->Course->id);
+                    $faculty = $this->UserFaculty->findAllByUserId(Set::extract('/UserCourse/user_id', $instructors));
+                    $department = $this->Department->findAllByFacultyId(Set::extract('/UserFaculty/faculty_id', $faculty));
+                    $this->CourseDepartment->insertCourses($this->Course->id, Set::extract('/Department/id', $department));
                 }
                 $this->Session->setFlash('Course created!', 'good');
                 $this->redirect('index');
@@ -279,6 +309,16 @@ class CoursesController extends AppController
         }
 
         if (!empty($this->data)) {
+            $this->data['Course'] = array_map('trim', $this->data['Course']);
+            $newInstructors = (!isset($this->data['Instructor'])) ? array() : 
+                $this->data['Instructor']['Instructor'];
+            // delete instructors from the course if they are not in the new list
+            $instructors = $this->UserCourse->findAllByCourseId($courseId);
+            foreach ($instructors as $instructor) {
+                if (!in_array($instructor['UserCourse']['user_id'], $newInstructors)) {
+                    $this->UserCourse->delete($instructor['UserCourse']['id']);
+                }
+            }
             $success = $this->Course->save($this->data);
             if ($success) {
                 $this->Session->setFlash(__('The course was updated successfully.', true), 'good');
@@ -289,6 +329,10 @@ class CoursesController extends AppController
             }
         }
 
+        $course['Instructor']['Instructor'] = Set::extract('/Instructor/id', $course);
+        $tutors = $this->UserTutor->findAllByCourseId($courseId);
+        $course['Tutor']['Tutor'] = Set::extract('/UserTutor/user_id', $tutors);
+        
         $this->data = $course;
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Edit Course', true)));
     }
@@ -325,6 +369,286 @@ class CoursesController extends AppController
         }
         $this->redirect('index');
     }
+    
+    /**
+     * move
+     *
+     * @access public
+     * @return void
+     */
+    function move()
+    {       
+        if (!empty($this->data)) {
+            $data = $this->data['Course'];
+            $move = $data['action'];
+
+            $destSub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter(
+                $data['destSurveys'], $data['submitters']);
+            if (!empty($destSub)) {
+                $this->Session->setFlash(__('The student has already submitted to the destination survey', true));
+                $this->redirect('move');
+                return;
+            }
+            // making copies of the submission and survey inputs
+            $sub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter(
+                $data['sourceSurveys'], $data['submitters']);
+            $inputs = $this->SurveyInput->getByEventIdUserId(
+                $data['sourceSurveys'], $data['submitters']);
+            
+            // if choose to copy set id to null
+            if (!$move) {
+                $sub['EvaluationSubmission']['id'] = null;
+            }
+            $sub['EvaluationSubmission']['event_id'] = $data['destSurveys'];
+            $sInputs = array();
+            foreach ($inputs as $input) {
+                $tmp = $input['SurveyInput'];
+                if (!$move) {
+                    $tmp['id'] = null;
+                }
+                $tmp['event_id'] = $data['destSurveys'];
+                $sInputs[] = $tmp;
+            }
+            $action = ($move) ? 'moved' : 'copied';
+            $this->User->id = $data['submitters'];
+            $student = $this->User->field('full_name');
+            $this->Course->id = $data['destCourses'];
+            $to = $this->Course->field('full_name');
+            
+            $msg = '';
+            if ($this->EvaluationSubmission->save($sub) && $this->SurveyInput->saveAll($sInputs)) {
+                $msg = $student.' was successfully '.$action.' to '.$to.'.';
+            } else {
+                $this->Session->setFlash(__($student.' was not successfully '.$action.' to '.$from.'.', true));
+                $this->redirect('move');
+                return;
+            }
+            
+            // if student is not enrolled in destination course - enrol them
+            $enrol = $this->Course->getAccessibleCourseById($data['destCourses'], $data['submitters'], Course::FILTER_PERMISSION_ENROLLED);
+            if (!$enrol) {
+                if (!$this->User->addStudent($data['submitters'], $data['destCourses'])) {
+                    $msg .= ' '.$student.' was unsuccessfully enrolled to '.$to.'.';
+                }
+            }
+
+            if ($move) {
+                $this->Course->id = $data['sourceCourses'];
+                $from = $this->Course->field('full_name');
+                if (!$this->User->removeStudent($data['submitters'], $data['sourceCourses'])) {
+                    $msg .= ' '.$student.' was unsuccessfully unenrolled from '.$from.'.';
+                }
+            }
+            $this->Session->setFlash(__($msg, true), 'good');
+        }
+        // clear data when user is redirected back to this page
+        $this->data = null;
+        
+        $sourceCourses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
+        $sourceEvents = $this->Event->getActiveSurveyEvents(array_keys($sourceCourses));
+        $courseIds = array_unique(Set::extract('/Event/course_id', $sourceEvents));
+        $sourceCourses = $this->Course->getCourseList($courseIds);
+        asort($sourceCourses);
+
+        $this->set('sourceCourses', $sourceCourses);
+        $this->set('sourceSurveys', array());
+        $this->set('submitters', array());
+        $this->set('destCourses', array());
+        $this->set('destSurveys', array());
+        $this->set('title_for_layout', __('Move Students', true));
+    }
+
+    /**
+     * ajax_options
+     *
+     * @access public
+     * @return void
+     */   
+    function ajax_options() 
+    {
+        if (!$this->RequestHandler->isAjax()) {
+            $this->cakeError('error404');
+        }
+
+        switch($_GET['field']) {
+            case 'sCourses':
+                $options = $this->Event->getActiveSurveyEvents($_GET['courseId'], 'list');
+                break;
+            case 'sSurveys':
+                $sub = $this->EvaluationSubmission->findAllByEventId($_GET['surveyId']);
+                $options = $this->User->getFullNames(Set::extract('/EvaluationSubmission/submitter_id', $sub));
+                break;
+            case 'submitters':
+                $event = $this->Event->findById($_GET['surveyId']);
+                $destCourses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
+                $destEvents = $this->Event->getSurveyByCourseIdTemplateId(array_keys($destCourses),
+                    $event['Event']['template_id'], 'all');
+                $options = $this->Course->getCourseList(array_unique(Set::extract('/Event/course_id', $destEvents)));
+                unset($options[$_GET['courseId']]); //remove source course
+                break;
+            case 'dCourses':
+                $event = $this->Event->findById($_GET['surveyId']);
+                $options = $this->Event->getSurveyByCourseIdTemplateId(
+                    $_GET['courseId'], $event['Event']['template_id']);
+                break;
+            case 'importDestCourses':
+                $options = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
+                unset($options[$_GET['courseId']]); // remove source course
+                break;
+        }
+
+        asort($options);
+        $this->set('options', $options);
+    }
+    
+    /**
+     * import
+     *
+     * @access public
+     * @return void
+     */
+    function import()
+    {
+        if (!empty($this->data)) {
+            // check that file upload worked
+            if ($this->FileUpload->success) {
+                $uploadFile = $this->FileUpload->uploadDir.DS.$this->FileUpload->finalFile;
+            } else {
+                $this->Session->setFlash($this->FileUpload->showErrors());
+                return;
+            }
+
+            $students = Toolkit::parseCSV($uploadFile);
+            $identifiers = Set::extract('/'.Course::IDENTIFIER, $students);
+            $data = $this->data['Course'];
+            $move = $data['action'];
+            $field = $data['identifiers'];
+            $fieldText = ($field == 'student_no') ? 'student number' : 'username';
+            
+            // create a copy of the source survey else grab destSurveys id
+            if (isset($data['sourceSurveys'])) {
+                if ($data['surveyChoices']) {
+                    $event = $this->Event->findById($data['sourceSurveys']);
+                    $event['Event']['id'] = null;
+                    $event['Event']['course_id'] = $data['destCourses'];
+                    if (!$this->Event->save($event['Event'])) {
+                        $this->Session->setFlash(__('Error: Event was unable to be created.', true));
+                        $this->redirect('import');
+                        return;
+                    }
+                    $destEventId = $this->Event->getLastInsertID();
+                } else {
+                    $destEventId = $data['destSurveys'];
+                }
+            }
+            
+            $error = array();
+            $success = array();
+            $users = array();
+            if (!empty($identifiers)) {
+                $users = $this->User->find('all', array(
+                    'conditions' => array('User.'.$field => $identifiers, 'Role.id' => $this->User->USER_TYPE_STUDENT),
+                    'contain' => array('Role')
+                ));
+            }
+            
+            $invalid = array_diff($identifiers, Set::extract('/User/'.$field, $users));
+            foreach ($invalid as $inv) {
+                $error[$inv] = __('No student with '.$fieldText.' '.$inv.' exists.', true);
+            }
+            $enrolled = $this->UserEnrol->findAllByCourseId($data['sourceCourses']);
+            $enrolled = Set::extract('/UserEnrol/user_id', $enrolled);
+            $destEnrolled = $this->UserEnrol->findAllByCourseId($data['destCourses']);
+            $destEnrolled = Set::extract('/UserEnrol/user_id', $destEnrolled);
+            if($move) {
+                $event = $this->Event->findAllByCourseId($data['sourceCourses']);
+                $eventIds = Set::extract('/Event/id', $event);
+                $sub = $this->EvaluationSubmission->find('all', array(
+                    'conditions' => array('grp_event_id !=' => null, 'submitter_id' => $enrolled,
+                        'EvaluationSubmission.event_id' => $eventIds)));
+                $submission = Set::combine($sub, '{n}.EvaluationSubmission.id', '{n}.EvaluationSubmission', '{n}.EvaluationSubmission.submitter_id');
+            }
+            // enrol student
+            foreach ($users as $user) {
+                $identifier = $user['User'][$field];
+                // enrol student to destination course if not already enrolled
+                if (!in_array($user['User']['id'], $destEnrolled)) {
+                    if (!$this->User->addStudent($user['User']['id'], $data['destCourses'])) {
+                        $error[$identifier] = __('The student could not be enrolled to the destination course.', true);
+                        continue;
+                    }
+                }
+                // move or copy survey submission
+                if (isset($data['sourceSurveys'])) {
+                    $sub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter(
+                        $data['sourceSurveys'], $user['User']['id']);
+                    $destSub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter(
+                        $data['destSurveys'], $user['User']['id']);
+                    if ($sub && empty($destSub)) {
+                        $inputs = $this->SurveyInput->getByEventIdUserId(
+                            $data['sourceSurveys'], $user['User']['id']);
+                        // if choose to copy set id to null
+                        if (!$move) {
+                            $sub['EvaluationSubmission']['id'] = null;
+                        }
+                        $sub['EvaluationSubmission']['event_id'] = $destEventId;
+                        $sInputs = array();
+                        foreach ($inputs as $input) {
+                            $tmp = $input['SurveyInput'];
+                            if (!$move) {
+                                $tmp['id'] = null;
+                            }
+                            $tmp['event_id'] = $destEventId;
+                            $sInputs[] = $tmp;
+                        }
+                        if (!($this->EvaluationSubmission->save($sub) && $this->SurveyInput->saveAll($sInputs))) {
+                            $error[$identifier] = __("The student's survey submission could not be transferred, however they are enrolled in the destination course.", true);
+                            continue;  
+                        }
+                    }
+                }
+                if (!isset($error[$identifier])) {
+                    $success[$identifier] = __('Success.', true);
+                }
+
+                if ($move && in_array($user['User']['id'], $enrolled)) {
+                    if (!$this->User->removeStudent($user['User']['id'], $data['sourceCourses'])) {
+                        $success[$identifier] .= __(' However they were unsuccessfully unenrolled from the source course.', true);
+                    }
+                } else if (!in_array($user['User']['id'], $enrolled)) {
+                    $success[$identifier] .= __(' However no student with '.$fieldText.' '.$identifier.' was enrolled in the source course.', true);
+                } 
+                
+                if ($move && isset($submission[$user['User']['id']])) {
+                    $success[$identifier] .= "\n".__("The student has already submitted a peer evaluation in the source course.", true);
+                } 
+                
+                if (isset($data['sourceSurveys']) && !empty($destSub) && $sub) {
+                    $success[$identifier] .= "\n".__("The student has already submitted to the 
+                        destination survey, therefore the survey submission from the source survey was not transferred.", true);
+                }
+            
+            }
+            $this->set('errors', $error);
+            $this->set('success', $success);
+            $this->set('courseId', $data['destCourses']);
+            $this->set('identifier', __(ucwords($fieldText), true));
+            $this->FileUpload->removeFile($uploadFile);
+            $this->render('import_summary');
+        }
+        
+        $destCourses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
+        //$sourceEvents = $this->Event->getActiveSurveyEvents(array_keys($destCourses));
+        //$courseIds = array_unique(Set::extract('/Event/course_id', $sourceEvents));
+        $courseIds = array_keys($destCourses);
+        $sourceCourses = $this->Course->getCourseList($courseIds);
+        asort($sourceCourses);
+        $this->set('sourceCourses', $sourceCourses);
+        $this->set('sourceSurveys', array());
+        $this->set('destCourses', $destCourses);
+        $this->set('destSurveys', array());
+    }
+     
 
     /**
      * addInstructor

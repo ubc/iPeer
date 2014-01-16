@@ -14,6 +14,9 @@ class SurveyInputTestCase extends CakeTestCase
         'app.rubrics_criteria', 'app.rubrics_criteria_comment',
         'app.survey_input', 'app.survey', 'app.faculty', 'app.user_faculty',
         'app.department', 'app.course_department', 'app.evaluation_simple',
+        'app.user_tutor', 'app.penalty', 'app.oauth_token', 'app.evaluation_rubric',
+        'app.evaluation_rubric_detail', 'app.evaluation_mixeval_detail',
+        'app.evaluation_mixeval', 'app.sys_parameter'
     );
     public $SurveyInput = null;
 
@@ -45,8 +48,6 @@ class SurveyInputTestCase extends CakeTestCase
                     'event_id' => 4,
                     'user_id' => 7,
                     'question_id' => 1,
-                    'sub_id' => null,
-                    'chkbx_id' => null,
                     'response_text' => '4+',
                     'response_id' => 1)
             ),
@@ -56,8 +57,6 @@ class SurveyInputTestCase extends CakeTestCase
                     'event_id' => 4,
                     'user_id' => 7,
                     'question_id' => 2,
-                    'sub_id' => null,
-                    'chkbx_id' => null,
                     'response_text' => 'yes',
                     'response_id' => 5)
             )
@@ -85,8 +84,6 @@ class SurveyInputTestCase extends CakeTestCase
                     'event_id' => 4,
                     'user_id' => 7,
                     'question_id' => 1,
-                    'sub_id' => null,
-                    'chkbx_id' => null,
                     'response_text' => '4+',
                     'response_id' => 1)
                 )
@@ -101,8 +98,6 @@ class SurveyInputTestCase extends CakeTestCase
                     'event_id' => 4,
                     'user_id' => 7,
                     'question_id' => 2,
-                    'sub_id' => null,
-                    'chkbx_id' => null,
                     'response_text' => 'yes',
                     'response_id' => 5)
                 )

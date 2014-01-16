@@ -14,11 +14,6 @@ class DepartmentsController extends AppController {
      * */
     public function beforeFilter() {
         parent::beforeFilter();
-        if (!User::hasPermission('controllers/Departments')) {
-            $this->Session->setFlash(__('Permission to access departments '.
-                'not found.', true));
-            $this->redirect('/home');
-        }
     }
 
     /**
@@ -35,7 +30,6 @@ class DepartmentsController extends AppController {
                 $this->redirect('/pages/admin');
             }
         }
-
 
         $departments = array();
         foreach ($ret as $department) {
@@ -58,6 +52,7 @@ class DepartmentsController extends AppController {
         if (!$id) {
             $this->Session->setFlash(__('Invalid department', true));
             $this->redirect(array('action' => 'index'));
+            return;
         }
         $ret = $this->Department->read(null, $id);
         $this->set('department', $ret['Department']['name']);
@@ -76,6 +71,7 @@ class DepartmentsController extends AppController {
 
         if (!empty($this->data)) {
             $this->Department->create();
+            $this->data['Department']['name'] = trim($this->data['Department']['name']);
             if ($this->Department->save($this->data)) {
                 $this->Session->setFlash(
                     __('The department has been saved', true), 'good');
@@ -99,8 +95,10 @@ class DepartmentsController extends AppController {
         if (!$id && empty($this->data)) {
             $this->Session->setFlash(__('Invalid department', true));
             $this->redirect(array('action' => 'index'));
+            return;
         }
         if (!empty($this->data)) {
+            $this->data['Department']['name'] = trim($this->data['Department']['name']);
             if ($this->Department->save($this->data)) {
                 $this->Session->setFlash(
                     __('The department has been saved', true), 'good');
@@ -123,10 +121,12 @@ class DepartmentsController extends AppController {
         if (!$id) {
             $this->Session->setFlash(__('Invalid id for department', true));
             $this->redirect(array('action'=>'index'));
+            return;
         }
         if ($this->Department->delete($id)) {
             $this->Session->setFlash(__('Department deleted', true), 'good');
             $this->redirect(array('action'=>'index'));
+            return;
         }
         $this->Session->setFlash(__('Department was not deleted', true));
         $this->redirect(array('action' => 'index'));

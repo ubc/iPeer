@@ -19,15 +19,9 @@ class Event extends AppModel
     public $_backupValidate = null;
     public $validate = array(
         'title' => array(
-            'notEmpty' => array(
-                'rule' => 'notEmpty',
-                'message' => 'Title is required.',
-                'allowEmpty' => false
-            ),
-            'isUnique' => array(
-                'rule' => 'isUnique',
-                'message' => 'Duplicate title found.'
-            )
+            'rule' => 'notEmpty',
+            'message' => 'Title is required.',
+            'allowEmpty' => false
         ),
         'course_id' => array(
             'rule' => 'notEmpty',
@@ -130,6 +124,29 @@ class Event extends AppModel
             'dependent' => true,
             'foreignKey' => 'event_id'
         ),
+        'EvaluationRubric' =>
+        array(
+            'className' => 'EvaluationRubric',
+            'conditions' => '',
+            'order' => '',
+            'dependent' => true,
+            'foreignKey' => 'event_id'
+        ),
+        'SurveyInput' =>
+        array(
+            'className' => 'SurveyInput',
+            'conditions' => '',
+            'order' => '',
+            'dependent' => true,
+            'foreignKey' => 'event_id'
+        ),
+        'EvaluationMixeval' =>
+        array(
+            'conditions' => '',
+            'order' => '',
+            'dependent' => true,
+            'foreignKey' => 'event_id'
+        ),
     );
 
     /**
@@ -144,10 +161,28 @@ class Event extends AppModel
      */
     function __construct($id = false, $table = null, $ds = null)
     {
+        $this->SysParameter = ClassRegistry::init('SysParameter');
+        $timezone = $this->SysParameter->findByParameterCode('system.timezone');
+        // default to UTC if no timezone is set    
+        if (!(empty($timezone) || empty($timezone['SysParameter']['parameter_value']))) {
+            $timezone = $timezone['SysParameter']['parameter_value'];
+        } else if (ini_get('date.timezone')) {
+            $timezone = ini_get('date.timezone');
+        } else {
+            $timezone = 'UTC';
+        }
+        // check that the timezone is valid
+        $validTZ = array_flip(DateTimeZone::listIdentifiers(DateTimeZone::ALL_WITH_BC));
+        if (!isset($validTZ[$timezone])) {
+            $timezone = (ini_get('date.timezone') && isset($validTZ[ini_get('date.timezone')])) ?
+                ini_get('date.timezone') : 'UTC';
+        }
+        date_default_timezone_set($timezone);
         parent::__construct($id, $table, $ds);
         $this->virtualFields['response_count'] = sprintf('SELECT count(*) as count FROM evaluation_submissions as sub WHERE sub.event_id = %s.id', $this->alias);
         $this->virtualFields['to_review_count'] = sprintf('SELECT count(*) as count FROM group_events as ge WHERE ge.event_id = %s.id AND marked LIKE "to review"', $this->alias);
         $this->virtualFields['student_count'] = sprintf('SELECT count(*) as count FROM group_events as vge RIGHT JOIN groups_members as vgm ON vge.group_id = vgm.group_id WHERE vge.event_id = %s.id', $this->alias);
+        $this->virtualFields['group_count'] = sprintf('SELECT count(*) as count FROM group_events as vge WHERE vge.event_id = %s.id', $this->alias);
         $this->virtualFields['completed_count'] = sprintf('SELECT count(*) as count FROM evaluation_submissions as ves WHERE ves.submitted = 1 AND ves.event_id = %s.id', $this->alias);
 
         /**
@@ -197,7 +232,13 @@ class Event extends AppModel
         return $results;
     }
 
-    function beforeValidate(array $options)
+    /**
+     * beforeValidate
+     *
+     * @access public
+     * @return void
+     */
+    function beforeValidate()
     {
         if ($this->data['Event']['event_template_type_id'] == 3) {
             // remove the result release validation
@@ -211,6 +252,14 @@ class Event extends AppModel
         return true;
     }
 
+    /**
+     * beforeSave
+     *
+     * @param array $options options
+     *
+     * @access public
+     * @return void
+     */
     function beforeSave(array $options) {
         if (isset($this->data['Group']['Group']) && isset($this->data[$this->alias]['id'])) {
             $this->GroupEvent->updateGroups($this->data[$this->alias]['id'], $this->data['Group']['Group']);
@@ -220,6 +269,14 @@ class Event extends AppModel
         return true;
     }
 
+    /**
+     * afterSave
+     *
+     * @param mixed $created
+     *
+     * @access public
+     * @return void
+     */
     function afterSave($created) {
         // restore the validate if it is been changed
         if (null != $this->_backupValidate) {
@@ -302,7 +359,6 @@ class Event extends AppModel
      */
     function getCourseEventCount($courseId=null)
     {
-        //return $this->find('course_id='.$courseId, 'COUNT(*) as total');
         return $this->find('count', array(
             'conditions' => array('course_id' => $courseId)
         ));
@@ -326,17 +382,39 @@ class Event extends AppModel
     /**
      * Get active survey events by course id
      *
-     * @param int $courseId course id
+     * @param mixed $courseId course id
+     * @param mixed $type     type
      *
      * @return array of survey events
      */
-    function getActiveSurveyEvents($courseId = null)
+    function getActiveSurveyEvents($courseId = null, $type='all')
     {
-        //return $this->find('all', 'course_id='.$courseId.' AND event_template_type_id=3');
-        return $this->find('all', array(
+        return $this->find($type, array(
             'conditions' => array('course_id' => $courseId, 'event_template_type_id' => '3', 'Event.record_status !='=>'I')
         ));
     }
+    
+    /**
+     * getSurveyByCourseIdTemplateId
+     *
+     * @param mixed $courseIds  course ids
+     * @param mixed $templateId template id
+     * @param mixed $type       type
+     *
+     * @access public
+     * @return void
+     */
+    function getSurveyByCourseIdTemplateId($courseIds, $templateId, $type='list')
+    {
+        return $this->find($type, array(
+            'conditions' => array(
+                'Event.event_template_type_id' => 3,
+                'Event.template_id' => $templateId,
+                'Event.course_id' => $courseIds
+            )
+        ));
+    }
+    
 
 
     /**
@@ -422,7 +500,7 @@ class Event extends AppModel
         }
         return true;
     }
-
+    
     /**
      * Check if event is late
      *
@@ -736,5 +814,23 @@ class Event extends AppModel
         }
 
         return $event;
+    }
+    
+    /**
+     * getEventSubmission
+     *
+     * @param mixed $eventId event id
+     * @param mixed $userId  user id
+     *
+     * @access public
+     * @return void
+     */
+    public function getEventSubmission($eventId, $userId)
+    {
+        return $this->find('first', array(
+            'conditions' => array('Event.id' => $eventId),
+            'contain' => array('EvaluationSubmission' => array(
+                'conditions' => array('EvaluationSubmission.submitter_id' => $userId)
+        ))));
     }
 }

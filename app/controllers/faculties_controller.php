@@ -11,11 +11,6 @@ class FacultiesController extends AppController {
      * */
     public function beforeFilter() {
         parent::beforeFilter();
-        if (!User::hasPermission('controllers/Faculties')) {
-            $this->Session->setFlash(__('Permission to access departments '.
-                'not found.', true));
-            $this->redirect('/home');
-        }
     }
 
     /**
@@ -93,10 +88,11 @@ class FacultiesController extends AppController {
 
         if (!empty($this->data)) {
             $this->Faculty->create();
+            $this->data['Faculty']['name'] = trim($this->data['Faculty']['name']);
             if ($this->Faculty->save($this->data)) {
                 $facultyId = $this->Faculty->getLastInsertID();
                 foreach ($superadmins as $sa) {
-                    $userfac = array_merge($userfac, array('user_id' => $sa['RolesUser']['user_id'], 'faculty_id' => $facultyId));
+                    $userfac[] = array('user_id' => $sa['RolesUser']['user_id'], 'faculty_id' => $facultyId);
                 }
                 $this->UserFaculty->saveAll($userfac);
                 $this->Session->setFlash(
@@ -119,6 +115,7 @@ class FacultiesController extends AppController {
             $this->redirect(array('action' => 'index'));
         }
         if (!empty($this->data)) {
+            $this->data['Faculty']['name'] = trim($this->data['Faculty']['name']);
             if ($this->Faculty->save($this->data)) {
                 $this->Session->setFlash(__('Faculty saved.', true), 'good');
                 $this->redirect(array('action' => 'index'));

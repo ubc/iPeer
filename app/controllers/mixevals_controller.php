@@ -10,7 +10,9 @@
  */
 class MixevalsController extends AppController
 {
-    public $uses =  array('Event', 'Mixeval','MixevalsQuestion', 'MixevalsQuestionDesc', 'Personalize', 'UserCourse');
+    public $uses =  array('Event', 'Mixeval','MixevalQuestion',
+        'MixevalQuestionDesc', 'Personalize', 'UserCourse',
+        'MixevalQuestionType', 'EvaluationSubmission');
     public $name = 'Mixevals';
     public $helpers = array('Html','Ajax','Javascript','Time');
     public $components = array('AjaxList','Auth','Output', 'userPersonalize', 'framework');
@@ -43,6 +45,13 @@ class MixevalsController extends AppController
         // Creates the custom in use column
         if ($data) {
             foreach ($data as $key => $entry) {
+                $entry['Mixeval']['event_count'] = $this->Event->find('count',
+                    array('conditions' => array(
+                        'event_template_type_id' => 4,
+                        'template_id' => $entry['Mixeval']['id'])
+                    )
+                );
+
                 // is it in use?
                 $inUse = (0 != $entry['Mixeval']['event_count']);
 
@@ -67,10 +76,11 @@ class MixevalsController extends AppController
             array("Mixeval.id",            "",              "",  "hidden"),
             array("Mixeval.name",          __("Name", true),         "auto", "action", "View Evaluation"),
             array("!Custom.inUse",         __("In Use", true),       "4em",  "number"),
-            array("Mixeval.availability",  __("Availability", true), "6em",  "string"),
-            array("Mixeval.total_question",  __("Questions", true),    "4em", "number"),
+            array("Mixeval.availability",  __("Availability", true), "6em",  "map",
+                array('private' => 'private', 'public' => 'public')),
+            array("Mixeval.peer_question", __("Peer Evaluation Questions", true), "6em", "number"),
+            array("Mixeval.self_eval", __("Self Evaluation Questions", true), "6em", "number"),
             array("Mixeval.total_marks",  __("Total Marks", true),    "4em", "number"),
-            array("Mixeval.event_count",   "",       "",        "hidden"),
             array("Mixeval.creator_id",           "",               "",    "hidden"),
             array("Mixeval.creator",     __("Creator", true),        "8em", "action", "View Creator"),
             array("Mixeval.created",      __("Creation Date", true),  "10em", "date"));
@@ -94,14 +104,19 @@ class MixevalsController extends AppController
             $extraFilters = "";
         } else {
             $creators = array();
-            // grab course ids of the courses admin has access to
-            $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+            // grab course ids of the courses admin/instructor has access to
+            $courseIds = array();
+            if (User::hasPermission('functions/user/admin')) {
+                $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+            } else {
+                $courseIds = Set::extract(
+                    $this->UserCourse->findAllByUserId(User::get('id')),
+                    '/UserCourse/course_id'
+                );
+            }
             // grab all instructors that have access to the courses above
-            $instructors = $this->UserCourse->find(
-                'all',
-                array(
-                    'conditions' => array('UserCourse.course_id' => $courseIds)
-            ));
+            $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+
             $extraFilters = "(";
             // only admins will go through this loop
             foreach ($instructors as $instructor) {
@@ -183,30 +198,31 @@ class MixevalsController extends AppController
     /**
      * view
      *
-     * @param string $id     id
-     * @param string $layout layout
+     * @param mixed $id id
      *
      * @access public
      * @return void
      */
-    function view($id, $layout='')
+    function view($id)
     {
-        $eval = $this->Mixeval->find(
-            'first',
-            array(
-                'conditions' => array('id' => $id),
-                'contain' => 'Question.Description',
-            )
-        );
+        $eval = $this->Mixeval->find('first', array(
+            'conditions' => array('id' => $id),
+            'contain' => 'Question.Description',
+        ));
 
-        // check to see if $id is valid - numeric & is a mixed evaluation
-        if (!is_numeric($id) || empty($eval)) {
-            $this->Session->setFlash(__('Error: Invalid ID.', true));
+        // check to see if $id is a valid mixed evaluation
+        if (empty($eval)) {
+            $this->Session->setFlash(_t('Error: Invalid Mixeval ID.'));
             $this->redirect('index');
             return;
         }
 
-        // check whether the user has access to the evaluation if the eval is not public
+        // Make sure the user has access if the eval is not public,
+        // - a user has access if they're superadmin.
+        // - if they're an instructor, they have access to evals made by
+        // themselves and by instructors who teach the saame courses.
+        // - if they're a faculty admin, they have access to all evals made by
+        // instructors in their faculty.
         if ($eval['Mixeval']['availability'] != 'public' && !User::hasPermission('functions/superadmin')) {
             // instructor
             if (!User::hasPermission('controllers/departments')) {
@@ -216,15 +232,8 @@ class MixevalsController extends AppController
                 // course ids
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
                 // instructors
-                $instructors = $this->UserCourse->find(
-                    'all',
-                    array(
-                        'conditions' => array('UserCourse.course_id' => $courseIds)
-                ));
-                $instructorIds = array();
-                foreach ($instructors as $instructor) {
-                    $instructorIds[] = $instructor['UserCourse']['user_id'];
-                }
+                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
                 // add the user's id
                 array_push($instructorIds, $this->Auth->user('id'));
             }
@@ -233,90 +242,305 @@ class MixevalsController extends AppController
             if (!(in_array($eval['Mixeval']['creator_id'], $instructorIds))) {
                 $this->Session->setFlash(__('Error: You do not have permission to view this evaluation', true));
                 $this->redirect('index');
+                return;
             }
         }
+        // the questions may be saved in a slightly different order
+        // this causes the order to be different between edit/copy and view.
+        $questions = $this->MixevalQuestion->find('all', array(
+            'conditions' => array('mixeval_id' => $id),
+            'order' => 'question_num'
+        ));
+        $mixeval = $this->Mixeval->find('first',
+            array('conditions' => array('id' => $id), 'contain' => false));
 
-        if ($layout != '') {
-            $this->layout = $layout;
-        }
-
-        $this->data = $eval;
-        $this->set('data', $eval);
-        $this->set('readonly', true);
-        $this->set('evaluate', false);
-        $this->set('action', __('View Mixed Evaluation', true));
-        $this->render('edit');
+        $this->set('mixeval', $mixeval['Mixeval']);
+        $this->set('questions', $questions);
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('mixevals')->
+            push(Inflector::humanize(Inflector::underscore($this->action)))->
+            push($mixeval['Mixeval']['name'])
+        );
     }
 
     /**
      * add
      *
-     * @param string $layout
+     * @access public
+     * @return void
+     */
+    function add()
+    {
+        // Check that the user has permission to access this page
+        if (!User::hasPermission('controllers/Mixevals')) {
+            $this->Session->setFlash(_t('Error: You do not have permission to edit this evaluation'));
+            $this->redirect('index');
+            return;
+        }
+
+        // Process form submit
+        if (!empty($this->data)) {
+            $this->_dataSavePrep();
+            $this->_transactionalSave();
+        }
+
+        // Load data for the view
+        $mixeval_question_types = $this->MixevalQuestionType->find('list');
+        $this->set('mixevalQuestionTypes', $mixeval_question_types);
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('mixevals')->
+            push(Inflector::humanize(Inflector::underscore($this->action)))
+        );
+    }
+
+    /**
+     * Helper method to correct inconsistencies resulting from user manipulation
+     * on the forms so that data can be saved correctly
+     */
+    public function _dataSavePrep() {
+        // Add a creation date
+        $this->data['Mixeval']['created'] = date('Y-m-d H:i:s');
+        $selfEval = $this->data['Mixeval']['self_eval'];
+
+        // Reorder the questions so that they're contiguous starting from 0.
+        // This is necessary because the question indexes can be missing
+        // questions due to users moving them around, and form persistence
+        // on save failure requires 0 indexed contiguous arrays.
+        // What's helpful is that question_num has been kept contiguous by
+        // javascript, unfortunately, it's indexed from 1 instead of 0 for
+        // user friendliness.
+        $newOrder = array(); // maps old index to new index, this is for
+        // fixing the QuestionDesc indexes, which
+        // is still referring to the old index
+        $deleteSelfEval = array();
+        if (isset($this->data['MixevalQuestion'])) {
+            $contiguousQs = array();
+            foreach ($this->data['MixevalQuestion'] as $oldIndex => $q) {
+                $newIndex = $q['question_num'] - 1;
+                if (!$selfEval && $q['self_eval']) {
+                    // skip self evaluation when they are "deleted"
+                    $deleteSelfEval[$oldIndex] = 1;
+                    continue;
+                }
+                $contiguousQs[$newIndex] = $q;
+                $newOrder[$oldIndex] = $newIndex;
+            }
+            $this->data['MixevalQuestion'] = $contiguousQs;
+        }
+
+        // Question desc has the same problem with needing to be contiguous.
+        // We also need to edit the question desc data:
+        // - Update question_index to the new question indexes.
+        // - Determine each desc's scale level.
+        //
+        // Determining each desc's scale level depends on the order of the
+        // question desc always being sequential. E.g. If Q1 has descs # 3,
+        // 8, 5534, 23323, then we assume that the lowest desc # (3 in this
+        // case) is the lowest scale (1) and 23323 is the desc for the
+        // highest scale (4 in this case)
+        if (isset($this->data['MixevalQuestionDesc'])) {
+            $contiguousDescs = array();
+            // map old question index to scale, this keeps track of how many
+            // descriptors for each question we've seen so far (and hence,
+            // the scale level)
+            $descScale = array();
+            foreach ($this->data['MixevalQuestionDesc'] as $desc) {
+                $oldIndex = $desc['question_index'];
+                if (isset($deleteSelfEval[$oldIndex])) {
+                    // skip desc for deleted self evaluation questions
+                    continue;
+                }
+                // fix the index
+                $desc['question_index'] = $newOrder[$oldIndex];
+                // assign the appropriate scale
+                if (!isset($descScale[$oldIndex])) {
+                    $descScale[$oldIndex] = 1;
+                }
+                else {
+                    $descScale[$oldIndex]++;
+                }
+                $desc['scale_level'] = $descScale[$oldIndex];
+                // make contiguous
+                $contiguousDescs[] = $desc;
+            }
+            $this->data['MixevalQuestionDesc'] = $contiguousDescs;
+        }
+    }
+
+    /**
+     * Helper method to split out all the complication involved in saving
+     * mixeval data.
+     *
+     * Can't figure out how to get cakephp to nicely save
+     * MixevalQuestionDesc with just a Mixeval->save call, so it'll have to be
+     * split up into a multi-model save transaction. Note that since CakePHP
+     * doesn't have nested transaction support, we're going to avoid saveAll as
+     * it issues another transaction by default. This should be simpler than
+     * having to properly deal with the return statuses in a non-transactional
+     * saveAll call.
      *
      * @access public
      * @return void
      */
-    function add($layout='')
-    {
-        if ($layout != '') {
-            $this->layout = $layout;
-            $this->set('layout', $layout);
+    public function _transactionalSave() {
+        // Don't actually do a save if user pressed cancelled button
+        if (isset($this->params['form']['cancel'])) {
+            $this->redirect('index');
         }
 
-        if (empty($this->data)) {
-            $this->data['Mixeval']= array();
-            $this->data['Question'] = array();
-            $this->set('data', $this->data);
+        // First, we have to validate the forms. The automagic validation errors
+        // won't show up with the multiple save calls we're going to be using.
+        // Note that this will validate Mixeval and MixevalQuestions, but not
+        // MixevalQuestionDesc.
+        if (!$this->Mixeval->saveAll($this->data, array('validate' => 'only'))){
+            $this->Session->setFlash(
+                _t('Unable to save, please check below for error messages.'));
+            return;
+        }
 
-        } else {
-            $data = $this->data;
+        $continue = true;
+        $this->Mixeval->begin();
 
-            if ($this->Mixeval->save($data)) {
-                $this->MixevalsQuestion->insertQuestion($this->Mixeval->id, $this->data['Question']);
-                $id = $this->Mixeval->id;
-                $question_ids= $this->MixevalsQuestion->find('all', array('conditions' => array('mixeval_id'=> $id), 'fields' => array('MixevalsQuestion.id, question_num')));
-                $this->MixevalsQuestionDesc->insertQuestionDescriptor($this->data['Question'], $question_ids);
-                $this->Session->setFlash(__('The Mixed Evaluation was added successfully.', true), 'good');
-                $this->redirect('index');
-            } else {
-                $this->set('data', $this->data);
-                $this->Session->setFlash($this->Mixeval->getErrorMessage());
+        // Only try deleting stuff if we're editing
+        if (isset($this->data['Mixeval']['id'])) {
+            // Delete removed questions
+            $existingQs = $this->MixevalQuestion->findAllByMixevalId(
+                $this->data['Mixeval']['id']);
+
+            // Declare all the functions used by array_map. Note that
+            // we check if the function_exists only because the test cases
+            // keep complaining about these functions being redeclared.
+            if (!function_exists('getExistingQId')) {
+                /**
+                 * getExistingQId
+                 *
+                 * @param mixed $x
+                 *
+                 * @access public
+                 * @return void
+                 */
+                function getExistingQId($x)
+                {
+                    return $x['MixevalQuestion']['id'];
+                }
+                /**
+                 * getId
+                 *
+                 * @param mixed $x
+                 *
+                 * @access public
+                 * @return void
+                 */
+                function getId($x)
+                {
+                    return isset($x['id']) ? $x['id'] : null;
+                }
+                /**
+                 * getExistingDescId
+                 *
+                 * @param mixed $x
+                 *
+                 * @access public
+                 * @return void
+                 */
+                function getExistingDescId($x)
+                {
+                    return array_map('getId', $x['MixevalQuestionDesc']);
+                }
+            }
+            $existingQIds = array_map('getExistingQId', $existingQs);
+
+            $submittedQIds = isset($this->data['MixevalQuestion']) ?
+                array_map('getId', $this->data['MixevalQuestion']) : array();
+
+            $deletedQIds = array_diff($existingQIds, $submittedQIds);
+
+            foreach ($deletedQIds as $id) {
+                $this->MixevalQuestion->delete($id);
+            }
+
+            // Delete removed question descs
+            $existingQDescIds = array_map('getExistingDescId', $existingQs);
+            $existingQDescIds = array_reduce($existingQDescIds,
+                'array_merge', array());
+
+            $submittedQDescIds = isset($this->data['MixevalQuestionDesc']) ?
+                array_map('getId', $this->data['MixevalQuestionDesc']) : array();
+
+            $deletedDescIds = array_diff($existingQDescIds, $submittedQDescIds);
+
+            foreach ($deletedDescIds as $id) {
+                $this->MixevalQuestionDesc->delete($id);
             }
         }
-        $this->set('data', $this->data);
-        $this->set('action', __('Add Mixed Evaluation', true));
-        $this->render('edit');
+
+        // Save the Mixeval info
+        if ($continue) {
+            $ret = $this->Mixeval->save($this->data);
+            if (!$ret) {
+                $this->Session->setFlash(
+                    _t('Unable to save the mixed evaluation.'));
+                $continue = false;
+            }
+        }
+
+        // Have to save each question individually due to previously noted
+        // problem with saveAll and transactions.
+        if ($continue && isset($this->data['MixevalQuestion'])) {
+            $questions = array('MixevalQuestion' =>
+                $this->data['MixevalQuestion']);
+            foreach ($questions['MixevalQuestion'] as $q) {
+                $q['mixeval_id'] = $this->Mixeval->id;
+                $saveQ = array('MixevalQuestion' => $q);
+                $this->MixevalQuestion->create();
+                if (!$this->MixevalQuestion->save($saveQ)) {
+                    $this->Session->setFlash(
+                        _t("Unable to save this mixed eval's questions."));
+                    $continue = false;
+                    break;
+                }
+            }
+        }
+
+        // Save the MixevalQuestionDesc
+        // Have to give a question_id to each question desc
+        if ($continue && isset($this->data['MixevalQuestionDesc'])) {
+            // first, need to map question number to question id
+            $questions = $this->MixevalQuestion->findAllByMixevalId(
+                $this->Mixeval->id);
+            $qIndexToId = array();
+            foreach ($questions as $q) {
+                $q = $q['MixevalQuestion'];
+                $qIndexToId[$q['question_num'] - 1] = $q['id'];
+            }
+            // try to save each question desc
+            foreach ($this->data['MixevalQuestionDesc'] as $d) {
+                $d['question_id'] = $qIndexToId[$d['question_index']];
+                $saveDesc = array('MixevalQuestionDesc' => $d);
+                $this->MixevalQuestionDesc->create();
+                if (!$this->MixevalQuestionDesc->save($saveDesc)) {
+                    $this->Session->setFlash(
+                        _t('Unable to save the mixed eval question descs.'));
+                    $continue = false;
+                    break;
+                }
+            }
+        }
+
+        // commit the transaction if everything looks good
+        if ($continue) {
+            $this->Mixeval->commit();
+            $this->Session->setFlash(
+                _t('The mixed evaluation was saved successfully.'), 'good');
+            // TODO Maybe redirect to view evaluation instead?
+            // And put an Edit button in the view evaluation too
+            $this->redirect('index');
+            return;
+        }
+        else {
+            $this->Mixeval->rollback();
+        }
     }
-
-    /**
-     * deleteQuestion
-     *
-     * @param mixed $question_id
-     *
-     * @access public
-     * @return void
-     */
-    function deleteQuestion($question_id)
-    {
-        $this->autoRender = false;
-        $this->MixevalsQuestion->deleteAll(array('id' => $question_id), true);
-    }
-
-
-    /**
-     * deleteDescriptor
-     *
-     * @param mixed $descriptor_id
-     *
-     * @access public
-     * @return void
-     */
-    function deleteDescriptor($descriptor_id)
-    {
-        $this->autoRender = false;
-        $this->MixevalsQuestionDesc->delete(array('id' => $descriptor_id));
-    }
-
 
     /**
      * edit
@@ -328,117 +552,125 @@ class MixevalsController extends AppController
      */
     function edit($id)
     {
-        if (!User::hasPermission('controllers/mixevals')) {
-            $this->Session->setFlash(__('Error: You do not have permission to edit mixed evaluations', true));
-            $this->redirect('/home');
-        }
-
-        // retrieving the requested mixed evaluation
-        $eval = $this->Mixeval->find(
-            'first',
-            array(
-                'conditions' => array('id' => $id),
-                'contain' => array('Event' => 'EvaluationSubmission')
-            )
-        );
-        // for storing submissions - for checking if there are any submissions
-        $submissions = array();
-
-        // check to see if $id is valid - numeric & is a mixed evaluation
-        if (!is_numeric($id) || empty($eval)) {
-            $this->Session->setFlash(__('Error: Invalid ID.', true));
-            $this->redirect('index');
-        }
+        // Check that the user has permission to access this page
         if (!User::hasPermission('functions/superadmin')) {
-            // instructor
+            // check people who are not superadmins
             if (!User::hasPermission('controllers/departments')) {
+            // instructor
                 $instructorIds = array($this->Auth->user('id'));
-            // admins
             } else {
+            // admins
                 // course ids
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
                 // instructors
-                $instructors = $this->UserCourse->find(
-                    'all',
-                    array(
-                        'conditions' => array('UserCourse.course_id' => $courseIds)
-                ));
-                $instructorIds = array();
-                foreach ($instructors as $instructor) {
-                    $instructorIds[] = $instructor['UserCourse']['user_id'];
-                }
+                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
                 // add the user's id
                 array_push($instructorIds, $this->Auth->user('id'));
             }
 
+            $eval = $this->Mixeval->findById($id);
             // creator's id be in the array of accessible user ids
             if (!(in_array($eval['Mixeval']['creator_id'], $instructorIds))) {
                 $this->Session->setFlash(__('Error: You do not have permission to edit this evaluation', true));
                 $this->redirect('index');
+                return;
             }
         }
 
-        foreach ($eval['Event'] as $event) {
-            if (!empty($event['EvaluationSubmission'])) {
-                $submissions[] = $event['EvaluationSubmission'];
-            }
-        }
-
-        // check to see if submissions had been made - if yes - mixed evaluation can't be edited
-        if (!empty($submissions)) {
-            $this->Session->setFlash(sprintf(__('Submissions had been made. %s cannot be edited. Please make a copy.', true), $eval['Mixeval']['name']));
+        // Check that there's actually a mixeval with the given ID
+        if (!is_numeric($id) ||
+            !$this->Mixeval->field('id', array('id' => $id))
+        ){
+            $this->Session->setFlash(_t('Error: Invalid ID.'));
             $this->redirect('index');
+            return;
         }
 
-        if (empty($this->data)) {
-            $this->data = $this->Mixeval->find('first', array('conditions' => array('id' => $id),
-                'contain' => array('Question.Description',
-            )));
-
-        } else {
-            $data = $this->data;
-
-            if ($this->Mixeval->save($data)) {
-                $this->MixevalsQuestion->insertQuestion($this->Mixeval->id, $this->data['Question']);
-                $id = $this->Mixeval->id;
-                $question_ids= $this->MixevalsQuestion->find('all', array('conditions' => array('mixeval_id'=> $id), 'fields'=>'id, question_num'));
-                $this->MixevalsQuestionDesc->insertQuestionDescriptor($this->data['Question'], $question_ids);
-                $this->Session->setFlash(__('The Mixed Evaluation was edited successfully.', true), 'good');
+        // Check for submissions, can't edit if there are submissions
+        $events = $this->Event->find(
+            'list',
+            array(
+                'conditions' => array(
+                    'event_template_type_id' => 4,
+                    'template_id' => $id
+                ),
+                'fields' => array('id'),
+            )
+        );
+        if (!empty($events)) {
+            $subs = $this->EvaluationSubmission->find('list',
+                array('conditions' => array('event_id' => $events)));
+            if (!empty($subs)) {
+                $this->Session->setFlash(sprintf(
+                    _t('%s cannot be edited now that submissions have been made. Please make a copy.'),
+                    $this->Mixeval->field('name', array('id' => $id))
+                ));
                 $this->redirect('index');
-
-            } else {
-                $this->set('data', $this->data);
-                $this->set('errmsg', $this->Mixeval->errorMessage);
+                return;
             }
         }
-        $this->set('data', $this->data);
-        $this->set('action', __('Edit Mixed Evaluation', true));
-        $this->render('edit');
-    }
 
-
-    /**
-     * __processForm
-     *
-     * @access protected
-     * @return void
-     */
-    function __processForm()
-    {
+        // Save changes if there are any
         if (!empty($this->data)) {
-            $this->Output->filter($this->data);//always filter
+            $this->_dataSavePrep();
+            $this->_transactionalSave();
+        } else {
 
-            //Save Data
-            if ($this->Mixeval->saveAllWithDescription($this->data)) {
-                $this->data['Mixeval']['id'] = $this->Mixeval->id;
-                return true;
-            } else {
-                $this->Session->setFlash($this->Mixeval->errorMessage, 'error');
+            // Load existing mix evaluation data for the view
+            // Needs to be here since we need to reload the data after a save, or
+            // the js question tracking will get confused due to the differing
+            // question indexes.
+            $this->data = $this->Mixeval->find(
+                'first',
+                array(
+                    'conditions' => array('id' => $id),
+                    'contain' => array('MixevalQuestion.MixevalQuestionDesc')
+                )
+            );
+            $qIds = $this->MixevalQuestion->find(
+                'list',
+                array(
+                    'conditions' => array('mixeval_id' => $id),
+                    'fields' => array('id')
+                )
+            );
+            $descs = $this->MixevalQuestionDesc->find(
+                'all',
+                array(
+                    'conditions' => array('question_id' => $qIds),
+                    'contain' => false,
+                )
+            );
+            // find all returns data in a different format than form submit, and
+            // since the question editor expects data in form submit format, we
+            // need to change the $descs data to the expected format.
+
+            // also need to add a question_index to each question descriptor, we do
+            // this with a mapping of question id to question index.
+            $qIdToIndex = array();
+            foreach ($this->data['MixevalQuestion'] as $index => $q) {
+                $qIdToIndex[$q['id']] = $index;
             }
+            $tmpDescs = array();
+            foreach ($descs as $d) {
+                $d = $d['MixevalQuestionDesc'];
+                $d['question_index'] = $qIdToIndex[$d['question_id']];
+                $tmpDescs[] = $d;
+            }
+            $this->data['MixevalQuestionDesc'] = $tmpDescs;
         }
-        return false;
-    }
 
+        // Load other stuff for the view
+        $mixeval_question_types = $this->MixevalQuestionType->find('list');
+        $this->set('mixevalQuestionTypes', $mixeval_question_types);
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('mixevals')->
+            push(Inflector::humanize(Inflector::underscore($this->action)))->
+            push($this->data['Mixeval']['name'])
+        );
+        $this->render('add');
+    }
 
     /**
      * copy
@@ -450,58 +682,74 @@ class MixevalsController extends AppController
      */
     function copy($id=null)
     {
-        if (!User::hasPermission('controllers/mixevals')) {
-            $this->Session->setFlash(__('Error: You do not have permission to copy mixed evaluations', true));
-            $this->redirect('/home');
-        }
-
-        $eval = $this->Mixeval->find(
-            'first',
-            array(
+        // Process form submit
+        if (!empty($this->data)) {
+            $this->_dataSavePrep();
+            $this->_transactionalSave();
+        } else {
+            $eval = $this->Mixeval->find('first', array(
                 'conditions' => array('id' => $id),
                 'contain' => array('Event' => 'EvaluationSubmission')
-            )
-        );
+            ));
 
-        // check to see if $id is valid - numeric & is a mixed evaluation
-        if (!is_numeric($id) || empty($eval)) {
-            $this->Session->setFlash(__('Error: Invalid ID.', true));
-            $this->redirect('index');
-        }
-
-        if (!User::hasPermission('functions/superadmin')) {
-            // instructor
-            if (!User::hasPermission('controllers/departments')) {
-                $instructorIds = array($this->Auth->user('id'));
-            // admins
-            } else {
-                // course ids
-                $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
-                // instructors
-                $instructors = $this->UserCourse->find(
-                    'all',
-                    array(
-                        'conditions' => array('UserCourse.course_id' => $courseIds)
-                ));
-                $instructorIds = array();
-                foreach ($instructors as $instructor) {
-                    $instructorIds[] = $instructor['UserCourse']['user_id'];
-                }
-                // add the user's id
-                array_push($instructorIds, $this->Auth->user('id'));
-            }
-
-            // creator's id be in the array of accessible user ids
-            if (!(in_array($eval['Mixeval']['creator_id'], $instructorIds))) {
-                $this->Session->setFlash(__('Error: You do not have permission to copy this evaluation', true));
+            // check to see if $id is valid - numeric & is a mixed evaluation
+            if (!is_numeric($id) || empty($eval)) {
+                $this->Session->setFlash(__('Error: Invalid ID.', true));
                 $this->redirect('index');
+                return;
             }
-        }
 
-        $this->data = $this->Mixeval->copy($id);
-        $this->set('data', $this->data);
-        $this->set('action', __('Copy Mixed Evaluation', true));
-        $this->render('edit');
+            if ($eval['Mixeval']['availability'] != 'public' && !User::hasPermission('functions/superadmin')) {
+                // instructor
+                if (!User::hasPermission('controllers/departments')) {
+                    $instructorIds = array($this->Auth->user('id'));
+                // admins
+                } else {
+                    // course ids
+                    $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+                    // instructors
+                    $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                    $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
+                    // add the user's id
+                    array_push($instructorIds, $this->Auth->user('id'));
+                }
+
+                // creator's id be in the array of accessible user ids
+                if (!(in_array($eval['Mixeval']['creator_id'], $instructorIds))) {
+                    $this->Session->setFlash(__('Error: You do not have permission to copy this evaluation', true));
+                    $this->redirect('index');
+                    return;
+                }
+            }
+
+            $mixeval = $this->Mixeval->find('first', array(
+                'conditions' => array('id' => $id),
+                'recursive' => 2
+            ));
+
+            $title = __('Copy of ', true).$mixeval['Mixeval']['name'];
+            $copy['Mixeval'] = array('name' => $title, 'availability' => $mixeval['Mixeval']['availability'],
+                'zero_mark' => $mixeval['Mixeval']['zero_mark'], 'self_eval' => $mixeval['Mixeval']['self_eval']);
+            foreach ($mixeval['MixevalQuestion'] as $index => $ques) {
+                $desc = $ques['MixevalQuestionDesc'];
+                unset($ques['id'], $ques['MixevalQuestionType'], $ques['mixeval_id'],
+                    $ques['scale_level'], $ques['MixevalQuestionDesc']);
+                $copy['MixevalQuestion'][] = $ques;
+                foreach ($desc as $d) {
+                    $descriptor = array('descriptor' => $d['descriptor'], 'question_index' => $index);
+                    $copy['MixevalQuestionDesc'][] = $descriptor;
+                }
+            }
+            $this->data = $copy;
+        }
+        $this->autoRender = false;
+        $mixeval_question_types = $this->MixevalQuestionType->find('list');
+        $this->set('mixevalQuestionTypes', $mixeval_question_types);
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('mixevals')->
+            push(Inflector::humanize(Inflector::underscore($this->action)))
+        );
+        $this->render('add');
     }
 
 
@@ -518,23 +766,20 @@ class MixevalsController extends AppController
         if (!User::hasPermission('controllers/mixevals')) {
             $this->Session->setFlash(__('You do not have permission to delete mixed evaluations', true));
             $this->redirect('/home');
+            return;
         }
 
-        // for checking the user's role
-        //$user = $this->User->find('first', array('conditions' => array('User.id' => $this->Auth->user('id'))));
         // retrieving the requested mixed evaluation
-        $eval = $this->Mixeval->find(
-            'first',
-            array(
-                'conditions' => array('id' => $id),
-                'contain' => array('Event' => 'EvaluationSubmission')
-            )
-        );
+        $eval = $this->Mixeval->find('first', array(
+            'conditions' => array('id' => $id),
+            'contain' => array('Event')
+        ));
 
         // check to see if $id is valid - numeric & is a mixed evaluation
         if (!is_numeric($id) || empty($eval)) {
             $this->Session->setFlash(__('Invalid ID.', true));
             $this->redirect('index');
+            return;
         }
 
         if (!User::hasPermission('functions/superadmin')) {
@@ -546,15 +791,8 @@ class MixevalsController extends AppController
                 // course ids
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
                 // instructors
-                $instructors = $this->UserCourse->find(
-                    'all',
-                    array(
-                        'conditions' => array('UserCourse.course_id' => $courseIds)
-                ));
-                $instructorIds = array();
-                foreach ($instructors as $instructor) {
-                    $instructorIds[] = $instructor['UserCourse']['user_id'];
-                }
+                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
                 // add the user's id
                 array_push($instructorIds, $this->Auth->user('id'));
             }
@@ -563,35 +801,28 @@ class MixevalsController extends AppController
             if (!(in_array($eval['Mixeval']['creator_id'], $instructorIds))) {
                 $this->Session->setFlash(__('Error: You do not have permission to delete this evaluation', true));
                 $this->redirect('index');
+                return;
             }
         }
 
         // Deny Deleting evaluations in use:
         $this->Mixeval->id = $id;
         $data = $this->Mixeval->read();
-        $inUse = (0 != $data['Mixeval']['event_count']);
-        //	$inUse = $this->Event->checkEvaluationToolInUse('4',$id);
+
+        $inUse = (0 < count($data['Event']));
 
         if ($inUse) {
-            $message = "<span style='color:red'>";
-            $message.= __("This evaluation is now in use, and can NOT be deleted.<br />", true);
-            $message.= __("Please remove all the events assosiated with this evaluation first.", true);
-            $message.= "</span>";
+            $message = __("This evaluation is now in use, and can NOT be deleted.<br />", true);
+            $message.= __("Please remove all the events associated with this evaluation first.", true);
             $this->Session->setFlash($message);
             $this->redirect('index');
             //	exit;
         } else {
             if ($this->Mixeval->delete($id)) {
-                //Automatically deleted by dependent setting on Model
-                //				$this->MixevalsQuestionDesc->deleteQuestionDescriptors($id);
-                //				$this->MixevalsQuestion->deleteQuestions($id);
-
                 $this->Session->setFlash(__('The Mixed Evaluation was removed successfully.', true), 'good');
                 $this->redirect('index');
-
             } else {
                 $this->Session->setFlash($this->Mixeval->errorMessage, 'error');
-
             }
         }
     }

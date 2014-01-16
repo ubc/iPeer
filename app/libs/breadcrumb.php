@@ -26,6 +26,10 @@ class Breadcrumb
             'url' => '/groups/index/',
             'key' => 'course_id'
         ),
+        'mixevals' => array(
+            'display' => 'Mixed Evaluations',
+            'url' => '/mixevals',
+        ),
         'surveys' => array(
             'url' => '/surveys',
         ),
@@ -46,6 +50,14 @@ class Breadcrumb
         'home_student' => array(
             'url' => '/home',
             'display' => 'Home',
+        ),
+        'simple_evaluations' => array(
+            'display' => 'Simple Evaluations',
+            'url' => '/simpleevaluations'
+        ),
+        'rubrics' => array(
+            'display' => 'Rubrics',
+            'url' => '/rubrics'
         ),
     );
 

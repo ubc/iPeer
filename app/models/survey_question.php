@@ -157,27 +157,6 @@ class SurveyQuestion extends AppModel
     }
 
     /**
-     * Used to copy questions to a new survey when a template is used
-     *
-     * @param type_INT $survey_id copy from this survey
-     * @param type_INT $id        copy to this survey
-     *
-     * @access public
-     * @return void
-     */
-    function copyQuestions($survey_id, $id)
-    {
-        $questions = $this->find('all', array('conditions' => array('SurveyQuestion.survey_id' => $survey_id)));
-
-        foreach ($questions as $k => $q) {
-            unset($q['SurveyQuestion']['id']);
-            $q['SurveyQuestion']['survey_id'] = $id;
-            $questions[$k] = $q;
-        }
-        $this->saveAll($questions);
-    }
-
-    /**
      * Assigned question number to each question in a survey based on its position in the list;
      * called after the survey question list is reordered
      *
@@ -201,6 +180,25 @@ class SurveyQuestion extends AppModel
         $this->saveAll($data, array('fieldList' => array('number')));
         return $data;
     }
+    
+    /**
+     * Assign the same question number to each question that they had in the source survey
+     * when copying surveys
+     *
+     * @param mixed $questionNo
+     * @param mixed $surveyId
+     *
+     * @access public
+     * @return void
+     */
+    function assignNumber($questionNo, $surveyId)
+    {
+        $questions = $this->findAllBySurveyId($surveyId);
+        foreach ($questions as $ques) {
+            $ques['SurveyQuestion']['number'] = $questionNo[$ques['SurveyQuestion']['question_id']];
+            $this->save($ques['SurveyQuestion']);
+        }
+    }
 
     /**
      * Retrieves the last question in the survey question list
@@ -216,6 +214,14 @@ class SurveyQuestion extends AppModel
         return $tmp[0][0]['max(number)'];
     }
 
+    /**
+     * getQuestionsByEventId
+     *
+     * @param mixed $eventId event id
+     * 
+     * @access public
+     * @return void
+     */
     function getQuestionsByEventId($eventId)
     {
         $this->Event = ClassRegistry::init('Event');

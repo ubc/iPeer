@@ -79,8 +79,6 @@ class SysParametersController extends AppController
     /**
      * index
      *
-     * @param string $message
-     *
      * @access public
      * @return void
      */
@@ -121,8 +119,10 @@ class SysParametersController extends AppController
      */
     function view($id)
     {
-        $this->SysParameter->id = $id;
-        $this->set('data', $this->SysParameter->read());
+        $this->data = $this->SysParameter->findById($id);
+        $types = array('S'=>__('String', true),'I'=>__('Integer', true), 'B'=>__('Boolean', true));
+        $this->set('types', $types);
+        $this->set('title_for_layout', 'View Sys Parameters');
     }
 
     /**
@@ -133,12 +133,19 @@ class SysParametersController extends AppController
      */
     function add()
     {
-        if ($this->SysParameter->save($this->params['data'])) {
-            $this->Session->setFlash(__('The record is saved successfully', true), 'good');
-            $this->redirect('index');
-        } else {
-            $this->Session->setFlash(__('Failed to save the record', true));
+        if (!empty($this->data)) {
+            $this->data['SysParameter'] = array_map('trim', $this->data['SysParameter']);
+            if ($this->SysParameter->save($this->data)) {
+                $this->Session->setFlash(__('The record is saved successfully', true), 'good');
+                $this->redirect('index');
+            } else {
+                $this->Session->setFlash(__('Failed to save the record', true));
+            }
         }
+
+        $types = array('S'=>__('String', true),'I'=>__('Integer', true), 'B'=>__('Boolean', true));
+        $this->set('types', $types);
+        $this->set('title_for_layout', 'Add Sys Parameters');
     }
 
     /**
@@ -151,19 +158,19 @@ class SysParametersController extends AppController
      */
     function edit($id)
     {
-        if (empty($this->data)) {
-            $this->SysParameter->id = $id;
-            $this->data = $this->SysParameter->read();
-            $this->set('data', $this->data);
-        } else {
+        if (!empty($this->data)) {
+            $this->data['SysParameter'] = array_map('trim', $this->data['SysParameter']);
             if ($this->SysParameter->save($this->data)) {
                 $this->Session->setFlash(__('The record is edited successfully.', true), 'good');
                 $this->redirect('index');
             } else {
-                $this->Session->setFlash($this->SysParameter->errorMessage, true);
-                $this->set('data', $this->data);
+                $this->Session->setFlash(__('Error: Course edits could not be saved.', true));
             }
         }
+        $this->data = $this->SysParameter->findById($id);
+        $types = array('S'=>__('String', true),'I'=>__('Integer', true), 'B'=>__('Boolean', true));
+        $this->set('types', $types);
+        $this->set('title_for_layout', 'Edit Sys Parameters');
     }
 
     /**
@@ -177,7 +184,7 @@ class SysParametersController extends AppController
     function delete($id = null)
     {
         if ($this->SysParameter->delete($id)) {
-            $this->Session->setFlash(__('The record is deleted successfully.', true));
+            $this->Session->setFlash(__('The record is deleted successfully.', true), 'good');
             $this->redirect('index');
         }
     }

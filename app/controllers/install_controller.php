@@ -39,12 +39,24 @@ class InstallController extends Controller
     }
 
     /**
+     * beforeFilter function called before filter
+     *
+     * @access public
+     * @return void
+     */
+    public function beforeFilter()
+    {
+        $timezone = ini_get('date.timezone') ? ini_get('date.timezone') : 'UTC';
+        date_default_timezone_set($timezone); // set the default time zone
+    }
+
+    /**
      * Check prereqs for installing iPeer
      * */
     function index()
     {
-        if (file_exists(CONFIGS.'installed.txt')) {
-            $this->Session->setFlash(__('WARNING: It looks like you already have a instance running. Reinstalling will remove all your current data. Remove app/config/installed.txt to proceed.', true));
+        if (IS_INSTALLED) {
+            $this->Session->setFlash(__('WARNING: It looks like you already have a instance running. Reinstalling will remove all your current data. Remove '.TMP.'installed.txt to proceed.', true));
         }
     }
 
@@ -76,7 +88,7 @@ class InstallController extends Controller
             return;
         }
 
-        if (!is_writable(CONFIGS.'database.php')) {
+        if (!DB_PREDEFINED && !is_writable(CONFIGS.'database.php')) {
             $this->Session->setFlash(sprintf(__('Cannot write to the database configuration file. Please change the permission on %s so that it is writable.', true), CONFIGS.'/database.php'));
         }
 
@@ -111,8 +123,8 @@ class InstallController extends Controller
      * */
     function install4()
     {
-        if (!is_writable(CONFIGS)) {
-            $this->Session->setFlash(sprintf(__('Cannot write to the configuration directory. Please change the permission on %s so that it is writable.', true), CONFIGS));
+        if (!is_writable(TMP)) {
+            $this->Session->setFlash(sprintf(__('Cannot write to the configuration directory. Please change the permission on %s so that it is writable.', true), TMP));
             return;
         }
 
@@ -123,9 +135,11 @@ class InstallController extends Controller
             }
         }
 
+        $timezones = DateTimeZone::listIdentifiers();
+        $this->set('timezones', array_combine($timezones, $timezones));
+
         if ($this->data) {
             // we have data submitted
-
             $this->InstallValidationStep4->set($this->data);
             if (!$this->InstallValidationStep4->validates()) {
                 // fails validation
@@ -149,11 +163,13 @@ class InstallController extends Controller
                     'email.port' => $this->data['InstallValidationStep4']['email_port'],
                     'email.username' => $this->data['InstallValidationStep4']['email_username'],
                     'email.password' => $this->data['InstallValidationStep4']['email_password'],
+                    'system.absolute_url' => Router::url('/', true),
+                    'system.timezone' => $this->data['InstallValidationStep4']['time_zone'],
                 )
             );
             $this->installHelper->updateSystemParameters($sysparams);
             // mark this instance as installed
-            $f = fopen(CONFIGS.'installed.txt', 'w');
+            $f = fopen(TMP.'installed.txt', 'w');
             if (!$f) {
                 $this->Session->setFlash(sprintf(__('Installation failed, unable to write to %s dir', true), CONFIGS));
                 $this->redirect(array('action' => 'install4'));
@@ -241,11 +257,6 @@ class InstallController extends Controller
         // Workaround for Windows portability
         $endl = (substr(PHP_OS, 0, 3)=='WIN')? "\r\n" : "\n";
 
-        //create and write file
-        $confile = fopen(CONFIGS.'database.php', 'wb');
-        if (!$confile) {
-            return false;
-        }
         $dbConfig = array();
         //Setup the database config parameters
         $dbConfig['host'] = $this->data['InstallValidationStep3']['host'];
@@ -253,21 +264,30 @@ class InstallController extends Controller
         $dbConfig['password'] = $this->data['InstallValidationStep3']['password'];
         $dbConfig['database'] = $this->data['InstallValidationStep3']['database'];
 
-        //Write Config file
-        fwrite($confile, "<?php" . $endl);
-        fwrite($confile, "class DATABASE_CONFIG
-        {".$endl);
-        fwrite($confile, "public \$default = array(".$endl);
-        fwrite($confile, "    'driver' => 'mysql', ". $endl);
-        fwrite($confile, "    'connect' => 'mysql_pconnect', ".$endl);
-        foreach ($dbConfig as $k => $v) {
-            fwrite($confile, "    '".$k."'   => '".$v."', ".$endl);
+        if (!DB_PREDEFINED) {
+            //create and write file
+            $confile = fopen(CONFIGS.'database.php', 'wb');
+            if (!$confile) {
+                return false;
+            }
+
+            //Write Config file
+            fwrite($confile, "<?php" . $endl);
+            fwrite($confile, "class DATABASE_CONFIG
+            {".$endl);
+            fwrite($confile, "public \$default = array(".$endl);
+            fwrite($confile, "    'driver' => 'mysql', ". $endl);
+            fwrite($confile, "    'connect' => 'mysql_pconnect', ".$endl);
+            foreach ($dbConfig as $k => $v) {
+                fwrite($confile, "    '".$k."'   => '".$v."', ".$endl);
+            }
+            fwrite($confile, "    'prefix'   => ''" . $endl);
+            fwrite($confile, "  );" . $endl . "}".$endl);
+            fwrite($confile, "?>" . $endl);
+            fflush($confile);
+            fclose($confile);
         }
-        fwrite($confile, "    'prefix'   => ''" . $endl);
-        fwrite($confile, "  );" . $endl . "}".$endl);
-        fwrite($confile, "?>" . $endl);
-        fflush($confile);
-        fclose($confile);
+
         return $dbConfig;
     }
 

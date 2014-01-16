@@ -69,6 +69,17 @@ echo $this->Form->input(
   )
 );
 
+echo "<h4>Time Zone Configuration</h4>";
+
+echo $this->Form->input(
+    'time_zone',
+    array(
+        'options' => $timezones,
+        'selected' => 'UTC',
+        'size' => 15
+    )
+);
+
 echo $form->submit('Done!', array('id'=>'next', 'div' => 'dbform')); 
 
 echo $this->Form->end();

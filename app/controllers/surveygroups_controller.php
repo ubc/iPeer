@@ -13,7 +13,8 @@ class SurveyGroupsController extends AppController
     public $uses =  array('Course', 'Survey', 'User', 'Question', 'SurveyQuestion', 'Response', 'Personalize', 'Event', 'EvaluationSubmission', 'UserEnrol', 'SurveyInput', 'SurveyGroupMember', 'SurveyGroupSet', 'SurveyGroup', 'Group', 'GroupsMembers', 'Event');
     public $name = 'SurveyGroups';
     public $helpers = array('Html', 'Ajax', 'Javascript');
-    public $components = array('Output', 'userPersonalize', 'framework', 'XmlHandler', 'AjaxList');
+    public $components = array('Output', 'userPersonalize', 'framework', 'XmlHandler', 'AjaxList',
+        'ExportBaseNew', 'ExportCsv');
 
     /**
      * __construct
@@ -42,7 +43,7 @@ class SurveyGroupsController extends AppController
         }
 
         foreach ($data as $key => $entry) {
-            $data[$key]['SurveyGroupSet']['released'] = $entry['SurveyGroupSet']['released'] == 0 ? 'No' : 'Yes';
+            $data[$key]['!Custom']['isReleased'] = $entry['SurveyGroupSet']['released'] == 0 ? 'No' : 'Yes';
         }
         return $data;
     }
@@ -61,10 +62,11 @@ class SurveyGroupsController extends AppController
         // Set up Columns
         $columns = array(
             array("SurveyGroupSet.id",            "",            "",      "hidden"),
-            array("Event.title",      __("Event", true),         "auto",  "string",   ""),
+            array("Event.title",      __("Event", true),         "auto",  "action",   "View/Edit Group Set"),
             array("SurveyGroupSet.set_description",        __("Group Set Name", true),      "13em",  "string", ""),
             array("SurveyGroupSet.group_count",        __("Number of Groups", true),      "13em",  "number", ""),
-            array("SurveyGroupSet.released",         __("Released?", true),       "9em", "string", ""),
+            array("!Custom.isReleased",         __("Released?", true),       "9em", "string"),
+            array("SurveyGroupSet.released", "", "", "hidden"),
         );
 
         $extraFilters = array("Event.course_id" => $course_id);
@@ -80,7 +82,7 @@ class SurveyGroupsController extends AppController
         $recursive = 0;
 
         $this->AjaxList->setUp($this->SurveyGroupSet, $columns, $actions,
-            "SurveyGroupSet.id", "SurveyGroupSet.id", array(), $extraFilters, $recursive, 'postProcess');
+            "SurveyGroupSet.id", "Event.title", array(), $extraFilters, $recursive, 'postProcess');
     }
 
     /**
@@ -97,9 +99,10 @@ class SurveyGroupsController extends AppController
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('index');
+            return;
         }
-
-        $this->set('course_id', $courseId);
+        
+        $this->set('course', $course);
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
         // Set the display list
@@ -138,7 +141,15 @@ class SurveyGroupsController extends AppController
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('index');
+            return;
         }
+        
+        // checks that the dom extension and DOMDocument class exists which are needed for TeamMaker
+        if (!(extension_loaded('dom') && class_exists('DOMDocument'))) {
+            $this->Session->setFlash(_t('DOMDocument could not be found. Please contact your
+                system administrator to use TeamMaker.'));
+        }
+        
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))
             ->push(__('Create Group Set', true)));
         $this->set('events', $this->Event->find('list', array('conditions' => array('course_id' => $course_id, 'event_template_type_id' => 3))));
@@ -288,6 +299,7 @@ class SurveyGroupsController extends AppController
 
         $this->redirect('index/'.$event['Event']['course_id']);
     }
+
 
 
     /**
@@ -472,6 +484,79 @@ class SurveyGroupsController extends AppController
 
         $this->Session->setFlash(__('Group set changed successfully.', true), 'good');
         $this->redirect('index/'.$event['Event']['course_id']);
+    }
+
+    /**
+     * export
+     *
+     * @param mixed $courseId
+     *
+     * @access public
+     * @return void
+     */
+    function export($courseId)
+    {
+        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
+        if (!$course) {
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
+            $this->redirect('index');
+            return;
+        }
+        $surveys = $this->Event->find('all', array(
+            'conditions' => array('course_id' => $courseId, 'event_template_type_id' => 3)
+        ));
+        $surveyGrp = $this->SurveyGroupSet->find('list', array(
+            'conditions' => array('survey_id' => Set::extract('/Event/id', $surveys)),
+            'fields' => array('set_description')
+        ));
+        $header = array(
+            'group_no' => __('Group #', true),
+            'username' => __('Username', true),
+            'student_no' => __('Student No', true),
+            'first_name' => __('First Name', true),
+            'last_name' =>__('Last Name', true)
+        );
+
+        if (!User::hasPermission('functions/viewusername')) {
+            unset($header['username']);
+        }
+
+        $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))
+            ->push(__('Export Survey Groups', true)));
+        $this->set('survey_group_set', $surveyGrp);
+        $this->set('fields', $header);
+        if ($this->data) {
+            if (!$this->SurveyGroup->save($this->data, array('validate' => 'only'))) {
+                // check a filename is provided
+                return;
+            } else if (!isset($this->data['SurveyGroup']['survey_group_set'])) {
+                // check that a survey group set is selected
+                $this->Session->setFlash(__('Please select a survey group set to export.', true));
+                return;
+            } else if (empty($this->data['SurveyGroup']['fields'])) {
+                // check that a survey group set is selected
+                $this->Session->setFlash(__('Please select at least one export field.', true));
+                return;
+            }
+            $this->autoRender = false;
+            $fields = array_flip($this->data['SurveyGroup']['fields']);
+            $header = array_intersect_key($header, $fields);
+            $group_no = false;
+            if (in_array('group_no', $this->data['SurveyGroup']['fields'])) {
+                unset($fields['group_no']);
+                $group_no = true;
+            }
+            $groups = $this->SurveyGroup->find('all', array(
+                'conditions' => array('group_set_id' => $this->data['SurveyGroup']['survey_group_set']),
+                'contain' => array('Member' => array('fields' => array_keys($fields)))
+            ));
+            $members = array_merge(array(implode(',', $header)), 
+                $this->ExportCsv->buildSurveyGroupSet($groups, $fields, $group_no));
+            $members = implode("\n", $members);
+            header('Content-Type: application/csv');
+            header('Content-Disposition: attachment; filename=' .$this->data['SurveyGroup']['file_name']. '.csv');
+            echo $members;
+        }
     }
 
     /**

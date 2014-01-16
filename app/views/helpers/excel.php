@@ -78,7 +78,8 @@ class ExcelHelper extends AppHelper
     function _headers()
     {
         $i=0;
-        foreach ($this->data[0] as $field => $value) {
+        $data = array_keys($this->data[0]);
+        foreach ($data as $field) {
             if (!in_array($field, $this->blacklist)) {
                 $columnName = Inflector::humanize($field);
                 $this->sheet->setCellValueByColumnAndRow($i++, 4, $columnName);

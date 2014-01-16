@@ -268,7 +268,7 @@ class ExportHelper2Component extends Object
         $this->Event = ClassRegistry::init('Event');
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
         $this->RubricsCriteria = ClassRegistry::init('RubricsCriteria');
-        $this->MixevalsQuestion = ClassRegistry::init('MixevalsQuestion');
+        $this->MixevalQuestion = ClassRegistry::init('MixevalQuestion');
 
         $groupEvent = $this->GroupEvent->getGrpEvent($grpEventId);
         $eventId = $groupEvent['GroupEvent']['event_id'];
@@ -280,8 +280,8 @@ class ExportHelper2Component extends Object
         // $EventType = 2(Rubric) or 4(Mix Eval)
         $evaluationType == 2 ? ($questions = $this->RubricsCriteria->getCriteria($evaluationId)) &&
             ($evalType = 'RubricsCriteria') :
-            ($questions = $this->MixevalsQuestion->getQuestion($evaluationId, 'S')) &&
-            ($evalType = 'MixevalsQuestion');
+            ($questions = $this->MixevalQuestion->getQuestion($evaluationId, '1')) &&
+            ($evalType = 'MixevalQuestion');
         //Store the $evaluationType
         $questions[0][$evalType]['evaluation_type'] = $evaluationType;
         //$questions['evaluation_type'] = $evaluationType;

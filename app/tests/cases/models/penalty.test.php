@@ -13,7 +13,10 @@ class PenaltyTestCase extends CakeTestCase
         'app.user_enrol', 'app.groups_member', 'app.survey',
         'app.user_faculty', 'app.faculty', 'app.department',
         'app.course_department', 'app.sys_parameter', 'app.user_tutor', 'app.penalty',
-        'app.evaluation_simple', 'app.survey_input',
+        'app.evaluation_simple', 'app.survey_input', 'app.oauth_token',
+        'app.evaluation_rubric', 'app.evaluation_rubric_detail', 'app.evaluation_mixeval',
+        'app.evaluation_mixeval_detail'
+        
     );
     public $Penalty = null;
 
@@ -162,5 +165,10 @@ class PenaltyTestCase extends CakeTestCase
         // invalid id - final deduction
         $ret = $this->Penalty->getPenaltyByEventAndDaysLate(999, 5);
         $this->assertEqual($ret, null);
+    }
+    
+    function testGetPenaltyPercent()
+    {
+        //TODO
     }
 }

@@ -98,4 +98,8 @@ function boldSelected($choices, $selected) {
     return $data;
 }
 ?>
+<div style="text-align: center;">
+<input type="button" name="Back" value="Back" onclick="javascript:(history.length > 1 ? history.back() : window.close());">
+</div>
+
 </div>

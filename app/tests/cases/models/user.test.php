@@ -11,7 +11,9 @@ class UserTestCase extends CakeTestCase {
         'app.question', 'app.response', 'app.survey_question', 'app.user_course',
         'app.user_tutor', 'app.user_enrol', 'app.department', 'app.faculty',
         'app.course_department', 'app.user_faculty', 'app.role', 'app.roles_user',
-        'app.penalty', 'app.evaluation_simple', 'app.survey_input',
+        'app.penalty', 'app.evaluation_simple', 'app.survey_input', 'app.oauth_token',
+        'app.evaluation_rubric', 'app.evaluation_rubric_detail', 'app.evaluation_mixeval',
+        'app.evaluation_mixeval_detail', 'app.sys_parameter'
     );
 
     function startCase()
@@ -272,15 +274,15 @@ class UserTestCase extends CakeTestCase {
 
         //Test remove instructor from wrong course
         $ret = $this->User->removeInstructor(4, 1);
-        $this->assertFalse($user); // operation should fail
+        $this->assertFalse($ret); // operation should fail
 
         //Test remove invalid instructor from  course
         $ret = $this->User->removeInstructor(999, 2);
-        $this->assertFalse($user); // operation should fail
+        $this->assertFalse($ret); // operation should fail
 
         //Test remove valid instructor from invalid course
         $ret = $this->User->removeInstructor(4, 999);
-        $this->assertFalse($user); // operation should fail
+        $this->assertFalse($ret); // operation should fail
 
         //Test remove invalid instructor from invalid course
         $ret = $this->User->removeInstructor(999, 999);
@@ -541,6 +543,53 @@ class UserTestCase extends CakeTestCase {
     }
 
     function testAddUserByArray() {
+        // TODO
+    }
+
+    function testremoveOldStudents() {
+        // TODO
+    }
+
+    function testGetEnrolledCourses() {
+        //Test valid student enrolled in 2 courses
+        $courses = $this->User->getEnrolledCourses(7);
+        $this->assertEqual($courses, array(1,2));
+
+        //Test valid user not enrolled in courses
+        $this->User->removeStudent(20,2);
+        $courses = $this->User->getEnrolledCourses(20);
+        $this->assertEqual($courses, null);
+        $this->User->addStudent(20, 2);
+
+        //Test invalid user
+        $courses = $this->User->getEnrolledCourses(999);
+        $this->assertEqual($courses, null);
+    }
+
+    function testGetEventGroupMembersNoTutors ()
+    {
+        //Test group, selfeval
+        $members = $this->User->getEventGroupMembersNoTutors(1, true, 5);
+        $this->assertEqual(Set::extract('/User/username', $members), array('redshirt0001', 'redshirt0002', 'redshirt0003'));
+
+        //Test group, no selfeval, valid used id
+        $members = $this->User->getEventGroupMembersNoTutors(1, false, 6);
+        $this->assertEqual(Set::extract('/User/username', $members), array('redshirt0001', 'redshirt0003'));
+
+        //Test group, no selfeval, invalid used id
+        $members = $this->User->getEventGroupMembersNoTutors(1, false, 999);
+        $this->assertEqual(Set::extract('/User/username', $members), array('redshirt0001', 'redshirt0002', 'redshirt0003'));
+
+        //Test invalid group
+        $members = $this->User->getEventGroupMembersNoTutors(999, false, 3);
+        $this->assertEqual(Set::extract('/User/username', $members), null);
+    }
+
+    function testgetFullNames() {
+        // TODO
+    }
+
+    function testgetUsers() {
         // TODO
     }
 

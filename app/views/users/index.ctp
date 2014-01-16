@@ -1,6 +1,9 @@
 <div class="content-container">
   <div class="button-row">
     <ul>
+            <?php if($can_merge_users):?>
+                <li><?php echo $html->link(__('Merge Users', true), '/users/merge', array('class' => 'merge-button')); ?></li>
+            <?php endif;?>
             <?php if($can_add_user):?>
                 <li><?php echo $html->link(__('Add User', true), '/users/add', array('class' => 'add-button')); ?></li>
             <?php endif;?>

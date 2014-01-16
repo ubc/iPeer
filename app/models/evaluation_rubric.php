@@ -65,6 +65,7 @@ class EvaluationRubric extends EvaluationResponseBase
      */
     function getResultsByEvaluatee($grpEventId=null, $evaluatee=null, $includeEvaluator=false)
     {
+        $this->GroupEvent = ClassRegistry::init('GroupEvent');
         $includeEvaluator ? $user = 'User.*' : $user = '';
         return $this->find('all', array(
             'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
@@ -205,8 +206,10 @@ class EvaluationRubric extends EvaluationResponseBase
      */
     function getReceivedTotalScore($grpEventId=null, $evaluatee=null)
     {
+        $this->GroupEvent = ClassRegistry::init('GroupEvent');
+        $members = Set::extract($this->GroupEvent->getGroupMembers($grpEventId), '/GroupsMembers/user_id');
         return $this->find('all', array(
-            'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
+            'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee, 'evaluator' => $members),
             'fields' => array('SUM(score) AS received_total_score')
         ));
     }
@@ -255,8 +258,10 @@ class EvaluationRubric extends EvaluationResponseBase
      */
     function getReceivedTotalEvaluatorCount($grpEventId=null, $evaluatee=null)
     {
+        $this->GroupEvent = ClassRegistry::init('GroupEvent');
+        $members = Set::extract($this->GroupEvent->getGroupMembers($grpEventId), '/GroupsMembers/user_id');
         return $this->find('count', array(
-            'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee)
+            'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee, 'evaluator' => $members)
         ));
     }
 

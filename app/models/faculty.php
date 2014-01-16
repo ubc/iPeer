@@ -9,7 +9,8 @@ class Faculty extends AppModel
     public $validate = array(
         'name' => array(
             'notempty' => array(
-                'rule' => array('notempty'),
+                'rule' => 'notEmpty',
+                'message' => 'Please fill in the name of the faculty.'
             ),
         ),
     );

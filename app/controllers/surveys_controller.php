@@ -10,7 +10,10 @@
  */
 class SurveysController extends AppController
 {
-    public $uses =  array('SurveyQuestion', 'Course', 'Survey', 'User', 'Question', 'Response', 'Personalize', 'Event', 'EvaluationSubmission', 'UserEnrol', 'SurveyInput', 'SurveyGroupMember', 'SurveyGroupSet', 'SurveyGroup');
+    public $uses =  array('SurveyQuestion', 'Course', 'Survey', 'User', 'Question',
+        'Response', 'Personalize', 'Event', 'EvaluationSubmission', 'UserEnrol',
+        'SurveyInput', 'SurveyGroupMember', 'SurveyGroupSet', 'SurveyGroup',
+        'UserCourse');
     public $name = 'Surveys';
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time');
     public $components = array('AjaxList', 'Output', 'framework');
@@ -59,26 +62,23 @@ class SurveysController extends AppController
     /**
      * setUpAjaxList
      *
-     * @param bool $conditions
-     *
      * @access public
      * @return void
      */
-    function setUpAjaxList($conditions = array())
+    function setUpAjaxList()
     {
         $myID = $this->Auth->user('id');
-
-        // Get the course data
-        $courses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
 
         // Set up Columns
         $columns = array(
             array("Survey.id",          __("ID", true),         "4em",   "hidden"),
-            array("Survey.name",        __("Name", true),        "auto",  "action", "Edit Survey"),
-            array("Survey.question_count", __("Questions", true),        "6em",  "action", "View Questions"),
+            array("Survey.name",        __("Name", true),        "auto",  "action", "View Survey"),
             array("!Custom.inUse",      __("In Use", true),      "4em",   "number"),
+            array("Survey.availability", __("Availability", true), "6em", "map",
+                array('private' => 'private', 'public' => 'public')),
+            array("Survey.question_count", __("Questions", true),        "6em",  "action", "Edit Questions"),
             array("Survey.creator_id",   "", "", "hidden"),
-            array("Survey.creator",  __("Created By", true),    "8em", "action", "View Creator"),
+            array("Survey.creator",  __("Creator", true),    "8em", "action", "View Creator"),
             array("Survey.created",     __("Creation Date", true), "10em", "date"));
 
         // Just list all and my evaluations for selections
@@ -98,18 +98,46 @@ class SurveysController extends AppController
         if (User::hasPermission('functions/superadmin')) {
             $extraFilters = "";
         } else {
-            // For instructors: only list their own course events (surveys)
-            $extraFilters = $conditions;
+            // grab course ids of the courses admin/instructor has access to
+            $creators = array();
+            $courseIds = User::getAccessibleCourses();
+            // grab all instructors that have access to the courses above
+            $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+            $extraFilters = "(";
+            foreach ($instructors as $instructor) {
+                $id = $instructor['UserCourse']['user_id'];
+                $creators[] = $id;
+                $extraFilters .= "Survey.creator_id = $id or ";
+            }
+            $extraFilters .= "Survey.creator_id = $myID or availability = 'public')";
         }
+
+        $restrictions = "";
+
+        $basicRestrictions = array(
+            $myID => true,
+            "!default" => false);
+        // super admins
+        if (User::hasPermission('functions/superadmin')) {
+            $basicRestrictions = "";
+        // faculty admins
+        } else if (User::hasPermission('controllers/departments')) {
+            foreach ($creators as $creator) {
+                $basicRestrictions = $basicRestrictions + array($creator => true);
+            }
+        }
+
+        empty($basicRestrictions) ? $restrictions = $basicRestrictions :
+            $restrictions['Survey.creator_id'] = $basicRestrictions;
 
         // Set up actions
         $warning = __("Are you sure you want to delete this survey permanently?", true);
         $actions = array(
             array(__("View Survey", true), "", "", "", "view", "Survey.id"),
-            array(__("Edit Survey", true), "", "", "", "edit", "Survey.id"),
-            array(__("View Questions", true), "", "", "", "questionsSummary", "Survey.id"),
+            array(__("Edit Survey", true), "", $restrictions, "", "edit", "Survey.id"),
+            array(__("Edit Questions", true), "", $restrictions, "", "questionsSummary", "Survey.id"),
             array(__("Copy Survey", true), "", "", "", "copy", "Survey.id"),
-            array(__("Delete Survey", true), $warning, "", "", "delete", "Survey.id"),
+            array(__("Delete Survey", true), $warning, $restrictions, "", "delete", "Survey.id"),
             array(__("View Creator", true), "",    "", "users", "view", "Survey.creator_id"));
 
         // No recursion in results (at all!)
@@ -138,7 +166,7 @@ class SurveysController extends AppController
             $course = $this->Course->getCourseById($course_id);
             $this->breadcrumb->push(array('course' => $course['Course']));
         }
-        $this->setUpAjaxList($conditions);
+        $this->setUpAjaxList();
         // Set the display list
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
         $this->set('course_id', $course_id);
@@ -174,12 +202,7 @@ class SurveysController extends AppController
     function view($id)
     {
         // retrieving the requested survey
-        $survey = $this->Survey->find('first',
-            array(
-                'conditions' => array('id' => $id),
-                'contain' => false
-            )
-        );
+        $survey = $this->Survey->findById($id);
 
         // check to see if $id is valid - numeric & is a survey
         if (!is_numeric($id) || empty($survey)) {
@@ -188,24 +211,7 @@ class SurveysController extends AppController
             return;
         }
 
-        // Get all required data from each table for every question
-        $questions = $this->Question->find('all', array(
-            'conditions' => array('Survey.id' => $id),
-            'order' => 'SurveyQuestion.number',
-            'recursive' => 1)
-        );
-
-        // Convert the response array into a flat options array for
-        // the form input helper
-        foreach ($questions as &$q) {
-            if (isset($q['Response'])) {
-                $options = array();
-                foreach ($q['Response'] as $resp) {
-                    $options[$resp['id']] = $resp['response'];
-                }
-                $q['ResponseOptions'] = $options;
-            }
-        }
+        $questions = $this->Survey->getQuestions($id);
 
         $this->set('breadcrumb', $this->breadcrumb->push('surveys')->
             push(__('View', true))->push($survey['Survey']['name']));
@@ -224,15 +230,14 @@ class SurveysController extends AppController
     function add()
     {
         if (!empty($this->data)) {
-            if ($result = $this->Survey->save($this->data)) {
-                $this->data = $result;
-                $this->data['Survey']['id'] = $this->Survey->id;
-
+            $this->data['Survey']['name'] = trim($this->data['Survey']['name']);
+            if ($this->Survey->save($this->data)) {
                 // check to see if a template has been selected
-                if (!empty($this->data['Survey']['template_id'] )) {
-                    $this->SurveyQuestion->copyQuestions($this->data['Survey']['template_id'], $this->Survey->id);
+                if (!empty($this->data['Survey']['template_id'])) {
+                    $questions = $this->SurveyQuestion->findAllBySurveyId($this->data['Survey']['template_id']);
+                    $quesNo = $this->Question->copyQuestions($questions, $this->Survey->id);
+                    $this->SurveyQuestion->assignNumber($quesNo, $this->Survey->id);
                 }
-
                 $this->Session->setFlash(__('Survey is saved!', true), 'good');
                 $this->redirect('index');
                 return;
@@ -242,7 +247,21 @@ class SurveysController extends AppController
         }
 
         // Get the course data
-        $templates = $this->Survey->find('list');
+        if (!User::hasPermission('functions/superadmin')) {
+            $courses = User::getAccessibleCourses();
+            $instructors = Set::extract('/UserCourse/user_id', $this->UserCourse->findByCourseId($courses));
+            $instructors[] = $this->Auth->user('id');
+            $templates = $this->Survey->find('all', array(
+                'conditions' => array('OR' => array('creator_id' => $instructors, 'availability' => 'public'))
+            ));
+            $templates = Set::combine($templates, '{n}.Survey.id', '{n}.Survey.name');
+        } else {
+            $templates = $this->Survey->find('list');
+        }
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('surveys')->
+            push(Inflector::humanize(Inflector::underscore($this->action)))
+        );
         $this->set('templates', $templates);
         $this->render('edit');
     }
@@ -259,46 +278,46 @@ class SurveysController extends AppController
     function edit($id)
     {
         // retrieving the requested survey
-        $survey = $this->Survey->find(
-            'first',
-            array(
-                'conditions' => array('id' => $id),
-                'contain' => array('Event' => 'EvaluationSubmission')
-            )
-        );
-        // for storing submissions - for checking if there are any submissions
-        $submissions = array();
+        $survey = $this->Survey->getEventSub($id);
+        if (!($this->surveyAccess($survey))) {
+            $this->Session->setFlash(__('Error: You do not have permission to edit this survey', true));
+            $this->redirect('index');
+            return;
+        }
 
         // check to see if $id is valid - numeric & is a survey
         if (!is_numeric($id) || empty($survey)) {
             $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
+            return;
         }
 
         // check to see if submissions had been made - if yes - survey can't be edited
-        if (isset($survey['Event'])) {
-            foreach ($survey['Event'] as $event) {
-                if (!empty($event['EvaluationSubmission'])) {
-                    $submissions[] = $event['EvaluationSubmission'];
-                }
-            }
-            if (!empty($submissions)) {
-                $this->Session->setFlash(sprintf(__('Submissions had been made. %s cannot be edited. Please make a copy.', true), $survey['Survey']['name']));
+        foreach ($survey['Event'] as $event) {
+            if (!empty($event['EvaluationSubmission'])) {
+                $this->Session->setFlash(sprintf(__('Submissions have been made. %s cannot be edited. Please make a copy.', true), $survey['Survey']['name']));
                 $this->redirect('index');
+                return;
             }
         }
 
         if (!empty($this->data)) {
+            $this->data['Survey']['name'] = trim($this->data['Survey']['name']);
             if ($this->Survey->save($this->data)) {
                 $this->Session->setFlash(__('The Survey was edited successfully.', true), 'good');
                 $this->redirect('index');
                 return;
             } else {
-                $this->Session->setFlash($this->Survey->errorMessage);
+                $this->Session->setFlash(__('Error: The Survey was not saved successfully.', true));
             }
         } else {
             $this->data = $survey;
         }
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('surveys')->
+            push(Inflector::humanize(Inflector::underscore($this->action)))->
+            push($survey['Survey']['name'])
+        );
     }
 
 
@@ -312,13 +331,7 @@ class SurveysController extends AppController
      */
     function copy($id)
     {
-        $survey = $this->Survey->find(
-            'first',
-            array(
-                'conditions' => array('id' => $id),
-                'contain' => false,
-            )
-        );
+        $survey = $this->Survey->findById($id);
 
         // check to see if $id is valid - numeric & is a survey
         if (!is_numeric($id) || empty($survey)) {
@@ -349,13 +362,12 @@ class SurveysController extends AppController
     function delete($id)
     {
         // retrieving the requested survey
-        $survey = $this->Survey->find(
-            'first',
-            array(
-                'conditions' => array('id' => $id),
-                'contain' => array('Event' => 'EvaluationSubmission')
-            )
-        );
+        $survey = $this->Survey->getEventSub($id);
+        if (!($this->surveyAccess($survey))) {
+            $this->Session->setFlash(__('Error: You do not have permission to delete this survey', true));
+            $this->redirect('index');
+            return;
+        }
 
         // check to see if $id is valid - numeric & is a survey
         if (!is_numeric($id) || empty($survey)) {
@@ -364,14 +376,8 @@ class SurveysController extends AppController
         }
 
         // check to see if submissions had been made - if yes - survey can't be edited
-        if (isset($survey['Event'])) {
-            $submissions = array();
-            foreach ($survey['Event'] as $event) {
-                if (!empty($event['EvaluationSubmission'])) {
-                    $submissions[] = $event['EvaluationSubmission'];
-                }
-            }
-            if (!empty($submissions)) {
+        foreach ($survey['Event'] as $event) {
+            if (!empty($event['EvaluationSubmission'])) {
                 $this->Session->setFlash(sprintf(__('Submissions had been made. %s cannot be edited. Please make a copy.', true), $survey['Survey']['name']));
                 $this->redirect('index');
             }
@@ -399,12 +405,12 @@ class SurveysController extends AppController
     function questionsSummary($survey_id)
     {
         // retrieving the requested survey
-        $survey = $this->Survey->find('first',
-            array(
-                'conditions' => array('id' => $survey_id),
-                'contain' => array('Event' => 'EvaluationSubmission')
-            )
-        );
+        $survey = $this->Survey->getEventSub($survey_id);
+        if (!($this->surveyAccess($survey))) {
+           $this->Session->setFlash(__('Error: You do not have permission to edit this survey', true));
+           $this->redirect('index');
+           return;
+        }
 
         // check to see if $id is valid - numeric & is a survey
         if (!is_numeric($survey_id) || empty($survey)) {
@@ -413,28 +419,24 @@ class SurveysController extends AppController
             return;
         }
 
-        // for storing submissions - for checking if there are any submissions
-        $hasSubmission = false;
         // check to see if submissions had been made - if yes - survey can't be edited
-        if (isset($survey['Event'])) {
-            foreach ($survey['Event'] as $event) {
-                if (!empty($event['EvaluationSubmission'])) {
-                    $hasSubmission = true;
-                }
+        foreach ($survey['Event'] as $event) {
+            if (!empty($event['EvaluationSubmission'])) {
+                $this->Session->setFlash(sprintf(__('Submissions have been made. %s cannot be edited. Please make a copy.', true), $survey['Survey']['name']));
+                $this->redirect('index');
+                return;
             }
         }
 
         // Get all required data from each table for every question
-        $questions = $this->Question->find('all', array(
-            'conditions' => array('Survey.id' => $survey_id),
-            //'contain' => array('Question', 'Response'),
-            'order' => 'SurveyQuestion.number',
-            'recursive' => 1));
+        $questions = $this->Survey->getQuestions($survey_id);
 
-        $this->set('breadcrumb', $this->breadcrumb->push('surveys')->push(__('View Questions', true)));
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('surveys')->
+            push(array('survey' => $survey['Survey']))->
+            push(__('Edit Questions', true)));
         $this->set('survey_id', $survey_id);
         $this->set('questions', $questions);
-        $this->set('is_editable', !$hasSubmission);
         $this->render('questionssummary');
     }
 
@@ -499,12 +501,25 @@ class SurveysController extends AppController
    */
   function addQuestion($survey_id)
   {
-      //check to see if user has clicked load question
-      if (!empty($this->params['form']['loadq'])) {
+      // retrieving the requested survey
+      $survey = $this->Survey->getEventSub($survey_id);
+      if (!($this->surveyAccess($survey))) {
+         $this->Session->setFlash(__('Error: You do not have permission to edit this survey', true));
+         $this->redirect('index');
+         return;
+      }
+      if (isset($this->params['form']['cancel'])) {
+          $this->redirect('questionsSummary/'.$survey_id);
+          return;
+      }
+      if (isset($this->params['form']['load'])) {
           // load values from selected question into temp array
-          $this->data = $this->Question->find('first', array('conditions' => array('id' => $this->data['Question']['template_id'])));
-          $this->set('responses', $this->data['Response']);
-      } elseif (!empty($this->params['data']['Question'])) {
+          $this->data = $this->Question->find('first', array(
+            'conditions' => array('id' => $this->data['Question']['template_id'])));
+          $this->data['Question']['master'] = 'no';
+      }
+      else if (!empty($this->data)) {
+          $this->data['Survey']['id'] = $survey_id;
           // Strip ID from responses or the original master question will
           // lose its responses. We want a copy, not the original.
           if (isset($this->data['Response'])) {
@@ -512,24 +527,18 @@ class SurveysController extends AppController
                   unset($response['id']);
               }
           }
-
           if ($this->Question->saveAll($this->data)) {
               $this->Session->setFlash(__('The question was added successfully.', true), 'good');
               // Need to run reorderQuestions once in order to correctly set the question position numbers
               $surveyQuestionId = $this->SurveyQuestion->find('first', array('conditions' => array('survey_id' => $survey_id), 'fields' => array('MIN(number) as minQuestionId')));
               $this->SurveyQuestion->reorderQuestions($survey_id, $surveyQuestionId['0']['minQuestionId'], 'TOP');
               $this->redirect('questionsSummary/'.$survey_id);
-              //$this->questionsSummary($this->params['form']['survey_id'], null, null);
+              return;
           } else {
-              $this->set('responses', $this->data['Response']);
-              $this->Session->setFlash(_('Failed to save question.'));
+              $this->Session->setFlash(__('Failed to save question.'));
           }
-      } else {
-          $this->set('responses', array());
       }
-
       $this->set('templates', $this->Question->find('list', array('conditions' => array('master' => 'yes'))));
-      $this->set('survey_id', $survey_id);
       $this->set('breadcrumb', $this->breadcrumb->push('surveys')->push(Inflector::humanize(Inflector::underscore($this->action))));
   }
 
@@ -545,14 +554,34 @@ class SurveysController extends AppController
    */
   function editQuestion( $question_id, $survey_id )
   {
-      if (!empty($this->data)) {
+      // retrieving the requested survey
+      $survey = $this->Survey->getEventSub($survey_id);
+      if (!($this->surveyAccess($survey))) {
+         $this->Session->setFlash(__('Error: You do not have permission to edit this survey', true));
+         $this->redirect('index');
+         return;
+      }
+      if (isset($this->params['form']['cancel'])) {
+          $this->redirect('questionsSummary/'.$survey_id);
+          return;
+      }
+      if (isset($this->params['form']['load'])) {
+          // load values from selected question into temp array
+          $this->data = $this->Question->find('first', array(
+            'conditions' => array('id' => $this->data['Question']['template_id'])));
+          $this->data['Question']['master'] = 'no';
+      }
+      else if (!empty($this->data)) {
+          $this->data['Question']['id'] = $question_id;
           // filter - remove the removed answers from the database
           $responses = $this->Response->find('list', array('conditions' => array('question_id' => $question_id)));
           $newResponses = array();
-          foreach ($this->data['Response'] as $new) {
-            if (isset($new['id'])) {
-                $newResponses[] = $new['id'];
-            }
+          if (isset($this->data['Response'])) {
+              foreach ($this->data['Response'] as $new) {
+                if (isset($new['id'])) {
+                    $newResponses[] = $new['id'];
+                }
+              }
           }
           foreach ($responses as $resp) {
             if (!in_array($resp, $newResponses)) {
@@ -566,13 +595,37 @@ class SurveysController extends AppController
               $this->Session->setFlash(__('Error in saving question.', true));
           }
       } else {
-          $this->data = $this->Question->find('first', array('conditions' => array('id' => $question_id)));
+          $this->data = $this->Question->findById($question_id);
       }
 
-      $this->set('question_id', $question_id);
-      $this->set('survey_id', $survey_id);
-      $this->set('responses', $this->data['Response']);
+      $this->set('templates', $this->Question->find('list', array('conditions' => array('master' => 'yes'))));
       $this->set('breadcrumb', $this->breadcrumb->push('surveys')->push(__('Edit Question', true)));
       $this->render('addQuestion');
+  }
+
+  /**
+   * surveyAccess
+   *
+   * @param mixed $survey
+   *
+   * @access public
+   * @return void
+   */
+  function surveyAccess($survey)
+  {
+      // instructor
+      if (!User::hasPermission('controllers/departments')) {
+          $instructorIds = array($this->Auth->user('id'));
+      // admins
+      } else {
+          // course ids
+          $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+          // instructors
+          $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+          $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
+          // add the user's id
+          array_push($instructorIds, $this->Auth->user('id'));
+      }
+      return (in_array($survey['Survey']['creator_id'], $instructorIds) || User::hasPermission('functions/superadmin'));
   }
 }

@@ -1,73 +1,56 @@
-<table class='standardtable'>
-    <tr><th><?php __('Survey Summary')?></th></tr>
-    <tr>
-        <td style="text-align: left;">
-            <?php if( !empty($questions)):?>
-            <?php foreach ($questions as $key => $row): $question = $row['Question'];?>
-            <div class="survey-prompt">
-                <div style="float: left">
-                <?php __('Q')?><?php echo $key+1?>: <?php echo $question['prompt']?>&nbsp;
-                <?php if ($is_editable):?>
-                <?php echo $this->Html->link(__(' Edit', true),
-                    'editQuestion/'.$question['id'].'/'.$survey_id,
-                    array('class' => 'edit-button'))?>
-                <?php echo $this->Html->link(__(' Delete', true),
-                    'removeQuestion/'.$survey_id.'/'.$question['id'],
-                    array('escape' => false, 'class' => 'delete-button'),
-                    __('Are you sure to delete question', true).' &ldquo;'.$question['prompt'].'&rdquo;?')?>
-                <?php endif; ?>
-                </div>
-                <?php if ($is_editable):?>
-                <div style="float: right">
-                <?php echo $this->Html->link(__('Top', true),
-                    'moveQuestion/'.$survey_id.'/'.$question['id'].'/TOP',
-                    array('escape' => false, 'class' => 'top-button small-font'))?>
-                <?php echo $this->Html->link(__('Up', true),
-                    'moveQuestion/'.$survey_id.'/'.$question['id'].'/UP',
-                    array('escape' => false, 'class' => 'up-button small-font'))?>
-                <?php echo $this->Html->link(__('Down', true),
-                    'moveQuestion/'.$survey_id.'/'.$question['id'].'/DOWN',
-                    array('escape' => false, 'class' => 'down-button small-font'))?>
-                <?php echo $this->Html->link(__('Bottom', true),
-                    'moveQuestion/'.$survey_id.'/'.$question['id'].'/BOTTOM',
-                    array('escape' => false, 'class' => 'bottom-button small-font'))?>
-                </div>
-                <?php endif;?>
-                <div style="clear: both;"></div>
-            </div>
-            <div class="survey-response">
-                <!-- Multiple Choice Question-->
-                <?php if( $question['type'] == 'M'):?>
-                    <?php if( !empty($row['Response'])):?>
-                        <?php foreach ($row['Response'] as $index => $value):?>
-                            <input type="radio" name="answer_<?php echo $row['SurveyQuestion']['number']?>" value="<?php echo $value['id']?>" /><?php echo $value['response']?><br>
-                        <?php endforeach;?>
-                    <?php endif;?>
-                <!-- Choose Any... Question -->
-                <?php elseif( $question['type'] == 'C'):?>
-                    <?php if( !empty($row['Response'])):?>
-                        <?php foreach ($row['Response'] as $index => $value):?>
-                            <input type="checkbox" name="answer_<?php echo $row['SurveyQuestion']['number']?>" value="<?php echo $value['id']?>" /><?php echo $value['response']?><br>
-                        <?php endforeach;?>
-                    <?php endif;?>
-                <!-- Short Answer Question -->
-                <?php elseif( $question['type'] == 'S'):?>
-                    <input type="text" name="answer_<?php echo $row['SurveyQuestion']['number']?>" />
-                <!--  Long Answer Question -->
-                <?php elseif( $question['type'] == 'L'):?>
-                    <textarea name="answer_<?php echo $row['SurveyQuestion']['number']?>"></textarea>
-                <?php endif;?>
-            </div>
-            <?php endforeach;?>
-            <?php endif;?>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <?php if ($is_editable): ?>
-                <button onclick="window.location='<?php echo $this->Html->url('addQuestion/'.$survey_id)?>';"><?php __('Add Questions')?></button>
-            <?php endif; ?>
-            <button onclick="window.location='<?php echo $this->Html->url('index')?>';"><?php __('Finish')?></button>
-        </td>
-    </tr>
-</table>
+<div class='surveyquestions'>
+<?php
+foreach ($questions as $i => $q) {
+    $i++;
+    $prompt = $q['Question']['prompt'];
+    echo $html->div('prompt', "$i. " . $prompt);
+    if ($q['Question']['type'] == 'M') {
+        echo $form->input($i,
+            array(
+                'type' => 'radio',
+                'options' => $q['ResponseOptions'],
+                'separator' => '<br />'
+            )
+        );
+    } else if ($q['Question']['type'] == 'C') {
+        echo $form->input('blah',
+            array(
+                'options' => $q['ResponseOptions'],
+                'multiple' => 'checkbox',
+                'label' => false
+            )
+        );
+    } else if ($q['Question']['type'] == 'S') {
+        echo $form->text($i);
+    } else if ($q['Question']['type'] == 'L') {
+        echo $form->textarea($i);
+    }
+    // question editing links
+    $qId = $q['Question']['id'];
+    echo $html->div('Operators',
+        $html->link(__('Edit', true), "editQuestion/$qId/$survey_id",
+            array('class' => 'edit-button')).
+        $html->link(__('Delete', true), "removeQuestion/$survey_id/$qId",
+            array('escape' => false, 'class' => 'delete-button'),
+            __('Are you sure you want to delete', true) . " &ldquo;$prompt&rdquo;?").
+        $html->div('MoveQuestion',
+            $html->link(__('Top', true), "moveQuestion/$survey_id/$qId/TOP",
+                array('escape' => false, 'class' => 'top-button')).
+            $html->link(__('Up', true), "moveQuestion/$survey_id/$qId/UP",
+                array('escape' => false, 'class' => 'up-button')).
+            $html->link(__('Down', true), "moveQuestion/$survey_id/$qId/DOWN",
+                array('escape' => false, 'class' => 'down-button')).
+            $html->link(__('Bottom', true), "moveQuestion/$survey_id/$qId/BOTTOM",
+                array('escape' => false, 'class' => 'bottom-button'))
+        )
+    );
+}
+
+echo $html->div('center',
+    $form->button(__('Add Question', true),
+       array('onclick' => "window.location='/surveys/addQuestion/$survey_id'")).
+    $form->button(__('Done', true),
+       array('onclick' => "window.location='/surveys/index'"))
+);
+?>
+</div>

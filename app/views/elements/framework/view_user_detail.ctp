@@ -22,7 +22,7 @@
         <td></td>
         <td></td>
     </tr>
-    <?php if ($user['Role']['0']['name'] == 'student'): ?>
+    <?php if (in_array($user['Role']['0']['name'], array('student', 'tutor'))): ?>
     <tr>
         <th><?php __('Student No.')?></th>
         <td><?php echo $user['User']['student_no']; ?> </td>

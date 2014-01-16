@@ -13,7 +13,8 @@ require_once (CORE_PATH.'cake/libs/controller/controller.php');
  */
 class SendEmailsShell extends Shell
 {
-    public $uses = array('User', 'EmailSchedule', 'SysParameter', 'EmailMerge');
+    public $uses = array('User', 'EmailSchedule', 'SysParameter', 'EmailMerge', 'Event', 
+        'Group', 'GroupsMembers', 'EvaluationSubmission', 'GroupEvent', 'Course', 'Penalty');
     const EMAIL_TASK_LOCK = 'tmp/email_task_lock';
     /**
      * main
@@ -43,6 +44,16 @@ class SendEmailsShell extends Shell
          * Goes through scheduled emails that have not yet been sent,
          * send them if they're due and mark them them as sent.
          */
+        $timezone = $this->SysParameter->findByParameterCode('system.timezone');
+        // default to UTC if no timezone is set 
+        if (!(empty($timezone) || empty($timezone['SysParameter']['parameter_value']))) {
+            $timezone = $timezone['SysParameter']['parameter_value'];
+        } else if (ini_get('date.timezone')) {
+            $timezone = ini_get('date.timezone');
+        } else {
+            $timezone = 'UTC';
+        }
+        date_default_timezone_set($timezone);
         $emails = $this->EmailSchedule->getEmailsToSend();
         $defaultFrom = $this->SysParameter->get('display.contact_info');
 
@@ -52,18 +63,38 @@ class SendEmailsShell extends Shell
             $e = $e['EmailSchedule'];
             echo "Processing email schedule id ".$e['id']."\n";
             $from_id = $e['from'];
+			$event_id = $e['event_id'];
+			
             $from = $this->User->getEmails($from_id);
             $from = (isset($from[$from_id]) && empty($from[$from_id])) ? $defaultFrom : $from[$from_id];
 
-            $emailList = $this->User->getEmails(explode(';', $e['to']));
+            //Returns the modified emaillist if the list contains the 'save_reminder' param, else returns $e['to']
+			$filter_email_list = $this->reminderFilter($event_id, $e['to'], $e['id'], $e['date']);
+			//If event id is set it is a event reminder.
+			$template = isset($event_id) ? 'eventReminder' : 'default';
+			if (isset($event_id)) {
+			    $event = $this->Event->findById($event_id);
+			    $type = ($event['Event']['event_template_type_id'] == 3) ? 'survey' : 'peer evaluation';
+			    $controller->set('event', $event);
+			    $controller->set('course', $this->Course->findById($event['Event']['course_id']));
+			    $controller->set('type', $type);
+			    $controller->set('penalty', $this->Penalty->findAllByEventId($event_id));
+			    $controller->set('url', $this->SysParameter->get('system.absolute_url'));
+			}
+			                                                                             
+            $emailList = $this->User->getEmails(explode(';', $filter_email_list));
             foreach ($emailList as $to_id => $to) {
                 if (empty($to)) {
                     // skip the empty ones
                     continue;
                 }
+
                 $subject = $e['subject'];
+                if (isset($event_id)) {
+                    $controller->set('user', $this->User->findById($to_id));
+                }
                 $content = $this->doMerge($e['content'], EmailMerge::MERGE_START, EmailMerge::MERGE_END, $to_id);
-                if ($this->sendEmail($content, $subject, $from, $to)) {
+                if ($this->sendEmail($content, $subject, $from, $to, $template)) {
                     $successCount++;
                 } else {
                     echo "Failed to send email to ".$to."\n";
@@ -78,6 +109,52 @@ class SendEmailsShell extends Shell
 
         if (!unlink(APP.SendEmailsShell::EMAIL_TASK_LOCK)) {
             echo "Failed to delete the email task lock file. Check the permission!\n";
+        }
+    }
+
+   /*
+    * If the email is an event reminder, returns the list of users that have not submitted
+    * 
+    * @param mixed $event_id
+    * @param mixed $to
+    * @param mixed $email_id
+    * @param mixed $date
+    * 
+    */ 
+    private function reminderFilter($event_id, $to, $email_id, $date)
+    {   
+        $to = explode(';', $to);
+        if (isset($event_id) && $to[0]=='save_reminder') {
+            //If the date on the reminder is past the due date, delete the corresponding reminder from the table
+            $event = $this->Event->findById($event_id);
+            if (strtotime($event['Event']['due_date']) < strtotime($date)) {
+                //Delete the corresponding row and return an empty to[] list
+                $this->EmailSchedule->delete($email_id, false);
+                return array();
+            } else { 
+                $submissions = $this->EvaluationSubmission->getEvalSubmissionsByEventId($event_id);
+                $submitter_list = Set::extract('/EvaluationSubmission/submitter_id', $submissions);
+                
+                if ($event['Event']['event_template_type_id'] == 3) {
+                    $members = $this->User->getEnrolledStudents($event['Event']['course_id']);
+                    $members = Set::extract('/User/id', $members);
+                } else {
+                    $groups = $this->GroupEvent->findAllByEventId($event_id);
+                    $groupIds = Set::extract('/GroupEvent/group_id', $groups);
+                    $members = $this->GroupsMembers->findAllByGroupId($groupIds);
+                    $members = Set::extract('/GroupsMembers/user_id', $members);
+                }
+                $sendTo = array_diff($members, $submitter_list);
+                $sendTo = implode(';', $sendTo);
+
+                //Save the new array in the Database table email_schedules
+                $data = array('id' => $email_id, 'to'=> $sendTo);
+                $this->EmailSchedule->save($data);
+
+                return $sendTo;
+            }
+        } else { //Database entry does not correspond to reminders and so, return list as is.
+            return implode(';', $to);
         }
     }
 

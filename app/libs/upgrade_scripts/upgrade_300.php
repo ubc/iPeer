@@ -32,6 +32,17 @@ class Upgrade300 extends UpgradeBase
      */
     public function isUpgradable()
     {
+        $sysparameter = ClassRegistry::init('SysParameter');
+        $dbv = $sysparameter->get('database.version');
+        $sysv = $sysparameter->get('system.version');
+
+        // If system.version doesn't exist, but we get a database version of 4, 
+        // then that means we're upgrading from a prior iPeer v3 installation 
+        // and don't need to run this upgrader.
+        if (empty($sysv) && $dbv == 4) {
+            return false;
+        }
+
         return parent::isUpgradable();
     }
 
@@ -55,6 +66,10 @@ class Upgrade300 extends UpgradeBase
             }
         }
 
+        // when upgrading from v2, will run through all the delta_*.sql files
+        // up to $this->dbVersion because the database version wasn't stored in
+        // the database, so PHP get a null value back, which is then treated
+        // as if we're starting from version 0 
         $sysparameter = ClassRegistry::init('SysParameter');
         $dbv = $sysparameter->getDatabaseVersion();
         $ret = $this->patchDb($dbv, $this->dbVersion);
@@ -64,8 +79,8 @@ class Upgrade300 extends UpgradeBase
         }
         $sysparameter->reload();
 
-        if (!file_exists(CONFIGS.'installed.txt')) {
-            $f = fopen(CONFIGS.'installed.txt', 'w');
+        if (!file_exists(TMP.'installed.txt')) {
+            $f = fopen(TMP.'installed.txt', 'w');
             if (!$f) {
                 $this->errors[] = sprintf(__('Installation failed, unable to write to %s dir', true), CONFIGS);
                 return false;

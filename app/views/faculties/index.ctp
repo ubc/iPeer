@@ -72,7 +72,7 @@ jQuery(document).ready(
             "sPaginationType" : "full_numbers",
             "aoColumnDefs": [
                 {"aTargets": [ 0 ], "bSearchable": false, "bVisible": false, "bSortable": false},
-                {"aTargets": [ 2 ], "bSortable": false}
+                {"aTargets": [ 2 ], "bSearchable": false, "bSortable": false}
             ],
             "aaSorting" : [[1, 'asc']]
         });

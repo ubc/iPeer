@@ -6,7 +6,7 @@
     <li><?php __('If password column is missing, system will generate random password for each student.')?></li>
     <li><?php __('If the user already exists, their password will NOT be changed.')?></li>
     <li><?php __('If an external authentication module is enabled (e.g. CWL or Shibboleth), password column can be ignored. Students will use external authentication module to login.')?></li>
-    <li><?php __('Please make sure to remove header from the CSV file.')?></li>
+    <li><?php __('Please make sure to remove the header from the CSV file.')?></li>
 </ul>
 
 <h3><?php __('Formatting:')?></h3>
@@ -29,6 +29,9 @@ echo $this->Form->create(null, array('type' => 'file'));
 echo $this->Form->input('file', array('type' => 'file', 'name' => 'file'));
 echo $this->Form->input('Course', 
     array('multiple' => false, 'default' => $courseId));
+echo $this->Form->input('update_class',
+    array('type'=>'checkbox'));
+?><div class="help-text"><?php __('Remove old students and add new students.')?></div><?php
 echo $this->Form->submit(__('Import', true));
 echo $this->Form->end();
 ?>

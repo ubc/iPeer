@@ -11,4 +11,8 @@ class CourseDepartmentTestCase extends CakeTestCase {
 
 	function endTest() {
 	}
+	
+	function testinsertCourses() {
+	    //TODO
+	}
 }

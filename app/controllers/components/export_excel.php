@@ -18,7 +18,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
     public $alphaNumeric;
     public $cursor = array();
     public $components = array('ExportHelper2');
-    public $EvaluationSubmission, $EvaluationSimple, $EvaluationRubric, $User, $GroupsMembers, $GroupEvent, $EvaluationMixeval, $MixevalsQuestion, $Event, $Group;
+    public $EvaluationSubmission, $EvaluationSimple, $EvaluationRubric, $User, $GroupsMembers, $GroupEvent, $EvaluationMixeval, $MixevalQuestion, $Event, $Group;
 
     /**
      * __construct
@@ -330,10 +330,10 @@ Class ExportExcelComponent extends ExportBaseNewComponent
             $row = array();
             $ques = array();
             $submissionCount = 0;
-            array_push($ques, $q['MixevalsQuestion']['title'].' (/'.$q['MixevalsQuestion']['multiplier'].')'.',');
+            array_push($ques, $q['MixevalQuestion']['title'].' (/'.$q['MixevalQuestion']['multiplier'].')'.',');
             foreach ($groupMembers as $evaluator) {
                 $evalResult = $this->EvaluationMixeval->getResultDetailByQuestion($grpEventId, $evaluatee['id'],
-                    $evaluator['id'], $q['MixevalsQuestion']['question_num']-1);
+                    $evaluator['id'], $q['MixevalQuestion']['question_num']-1);
                 if (!empty($evalResult)) {
                     $submissionCount++;
                     $result = $evalResult['EvaluationMixevalDetail']['grade'];
@@ -516,7 +516,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
     function _buildMixEvalQuestionCommentTable($params ,$grpEventId)
     {
         $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
-        $this->MixevalsQuestion = ClassRegistry::init('MixevalsQuestion');
+        $this->MixevalQuestion = ClassRegistry::init('MixevalQuestion');
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
         $this->Event = ClassRegistry::init('Event');
 
@@ -524,10 +524,10 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         $groupCount = count($groupMembersNoTutors);
         $grpEvent = $this->GroupEvent->getGrpEvent($grpEventId);
         $evaluation = $this->Event->getEventById($grpEvent['GroupEvent']['event_id']);
-        $questions = $this->MixevalsQuestion->getQuestion($evaluation['Event']['template_id'], 'T');
+        $questions = $this->MixevalQuestion->getQuestion($evaluation['Event']['template_id'], '2');
         $validQuestionNum = array();
         foreach ($questions as $q) {
-            array_push($validQuestionNum, $q['MixevalsQuestion']['question_num']-1);
+            array_push($validQuestionNum, $q['MixevalQuestion']['question_num']-1);
         }
         $qCount = count($questions);
         // Create grid
@@ -540,7 +540,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
 
         foreach ($questions as $q) {
             $this->ExportHelper2->repeatDrawByCoordinateVertical($grid, $xPosition, $questionYPos, $sectionSpacing, $groupCount,
-                "Question ".$questionNum.": ".$q['MixevalsQuestion']['title']);
+                "Question ".$questionNum.": ".$q['MixevalQuestion']['title']);
             $questionNum++;
             $questionYPos += $groupCount+1;
         }
@@ -610,8 +610,8 @@ Class ExportExcelComponent extends ExportBaseNewComponent
     /**
      * createExcel
      *
-     * @param mixed $params  params
-     * @param mixed $eventId event id
+     * @param mixed $params params
+     * @param mixed $event  event
      *
      * @access public
      * @return void
@@ -725,7 +725,8 @@ Class ExportExcelComponent extends ExportBaseNewComponent
             }
             break;
 
-        default: throw new Exception("Event id input seems to be invalid!");
+        default:
+            throw new Exception("Event id input seems to be invalid!");
         }
         //return $CSV;
         $this->_output($params['file_name']);

@@ -17,6 +17,8 @@ class RubricTestCase extends CakeTestCase
         'app.faculty', 'app.user_faculty', 'app.department',
         'app.course_department', 'app.sys_parameter', 'app.user_tutor',
         'app.penalty', 'app.evaluation_simple', 'app.survey_input',
+        'app.oauth_token', 'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
+        'app.evaluation_rubric', 'app.evaluation_rubric_detail'
     );
     public $Rubric = null;
 
@@ -52,6 +54,7 @@ class RubricTestCase extends CakeTestCase
 
         // Assert that Rubrics was saved correctly
         $rubric = $this->Rubric->find('first', array('conditions' => array('Rubric.id' => 50)));
+
         $this->assertEqual($rubric['Rubric']['id'], $tmp['Rubric']['id']);
         $this->assertEqual($rubric['Rubric']['name'], $tmp['Rubric']['name']);
 
@@ -125,7 +128,7 @@ class RubricTestCase extends CakeTestCase
                 'name' => 'Some Rubric',
                 'lom_max' => 2,
                 'criteria' => 50,
-                'availability' => '',
+                'availability' => 1,
                 'zero_mark' => 0,
                 'criteria_mark_0_0' => 0.5,
                 'criteria_mark_0_1' => 1

@@ -98,13 +98,13 @@ $evalExpired = getNonUpcomingTableArray($html, $evals['expired']);
 $surveyExpired = getNonUpcomingTableArray($html, $surveys['expired']);
 
 if ($numOverdue) {
-    echo "<div class='eventSummary overdue'>$numOverdue Overdue Events</div>";
+    echo "<div class='eventSummary overdue'>$numOverdue Overdue Event(s)</div>";
 }
 if ($numDue) {
-    echo "<div class='eventSummary pending'>$numDue Pending Events Total</div>";
+    echo "<div class='eventSummary pending'>$numDue Pending Event(s) Total</div>";
 }
 else {
-    echo "<div class='eventSummary alldone'>No Events Pending</div>";
+    echo "<div class='eventSummary alldone'>No Event(s) Pending</div>";
 }
 ?>
 

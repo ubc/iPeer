@@ -14,6 +14,21 @@ App::import('Lib', 'toolkit');
 App::import('Lib', 'breadcrumb');
 
 /**
+ * _t
+ * because CakePHP 1.3's internationalization __() call is stupid and wants
+ * you to pass an extra parameter for no reason to get a string, use this
+ * instead.
+ *
+ * @param mixed $str
+ *
+ * @access public
+ * @return void
+ */
+function _t($str) {
+    return __($str, true);
+}
+
+/**
  * AppController the base controller
  *
  * @uses Controller
@@ -30,6 +45,7 @@ class AppController extends Controller
     public $access     = array ();
     public $actionList = array ();
     public $breadcrumb;
+    public $validTZ;
 
     /**
      * if this request has session transfer data
@@ -51,6 +67,7 @@ class AppController extends Controller
     public function __construct()
     {
         parent::__construct();
+        $this->validTZ = array_flip(DateTimeZone::listIdentifiers(DateTimeZone::ALL_WITH_BC));
     }
 
     /**
@@ -61,6 +78,18 @@ class AppController extends Controller
      */
     public function beforeFilter()
     {
+        $timezone = $this->SysParameter->findByParameterCode('system.timezone');
+        // default to UTC if no timezone is set
+        if (!(empty($timezone) || empty($timezone['SysParameter']['parameter_value']))) {
+            $timezone = $timezone['SysParameter']['parameter_value'];
+            // check that the timezone is valid
+            if (isset($this->validTZ[$timezone])) {
+                date_default_timezone_set($timezone);
+            } else {
+                $this->Session->setFlash(__('An invalid timezone is provided, please edit "system.timezone"', true));
+            }
+        }
+
         $this->Auth->autoRedirect = false;
         // backward compatible with original ipeer hash  method
         Security::setHash('md5');
@@ -96,6 +125,14 @@ class AppController extends Controller
 
             $this->_checkDatabaseVersion();
         }
+
+        // for setting up google analytics
+        $trackingId = $this->SysParameter->findByParameterCode('google_analytics.tracking_id');
+        $domain = $this->SysParameter->findByParameterCode('google_analytics.domain');
+        $customLogo = $this->SysParameter->findByParameterCode('banner.custom_logo');
+        $this->set('trackingId', $trackingId);
+        $this->set('domain', $domain);
+        $this->set('customLogo', $customLogo);
 
         parent::beforeFilter();
     }
@@ -210,6 +247,7 @@ class AppController extends Controller
             // after login stuff
             $this->User->loadRoles(User::get('id'));
             $this->AccessControl->loadPermissions();
+            $this->SysParameter->reload();
             //TODO logging!
         }
 

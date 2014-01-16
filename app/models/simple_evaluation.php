@@ -32,10 +32,36 @@ class SimpleEvaluation extends EvaluationBase
     public $validate = array(
         'availability' => array(
             'rule' => 'notEmpty',
-            'message' => 'Please select an availability option'
-        )
+            'message' => 'Please select an availability option.'
+        ),
+        'name' => array(
+            'unique' => array(
+                'rule' => 'isUnique',
+                'message' => 'Duplicate name found. Please change the name.'
+            ),
+            'required' => array(
+                'rule' => 'notEmpty',
+                'message' => 'Please give the evaluation template a name.'
+            )
+        ),
+        'point_per_member' => array(
+            'valid' => array(
+                'rule' => array('comparison', '>', 0),
+                'message' => 'Please enter a positive integer.'
+            ),
+        ),
     );
 
+
+
+    /**
+     * getEvaluation
+     *
+     * @param mixed $id id
+     * 
+     * @access public
+     * @return void
+     */
     public function getEvaluation($id)
     {
         $eval = $this->find('first', array('conditions' => array($this->alias.'.id' => $id), 'contain' => false));

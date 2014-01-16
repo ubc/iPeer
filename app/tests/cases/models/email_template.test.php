@@ -35,25 +35,6 @@ class EmailTemplateTestCase extends CakeTestCase
     {
     }
 
-    function testGetMyEmailTemplate()
-    {
-        //Test on valid input w/ find all
-        $templates = $this->EmailTemplate->getMyEmailTemplate('1', 'all');
-        $this->assertEqual(count($templates), 2);
-        $this->assertEqual($templates[0]['EmailTemplate']['id'], 1);
-        $this->assertEqual($templates[1]['EmailTemplate']['id'], 2);
-        $this->assertEqual($templates[0]['EmailTemplate']['name'], 'Submission Confirmation');
-        $this->assertEqual($templates[1]['EmailTemplate']['name'], 'Email template example');
-
-        //Test on valid input w/ find list
-        $templates = $this->EmailTemplate->getMyEmailTemplate('1', 'list');
-        $this->assertEqual($templates, array('1' => 'Submission Confirmation', '2' => 'Email template example'));
-
-        //Test on null input
-        $templates = $this->EmailTemplate->getMyEmailTemplate(null);
-        $this->assertEqual($templates, null);
-    }
-
     function testGetPermittedEmailTemplate()
     {
         //Test on valid input w/ find all
@@ -80,20 +61,5 @@ class EmailTemplateTestCase extends CakeTestCase
         //Test on null input
         $templates = $this->EmailTemplate->getPermittedEmailTemplate(null);
         $this->assertEqual($templates, array());
-    }
-
-    function testGetCreatorId()
-    {
-        //Test on valid input
-        $creator_id = $this->EmailTemplate->getCreatorId('3');
-        $this->assertEqual($creator_id, '2');
-
-        //Test on invalid input
-        $creator_id = $this->EmailTemplate->getCreatorId('10');
-        $this->assertEqual($creator_id, null);
-
-        //null input
-        $creator_id = $this->EmailTemplate->getCreatorId(null);
-        $this->assertEqual($creator_id, null);
     }
 }

@@ -12,8 +12,10 @@ class EventsController extends AppController
 {
     public $name = 'Events';
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time');
-    public $uses = array('GroupEvent', 'User', 'Group', 'Course', 'Event', 'EventTemplateType', 'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers', 'Penalty', 'Survey');
-    public $components = array("AjaxList", "Session");
+    public $uses = array('GroupEvent', 'User', 'Group', 'Course', 'Event', 'EventTemplateType',
+        'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers', 'Penalty', 'Survey','EmailSchedule',
+        'EvaluationSubmission');
+    public $components = array("AjaxList", "Session", "RequestHandler","Email");
 
     /**
      * __construct
@@ -46,6 +48,8 @@ class EventsController extends AppController
         foreach ($data as $i => $entry) {
             $releaseDate = strtotime($entry["Event"]["release_date_begin"]);
             $endDate = strtotime($entry["Event"]["release_date_end"]);
+            $resultStart = strtotime($entry['Event']['result_release_date_begin']);
+            $resultEnd = strtotime($entry['Event']['result_release_date_end']);
             $timeNow = time();
 
             if (!$releaseDate) {
@@ -69,6 +73,28 @@ class EventsController extends AppController
 
             // Set the view results column
             $entry['!Custom']['results'] = __("Results", true);
+
+            if ($entry['Event']['event_template_type_id'] == 3) {
+                $entry['!Custom']['resultReleased'] = 'N/A';
+            } else if ($timeNow < $resultStart) {
+                $entry['!Custom']['resultReleased'] = 'Not Yet';
+            } else if ($timeNow >= $resultEnd) {
+                $entry['!Custom']['resultReleased'] = 'Closed';
+            } else if ($entry['Event']['auto_release']){
+                $entry['!Custom']['resultReleased'] = 'Auto';
+            } else {
+                $entry['!Custom']['resultReleased'] = 'Manual';
+            }
+            
+            // group count
+            if ($entry['Event']['event_template_type_id'] == 3) {
+                $entry['!Custom']['group_count'] = 'N/A';
+            } else if ($entry['Event']['group_count'] > 0) {
+                $entry['!Custom']['group_count'] = $entry['Event']['group_count'];
+            } else {
+                // evaluation event without any groups - warning
+                $entry['!Custom']['group_count'] = "<font color='red'>0</font>";
+            }
 
             // Write the entry back
             $data[$i] = $entry;
@@ -96,9 +122,11 @@ class EventsController extends AppController
         $columns = array(
             array("Event.id",             "",            "",     "hidden"),
             array("Course.id",            "",            "",     "hidden"),
+            array("Event.group_count", "", "", "hidden"),
             array("Course.course",        __("Course", true),      "9em", "action", "View Course"),
             array("Event.Title",          __("Title", true),       "auto", "action", "View Event"),
             array("!Custom.results",       __("View", true),       "4em", "action", "View Results"),
+            array("!Custom.group_count", __("Groups", true), "2em", "string"),
             array("Event.event_template_type_id", __("Type", true), "", "map",
             array(
                 "1" => __("Simple", true),
@@ -107,14 +135,14 @@ class EventsController extends AppController
                 "4" => __("Mixed", true))),
             array("Event.due_date",       __("Due Date", true),    "10em", "date"),
             array("!Custom.isReleased",    __("Released ?", true), "8em", "string"),
-            array("Event.self_eval",       __("Self Eval", true),   "6em", "map",
-            array("0" => __("Disabled", true), "1" => __("Enabled", true))),
-            array("Event.com_req",        __("Comment", true),      "6em", "map",
-            array("0" => __("Optional", true), "1" => __("Required", true))),
+            array("!Custom.resultReleased",       __("Result Released", true),   "6em", "string"),
 
             // Release window
             array("Event.release_date_begin", "", "",    "hidden"),
             array("Event.release_date_end",   "", "",    "hidden"),
+            array("Event.result_release_date_begin", "", "", "hidden"),
+            array("Event.result_release_date_end", "", "", "hidden"),
+            array("Event.auto_release", "", "", "hidden"),
         );
 
         // put all the joins together
@@ -153,6 +181,10 @@ class EventsController extends AppController
             $extraFilters .= "1=0 ) ";
         }
 
+        // Surveys cannot be exported
+        $restrictions['Event.event_template_type_id'] = array(1 => true, 2 => true,
+            4 => true, "!default" => false);
+
         // Set up actions
         $warning = __("Are you sure you want to delete this event permanently?", true);
         $actions = array(
@@ -160,7 +192,7 @@ class EventsController extends AppController
             array("View Event", "", "", "", "view", "Event.id"),
             array("Edit Event", "", "", "", "edit", "Event.id"),
             array("View Course", "", "", "courses", "view", "Course.id"),
-            array("Export Results", "", "", "evaluations", "export/event", "Event.id"),
+            array("Export Results", "", $restrictions, "evaluations", "export/event", "Event.id"),
             array("Delete Event", $warning, "", "", "delete", "Event.id"));
 
         $recursive = 0;
@@ -174,19 +206,20 @@ class EventsController extends AppController
      * index
      *
      * @param mixed $courseId
-     * @param string $message
      *
      * @access public
      * @return void
      */
     function index($courseId = null)
     {
+        $course = array('Course' => array('id' => $courseId));
         // check for permission to course ($courseId) only when $courseId is provided
         if (!is_null($courseId)) {
             $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
             if (!$course) {
                 $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
                 $this->redirect('index');
+                return;
             }
             $this->breadcrumb->push(array('course' => $course['Course']));
         }
@@ -206,8 +239,8 @@ class EventsController extends AppController
         $this->Session->write('eventsControllerCourseId', $courseId);
         $this->setUpAjaxList($courseId);
         // Set the display list
+        $this->set('course', $course);
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
-        $this->set('courseId', $courseId);
         $this->set('breadcrumb', $this->breadcrumb->push(__('Events', true)));
     }
 
@@ -230,7 +263,7 @@ class EventsController extends AppController
     /**
      * view
      *
-     * @param mixed $id
+     * @param mixed $eventId
      *
      * @access public
      * @return void
@@ -258,10 +291,9 @@ class EventsController extends AppController
         }
 
         // find the related evaluation
-        $model = ClassRegistry::init($modelName);
-        $evaluation = $model->find('first', array(
+        $evaluation = $this->$modelName->find('first', array(
             'conditions' => array('id' => $event['Event']['template_id']),
-            'contain' => false
+            'recursive' => -1
         ));
 
         //merge into event
@@ -315,6 +347,8 @@ class EventsController extends AppController
             'rubrics',
             $this->Rubric->getBelongingOrPublic($this->Auth->user('id'))
         );
+        $emailReminders = array('0'=> 'Disable', '1' => '1 Day', '2'=>'2 Days','3'=>'3 Days','4'=>'4 Days','5'=>'5 Days','6'=>'6 Days','7'=>'7 Days');
+        $this->set('emailSchedules', $emailReminders);
         $this->set('course_id', $courseId);
 
         // Try to save the data
@@ -334,9 +368,11 @@ class EventsController extends AppController
                 $this->data['Event']['template_id'] =
                     $this->data['Event']['Mixeval'];
             }
-
+            $this->data = $this->_multiMap($this->data);
             if ($this->Event->saveAll($this->data)) {
                 $this->Session->setFlash("Add event successful!", 'good');
+                //Call the setSchedule function to Schedule reminder emails
+                $this->setSchedule($this->Event->id, $this->data);
                 $this->redirect('index/'.$courseId);
                 return;
             } else {
@@ -345,10 +381,85 @@ class EventsController extends AppController
         }
     }
 
+
+    /**
+     * setSchedule
+     *
+     * @param mixed $eventId
+     * @param mixed $eventData
+     *
+     * @access public
+     * @return void
+     */
+     function setSchedule($eventId, $eventData)
+     {
+        $emailFreq = $eventData['Event']['email_schedule'];
+        $to = $this->getGroupMembers($eventId); // get members
+        if ($emailFreq == 0 || empty($to)) {
+            return;
+        }
+
+        $courseId = $this->Event->getCourseByEventId($eventId);
+        //Get the startdate, duedate and frequency of emails
+        $startDate = $eventData['Event']['release_date_begin'];
+        $startDate = strtotime($eventData['Event']['release_date_begin']) > time() ?
+            $eventData['Event']['release_date_begin'] : date('Y-m-j H:i:s');
+        $dueDate = $eventData['Event']['due_date'];
+        $emailFreq = '+' . $emailFreq . ' day';
+
+        $courseName = $this->Course->getCourseName($courseId);
+        $type = ($eventData['Event']['event_template_type_id'] == 3) ? 'Survey' : 'Evaluation';
+
+        //Prepare the data for pushing to the email_schedules table
+        $data = array();
+        $data['course_id']= $courseId;
+        $data['event_id'] = $eventId;
+        $data['from'] = $this->Auth->user('id');
+        $data['subject'] = $courseName.' - iPeer '.$type.' Reminder';
+        $data['content'] = '';
+        $data['to'] = 'save_reminder;'.implode(';', $to);
+
+        while (strtotime($startDate) < strtotime($dueDate)) {
+            $data['date'] = $startDate;
+            $startDate = strtotime($emailFreq, strtotime($startDate));
+            $startDate = date('Y-m-j H:i:s', $startDate);
+            $data = $this->_multiMap($data);
+            $this->EmailSchedule->saveAll($data);
+        }
+
+        return;
+     }
+
+    /**
+     * getGroupMembers
+     *
+     * @param mixed $eventId
+     *
+     * @access public
+     * @return void
+     */
+    function getGroupMembers($eventId)
+    {
+        $event = $this->Event->findById($eventId);
+        if ($event['Event']['event_template_type_id'] == 3) {
+            $class = $this->User->getEnrolledStudents($event['Event']['course_id']);
+
+            return Set::extract('/User/id', $class);
+        } else {
+            //Get the groups by the eventId
+            $groups = $this->GroupEvent->findAllByEventId($eventId);
+            //Get the assigned groupids and their resepctive members for the event
+            $groupIds = Set::extract('/GroupEvent/group_id', $groups);
+            $members = $this->GroupsMembers->findAllByGroupId($groupIds);
+
+            return Set::extract('/GroupsMembers/user_id', $members);
+        }
+    }
+
     /**
      * edit
      *
-     * @param mixed $id
+     * @param mixed $eventId
      *
      * @access public
      * @return void
@@ -361,6 +472,10 @@ class EventsController extends AppController
             $this->redirect('index');
             return;
         }
+
+        $orig_email_frequency = $this->calculateFrequency($eventId);
+        $this->set('email_schedule', $orig_email_frequency);
+        $event = $this->Event->getEventById($eventId);
 
         if (!empty($this->data)) {
             // need to set the template_id based on the event_template_type_id
@@ -378,6 +493,11 @@ class EventsController extends AppController
                 $this->data['Event']['template_id'] =
                     $this->data['Event']['Mixeval'];
             }
+            
+            // if all groups unselected - delete groupEvents
+            if (empty($this->data['Group']['Group'])) {
+                $this->GroupEvent->deleteAll(array('GroupEvent.event_id' => $eventId));
+            }
 
             $penaltyData = $this->Penalty->find('all', array('conditions' => array('event_id' => $eventId), 'contain' => false));
             $penalties = array();
@@ -393,8 +513,14 @@ class EventsController extends AppController
                     $this->Penalty->delete($pTmp['id']);
                 }
             }
+            $this->data = $this->_multiMap($this->data);
             if ($this->Event->saveAll($this->data)) {
                 $this->Session->setFlash("Edit event successful!", 'good');
+                if ($this->checkIfChanged($event, $this->data, $orig_email_frequency)) {
+                    // only delete emails that haven't been sent
+                    $this->EmailSchedule->deleteAll(array('event_id' => $eventId, 'sent' => 0), false);
+                    $this->setSchedule($eventId, $this->data);
+                }
                 $this->redirect('index/'.$event['Event']['course_id']);
                 return;
             } else {
@@ -440,11 +566,69 @@ class EventsController extends AppController
         } else if ($typeId == 4) {
             $this->set('mixevalSelected', $event['Event']['template_id']);
         }
+        $emailReminders = array('0'=> 'Disable', '1' => '1 Day', '2'=>'2 Days','3'=>'3 Days','4'=>'4 Days','5'=>'5 Days','6'=>'6 Days','7'=>'7 Days');
+        $this->set('emailSchedules', $emailReminders);
 
         $this->set('event', $event);
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $event['Course']))->push(array('event' => $event['Event']))->push(__('Edit', true)));
 
         $this->data = $event;
+    }
+
+    /**
+     * checkIfChanged
+     *
+     * @param mixed $event
+     * @param mixed $data
+     * @param int $email_frequency
+     *
+     * @access public
+     * @return bool -  return 1 if the data has been modified else returns 0
+     **/
+    function checkIfChanged($event, $data, $email_frequency)
+    {
+        $orig_release_date_begin = $event['Event']['release_date_begin'];
+        $orig_due_date = $event['Event']['due_date'];
+        $new_release_date_begin = $data['Event']['release_date_begin'];
+        $new_due_date = $data['Event']['due_date'];
+        $orig_frequency = $email_frequency;
+        $new_frequency =  $data['Event']['email_schedule'];
+
+        if ($orig_release_date_begin != $new_release_date_begin || $orig_due_date != $new_due_date
+            || $orig_frequency != $new_frequency) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * calculateFrequency
+     *
+     * @param int $eventId
+     *
+     * @access public
+     * @return int - email_frequency
+     **/
+    function calculateFrequency($eventId)
+    {
+        $schedule = $this->EmailSchedule->find('all', array(
+            'conditions' => array('event_id' => $eventId),
+            'order' => 'date DESC'
+        ));
+        $count = count($schedule);
+        if ($count <= 0) {
+            $email_frequency = 0;
+        } else if ($count == 1) {
+            $email_frequency = 7; // set to 7 days
+        } else {
+            // last two emails
+            $last = strtotime($schedule[0]['EmailSchedule']['date']);
+            $second = strtotime($schedule[1]['EmailSchedule']['date']);
+            $diff = $last - $second;
+            $email_frequency = ceil($diff/(60*60*24));
+        }
+        return $email_frequency;
     }
 
     /**
@@ -479,5 +663,49 @@ class EventsController extends AppController
             $this->redirect('index/'.$event['Event']['course_id']);
             return;
         }
+    }
+
+    /**
+     * checkDuplicateName
+     *
+     * @param mixed $courseId course id
+     * @param mixed $eventId  event id
+     *
+     * @access public
+     * @return void
+     */
+    function checkDuplicateName($courseId, $eventId=null)
+    {
+        if (!$this->RequestHandler->isAjax()) {
+            $this->cakeError('error404');
+        }
+        $this->layout = 'ajax';
+        $this->autoRender = false;
+
+        $conditions = array('Event.title' => $this->data['Event']['title'], 'Event.course_id' => $courseId);
+        if (!is_null($eventId)) {
+            $conditions = $conditions + array('not' => array('Event.id' => $eventId));
+        }
+
+        $sFound = $this->Event->find('all', array('conditions' => $conditions));
+
+        return ($sFound) ? __('Event title "', true).$this->data['Event']['title'].__('" already exists in this course.', true) : '';
+    }
+
+    /**
+     * _multiMap
+     *
+     * @param mixed $data data
+     *
+     * @access private
+     * @return void
+     */
+    function _multiMap($data)
+    {
+        $ret = array();
+        foreach($data as $key => $value) {
+            $ret[$key] = is_array($value) ? $this->_multiMap($value) : trim($value);
+        }
+        return $ret;
     }
 }

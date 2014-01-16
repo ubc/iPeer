@@ -25,8 +25,6 @@ class SimpleevaluationsController extends AppController
     public $uses = array('SimpleEvaluation', 'Event', 'Personalize', 'UserCourse');
     public $components = array('AjaxList');
 
-    //	public $components = array('EvaluationSimpleHelper');
-
     /**
      * __construct
      *
@@ -95,7 +93,8 @@ class SimpleevaluationsController extends AppController
             array("SimpleEvaluation.name", __("Name", true),   "12em",    "action",   "View Evaluation"),
             array("SimpleEvaluation.description", __("Description", true), "auto",  "action", "View Evaluation"),
             array("!Custom.inUse", __("In Use", true),          "4em",    "number"),
-            array("SimpleEvaluation.availability", __("Availability", true), "6em", "string"),
+            array("SimpleEvaluation.availability", __("Availability", true), "6em", "map", 
+                array('private' => 'private', 'public' => 'public')),
             array("SimpleEvaluation.point_per_member", __("Points/Member", true), "10em", "number"),
             array("SimpleEvaluation.creator_id",           "",            "",     "hidden"),
             array("SimpleEvaluation.creator",     __("Creator", true),  "10em", "action", "View Creator"),
@@ -119,14 +118,12 @@ class SimpleevaluationsController extends AppController
             $extraFilters = "";
         } else {
             $creators = array();
-            // grab course ids of the courses admin has access to
-            $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
+            // grab course ids of the courses admin/instructor has access to
+            $courseIds = User::getAccessibleCourses();
+
             // grab all instructors that have access to the courses above
-            $instructors = $this->UserCourse->find(
-                'all',
-                array(
-                    'conditions' => array('UserCourse.course_id' => $courseIds)
-            ));
+            $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+
             $extraFilters = "(";
             // only admins will go through this loop
             foreach ($instructors as $instructor) {
@@ -185,10 +182,6 @@ class SimpleevaluationsController extends AppController
      */
     function index()
     {
-        if (!User::hasPermission('controllers/simpleevaluations')) {
-            $this->Session->setFlash(__('Error: You do not have permission to access simple evaluations.', true));
-            $this->redirect('/home');
-        }
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
         // Set the display list
@@ -212,31 +205,20 @@ class SimpleevaluationsController extends AppController
     /**
      * view
      *
-     * @param mixed  $id     id
-     * @param string $layout layout
+     * @param mixed $id id
      *
      * @access public
      * @return void
      */
-    function view($id = null, $layout='')
+    function view($id = null)
     {
-        if (!User::hasPermission('controllers/simpleevaluations')) {
-            $this->Session->setFlash(__('Error: You do not have permission to view simple evaluations.', true));
-            $this->redirect('/home');
-        }
-
-        $eval = $this->SimpleEvaluation->find(
-            'first',
-            array(
-                'conditions' => array('id' => $id),
-                'contain' => array('Event' => 'EvaluationSubmission')
-            )
-        );
+        $eval = $this->SimpleEvaluation->getEventSub($id);
 
         // check to see if $id is valid - numeric & is a simple evaluation
         if (!is_numeric($id) || empty($eval)) {
             $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
+            return;
         }
 
         // check whether the user has access to the evaluation if the eval is not public
@@ -249,15 +231,8 @@ class SimpleevaluationsController extends AppController
                 // course ids
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
                 // instructors
-                $instructors = $this->UserCourse->find(
-                    'all',
-                    array(
-                        'conditions' => array('UserCourse.course_id' => $courseIds)
-                ));
-                $instructorIds = array();
-                foreach ($instructors as $instructor) {
-                    $instructorIds[] = $instructor['UserCourse']['user_id'];
-                }
+                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
                 // add the user's id
                 array_push($instructorIds, $this->Auth->user('id'));
             }
@@ -266,43 +241,38 @@ class SimpleevaluationsController extends AppController
             if (!(in_array($eval['SimpleEvaluation']['creator_id'], $instructorIds))) {
                 $this->Session->setFlash(__('Error: You do not have permission to view this evaluation', true));
                 $this->redirect('index');
+                return;
             }
         }
 
-        if ($layout != '') {
-            $this->layout = $layout;
-            if ($layout == 'pop_up') {
-                $this->set('popUp', 1);
-            }
-        }
         $data = $this->SimpleEvaluation->read(null, $id);
         $this->set('data', $data);
         $user = $this->Auth->user();
         $this->set('user', $user['User']);
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('simple_evaluations')->
+            push(Inflector::humanize(Inflector::underscore($this->action)))->
+            push($data['SimpleEvaluation']['name'])
+        );
     }
 
     /**
      * add
      *
-     * @param string $layout
-     *
      * @access public
      * @return void
      */
-    function add($layout='')
+    function add()
     {
-        if (!User::hasPermission('controllers/simpleevaluations')) {
-            $this->Session->setFlash(__('Error: You do not have permission to add simple evaluations.', true));
-            $this->redirect('/home');
-        }
-        if ($layout != '') {
-            $this->layout = $layout;
-        }
-        $this->set('title_for_layout', __('Simple Evaluations > Add Template', true));
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('simple_evaluations')->
+            push(Inflector::humanize(Inflector::underscore($this->action)))
+        );
         if (!empty($this->data)) {
             if ($this->__processForm()) {
                 $this->Session->setFlash(__("The evaluation was added successfully.", true), 'good');
                 $this->redirect('index');
+                return;
             } else {
                 $this->Session->setFlash(__("The evaluation was not added successfully.", true));
                 $this->set('data', $this->data);
@@ -321,7 +291,7 @@ class SimpleevaluationsController extends AppController
     {
         if (!empty($this->data)) {
             $this->Output->filter($this->data);//always filter
-
+            $this->data['SimpleEvaluation'] = array_map('trim', $this->data['SimpleEvaluation']);
             //Save Data
             if ($this->SimpleEvaluation->save($this->data)) {
                 $this->data['SimpleEvaluation']['id'] = $this->SimpleEvaluation->id;
@@ -343,20 +313,13 @@ class SimpleevaluationsController extends AppController
     function edit($id = null)
     {
         // retrieving the requested simple evaluation
-        $eval = $this->SimpleEvaluation->find(
-            'first',
-            array(
-                'conditions' => array('id' => $id),
-                'contain' => array('Event' => 'EvaluationSubmission')
-            )
-        );
-        // for storing submissions - for checking if there are any submissions
-        $submissions = array();
+        $eval = $this->SimpleEvaluation->getEventSub($id);
 
         // check to see if $id is valid - numeric & is a simple evaluation
         if (!is_numeric($id) || empty($eval)) {
             $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
+            return;
         }
 
         if (!User::hasPermission('functions/superadmin')) {
@@ -368,15 +331,8 @@ class SimpleevaluationsController extends AppController
                 // course ids
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
                 // instructors
-                $instructors = $this->UserCourse->find(
-                    'all',
-                    array(
-                        'conditions' => array('UserCourse.course_id' => $courseIds)
-                ));
-                $instructorIds = array();
-                foreach ($instructors as $instructor) {
-                    $instructorIds[] = $instructor['UserCourse']['user_id'];
-                }
+                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
                 // add the user's id
                 array_push($instructorIds, $this->Auth->user('id'));
             }
@@ -385,19 +341,16 @@ class SimpleevaluationsController extends AppController
             if (!(in_array($eval['SimpleEvaluation']['creator_id'], $instructorIds))) {
                 $this->Session->setFlash(__('Error: You do not have permission to edit this evaluation', true));
                 $this->redirect('index');
-            }
-        }
-
-        foreach ($eval['Event'] as $event) {
-            if (!empty($event['EvaluationSubmission'])) {
-                $submissions[] = $event['EvaluationSubmission'];
+                return;
             }
         }
 
         // check to see if submissions had been made - if yes - simple evaluation can't be edited
-        if (!empty($submissions)) {
-            $this->Session->setFlash(sprintf(__('Submissions had been made. %s cannot be edited. Please make a copy.', true), $eval['SimpleEvaluation']['name']));
-            $this->redirect('index');
+        foreach ($eval['Event'] as $event) {
+            if (!empty($event['EvaluationSubmission'])) {
+                $this->Session->setFlash(sprintf(__('Submissions had been made. %s cannot be edited. Please make a copy.', true), $eval['SimpleEvaluation']['name']));
+                $this->redirect('index');
+            }
         }
 
         $this->data['SimpleEvaluation']['id'] = $id;
@@ -405,16 +358,19 @@ class SimpleevaluationsController extends AppController
         if ($this->__processForm()) {
             $this->Session->setFlash(__('The simple evaluation was updated successfully.', true), 'good');
             $this->redirect('index');
+            return;
         } else {
-            $this->data = $this->SimpleEvaluation->find('first', array('conditions' => array('id' => $id),
-                'contain' => false));
-
+            $this->data = $this->SimpleEvaluation->findById($id);
             $this->Output->filter($this->data);//always filter
             //converting nl2br back so it looks better
             $this->Output->br2nl($this->data);
         }
 
-        $this->set('title_for_layout', __('Simple Evaluations > Edit Template', true));
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('simple_evaluations')->
+            push(Inflector::humanize(Inflector::underscore($this->action)))->
+            push($this->data['SimpleEvaluation']['name'])
+        );
     }
 
     /**
@@ -427,23 +383,13 @@ class SimpleevaluationsController extends AppController
      */
     function copy($id = null)
     {
-        if (!User::hasPermission('controllers/simpleevaluations')) {
-            $this->Session->setFlash(__('Error: You do not have permission to copy simple evaluations.', true));
-            $this->redirect('/home');
-        }
-
-        $eval = $this->SimpleEvaluation->find(
-            'first',
-            array(
-                'conditions' => array('id' => $id),
-                'contain' => array('Event' => 'EvaluationSubmission')
-            )
-        );
+        $eval = $this->SimpleEvaluation->getEventSub($id);
 
         // check to see if $id is valid - numeric & is a simple evaluation
         if (!is_numeric($id) || empty($eval)) {
             $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
+            return;
         }
 
         // can be copied if eval is public
@@ -456,15 +402,8 @@ class SimpleevaluationsController extends AppController
                 // course ids
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
                 // instructors
-                $instructors = $this->UserCourse->find(
-                    'all',
-                    array(
-                        'conditions' => array('UserCourse.course_id' => $courseIds)
-                ));
-                $instructorIds = array();
-                foreach ($instructors as $instructor) {
-                    $instructorIds[] = $instructor['UserCourse']['user_id'];
-                }
+                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
                 // add the user's id
                 array_push($instructorIds, $this->Auth->user('id'));
             }
@@ -473,9 +412,14 @@ class SimpleevaluationsController extends AppController
             if (!(in_array($eval['SimpleEvaluation']['creator_id'], $instructorIds))) {
                 $this->Session->setFlash(__('Error: You do not have permission to copy this evaluation', true));
                 $this->redirect('index');
+                return;
             }
         }
 
+        $this->set('breadcrumb',
+            $this->breadcrumb->push('simple_evaluations')->
+            push(Inflector::humanize(Inflector::underscore($this->action)))
+        );
         $this->render = false;
         $this->data = $this->SimpleEvaluation->read(null, $id);
         $this->data['SimpleEvaluation']['id'] = null;
@@ -495,24 +439,14 @@ class SimpleevaluationsController extends AppController
      */
     function delete($id = null)
     {
-        if (!User::hasPermission('controllers/simpleevaluations')) {
-            $this->Session->setFlash(__('You do not have permission to delete simple evaluations', true));
-            $this->redirect('/home');
-        }
-
         // retrieving the requested simple evaluation
-        $eval = $this->SimpleEvaluation->find(
-            'first',
-            array(
-                'conditions' => array('id' => $id),
-                'contain' => array('Event' => 'EvaluationSubmission')
-            )
-        );
+        $eval = $this->SimpleEvaluation->getEventSub($id);
 
         // check to see if $id is valid - numeric & is a simple evaluation
         if (!is_numeric($id) || empty($eval)) {
             $this->Session->setFlash(__('Invalid ID.', true));
             $this->redirect('index');
+            return;
         }
 
         if (!User::hasPermission('functions/superadmin')) {
@@ -524,15 +458,8 @@ class SimpleevaluationsController extends AppController
                 // course ids
                 $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
                 // instructors
-                $instructors = $this->UserCourse->find(
-                    'all',
-                    array(
-                        'conditions' => array('UserCourse.course_id' => $courseIds)
-                ));
-                $instructorIds = array();
-                foreach ($instructors as $instructor) {
-                    $instructorIds[] = $instructor['UserCourse']['user_id'];
-                }
+                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
                 // add the user's id
                 array_push($instructorIds, $this->Auth->user('id'));
             }
@@ -541,6 +468,7 @@ class SimpleevaluationsController extends AppController
             if (!(in_array($eval['SimpleEvaluation']['creator_id'], $instructorIds))) {
                 $this->Session->setFlash(__('Error: You do not have permission to delete this evaluation', true));
                 $this->redirect('index');
+                return;
             }
         }
 
@@ -552,10 +480,6 @@ class SimpleevaluationsController extends AppController
             $this->redirect('index');
         }
 
-    /*if (isset($this->params['form']['id'])) {
-      $id = intval(substr($this->params['form']['id'], 5));
-    }   //end if*/
-
         if ($this->SimpleEvaluation->delete($id)) {
             $this->Session->setFlash(__('The evaluation was deleted successfully.', true), 'good');
         } else {
@@ -563,10 +487,4 @@ class SimpleevaluationsController extends AppController
         }
         $this->redirect('index');
     }
-
-  /*function update($attributeCode='',$attributeValue='')
-{
-        if ($attributeCode != '' && $attributeValue != '') //check for empty params
-        $this->params['data'] = $this->Personalize->updateAttribute($this->Auth->user('id'), $attributeCode, $attributeValue);
-  }*/
 }

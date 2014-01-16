@@ -21,7 +21,6 @@ $configwritable = $no;
 $dbconfig = $no;
 $magicquotes = $yes;
 $guard_plugin = $no;
-$gdext = $no;
 
 // Optional requirements init
 $sendmail = $no;
@@ -30,9 +29,6 @@ $emailperm = $no;
 // Mandatory requirements check
 if (version_compare(phpversion(), $REQPHPVER) >= 0) {
   $phpver = $yes;
-}
-if (extension_loaded('gd') && function_exists('gd_info')) {
-    $gdext = $yes;
 }
 if (function_exists('mysql_connect')) {
   $mysql = $yes;
@@ -66,7 +62,22 @@ if($return_var == 0)
 // ldap
 $ldap = function_exists('ldap_connect') ? $yes : $no;
 
+// DOMDocment
+$domdoc = (extension_loaded('dom') && class_exists('DOMDocument')) ? $yes : $no;
+
 // Recommended requirements init
+
+// make sure that the php memory limit is at least 64 mb
+$limit = ini_get('memory_limit');
+$unit = substr($limit, -1);
+// convert to bytes 
+if ($limit == -1) $limit = 9999999999999; # no memory limit
+else if (strcasecmp($unit, 'k') == 0) $limit *= 1024;
+else if (strcasecmp($unit, 'm')) $limit *= 1024 * 1024;
+else if (strcasecmp($unit, 'g')) $limit *= 1024 * 1024 * 1024;
+$memlimit = $no;
+if ($limit >= 64 * 1024 * 1024) $memlimit = $yes;
+
 $php_recommended_settings = array(
   array (
     'name' => 'Safe Mode',
@@ -76,7 +87,7 @@ $php_recommended_settings = array(
   array (
     'name' => 'Display Errors',
     'directive' => 'display_errors',
-    'recommend' => 'ON'
+    'recommend' => 'OFF'
   ),
   array (
     'name' => 'File Uploads',
@@ -121,13 +132,10 @@ foreach ($php_recommended_settings as $key => $setting)
     <td width="30%"><?php echo $phpver; ?></td>
   </tr>
   <tr>
-    <td><?php __('PHP GD extension')?></td>
-    <td><?php echo $gdext; ?></td>
-  </tr>
-  <tr>
     <td><?php __('MySQL support')?></td>
     <td><?php echo $mysql; ?></td>
   </tr>
+  <?php if(!DB_PREDEFINED): ?>
   <tr>
     <td><?php __('Directory app/config writable ')?></td>
     <td><?php echo $configwritable; ?></td>
@@ -136,6 +144,7 @@ foreach ($php_recommended_settings as $key => $setting)
     <td><?php __('File app/config/database.php writable ')?></td>
     <td><?php echo $dbconfig; ?></td>
   </tr>
+  <?php endif; ?>
   <tr>
     <td><?php __('magic_quotes_gpc is off ')?></td>
     <td><?php echo $magicquotes; ?></td>
@@ -169,9 +178,23 @@ foreach ($php_recommended_settings as $key => $setting)
       </td>
       <td><?php echo $ldap; ?></td>
   </tr>
+  <tr>
+    <td><?php __('PHP DOMDocument.') ?>
+        <div class="help"><?php __('Required if you are planning to use TeamMaker.')?></div>
+    </td>
+    <td><?php echo $domdoc; ?></td>
 </table>
 
 <h4>Recommended</h4>
+<table>
+    <tr>
+        <td width="70%">
+        <?php __('PHP memory limit at least 64 MB') ?>
+        <div class="help"><?php __('Some operations, such as export, requires more memory when dealing with large courses.')?></div>
+        </td>
+        <td width="30%"><?php echo $memlimit ?></td>
+    </tr>
+</table>
 <table>
   <tr>
     <th width="40%"><?php __('PHP Directive')?></th>

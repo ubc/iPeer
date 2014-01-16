@@ -15,6 +15,8 @@ class UserEnrolTestCase extends CakeTestCase
         'app.user_faculty', 'app.department', 'app.course_department',
         'app.sys_parameter', 'app.user_tutor', 'app.penalty',
         'app.evaluation_simple', 'app.survey_input',
+        'app.oauth_token', 'app.evaluation_rubric', 'app.evaluation_rubric_detail',
+        'app.evaluation_mixeval', 'app.evaluation_mixeval_detail'
     );
     public $Course = null;
 
@@ -55,24 +57,5 @@ class UserEnrolTestCase extends CakeTestCase
         $user = $this->User->UserEnrol->field('id',
             array('user_id' => 26, 'course_id' => 3));
         $this->assertTrue($user);
-    }
-
-    function testGetEnrolledCourses()
-    {
-
-        //Test valid student enrolled in 2 courses
-        $courses = $this->UserEnrol->getEnrolledCourses(7);
-        $this->assertEqual(Set::extract('/UserEnrol/course_id', $courses), array(1,2));
-
-        //Test valid user not enrolled in courses
-        $this->User->removeStudent(20, 2);
-        $courses = $this->UserEnrol->getEnrolledCourses(20);
-        $this->assertEqual($courses, null);
-        $this->UserEnrol->insertCourses(20, array(2));
-
-        //Test invalid user
-        $courses = $this->UserEnrol->getEnrolledCourses(999);
-        $this->assertEqual($courses, null);
-
     }
 }

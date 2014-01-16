@@ -8,15 +8,17 @@ class MixevalTestCase extends CakeTestCase
         'app.course', 'app.role', 'app.user', 'app.group',
         'app.roles_user', 'app.event', 'app.event_template_type',
         'app.group_event', 'app.evaluation_submission',
-        'app.survey',
+        'app.survey', 'app.oauth_token',
         'app.survey_group_set', 'app.survey_group',
         'app.survey_group_member', 'app.question',
         'app.response', 'app.survey_question', 'app.user_course',
         'app.user_enrol', 'app.groups_member', 'app.mixeval',
-        'app.mixevals_question', 'app.mixevals_question_desc', 'app.faculty',
+        'app.mixeval_question', 'app.mixeval_question_desc', 'app.faculty',
         'app.user_faculty', 'app.department', 'app.course_department',
         'app.sys_parameter', 'app.user_tutor', 'app.penalty',
-        'app.evaluation_simple', 'app.survey_input',
+        'app.evaluation_simple', 'app.survey_input', 
+        'app.mixeval_question_type', 'app.evaluation_rubric', 'app.evaluation_rubric_detail',
+        'app.evaluation_mixeval', 'app.evaluation_mixeval_detail'
     );
     public $Mixeval = null;
 
@@ -118,11 +120,11 @@ class MixevalTestCase extends CakeTestCase
                     'question_num' => 0,
                     'title' => 'l1',
                     'instructions' => null,
-                    'question_type' => 'S',
+                    'mixeval_question_type_id' => '1',
                     'required' => 1,
+                    'self_eval' => 0,
                     'multiplier' => 1,
                     'scale_level' => 0,
-                    'response_type' => null
                 ),
 
                 '1' => array(
@@ -131,11 +133,11 @@ class MixevalTestCase extends CakeTestCase
                     'question_num' => 1,
                     'title' => 'c1',
                     'instructions' => 'c1i1',
-                    'question_type' => 'T',
+                    'mixeval_question_type_id' => '2',
                     'required' => 1,
+                    'self_eval' => 0,
                     'multiplier' => 0,
                     'scale_level' => 0,
-                    'response_type' => 'L'
                 ),
 
                 '2' => array(
@@ -144,11 +146,11 @@ class MixevalTestCase extends CakeTestCase
                     'question_num' => 2,
                     'title' => 'c2',
                     'instructions' => 'c2i1',
-                    'question_type' => 'T',
+                    'mixeval_question_type_id' => '2',
                     'required' => 1,
+                    'self_eval' => 0,
                     'multiplier' => 0,
                     'scale_level' => 0,
-                    'response_type' => 'L'
                 )
             )
         );

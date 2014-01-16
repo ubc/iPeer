@@ -15,7 +15,9 @@ class EvaluationRubricDetailTestCase extends CakeTestCase
         'app.evaluation_rubric', 'app.evaluation_rubric_detail',
         'app.faculty', 'app.user_faculty', 'app.user_tutor', 'app.department',
         'app.course_department', 'app.penalty',
-        'app.evaluation_simple', 'app.survey_input',
+        'app.evaluation_simple', 'app.survey_input', 'app.evaluation_rubric_detail',
+        'app.oauth_token', 'app.sys_parameter', 'app.evaluation_mixeval',
+        'app.evaluation_mixeval_detail'
     );
     public $Course = null;
 

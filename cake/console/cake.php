@@ -261,7 +261,7 @@ class ShellDispatcher {
 		);
 
 		foreach ($includes as $inc) {
-			if (!require($inc)) {
+			if (!require_once($inc)) {
 				$this->stderr("Failed to load Cake core file {$inc}");
 				return false;
 			}

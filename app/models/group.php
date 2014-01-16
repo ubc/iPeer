@@ -62,9 +62,17 @@ class Group extends AppModel
         ),
     );
     public $validate = array(
-        'group_num' => 'notEmpty',
-        'group_name' => array('rule' => 'notEmpty', 'message' => 'Please insert group name')
-        );
+        'group_name' => array(
+            'empty' => array(
+                'rule' => 'notEmpty',
+                'message' => 'Please insert group name'
+            ),
+            'duplicate' => array(
+                'rule' => 'checkDuplicate',
+                'message' => 'A group with the name already exists.'
+            )
+        )
+    );
 
     /**
      * __construct
@@ -217,18 +225,18 @@ class Group extends AppModel
     }
 
     /**
-     * findGroupByGroupNumber Get group id by group number
+     * findGroupByGroupName Get group by group name
      *
      * @param mixed $course_id
-     * @param mixed $group_num
+     * @param mixed $group_name
      *
      * @access public
      *
      * @return array of the group
      */
-    function findGroupByGroupNumber($course_id, $group_num)
+    function findGroupByGroupName($course_id, $group_name)
     {
-        return $this->find('first', array('conditions' => array('group_num' => $group_num, 'course_id' => $course_id)));
+        return $this->find('first', array('conditions' => array('group_name' => $group_name, 'course_id' => $course_id)));
     }
 
     /**
@@ -364,6 +372,14 @@ class Group extends AppModel
         );
     }
 
+    /**
+     * getGroupWithMembersById
+     *
+     * @param mixed $id id
+     * 
+     * @access public
+     * @return void
+     */
     function getGroupWithMembersById($id)
     {
         return $this->find('first', array(
@@ -372,6 +388,15 @@ class Group extends AppModel
         ));
     }
 
+    /**
+     * getGroupsByEventId
+     *
+     * @param mixed $eventId event id
+     * @param mixed $contain contain
+     * 
+     * @access public
+     * @return void
+     */
     function getGroupsByEventId($eventId, $contain = array())
     {
         return $this->find('all', array(
@@ -380,11 +405,29 @@ class Group extends AppModel
         ));
     }
 
+    /**
+     * getGroupByGroupIdEventId
+     *
+     * @param mixed $groupId group id
+     * @param mixed $eventId event id
+     * 
+     * @access public
+     * @return void
+     */
     function getGroupByGroupIdEventId($groupId, $eventId)
     {
         return $this->getGroupByGroupIdEventIdMemberId($groupId, $eventId, null);
     }
 
+    /**
+     * getGroupWithMemberRoleByGroupIdEventId
+     *
+     * @param mixed $groupId group id
+     * @param mixed $eventId event id
+     * 
+     * @access public
+     * @return void
+     */
     function getGroupWithMemberRoleByGroupIdEventId($groupId, $eventId)
     {
         $group = $this->getGroupByGroupIdEventIdMemberId($groupId, $eventId, null);
@@ -441,5 +484,22 @@ class Group extends AppModel
         }
 
         return $group;
+    }
+    
+    /**
+     * checkDuplicate checks for duplicate group name in the course
+     *
+     * @access public
+     * @return void
+     */
+    function checkDuplicate()
+    {
+        $conditions['Group.course_id'] = $this->data['Group']['course_id'];
+        // edit groups have group id & doesn't make sense for them not being able to keep their name
+        if (isset($this->data['Group']['id'])) {
+            $conditions['Group.id !='] = $this->data['Group']['id'];
+        }
+        $names = Set::extract('/Group/group_name', $this->find('all', array('conditions' => $conditions)));;
+        return !in_array($this->data['Group']['group_name'], $names);
     }
 }

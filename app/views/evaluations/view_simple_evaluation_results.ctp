@@ -28,19 +28,37 @@
 <!-- Users who haven't done the evaluation yet table -->
 <table class="standardtable">
 <?php
-if (!$allMembersCompleted) {
+if (!empty($results['Incomplete'])) {
     echo $html->tableHeaders(
-        array(__('These people have not yet submitted their evaluations',true)),
+        array(__('Have not submitted their evaluations', true)),
         null,
         array('class' => 'red')
     );
-    $incompletedMembersArr = array();
     $users = array();
-    foreach($inCompletedMembers as $row) {
-        $user = $row['User'];
-        array_push($incompletedMembersArr, $user['full_name']);
-        $users[] = array($user['full_name'] .
-            ($row['Role'][0]['id']==4 ? ' (TA)' : ' (student)'));
+    foreach($results['Incomplete'] as $userid) {
+        $user = $results['evaluators'][$userid];
+        $users[] = array($user['User']['full_name'] .
+            ($user['Role'][0]['id']==4 ? ' (TA)' : ' (student)'));
+    }
+    echo $html->tableCells($users);
+}
+?>
+</table>
+
+<!-- Users who have left the group -->
+<table class="standardtable">
+<?php
+if (!empty($results['Dropped'])) {
+    echo $html->tableHeaders(
+        array(__('Left the group, but had submitted or were evaluated', true)),
+        null,
+        array('class' => 'blue')
+    );
+    $users = array();
+    foreach($results['Dropped'] as $userid) {
+        $user = $results['evaluators'][$userid];
+        $users[] = array($user['User']['full_name'] .
+            ($user['Role'][0]['id']==4 ? ' (TA)' : ' (student)'));
     }
     echo $html->tableCells($users);
 }
@@ -48,18 +66,32 @@ if (!$allMembersCompleted) {
 </table>
 
 <h3><?php __('Evaluation Results')?></h3>
+<?php
+if ($event['Event']['auto_release']) {
+    echo "<div id='autoRelease_msg' class='green'>";
+    echo __("Auto Release is ON, you do not need to manually release the grades and comments", true);
+    echo "</div><br>";
+}
+?>
 <!-- Point Distribution Table -->
 <table class='standardtable'>
 <tr>
     <th rowspan="2"><?php __('Evaluator')?></th>
-    <th colspan='<?php echo count($groupMembersNoTutors);?>'>
+    <th colspan='<?php echo count($results['evaluatees']);?>'>
     <?php __('Members Evaluated')?>
     </th>
 </tr>
 <tr>
     <?php
-    foreach ($groupMembersNoTutors as $member) {
-        echo '<th>'.$member['User']['full_name'].'</th>';
+    foreach ($results['evaluatees'] as $member) {
+        $class = "";
+        if (in_array($member['User']['id'], $results['Dropped'])) {
+            $class = "class='blue'";
+        }
+        else if (in_array($member['User']['id'], $results['Incomplete'])) {
+            $class = "class='red'";
+        }
+        echo "<th $class>" . $member['User']['full_name'] . '</th>';
     }
     ?>
 </tr>
@@ -67,56 +99,46 @@ if (!$allMembersCompleted) {
 // data processing for scores
 
 // first the individual scores
-foreach ($groupMembers as $evaluator) {
+foreach ($results['evaluators'] as $evaluatorId => $evaluator) {
+    $class = "";
+    if (in_array($evaluatorId, $results['Dropped'])) {
+        $class = "class='blue'";
+    }
+    else if (in_array($evaluatorId, $results['Incomplete'])) {
+        $class = "class='red'";
+    }
     echo '<tr>';
-    $evaluatorId = $evaluator['User']['id'];
-    echo '<th>'. $evaluator['User']['full_name'].'</th>';
-    foreach ($groupMembersNoTutors as $evaluatee) {
+    echo "<th $class>" . $evaluator['User']['full_name'] . '</th>';
+    foreach ($results['evaluatees'] as $evaluatee) {
         $evaluateeId = $evaluatee['User']['id'];
-        if (($evaluatorId == $evaluateeId) && !$event['Event']['self_eval']) {
-            // if no self evaluation, no score for self
-            echo '<td>-</td>';
-        } else {
-            // get the score that the evaluator gave to the evaluatee
-            if (isset($scoreRecords[$evaluatorId][$evaluateeId])) {
-                $score = $scoreRecords[$evaluatorId][$evaluateeId];
-                echo '<td>'. (is_numeric($score) ? number_format($score, 2) :
-                    $score) . '</td>';
-            } else {
-                echo '<td>0.00</td>';
-            }
+        $score = '-';
+        // get the score that the evaluator gave to the evaluatee
+        if (isset($results['Submissions'][$evaluatorId][$evaluateeId])) {
+            $score = $results['Submissions'][$evaluatorId]
+                [$evaluateeId]['score'];
+            $score = is_numeric($score) ? number_format($score, 2) : $score;
         }
+        echo "<td>$score</td>";
     }
     echo '</tr>';
 }
 ?>
 
 <tr>
-    <td colspan='<?php echo count($groupMembersNoTutors) + 1;?>'></td>
+    <td colspan='<?php echo count($results['evaluatees']) + 1;?>'></td>
 </tr>
 
 <tr>
     <th><?php __('Total'); ?></th>
 <?php
 // then the total for each user
-$memberEvaluatedCount = $event['Event']['self_eval'] ? count($scoreRecords) :
-    count($scoreRecords) - 1;
-foreach ($groupMembersNoTutors as $evaluatee) {
+foreach ($results['evaluatees'] as $evaluatee) {
     $evaluateeId = $evaluatee['User']['id'];
-    if (isset($memberScoreSummary[$evaluateeId])) {
-        $totalGrade = number_format($memberScoreSummary[$evaluateeId]['received_total_score'],2);
-        $gradePenalty = ($penalties[$evaluateeId] / 100) * $totalGrade;
-        $finalGrade = $totalGrade - $gradePenalty;
-
-        (!empty($gradePenalty) && $gradePenalty > 0) ? $stringAddOn = ' - ('."<span class=\"red\">".$gradePenalty."</span>".")".
-            "<span class=\"red\">".'*'."</span>".' = '.$finalGrade :
-            $stringAddOn = '';
-
-        echo '<td>'.$totalGrade.'</td>';
-
-    } else {
-        echo '<td> - </td>';
+    $totalGrade = '-';
+    if (isset($results['TotalGrades'][$evaluateeId])) {
+        $totalGrade = number_format($results['TotalGrades'][$evaluateeId], 2);
     }
+    echo "<td>$totalGrade</td>";
 }
 ?>
 </tr>
@@ -125,23 +147,19 @@ foreach ($groupMembersNoTutors as $evaluatee) {
     <th><?php __('Penalty'); ?> </th>
 <?php
 // the penalty for each user
-$memberEvaluatedCount = ($event['Event']['self_eval'])? count($scoreRecords) :
-    count($scoreRecords) - 1;
-foreach ($groupMembersNoTutors as $evaluatee) {
+foreach ($results['evaluatees'] as $evaluatee) {
     $evaluateeId = $evaluatee['User']['id'];
-    if (isset($memberScoreSummary[$evaluateeId])) {
-        $totalGrade = number_format($memberScoreSummary[$evaluateeId]['received_total_score'],2);
-        $gradePenalty = number_format(($penalties[$evaluateeId] / 100) * $totalGrade, 2);
-
-        (!empty($gradePenalty) && $gradePenalty > 0) ? $stringAddOn = "<span class=\"red\">".$gradePenalty." </span>".
-            "(".$penalties[$evaluateeId]."%)":
-            $stringAddOn = '-';
-
-        echo '<td>'.$stringAddOn.'</td>'."\n\t\t";
-
-    } else {
-        echo '<td> - </td>';
+    $disp = '-';
+    if (isset($results['TotalGrades'][$evaluateeId])) {
+        $totalGrade = $results['TotalGrades'][$evaluateeId];
+        $penaltyPct = $results['Penalties'][$evaluateeId];
+        $gradePenalty = ($penaltyPct / 100) * $totalGrade;
+        if ($gradePenalty > 0) {
+            $gradePenalty = number_format($gradePenalty, 2);
+            $disp = "<span class='red'>$gradePenalty</span> ($penaltyPct%)";
+        }
     }
+    echo "<td>$disp</td>";
 }
 ?>
 </tr>
@@ -150,46 +168,28 @@ foreach ($groupMembersNoTutors as $evaluatee) {
     <th><?php __('Final Mark'); ?></th>
 <?php
 // the final mark for each user
-$memberEvaluatedCount = ($event['Event']['self_eval']) ? count($scoreRecords) :
-    count($scoreRecords) - 1;
-foreach ($groupMembersNoTutors as $evaluatee) {
+foreach ($results['evaluatees'] as $evaluatee) {
     $evaluateeId = $evaluatee['User']['id'];
-    if (isset($memberScoreSummary[$evaluateeId])) {
-        $totalGrade = number_format($memberScoreSummary[$evaluateeId]['received_total_score'],2);
-        $gradePenalty = ($penalties[$evaluateeId] / 100) * $totalGrade;
-        $finalGrade = number_format($totalGrade - $gradePenalty, 2);
-
-        echo '<td>'.$finalGrade.'</td>';
-
-    } else {
-        echo '<td> - </td>';
+    $finalGrade = '-';
+    if (isset($results['FinalGrades'][$evaluateeId])) {
+        $finalGrade = number_format($results['FinalGrades'][$evaluateeId], 2);
     }
-}?>
+    echo "<td>$finalGrade</td>";
+}
+?>
 </tr>
 
 <tr>
     <th><?php __('# of Evaluator(s)')?></th>
 <?php
 // the number of evaluators for each user
-$memberEvaluatedCount = ($event['Event']['self_eval']) ? count($scoreRecords) :
-    count($scoreRecords) - 1;
-foreach ($groupMembersNoTutors as $evaluatee) {
+foreach ($results['evaluatees'] as $evaluatee) {
     $evaluateeId = $evaluatee['User']['id'];
-    if (isset($memberScoreSummary[$evaluateeId])) {
-        if ($event['Event']['self_eval']) {
-            // with self_eval on, calculation is simple
-            echo '<td>'.($memberEvaluatedCount-(count($inCompletedMembers))).'</td>';
-        } else {
-            // with self_eval off, we need to handle the case that
-            // the member hasn't completed the evaluation
-            if (!empty($incompletedMembersArr) && in_array($evaluatee['User']['full_name'], $incompletedMembersArr))
-                echo '<td>'.($memberEvaluatedCount-(count($inCompletedMembers))+1).'</td>';
-            else
-                echo '<td>'.($memberEvaluatedCount-(count($inCompletedMembers))).'</td>';
-        }
-    } else {
-        echo '<td> - </td>';
+    $numEvaluators = '-';
+    if (isset($results['NumEvaluators'][$evaluateeId])) {
+        $numEvaluators = $results['NumEvaluators'][$evaluateeId];
     }
+    echo "<td>$numEvaluators</td>";
 }
 ?>
 </tr>
@@ -198,37 +198,17 @@ foreach ($groupMembersNoTutors as $evaluatee) {
     <th><?php __('Average Received')?></th>
 <?php
 // the average for each user
-$memberEvaluatedCount = ($event['Event']['self_eval']) ? count($scoreRecords) :
-    count($scoreRecords) - 1;
-foreach ($groupMembersNoTutors as $evaluatee) {
+foreach ($results['evaluatees'] as $evaluatee) {
     $evaluateeId = $evaluatee['User']['id'];
-    $totalScore = $memberScoreSummary[$evaluateeId]['received_total_score'];
-    $gradePenalty = ($penalties[$evaluateeId] / 100) * $totalScore;
-    $finalGrade = $totalScore - $gradePenalty;
-    if (isset($memberScoreSummary[$evaluateeId])) {
-        if ($event['Event']['self_eval']) {
-            // with self_eval on, calculation is simple
-            echo '<td >'.number_format($memberScoreSummary[$evaluateeId]['received_total_score'] / ($memberEvaluatedCount-count($inCompletedMembers)), 2).'</td>';
-        } else {
-            // with self_eval off, we need to handle the case that
-            // the member hasn't completed the evaluation
-            if (!empty($incompletedMembersArr) && in_array($evaluatee['User']['full_name'], $incompletedMembersArr)) {
-                if ($memberEvaluatedCount > count($inCompletedMembers)) {
-                    echo '<td>'.number_format($finalGrade / ($memberEvaluatedCount-(count($inCompletedMembers))+1), 2).'</td>';
-                } else {
-                    echo '<td>'.number_format($finalGrade).'</td>';
-                }
-            } else {
-                if ($memberEvaluatedCount > count($inCompletedMembers)) {
-                    echo '<td>'.number_format($finalGrade / ($memberEvaluatedCount-count($inCompletedMembers)), 2).'</td>';
-                } else {
-                    echo '<td>'.number_format($finalGrade).'</td>';
-                }
-            }
-        }
-    } else {
-        echo '<td> - </td>';
+    $avgScore = '-';
+    if (isset($results['NumEvaluators'][$evaluateeId])) {
+        $totalGrade = (float) $results['TotalGrades'][$evaluateeId];
+        $numEvaluators = $results['NumEvaluators'][$evaluateeId];
+        $penalty = (1 - $results['Penalties'][$evaluateeId] / 100);
+        $avgScore = $totalGrade * $penalty / $numEvaluators;
+        $avgScore = number_format($avgScore, 2);
     }
+    echo "<td>$avgScore</td>";
 }
 ?>
 </tr>
@@ -237,25 +217,34 @@ foreach ($groupMembersNoTutors as $evaluatee) {
     <td><?php __('Grade Release')?></td>
 <?php
 // controls to initiate grade release
-$n=0;
-for ($m=0; $m<count($groupMembersNoTutors); $m++) {
-    if(array_key_exists($groupMembersNoTutors[$m]['User']['id'], $gradeReleaseStatus)){
-        $gradeRelease = $gradeReleaseStatus[$groupMembersNoTutors[$m]['User']['id']];
-        echo '<td>';
-        if (isset($gradeRelease['grade_release']) && $gradeRelease['grade_release']) {?>
-            <input type="button" name="Unrelease" value="Unrelease" onclick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$groupMembersNoTutors[$m]['User']['id'].';'.$event['GroupEvent']['id'].';0'; ?>'">
-           <?php } else { ?>
-            <input type="button" name="Release" value="Release" onclick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$groupMembersNoTutors[$m]['User']['id'].';'.$event['GroupEvent']['id'].';1'; ?>'">
-<?php }
-echo '</td>';
-    } else
-        echo '<td><input type="button" value="'.__('marks n/a', true).'" disabled /></td>';
+foreach ($results['evaluatees'] as $evaluatee) {
+    $evaluateeId = $evaluatee['User']['id'];
+    $button = $form->button(__('N/A', true), array('disabled' => 'disabled'));
+    if (array_key_exists($evaluateeId, $results['ReleaseStatus'])) {
+        $status = $results['ReleaseStatus'][$evaluateeId];
+        $buttonName = "Release";
+        $releaseAction = '1';
+        if (isset($status['grade_release']) && $status['grade_release']) {
+            $buttonName = "Unrelease";
+            $releaseAction = '0';
+        }
+        $eventId = $event['Event']['id'];
+        $groupId = $event['Group']['id'];
+        $grpEventId = $event['GroupEvent']['id'];
+        $button = $form->button(
+            $buttonName,
+            array(
+                'onclick' => "location.href='/evaluations/markGradeRelease/$eventId;$groupId;$evaluateeId;$grpEventId;$releaseAction'"
+            )
+        );
+    }
+    echo "<td>$button</td>";
 }
 ?>
 </tr>
 
 <tr>
-	<td colspan="<?php echo count($groupMembersNoTutors) + 1; ?>">
+	<td colspan="<?php echo count($results['evaluatees']) + 1; ?>">
     <form name="evalForm" id="evalForm" method="POST" action="<?php echo $html->url('markEventReviewed') ?>">
     <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
     <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>" />
@@ -263,10 +252,10 @@ echo '</td>';
     <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>" />
     <?php
     if ($event['GroupEvent']['marked'] == "reviewed") {
-        echo "<input type=\"submit\" name=\"mark_not_reviewed\" value=\" ".__('Mark Peer Evaluations as Not Reviewed', true)."\" />";
+        echo "<input type='submit' name='mark_not_reviewed' value=' ".__('Mark Peer Evaluations as Not Reviewed', true)."' />";
     }
     else {
-        echo "<input type=\"submit\" name=\"mark_reviewed\" value=\" ".__('Mark Peer Evaluations as Reviewed', true)."\" />";
+        echo "<input type='submit' name='mark_reviewed' value=' ".__('Mark Peer Evaluations as Reviewed', true)."' />";
     }
     ?>
     </form>
@@ -278,51 +267,62 @@ echo '</td>';
 <!-- Comment Section -->
 
 <h2><?php __('Comment Sections')?></h2>
-<h4><?php __('Instructions'); ?></h4>
-<ul>
+<h3><?php __('Instructions'); ?></h3>
+<ul class="instructions">
 <li><?php __('Check the "Released" checkbox and click "Save Changes" to release individual comments , or')?></li>
 <li><?php __('Click "Release All" or "Unrelease All" buttons to release or unrelease all comments.')?></li>
+<?php if ($event['Event']['auto_release']) {
+    echo "<li class='green'>".__("Auto Release is ON, you do not need to manually release the grades and comments", true)."</li>";
+} ?>
 </ul>
 
 <form name="evalForm2" id="evalForm2" method="POST" action="<?php echo $html->url('markCommentRelease') ?>">
 <?php
 // controls to release comments
-foreach ($groupMembers as $row) {
-    $user = $row['User'];
-    echo '<h3>Evaluator: '.$user['full_name'].'</h3>';
-    $headers = array(
-        __('Evaluatee', true),
-        __('Comment', true),
-        __('Released', true)
-    );
-    echo "<table class='standardtable'>";
-    echo $html->tableHeaders($headers);
-    $comments = array();
-    $i = 0;
-    foreach ($evalResult[$user['id']] as $row) {
-        // We need to skip self-evaluation results
-        if (($groupMembersNoTutors[$i]['User']['id']==$user['id']) && (!$event['Event']['self_eval'])) {
-            $i++;
+if (isset($results['Submissions'])) {
+    foreach ($results['Submissions'] as $evaluatorId => $evaluator) {
+        $class = "";
+        if (in_array($evaluatorId, $results['Dropped'])) {
+            $class = "class='blue'";
         }
-
-        $evaluatee = $groupMembersNoTutors[$i++]['User'];
-        $evalMark = isset($row['EvaluationSimple'])? $row['EvaluationSimple']: null;
-        echo '<tr>';
-        if (isset($evalMark)) {
-            echo '<td width="15%">'.$evaluatee['full_name'].'</td>';
-            echo '<td>';
-            echo (isset($evalMark['comment']))? $evalMark['comment'] : __('No Comments', true);
-            echo '</td>' ;
-            $checked = $evalMark['release_status'] == 1 ? 'checked' : '';
-            // made explicit comparison with 1
-            echo '<td width="5%">' . '<input type="checkbox" name="release' .  $evalMark['evaluator']  . '[]" value="' . $evalMark['evaluatee'] . '" '.$checked.'/>';
-            echo '<input type="hidden" name="evaluator_ids[]" value="' .  $evalMark['evaluator']  . '" /></td>';
-        } else {
-            echo '<td colspan="4">'.__('n/a', true).'</td>';
+        $evaluatorInfo = $results['evaluators'][$evaluatorId]['User'];
+        echo "<h3 $class>Evaluator: ".$evaluatorInfo['full_name'].'</h3>';
+        $headers = array(__('Evaluatee', true), __('Comment', true), __('Released', true));
+        echo "<table class='standardtable'>";
+        echo $html->tableHeaders($headers);
+        $cells = array();
+        foreach ($evaluator as $evaluateeId => $evalMark) {
+            $class = "";
+            if (in_array($evaluateeId, $results['Dropped'])) {
+                $class = "blue";
+            }
+            else if (in_array($evaluateeId, $results['Incomplete'])) {
+                $class = "red";
+            }
+            $evaluateeInfo = $results['evaluators'][$evaluateeId]['User'];
+            $tmp = array();
+            $tmp[] = array($evaluateeInfo['full_name'],
+                array('width' => '15%', 'class' => $class));
+            $tmp[] = isset($evalMark['comment']) ? $evalMark['comment'] : '-';
+            $releaseChk = "";
+            $releaseChkParams = array(
+                'value' => $evalMark['evaluatee'],
+                'hiddenField' => false,
+                'name' => 'release' . $evalMark['evaluator'] . '[]'
+            );
+            if ($evalMark['release_status'] == 1) {
+                $releaseChkParams['checked'] = 'checked';
+            }
+            $releaseChk = $form->checkbox($releaseChkParams['name'],
+                $releaseChkParams);
+            $releaseChk .= $form->hidden("evaluator_ids[]", array(
+                'value' => $evalMark['evaluator'], 'name' => 'evaluator_ids[]'));
+            $tmp[] = array($releaseChk, array('width' => '5%'));
+            $cells[] = $tmp;
         }
-        echo '</tr>';
+        echo $html->tableCells($cells);
+        echo "</table>";
     }
-    echo "</table>";
 }
 ?>
 <p style="text-align: center;">

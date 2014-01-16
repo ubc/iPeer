@@ -28,13 +28,15 @@
 <table class="standardtable">
 <tr>
     <th width=50%><?php __('Rating')?></th>
-    <th width=50%><?php __('Group Average')?></th>
+    <?php if ($event['Event']['enable_details']) { ?>
+        <th width=50%><?php __('Group Average')?></th>
+    <?php } ?>
 </tr>
 <tr>
     <td>
-        <?php if ($studentResult['gradeReleaseStatus']) {
+        <?php if ($gradeReleased) {
             $finalAvg = $studentResult['aveScore'] - $studentResult['avePenalty'];
-            ($studentResult['avePenalty'] > 0) ? ($stringAddOn = ' - '.'('.'<font color=\'red\'>'.$studentResult['avePenalty'].'</font>'.
+            ($studentResult['avePenalty'] > 0) ? ($stringAddOn = ' - '.'('.'<font color=\'red\'>'.number_format($studentResult['avePenalty'], 2).'</font>'.
                 ')'.'<font color=\'red\'>*</font>'.' = '.number_format($finalAvg, 2)) : $stringAddOn = '';
 
             echo number_format($studentResult['aveScore'], 2).$stringAddOn;
@@ -46,18 +48,21 @@
         }
         ?>
     </td>
+    <?php if ($event['Event']['enable_details']) { ?>
     <td>
         <?php
-            if ($studentResult['gradeReleaseStatus']) {
-                isset($studentResult['groupAve'])? $groupAve = $studentResult['groupAve']: $groupAve = 0;
+            if ($gradeReleased) {
+                $groupAve = isset($studentResult['groupAve']) ? $studentResult['groupAve']: 0;
                 echo number_format($groupAve, 2);
             } else {
                 echo __('Not Released', true);
             }
         ?>
     </td>
+    <?php } ?>
 </tr>
 </table>
+<?php if ($event['Event']['enable_details'] && $commentReleased) { ?>
 <table class="standardtable">
     <tr>
         <th><?php __('Comments')?> (<?php __('Randomly Ordered')?>)</th>
@@ -71,10 +76,13 @@
                 echo '<tr><td>n/a</td></tr>';
             }
         }
+    } else if ($event['Event']['auto_release']) {
+        echo '<tr><td>n/a</td></tr>';
     } else { ?>
         <tr><td><?php echo __('Not Released.', true); ?> </td></tr>
     <?php } ?>
 </table>
+<?php } ?>
 <div style="text-align: center;">
 <input type="button" name="Back" value="Back" onclick="javascript:(history.length > 1 ? history.back() : window.close());">
 </div>

@@ -14,9 +14,15 @@ class SysParameter extends AppModel
     public $actsAs = array('Traceable');
 
     public $validate = array (
-        'parameter_code' => array(
-            'rule' => 'notEmpty',
-            'message' => 'Parameter code is required',
+        'parameter_code'  => array(
+            'notEmpty' => array(
+                'rule' => 'notEmpty',
+                'message' => 'Parameter code is required'
+            ),
+            'isUnique' => array(
+                'rule' => 'isUnique',
+                'message' => 'Duplicate parameter code is found. Please select another.'
+            )
         ),
         'parameter_type' => array(
             'rule' => 'notEmpty',

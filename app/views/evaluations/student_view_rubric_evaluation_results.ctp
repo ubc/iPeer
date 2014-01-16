@@ -7,24 +7,33 @@
 <tr>
     <td>
     <?php
-    isset($scoreRecords[User::get('id')]['grade_released'])? $gradeReleaseStatus = $scoreRecords[User::get('id')]['grade_released'] : $gradeReleaseStatus = array();
-    if ($gradeReleaseStatus) {
-            $finalAvg = $memberScoreSummary[User::get('id')]['received_ave_score'] - $ratingPenalty;
-            ($ratingPenalty > 0) ? ($stringAddOn = ' - '.'('.'<font color=\'red\'>'.$ratingPenalty.'</font>'.
-                ')'.'<font color=\'red\'>*</font>'.' = '.number_format($finalAvg, 2)) : $stringAddOn = '';
+    if (isset($status)) {
+        $gradeReleased = $status['autoRelease'] || $status['grade'];
+        $commentReleased = $status['autoRelease'] || $status['comment'];
+    } else {
+        $gradeReleased = 0;
+        $commentReleased = 0;
+    }
+    if ($gradeReleased) {
+        $ave = count($evaluateeDetails) > 0 ? number_format(array_sum(Set::extract($evaluateeDetails, '/EvaluationRubric/score')) / count($evaluateeDetails), 2) : '0.00';
+        $deduction = number_format($ave * $penalty / 100, 2);
+        $finalAvg = number_format($ave * (100 - $penalty) / 100, 2);
+        ($penalty > 0) ? ($stringAddOn = ' - '.'('.'<font color=\'red\'>'.$deduction.'</font>'.
+            ')'.'<font color=\'red\'>*</font>'.' = '.$finalAvg) : $stringAddOn = '';
 
-            echo number_format($memberScoreSummary[User::get('id')]['received_ave_score'], 2).$stringAddOn;
-            $ratingPenalty > 0 ? $penaltyNote = '&nbsp &nbsp &nbsp &nbsp &nbsp ( )'.'<font color=\'red\'>*</font>'.' : '.$penalty.
-                '% late penalty.' : $penaltyNote = '';
-            echo $penaltyNote;
-        } else {
-            echo __('Not Released', true);
-        }
+        echo $ave.$stringAddOn;
+        $penalty > 0 ? $penaltyNote = '&nbsp &nbsp &nbsp &nbsp &nbsp ( )'.'<font color=\'red\'>*</font>'.' : '.$penalty.
+            '% late penalty.' : $penaltyNote = '';
+        echo $penaltyNote;
+    } else {
+        echo __('Not Released', true);
+    }
     ?>
     </td>
 </tr>
 </table>
 
+<?php if ($event['Event']['enable_details']) { ?>
 <?php echo $html->script('ricobase')?>
 <?php echo $html->script('ricoeffects')?>
 <?php echo $html->script('ricoanimation')?>
@@ -32,35 +41,9 @@
 <?php echo $html->script('ricoaccordion')?>
 <?php echo empty($params['data']['Evaluation']['id']) ? null : $html->hidden('Evaluation/id'); ?>
 
-<?php
-$numerical_index = 1;  //use numbers instead of words; get users to refer to the legend
-$color = array("", "#FF3366","#ff66ff","#66ccff","#66ff66","#ff3333","#00ccff","#ffff33");
-$membersAry = array();  //used to format result
-$groupAve = 0;
-if (isset($scoreRecords[User::get('id')])) {
-    $gradeReleased = $scoreRecords[User::get('id')]['grade_released'];
-    $commentReleased = $scoreRecords[User::get('id')]['comment_released'];
-} else {
-    $gradeReleased = 0;
-    $commentReleased = 0;
-}
-?>
-			 <!--br>Total: <?php /*$memberAve = number_format($membersAry[$user['id']]['received_ave_score'], 2);
-			                  echo number_format($membersAry[$user['id']]['received_ave_score'], 2);
-			                  echo '('.number_format($membersAry[$member['User']['id']]['received_ave_score_%']) .'%)';
-			                  if ($memberAve == $groupAve) {
-			                    echo "&nbsp;&nbsp;<< Same Mark as Group Average >>";
-			                  } else if ($memberAve < $groupAve) {
-			                    echo "&nbsp;&nbsp;<font color='#FF6666'><< Below Group Average >></font>";
-			                  } else if ($memberAve > $groupAve) {
-			                    echo "&nbsp;&nbsp;<font color='#000099'><< Above Group Average >></font>";
-			                  }*/
-			                  ?>
-			        <br><br-->
-
 <div id="accordion">
     <!-- Panel of Evaluations Results -->
-    <div id="panelResults">
+    <div id="panelResults" class="panelName">
         <div id="panelResultsHeader" class="panelheader">
             <?php echo __('Evaluation Results From Your Teammates. (Randomly Ordered)', true);?>
             <font color="red">
@@ -76,19 +59,19 @@ if (isset($scoreRecords[User::get('id')])) {
         </div>
         <div style="height: 200px;" id="panelResultsContent" class="panelContent">
             <?php
-            $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'rubricCriteria'=>$rubricCriteria, 'membersAry'=>$groupMembers, 'evalResult'=>$evalResult, 'userId'=>User::get('id'), 'scoreRecords'=>$scoreRecords);
+            $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'membersList'=>$membersList, 'details'=>$evaluateeDetails, 'penalty'=> $penalty, 'release'=>$status);
             echo $this->element('evaluations/student_view_rubric_details', $params);
             ?>
         </div>
     </div>
     <!-- Panel of Evaluations Reviews -->
-    <div id="panelReviews">
+    <div id="panelReviews" class="panelName">
         <div id="panelReviewsHeader" class="panelheader">
             <?php echo 'Review Evaluations From You.'?>
         </div>
         <div style="height: 200px;" id="panelReviewsContent" class="panelContent">
             <?php
-            $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'rubricCriteria'=>$rubricCriteria, 'membersAry'=>$groupMembers, 'evalResult'=>$reviewEvaluations, 'userId'=>User::get('id'), 'scoreRecords'=>$scoreRecords, 'isReview' => true);
+            $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'membersList'=>$membersList, 'details'=>$evaluatorDetails, 'penalty'=>$penalty);
             echo $this->element('evaluations/student_view_rubric_details', $params);
             ?>
         </div>
@@ -104,3 +87,26 @@ if (isset($scoreRecords[User::get('id')])) {
             unselectedClass: 'panelheader'});
 
 </script>
+<?php } else {
+    $grades = array();
+    foreach ($evaluateeDetails as $details) {
+        foreach ($details['EvaluationRubricDetail'] as $grade) {
+            $grades[$grade['criteria_number']][] = $grade['grade'];
+        }
+    }
+    foreach ($grades as $num => $marks) {
+        $grades[$num] = $this->Evaluation->array_avg($marks);
+    }
+    echo "<br><table class='standardtable'>";
+    echo "<tr>";
+    echo "<th width=50%>"._t('Criteria')."</th>";
+    echo "<th width=50%>"._t('Grade')."</th>";
+    echo "</tr>";
+    foreach ($rubric['RubricsCriteria'] as $ques) {
+        echo "<tr>";
+        echo "<td width=50%>".$ques['criteria']."</th>";
+        echo "<td width=50%>".number_format($grades[$ques['criteria_num']], 2)."</td>";
+        echo "</tr>";
+    }
+    echo "</table>";
+} ?>

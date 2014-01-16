@@ -103,17 +103,17 @@ p {
     width: 100%;
 }
 
-.text label, .password label, .textarea label, .select label, .checkbox label, .datetime label, .date label, .radio legend, .penaltyLabel, .file label
+.text label, .password label, .textarea label, .select label, .checkbox label, .datetime label, .date label, .radio legend, .penaltyLabel, .file label, .defLabel
 {
     float: left;
     text-align: right;
     clear: left;
     padding: 0 1em 0 0;
     width: 13em;
+    margin-top: 0.4em;
 }
 
-.text input, .password input, .textarea textarea, .select select, 
-.datetime select, .date select, .penaltyInput input, .file input
+input[type="text"], input[type="file"], input[type="password"], textarea, select
 {   
     margin: 0.35em 0.35em; 
     border-radius: 3px; 
@@ -124,7 +124,12 @@ p {
 
 .radio input
 {
-    margin: 0.5em 0.5em 0.5em 1em;
+    margin: 0.7em 0.5em 0.5em 1em;
+}
+
+.checkbox input
+{
+    margin-top: 0.7em;
 }
 
 .submit input {
@@ -137,6 +142,11 @@ p {
     width: 8em;
 }
 
+/* Make buttons a bit easier to press */
+button {
+    padding: 0.3em 0.5em;
+}
+
 a:link, a:visited {
     text-decoration: none;
 }
@@ -147,6 +157,15 @@ a:hover {
 
 .center {
     margin: 0 auto;
+}
+
+/* Make semi-centered button clusters, mainly for Save and Cancel buttons */
+.center {
+    width: 12em; /* width chosen to be near the middle of most forms */
+}
+
+.center button {
+    margin-right: 0.5em;
 }
 
 strong {
@@ -200,41 +219,64 @@ div.ui-datepicker { font-size: 0.85em; }
 .banner {
     border-top-left-radius: 8px; 
     border-top-right-radius: 8px; 
-    border: 1px solid #ddd;
     border-bottom: none;
-    background-color: #f4f4f4;
+    background-color: #fff;
 }
 
 #bannerLarge {
-    height: 98px;
-    background-image: url('../img/layout/banner_back_noborder.gif');
-    background-repeat: repeat-x;
+    height: 40px;
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+}
+
+#customLogo {
+    float: right;
+    margin-right: 1em;
 }
 
 #bannerLogoImgLeft {
-    padding-left: 1.5em;
+    padding-right: 0.5em;
 }
 
 #bannerLogoImgRight {
-    padding-right: 1.5em;
+    height: 40px;
+}
+
+#ipeerLogo {
+    float: left;
+    margin-left: 1em;
 }
 
 #bannerLogoText {
-    padding-top: 50px; 
     font-size: 1em; 
-    font-weight: 600; color: white;
-    text-shadow: 0 0 7px #222
+    font-weight: 200;
+    font-style: italic;
+}
+
+#ipeerI {
+    font-size: 32px;
+}
+
+#ipeerText {
+    font-size: 36px;
+}
+
+a#home, a#home:hover, a#home:active {
+    text-decoration: none;
+    color: black;
+    background-color: transparent;
 }
 
 /* NAVIGATION */
 #navigationOuter {
-    border: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
     border-top: none;
 }
 
 .navigation ul {
     padding: 0.5em 0; /* needed to expand the div, keep a from overflowing the ul */
-    background-color: #0a2a64;
+    background-color: white;
 }
 
 .navigation li {
@@ -250,8 +292,10 @@ div.ui-datepicker { font-size: 0.85em; }
     font-weight: 600;
     text-align: center;
     padding: 0.5em;
+    padding-bottom: 0.43em;
     padding-left: 0.6em;
     text-decoration: none;
+    background-color: #0a2a64;
 }
 
 .navigation a:hover,a:active {
@@ -267,9 +311,8 @@ div.ui-datepicker { font-size: 0.85em; }
 .navigation .miniLinks {
     font-family: 'Open Sans', serif;
     font-size: 0.8em;
-    border: none;
-    margin-right: 0.5em;
-    padding: 0.5em 1em;
+    padding: 0.4em 1em;
+    float: right;
 }
 
 /* CONTENT CONTAINER */
@@ -312,6 +355,10 @@ div.ui-datepicker { font-size: 0.85em; }
     color: orangered;
 }
 
+.blue {
+    color: blue;
+}
+
 h1.title {
     margin: 0.5em 0;
     font-weight: 600;
@@ -328,6 +375,7 @@ h2 {
 
 h3 {
     margin: 1em 0;
+    font-size: 1.1em;
     font-weight: 600;
 }
 
@@ -394,6 +442,11 @@ i {
 .login form {
     padding: 1em;
     padding-right: 0;
+}
+
+/* Datepicker */
+.ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current {
+    display: none;
 }
 
 /* HOME */
@@ -542,6 +595,17 @@ i {
     text-align: left;
 }
 
+#emailContent {
+    text-align: left;
+    padding: 1em;
+}
+
+#emailContent ul li {
+    list-style-type: circle;
+    list-style-position: inside;
+    margin: 0.5em;
+}
+
 /* edit profile - Oauth section */
 
 .oauth {
@@ -650,25 +714,38 @@ i {
     background-position: 0.5em;
 }
 
+#CourseHome .invalid {
+    text-align: center;
+    padding: 0.3em;
+    margin-bottom: 0.1em;
+    font-weight: bold;
+    background-color: salmon;
+}
+
+/* courses/move courses/import */
+
+#UserMove select, #CourseImport select {
+    width: 30em;
+}
+
+#UserMove ul li, #CourseImport ul li{
+    list-style-type: circle;
+    list-style-position: inside;
+    margin: 0.5em;
+}
+
+#CourseImport #example {
+    background-color: white;
+    border:1px solid black;
+    padding: 0.5em;
+    margin-left: 1em;
+    display: inline-block;
+    line-height: 150%;
+}
+
 /* USERS */
 
 /* users/add users/edit */
-#UserForm .text label {
-    width: 13em;
-    margin-top: 0.3em;
-}
-
-#UserForm .select label {
-    width: 13em;
-    margin-top: 0.5em;
-}
-
-#UserForm .checkbox {
-    vertical-align: middle;
-    margin-top: 0.5em;
-    margin-left: 3em;
-}
-
 #UserForm #usernameErr {
     margin-left: 14em;
 }
@@ -709,6 +786,10 @@ i {
     float: none;
 }
 
+#UserForm .checkbox {
+    vertical-align: middle;
+}
+
 #UserForm .submit input{
     width: 12em;
     margin: 2em;
@@ -719,27 +800,8 @@ i {
     display: inline-block;
 }
 
-#UserForm .email.required {
-    clear: both;
-    margin-left: 14em;
-    margin-bottom: 0.5em;
-    margin-top: 0.5em;
-}
-
-#UserForm .email.required label {
-    margin-left: 0.5em;
-}
-
-#UserForm .input.select {
-    margin-bottom: 1em;
-}
-
 #UserForm .buttons {
     margin-left: 14em;
-}
-
-#UserForm .checkbox label {
-    float: none;
 }
 
 /* users/goToClassList/ */
@@ -779,34 +841,89 @@ i {
     width: 25em;
 }
 
+#UserImport .checkbox input {
+    margin-top: 0.85em;
+}
+
+/* users/merge */
+
+#UserMergeForm ul li {
+    list-style-type: circle;
+    list-style-position: inside;
+    margin: 0.5em;
+}
+
+#UserMergeForm h3, #UserMergeForm h3 {
+    text-align: center;
+}
+
+#UserMergeForm div#form {
+    overflow: hidden;
+}
+
+#UserMergeForm label{
+    width: auto;
+}
+
+#UserMergeForm div.input.select {
+    margin-top: 2em;
+}
+
+#UserMergeForm .account {
+    width: 30em;
+}
+
+#UserMergeForm div#secondary, #UserMergeForm div#primary{
+    float: right;
+    width: 50%;
+}
+
+#UserMergeForm .search, #UserMergeForm .searchValue {
+    display: inline;
+}
+
+#UserMergeForm .searchValue {
+    width: 25em;
+}
+
+#UserMergeForm #primaryData, #UserMergeForm #secondaryData {
+    padding: 1em;
+}
+
+#UserMergeForm td {
+    width: 50%;
+}
+
+#UserMergeForm div.submit {
+    clear: both;
+}
+
 /* Courses */
 
 /* courses/add, courses/edit */
 
-#CourseAddForm .text label, #CourseAddForm .select label, 
-#CourseEditForm .text label, #CourseEditForm .select label {
-    width: 13em;
-}
-
-#CourseAddForm .text input, #CourseEditForm .text input {
-    width: 21em;
-    text-align: left;
-}
-
-#CourseAddForm .select #InstructorInstructor, #CourseEditForm .select #InstructorInstructor {
-    height: 10em;
+#CourseEditForm .select #CourseInstructors, #CourseEditForm .select #CourseTutors {
     width: 20em;
 }
 
-#CourseAddForm .input input, #CourseEditForm .input input{
+#CourseEditForm .input input{
     margin-right: 10em;
     position: relative;
     width: 30em;
 }
 
-#CourseAddForm .submit, #CourseEditForm .submit {
-    width: 10em;
-    margin: 1em auto;
+#CourseEditForm .center {
+    text-align: center;
+}
+
+#CourseEditForm #instructors .text input, #CourseEditForm #tutors .text input {
+    width: 20em;
+    margin-bottom: 0.75em;
+    margin-right: 1em;
+}
+
+#CourseEditForm #instructors a, #CourseEditForm #tutors a {
+    padding: 0.5em;
 }
 
 /* PAGES/ADMIN */
@@ -846,6 +963,14 @@ i {
 
 /* events/edit */
 
+#Events .help-text {
+    margin-left: 24em;
+}
+
+#Events #titleWarning, #Events .selectAll {
+    margin-left: 19em;
+}
+
 #Events fieldset, #Events .submit {
     clear: both;
 }
@@ -874,10 +999,17 @@ i {
     background-color: white;
 }
 
-#Events label {
+#Events .radio legend {
     margin-top: 0.25em;
+    margin-bottom: 0.5em;
 }
 
+#Events form div.email-help-text {
+    margin: 0.5em 0 1em 24em;
+    font-size: 0.8em;
+    width: 35em;
+    color: gray;
+}
 
 /* Survey Results */
 
@@ -905,6 +1037,65 @@ i {
 
 #SurveyResults .noanswer {
     font-style: italic;
+}
+
+/* SysParameters */
+#sysParam .text label, #sysParam .select label {
+    width: 18em;
+}
+
+#sysParam .text input {
+    width: 20em;
+}
+
+/* Evaluations Export */
+
+#exportEval .text label, #exportEval .select label,
+#exportEval .checkbox label {
+    width: 18em;
+}
+
+#exportEval .text input {
+    width: 20em;
+}
+
+#exportEval ul li {
+    list-style-type: circle;
+    list-style-position: inside;
+    margin: 0.5em;
+}
+
+#exportEval div.help-text {
+    margin-left: 24em;
+}
+
+/* SurveyGroups Export */
+
+#exportSurveyGroup .text label, #exportSurveyGroup .select label {
+    width: 18em;
+}
+
+#exportSurveyGroup .text input {
+    width: 20em;
+}
+
+#exportSurveyGroup ul li {
+    list-style-type: circle;
+    list-style-position: inside;
+    margin: 0.5em;
+}
+
+/* survey summary bar graph*/
+.graph {
+    background-color: #EEFAED;
+    width: 20em;
+    border: #ccc 1px solid;
+}
+
+.graph .bar {
+    background-color: #4dc14f;
+    border-right: #538e02 1px solid;
+    height: 1em;
 }
 
 /* ajax pagination */
@@ -1032,15 +1223,334 @@ i {
     margin-left: 3em;
 }
 
+.surveyquestions .checkbox label { /* checkboxes look weird with left floating labels */
+    float: none;
+}
+
+.surveyquestions #description {
+    margin-left: 3em;
+    margin-right: 3em;
+    margin-top: 0.5em;
+    padding: 0.5em;
+}
+
+/* surveys/addQuestion */
+.SurveyAddQuestion #QuestionPrompt {
+    width: 35em;
+}
+
+.SurveyAddQuestion .center {
+    width: 30em;
+    display: block;
+    margin: 1em auto;
+}
+
+.SurveyAddQuestion input[type="submit"] {
+    padding: 0.3em 0.5em;
+}
+
+.SurveyAddQuestion .center input {
+    margin-right: 1em;
+}
+
+.SurveyAddQuestion div#responseInput {
+    margin-bottom: 1.5em;
+}
+
+.SurveyAddQuestion #responseInput a {
+    padding: 0.5em;
+    display: inline-block;
+}
+
+.SurveyAddQuestion #responseInput .input {
+    margin-left: 14em;
+}
+
+.SurveyAddQuestion #responseInput .input input {
+    width: 15em;
+}
+
+/* surveys/questionssummary */
+
+.surveyquestions .MoveQuestion {
+    display: inline;
+    float: right;
+}
+
+.surveyquestions .Operators {
+    margin: 1em;
+    font-size: 0.9em;
+}
+
+.surveyquestions .Operators a {
+    padding-left: 20px;
+    padding-right: 1em;
+}
+
+.surveyquestions .top-button {
+    background:url('/img/icons/top.gif') center left no-repeat;
+    padding: 0 0.5em 0 1.5em;
+    white-space:nowrap;
+}
+.surveyquestions .up-button {
+    background:url('/img/icons/up.gif') center left no-repeat;
+    padding: 0 0.5em 0 1.5em;
+    white-space:nowrap;
+}
+
+.surveyquestions .down-button {
+    background:url('/img/icons/down.gif') center left no-repeat;
+    padding: 0 0.5em 0 1.5em;
+    white-space:nowrap;
+}
+
+.surveyquestions .bottom-button {
+    background:url('/img/icons/bottom.gif') center left no-repeat;
+    padding: 0 0.5em 0 1.5em;
+    white-space:nowrap;
+}
+
 /* GROUPS */
 
 /* groups/import */
 
-.groupsimport .csvexample {
-    border: 1px solid black;
-    background: white;
-    padding: 1em;
-    margin: 1em;
+#groupsimport ul li {
+    list-style-type: circle;
+    list-style-position: inside;
+    margin: 0.5em;
+}
+
+#groupsimport .checkbox input {
+    margin-top: 0.85em;
+}
+
+#groupsimport #example {
+    background-color: white;
+    border:1px solid black;
+    padding: 0.5em;
+    margin-left: 1em;
+    display: inline-block;
+    line-height: 100%;
+}
+
+#groupsimport #title {
+    font-size: 150%;
+}
+
+#groupsimport #title, #groupsimport #button_text {
+    text-align: center;
+}
+
+/* MIXEVALS */
+
+/* mixevals results */
+
+#mixeval_result ul li {
+    list-style-type: square;
+    list-style-position: inside;
+    margin: 0.5em;
+    margin-left: 2.5em;
+}
+
+#mixeval_result h3, #mixeval_result .desc {
+    margin-left: 1em;
+}
+
+#mixeval_result .grade {
+    margin-left: 5em;
+}
+
+#mixeval_result .name, #mixeval_result .blue {
+    margin-right: 1em;
+    display: inline-block;
+    width: 10em;
+    font-weight: bold;
+}
+
+#mixeval_result {
+    text-align: left;
+}
+
+/* mixevals/view */
+
+.MixevalView dt {
+    width: 13em;
+    padding-bottom: 0.5em;
+    text-align: right;
+    float: left;
+}
+
+.MixevalView dd {
+    padding-bottom: 0.5em;
+    display: block;
+    margin-left: 14em;
+}
+
+.MixevalView span.help, .MixevalForm span.help {
+    color: chocolate;
+    font-size: 0.9em;
+}
+
+/* Need to change the font to match how they look in headings (the required
+ * mark are in h3 tags in the question prompts) */
+.MixevalView span.required, .MixevalForm span.required {
+    font-weight: bold;
+    font-family: 'Open Sans', serif;
+}
+
+.MixevalView span.required, .MixevalQuestion span.required,
+.MixevalForm span.required {
+    font-size: 1.5em;
+}
+
+.MixevalView p.note, .MixevalForm p.note {
+    display: inline-block;
+    margin-left: 1em;
+    margin-top: 1em;
+}
+
+.MixevalView p.marks, .MixevalForm p.marks {
+    float: right;
+    text-align: right;
+    margin-top: 1em;
+    margin-right: 1em;
+    padding-top: 1.5em;
+    font-family: 'Open Sans', serif; /* for visual distinctiveness */
+}
+
+.MixevalForm table {
+    width: 100%;
+}
+
+.MixevalForm ul li {
+    list-style-type: circle;
+    list-style-position: inside;
+    margin: 0.5em;
+}
+
+.MixevalForm #description {
+    margin-left: 3em;
+    margin-right: 3em;
+    margin-top: 0.5em;
+    padding: 0.5em;
+}
+
+.MixevalForm #penalty {
+    border: 1px solid red;
+    color: darkred;
+    margin-left: 3em;
+    margin-top: 0.5em;
+    padding: 0.5em;
+    width: 75%;
+}
+
+div.MixevalQuestion {
+    margin: 0 1em;
+}
+
+.MixevalQuestion p.help {
+    padding-top: 0;
+}
+
+.MixevalQuestion h3 {
+    margin-top: 2em;
+}
+
+.MixevalQuestion table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.MixevalQuestion td {
+    text-align: center;
+    padding-bottom: 0.5em;
+}
+
+.MixevalQuestion input[type="text"], .MixevalQuestion textarea {
+    width: 80%;
+    margin: 0 auto;
+    display: block;
+}
+
+.MixevalQuestion textarea {
+    height: 8em;
+}
+
+/* mixevals/add */
+
+.MixevalAdd .questions div a.removeQ, .MixevalAdd .questions div a.upQ,
+.MixevalAdd .questions div a.downQ {
+    font-size: 1.2em;
+    padding: 0.3em;
+    margin: 0;
+}
+
+.MixevalAdd .questions div a.removeQ {
+    color: crimson;
+}
+
+.MixevalAdd .questions div a.upQ {
+    color: orangered;
+}
+
+.MixevalAdd .questions div a.downQ {
+    margin-right: 1em;
+    color: dodgerblue;
+}
+
+.MixevalAdd .questions div a.removeQ:hover {
+    color: white;
+    text-decoration: none;
+}
+
+.MixevalAdd .questions div a.removeQ:hover, .MixevalAdd .questions div.remove {
+    background-color: crimson;
+}
+
+.MixevalAdd .questions div a.upQ:hover {
+    background-color: orangered;
+    color: white;
+    text-decoration: none;
+}
+
+.MixevalAdd .questions div a.downQ:hover {
+    background-color: dodgerblue;
+    color: white;
+    text-decoration: none;
+}
+
+div.MixevalMakeQuestion {
+    padding: 0.5em 0;
+}
+
+.MixevalAdd input[type='text'], .MixevalMakeQuestion
+input[type='text'], .MixevalMakeQuestion textarea {
+    width: 30em;
+}
+
+.MixevalMakeQuestion div.DescsDiv input[type="text"] {
+    width: 10em;
+}
+
+.DescsDiv {
+    margin-top: 0.2em;
+    margin-left: 14em;
+}
+
+.MixevalQuestionDesc {
+    padding-bottom: 0.1em;
+}
+
+/* rubrics view */
+
+#rubricPreview, #simplePreview {
+    cursor: pointer;
+}
+
+/* permissions editor */
+/* access/edit */
+#perm_editor label {
+    width: auto;
 }
 
 /* TO BE REFACTORED LATER */
@@ -1152,6 +1662,15 @@ i {
     font-weight:600;
 }
 
+div.panelName, div.panelContent input,
+div.submitComplete input {
+    cursor: pointer;
+}
+
+div.panelContent {
+    cursor: auto;
+}
+
 /* Home styles */
 
 
@@ -1231,6 +1750,13 @@ table.content-table {
     font-size: 0.9em;
 }
 
+.merge-button {
+    background:url('/img/icons/merge.png') center left no-repeat;
+    padding: 0 0 0 20px;
+    white-space:nowrap;
+    font-size: 0.9em;
+}
+
 .export-excel-button {
     background:url('/img/icons/export_excel.gif') center left no-repeat;
     padding: 0 0 0 20px;
@@ -1295,7 +1821,7 @@ table.content-table {
 }
 
 textarea.question-title-textarea, textarea.question-descriptor {
-    width: 100%;
+    width: 90%;
     height: 4em; 
 }
 
@@ -1345,10 +1871,6 @@ textarea.question-title-textarea, textarea.question-descriptor {
     float: right;
 }
 
-.text-button {
-    cursor: pointer;
-}
-
 #summary {
     text-align: right;
     background-color: #EAEAEA;
@@ -1364,74 +1886,9 @@ textarea.question-title-textarea, textarea.question-descriptor {
 
 /* evaluation result tables */
 
-.result-header-td {
-    vertical-align: middle;
-    font-weight: 600;
-    color: #FFFFFF;
-    background-color: #4478AC;
-    font-size: 0.9em;
-    height: 40px;
-    padding: 0em;
-}
-
-.inner-table-cell {
-    padding: 0em;
-}
-
-.group-members {
-    height: 40px;
-}
-
-.total-cell {
-    height: 40px;
-    width: 250px;
-}
-
-.result-cell {
-    height: 40px;
-    width: 200px;
-    padding: 0em;
-}
-
-.inner-table {
-    width: 100%;
-    margin-top: 0em;
-    table-layout: fixed;
-}
-
-.outer-table {
-    table-layout: fixed;
-}
-
-.scrollbar {
-    overflow-x: auto;
-    overflow-y: hidden;
-}
-
-table.full-size {
-    width: 100%;
-    border: 0px;
-    font-size: 0.9em;
-    text-align: left;
-    margin-bottom: 2em;
-}
-
-table.event-detail {
-}
-
-.event-summary div.incompleted {
-    color: red;
-    margin: 1em 0 1em 1em;
-    font-size: 0.9em;
-}
-
-.event-summary div.incompleted ul {
-    margin: 20px;
-}
-
-.event-summary div.incompleted li {
-    list-style-type: square; 
-    padding: 0.2em;
+#autoRelease_msg {
+    font-weight: bold;
+    text-align: center;
 }
 
 ul.instructions {
@@ -1441,37 +1898,6 @@ ul.instructions {
 ul.instructions li {
     list-style-type: square; 
     padding: 0.2em;
-}
-
-table.event-view {
-    border-collapse:collapse;
-}
-
-table.event-view tr.tablecell2 {
-    background-color: #EAEAEA;
-}
-
-table.event-view td {
-    border: 1px solid white;
-}
-
-table.event-view table td {
-    border: 0;
-}
-
-.text-button {
-    -webkit-box-shadow:rgba(0,0,0,0.2) 0 1px 0 0;
-    -moz-box-shadow:rgba(0,0,0,0.2) 0 1px 0 0;
-    box-shadow:rgba(0,0,0,0.2) 0 1px 0 0;
-    color:#333;
-    background-color: white;
-    border-radius:3px;
-    -moz-border-radius:3px;
-    -webkit-border-radius:3px;
-    border: 1px solid;
-    height:32px;
-    padding:4px 16px;
-    text-decoration:none !important;
 }
 
 table.group-list-chooser {
@@ -1498,73 +1924,13 @@ table.group-list-chooser td{
     font-size: 0.9em;
 }
 
-/* survey related */
-.survey-prompt {
-    margin: 1em 1em;
-}
-
-.survey-response {
-    padding: 1em 1em 2em 2em;
-    border-bottom: 1px solid gray;
-}
-
-.survey-response textarea {
-    width: 50%;
-    height: 7em;
-}
-
-.survey-response input[type=text] {
-    width: 50%;
-}
-
-div#answers {
-    margin-left: 14em;
-}
-
-div#answers input {
-    width: 60%;
-}
-
-.top-button {
-    background:url('/img/icons/top.gif') center left no-repeat;
-    padding: 0 0.5em 0 1.5em;
-    white-space:nowrap;
-}
-.up-button {
-    background:url('/img/icons/up.gif') center left no-repeat;
-    padding: 0 0.5em 0 1.5em;
-    white-space:nowrap;
-}
-
-.down-button {
-    background:url('/img/icons/down.gif') center left no-repeat;
-    padding: 0 0.5em 0 1.5em;
-    white-space:nowrap;
-}
-
-.bottom-button {
-    background:url('/img/icons/bottom.gif') center left no-repeat;
-    padding: 0 0.5em 0 1.5em;
-    white-space:nowrap;
-}
-
 /* public */
-.small-font {
-    font-size: 0.7em;
-}
 
-button a:link {
-    text-decoration: none;
-}
-
-div.help-text {
+form div.help-text {
     margin: 0.5em 0 1em 18em;
     font-size: 0.8em;
+    width: 35em;
     color: gray;
-}
-
-form div.input {
-    margin: 0.5em 0 0 0;
 }
 
 .ipeer-icon {
@@ -1573,60 +1939,7 @@ form div.input {
     white-space:nowrap;
 }
 
-.login-footer {
-    font-size: 0.8em;
-    margin: 0.5em 0 1em 0;
-}
-
-.login-footer a {
-    text-decoration: none;
-    color: black;
-}
-
 #cwl-login td {
     background-color: transparent;
 }
 
-td.weight1 {
-    background-color: #00ff00;
-}
-
-td.weight2 {
-    background-color: #30ff30;
-}
-
-td.weight3 {
-    background-color: #60ff60;
-}
-
-td.weight4 {
-    background-color: #90ff90;
-}
-
-td.weight5 {
-    background-color: #c0ffc0;
-}
-
-td.weight6 {
-    background-color: #ffffff;
-}
-
-td.weight7 {
-    background-color: #ffcfcf;
-}
-
-td.weight8 {
-    background-color: #ff9f9f;
-}
-
-td.weight9 {
-    background-color: #ff6f6f;
-}
-
-td.weight10 {
-    background-color: #ff3f3f;
-}
-
-td.weight11 {
-    background-color: #ff0f0f;
-}

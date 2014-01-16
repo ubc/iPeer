@@ -8,7 +8,8 @@ class Department extends AppModel {
     public $validate = array(
         'name' => array(
             'notempty' => array(
-                'rule' => array('notempty'),
+                'rule' => 'notempty',
+                'message' => 'Please fill in the name of the Department.'
             ),
         ),
         'faculty_id' => array(
@@ -39,6 +40,14 @@ class Department extends AppModel {
         return $departments;
     }
 
+    /**
+     * getIdsByUserId
+     * 
+     * @param mixed $userId user id
+     *
+     * @access public
+     * @return void
+     */
     public function getIdsByUserId($userId)
     {
         $faculties = $this->Faculty->find('all', array(

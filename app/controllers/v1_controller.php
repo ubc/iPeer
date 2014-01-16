@@ -16,7 +16,7 @@ class V1Controller extends Controller {
         'Group', 'Course', 'Event', 'EvaluationSimple', 'EvaluationRubric',
         'EvaluationMixeval', 'OauthClient', 'OauthNonce', 'OauthToken',
         'GroupsMembers', 'GroupEvent', 'Department', 'Role', 'CourseDepartment',
-        'UserCourse', 'UserTutor', 'UserEnrol', 'Penalty'
+        'UserCourse', 'UserTutor', 'UserEnrol', 'Penalty','SysParameter'
     );
     public $helpers = array('Session');
     public $components = array('RequestHandler', 'Session');
@@ -129,7 +129,18 @@ class V1Controller extends Controller {
         } else if ($this->RequestHandler->isDelete()) {
             $reqType = "DELETE";
         }
-        $params = "$reqType&" . rawurlencode(Router::url(null, true))
+
+        // use the url set in the settings first. The deploy behind load
+        // balancer with SSL off loading may cause problem if using the URL
+        // directly with Router::url (missing https)
+        $appUrl = $this->SysParameter->get('system.absolute_url');
+        if (empty($appUrl)) {
+            $appUrl = Router::url(null, true);
+        } else {
+            $appUrl .= Router::url(null, false);
+        }
+
+        $params = "$reqType&" . rawurlencode($appUrl)
             . "&" . rawurlencode($params);
         // construct the key used for hmac calculation
         $clientSecret = $this->_getClientSecret($_REQUEST['oauth_consumer_key']);
@@ -1059,6 +1070,16 @@ class V1Controller extends Controller {
         $this->render('json');
     }
 
+    /**
+     * getRequestInfo
+     * get the user's request
+     *
+     * @param mixed $request
+     * @param mixed $body
+     *
+     * @access protected
+     * @return void
+     */
     protected function getRequestInfo($request, $body)
     {
         $ret = '';

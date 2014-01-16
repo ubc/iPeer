@@ -34,11 +34,11 @@
 
 <br />
 
-<h1 onclick="$('rpreview').toggle();" class="title">
+<h1 onclick="$('rpreview').toggle();" class="title" id="simplePreview">
     <span class="ipeer-icon"><?php __(' Simple Evaluation Preview')?></span>
 </h1>
 
-<div id="rpreview" style="display: none;">
+<div id="rpreview">
 <?php
 echo $this->element('evaluations/simple_eval_form', array(
     'event' => array(

@@ -14,7 +14,8 @@ class EvaluationMixevalTestCase extends CakeTestCase
         'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
         'app.faculty', 'app.user_faculty', 'app.user_tutor', 'app.department',
         'app.course_department', 'app.penalty',
-        'app.evaluation_simple', 'app.survey_input',
+        'app.evaluation_simple', 'app.survey_input', 'app.oauth_token',
+        'app.sys_parameter', 'app.evaluation_rubric', 'app.evaluation_rubric_detail'
     );
     public $Course = null;
 
@@ -62,7 +63,7 @@ class EvaluationMixevalTestCase extends CakeTestCase
 
     function testGetResultsByEvaluatee()
     {
-        $result = $this->EvaluationMixeval->getResultsByEvaluatee(5, 6);
+        $result = $this->EvaluationMixeval->getResultsByEvaluatee(5, 6, array(5, 7));
         // Assert the queried data matches and is correctly ordered according to the fixture data
         $this->assertTrue(!empty($result[0]));
         $this->assertTrue(!empty($result[1]));
@@ -71,9 +72,9 @@ class EvaluationMixevalTestCase extends CakeTestCase
         $this->assertEqual($result[1]['EvaluationMixeval']['grp_event_id'], 5);
         $this->assertEqual($result[1]['EvaluationMixeval']['score'], 2.40);
         // Test invalid inputs
-        $invalidInputs = $this->EvaluationMixeval->getResultsByEvaluatee(2, 323);
-        $invalidInputs1 = $this->EvaluationMixeval->getResultsByEvaluatee(232, 1);
-        $nullInput = $this->EvaluationMixeval->getResultsByEvaluatee(null, null);
+        $invalidInputs = $this->EvaluationMixeval->getResultsByEvaluatee(2, 323, array(323));
+        $invalidInputs1 = $this->EvaluationMixeval->getResultsByEvaluatee(232, 1, array(1));
+        $nullInput = $this->EvaluationMixeval->getResultsByEvaluatee(null, null, null);
         $this->assertTrue(empty($invalidInputs));
         $this->assertTrue(empty($invalidInputs1));
         $this->assertTrue(empty($nullInputs));
@@ -166,5 +167,10 @@ class EvaluationMixevalTestCase extends CakeTestCase
         $this->assertEqual($searched[0]['EvaluationMixeval']['grade_release'], 0);
         $this->assertEqual($searched[1]['EvaluationMixeval']['grade_release'], 0);
         $this->assertEqual($searched[2]['EvaluationMixeval']['grade_release'], 0);
+    }
+    
+    function testGetResultsByEvaluateesAndEvaluators()
+    {
+        // TODO
     }
 }

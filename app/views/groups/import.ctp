@@ -1,50 +1,44 @@
-<div class='groupsimport'>
-<table class='standardtable'>
-    <tr>
-        <th width="50%"><?php __('Instructions')?></th>
-        <th width="50%"><?php __('Import')?></th>
-    </tr>
-    <tr>
-        <td style="text-align: left;">
-          <?php __('NOTE:')?>
-          <ul class="instructions">
-            <li><?php __('Please make sure the username column matches the username column in student import file.')?></li>
-            <li><?php __('Please make sure to remove the header in CSV file.')?></li>
-            <li><?php __('All columns are required.')?></li>
-          </ul>
-          <br />
-          <?php __('Format')?>:
-          <pre class='csvexample'>
-<?php __('Username, Group#, and Group Name')?>
-          </pre>
+<div id='groupsimport'>
+<h2><?php __('Instructions') ?></h2>
+<ul>
+    <li><?php __('Please make sure to remove the header in CSV file.')?></li>
+    <li><?php __('All fields are mandatory. The system will generate the group numbers.')?></li>
+    <li><?php __('All group names must be unique within the class.')?></li>
+    <li><?php __('The student identifiers that can be used are usernames or student numbers.')?></li>
+    <li><?php __("Please make sure the column matches the username/student number in the students' profile")?></li>
+</ul>
 
-          <?php __('Example')?>:
-          <pre class='csvexample'>
-29978037, 1, <?php __('Team A')?>
+<h3><?php __('Formatting:')?></h3>
+    <pre id='example'>
+    <?php __('Student Identifier, Group Name')?>
+    </pre>
 
-29978063, 1, <?php __('Team A')?>
+<h3><?php __('Examples:')?></h3>
+    <pre id='example'>
+        29978037, <?php __('Team A')?><br>
+        29978063, <?php __('Team A')?><br>
+        29978043, <?php __('Team B')?><br>
+        29978051, <?php __('Team B')?>
+    </pre>
+    
+<h2><?php __('Import')?></h2>
 
-29978043, 2, <?php __('Team B')?>
-
-29978051, 2, <?php __('Team B')?>
-          </pre>
-        </td>
-        <td style="text-align: left;">
-    <form name="importfrm" id="importfrm" method="POST" action="<?php echo $html->url('import/'.$courseId) ?>" enctype="multipart/form-data" >
-        <h3>1) <?php __('Please select a CSV file to import')?>:</h3>
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        <input type="file" name="file" value="<?php __('Browse')?>" /><br>
-        <?php
-            $params = array('controller'=>'users', 'courseList'=>$coursesList, "defaultOpt" => $courseId);
-        ?>
-        <br /><h3>2) <?php __('Select the course to import into')?>:</h3>
-        &nbsp;&nbsp;&nbsp;&nbsp;
-            <?php echo $this->element('courses/course_selection_box', $params); ?>
-        <br /><br /><h3>3) <?php __('Click the button below to Create the Groups')?>:</h3>
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        <input type="submit" value="<?php __('Import Group CSV')?> "/>
-    </form>
-    </td>
-    </tr>
-</table>
+<?php
+echo $this->Form->create(null, array('type' => 'file', 'url' => 'import/'.$courseId));
+echo $this->Form->input('file', array('type' => 'file', 'name' => 'file'));
+echo $this->Form->input('identifiers', array(
+    'type' => 'radio',
+    'options' => array('student_no' => 'Student No.', 'username' => 'Username'),
+    'legend' => __('Student Identifier', true),
+    'default' => 'username'
+));
+?><div class="help-text"><?php echo _t('The student identifier used in the CSV file.')?></div><?php
+echo $this->Form->input('Course',
+    array('multiple'=>false, 'default' => $courseId));
+echo $this->Form->input('update_groups',
+    array('type'=>'checkbox'));;
+?><div class="help-text"><?php echo _t('Update group members for existing groups.')?></div><?php
+echo $this->Form->submit(__('Import', true));
+echo $this->Form->end();
+?>
 </div>

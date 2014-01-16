@@ -108,9 +108,16 @@ class HomeController extends AppController
     }
 
     /**
+     * formatDueIn
+     *
      * Take the due interval, which is in seconds, and format
      * it something that's easier for users to read.
-     * */
+     *
+     * @param mixed $seconds seconds
+     *
+     * @access private
+     * @return void
+     */
     private function _formatDueIn($seconds)
     {
         $ret = "";

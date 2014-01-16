@@ -13,7 +13,7 @@ class EmailerController extends AppController
     public $name = 'Emailer';
     public $uses = array('GroupsMembers', 'UserEnrol', 'User', 'EmailTemplate', 'EmailMerge',
         'EmailSchedule', 'Personalize', 'SysParameter', 'Group', 'Course', 'UserCourse',
-        'UserTutor');
+        'UserTutor', 'Event', 'Penalty');
     public $components = array('AjaxList', 'Session', 'RequestHandler', 'Email');
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'Js' => array('Prototype'));
 
@@ -63,47 +63,29 @@ class EmailerController extends AppController
         //put all the joins together
         $joinTables = array($jointTableCreator);
 
+        // super admin
         if (User::hasPermission('functions/superadmin')) {
             $extraFilters = '';
+            $restrictions = '';
         } else {
-            $creators = array();
-            // grab course ids of the courses admin/super admin has access to
-            $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
-            // grab all instructors that have access to the courses above
-            $instructors = $this->UserCourse->find(
-                'all',
-                array(
-                    'conditions' => array('UserCourse.course_id' => $courseIds)
-            ));
+            $courseIds = User::getAccessibleCourses();
+            $restrictions['EmailSchedule.creator_id'] = array($myID => true, "!default" => false);
+            // instructor - only their own and emails for one of their accessible courses
             $extraFilters = "(";
-            // only admins will go through this loop
-            foreach ($instructors as $instructor) {
-                $id = $instructor['UserCourse']['user_id'];
-                $creators[] = $id;
-                $extraFilters .= "creator_id = $id or ";
+            foreach ($courseIds as $courseId) {
+                $extraFilters .= "course_id = $courseId or ";
             }
-            // allow instructors/admins to see their own email schedules
+            // admin - their own and emails from instructors and courses in their departments
+            if (User::hasPermission('controllers/departments')) {
+                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                $creators = Set::extract('/UserCourse/user_id', $instructors);
+                foreach ($creators as $creator) {
+                    $extraFilters .= "creator_id = $creator or ";
+                    $restrictions['EmailSchedule.creator_id'][$creator] = true;
+                }
+            }
             $extraFilters .= "creator_id = $myID)";
         }
-
-        // Instructors can only edit their own email schedules
-        $restrictions = "";
-        // instructors
-        $basicRestrictions = array(
-            $myID => true,
-            "!default" => false);
-        // super admins
-        if (User::hasPermission('functions/superadmin')) {
-            $basicRestrictions = "";
-        // faculty admins
-        } else if (User::hasPermission('controllers/departments')) {
-            foreach ($creators as $creator) {
-                $basicRestrictions = $basicRestrictions + array($creator => true);
-            }
-        }
-
-        empty($basicRestrictions) ? $restrictions = $basicRestrictions :
-            $restrictions['EmailSchedule.creator_id'] = $basicRestrictions;
 
         // Set up actions
         $warning = __("Are you sure you want to cancel this email?", true);
@@ -114,7 +96,7 @@ class EmailerController extends AppController
 
         // Set up the list itself
         $this->AjaxList->setUp($this->EmailSchedule, $columns, $actions,
-            "EmailSchedule.date", "EmailSchedule.id", $joinTables, $extraFilters);
+            "EmailSchedule.date", "EmailSchedule.subject", $joinTables, $extraFilters);
     }
 
     /**
@@ -166,12 +148,15 @@ class EmailerController extends AppController
         // class, group, user
         if ('C' == $type || 'G' == $type || null != $id) {
             if ('C' == $type) {
-                $group = $this->Course->find('first', array('conditions' => array('Course.id' => $id)));
+                $group = $this->Course->findById($id);
                 $this->breadcrumb->push(array('course' => $group['Course']));
+                $courseId = $id;
             } else if ('G' == $type) {
-                $group = $this->Group->find('first', array('conditions' => array('Group.id' => $id)));
+                $group = $this->Group->findById($id);
+                $courseId = $group['Group']['course_id'];
+                $groupId = $id;
             } else if (null != $id) {
-                $group = $this->User->find('first', array('conditions' => array('User.id' => $id)));
+                $group = $this->User->findById($id);
             }
 
             // check for valid id
@@ -192,14 +177,7 @@ class EmailerController extends AppController
         // for checking if the user can email to group with $id
         } else if ('G' == $type && !User::hasPermission('functions/email/allgroups')) {
             // check if they have access to group with $id
-            $group = $this->Group->find(
-                'first',
-                array(
-                    'conditions' => array(
-                        'Group.id' => $id
-                    )
-                )
-            );
+            $group = $this->Group->findById($id);
             if (!in_array($group['Course']['id'], array_keys($courseList))) {
                 $this->Session->setFlash(__('Error: You do not have permission to write emails to this group', true));
                 $this->redirect('index');
@@ -211,16 +189,19 @@ class EmailerController extends AppController
 
         if (!isset($this->data)) {
             //Get recipients' email address
+            $courseId = isset($courseId) ? $courseId : null;
+            $grpId = isset($groupId) ? $groupId : null;
             $recipients = $this->getRecipient($type, $id);
             $this->set('recipients', $recipients['Display']);
             //Write current recipients into session
             $this->Session->write('email_recipients', $recipients['Users']);
+            // Write the course id (and group id)
+            $this->Session->write('grp_id', $grpId);
+            $this->Session->write('course_id', $courseId);
             //Users who are not in recipients of the email
             $this->set('recipients_rest', $this->User->find('list', array(
-                'conditions'=>array('NOT' => array('User.id' => array_flip($this->getRecipient($type, $id, 'list')))))));
-            $this->set('from', $this->Auth->user('email'));
+                'conditions'=>array('NOT' => array('User.id' => Set::extract('/User/id', $recipients['Users']))))));
             $this->set('templatesList', $this->EmailTemplate->getPermittedEmailTemplate($this->Auth->user('id'), 'list'));
-            $this->set('templates', $this->EmailTemplate->getPermittedEmailTemplate($this->Auth->user('id')));
             $this->set('mergeList', $this->EmailMerge->getMergeList());
         } else {
             $recipients = $this->Session->read('email_recipients');
@@ -228,12 +209,11 @@ class EmailerController extends AppController
             $data = $data['Email'];
 
             $data['from'] = $this->Auth->user('id');
-            $to = array();
-            foreach ($recipients as $key => $r) {
-                $to[$key] = $r['User']['id'];
-            }
+            $to = Set::extract('/User/id', $recipients);
             $to = implode(';', $to);
             $data['to'] = $to;
+            $data['course_id'] = $this->Session->read('course_id');
+            $data['grp_id'] = $this->Session->read('grp_id');
             $date = $data['date'];
 
             //Set current date if no schedule
@@ -249,6 +229,7 @@ class EmailerController extends AppController
             }
 
             //Push an email into email_schedules table
+            $data = $this->_multiMap($data);
             $this->EmailSchedule->saveAll($data);
 
             $this->Session->setFlash(__('The Email was saved successfully', true), 'good');
@@ -264,12 +245,7 @@ class EmailerController extends AppController
     function cancel ($id)
     {
         // retrieving the requested email schedule
-        $email = $this->EmailSchedule->find(
-            'first',
-            array(
-                'conditions' => array('id' => $id)
-            )
-        );
+        $email = $this->EmailSchedule->findById($id);
 
         // check to see if $id is valid - numeric & is a email schedule
         if (!is_numeric($id) || empty($email)) {
@@ -278,26 +254,19 @@ class EmailerController extends AppController
         }
 
         if (!User::hasPermission('functions/superadmin')) {
-            // instructor
-            if (!User::hasPermission('controllers/departments')) {
-                $instructorIds = array($this->Auth->user('id'));
-            // admins
-            } else {
-                // course ids
-                $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
-                // instructors
-                $instructors = $this->UserCourse->find(
-                    'all',
-                    array(
-                        'conditions' => array('UserCourse.course_id' => $courseIds)
-                ));
-                $instructorIds = Set::extract($instructors, '/UserCourse/user_id');
-                // add the user's id
-                array_push($instructorIds, $this->Auth->user('id'));
+            $courseIds = User::getAccessibleCourses();
+            $instructorIds = array();
+            if (User::hasPermission('controllers/departments')) {
+                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                $instructorIds = Set::extract('/UserCourse/user_id', $instructors);
             }
+            // add the user's id
+            array_push($instructorIds, $this->Auth->user('id'));
 
-            // creator's id must be in the array of accessible user ids
-            if (!(in_array($email['EmailSchedule']['creator_id'], $instructorIds))) {
+            // creator's id must be in the array of accessible user ids OR
+            // they have access to the course
+            if (!(in_array($email['EmailSchedule']['creator_id'], $instructorIds) ||
+                in_array($email['EmailSchedule']['course_id'], $courseIds))) {
                 $this->Session->setFlash(__('Error: You do not have permission to cancel this email schedule', true));
                 $this->redirect('index');
             }
@@ -324,12 +293,7 @@ class EmailerController extends AppController
     function view ($id)
     {
         // retrieving the requested email schedule
-        $email = $this->EmailSchedule->find(
-            'first',
-            array(
-                'conditions' => array('id' => $id)
-            )
-        );
+        $email = $this->EmailSchedule->findById($id);
 
         // check to see if $id is valid - numeric & is a email schedule
         if (!is_numeric($id) || empty($email)) {
@@ -338,39 +302,37 @@ class EmailerController extends AppController
         }
 
         if (!User::hasPermission('functions/superadmin')) {
-            // instructor
-            if (!User::hasPermission('controllers/departments')) {
-                $instructorIds = array($this->Auth->user('id'));
-            // admins
-            } else {
-                // course ids
-                $courseIds = array_keys(User::getMyDepartmentsCourseList('list'));
-                // instructors
-                $instructors = $this->UserCourse->find(
-                    'all',
-                    array(
-                        'conditions' => array('UserCourse.course_id' => $courseIds)
-                ));
-                $instructorIds = array();
-                foreach ($instructors as $instructor) {
-                    $instructorIds[] = $instructor['UserCourse']['user_id'];
-                }
-                // add the user's id
-                array_push($instructorIds, $this->Auth->user('id'));
+            $courseIds = User::getAccessibleCourses();
+            $instructorIds = array();
+            if (User::hasPermission('controllers/departments')) {
+                $instructors = $this->UserCourse->findAllByCourseId($courseIds);
+                $instructorIds = Set::extract('/UserCourse/user_id', $instructors);
             }
+            // add the user's id
+            array_push($instructorIds, $this->Auth->user('id'));
 
-            // creator's id must be in the array of accessible user ids
-            if (!(in_array($email['EmailSchedule']['creator_id'], $instructorIds))) {
+            // creator's id must be in the array of accessible user ids OR
+            // they have access to the course
+            if (!(in_array($email['EmailSchedule']['creator_id'], $instructorIds) ||
+                in_array($email['EmailSchedule']['course_id'], $courseIds))) {
                 $this->Session->setFlash(__('Error: You do not have permission to view this email schedule', true));
                 $this->redirect('index');
             }
         }
 
         $email['EmailSchedule']['to'] = explode(';', $email['EmailSchedule']['to']);
+        $email['EmailSchedule']['content'] = str_replace("\n", '<br/>', $email['EmailSchedule']['content']);
         $this->User->recursive = -1;
-        $email['User'] = $this->User->find('all', array(
-            'conditions' => array('User.id'=>$email['EmailSchedule']['to'])
-        ));
+        $email['User'] = $this->User->findAllById($email['EmailSchedule']['to']);
+        // event reminders
+        if (isset($email['EmailSchedule']['event_id'])) {
+            $event = $this->Event->findById($email['EmailSchedule']['event_id']);
+            $user = array('User' => array('full_name' => 'Name'));
+            $type = ($event['Event']['event_template_type_id'] == 3) ? 'survey' : 'peer evaluation';
+            $url = Router::url('/', true);
+            $this->set('params', array('event' => $event, 'course' => array('Course' => $event['Course']), 
+                'penalty' => $event['Penalty'], 'user' => $user, 'type' => $type, 'url' => $url));
+        }
         $this->set('data', $email);
     }
 
@@ -454,38 +416,28 @@ class EmailerController extends AppController
             $users = array();
             break;
         case 'C': //Email addresses for all in Course
-            $users = $this->User->find($s_type, array(
-                //'fields' => array('email'),
-                'conditions' => array('User.id' => $this->UserEnrol->getUserListByCourse($id))
+            $users = $this->UserEnrol->find($s_type, array(
+                'conditions' => array('UserEnrol.course_id' => $id),
+                'contain' => array('User')
             ));
-            $course = $this->Course->find('first', array(
-                'fields' => array('id', 'course'),
-                'conditions' => array('Course.id' => $id)
-            ));
+            $users = Set::extract('/User', $users);
+            $course = $this->Course->findById($id);
             $display['name'] = __('All students in course: ', true).$course['Course']['course'];
             $display['link'] = '/users/goToClassList/'.$course['Course']['id'];
             break;
         case 'G': //Email addresses for all in group
             $users = $this->User->find($s_type, array(
-                //'fields' => array('email'),
                 'conditions' => array('User.id' => $this->GroupsMembers->getMembers($id))
             ));
-            $group = $this->Group->find('first', array(
-                'fields' => array('id', 'group_name'),
-                'conditions' => array('Group.id' => $id)
-            ));
+            $group = $this->Group->findById($id);
             $display['name'] = __('All students in  group: ', true).$group['Group']['group_name'];
             $display['link'] = '/groups/view/'.$group['Group']['id'];
             break;
         default: //Email address for a user
             $users = $this->User->find($s_type, array(
-                //'fields' => array('email'),
                 'conditions' => array('User.id' => $id)
             ));
-            $user = $this->User->find('first', array(
-                //'fields' => array('email'),
-                'conditions' => array('User.id' => $id)
-            ));
+            $user = $this->User->findById($id);
             $display['name'] = $user['User']['full_name'];
             $display['link'] = '/users/view/'.$user['User']['id'];
 
@@ -519,5 +471,22 @@ class EmailerController extends AppController
                 $i++;
             }
         }
+    }
+    
+    /**
+     * _multiMap
+     *
+     * @param mixed $data data
+     *
+     * @access private
+     * @return void
+     */
+    function _multiMap($data)
+    {
+        $ret = array();
+        foreach($data as $key => $value) {
+            $ret[$key] = is_array($value) ? $this->_multiMap($value) : trim($value);
+        }
+        return $ret;
     }
 }

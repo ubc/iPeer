@@ -71,12 +71,12 @@ div.install
 	margin: 0.5em;
 }
 
-.install .text label, .install .password label, .install .textarea label
+.install .text label, .install .password label, .install .textarea label, .install .select label
 {
 	width: 16em;
 }
 
-.install .text input, .install .password input, .install .textarea textarea
+.install .text input, .install .password input, .install .textarea textarea, .install .select select
 {
     width: 21em;
 }

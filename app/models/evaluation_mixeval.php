@@ -76,16 +76,37 @@ class EvaluationMixeval extends EvaluationResponseBase
      *
      * @param bool $grpEventId group event id
      * @param bool $evaluatee  evaluatee
+     * @param mixed $include   evaluators that have submitted
      *
      * @access public
      * @return void
      */
-    function getResultsByEvaluatee($grpEventId=null, $evaluatee=null)
+    function getResultsByEvaluatee($grpEventId, $evaluatee, $include)
     {
         return $this->find('all', array(
-            'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee),
+            'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee, 'evaluator' => $include),
             'order' => 'evaluator ASC',
             'contain' => 'EvaluationMixevalDetail',
+        ));
+    }
+    
+    /**
+     * getResultsByEvaluateesAndEvaluators
+     * gets Mixeval evaluation result for a specific assignment and evaluator
+     *
+     * @param mixed $grpEventId group event id
+     * @param mixed $members    members
+     *
+     * @access public
+     * @return void
+     */
+    function getResultsByEvaluateesOrEvaluators($grpEventId=null, $members=null)
+    {
+        return $this->find('all', array(
+            'conditions' => array('grp_event_id' => $grpEventId, "OR"=>array('evaluatee' => $members, 'evaluator' => $members)),
+            'order' => 'evaluator ASC',
+            'contain' => 'EvaluationMixevalDetail',
+            'group' => array('EvaluationMixeval.evaluator','EvaluationMixeval.evaluatee'),
         ));
     }
 
@@ -367,7 +388,7 @@ class EvaluationMixeval extends EvaluationResponseBase
     {
         $mixEval = $this->find('first', array('conditions' => array('evaluator' => $evluatorId, 'evaluatee' => $evaluateeId,
             'grp_event_id' => $groupEventId)));
-        $evalDetail = $this->EvaluationMixevalDetail->getByEvalMixevalIdCritera($mixEval['EvaluationMixeval']['id'], $questionNum);
+        $evalDetail = $this->EvaluationMixevalDetail->getByEvalMixevalIdCriteria($mixEval['EvaluationMixeval']['id'], $questionNum);
         return $evalDetail;
     }
 
@@ -430,4 +451,5 @@ class EvaluationMixeval extends EvaluationResponseBase
 
         return $grades;
      }
+
 }

@@ -1,13 +1,5 @@
--- phpMyAdmin SQL Dump
--- version 2.6.2
--- http://www.phpmyadmin.net
 --
--- Host: localhost
--- Generation Time: Jun 27, 2006 at 10:51 AM
--- Server version: 4.1.11
--- PHP Version: 4.3.10-16
---
--- Database: `ipeer2`
+-- iPeer Database
 --
 
 SET foreign_key_checks = 0;
@@ -30,13 +22,348 @@ CREATE TABLE IF NOT EXISTS `acos` (
   PRIMARY KEY (`id`),
   KEY `parent_id` (`parent_id`),
   KEY `alias` (`alias`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=350 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `acos`
 --
 
-INSERT INTO `acos` VALUES (1,NULL,NULL,NULL,'adminpage',1,2),(2,NULL,NULL,NULL,'controllers',3,574),(3,2,NULL,NULL,'Pages',4,17),(4,3,NULL,NULL,'display',5,6),(5,3,NULL,NULL,'add',7,8),(6,3,NULL,NULL,'edit',9,10),(7,3,NULL,NULL,'index',11,12),(8,3,NULL,NULL,'view',13,14),(9,3,NULL,NULL,'delete',15,16),(10,2,NULL,NULL,'Courses',18,35),(11,10,NULL,NULL,'daysLate',19,20),(12,10,NULL,NULL,'index',21,22),(13,10,NULL,NULL,'ajaxList',23,24),(14,10,NULL,NULL,'view',25,26),(15,10,NULL,NULL,'home',27,28),(16,10,NULL,NULL,'add',29,30),(17,10,NULL,NULL,'edit',31,32),(18,10,NULL,NULL,'delete',33,34),(19,2,NULL,NULL,'Departments',36,47),(20,19,NULL,NULL,'index',37,38),(21,19,NULL,NULL,'view',39,40),(22,19,NULL,NULL,'add',41,42),(23,19,NULL,NULL,'edit',43,44),(24,19,NULL,NULL,'delete',45,46),(25,2,NULL,NULL,'Emailer',48,75),(26,25,NULL,NULL,'setUpAjaxList',49,50),(27,25,NULL,NULL,'ajaxList',51,52),(28,25,NULL,NULL,'index',53,54),(29,25,NULL,NULL,'write',55,56),(30,25,NULL,NULL,'cancel',57,58),(31,25,NULL,NULL,'view',59,60),(32,25,NULL,NULL,'addRecipient',61,62),(33,25,NULL,NULL,'deleteRecipient',63,64),(34,25,NULL,NULL,'getRecipient',65,66),(35,25,NULL,NULL,'searchByUserId',67,68),(36,25,NULL,NULL,'add',69,70),(37,25,NULL,NULL,'edit',71,72),(38,25,NULL,NULL,'delete',73,74),(39,2,NULL,NULL,'Emailtemplates',76,95),(40,39,NULL,NULL,'setUpAjaxList',77,78),(41,39,NULL,NULL,'ajaxList',79,80),(42,39,NULL,NULL,'index',81,82),(43,39,NULL,NULL,'add',83,84),(44,39,NULL,NULL,'edit',85,86),(45,39,NULL,NULL,'delete',87,88),(46,39,NULL,NULL,'view',89,90),(47,39,NULL,NULL,'displayTemplateContent',91,92),(48,39,NULL,NULL,'displayTemplateSubject',93,94),(49,2,NULL,NULL,'Evaltools',96,109),(50,49,NULL,NULL,'index',97,98),(51,49,NULL,NULL,'showAll',99,100),(52,49,NULL,NULL,'add',101,102),(53,49,NULL,NULL,'edit',103,104),(54,49,NULL,NULL,'view',105,106),(55,49,NULL,NULL,'delete',107,108),(56,2,NULL,NULL,'Evaluations',110,161),(57,56,NULL,NULL,'setUpAjaxList',111,112),(58,56,NULL,NULL,'ajaxList',113,114),(59,56,NULL,NULL,'view',115,116),(60,56,NULL,NULL,'index',117,118),(61,56,NULL,NULL,'export',119,120),(62,56,NULL,NULL,'makeEvaluation',121,122),(63,56,NULL,NULL,'validSurveyEvalComplete',123,124),(64,56,NULL,NULL,'validRubricEvalComplete',125,126),(65,56,NULL,NULL,'completeEvaluationRubric',127,128),(66,56,NULL,NULL,'validMixevalEvalComplete',129,130),(67,56,NULL,NULL,'completeEvaluationMixeval',131,132),(68,56,NULL,NULL,'viewEvaluationResults',133,134),(69,56,NULL,NULL,'studentViewEvaluationResult',135,136),(70,56,NULL,NULL,'markEventReviewed',137,138),(71,56,NULL,NULL,'markGradeRelease',139,140),(72,56,NULL,NULL,'markCommentRelease',141,142),(73,56,NULL,NULL,'changeAllCommentRelease',143,144),(74,56,NULL,NULL,'changeAllGradeRelease',145,146),(75,56,NULL,NULL,'viewGroupSubmissionDetails',147,148),(76,56,NULL,NULL,'viewSurveySummary',149,150),(77,56,NULL,NULL,'export_rubic',151,152),(78,56,NULL,NULL,'export_test',153,154),(79,56,NULL,NULL,'add',155,156),(80,56,NULL,NULL,'edit',157,158),(81,56,NULL,NULL,'delete',159,160),(82,2,NULL,NULL,'Events',162,179),(83,82,NULL,NULL,'postProcessData',163,164),(84,82,NULL,NULL,'setUpAjaxList',165,166),(85,82,NULL,NULL,'index',167,168),(86,82,NULL,NULL,'ajaxList',169,170),(87,82,NULL,NULL,'view',171,172),(88,82,NULL,NULL,'add',173,174),(89,82,NULL,NULL,'edit',175,176),(90,82,NULL,NULL,'delete',177,178),(91,2,NULL,NULL,'Faculties',180,191),(92,91,NULL,NULL,'index',181,182),(93,91,NULL,NULL,'view',183,184),(94,91,NULL,NULL,'add',185,186),(95,91,NULL,NULL,'edit',187,188),(96,91,NULL,NULL,'delete',189,190),(97,2,NULL,NULL,'Framework',192,209),(98,97,NULL,NULL,'calendarDisplay',193,194),(99,97,NULL,NULL,'userInfoDisplay',195,196),(100,97,NULL,NULL,'tutIndex',197,198),(101,97,NULL,NULL,'add',199,200),(102,97,NULL,NULL,'edit',201,202),(103,97,NULL,NULL,'index',203,204),(104,97,NULL,NULL,'view',205,206),(105,97,NULL,NULL,'delete',207,208),(106,2,NULL,NULL,'Groups',210,229),(107,106,NULL,NULL,'setUpAjaxList',211,212),(108,106,NULL,NULL,'index',213,214),(109,106,NULL,NULL,'ajaxList',215,216),(110,106,NULL,NULL,'view',217,218),(111,106,NULL,NULL,'add',219,220),(112,106,NULL,NULL,'edit',221,222),(113,106,NULL,NULL,'delete',223,224),(114,106,NULL,NULL,'import',225,226),(115,106,NULL,NULL,'export',227,228),(116,2,NULL,NULL,'Home',230,241),(117,116,NULL,NULL,'index',231,232),(118,116,NULL,NULL,'add',233,234),(119,116,NULL,NULL,'edit',235,236),(120,116,NULL,NULL,'view',237,238),(121,116,NULL,NULL,'delete',239,240),(122,2,NULL,NULL,'Install',242,263),(123,122,NULL,NULL,'index',243,244),(124,122,NULL,NULL,'install2',245,246),(125,122,NULL,NULL,'install3',247,248),(126,122,NULL,NULL,'install4',249,250),(127,122,NULL,NULL,'install5',251,252),(128,122,NULL,NULL,'gpl',253,254),(129,122,NULL,NULL,'add',255,256),(130,122,NULL,NULL,'edit',257,258),(131,122,NULL,NULL,'view',259,260),(132,122,NULL,NULL,'delete',261,262),(133,2,NULL,NULL,'Lti',264,275),(134,133,NULL,NULL,'index',265,266),(135,133,NULL,NULL,'add',267,268),(136,133,NULL,NULL,'edit',269,270),(137,133,NULL,NULL,'view',271,272),(138,133,NULL,NULL,'delete',273,274),(139,2,NULL,NULL,'Mixevals',276,297),(140,139,NULL,NULL,'setUpAjaxList',277,278),(141,139,NULL,NULL,'index',279,280),(142,139,NULL,NULL,'ajaxList',281,282),(143,139,NULL,NULL,'view',283,284),(144,139,NULL,NULL,'add',285,286),(145,139,NULL,NULL,'deleteQuestion',287,288),(146,139,NULL,NULL,'deleteDescriptor',289,290),(147,139,NULL,NULL,'edit',291,292),(148,139,NULL,NULL,'copy',293,294),(149,139,NULL,NULL,'delete',295,296),(150,2,NULL,NULL,'Oauthclients',298,309),(151,150,NULL,NULL,'index',299,300),(152,150,NULL,NULL,'add',301,302),(153,150,NULL,NULL,'edit',303,304),(154,150,NULL,NULL,'delete',305,306),(155,150,NULL,NULL,'view',307,308),(156,2,NULL,NULL,'Oauthtokens',310,321),(157,156,NULL,NULL,'index',311,312),(158,156,NULL,NULL,'add',313,314),(159,156,NULL,NULL,'edit',315,316),(160,156,NULL,NULL,'delete',317,318),(161,156,NULL,NULL,'view',319,320),(162,2,NULL,NULL,'Penalty',322,335),(163,162,NULL,NULL,'save',323,324),(164,162,NULL,NULL,'add',325,326),(165,162,NULL,NULL,'edit',327,328),(166,162,NULL,NULL,'index',329,330),(167,162,NULL,NULL,'view',331,332),(168,162,NULL,NULL,'delete',333,334),(169,2,NULL,NULL,'Rubrics',336,355),(170,169,NULL,NULL,'postProcess',337,338),(171,169,NULL,NULL,'setUpAjaxList',339,340),(172,169,NULL,NULL,'index',341,342),(173,169,NULL,NULL,'ajaxList',343,344),(174,169,NULL,NULL,'view',345,346),(175,169,NULL,NULL,'add',347,348),(176,169,NULL,NULL,'edit',349,350),(177,169,NULL,NULL,'copy',351,352),(178,169,NULL,NULL,'delete',353,354),(179,2,NULL,NULL,'Searchs',356,383),(180,179,NULL,NULL,'update',357,358),(181,179,NULL,NULL,'index',359,360),(182,179,NULL,NULL,'searchEvaluation',361,362),(183,179,NULL,NULL,'searchResult',363,364),(184,179,NULL,NULL,'searchInstructor',365,366),(185,179,NULL,NULL,'eventBoxSearch',367,368),(186,179,NULL,NULL,'formatSearchEvaluation',369,370),(187,179,NULL,NULL,'formatSearchInstructor',371,372),(188,179,NULL,NULL,'formatSearchEvaluationResult',373,374),(189,179,NULL,NULL,'add',375,376),(190,179,NULL,NULL,'edit',377,378),(191,179,NULL,NULL,'view',379,380),(192,179,NULL,NULL,'delete',381,382),(193,2,NULL,NULL,'Simpleevaluations',384,403),(194,193,NULL,NULL,'postProcess',385,386),(195,193,NULL,NULL,'setUpAjaxList',387,388),(196,193,NULL,NULL,'index',389,390),(197,193,NULL,NULL,'ajaxList',391,392),(198,193,NULL,NULL,'view',393,394),(199,193,NULL,NULL,'add',395,396),(200,193,NULL,NULL,'edit',397,398),(201,193,NULL,NULL,'copy',399,400),(202,193,NULL,NULL,'delete',401,402),(203,2,NULL,NULL,'Surveygroups',404,433),(204,203,NULL,NULL,'postProcess',405,406),(205,203,NULL,NULL,'setUpAjaxList',407,408),(206,203,NULL,NULL,'index',409,410),(207,203,NULL,NULL,'ajaxList',411,412),(208,203,NULL,NULL,'makegroups',413,414),(209,203,NULL,NULL,'makegroupssearch',415,416),(210,203,NULL,NULL,'maketmgroups',417,418),(211,203,NULL,NULL,'savegroups',419,420),(212,203,NULL,NULL,'release',421,422),(213,203,NULL,NULL,'delete',423,424),(214,203,NULL,NULL,'edit',425,426),(215,203,NULL,NULL,'changegroupset',427,428),(216,203,NULL,NULL,'add',429,430),(217,203,NULL,NULL,'view',431,432),(218,2,NULL,NULL,'Surveys',434,461),(219,218,NULL,NULL,'setUpAjaxList',435,436),(220,218,NULL,NULL,'index',437,438),(221,218,NULL,NULL,'ajaxList',439,440),(222,218,NULL,NULL,'view',441,442),(223,218,NULL,NULL,'add',443,444),(224,218,NULL,NULL,'edit',445,446),(225,218,NULL,NULL,'copy',447,448),(226,218,NULL,NULL,'delete',449,450),(227,218,NULL,NULL,'questionsSummary',451,452),(228,218,NULL,NULL,'moveQuestion',453,454),(229,218,NULL,NULL,'removeQuestion',455,456),(230,218,NULL,NULL,'addQuestion',457,458),(231,218,NULL,NULL,'editQuestion',459,460),(232,2,NULL,NULL,'Sysparameters',462,477),(233,232,NULL,NULL,'setUpAjaxList',463,464),(234,232,NULL,NULL,'index',465,466),(235,232,NULL,NULL,'ajaxList',467,468),(236,232,NULL,NULL,'view',469,470),(237,232,NULL,NULL,'add',471,472),(238,232,NULL,NULL,'edit',473,474),(239,232,NULL,NULL,'delete',475,476),(240,2,NULL,NULL,'Upgrade',478,491),(241,240,NULL,NULL,'index',479,480),(242,240,NULL,NULL,'step2',481,482),(243,240,NULL,NULL,'add',483,484),(244,240,NULL,NULL,'edit',485,486),(245,240,NULL,NULL,'view',487,488),(246,240,NULL,NULL,'delete',489,490),(247,2,NULL,NULL,'Users',492,519),(248,247,NULL,NULL,'ajaxList',493,494),(249,247,NULL,NULL,'index',495,496),(250,247,NULL,NULL,'goToClassList',497,498),(251,247,NULL,NULL,'determineIfStudentFromThisData',499,500),(252,247,NULL,NULL,'view',501,502),(253,247,NULL,NULL,'add',503,504),(254,247,NULL,NULL,'edit',505,506),(255,247,NULL,NULL,'editProfile',507,508),(256,247,NULL,NULL,'delete',509,510),(257,247,NULL,NULL,'checkDuplicateName',511,512),(258,247,NULL,NULL,'resetPassword',513,514),(259,247,NULL,NULL,'import',515,516),(260,247,NULL,NULL,'update',517,518),(261,2,NULL,NULL,'V1',520,555),(262,261,NULL,NULL,'oauth',521,522),(263,261,NULL,NULL,'oauth_error',523,524),(264,261,NULL,NULL,'users',525,526),(265,261,NULL,NULL,'courses',527,528),(266,261,NULL,NULL,'groups',529,530),(267,261,NULL,NULL,'groupMembers',531,532),(268,261,NULL,NULL,'events',533,534),(269,261,NULL,NULL,'grades',535,536),(270,261,NULL,NULL,'departments',537,538),(271,261,NULL,NULL,'courseDepartments',539,540),(272,261,NULL,NULL,'userEvents',541,542),(273,261,NULL,NULL,'enrolment',543,544),(274,261,NULL,NULL,'add',545,546),(275,261,NULL,NULL,'edit',547,548),(276,261,NULL,NULL,'index',549,550),(277,261,NULL,NULL,'view',551,552),(278,261,NULL,NULL,'delete',553,554),(279,2,NULL,NULL,'Guard',556,573),(280,279,NULL,NULL,'Guard',557,572),(281,280,NULL,NULL,'login',558,559),(282,280,NULL,NULL,'logout',560,561),(283,280,NULL,NULL,'add',562,563),(284,280,NULL,NULL,'edit',564,565),(285,280,NULL,NULL,'index',566,567),(286,280,NULL,NULL,'view',568,569),(287,280,NULL,NULL,'delete',570,571),(288,NULL,NULL,NULL,'functions',575,638),(289,288,NULL,NULL,'user',576,603),(290,289,NULL,NULL,'superadmin',577,578),(291,289,NULL,NULL,'admin',579,580),(292,289,NULL,NULL,'instructor',581,582),(293,289,NULL,NULL,'tutor',583,584),(294,289,NULL,NULL,'student',585,586),(295,289,NULL,NULL,'import',587,588),(296,289,NULL,NULL,'password_reset',589,600),(297,296,NULL,NULL,'superadmin',590,591),(298,296,NULL,NULL,'admin',592,593),(299,296,NULL,NULL,'instructor',594,595),(300,296,NULL,NULL,'tutor',596,597),(301,296,NULL,NULL,'student',598,599),(302,289,NULL,NULL,'index',601,602),(303,288,NULL,NULL,'role',604,615),(304,303,NULL,NULL,'superadmin',605,606),(305,303,NULL,NULL,'admin',607,608),(306,303,NULL,NULL,'instructor',609,610),(307,303,NULL,NULL,'tutor',611,612),(308,303,NULL,NULL,'student',613,614),(309,288,NULL,NULL,'evaluation',616,617),(310,288,NULL,NULL,'email',618,625),(311,310,NULL,NULL,'allUsers',619,620),(312,310,NULL,NULL,'allGroups',621,622),(313,310,NULL,NULL,'allCourses',623,624),(314,288,NULL,NULL,'emailtemplate',626,627),(315,288,NULL,NULL,'viewstudentresults',628,629),(316,288,NULL,NULL,'viewemailaddresses',630,631),(317,288,NULL,NULL,'superadmin',632,633),(318,288,NULL,NULL,'coursemanager',634,635),(319,288,NULL,NULL,'viewusername',636,637);
+SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+
+INSERT INTO acos (id, parent_id, model, foreign_key, alias, lft, rght) VALUES
+(1, NULL, NULL, NULL, 'adminpage', 1, 2),
+(2, NULL, NULL, NULL, 'controllers', 3, 592),
+(3, 2, NULL, NULL, 'Pages', 4, 17),
+(4, 3, NULL, NULL, 'display', 5, 6),
+(5, 3, NULL, NULL, 'add', 7, 8),
+(6, 3, NULL, NULL, 'edit', 9, 10),
+(7, 3, NULL, NULL, 'index', 11, 12),
+(8, 3, NULL, NULL, 'view', 13, 14),
+(9, 3, NULL, NULL, 'delete', 15, 16),
+(10, 2, NULL, NULL, 'Accesses', 18, 29),
+(11, 10, NULL, NULL, 'view', 19, 20),
+(12, 10, NULL, NULL, 'edit', 21, 22),
+(13, 10, NULL, NULL, 'add', 23, 24),
+(14, 10, NULL, NULL, 'index', 25, 26),
+(15, 10, NULL, NULL, 'delete', 27, 28),
+(16, 2, NULL, NULL, 'Courses', 30, 53),
+(17, 16, NULL, NULL, 'daysLate', 31, 32),
+(18, 16, NULL, NULL, 'index', 33, 34),
+(19, 16, NULL, NULL, 'ajaxList', 35, 36),
+(20, 16, NULL, NULL, 'view', 37, 38),
+(21, 16, NULL, NULL, 'home', 39, 40),
+(22, 16, NULL, NULL, 'add', 41, 42),
+(23, 16, NULL, NULL, 'edit', 43, 44),
+(24, 16, NULL, NULL, 'delete', 45, 46),
+(25, 16, NULL, NULL, 'move', 47, 48),
+(26, 16, NULL, NULL, 'ajax_options', 49, 50),
+(27, 16, NULL, NULL, 'import', 51, 52),
+(28, 2, NULL, NULL, 'Departments', 54, 65),
+(29, 28, NULL, NULL, 'index', 55, 56),
+(30, 28, NULL, NULL, 'view', 57, 58),
+(31, 28, NULL, NULL, 'add', 59, 60),
+(32, 28, NULL, NULL, 'edit', 61, 62),
+(33, 28, NULL, NULL, 'delete', 63, 64),
+(34, 2, NULL, NULL, 'Emailer', 66, 93),
+(35, 34, NULL, NULL, 'setUpAjaxList', 67, 68),
+(36, 34, NULL, NULL, 'ajaxList', 69, 70),
+(37, 34, NULL, NULL, 'index', 71, 72),
+(38, 34, NULL, NULL, 'write', 73, 74),
+(39, 34, NULL, NULL, 'cancel', 75, 76),
+(40, 34, NULL, NULL, 'view', 77, 78),
+(41, 34, NULL, NULL, 'addRecipient', 79, 80),
+(42, 34, NULL, NULL, 'deleteRecipient', 81, 82),
+(43, 34, NULL, NULL, 'getRecipient', 83, 84),
+(44, 34, NULL, NULL, 'searchByUserId', 85, 86),
+(45, 34, NULL, NULL, 'add', 87, 88),
+(46, 34, NULL, NULL, 'edit', 89, 90),
+(47, 34, NULL, NULL, 'delete', 91, 92),
+(48, 2, NULL, NULL, 'Emailtemplates', 94, 113),
+(49, 48, NULL, NULL, 'setUpAjaxList', 95, 96),
+(50, 48, NULL, NULL, 'ajaxList', 97, 98),
+(51, 48, NULL, NULL, 'index', 99, 100),
+(52, 48, NULL, NULL, 'add', 101, 102),
+(53, 48, NULL, NULL, 'edit', 103, 104),
+(54, 48, NULL, NULL, 'delete', 105, 106),
+(55, 48, NULL, NULL, 'view', 107, 108),
+(56, 48, NULL, NULL, 'displayTemplateContent', 109, 110),
+(57, 48, NULL, NULL, 'displayTemplateSubject', 111, 112),
+(58, 2, NULL, NULL, 'Evaltools', 114, 125),
+(59, 58, NULL, NULL, 'index', 115, 116),
+(60, 58, NULL, NULL, 'add', 117, 118),
+(61, 58, NULL, NULL, 'edit', 119, 120),
+(62, 58, NULL, NULL, 'view', 121, 122),
+(63, 58, NULL, NULL, 'delete', 123, 124),
+(64, 2, NULL, NULL, 'Evaluations', 126, 165),
+(65, 64, NULL, NULL, 'setUpAjaxList', 127, 128),
+(66, 64, NULL, NULL, 'ajaxList', 129, 130),
+(67, 64, NULL, NULL, 'view', 131, 132),
+(68, 64, NULL, NULL, 'index', 133, 134),
+(69, 64, NULL, NULL, 'export', 135, 136),
+(70, 64, NULL, NULL, 'makeEvaluation', 137, 138),
+(71, 64, NULL, NULL, 'completeEvaluationRubric', 139, 140),
+(72, 64, NULL, NULL, 'viewEvaluationResults', 141, 142),
+(73, 64, NULL, NULL, 'studentViewEvaluationResult', 143, 144),
+(74, 64, NULL, NULL, 'markEventReviewed', 145, 146),
+(75, 64, NULL, NULL, 'markGradeRelease', 147, 148),
+(76, 64, NULL, NULL, 'markCommentRelease', 149, 150),
+(77, 64, NULL, NULL, 'changeAllCommentRelease', 151, 152),
+(78, 64, NULL, NULL, 'changeAllGradeRelease', 153, 154),
+(79, 64, NULL, NULL, 'viewGroupSubmissionDetails', 155, 156),
+(80, 64, NULL, NULL, 'viewSurveySummary', 157, 158),
+(81, 64, NULL, NULL, 'add', 159, 160),
+(82, 64, NULL, NULL, 'edit', 161, 162),
+(83, 64, NULL, NULL, 'delete', 163, 164),
+(84, 2, NULL, NULL, 'Events', 166, 193),
+(85, 84, NULL, NULL, 'postProcessData', 167, 168),
+(86, 84, NULL, NULL, 'setUpAjaxList', 169, 170),
+(87, 84, NULL, NULL, 'index', 171, 172),
+(88, 84, NULL, NULL, 'ajaxList', 173, 174),
+(89, 84, NULL, NULL, 'view', 175, 176),
+(90, 84, NULL, NULL, 'add', 177, 178),
+(91, 84, NULL, NULL, 'setSchedule', 179, 180),
+(92, 84, NULL, NULL, 'getGroupMembers', 181, 182),
+(93, 84, NULL, NULL, 'edit', 183, 184),
+(94, 84, NULL, NULL, 'checkIfChanged', 185, 186),
+(95, 84, NULL, NULL, 'calculateFrequency', 187, 188),
+(96, 84, NULL, NULL, 'delete', 189, 190),
+(97, 84, NULL, NULL, 'checkDuplicateName', 191, 192),
+(98, 2, NULL, NULL, 'Faculties', 194, 205),
+(99, 98, NULL, NULL, 'index', 195, 196),
+(100, 98, NULL, NULL, 'view', 197, 198),
+(101, 98, NULL, NULL, 'add', 199, 200),
+(102, 98, NULL, NULL, 'edit', 201, 202),
+(103, 98, NULL, NULL, 'delete', 203, 204),
+(104, 2, NULL, NULL, 'Framework', 206, 221),
+(105, 104, NULL, NULL, 'calendarDisplay', 207, 208),
+(106, 104, NULL, NULL, 'tutIndex', 209, 210),
+(107, 104, NULL, NULL, 'add', 211, 212),
+(108, 104, NULL, NULL, 'edit', 213, 214),
+(109, 104, NULL, NULL, 'index', 215, 216),
+(110, 104, NULL, NULL, 'view', 217, 218),
+(111, 104, NULL, NULL, 'delete', 219, 220),
+(112, 2, NULL, NULL, 'Groups', 222, 241),
+(113, 112, NULL, NULL, 'setUpAjaxList', 223, 224),
+(114, 112, NULL, NULL, 'index', 225, 226),
+(115, 112, NULL, NULL, 'ajaxList', 227, 228),
+(116, 112, NULL, NULL, 'view', 229, 230),
+(117, 112, NULL, NULL, 'add', 231, 232),
+(118, 112, NULL, NULL, 'edit', 233, 234),
+(119, 112, NULL, NULL, 'delete', 235, 236),
+(120, 112, NULL, NULL, 'import', 237, 238),
+(121, 112, NULL, NULL, 'export', 239, 240),
+(122, 2, NULL, NULL, 'Home', 242, 253),
+(123, 122, NULL, NULL, 'index', 243, 244),
+(124, 122, NULL, NULL, 'add', 245, 246),
+(125, 122, NULL, NULL, 'edit', 247, 248),
+(126, 122, NULL, NULL, 'view', 249, 250),
+(127, 122, NULL, NULL, 'delete', 251, 252),
+(128, 2, NULL, NULL, 'Install', 254, 275),
+(129, 128, NULL, NULL, 'index', 255, 256),
+(130, 128, NULL, NULL, 'install2', 257, 258),
+(131, 128, NULL, NULL, 'install3', 259, 260),
+(132, 128, NULL, NULL, 'install4', 261, 262),
+(133, 128, NULL, NULL, 'install5', 263, 264),
+(134, 128, NULL, NULL, 'gpl', 265, 266),
+(135, 128, NULL, NULL, 'add', 267, 268),
+(136, 128, NULL, NULL, 'edit', 269, 270),
+(137, 128, NULL, NULL, 'view', 271, 272),
+(138, 128, NULL, NULL, 'delete', 273, 274),
+(139, 2, NULL, NULL, 'Lti', 276, 287),
+(140, 139, NULL, NULL, 'index', 277, 278),
+(141, 139, NULL, NULL, 'add', 279, 280),
+(142, 139, NULL, NULL, 'edit', 281, 282),
+(143, 139, NULL, NULL, 'view', 283, 284),
+(144, 139, NULL, NULL, 'delete', 285, 286),
+(145, 2, NULL, NULL, 'Mixevals', 288, 305),
+(146, 145, NULL, NULL, 'setUpAjaxList', 289, 290),
+(147, 145, NULL, NULL, 'index', 291, 292),
+(148, 145, NULL, NULL, 'ajaxList', 293, 294),
+(149, 145, NULL, NULL, 'view', 295, 296),
+(150, 145, NULL, NULL, 'add', 297, 298),
+(151, 145, NULL, NULL, 'edit', 299, 300),
+(152, 145, NULL, NULL, 'copy', 301, 302),
+(153, 145, NULL, NULL, 'delete', 303, 304),
+(154, 2, NULL, NULL, 'Oauthclients', 306, 317),
+(155, 154, NULL, NULL, 'index', 307, 308),
+(156, 154, NULL, NULL, 'add', 309, 310),
+(157, 154, NULL, NULL, 'edit', 311, 312),
+(158, 154, NULL, NULL, 'delete', 313, 314),
+(159, 154, NULL, NULL, 'view', 315, 316),
+(160, 2, NULL, NULL, 'Oauthtokens', 318, 329),
+(161, 160, NULL, NULL, 'index', 319, 320),
+(162, 160, NULL, NULL, 'add', 321, 322),
+(163, 160, NULL, NULL, 'edit', 323, 324),
+(164, 160, NULL, NULL, 'delete', 325, 326),
+(165, 160, NULL, NULL, 'view', 327, 328),
+(166, 2, NULL, NULL, 'Penalty', 330, 343),
+(167, 166, NULL, NULL, 'save', 331, 332),
+(168, 166, NULL, NULL, 'add', 333, 334),
+(169, 166, NULL, NULL, 'edit', 335, 336),
+(170, 166, NULL, NULL, 'index', 337, 338),
+(171, 166, NULL, NULL, 'view', 339, 340),
+(172, 166, NULL, NULL, 'delete', 341, 342),
+(173, 2, NULL, NULL, 'Rubrics', 344, 363),
+(174, 173, NULL, NULL, 'postProcess', 345, 346),
+(175, 173, NULL, NULL, 'setUpAjaxList', 347, 348),
+(176, 173, NULL, NULL, 'index', 349, 350),
+(177, 173, NULL, NULL, 'ajaxList', 351, 352),
+(178, 173, NULL, NULL, 'view', 353, 354),
+(179, 173, NULL, NULL, 'add', 355, 356),
+(180, 173, NULL, NULL, 'edit', 357, 358),
+(181, 173, NULL, NULL, 'copy', 359, 360),
+(182, 173, NULL, NULL, 'delete', 361, 362),
+(183, 2, NULL, NULL, 'Searchs', 364, 391),
+(184, 183, NULL, NULL, 'update', 365, 366),
+(185, 183, NULL, NULL, 'index', 367, 368),
+(186, 183, NULL, NULL, 'searchEvaluation', 369, 370),
+(187, 183, NULL, NULL, 'searchResult', 371, 372),
+(188, 183, NULL, NULL, 'searchInstructor', 373, 374),
+(189, 183, NULL, NULL, 'eventBoxSearch', 375, 376),
+(190, 183, NULL, NULL, 'formatSearchEvaluation', 377, 378),
+(191, 183, NULL, NULL, 'formatSearchInstructor', 379, 380),
+(192, 183, NULL, NULL, 'formatSearchEvaluationResult', 381, 382),
+(193, 183, NULL, NULL, 'add', 383, 384),
+(194, 183, NULL, NULL, 'edit', 385, 386),
+(195, 183, NULL, NULL, 'view', 387, 388),
+(196, 183, NULL, NULL, 'delete', 389, 390),
+(197, 2, NULL, NULL, 'Simpleevaluations', 392, 411),
+(198, 197, NULL, NULL, 'postProcess', 393, 394),
+(199, 197, NULL, NULL, 'setUpAjaxList', 395, 396),
+(200, 197, NULL, NULL, 'index', 397, 398),
+(201, 197, NULL, NULL, 'ajaxList', 399, 400),
+(202, 197, NULL, NULL, 'view', 401, 402),
+(203, 197, NULL, NULL, 'add', 403, 404),
+(204, 197, NULL, NULL, 'edit', 405, 406),
+(205, 197, NULL, NULL, 'copy', 407, 408),
+(206, 197, NULL, NULL, 'delete', 409, 410),
+(207, 2, NULL, NULL, 'Surveygroups', 412, 443),
+(208, 207, NULL, NULL, 'postProcess', 413, 414),
+(209, 207, NULL, NULL, 'setUpAjaxList', 415, 416),
+(210, 207, NULL, NULL, 'index', 417, 418),
+(211, 207, NULL, NULL, 'ajaxList', 419, 420),
+(212, 207, NULL, NULL, 'makegroups', 421, 422),
+(213, 207, NULL, NULL, 'makegroupssearch', 423, 424),
+(214, 207, NULL, NULL, 'maketmgroups', 425, 426),
+(215, 207, NULL, NULL, 'savegroups', 427, 428),
+(216, 207, NULL, NULL, 'export', 429, 430),
+(217, 207, NULL, NULL, 'release', 431, 432),
+(218, 207, NULL, NULL, 'delete', 433, 434),
+(219, 207, NULL, NULL, 'edit', 435, 436),
+(220, 207, NULL, NULL, 'changegroupset', 437, 438),
+(221, 207, NULL, NULL, 'add', 439, 440),
+(222, 207, NULL, NULL, 'view', 441, 442),
+(223, 2, NULL, NULL, 'Surveys', 444, 473),
+(224, 223, NULL, NULL, 'setUpAjaxList', 445, 446),
+(225, 223, NULL, NULL, 'index', 447, 448),
+(226, 223, NULL, NULL, 'ajaxList', 449, 450),
+(227, 223, NULL, NULL, 'view', 451, 452),
+(228, 223, NULL, NULL, 'add', 453, 454),
+(229, 223, NULL, NULL, 'edit', 455, 456),
+(230, 223, NULL, NULL, 'copy', 457, 458),
+(231, 223, NULL, NULL, 'delete', 459, 460),
+(232, 223, NULL, NULL, 'questionsSummary', 461, 462),
+(233, 223, NULL, NULL, 'moveQuestion', 463, 464),
+(234, 223, NULL, NULL, 'removeQuestion', 465, 466),
+(235, 223, NULL, NULL, 'addQuestion', 467, 468),
+(236, 223, NULL, NULL, 'editQuestion', 469, 470),
+(237, 223, NULL, NULL, 'surveyAccess', 471, 472),
+(238, 2, NULL, NULL, 'Sysparameters', 474, 489),
+(239, 238, NULL, NULL, 'setUpAjaxList', 475, 476),
+(240, 238, NULL, NULL, 'index', 477, 478),
+(241, 238, NULL, NULL, 'ajaxList', 479, 480),
+(242, 238, NULL, NULL, 'view', 481, 482),
+(243, 238, NULL, NULL, 'add', 483, 484),
+(244, 238, NULL, NULL, 'edit', 485, 486),
+(245, 238, NULL, NULL, 'delete', 487, 488),
+(246, 2, NULL, NULL, 'Upgrade', 490, 503),
+(247, 246, NULL, NULL, 'index', 491, 492),
+(248, 246, NULL, NULL, 'step2', 493, 494),
+(249, 246, NULL, NULL, 'add', 495, 496),
+(250, 246, NULL, NULL, 'edit', 497, 498),
+(251, 246, NULL, NULL, 'view', 499, 500),
+(252, 246, NULL, NULL, 'delete', 501, 502),
+(253, 2, NULL, NULL, 'Users', 504, 537),
+(254, 253, NULL, NULL, 'ajaxList', 505, 506),
+(255, 253, NULL, NULL, 'index', 507, 508),
+(256, 253, NULL, NULL, 'goToClassList', 509, 510),
+(257, 253, NULL, NULL, 'determineIfStudentFromThisData', 511, 512),
+(258, 253, NULL, NULL, 'view', 513, 514),
+(259, 253, NULL, NULL, 'add', 515, 516),
+(260, 253, NULL, NULL, 'enrol', 517, 518),
+(261, 253, NULL, NULL, 'edit', 519, 520),
+(262, 253, NULL, NULL, 'editProfile', 521, 522),
+(263, 253, NULL, NULL, 'delete', 523, 524),
+(264, 253, NULL, NULL, 'checkDuplicateName', 525, 526),
+(265, 253, NULL, NULL, 'resetPassword', 527, 528),
+(266, 253, NULL, NULL, 'import', 529, 530),
+(267, 253, NULL, NULL, 'merge', 531, 532),
+(268, 253, NULL, NULL, 'ajax_merge', 533, 534),
+(269, 253, NULL, NULL, 'update', 535, 536),
+(270, 2, NULL, NULL, 'V1', 538, 573),
+(271, 270, NULL, NULL, 'oauth', 539, 540),
+(272, 270, NULL, NULL, 'oauth_error', 541, 542),
+(273, 270, NULL, NULL, 'users', 543, 544),
+(274, 270, NULL, NULL, 'courses', 545, 546),
+(275, 270, NULL, NULL, 'groups', 547, 548),
+(276, 270, NULL, NULL, 'groupMembers', 549, 550),
+(277, 270, NULL, NULL, 'events', 551, 552),
+(278, 270, NULL, NULL, 'grades', 553, 554),
+(279, 270, NULL, NULL, 'departments', 555, 556),
+(280, 270, NULL, NULL, 'courseDepartments', 557, 558),
+(281, 270, NULL, NULL, 'userEvents', 559, 560),
+(282, 270, NULL, NULL, 'enrolment', 561, 562),
+(283, 270, NULL, NULL, 'add', 563, 564),
+(284, 270, NULL, NULL, 'edit', 565, 566),
+(285, 270, NULL, NULL, 'index', 567, 568),
+(286, 270, NULL, NULL, 'view', 569, 570),
+(287, 270, NULL, NULL, 'delete', 571, 572),
+(288, 2, NULL, NULL, 'Guard', 574, 591),
+(289, 288, NULL, NULL, 'Guard', 575, 590),
+(290, 289, NULL, NULL, 'login', 576, 577),
+(291, 289, NULL, NULL, 'logout', 578, 579),
+(292, 289, NULL, NULL, 'add', 580, 581),
+(293, 289, NULL, NULL, 'edit', 582, 583),
+(294, 289, NULL, NULL, 'index', 584, 585),
+(295, 289, NULL, NULL, 'view', 586, 587),
+(296, 289, NULL, NULL, 'delete', 588, 589),
+(297, NULL, NULL, NULL, 'functions', 593, 656),
+(298, 297, NULL, NULL, 'user', 594, 621),
+(299, 298, NULL, NULL, 'superadmin', 595, 596),
+(300, 298, NULL, NULL, 'admin', 597, 598),
+(301, 298, NULL, NULL, 'instructor', 599, 600),
+(302, 298, NULL, NULL, 'tutor', 601, 602),
+(303, 298, NULL, NULL, 'student', 603, 604),
+(304, 298, NULL, NULL, 'import', 605, 606),
+(305, 298, NULL, NULL, 'password_reset', 607, 618),
+(306, 305, NULL, NULL, 'superadmin', 608, 609),
+(307, 305, NULL, NULL, 'admin', 610, 611),
+(308, 305, NULL, NULL, 'instructor', 612, 613),
+(309, 305, NULL, NULL, 'tutor', 614, 615),
+(310, 305, NULL, NULL, 'student', 616, 617),
+(311, 298, NULL, NULL, 'index', 619, 620),
+(312, 297, NULL, NULL, 'role', 622, 633),
+(313, 312, NULL, NULL, 'superadmin', 623, 624),
+(314, 312, NULL, NULL, 'admin', 625, 626),
+(315, 312, NULL, NULL, 'instructor', 627, 628),
+(316, 312, NULL, NULL, 'tutor', 629, 630),
+(317, 312, NULL, NULL, 'student', 631, 632),
+(318, 297, NULL, NULL, 'evaluation', 634, 635),
+(319, 297, NULL, NULL, 'email', 636, 643),
+(320, 319, NULL, NULL, 'allUsers', 637, 638),
+(321, 319, NULL, NULL, 'allGroups', 639, 640),
+(322, 319, NULL, NULL, 'allCourses', 641, 642),
+(323, 297, NULL, NULL, 'emailtemplate', 644, 645),
+(324, 297, NULL, NULL, 'viewstudentresults', 646, 647),
+(325, 297, NULL, NULL, 'viewemailaddresses', 648, 649),
+(326, 297, NULL, NULL, 'superadmin', 650, 651),
+(327, 297, NULL, NULL, 'coursemanager', 652, 653),
+(328, 297, NULL, NULL, 'viewusername', 654, 655);
 
 -- --------------------------------------------------------
 
@@ -54,7 +381,7 @@ CREATE TABLE IF NOT EXISTS `aros` (
   `lft` int(10) DEFAULT NULL,
   `rght` int(10) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `aros`
@@ -84,13 +411,137 @@ CREATE TABLE IF NOT EXISTS `aros_acos` (
   `_delete` varchar(2) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `ARO_ACO_KEY` (`aro_id`,`aco_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=60 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `aros_acos`
 --
 
-INSERT INTO `aros_acos` VALUES (1,1,2,'1','1','1','1'),(2,1,288,'1','1','1','1'),(3,1,1,'1','1','1','1'),(4,2,2,'-1','-1','-1','-1'),(5,2,116,'1','1','1','1'),(6,2,10,'1','1','1','1'),(7,2,19,'1','1','1','1'),(8,2,25,'1','1','1','1'),(9,2,39,'1','1','1','1'),(10,2,49,'1','1','1','1'),(11,2,56,'1','1','1','1'),(12,2,82,'1','1','1','1'),(13,2,106,'1','1','1','1'),(14,2,139,'1','1','1','1'),(15,2,169,'1','1','1','1'),(16,2,193,'1','1','1','1'),(17,2,218,'1','1','1','1'),(18,2,203,'1','1','1','1'),(19,2,247,'1','1','1','1'),(20,2,282,'1','1','1','1'),(21,2,152,'1','1','1','1'),(22,2,154,'1','1','1','1'),(23,2,158,'1','1','1','1'),(24,2,160,'1','1','1','1'),(25,2,288,'-1','-1','-1','-1'),(26,2,314,'1','1','1','1'),(27,2,309,'1','1','1','1'),(28,2,311,'1','1','1','1'),(29,2,289,'1','1','1','1'),(30,2,291,'1','1','1','-1'),(31,2,290,'-1','-1','-1','-1'),(32,2,316,'1','1','1','1'),(33,2,319,'1','1','1','1'),(34,2,318,'1','1','1','1'),(35,2,317,'-1','-1','-1','-1'),(36,3,2,'-1','-1','-1','-1'),(37,3,116,'1','1','1','1'),(38,3,10,'1','1','1','1'),(39,3,25,'1','1','1','1'),(40,3,39,'1','1','1','1'),(41,3,49,'1','1','1','1'),(42,3,56,'1','1','1','1'),(43,3,82,'1','1','1','1'),(44,3,106,'1','1','1','1'),(45,3,139,'1','1','1','1'),(46,3,169,'1','1','1','1'),(47,3,193,'1','1','1','1'),(48,3,218,'1','1','1','1'),(49,3,203,'1','1','1','1'),(50,3,247,'1','1','1','1'),(51,3,282,'1','1','1','1'),(52,3,152,'1','1','1','1'),(53,3,154,'1','1','1','1'),(54,3,158,'1','1','1','1'),(55,3,160,'1','1','1','1'),(56,3,288,'-1','-1','-1','-1'),(57,3,309,'1','1','-1','-1'),(58,3,289,'1','1','1','1'),(59,3,291,'-1','-1','-1','-1'),(60,3,290,'-1','-1','-1','-1'),(61,3,292,'-1','1','-1','-1'),(62,3,302,'-1','-1','-1','-1'),(63,3,316,'-1','-1','-1','-1'),(64,3,317,'-1','-1','-1','-1'),(65,3,318,'1','1','1','1'),(66,4,2,'-1','-1','-1','-1'),(67,4,116,'1','1','1','1'),(68,4,10,'-1','-1','-1','-1'),(69,4,25,'-1','-1','-1','-1'),(70,4,39,'-1','-1','-1','-1'),(71,4,49,'-1','-1','-1','-1'),(72,4,82,'-1','-1','-1','-1'),(73,4,106,'-1','-1','-1','-1'),(74,4,139,'-1','-1','-1','-1'),(75,4,169,'-1','-1','-1','-1'),(76,4,193,'-1','-1','-1','-1'),(77,4,218,'-1','-1','-1','-1'),(78,4,203,'-1','-1','-1','-1'),(79,4,247,'-1','-1','-1','-1'),(80,4,282,'1','1','1','1'),(81,4,62,'1','1','1','1'),(82,4,69,'1','1','1','1'),(83,4,65,'1','1','1','1'),(84,4,67,'1','1','1','1'),(85,4,255,'1','1','1','1'),(86,4,288,'-1','-1','-1','-1'),(87,4,316,'-1','-1','-1','-1'),(88,4,317,'-1','-1','-1','-1'),(89,5,2,'-1','-1','-1','-1'),(90,5,116,'1','1','1','1'),(91,5,10,'-1','-1','-1','-1'),(92,5,25,'-1','-1','-1','-1'),(93,5,39,'-1','-1','-1','-1'),(94,5,49,'-1','-1','-1','-1'),(95,5,82,'-1','-1','-1','-1'),(96,5,106,'-1','-1','-1','-1'),(97,5,139,'-1','-1','-1','-1'),(98,5,169,'-1','-1','-1','-1'),(99,5,193,'-1','-1','-1','-1'),(100,5,218,'-1','-1','-1','-1'),(101,5,203,'-1','-1','-1','-1'),(102,5,247,'-1','-1','-1','-1'),(103,5,282,'1','1','1','1'),(104,5,62,'1','1','1','1'),(105,5,69,'1','1','1','1'),(106,5,65,'1','1','1','1'),(107,5,67,'1','1','1','1'),(108,5,255,'1','1','1','1'),(109,5,152,'1','1','1','1'),(110,5,154,'1','1','1','1'),(111,5,158,'1','1','1','1'),(112,5,160,'1','1','1','1'),(113,5,288,'-1','-1','-1','-1'),(114,5,315,'1','1','1','1'),(115,5,316,'-1','-1','-1','-1'),(116,5,317,'-1','-1','-1','-1');
+SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+
+
+INSERT INTO aros_acos (id, aro_id, aco_id, _create, _read, _update, _delete) VALUES
+(1, 1, 2, '1', '1', '1', '1'),
+(2, 1, 297, '1', '1', '1', '1'),
+(3, 1, 1, '1', '1', '1', '1'),
+(4, 2, 2, '-1', '-1', '-1', '-1'),
+(5, 2, 122, '1', '1', '1', '1'),
+(6, 2, 16, '1', '1', '1', '1'),
+(7, 2, 28, '1', '1', '1', '1'),
+(8, 2, 31, '-1', '-1', '-1', '-1'),
+(9, 2, 30, '-1', '-1', '-1', '-1'),
+(10, 2, 33, '-1', '-1', '-1', '-1'),
+(11, 2, 32, '-1', '-1', '-1', '-1'),
+(12, 2, 29, '-1', '-1', '-1', '-1'),
+(13, 2, 34, '1', '1', '1', '1'),
+(14, 2, 48, '1', '1', '1', '1'),
+(15, 2, 58, '1', '1', '1', '1'),
+(16, 2, 64, '1', '1', '1', '1'),
+(17, 2, 84, '1', '1', '1', '1'),
+(18, 2, 112, '1', '1', '1', '1'),
+(19, 2, 145, '1', '1', '1', '1'),
+(20, 2, 173, '1', '1', '1', '1'),
+(21, 2, 197, '1', '1', '1', '1'),
+(22, 2, 223, '1', '1', '1', '1'),
+(23, 2, 207, '1', '1', '1', '1'),
+(24, 2, 253, '1', '1', '1', '1'),
+(25, 2, 291, '1', '1', '1', '1'),
+(26, 2, 297, '-1', '-1', '-1', '-1'),
+(27, 2, 323, '1', '1', '1', '1'),
+(28, 2, 318, '1', '1', '1', '1'),
+(29, 2, 320, '1', '1', '1', '1'),
+(30, 2, 298, '1', '1', '1', '1'),
+(31, 2, 300, '1', '1', '1', '-1'),
+(32, 2, 299, '-1', '-1', '-1', '-1'),
+(33, 2, 325, '1', '1', '1', '1'),
+(34, 2, 328, '1', '1', '1', '1'),
+(35, 2, 327, '1', '1', '1', '1'),
+(36, 2, 326, '-1', '-1', '-1', '-1'),
+(37, 3, 2, '-1', '-1', '-1', '-1'),
+(38, 3, 122, '1', '1', '1', '1'),
+(39, 3, 16, '1', '1', '1', '1'),
+(40, 3, 34, '1', '1', '1', '1'),
+(41, 3, 48, '1', '1', '1', '1'),
+(42, 3, 58, '1', '1', '1', '1'),
+(43, 3, 64, '1', '1', '1', '1'),
+(44, 3, 84, '1', '1', '1', '1'),
+(45, 3, 112, '1', '1', '1', '1'),
+(46, 3, 145, '1', '1', '1', '1'),
+(47, 3, 173, '1', '1', '1', '1'),
+(48, 3, 197, '1', '1', '1', '1'),
+(49, 3, 223, '1', '1', '1', '1'),
+(50, 3, 207, '1', '1', '1', '1'),
+(51, 3, 253, '1', '1', '1', '1'),
+(52, 3, 291, '1', '1', '1', '1'),
+(53, 3, 156, '1', '1', '1', '1'),
+(54, 3, 158, '1', '1', '1', '1'),
+(55, 3, 162, '1', '1', '1', '1'),
+(56, 3, 164, '1', '1', '1', '1'),
+(57, 3, 267, '-1', '-1', '-1', '-1'),
+(58, 3, 297, '-1', '-1', '-1', '-1'),
+(59, 3, 318, '1', '1', '-1', '-1'),
+(60, 3, 298, '1', '1', '1', '1'),
+(61, 3, 300, '-1', '-1', '-1', '-1'),
+(62, 3, 299, '-1', '-1', '-1', '-1'),
+(63, 3, 301, '-1', '1', '-1', '-1'),
+(64, 3, 311, '-1', '-1', '-1', '-1'),
+(65, 3, 325, '-1', '-1', '-1', '-1'),
+(66, 3, 326, '-1', '-1', '-1', '-1'),
+(67, 3, 327, '1', '1', '1', '1'),
+(68, 4, 2, '-1', '-1', '-1', '-1'),
+(69, 4, 122, '1', '1', '1', '1'),
+(70, 4, 16, '-1', '-1', '-1', '-1'),
+(71, 4, 34, '-1', '-1', '-1', '-1'),
+(72, 4, 48, '-1', '-1', '-1', '-1'),
+(73, 4, 58, '-1', '-1', '-1', '-1'),
+(74, 4, 84, '-1', '-1', '-1', '-1'),
+(75, 4, 112, '-1', '-1', '-1', '-1'),
+(76, 4, 145, '-1', '-1', '-1', '-1'),
+(77, 4, 173, '-1', '-1', '-1', '-1'),
+(78, 4, 197, '-1', '-1', '-1', '-1'),
+(79, 4, 223, '-1', '-1', '-1', '-1'),
+(80, 4, 207, '-1', '-1', '-1', '-1'),
+(81, 4, 253, '-1', '-1', '-1', '-1'),
+(82, 4, 291, '1', '1', '1', '1'),
+(83, 4, 70, '1', '1', '1', '1'),
+(84, 4, 73, '1', '1', '1', '1'),
+(85, 4, 71, '1', '1', '1', '1'),
+(86, 4, 262, '1', '1', '1', '1'),
+(87, 4, 297, '-1', '-1', '-1', '-1'),
+(88, 4, 325, '-1', '-1', '-1', '-1'),
+(89, 4, 326, '-1', '-1', '-1', '-1'),
+(90, 5, 2, '-1', '-1', '-1', '-1'),
+(91, 5, 122, '1', '1', '1', '1'),
+(92, 5, 16, '-1', '-1', '-1', '-1'),
+(93, 5, 34, '-1', '-1', '-1', '-1'),
+(94, 5, 48, '-1', '-1', '-1', '-1'),
+(95, 5, 58, '-1', '-1', '-1', '-1'),
+(96, 5, 84, '-1', '-1', '-1', '-1'),
+(97, 5, 112, '-1', '-1', '-1', '-1'),
+(98, 5, 145, '-1', '-1', '-1', '-1'),
+(99, 5, 173, '-1', '-1', '-1', '-1'),
+(100, 5, 197, '-1', '-1', '-1', '-1'),
+(101, 5, 223, '-1', '-1', '-1', '-1'),
+(102, 5, 207, '-1', '-1', '-1', '-1'),
+(103, 5, 253, '-1', '-1', '-1', '-1'),
+(104, 5, 291, '1', '1', '1', '1'),
+(105, 5, 70, '1', '1', '1', '1'),
+(106, 5, 73, '1', '1', '1', '1'),
+(107, 5, 71, '1', '1', '1', '1'),
+(108, 5, 262, '1', '1', '1', '1'),
+(109, 5, 156, '1', '1', '1', '1'),
+(110, 5, 158, '1', '1', '1', '1'),
+(111, 5, 162, '1', '1', '1', '1'),
+(112, 5, 164, '1', '1', '1', '1'),
+(113, 5, 297, '-1', '-1', '-1', '-1'),
+(114, 5, 324, '1', '1', '1', '1'),
+(115, 5, 325, '-1', '-1', '-1', '-1'),
+(116, 5, 326, '-1', '-1', '-1', '-1');
 
 -- --------------------------------------------------------
 
@@ -100,7 +551,7 @@ INSERT INTO `aros_acos` VALUES (1,1,2,'1','1','1','1'),(2,1,288,'1','1','1','1')
 
 DROP TABLE IF EXISTS `courses`;
 CREATE TABLE `courses` (
-  `id` int(11) NOT NULL auto_increment,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `course` varchar(80) NOT NULL default '',
   `title` varchar(80) default NULL,
   `homepage` varchar(100) default NULL,
@@ -108,21 +559,22 @@ CREATE TABLE `courses` (
   `password` varchar(25) default NULL,
   `record_status` varchar(1) NOT NULL default 'A',
   `creator_id` int(11) NOT NULL default '0',
-  `created` datetime NOT NULL default '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) default NULL,
-  `modified` datetime default NULL,
-  `instructor_id` int(11) NOT NULL default '0',
+  `modified` datetime,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `course` (`course`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `courses`
 --
 
-INSERT INTO `courses` VALUES (1, 'MECH 328', 'Mechanical Engineering Design Project', 'http://www.mech.ubc.ca', 'off', NULL, 'A', 1, '2006-06-20 14:14:45', NULL, '2006-06-20 14:14:45', 0);
-INSERT INTO `courses` VALUES (2, 'APSC 201', 'Technical Communication', 'http://www.apsc.ubc.ca', 'off', NULL, 'A', 1, '2006-06-20 14:15:38', NULL, '2006-06-20 14:39:31', 0);
-INSERT INTO `courses` VALUES (3, 'CPSC 101', 'Connecting with Computer Science', 'http://www.ugrad.cs.ubc.ca/~cs101/', 'off', NULL, 'I', 0, '2006-06-20 00:00:00', NULL, NULL, 0);
+INSERT INTO `courses` (`id`, `course`, `title`, `homepage`, `self_enroll`, `password`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
+(1, 'MECH 328', 'Mechanical Engineering Design Project', 'http://www.mech.ubc.ca', 'off', NULL, 'A', 1, '2006-06-20 14:14:45', NULL, '2006-06-20 14:14:45'),
+(2, 'APSC 201', 'Technical Communication', 'http://www.apsc.ubc.ca', 'off', NULL, 'A', 1, '2006-06-20 14:15:38', NULL, '2006-06-20 14:39:31'),
+(3, 'CPSC 101', 'Connecting with Computer Science', 'http://www.ugrad.cs.ubc.ca/~cs101/', 'off', NULL, 'I', 1, '2006-06-20 00:00:00', NULL, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -132,26 +584,27 @@ INSERT INTO `courses` VALUES (3, 'CPSC 101', 'Connecting with Computer Science',
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(80) NOT NULL DEFAULT '',
+  `username` varchar(80) NOT NULL,
   `password` varchar(80) NOT NULL DEFAULT '',
-  `first_name` varchar(80) DEFAULT NULL,
-  `last_name` varchar(80) DEFAULT NULL,
-  `student_no` varchar(30) DEFAULT NULL,
-  `title` varchar(80) DEFAULT NULL,
-  `email` varchar(80) DEFAULT NULL,
-  `last_login` datetime DEFAULT NULL,
-  `last_logout` datetime DEFAULT NULL,
+  `first_name` varchar(80) DEFAULT '',
+  `last_name` varchar(80) DEFAULT '',
+  `student_no` varchar(30) DEFAULT '',
+  `title` varchar(80) DEFAULT '',
+-- The maximum length for an email address is 254 chars by RFC3696 errata
+  `email` varchar(254) DEFAULT '',
+  `last_login` datetime,
+  `last_logout` datetime,
   `last_accessed` varchar(10) DEFAULT NULL,
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   `lti_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE (`lti_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `users`
@@ -208,20 +661,20 @@ CREATE TABLE IF NOT EXISTS `faculties` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(80) NOT NULL,
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`),
   UNIQUE (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `faculties`
 --
 
 INSERT INTO `faculties` (`id`, `name`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
-(1, 'Applied Science', 0, '0000-00-00 00:00:00', NULL, '2012-05-23 11:29:58'),
-(2, 'Science', 0, '0000-00-00 00:00:00', NULL, '2012-05-23 11:30:05');
+(1, 'Applied Science', 0, NOW(), NULL, '2012-05-23 11:29:58'),
+(2, 'Science', 0, NOW(), NULL, '2012-05-23 11:30:05');
 
 -- --------------------------------------------------------
 
@@ -235,22 +688,22 @@ CREATE TABLE IF NOT EXISTS `departments` (
   `name` varchar(80) NOT NULL,
   `faculty_id` int NOT NULL,
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   FOREIGN KEY (`faculty_id`) REFERENCES `faculties` (`id`) ON DELETE CASCADE,
   PRIMARY KEY (`id`),
   UNIQUE (`name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `departments`
 --
 
 INSERT INTO `departments` (`id`, `name`, `faculty_id`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
-(1, 'MECH', 1, 0, '0000-00-00 00:00:00', NULL, '2012-05-23 11:30:41'),
-(2, 'APSC', 1, 0, '0000-00-00 00:00:00', NULL, '2012-05-23 11:30:57'),
-(3, 'CPSC', 2, 0, '0000-00-00 00:00:00', NULL, '2012-05-23 11:31:07');
+(1, 'MECH', 1, 0, NOW(), NULL, '2012-05-23 11:30:41'),
+(2, 'APSC', 1, 0, NOW(), NULL, '2012-05-23 11:30:57'),
+(3, 'CPSC', 2, 0, NOW(), NULL, '2012-05-23 11:31:07');
 
 -- --------------------------------------------------------
 
@@ -260,13 +713,13 @@ INSERT INTO `departments` (`id`, `name`, `faculty_id`, `creator_id`, `created`, 
 
 DROP TABLE IF EXISTS `course_departments`;
 CREATE TABLE `course_departments` (
-  `id` int NOT NULL auto_increment,
+  `id` int NOT NULL AUTO_INCREMENT,
   `course_id` int NOT NULL,
   `department_id` int NOT NULL,
   FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE,
   FOREIGN KEY (`department_id`) REFERENCES `departments` (`id`) ON DELETE CASCADE,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `course_departments`
@@ -275,7 +728,8 @@ CREATE TABLE `course_departments` (
 INSERT INTO `course_departments` (`id`, `course_id`, `department_id`) VALUES
 (1, 2, 2),
 (2, 1, 1),
-(3, 3, 3);
+(3, 3, 3),
+(4, 3, 2);
 
 -- --------------------------------------------------------
 
@@ -290,20 +744,20 @@ CREATE TABLE IF NOT EXISTS `email_merges` (
   `value` varchar(80) NOT NULL,
   `table_name` varchar(80) NOT NULL,
   `field_name` varchar(80) NOT NULL,
-  `created` datetime NOT NULL,
-  `modified` datetime NOT NULL,
+  `created` datetime,
+  `modified` datetime,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `email_merges`
 --
 
 INSERT INTO `email_merges` (`id`, `key`, `value`, `table_name`, `field_name`, `created`, `modified`) VALUES
-(1, 'Username', '{{{USERNAME}}}', 'User', 'username', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
-(2, 'First Name', '{{{FIRSTNAME}}}', 'User', 'first_name', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
-(3, 'Last Name', '{{{LASTNAME}}}', 'User', 'last_name', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
-(4, 'Email Address', '{{{Email}}}', 'User', 'email', '0000-00-00 00:00:00', '0000-00-00 00:00:00');
+(1, 'Username', '{{{USERNAME}}}', 'User', 'username', NOW(), NOW()),
+(2, 'First Name', '{{{FIRSTNAME}}}', 'User', 'first_name', NOW(), NOW()),
+(3, 'Last Name', '{{{LASTNAME}}}', 'User', 'last_name', NOW(), NOW()),
+(4, 'Email Address', '{{{Email}}}', 'User', 'email', NOW(), NOW());
 
 -- --------------------------------------------------------
 
@@ -316,17 +770,17 @@ CREATE TABLE IF NOT EXISTS `email_schedules` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `subject` varchar(80) NOT NULL,
   `content` text NOT NULL,
-  `date` datetime NOT NULL,
+  `date` datetime,
   `from` varchar(80) NOT NULL,
-  `to` varchar(600) NOT NULL,
+  `to` text NOT NULL,
   `course_id` int(11) DEFAULT NULL,
   `event_id` int(11) DEFAULT NULL,
   `grp_id` int(11) DEFAULT NULL,
   `sent` tinyint(1) NOT NULL DEFAULT '0',
   `creator_id` int(11) NOT NULL,
-  `created` datetime NOT NULL,
+  `created` datetime,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `email_schedules`
@@ -352,11 +806,11 @@ CREATE TABLE IF NOT EXISTS `email_templates` (
   `content` text NOT NULL,
   `availability` tinyint(4) NOT NULL,
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `updated` datetime DEFAULT NULL,
+  `updated` datetime,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=13 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `email_templates`
@@ -364,9 +818,9 @@ CREATE TABLE IF NOT EXISTS `email_templates` (
 
 INSERT INTO `email_templates` (`id`, `name`, `description`, `subject`, `content`, `availability`, `creator_id`, `created`, `updater_id`, `updated`) VALUES
 (1, 'Submission Confirmation', 'template for submission confirmation', 'iPeer: Evaluation Submission Confirmation', 'Hi {{{FIRSTNAME}}}, \nYour evaluation has been submitted successfully. Thank you for your feedback!\n\n iPeer',1, 1, NOW(), NULL, NULL),
-(2, 'Email template example', 'This is an email template example', 'Email Template', 'Hello, {{{USERNAME}}}',1, 1, '0000-00-00', NULL, NULL),
-(3, 'Email template example2', 'email template ex2', 'Email Template2', 'Hello, {{{FIRSTNAME}}}',1, 2, '0000-00-00', NULL, NULL),
-(4, 'Email template example3', 'email temp example3', 'Email Template3', 'Hello,',1, 3, '0000-00-00', NULL, NULL);
+(2, 'Email template example', 'This is an email template example', 'Email Template', 'Hello, {{{USERNAME}}}',1, 1, NOW(), NULL, NULL),
+(3, 'Email template example2', 'email template ex2', 'Email Template2', 'Hello, {{{FIRSTNAME}}}',1, 2, NOW(), NULL, NULL),
+(4, 'Email template example3', 'email temp example3', 'Email Template3', 'Hello,',1, 3, NOW(), NULL, NULL);
 
 
 -- --------------------------------------------------------
@@ -385,12 +839,12 @@ CREATE TABLE IF NOT EXISTS `evaluation_mixeval_details` (
   `grade` double(12,2) NOT NULL DEFAULT '0.00',
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`),
   UNIQUE KEY `evaluation_mixeval_id` (`evaluation_mixeval_id`,`question_number`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `evaluation_mixeval_details`
@@ -446,11 +900,11 @@ CREATE TABLE IF NOT EXISTS `evaluation_mixevals` (
   `event_id` int(11) NOT NULL DEFAULT '0',
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `evaluation_mixevals`
@@ -479,12 +933,12 @@ CREATE TABLE IF NOT EXISTS `evaluation_rubric_details` (
   `grade` double(12,2) NOT NULL DEFAULT '0.00',
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`),
   UNIQUE KEY `evaluation_rubric_id` (`evaluation_rubric_id`,`criteria_number`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `evaluation_rubric_details`
@@ -523,12 +977,12 @@ CREATE TABLE IF NOT EXISTS `evaluation_rubrics` (
   `event_id` int(11) NOT NULL DEFAULT '0',
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   `rubric_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `evaluation_rubrics`
@@ -556,15 +1010,15 @@ CREATE TABLE IF NOT EXISTS `evaluation_simples` (
   `release_status` int(1) NOT NULL DEFAULT '0',
   `grp_event_id` int(11) NOT NULL DEFAULT '0',
   `event_id` bigint(11) NOT NULL DEFAULT '0',
-  `date_submitted` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `date_submitted` datetime,
   `grade_release` int(1) DEFAULT NULL,
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `evaluation_simples`
@@ -595,15 +1049,15 @@ CREATE TABLE IF NOT EXISTS `evaluation_submissions` (
   `grp_event_id` int(11) DEFAULT NULL,
   `submitter_id` int(11) NOT NULL DEFAULT '0',
   `submitted` tinyint(1) NOT NULL DEFAULT '0',
-  `date_submitted` datetime DEFAULT NULL,
+  `date_submitted` datetime,
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`),
   UNIQUE KEY `grp_event_id` (`grp_event_id`,`submitter_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `evaluation_submissions`
@@ -638,22 +1092,22 @@ CREATE TABLE IF NOT EXISTS `event_template_types` (
   `display_for_selection` tinyint(1) NOT NULL DEFAULT '1',
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`),
   UNIQUE KEY `type_name` (`type_name`),
   UNIQUE KEY `table_name` (`table_name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `event_template_types`
 --
 
 INSERT INTO `event_template_types` (`id`, `type_name`, `table_name`, `model_name`, `display_for_selection`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
-(1, 'SIMPLE', 'simple_evaluations', 'SimpleEvaluation', 1, 'A', 0, '0000-00-00 00:00:00', NULL, NULL),
-(2, 'RUBRIC', 'rubrics', 'Rubric', 1, 'A', 0, '0000-00-00 00:00:00', NULL, NULL),
-(3, 'SURVEY', 'surveys', '', 1, 'A', 0, '0000-00-00 00:00:00', NULL, NULL),
+(1, 'SIMPLE', 'simple_evaluations', 'SimpleEvaluation', 1, 'A', 0, NOW(), NULL, NULL),
+(2, 'RUBRIC', 'rubrics', 'Rubric', 1, 'A', 0, NOW(), NULL, NULL),
+(3, 'SURVEY', 'surveys', '', 1, 'A', 0, NOW(), NULL, NULL),
 (4, 'MIX EVALUATION', 'mixevals', 'Mixeval', 1, 'A', 0, '2006-04-03 11:51:02', 0, '2006-04-06 15:31:48');
 
 -- --------------------------------------------------------
@@ -670,36 +1124,40 @@ CREATE TABLE IF NOT EXISTS `events` (
   `description` text,
   `event_template_type_id` int(20) NOT NULL DEFAULT '0',
   `template_id` int(11) NOT NULL DEFAULT '2',
-  `self_eval` varchar(11) NOT NULL DEFAULT '',
+  `self_eval` varchar(11) NOT NULL DEFAULT '0',
   `com_req` int(11) NOT NULL DEFAULT '0',
-  `due_date` datetime DEFAULT NULL,
-  `release_date_begin` datetime DEFAULT NULL,
-  `release_date_end` datetime DEFAULT NULL,
-  `result_release_date_begin` datetime DEFAULT NULL,
-  `result_release_date_end` datetime DEFAULT NULL,
+  `auto_release` int(11) NOT NULL DEFAULT '0',
+  `enable_details` int(11) NOT NULL DEFAULT '1',
+  `due_date` datetime,
+  `release_date_begin` datetime,
+  `release_date_end` datetime,
+  `result_release_date_begin` datetime,
+  `result_release_date_end` datetime,
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `events`
 --
 
-INSERT INTO events (id, title, course_id, description, event_template_type_id, template_id, self_eval, com_req, due_date, release_date_begin, release_date_end, result_release_date_begin, result_release_date_end, record_status, creator_id, created, updater_id, modified) VALUES
-(1, 'Term 1 Evaluation', 1, '', 1, 1, '0', 0, CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 1 YEAR)), '-07-02 16:34:43'), '2011-06-16 16:34:49', '2023-07-22 16:34:53', '2024-07-04 16:34:43', '2024-07-30 16:34:43', 'A', 1, '2006-06-20 16:27:33', 1, '2006-06-21 08:51:20'),
-(2, 'Term Report Evaluation', 1, '', 2, 1, '0', 0, CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 1 YEAR)), '-06-08 08:59:29'), '2011-06-06 08:59:35', '2023-07-02 08:59:41', '2024-06-09 08:59:29', '2024-07-08 08:59:29', 'A', 1, '2006-06-21 08:52:20', 1, '2006-06-21 08:54:25'),
-(3, 'Project Evaluation', 1, '', 4, 1, '0', 0, CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 1 YEAR)), '-07-02 09:00:28'), '2011-06-07 09:00:35', '2023-07-09 09:00:39', '2023-07-04 09:00:28', '2024-07-12 09:00:28', 'A', 1, '2006-06-21 08:53:14', 1, '2006-06-21 09:07:26'),
-(4, 'Team Creation Survey', 1, NULL, 3, 1, '1', 1, CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 1 YEAR)), '-07-31 11:20:00'), '2012-07-01 11:20:00', '2014-12-31 11:20:00', NULL, NULL, 'A', 2, '2012-07-13 11:18:56', 2, '2012-07-13 11:18:56'),
-(5, 'Survey, all Q types', 1, NULL, 3, 2, '1', 1, CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 1 YEAR)), '-07-31 11:20:00'), '2012-07-01 11:20:00', '2014-12-31 11:20:00', NULL, NULL, 'A', 1, '2012-07-13 11:18:56', 1, '2012-07-13 11:18:56'),
-(6, 'simple evaluation 2', 1, '2nd simple evaluation', 1, 1, '0', 0, '2012-11-28 00:00:00', '2012-11-20 00:00:00', '2022-11-29 00:00:00', '2022-11-30 00:00:00', '2022-12-12 00:00:00', 'A', 1, '2012-11-21 12:23:13', 1, '2012-11-21 12:23:13'),
-(7, 'simple evaluation 3', 1, '3rd simple evaluation for testing overdue event', 1, 1, '0', 0, '2012-11-28 00:00:00', '2012-11-20 00:00:00', '2012-11-29 00:00:00', '2022-11-30 00:00:00', '2022-12-12 00:00:00', 'A', 1, '2012-11-21 12:23:13', 1, '2012-11-21 12:23:13'),
-(8, 'simple evaluation 4', 1, 'result released with submission', 1, 1, '0', 0, '2012-11-28 00:00:00', '2012-11-20 00:00:00', '2012-11-29 00:00:00', '2012-11-30 00:00:00', '2022-12-12 00:00:00', 'A', 1, '2012-11-21 12:23:13', 1, '2012-11-21 12:23:13'),
-(9, 'simple evaluation 5', 1, 'result released with no submission', 1, 1, '0', 0, '2012-11-28 00:00:00', '2012-11-20 00:00:00', '2012-11-29 00:00:00', '2012-11-30 00:00:00', '2022-12-12 00:00:00', 'A', 1, '2012-11-21 12:23:13', 1, '2012-11-21 12:23:13'),
-(10, 'simple evaluation 6', 1, 'result released with no submission', 1, 1, '0', 0, CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 2 YEAR)), '-07-31 11:20:00'), CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 1 YEAR)), '-07-31 11:20:00'), CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 2 YEAR)), '-07-31 11:20:00'), CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 2 YEAR)), '-07-31 11:20:00'), CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 3 YEAR)), '-07-31 11:20:00'), 'A', 1, '2012-11-21 12:23:13', 1, '2012-11-21 12:23:13');
+SET @year = YEAR(DATE_ADD(NOW(), INTERVAL 1 YEAR));
+
+INSERT INTO events (id, title, course_id, description, event_template_type_id, template_id, self_eval, com_req, auto_release, enable_details, due_date, release_date_begin, release_date_end, result_release_date_begin, result_release_date_end, record_status, creator_id, created, updater_id, modified) VALUES
+(1, 'Term 1 Evaluation', 1, '', 1, 1, '0', 0, 0, 1, CONCAT(@year, '-07-02 16:34:43'), '2011-06-16 16:34:49', '2023-07-22 16:34:53', '2024-07-04 16:34:43', '2024-07-30 16:34:43', 'A', 1, '2006-06-20 16:27:33', 1, '2006-06-21 08:51:20'),
+(2, 'Term Report Evaluation', 1, '', 2, 1, '0', 0, 0, 1, CONCAT(@year, '-06-08 08:59:29'), '2011-06-06 08:59:35', '2023-07-02 08:59:41', '2024-06-09 08:59:29', '2024-07-08 08:59:29', 'A', 1, '2006-06-21 08:52:20', 1, '2006-06-21 08:54:25'),
+(3, 'Project Evaluation', 1, '', 4, 1, '0', 0, 0, 1, CONCAT(@year, '-07-02 09:00:28'), '2011-06-07 09:00:35', '2023-07-09 09:00:39', '2023-07-04 09:00:28', '2024-07-12 09:00:28', 'A', 1, '2006-06-21 08:53:14', 1, '2006-06-21 09:07:26'),
+(4, 'Team Creation Survey', 1, NULL, 3, 1, '1', 1, 0, 1, CONCAT(@year, '-07-31 11:20:00'), '2012-07-01 11:20:00', CONCAT(@year, '-12-31 11:20:00'), NULL, NULL, 'A', 2, '2012-07-13 11:18:56', 2, '2012-07-13 11:18:56'),
+(5, 'Survey, all Q types', 1, NULL, 3, 2, '1', 1, 0, 1, CONCAT(@year, '-07-31 11:20:00'), '2012-07-01 11:20:00', CONCAT(@year, '-12-31 11:20:00'), NULL, NULL, 'A', 1, '2012-07-13 11:18:56', 1, '2012-07-13 11:18:56'),
+(6, 'simple evaluation 2', 1, '2nd simple evaluation', 1, 1, '0', 0, 0, 1, '2012-11-28 00:00:00', '2012-11-20 00:00:00', '2022-11-29 00:00:00', '2022-11-30 00:00:00', '2022-12-12 00:00:00', 'A', 1, '2012-11-21 12:23:13', 1, '2012-11-21 12:23:13'),
+(7, 'simple evaluation 3', 1, '3rd simple evaluation for testing overdue event', 1, 1, '0', 0, 0, 1, '2012-11-28 00:00:00', '2012-11-20 00:00:00', '2012-11-29 00:00:00', '2022-11-30 00:00:00', '2022-12-12 00:00:00', 'A', 1, '2012-11-21 12:23:13', 1, '2012-11-21 12:23:13'),
+(8, 'simple evaluation 4', 1, 'result released with submission', 1, 1, '0', 0, 0, 1, '2012-11-28 00:00:00', '2012-11-20 00:00:00', '2012-11-29 00:00:00', '2012-11-30 00:00:00', '2022-12-12 00:00:00', 'A', 1, '2012-11-21 12:23:13', 1, '2012-11-21 12:23:13'),
+(9, 'simple evaluation 5', 1, 'result released with no submission', 1, 1, '0', 0, 0, 1, '2012-11-28 00:00:00', '2012-11-20 00:00:00', '2012-11-29 00:00:00', '2012-11-30 00:00:00', '2022-12-12 00:00:00', 'A', 1, '2012-11-21 12:23:13', 1, '2012-11-21 12:23:13'),
+(10, 'simple evaluation 6', 1, 'result released with no submission', 1, 1, '0', 0, 0, 1, CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 2 YEAR)), '-07-31 11:20:00'), CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 1 YEAR)), '-07-31 11:20:00'), CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 2 YEAR)), '-07-31 11:20:00'), CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 2 YEAR)), '-07-31 11:20:00'), CONCAT(YEAR(DATE_ADD(NOW(), INTERVAL 3 YEAR)), '-07-31 11:20:00'), 'A', 1, '2012-11-21 12:23:13', 1, '2012-11-21 12:23:13');
 
 -- --------------------------------------------------------
 
@@ -718,12 +1176,12 @@ CREATE TABLE IF NOT EXISTS `group_events` (
   `comment_release_status` varchar(20) NOT NULL DEFAULT 'None',
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`),
   UNIQUE KEY `group_id` (`event_id`,`group_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `group_events`
@@ -735,12 +1193,12 @@ INSERT INTO `group_events` VALUES (3, 1, 2, 'not reviewed', NULL, 'None', 'None'
 INSERT INTO `group_events` VALUES (4, 2, 2, 'not reviewed', NULL, 'None', 'None', 'A', 0, '2006-06-21 08:52:20', NULL, '2006-06-21 08:52:20');
 INSERT INTO `group_events` VALUES (5, 1, 3, 'not reviewed', NULL, 'None', 'None', 'A', 0, '2006-06-21 08:53:23', NULL, '2006-06-21 08:53:23');
 INSERT INTO `group_events` VALUES (6, 2, 3, 'not reviewed', NULL, 'None', 'None', 'A', 0, '2006-06-21 08:53:23', NULL, '2006-06-21 08:53:23');
-INSERT INTO `group_events` VALUES (7, 1, 6, 'not reviewed', NULL, 'None', 'None', 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
-INSERT INTO `group_events` VALUES (8, 2, 6, 'not reviewed', NULL, 'None', 'None', 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
-INSERT INTO `group_events` VALUES (9, 1, 7, 'not reviewed', NULL, 'None', 'None', 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
-INSERT INTO `group_events` VALUES (10, 1, 8, 'not reviewed', NULL, 'None', 'None', 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
-INSERT INTO `group_events` VALUES (11, 1, 9, 'not reviewed', NULL, 'None', 'None', 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
-INSERT INTO `group_events` VALUES (12, 1, 10, 'not reviewed', NULL, 'None', 'None', 'A', 0, '0000-00-00 00:00:00', NULL, NULL);
+INSERT INTO `group_events` VALUES (7, 1, 6, 'not reviewed', NULL, 'None', 'None', 'A', 0, NOW(), NULL, NULL);
+INSERT INTO `group_events` VALUES (8, 2, 6, 'not reviewed', NULL, 'None', 'None', 'A', 0, NOW(), NULL, NULL);
+INSERT INTO `group_events` VALUES (9, 1, 7, 'not reviewed', NULL, 'None', 'None', 'A', 0, NOW(), NULL, NULL);
+INSERT INTO `group_events` VALUES (10, 1, 8, 'not reviewed', NULL, 'None', 'None', 'A', 0, NOW(), NULL, NULL);
+INSERT INTO `group_events` VALUES (11, 1, 9, 'not reviewed', NULL, 'None', 'None', 'A', 0, NOW(), NULL, NULL);
+INSERT INTO `group_events` VALUES (12, 1, 10, 'not reviewed', NULL, 'None', 'None', 'A', 0, NOW(), NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -756,11 +1214,11 @@ CREATE TABLE IF NOT EXISTS `groups` (
   `course_id` int(11) DEFAULT NULL,
   `record_status` varchar(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `groups`
@@ -781,8 +1239,9 @@ CREATE TABLE IF NOT EXISTS `groups_members` (
   `group_id` int(11) NOT NULL DEFAULT '0',
   `user_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `group_user` (`group_id`,`user_id`),
   KEY `group_id` (`group_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `groups_members`
@@ -808,46 +1267,103 @@ CREATE TABLE IF NOT EXISTS `mixevals` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(80) NOT NULL DEFAULT '',
   `zero_mark` tinyint(1) NOT NULL DEFAULT '0',
-  `total_question` int(11) NOT NULL DEFAULT '0',
-  `lickert_question_max` int(11) NOT NULL DEFAULT '0',
-  `scale_max` int(11) NOT NULL DEFAULT '0',
-  `prefill_question_max` int(11) DEFAULT NULL,
   `availability` varchar(10) NOT NULL DEFAULT 'public',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `mixevals`
 --
 
-INSERT INTO `mixevals` (`id`, `name`, `zero_mark`, `total_question`, `lickert_question_max`, `scale_max`, `prefill_question_max`, `availability`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
-(1, 'Default Mix Evalution', 0, 7, 3, 5, 3, 'public', 1, '2006-09-12 13:34:30', 1, '2006-09-12 13:47:57');
+INSERT INTO `mixevals` (`id`, `name`, `zero_mark`, `availability`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
+(1, 'Default Mix Evaluation', 0, 'public', 1, '2006-09-12 13:34:30', 1, '2006-09-12 13:47:57');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `mixevals_question_descs`
+-- Table structure for table `mixeval_question_types`
 --
 
-DROP TABLE IF EXISTS `mixevals_question_descs`;
-CREATE TABLE IF NOT EXISTS `mixevals_question_descs` (
+DROP TABLE IF EXISTS `mixeval_question_types`;
+CREATE TABLE IF NOT EXISTS `mixeval_question_types` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `type` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `mixeval_question_types`
+--
+
+INSERT INTO `mixeval_question_types` (`id`, `type`) VALUES
+(1, 'Likert'),
+(2, 'Paragraph'),
+(3, 'Sentence'),
+(4, 'ScoreDropdown');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `mixeval_questions`
+--
+
+DROP TABLE IF EXISTS `mixeval_questions`;
+CREATE TABLE IF NOT EXISTS `mixeval_questions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `mixeval_id` int(11) NOT NULL DEFAULT '0',
+  `question_num` int(11) NOT NULL DEFAULT '0',
+  `title` text,
+  `instructions` text,
+  `mixeval_question_type_id` int(11) NOT NULL,
+  `required` tinyint(1) NOT NULL DEFAULT '1',
+  `self_eval` tinyint(1) NOT NULL DEFAULT '0',
+  `multiplier` int(11) NOT NULL DEFAULT '0',
+  `scale_level` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`mixeval_question_type_id`) REFERENCES `mixeval_question_types` 
+	(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`mixeval_id`) REFERENCES `mixevals` 
+	(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `mixeval_questions`
+--
+
+INSERT INTO `mixeval_questions` (`id`, `mixeval_id`, `question_num`, `title`, `instructions`, `mixeval_question_type_id`, `required`, `self_eval`, `multiplier`, `scale_level`) VALUES
+(1, 1, 1, 'Participated in Team Meetings', "Please rate performance.", 1, 1, 0, 1, 5),
+(2, 1, 2, 'Was Helpful and co-operative', NULL, 1, 1, 0, 1, 5),
+(3, 1, 3, 'Submitted work on time', NULL, 1, 1, 0, 1, 5),
+(4, 1, 4, 'Produced efficient work?', NULL, 3, 1, 0, 0, 5),
+(5, 1, 5, 'Contributed?', "Please give a paragraph answer.", 2, 1, 0, 0, 5),
+(6, 1, 6, 'Easy to work with?', NULL, 3, 0, 0, 0, 5);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `mixeval_question_descs`
+--
+
+DROP TABLE IF EXISTS `mixeval_question_descs`;
+CREATE TABLE IF NOT EXISTS `mixeval_question_descs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `question_id` int(11) NOT NULL DEFAULT '0',
   `scale_level` int(11) NOT NULL DEFAULT '0',
   `descriptor` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `question_num` (`question_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
+  FOREIGN KEY (`question_id`) REFERENCES `mixeval_questions` 
+	(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `mixevals_question_descs`
+-- Dumping data for table `mixeval_question_descs`
 --
 
-INSERT INTO `mixevals_question_descs` (`id`, `question_id`, `scale_level`, `descriptor`) VALUES
+INSERT INTO `mixeval_question_descs` (`id`, `question_id`, `scale_level`, `descriptor`) VALUES
 (1, 1, 1, 'Lowest'),
 (2, 1, 2, NULL),
 (3, 1, 3, 'Middle'),
@@ -867,39 +1383,6 @@ INSERT INTO `mixevals_question_descs` (`id`, `question_id`, `scale_level`, `desc
 -- --------------------------------------------------------
 
 --
--- Table structure for table `mixevals_questions`
---
-
-DROP TABLE IF EXISTS `mixevals_questions`;
-CREATE TABLE IF NOT EXISTS `mixevals_questions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `mixeval_id` int(11) NOT NULL DEFAULT '0',
-  `question_num` int(11) NOT NULL DEFAULT '0',
-  `title` text,
-  `instructions` text,
-  `question_type` char(1) DEFAULT NULL,
-  `required` tinyint(1) NOT NULL DEFAULT '1',
-  `multiplier` int(11) NOT NULL DEFAULT '0',
-  `scale_level` int(11) NOT NULL DEFAULT '0',
-  `response_type` char(1) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
-
---
--- Dumping data for table `mixevals_questions`
---
-
-INSERT INTO `mixevals_questions` (`id`, `mixeval_id`, `question_num`, `title`, `instructions`, `question_type`, `required`, `multiplier`, `scale_level`, `response_type`) VALUES
-(1, 1, 1, 'Participated in Team Meetings', NULL, 'S', 1, 1, 5, NULL),
-(2, 1, 2, 'Was Helpful and co-operative', NULL, 'S', 1, 1, 5, NULL),
-(3, 1, 3, 'Submitted work on time', NULL, 'S', 1, 1, 5, NULL),
-(4, 1, 4, 'Produced efficient work?', NULL, 'T', 1, 0, 5, 'S'),
-(5, 1, 5, 'Contributed?', NULL, 'T', 1, 0, 5, 'L'),
-(6, 1, 6, 'Easy to work with?', NULL, 'T', 0, 0, 5, 'S');
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `oauth_clients`
 -- This stores OAuth client credentials (AKA: consumer key and secret).
 -- Client credentails are used to identify client software.
@@ -914,7 +1397,7 @@ CREATE TABLE IF NOT EXISTS `oauth_clients` (
   `enabled` tinyint(1) DEFAULT 1,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `oauth_clients`
@@ -935,7 +1418,7 @@ CREATE TABLE IF NOT EXISTS `oauth_nonces` (
   `nonce` varchar(255) NOT NULL,
   `expires` TIMESTAMP NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 --
@@ -955,7 +1438,7 @@ CREATE TABLE IF NOT EXISTS `oauth_tokens` (
   `enabled` tinyint(1) DEFAULT 1,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `oauth_tokens`
@@ -977,7 +1460,7 @@ CREATE TABLE IF NOT EXISTS `penalties` (
   `percent_penalty` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=36 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `penalties`
@@ -1007,11 +1490,11 @@ CREATE TABLE IF NOT EXISTS `personalizes` (
   `user_id` int(11) NOT NULL DEFAULT '0',
   `attribute_code` varchar(80) DEFAULT NULL,
   `attribute_value` varchar(80) DEFAULT NULL,
-  `created` datetime DEFAULT NULL,
-  `updated` datetime DEFAULT NULL,
+  `created` datetime,
+  `updated` datetime,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`,`attribute_code`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `personalizes`
@@ -1047,7 +1530,7 @@ CREATE TABLE IF NOT EXISTS `questions` (
   `type` varchar(1) DEFAULT NULL,
   `master` varchar(3) NOT NULL DEFAULT 'yes',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `questions`
@@ -1072,7 +1555,7 @@ CREATE TABLE IF NOT EXISTS `responses` (
   `question_id` int(11) NOT NULL DEFAULT '0',
   `response` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `responses`
@@ -1102,10 +1585,10 @@ DROP TABLE IF EXISTS `roles`;
 CREATE TABLE IF NOT EXISTS `roles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
-  `created` datetime NOT NULL,
-  `modified` datetime NOT NULL,
+  `created` datetime,
+  `modified` datetime,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `roles`
@@ -1129,10 +1612,10 @@ CREATE TABLE IF NOT EXISTS `roles_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `role_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `created` datetime NOT NULL,
-  `modified` datetime NOT NULL,
+  `created` datetime,
+  `modified` datetime,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `roles_users`
@@ -1194,11 +1677,11 @@ CREATE TABLE IF NOT EXISTS `rubrics` (
   `availability` varchar(10) NOT NULL DEFAULT 'public',
   `template` varchar(20) NOT NULL DEFAULT 'horizontal',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `rubrics`
@@ -1221,7 +1704,7 @@ CREATE TABLE IF NOT EXISTS `rubrics_criteria_comments` (
   PRIMARY KEY (`id`),
   KEY `criteria_id` (`criteria_id`),
   KEY `rubrics_loms_id` (`rubrics_loms_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `rubrics_criteria_comments`
@@ -1257,7 +1740,7 @@ CREATE TABLE IF NOT EXISTS `rubrics_criterias` (
   `criteria` varchar(255) DEFAULT NULL,
   `multiplier` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `rubrics_criterias`
@@ -1280,7 +1763,7 @@ CREATE TABLE IF NOT EXISTS `rubrics_loms` (
   `lom_num` int(11) NOT NULL DEFAULT '999',
   `lom_comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `rubrics_loms`
@@ -1307,11 +1790,12 @@ CREATE TABLE IF NOT EXISTS `simple_evaluations` (
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `availability` varchar(10) NOT NULL DEFAULT 'public',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  `modified` datetime,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `simple_evaluations`
@@ -1332,7 +1816,7 @@ CREATE TABLE IF NOT EXISTS `survey_group_members` (
   `group_id` int(11) NOT NULL DEFAULT '0',
   `user_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `survey_group_members`
@@ -1367,13 +1851,13 @@ CREATE TABLE IF NOT EXISTS `survey_group_sets` (
   `released` int(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `survey_id` (`survey_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `survey_group_sets`
 --
 
-INSERT INTO `survey_group_sets` VALUES (3, 1, 'test groupset', 3, 1150923956, 0);
+INSERT INTO `survey_group_sets` VALUES (3, 4, 'test groupset', 3, 1150923956, 0);
 
 -- --------------------------------------------------------
 
@@ -1387,7 +1871,7 @@ CREATE TABLE IF NOT EXISTS `survey_groups` (
   `group_set_id` int(11) NOT NULL DEFAULT '0',
   `group_number` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `survey_groups`
@@ -1409,27 +1893,25 @@ CREATE TABLE IF NOT EXISTS `survey_inputs` (
   `event_id` int(11) NOT NULL DEFAULT '0',
   `user_id` int(11) NOT NULL DEFAULT '0',
   `question_id` int(11) NOT NULL DEFAULT '0',
-  `sub_id` int(11) DEFAULT NULL,
-  `chkbx_id` int(11) DEFAULT NULL,
   `response_text` text,
   `response_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `survey_inputs`
 --
 
-INSERT INTO survey_inputs (id, event_id, user_id, question_id, sub_id, chkbx_id, response_text, response_id) VALUES
-(1, 4, 7, 1, NULL, NULL, '4+', 1),
-(2, 4, 7, 2, NULL, NULL, 'yes', 5),
-(3, 4, 31, 1, NULL, NULL, '3-4', 2),
-(4, 4, 31, 2, NULL, NULL, 'no', 6),
-(5, 5, 17, 3, NULL, NULL, 'B', 8),
-(6, 5, 17, 4, NULL, 0, 'choose me', 11),
-(7, 5, 17, 4, NULL, 1, 'no, me', 12),
-(8, 5, 17, 5, NULL, NULL, 'single line rah rah', 0),
-(9, 5, 17, 6, NULL, NULL, 'long answer what what', 0);
+INSERT INTO survey_inputs (id, event_id, user_id, question_id, response_text, response_id) VALUES
+(1, 4, 7, 1, '4+', 1),
+(2, 4, 7, 2, 'yes', 5),
+(3, 4, 31, 1, '3-4', 2),
+(4, 4, 31, 2, 'no', 6),
+(5, 5, 17, 3, 'B', 8),
+(6, 5, 17, 4, 'choose me', 11),
+(7, 5, 17, 4, 'no, me', 12),
+(8, 5, 17, 5, 'single line rah rah', 0),
+(9, 5, 17, 6, 'long answer what what', 0);
 
 -- --------------------------------------------------------
 
@@ -1446,7 +1928,7 @@ CREATE TABLE IF NOT EXISTS `survey_questions` (
   PRIMARY KEY (`id`),
   KEY `question_id` (`question_id`),
   KEY `survey_id` (`survey_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `survey_questions`
@@ -1469,28 +1951,26 @@ INSERT INTO survey_questions (id, survey_id, number, question_id) VALUES
 DROP TABLE IF EXISTS `surveys`;
 CREATE TABLE IF NOT EXISTS `surveys` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `course_id` int(11) NOT NULL DEFAULT '0',
-  `user_id` int(11) NOT NULL DEFAULT '1',
   `name` varchar(255) NOT NULL,
   `availability` varchar(10) NOT NULL DEFAULT 'public',
-  `due_date` datetime DEFAULT NULL,
-  `release_date_begin` datetime DEFAULT NULL,
-  `release_date_end` datetime DEFAULT NULL,
+  `due_date` datetime,
+  `release_date_begin` datetime,
+  `release_date_end` datetime,
   `released` tinyint(1) NOT NULL DEFAULT '0',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `surveys`
 --
 
-INSERT INTO surveys (id, course_id, user_id, name, due_date, release_date_begin, release_date_end, released, creator_id, created, updater_id, modified) VALUES
-(1, 1, 1, 'Team Creation Survey', '2012-07-31 11:20:00', '2012-07-01 11:20:00', '2013-12-31 11:20:00', 0, 2, '2012-07-13 11:18:56', 2, '2012-07-13 11:18:56'),
-(2, 1, 1, 'Survey, all Q types', '2012-07-31 11:20:00', '2012-07-01 11:20:00', '2013-12-31 11:20:00', 0, 1, '2012-07-13 11:18:56', 1, '2012-07-13 11:18:56');
+INSERT INTO surveys (id, name, due_date, release_date_begin, release_date_end, released, creator_id, created, updater_id, modified) VALUES
+(1, 'Team Creation Survey', '2012-07-31 11:20:00', '2012-07-01 11:20:00', '2013-12-31 11:20:00', 0, 2, '2012-07-13 11:18:56', 2, '2012-07-13 11:18:56'),
+(2, 'Survey, all Q types', '2012-07-31 11:20:00', '2012-07-01 11:20:00', '2013-12-31 11:20:00', 0, 1, '2012-07-13 11:18:56', 1, '2012-07-13 11:18:56');
 -- --------------------------------------------------------
 
 --
@@ -1500,47 +1980,41 @@ INSERT INTO surveys (id, course_id, user_id, name, due_date, release_date_begin,
 DROP TABLE IF EXISTS `sys_parameters`;
 CREATE TABLE IF NOT EXISTS `sys_parameters` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `parameter_code` varchar(80) NOT NULL DEFAULT '',
+  `parameter_code` varchar(80) NOT NULL,
   `parameter_value` text,
   `parameter_type` char(1) NOT NULL DEFAULT '',
   `description` varchar(255) DEFAULT NULL,
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`),
   UNIQUE KEY `parameter_code` (`parameter_code`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=25 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `sys_parameters`
 --
 
-INSERT INTO `sys_parameters` (`id`, `parameter_code`, `parameter_value`, `parameter_type`, `description`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
-(1, 'system.soft_delete_enable', 'true', 'B', 'Whether soft deletion of records is enabled.', 'A', 0, NOW(), 0, NOW()),
-(2, 'system.debug_mode', '0', 'I', 'Debug Mode of the system', 'A', 0, NOW(), NULL, NOW()),
-(3, 'system.debug_verbosity', '1', 'I', NULL, 'A', 0, NOW(), NULL, NOW()),
-(6, 'system.super_admin', 'root', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
-(7, 'system.upload_dir', 'uploads/', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
-(9, 'display.page_title', 'iPeer v2 with TeamMaker', 'S', 'Page title show in HTML.', 'A', 0, NOW(), 0, NOW()),
-(10, 'display.logo_file', 'LayoutLogoDefault.gif', 'S', 'Logo image name.', 'A', 0, NOW(), 0, NOW()),
-(11, 'display.login_logo_file', 'LayoutLoginLogoDefault.gif', 'S', 'Login Image File Name.', 'A', 0, NOW(), 0, NOW()),
-(13, 'custom.login_control', 'ipeer', 'S', 'The login control for iPeer: ipeer; CWL: UBC_CWL', 'A', 0, NOW(), NULL, NOW()),
-(14, 'custom.login_page_pathname', 'custom_ubc_cwl_login', 'S', 'The file pathname for the custom login page; CWL:custom_ubc_cwl_login', 'A', 0, NOW(), NULL, NOW()),
-(15, 'system.admin_email', 'Please enter the iPeer administrator\\''s email address.', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
-(16, 'system.password_reset_mail', 'Dear <user>,<br> Your password has been reset to <newpassword>. Please use this to log in from now on. <br><br>iPeer Administrator', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
-(17, 'system.password_reset_emailsubject', 'iPeer Password Reset Notification', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
-(18, 'display.date_format', 'D, M j, Y g:i a', 'S', 'date format preference', 'A', 0, NOW(), NULL, NOW()),
-(20, 'database.version', '4', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
-(21, 'email.port', '25', 'S', 'port number for email smtp option', 'A', '0', NOW(), NULL , NOW()),
-(22, 'email.host', 'localhost', 'S', 'host address for email smtp option', 'A', '0', NOW(), NULL , NOW()),
-(23, 'email.username', '', 'S', 'username for email smtp option', 'A', '0', NOW(), NULL , NOW()),
-(24, 'email.password', '', 'S', 'password for email smtp option', 'A', '0', NOW(), NULL , NOW()),
-(25, 'display.contact_info', 'noreply@ipeer.ctlt.ubc.ca', 'S', 'Contact Info', 'A', 0, NOW(), 0, NOW()),
-(26, 'display.login.header', '', 'S', 'Login Info Header', 'A', 0, NOW(), 0, NOW()),
-(27, 'display.login.footer', '', 'S', 'Login Info Footer', 'A', 0, NOW(), 0, NOW()),
-(28, 'display.vocabulary.department', 'Department', 'S', 'Department vocabulary', 'A', 0, NOW(), 0, NOW());
+INSERT INTO `sys_parameters` (`parameter_code`, `parameter_value`, `parameter_type`, `description`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
+('system.super_admin', 'root', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
+('system.admin_email', 'Please enter the iPeer administrator\\''s email address.', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
+('display.date_format', 'D, M j, Y g:i a', 'S', 'date format preference', 'A', 0, NOW(), NULL, NOW()),
+('system.version', '3.1.0', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
+('database.version', '6', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
+('email.port', '25', 'S', 'port number for email smtp option', 'A', '0', NOW(), NULL , NOW()),
+('email.host', 'localhost', 'S', 'host address for email smtp option', 'A', '0', NOW(), NULL , NOW()),
+('email.username', '', 'S', 'username for email smtp option', 'A', '0', NOW(), NULL , NOW()),
+('email.password', '', 'S', 'password for email smtp option', 'A', '0', NOW(), NULL , NOW()),
+('display.contact_info', 'noreply@ipeer.ctlt.ubc.ca', 'S', 'Contact Info', 'A', 0, NOW(), 0, NOW()),
+('display.login.header', '', 'S', 'Login Info Header', 'A', 0, NOW(), 0, NOW()),
+('display.login.footer', '', 'S', 'Login Info Footer', 'A', 0, NOW(), 0, NOW()),
+('system.absolute_url', '', 'S', 'base url to iPeer', 'A', 0, NOW(), 0, NOW()),
+('google_analytics.tracking_id', '', 'S', 'tracking id for Google Analytics', 'A', 0, NOW(), 0, NOW()),
+('google_analytics.domain', '', 'S', 'domain name for Google Analytics', 'A', 0, NOW(), 0, NOW()),
+('banner.custom_logo', '', 'S', 'custom logo that appears on the left side of the banner', 'A', 0, NOW(), 0, NOW()),
+('system.timezone', '', 'S', 'timezone', 'A', 0, NOW(), 0, NOW());
 
 -- --------------------------------------------------------
 
@@ -1556,14 +2030,14 @@ CREATE TABLE IF NOT EXISTS `user_courses` (
   `access_right` varchar(1) NOT NULL DEFAULT 'O',
   `record_status` varchar(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`),
   UNIQUE no_duplicates (`course_id`,`user_id`),
   FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `user_courses`
@@ -1587,49 +2061,50 @@ CREATE TABLE IF NOT EXISTS `user_enrols` (
   `user_id` int(11) NOT NULL DEFAULT '0',
   `record_status` varchar(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`),
   UNIQUE no_duplicates (`course_id`,`user_id`),
   FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `user_enrols`
 --
 
-INSERT INTO `user_enrols` VALUES (1, 1, 5, 'A', 0, '2006-06-20 14:19:18', NULL, '2006-06-20 14:19:18');
-INSERT INTO `user_enrols` VALUES (2, 1, 6, 'A', 0, '2006-06-20 14:26:59', NULL, '2006-06-20 14:26:59');
-INSERT INTO `user_enrols` VALUES (3, 1, 7, 'A', 0, '2006-06-20 14:27:24', NULL, '2006-06-20 14:27:24');
-INSERT INTO `user_enrols` VALUES (5, 2, 9, 'A', 0, '2006-06-20 14:28:08', NULL, '2006-06-20 14:28:08');
-INSERT INTO `user_enrols` VALUES (6, 2, 10, 'A', 0, '2006-06-20 14:28:29', NULL, '2006-06-20 14:28:29');
-INSERT INTO `user_enrols` VALUES (7, 2, 11, 'A', 0, '2006-06-20 14:28:49', NULL, '2006-06-20 14:28:49');
-INSERT INTO `user_enrols` VALUES (8, 2, 12, 'A', 0, '2006-06-20 14:29:07', NULL, '2006-06-20 14:29:07');
-INSERT INTO `user_enrols` VALUES (9, 1, 13, 'A', 0, '2006-06-20 14:31:17', NULL, '2006-06-20 14:31:17');
-INSERT INTO `user_enrols` VALUES (11, 1, 15, 'A', 0, '2006-06-20 15:00:35', NULL, '2006-06-20 15:00:35');
-INSERT INTO `user_enrols` VALUES (12, 2, 16, 'A', 0, '2006-06-20 15:01:09', NULL, '2006-06-20 15:01:09');
-INSERT INTO `user_enrols` VALUES (13, 1, 17, 'A', 0, '2006-06-20 15:01:24', NULL, '2006-06-20 15:01:24');
-INSERT INTO `user_enrols` VALUES (14, 2, 18, 'A', 0, '2006-06-20 15:01:52', NULL, '2006-06-20 15:01:52');
-INSERT INTO `user_enrols` VALUES (15, 1, 19, 'A', 0, '2006-06-20 15:02:20', NULL, '2006-06-20 15:02:20');
-INSERT INTO `user_enrols` VALUES (16, 2, 20, 'A', 0, '2006-06-20 15:03:27', NULL, '2006-06-20 15:03:27');
-INSERT INTO `user_enrols` VALUES (17, 1, 21, 'A', 0, '2006-06-20 15:03:47', NULL, '2006-06-20 15:03:47');
-INSERT INTO `user_enrols` VALUES (18, 2, 22, 'A', 0, '2006-06-20 15:04:22', NULL, '2006-06-20 15:04:22');
-INSERT INTO `user_enrols` VALUES (19, 2, 23, 'A', 0, '2006-06-20 15:05:55', NULL, '2006-06-20 15:05:55');
-INSERT INTO `user_enrols` VALUES (20, 2, 24, 'A', 0, '2006-06-20 15:06:20', NULL, '2006-06-20 15:06:20');
-INSERT INTO `user_enrols` VALUES (21, 2, 25, 'A', 0, '2006-06-20 15:06:46', NULL, '2006-06-20 15:06:46');
-INSERT INTO `user_enrols` VALUES (22, 1, 26, 'A', 0, '2006-06-20 15:07:01', NULL, '2006-06-20 15:07:01');
-INSERT INTO `user_enrols` VALUES (23, 2, 27, 'A', 0, '2006-06-20 15:07:37', NULL, '2006-06-20 15:07:37');
-INSERT INTO `user_enrols` VALUES (24, 1, 28, 'A', 0, '2006-06-20 15:08:04', NULL, '2006-06-20 15:08:04');
-INSERT INTO `user_enrols` VALUES (25, 2, 29, 'A', 0, '2006-06-20 15:08:31', NULL, '2006-06-20 15:08:31');
-INSERT INTO `user_enrols` VALUES (26, 2, 30, 'A', 0, '2006-06-20 15:08:47', NULL, '2006-06-20 15:08:47');
-INSERT INTO `user_enrols` VALUES (27, 1, 31, 'A', 0, '2006-06-20 15:10:16', NULL, '2006-06-20 15:10:16');
-INSERT INTO `user_enrols` VALUES (28, 1, 32, 'A', 0, '2006-06-20 15:10:32', NULL, '2006-06-20 15:10:32');
-INSERT INTO `user_enrols` VALUES (29, 1, 33, 'A', 0, '2006-06-21 08:44:09', NULL, '2006-06-21 08:44:09');
-INSERT INTO `user_enrols` VALUES (30, 2, 7, 'A', 0, '2006-06-21 08:44:09', NULL, '2006-06-21 08:44:09');
-INSERT INTO `user_enrols` VALUES (31, 3, 33, 'A', 0, '2006-06-21 08:44:09', NULL, '2006-06-21 08:44:09');
-INSERT INTO `user_enrols` VALUES (32, 3, 8, 'A', 0, '2006-06-21 08:44:09', NULL, '2006-06-21 08:44:09');
+INSERT INTO `user_enrols` (`course_id`, `user_id`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) VALUES 
+(1, 5, 'A', 1, '2006-06-20 14:19:18', NULL, '2006-06-20 14:19:18'),
+(1, 6, 'A', 1, '2006-06-20 14:26:59', NULL, '2006-06-20 14:26:59'),
+(1, 7, 'A', 1, '2006-06-20 14:27:24', NULL, '2006-06-20 14:27:24'),
+(2, 9, 'A', 1, '2006-06-20 14:28:08', NULL, '2006-06-20 14:28:08'),
+(2, 10, 'A', 1, '2006-06-20 14:28:29', NULL, '2006-06-20 14:28:29'),
+(2, 11, 'A', 1, '2006-06-20 14:28:49', NULL, '2006-06-20 14:28:49'),
+(2, 12, 'A', 1, '2006-06-20 14:29:07', NULL, '2006-06-20 14:29:07'),
+(1, 13, 'A', 1, '2006-06-20 14:31:17', NULL, '2006-06-20 14:31:17'),
+(1, 15, 'A', 1, '2006-06-20 15:00:35', NULL, '2006-06-20 15:00:35'),
+(2, 16, 'A', 1, '2006-06-20 15:01:09', NULL, '2006-06-20 15:01:09'),
+(1, 17, 'A', 1, '2006-06-20 15:01:24', NULL, '2006-06-20 15:01:24'),
+(2, 18, 'A', 1, '2006-06-20 15:01:52', NULL, '2006-06-20 15:01:52'),
+(1, 19, 'A', 1, '2006-06-20 15:02:20', NULL, '2006-06-20 15:02:20'),
+(2, 20, 'A', 1, '2006-06-20 15:03:27', NULL, '2006-06-20 15:03:27'),
+(1, 21, 'A', 1, '2006-06-20 15:03:47', NULL, '2006-06-20 15:03:47'),
+(2, 22, 'A', 1, '2006-06-20 15:04:22', NULL, '2006-06-20 15:04:22'),
+(2, 23, 'A', 1, '2006-06-20 15:05:55', NULL, '2006-06-20 15:05:55'),
+(2, 24, 'A', 1, '2006-06-20 15:06:20', NULL, '2006-06-20 15:06:20'),
+(2, 25, 'A', 1, '2006-06-20 15:06:46', NULL, '2006-06-20 15:06:46'),
+(1, 26, 'A', 1, '2006-06-20 15:07:01', NULL, '2006-06-20 15:07:01'),
+(2, 27, 'A', 1, '2006-06-20 15:07:37', NULL, '2006-06-20 15:07:37'),
+(1, 28, 'A', 1, '2006-06-20 15:08:04', NULL, '2006-06-20 15:08:04'),
+(2, 29, 'A', 1, '2006-06-20 15:08:31', NULL, '2006-06-20 15:08:31'),
+(2, 30, 'A', 1, '2006-06-20 15:08:47', NULL, '2006-06-20 15:08:47'),
+(1, 31, 'A', 1, '2006-06-20 15:10:16', NULL, '2006-06-20 15:10:16'),
+(1, 32, 'A', 1, '2006-06-20 15:10:32', NULL, '2006-06-20 15:10:32'),
+(1, 33, 'A', 1, '2006-06-21 08:44:09', NULL, '2006-06-21 08:44:09'),
+(2, 7, 'A', 1, '2006-06-21 08:44:09', NULL, '2006-06-21 08:44:09'),
+(3, 33, 'A', 1, '2006-06-21 08:44:09', NULL, '2006-06-21 08:44:09'),
+(3, 8, 'A', 1, '2006-06-21 08:44:09', NULL, '2006-06-21 08:44:09');
 
 -- --------------------------------------------------------
 
@@ -1639,23 +2114,27 @@ INSERT INTO `user_enrols` VALUES (32, 3, 8, 'A', 0, '2006-06-21 08:44:09', NULL,
 
 DROP TABLE IF EXISTS `user_faculties`;
 CREATE TABLE `user_faculties` (
-  `id` int NOT NULL auto_increment,
+  `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
   `faculty_id` int NOT NULL,
   FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   FOREIGN KEY (`faculty_id`) REFERENCES `faculties` (`id`) ON DELETE CASCADE,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `user_faculties`
 --
 
 INSERT INTO `user_faculties` (`id`, `user_id`, `faculty_id`) VALUES
-(1, 34, 1),
-(2, 1, 1),
-(3, 1, 2),
-(4, 38, 2);
+(1, 1, 1),
+(2, 1, 2),
+(3, 2, 1),
+(4, 3, 1),
+(5, 3, 2),
+(6, 4, 1),
+(7, 34, 1),
+(8, 38, 2);
 
 -- --------------------------------------------------------
 
@@ -1669,23 +2148,23 @@ CREATE TABLE IF NOT EXISTS `user_tutors` (
   `user_id` int(11) NOT NULL DEFAULT '0',
   `course_id` int(11) NOT NULL DEFAULT '0',
   `creator_id` int(11) NOT NULL DEFAULT '0',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime,
   `updater_id` int(11) DEFAULT NULL,
-  `modified` datetime DEFAULT NULL,
+  `modified` datetime,
   PRIMARY KEY (`id`),
   UNIQUE no_duplicates (`course_id`,`user_id`),
   FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `user_tutors`
 --
 
 INSERT INTO user_tutors (id, user_id, course_id, creator_id, created, updater_id, modified) VALUES
-(1, 35, 1, 0, '0000-00-00 00:00:00', NULL, '2012-07-13 09:45:57'),
-(2, 36, 1, 0, '0000-00-00 00:00:00', NULL, '2012-07-13 09:48:16'),
-(3, 37, 2, 0, '0000-00-00 00:00:00', NULL, '2012-07-13 09:48:24'),
-(4, 37, 3, 0, '0000-00-00 00:00:00', NULL, '2012-07-13 09:48:24');
+(1, 35, 1, 0, NOW(), NULL, NOW()),
+(2, 36, 1, 0, NOW(), NULL, NOW()),
+(3, 37, 2, 0, NOW(), NULL, NOW()),
+(4, 37, 3, 0, NOW(), NULL, NOW());
 
 SET foreign_key_checks = 1;

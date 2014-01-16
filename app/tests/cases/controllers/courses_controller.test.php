@@ -48,18 +48,33 @@ class CoursesControllerTest extends ExtendedAuthTestCase
     private $fixtureIndex = array(
         array(
             'Course' => array(
-                'id' => 1, 'homepage' => 'http://www.mech.ubc.ca', 'course' => 'MECH 328', 'title' => 'Mechanical Engineering Design Project',
-                'creator_id' => 1, 'record_status' => 'A', 'creator' => 'Super Admin'),
+                'id' => 1,
+                'course' => 'MECH 328',
+                'title' => 'Mechanical Engineering Design Project',
+                'creator_id' => 1,
+                'record_status' => 'A',
+                'creator' => 'Super Admin'
+            ),
         ),
         array(
             'Course' => array(
-                'id' => 2, 'homepage' => 'http://www.apsc.ubc.ca', 'course' => 'APSC 201', 'title' => 'Technical Communication',
-                'creator_id' => 1, 'record_status' => 'A', 'creator' => 'Super Admin'),
+                'id' => 2,
+                'course' => 'APSC 201',
+                'title' => 'Technical Communication',
+                'creator_id' => 1,
+                'record_status' => 'A',
+                'creator' => 'Super Admin'
+            ),
         ),
         array(
             'Course' => array(
-                'id' => 3, 'homepage' => 'http://www.ugrad.cs.ubc.ca/~cs101/', 'course' => 'CPSC 101', 'title' => 'Connecting with Computer Science',
-                'creator_id' => 0, 'record_status' => 'I', 'creator' => null),
+                'id' => 3,
+                'course' => 'CPSC 101',
+                'title' => 'Connecting with Computer Science',
+                'creator_id' => 1,
+                'record_status' => 'I',
+                'creator' => 'Super Admin'
+            ),
         ),
     );
 
@@ -265,7 +280,8 @@ class CoursesControllerTest extends ExtendedAuthTestCase
             $this->fixtureIndex[2],
             $this->fixtureIndex[0],
         );
-        $this->assertTrue($result['paramsForList']['data']['entries'] == $expected);
+        $this->assertEqual($result['paramsForList']['data']['entries'],
+            $expected);
     }
 
     function testIndexNoPermission()
@@ -332,13 +348,13 @@ class CoursesControllerTest extends ExtendedAuthTestCase
     {
         $result = $this->testAction('/courses/home/1', array('return' => 'vars'));
 
-        $this->assertEqual($result['studentCount'], 13);
-        $this->assertEqual($result['course_id'], $this->fixtureView['Course'][0]['id']);
+        $this->assertEqual($result['data']['Course']['student_count'], 13);
+        $this->assertEqual($result['data']['Course']['id'], $this->fixtureView['Course'][0]['id']);
         $this->assertEqual($result['data']['Course']['id'], $this->fixtureView['Course'][0]['id']);
         $this->assertEqual($result['data']['Course']['course'], $this->fixtureView['Course'][0]['course']);
         $this->assertEqual($result['data']['Course']['title'], $this->fixtureView['Course'][0]['title']);
-        $this->assertEqual($result['groupCount'], 2);
-        $this->assertEqual($result['eventCount'], 10);
+        $this->assertEqual(count($result['data']['Group']), 2);
+        $this->assertEqual(count($result['data']['Event']), 10);
         $this->assertEqual($result['title_for_layout'], $this->fixtureView['Course'][0]['course'].' - '.$this->fixtureView['Course'][0]['title']);
     }
 
@@ -445,7 +461,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->assertEqual(count($result['instructors']), 3);
         $this->assertEqual($this->controller->data['Course']['course'], $this->fixtureView['Course'][0]['course']);
         $this->assertEqual($this->controller->data['Course']['course'], $this->fixtureView['Course'][0]['course']);
-        $this->assertEqual(count($this->controller->data['Instructor']), 1);
+        $this->assertEqual(count($this->controller->data['Instructor']['Instructor']), 1);
         $this->assertEqual($this->controller->data['Instructor'][0]['id'], 2);
     }
 
@@ -466,6 +482,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'Department' => array(3)
             ),
         );
+
         $this->controller->expectOnce('redirect', array('index'));
         $result = $this->testAction(
             '/courses/edit/1',
@@ -568,6 +585,11 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->assertEqual($message['message'], 'The course was deleted successfully.');
     }
 
+    /*function testMove()
+    {
+        //TODO
+    }*/
+
     function testDeleteNonExistingCourse()
     {
         $this->controller->expectOnce('redirect', array('index'));
@@ -613,6 +635,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->assertFalse(array_key_exists('Auth', $_SESSION));
         $this->assertFalse(array_key_exists('ipeerSession', $_SESSION));
     }
+
 /*    function testAddInstructor() {
         $this->Course = ClassRegistry::init('Course');
         $data = array('instructor_id'=> 2, 'course_id' => 1);

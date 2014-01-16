@@ -336,8 +336,13 @@ class GroupEvent extends AppModel
      */
     function getLateGroupMembers($groupEventId)
     {
+        $members = Set::extract($this->getGroupMembers($groupEventId), '/GroupsMembers/user_id');
+    
         return $this->find('count', array(
-            'conditions' => array('GroupEvent.id' => $groupEventId, 'EvaluationSubmission.date_submitted > Event.due_date'),
+            'conditions' => array(
+                'GroupEvent.id' => $groupEventId,
+                'EvaluationSubmission.date_submitted > Event.due_date',
+                'EvaluationSubmission.submitter_id' => $members),
             'joins' => array(
                 array(
                     'table' => 'evaluation_submissions',

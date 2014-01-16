@@ -3,9 +3,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <title>iPeer - <?php echo $title_for_layout; ?></title>
+  <!-- Needed to force IE back to standards mode when it ignores the doctype -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
   <meta http-equiv="Content-Language" content="en" />
-  <!--link rel="shortcut icon" href="favicon.ico" type="image/x-icon"-->
+  <link rel="shortcut icon" href="/img/favicon.png" type="image/png" />
   <?php
   // CSS files
   echo $html->css('datepicker');
@@ -44,7 +46,7 @@
 
 <div class='containerOuter pagewidth'>
 <!-- BANNER -->
-<?php echo $this->element('global/banner'); ?>
+<?php echo $this->element('global/banner', array('customLogo' => $customLogo)); ?>
 
 <!-- NAVIGATION -->
 <?php echo $this->element('global/navigation', array());?>
@@ -74,5 +76,37 @@
 <?php echo $this->element('global/debug'); ?>
 
 <?php echo $this->Js->writeBuffer(); // Write cached scripts?>
+<?php
+// check that a google analytics tracking id is given
+if (!empty($trackingId)) {
+    $trackingId = $trackingId['SysParameter']['parameter_value'];
+    // check whether a domain is given
+    if (empty($domain) || empty($domain['SysParameter']['parameter_value'])) {
+        // domain is not given - Classic Google Analytics
+        echo "<script type='text/javascript'>
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', '".$trackingId."']);
+            _gaq.push(['_trackPageview']);
+
+            (function() {
+                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+            })();
+        </script>";
+    } else {
+        $domain = $domain['SysParameter']['parameter_value'];
+        // domain is given - Beta Google Analytics
+        echo "<script>
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+            ga('create', '".$trackingId."', '".$domain."');
+            ga('send', 'pageview');
+        </script>";
+    }
+}
+?>
 </body>
 </html>

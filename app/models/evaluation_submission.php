@@ -52,7 +52,7 @@ class EvaluationSubmission extends AppModel
      * @return void
      */
     function getEvalSubmissionsByGroupEventId($groupEventId)
-    {
+    {     
         return $this->find('all', array(
             'conditions' => array(
                 $this->alias.'.grp_event_id' => $groupEventId,
@@ -141,15 +141,13 @@ class EvaluationSubmission extends AppModel
      */
     function numCountInGroupCompleted($groupEventId)
     {
-        return $this->find(
-            'count',
-            array(
-                'conditions' => array(
-                    $this->alias.'.submitted' => 1,
-                    $this->alias.'.grp_event_id' => $groupEventId
-                ),
-            )
-        );
+        $members = Set::extract($this->GroupEvent->getGroupMembers($groupEventId), '/GroupsMembers/user_id');
+        return $this->find('count', array(
+            'conditions' => array(
+                $this->alias.'.submitted' => 1,
+                $this->alias.'.grp_event_id' => $groupEventId,
+                $this->alias.'.submitter_id' => $members,
+        )));
     }
 
     /**
@@ -186,5 +184,37 @@ class EvaluationSubmission extends AppModel
     function countSubmissions($grpEventId)
     {
         return $this->find('count', array('conditions' => array('grp_event_id' => $grpEventId,)));
+    }
+    
+    /**
+     * getGrpEventIdEvalSub
+     *
+     * @param mixed $userId
+     *
+     * @access public
+     * @return void
+     */
+    function getGrpEventIdEvalSub($userId)
+    {
+        return $this->find('list', array(
+            'conditions' => array('EvaluationSubmission.submitter_id' => $userId, 'EvaluationSubmission.grp_event_id !=' => null),
+            'fields' => array('EvaluationSubmission.grp_event_id')
+        ));
+    }
+    
+    /**
+     * getEventIdSurveySub
+     *
+     * @param mixed $userId
+     *
+     * @access public
+     * @return void
+     */
+    function getEventIdSurveySub($userId)
+    {
+        return $this->find('list', array(
+            'conditions' => array('EvaluationSubmission.submitter_id' => $userId, 'EvaluationSubmission.grp_event_id' => null),
+            'fields' => array('EvaluationSubmission.event_id')
+        ));
     }
 }

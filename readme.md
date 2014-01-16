@@ -1,3 +1,47 @@
+Running Tests
+---------------------------
+Integration Tests
+
+Requirements:
+* Selenium Server 2.38+
+* PHP Webdriver (https://github.com/Element-34/php-webdriver)
+* Firfox
+
+Ruuning the tests:
+
+    cd iPeer
+    cake/console/cake -app app testsuite app group system
+
+It is better not to touch the mouse or keyboard during the tests.
+
+iPeer 3.1.0
+---------------------------
+This is a feature release that has a few exciting new features:
+* New mixed evaluation question type called Score Dropdown
+* New interface to add or remove instructors and tutors from courses
+* Permissions Editor
+* Basic evaluation results view for students
+* Email reminders for submitting evaluations
+* New auto-release evaluation results option. Results can be release without review
+* PDF export for evaluation results
+* Ability to import groups with student numbers
+* New option to update or merge for users and groups import
+* Account Consolidation
+* Moving students between courses with the same survey
+* Bulk moving students between courses
+* Google Analytics Support
+* Support for PagodaBox for easier instance set up
+* Login logging
+* Improved interfaces for mixed evaluation and survey templates
+
+iPeer 3.0.8
+---------------------------
+This is a maintenance release.
+
+* Fix the API logging message missing info
+* Text Wrap for Survey Response and Timezone Fix
+* Fixed Firefox issue with mixed eval scale weight
+
 iPeer 3.0.8
 ---------------------------
 This is a maintenance release.

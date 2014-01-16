@@ -15,7 +15,9 @@ class QuestionTestCase extends CakeTestCase
         'app.rubrics_criteria', 'app.rubrics_criteria_comment', 'app.faculty',
         'app.user_faculty', 'app.department', 'app.course_department',
         'app.user_tutor', 'app.sys_parameter', 'app.penalty',
-        'app.evaluation_simple', 'app.survey_input',
+        'app.evaluation_simple', 'app.survey_input', 'app.oauth_token',
+        'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
+        'app.evaluation_rubric', 'app.evaluation_rubric_detail'
     );
     public $Question = null;
 
@@ -52,6 +54,10 @@ class QuestionTestCase extends CakeTestCase
 
         $this->assertNull($faultyId);
         $this->assertNull($nullId);
+    }
+    
+    function testCopyQuestions()
+    {
     }
 
 }

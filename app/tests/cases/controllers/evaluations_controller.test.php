@@ -35,8 +35,8 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
         'app.user_faculty', 'app.department', 'app.sys_parameter',
         'app.oauth_token', 'app.rubric', 'app.rubrics_criteria',
         'app.rubrics_criteria_comment', 'app.rubrics_lom',
-        'app.simple_evaluation', 'app.survey_input', 'app.mixevals_question',
-        'app.mixevals_question_desc', 'app.mixeval'
+        'app.simple_evaluation', 'app.survey_input', 'app.mixeval_question',
+        'app.mixeval_question_desc', 'app.mixeval', 'app.mixeval_question_type',
     );
 
     public function getController()
@@ -138,9 +138,9 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
 
         // rubric evaluation
         $result = $this->testAction('/evaluations/makeEvaluation/3/1', array('return' => 'vars'));
-        $this->assertEqual($result['evaluateeCount'], 2);
         $this->assertEqual(count($result['groupMembers']), 2);
-        $this->assertEqual($result['data']['Mixeval']['id'], 1);
+        $this->assertEqual(count($result['groupMembers']), 2);
+        $this->assertEqual($result['mixeval']['Mixeval']['id'], 1);
         $this->assertEqual(count($result['penalty']), 0);
         $this->assertEqual(Set::extract($result['penalty'], '/Penalty/id'), array());
         $this->assertEqual($result['penaltyDays'], 0);
@@ -162,12 +162,15 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
 
         $result = $this->testAction('/evaluations/makeEvaluation/4', array('return' => 'vars'));
         $this->assertEqual($result['eventId'], 4);
-        $this->assertEqual($result['courseId'], 1);
-        $this->assertEqual(count($result['survey']['Question']), 2);
-        $this->assertEqual($result['survey']['Question'][0]['prompt'], 'What was your GPA last term?');
-        $this->assertEqual($result['survey']['Question'][1]['prompt'], 'Do you own a laptop?');
-        $this->assertEqual(count($result['survey']['Question'][0]['Response']), 4);
-        $this->assertEqual(count($result['survey']['Question'][1]['Response']), 2);
+        $this->assertEqual(count($result['questions']), 2);
+        $this->assertEqual($result['questions'][0]['Question']['prompt'], 
+            'What was your GPA last term?');
+        $this->assertEqual($result['questions'][1]['Question']['prompt'], 
+            'Do you own a laptop?');
+        $this->assertEqual(count($result['questions'][0]['ResponseOptions']), 
+            4);
+        $this->assertEqual(count($result['questions'][1]['ResponseOptions']), 
+            2);
         $message = $this->controller->Session->read('Message.flash');
         $this->assertEqual($message['message'], '');
     }

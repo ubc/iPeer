@@ -12,8 +12,7 @@ echo "<div id='usernameErr' class='red'></div>";
 echo $this->Form->input('first_name');
 echo $this->Form->input('last_name');
 echo $this->Form->input('email');
-echo $this->Form->input('send_email_notification',
-  array('type'=>'checkbox', 'div' => 'email'));
+echo $this->Form->input('send_email_notification', array('type'=>'checkbox'));
 echo $this->Form->input(
   'Role.RolesUser.role_id',
   array(
@@ -50,12 +49,17 @@ echo $this->Form->submit(
 ?></div><?php
 echo $this->Form->end();
 
+$url = 'checkDuplicateName/';
+if(!is_null($courseId)) {
+    $url = $url.$courseId;
+}
+
 // dynamically check username availability
 echo $ajax->observeField(
   'UserUsername',
   array(
     'update'=>'usernameErr',
-    'url'=>'checkDuplicateName/',
+    'url'=>$url,
     'frequency'=>1,
     'loading'=>"Element.show('loading');",
     'complete'=>"Element.hide('loading');stripe();"

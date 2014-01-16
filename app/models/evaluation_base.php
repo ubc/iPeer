@@ -47,8 +47,8 @@ class EvaluationBase extends AppModel
     {
         // Ensure the name is not empty
         if (empty($this->data[$this->name]['name'])) {
-            $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
-            return false;
+           $this->errorMessage = "Please enter a new name for this " . $this->name . ".";
+           return false;
         }
 
         // Remove any signle quotes in the name, so that custom SQL queries are not confused.
@@ -62,7 +62,7 @@ class EvaluationBase extends AppModel
         //check if questions are entered
         if (!empty($this->data['Question'])&&$this->name =='Mixeval') {
             foreach ($this->data['Question'] as $row) {
-                if ($row['question_type']== 'S' &&(empty($row['Description'] ) || (count($row['Description'])) < 2)) {
+                if ($row['mixeval_question_type_id']== '1' &&(empty($row['Description'] ) || (count($row['Description'])) < 2)) {
                     $this->errorMessage = "Please add at least two descriptors for each of the Lickert questions.";
                     return false;
                 }
@@ -70,7 +70,7 @@ class EvaluationBase extends AppModel
         }
 
         if (empty($this->data['Question'])&&($this->name =='Mixeval')) {
-            $this->errorMessage = "Please add at least one question for this " . $this->name . ".";
+            $this->errorMessage = "Please add at least one question for this mixed evaluation.";
             return false;
         }
         return parent::beforeSave();
@@ -149,17 +149,14 @@ class EvaluationBase extends AppModel
     {
         $this->Penalty = ClassRegistry::init('Penalty');
         $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
-        $memberIds = Set::extract($groupMembers, '/User/id');
+
+        $memberIds = array_keys($groupMembers);
         $userPenalty = array_fill_keys($memberIds, 0);
+        $now = time();
 
         // find the event
-        $event = $this->Event->find(
-            'first',
-            array(
-                'conditions' => array('Event.id' => $eventId),
-                'contain' => false,
-            )
-        );
+        $event = $this->Event->findById($eventId);
+        $end = strtotime($event['Event']['release_date_end']);
 
         // not due yet. no penalty
         if ($event['Event']['due_in'] >= 0) {
@@ -191,11 +188,28 @@ class EvaluationBase extends AppModel
 
         // no submission - if now is after release date end then - gets final deduction
         $penalty = $this->Penalty->getPenaltyFinal($eventId);
-        $noSubmissions = array_intersect($memberIds, Set::extract($submissions, '/EvluationSubmission/submitter_id'));
-        foreach ($noSubmissions as $userId) {
-            $userPenalty[$userId] = $penalty['Penalty']['percent_penalty'];
+        if ($now >= $end) {
+            $noSubmissions = array_diff($memberIds, Set::extract($submissions, '/EvaluationSubmission/submitter_id'));
+            foreach ($noSubmissions as $userId) {
+                $userPenalty[$userId] = $penalty['Penalty']['percent_penalty'];
+            }
         }
 
         return $userPenalty;
+    }
+    
+    /**
+     * get Event and Submission of Eval
+     *
+     * @param mixed $evalId eval id
+     *
+     * @access public
+     * @return void
+     */
+    function getEventSub($evalId) {
+        return $this->find('first', array(
+            'conditions' => array('id' => $evalId),
+            'contain' => array('Event' => 'EvaluationSubmission')
+        ));
     }
 }

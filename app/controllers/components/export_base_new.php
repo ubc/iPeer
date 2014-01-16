@@ -21,9 +21,9 @@ class ExportBaseNewComponent extends Object
     /**
      * generateHeader2
      *
-     * @param mixed $params  params
-     * @param mixed $eventId event id
-     * @param mixed $type    type
+     * @param mixed $params params
+     * @param mixed $event  event
+     * @param mixed $type   type
      *
      * @access public
      * @return void
@@ -79,24 +79,28 @@ class ExportBaseNewComponent extends Object
      * buildEvaluationScoreTableByGroup
      *
      * @param mixed $params     params
-     * @param mixed $grpEventId group event id
-     * @param mixed $eventId    event id
+     * @param mixed $groupEvent group event
+     * @param mixed $event      event
+     * @param mixed $results    results
+     * @param mixed $peerEval   boolean for self/peer eval
      *
      * @access public
      * @return void
      */
-    function buildEvaluationScoreTableByGroup($params, $groupEvent, $event, $results)
+    function buildEvaluationScoreTableByGroup($params, $groupEvent, $event, $results, $peerEval)
     {
         $this->Group = ClassRegistry::init('Group');
+        $this->User = ClassRegistry::init('User');
+
         $group = $this->Group->getGroupWithMemberRoleByGroupIdEventId($groupEvent['group_id'], $event['Event']['id']);
+        $dropped = $this->User->getDroppedStudentsWithRole($this->responseModelName, $results, $group);
+        
         $grid = array();
+        $subDate = Set::combine($results, '{n}.EvaluationSubmission.submitter_id', '{n}.EvaluationSubmission.date_submitted');
         $responsesByEvaluatee = Set::combine($results, '{n}.'.$this->responseModelName.'.evaluator', '{n}', '{n}.'.$this->responseModelName.'.evaluatee');
+        $group['Member'] = array_merge($group['Member'], $dropped);
         foreach ($group['Member'] as $member) {
-            // skip the non student member, for now we assume all the evaluatees are students
-            if ($member['Role']['name'] != 'student') {
-                continue;
-            }
-            $grid = array_merge($grid, $this->buildScoreTableByEvaluatee($params, $group, $member, $event, $responsesByEvaluatee));
+            $grid = array_merge($grid, $this->buildScoreTableByEvaluatee($params, $group, $member, $event, $responsesByEvaluatee, $subDate, $peerEval));
         }
 
         return $grid;
@@ -106,75 +110,87 @@ class ExportBaseNewComponent extends Object
     /**
      * buildEvaluationScoreTableByEvent
      *
-     * @param mixed $params  params
-     * @param mixed $event   event
+     * @param mixed $params   params
+     * @param mixed $event    event
+     * @param mixed $results  results
+     * @param mixed $peerEval boolean for self/peer eval
      *
      * @access public
      * @return void
      */
-    function buildEvaluationScoreTableByEvent($params, $event, $results)
+    function buildEvaluationScoreTableByEvent($params, $event, $results, $peerEval = 1)
     {
         $grid = array();
         if (empty($event['GroupEvent'])) {
             return $grid;
         }
         foreach ($event['GroupEvent'] as $ge) {
-            $grid = array_merge($grid, $this->buildEvaluationScoreTableByGroup($params, $ge, $event, $results[$ge['id']]));
+            if (isset($results[$ge['id']])) {
+                $grid = array_merge($grid, $this->buildEvaluationScoreTableByGroup($params, $ge, $event, $results[$ge['id']], $peerEval));
+            }
         }
         return $grid;
     }
 
 
     /**
-     * buildMixedEvalScoreTableByEvaluatee
+     * buildScoreTableByEvaluatee
      *
-     * @param mixed $params      params
-     * @param mixed $grpEventId  group event id
-     * @param mixed $evaluateeId evalutee id
-     * @param mixed $eventId     event id
+     * @param mixed $params    params
+     * @param mixed $group     group
+     * @param mixed $evaluatee evaluatee
+     * @param mixed $event     event
+     * @param mixed $responses responses
+     * @param mixed $subDate   submission dates
+     * @param mixed $peerEval  boolean for self/peer eval
      *
      * @access public
      * @return void
      */
-    function buildScoreTableByEvaluatee($params, $group, $evaluatee, $event, $responses)
+    function buildScoreTableByEvaluatee($params, $group, $evaluatee, $event, $responses, $subDate, $peerEval)
     {
         // Build grid
-        $xPosition = 0;
-        $yPosition = 0;
+        //$xPosition = 0;
+        //$yPosition = 0;
         // Fill in grid Results
         $yInc = 0;
 
         $xDimension = $this->calcDimensionX($params, $event);
-        $yDimensions = count($group['Member']);
+        //$yDimensions = count($group['Member']);
         $grid = array();
 
         foreach ($group['Member'] as $evaluator) {
+            if (!$peerEval && $evaluator['id'] != $evaluatee['id']) {
+                continue; // skip peer evaluations for self-evaluation
+            }
             $row = array();
-            if (!empty($params['include']['course'])) {
+            if ($params['include']['course']) {
                 array_push($row, $event['Course']['course']);
             }
-            if (!empty($params['include']['eval_event_names'])) {
+            if ($params['include']['eval_event_names']) {
                 array_push($row, $event['Event']['title']);
             }
-            if (!empty($params['include']['eval_event_type'])) {
+            if ($peerEval && $params['include']['eval_event_type']) {
                 array_push($row, $this->eventType[$event['Event']['event_template_type_id']]);
             }
-            if (!empty($params['include']['group_names'])) {
+            if ($params['include']['group_names']) {
                 array_push($row, $group['Group']['group_name']);
             }
-            if (!empty($params['include']['student_email'])) {
+            /*if ($params['include']['student_email']) {
                 array_push($row, $evaluatee['email']);
+            }*/
+            if ($params['include']['student_name']) {
+                $dropped = isset($evaluatee['GroupsMember']) ? '' : '*';
+                array_push($row, $dropped.$evaluatee['full_name']);
             }
-            if (!empty($params['include']['student_name'])) {
-                array_push($row, $evaluatee['full_name']);
-            }
-            if (!empty($params['include']['student_id'])) {
+            if ($params['include']['student_id']) {
                 array_push($row, $evaluatee['student_no']);
             }
-            if (!empty($params['include']['student_name'])) {
-                array_push($row, $evaluator['full_name']);
+            if ($peerEval && $params['include']['student_name']) {
+                $dropped = isset($evaluator['GroupsMember']) ? '' : '*';
+                array_push($row, $dropped.$evaluator['full_name']);
             }
-            if (!empty($params['include']['student_id'])) {
+            if ($peerEval && $params['include']['student_id']) {
                 array_push($row, $evaluator['student_no']);
             }
 
@@ -187,29 +203,51 @@ class ExportBaseNewComponent extends Object
             $response = $responses[$evaluatee['id']][$evaluator['id']];
 
             // comments for Rubric and Simple Evaluation
-            if ($event['Event']['event_template_type_id'] != 4 && isset($params['include']['comments'])) {
+            if ($event['Event']['event_template_type_id'] != 4 && $params['include']['comments']) {
                 array_push($row, $response[$this->responseModelName]['comment']);
             }
 
             if ($this->detailModel[$event['Event']['event_template_type_id']] && array_key_exists($this->detailModel[$event['Event']['event_template_type_id']], $response)) {
-                foreach ($response[$this->detailModel[$event['Event']['event_template_type_id']]] as $key => $result) {
-                    if (isset($event['Question'][$key]['question_type'])) {
-                        if (isset($params['include']['grade_tables']) && $event['Question'][$key]['question_type'] == 'S') {
+                if (in_array($event['Event']['event_template_type_id'], array(1, 2))) {
+                    if ($params['include']['grade_tables']) {
+                        foreach ($response[$this->detailModel[$event['Event']['event_template_type_id']]] as $result) {
                             array_push($row, $result['grade']);
-                        } elseif (isset($params['include']['comments']) && $event['Question'][$key]['question_type'] == 'T') {
-                            array_push($row, $result['question_comment']);
                         }
-                    } else {
-                        array_push($row, $result['grade']);
+                    }
+                } else {
+                    // mixed evaluation
+                    $results = $response[$this->detailModel[$event['Event']['event_template_type_id']]];
+                    $results = Set::combine($results, '{n}.question_number', '{n}');
+                    foreach ($event['Question'] as $question) {
+                        if ($question['self_eval'] == $peerEval) {
+                            continue; // skip questions that don't belong in the desired section
+                        }
+                        if (!isset($results[$question['question_num']])) {
+                            array_push($row, '');
+                        } elseif ($params['include']['grade_tables'] && in_array($question['mixeval_question_type_id'], array(1, 4))) {
+                            array_push($row, $results[$question['question_num']]['grade']);
+                        } elseif ($params['include']['comments'] && in_array($question['mixeval_question_type_id'], array(2, 3))) {
+                            array_push($row, $results[$question['question_num']]['question_comment']);
+                        } else {
+                            array_push($row, 'N/A');
+                        }
                     }
                 }
             }
+            
+            if (!$peerEval) {
+                $grid[] = $row;
+                $yInc++;
+                continue; // skip final marks/penalty for self-evaluation
+            }
+            
             array_push($row, $response[$this->responseModelName]['score']);
+            $date = isset($subDate[$evaluatee['id']]) ? $subDate[$evaluatee['id']] : false;
 
             $penalty = $this->Penalty->calculate(
                 $event['Event']['due_date'],
                 $event['Event']['release_date_end'],
-                $response['EvaluationSubmission']['date_submitted'],
+                $date,
                 $event['Penalty']
             );
 
@@ -221,7 +259,7 @@ class ExportBaseNewComponent extends Object
                 $finalGrade = $response[$this->responseModelName]['score'];
             }
 
-            if (isset($params['include']['final_marks'])) {
+            if ($params['include']['final_marks']) {
                 array_push($row, $finalGrade);
             }
             $grid[] = $row;
@@ -231,10 +269,19 @@ class ExportBaseNewComponent extends Object
         return $grid;
     }
 
+    /**
+     * calcDimensionX
+     *
+     * @param mixed $params params
+     * @param mixed $event  event
+     *
+     * @access public
+     * @return void
+     */
     public function calcDimensionX($params, $event) {
         $total = 2 + count($params['include']);
         if (4 == $event['Event']['event_template_type_id']) {
-            $commentQuestions = Set::extract($event, '/Question[question_type=T]');
+            $commentQuestions = Set::extract($event, '/Question[mixeval_question_type_id=2]');
             if (isset($params['include']['grade_tables'])) {
                 // question number - 1 as one is counted as grade_tables in include
                 $total += count($event['Question']) - count($commentQuestions) - 1;
@@ -269,12 +316,12 @@ class ExportBaseNewComponent extends Object
      function buildMixEvalCommentTableByEvaluatee($params, $grpEventId, $evaluateeId)
      {
          $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
-         $this->MixevalsQuestion = ClassRegistry::init('MixevalsQuestion');
+         $this->MixevalQuestion = ClassRegistry::init('MixevalQuestion');
          $this->GroupEvent = ClassRegistry::init('GroupEvent');
          $this->Event = ClassRegistry::init('Event');
 
          $groupMembers = $this->ExportHelper2->getGroupMemberHelper($grpEventId);
-         $questions = $this->MixevalsQuestion->getQuestion($evaluation['Event']['template_id'], 'T');
+         $questions = $this->MixevalQuestion->getQuestion($evaluation['Event']['template_id'], 'T');
          // Create grid
          $gridYDim = count($questions)*(count($groupMembers) + 1);
          $gridXDim = 8;
@@ -285,13 +332,13 @@ class ExportBaseNewComponent extends Object
          $qSpacing = count($groupMembers) + 1;
          $qIndexing = 0;
          foreach ($question as $q) {
-             $grid[$xPosition + 2][$yPosition + $qIndexing + 2] = "Question ".$qCount.":".$q['MixevalsQuestion']['title'];
+             $grid[$xPosition + 2][$yPosition + $qIndexing + 2] = "Question ".$qCount.":".$q['MixevalQuestion']['title'];
              $qIndexing += $qSpacing;
 }
 // Save question_comment's quesion num; only way to identify question comments via question num
 $validQuestionNum = array();
 foreach ($questions as $q) {
-    array_push($validQuestionNum, $q['MixevalsQuestion']['question_num']);
+    array_push($validQuestionNum, $q['MixevalQuestion']['question_num']);
 }
 // Setup evaluator's info
 $grpMembersBlock = $this->ExportHelper2->createGroupMemberArrayBlock($groupMembers, $params);
@@ -315,7 +362,7 @@ for ($inc=0; $inc<$count($groupMembers); $inc++) {
     function buildMixEvalQuestionCommentTable($params ,$grpEventId)
     {
         $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
-        $this->MixevalsQuestion = ClassRegistry::init('MixevalsQuestion');
+        $this->MixevalQuestion = ClassRegistry::init('MixevalQuestion');
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
         $this->Event = ClassRegistry::init('Event');
 
@@ -323,10 +370,10 @@ for ($inc=0; $inc<$count($groupMembers); $inc++) {
         $groupCount = count($groupMembers);
         $grpEvent = $this->GroupEvent->getGrpEvent($grpEventId);
         $evaluation = $this->Event->getEventById($grpEvent['GroupEvent']['event_id']);
-        $questions = $this->MixevalsQuestion->getQuestion($evaluation['Event']['template_id'], 'T');
+        $questions = $this->MixevalQuestion->getQuestion($evaluation['Event']['template_id'], '2');
         $validQuestionNum = array();
         foreach ($questions as $q) {
-            array_push($validQuestionNum, $q['MixevalsQuestion']['question_num']);
+            array_push($validQuestionNum, $q['MixevalQuestion']['question_num']);
         }
         $qCount = count($questions);
         // Create grid
@@ -339,7 +386,7 @@ for ($inc=0; $inc<$count($groupMembers); $inc++) {
         $submissionCount = $this->EvaluationSubmission->countSubmissions($grpEventId);
         foreach ($questions as $q) {
             $this->ExportHelper2->repeatDrawByCoordinateVertical($grid, $xPosition, $questionYPos, $sectionSpacing, $groupCount,
-                "Question ".$questionNum.": ".$q['MixevalsQuestion']['title']);
+                "Question ".$questionNum.": ".$q['MixevalQuestion']['title']);
             $questionNum++;
             $questionYPos += $submissionCount + 1;
         }
@@ -520,10 +567,10 @@ for ($inc=0; $inc<$count($groupMembers); $inc++) {
         foreach ($questions as $q) {
             $totalScore = 0;
             $row = array();
-            array_push($row, $q['MixevalsQuestion']['title'].' (/'.$q['MixevalsQuestion']['multiplier'].')'.',');
+            array_push($row, $q['MixevalQuestion']['title'].' (/'.$q['MixevalQuestion']['multiplier'].')'.',');
             foreach ($groupMembers as $evaluator) {
                 $evalResult = $this->EvaluationMixeval->getResultDetailByQuestion($grpEventId, $evaluatee['id'],
-                    $evaluator['id'], $q['MixevalsQuestion']['question_num']-1);
+                    $evaluator['id'], $q['MixevalQuestion']['question_num']-1);
                 array_push($row, $evalResult['EvaluationMixevalDetail']['grade']);
                 $totalScore += $evalResult['EvaluationMixevalDetail']['grade'];
             }

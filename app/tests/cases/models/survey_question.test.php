@@ -16,6 +16,8 @@ class SurveyQuestionTestCase extends CakeTestCase
         'app.faculty', 'app.user_faculty', 'app.department',
         'app.course_department', 'app.sys_parameter', 'app.user_tutor',
         'app.penalty', 'app.evaluation_simple', 'app.survey_input',
+        'app.oauth_token', 'app.evaluation_rubric', 'app.evaluation_rubric_detail',
+        'app.evaluation_mixeval', 'app.evaluation_mixeval_detail'
     );
     public $SurveyQuestion = null;
 
@@ -129,33 +131,14 @@ class SurveyQuestionTestCase extends CakeTestCase
 
     }
 
-    function testCopyQuestions()
-    {
-        // Create an empty survey to copy questions into
-        $ret = $this->Survey->save(array(
-                'Survey' => array(
-                    'id' => 50,
-                    'course_id' => 1,
-                    'user_id' => 1,
-                    'name' => 'Empty'
-                )
-            )
-        );
-        $this->SurveyQuestion->copyQuestions(1, 50);
-        $surveyOriginal = $this->Survey->find('all',
-            array('conditions' => array('Survey.id' => 1)));
-        $surveyCopied = $this->Survey->find('all',
-            array('conditions' => array('Survey.id' => 50)));
-        $surveyOriginalQuestion = $surveyOriginal[0]['Question'];
-        $surveyCopiedQuestion = $surveyCopied[0]['Question'];
-        // Assert that survey has been copied
-        $this->assertEqual($surveyOriginalQuestion[0]['prompt'], $surveyCopiedQuestion[0]['prompt']);
-        $this->assertEqual($surveyOriginalQuestion[1]['prompt'], $surveyCopiedQuestion[1]['prompt']);
-    }
-
     function testGetLastSurveyQuestionNum()
     {
         $lastQuestionNum = $this->SurveyQuestion->getLastSurveyQuestionNum(1);
         $this->assertEqual($lastQuestionNum, 2);
+    }
+    
+    function testAssignNumber()
+    {
+        //TODO
     }
 }

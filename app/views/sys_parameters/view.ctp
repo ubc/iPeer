@@ -1,8 +1,11 @@
-<div class="title">
-  <h4><?php 
-  echo $data['SysParameter']['parameter_code']; ?></h4>
-</div>
-<div class="content">
-  <p><small>Created: <?php echo $data['SysParameter']['created']; ?></small></p>
-  <p><small>Modified: <?php echo $data['SysParameter']['modified']; ?></small></p>
+<div id="sysParam">
+<?php
+echo $this->Form->input('SysParameter.id', array('type' => 'text', 'readonly' => true));
+echo $this->Form->input('SysParameter.parameter_code', array('readonly' => true));
+echo $this->Form->input('SysParameter.parameter_value', array('type' => 'text', 'readonly' => true));
+echo $this->Form->input('SysParameter.parameter_type', array('options' => $types, 'disabled' => true));
+echo $this->Form->input('SysParameter.description', array('readonly' => true));
+echo $this->Form->input('SysParameter.created', array('type' => 'text', __('Create Date', true), 'readonly' => true));
+echo $this->Form->input('SysParameter.modified', array('type' => 'text', __('Update Date', true), 'readonly' => true));
+?>
 </div>

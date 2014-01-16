@@ -47,7 +47,7 @@
         <mkdir dir="${project.basedir}/build/pdepend"/>
         <!-- Needed to enable the API controller tests -->
         <!-- make ipeer seem to be installed -->
-        <touch file="${project.basedir}/app/config/installed.txt" />
+        <touch file="${project.basedir}/app/tmp/installed.txt" />
         <!-- let Apache write to cache -->
         <exec command="chmod -R 777 ${project.basedir}/app/tmp"/>
     </target>
@@ -212,8 +212,8 @@
     </target>
 
     <target name="test" description="Run unit tests" depends="init-test-db">
-        <exec command="cake/console/cake testsuite app group model" passthru="true"/>
-        <exec command="cake/console/cake testsuite app group controller" passthru="true"/>
+        <exec command="cake/console/cake -app app testsuite app group model" passthru="true"/>
+        <exec command="cake/console/cake -app app testsuite app group controller" passthru="true"/>
         <!-- v1_controller test must be last one as it will change the database --> 
         <phingcall target="post-test"/>
     </target>
@@ -223,6 +223,10 @@
         <exec command="cake/console/cake testreport app group controller" passthru="true"/>
         <!-- v1_controller test must be last one as it will change the database --> 
         <phingcall target="post-test"/>
+    </target>
+
+    <target name="upgrade" description="Upgrade iPeer">
+        <exec command="cake/console/cake upgrade" passthru="true"/>
     </target>
 
     <target name="phpcb"

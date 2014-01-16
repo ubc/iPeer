@@ -29,23 +29,26 @@ class PenaltyComponent extends Object
         $submissionDate = strtotime($submissionDate);
 
         // not due yet. no penalty
-        if ($eventDueDate <= time()) {
+        if ($eventDueDate >= time()) {
             return 0;
-        }
-
-        // event is not end yet
-        if ($eventEndDate <= time()) {
-            return __('N/A', true);
         }
 
         // prepare penalty array in reverse order, hight -> low
         $penalties = Set::combine($penalties, '{n}.days_late', '{n}.percent_penalty');
+        if (empty($penalties)) {
+            return __('N/A', true);
+        }
         krsort($penalties);
         $keys = array_keys($penalties);
 
         // no submission - if now is after release date end then - gets final deduction
+        // else return N/A
         if (!$submissionDate) {
-            return $penalties[$keys[0]];
+            if ($eventEndDate < time()) {
+                return $penalties[$keys[0]];
+            } else {
+                return __('N/A', true);
+            }
         }
 
         // there is submission - may be on time or late

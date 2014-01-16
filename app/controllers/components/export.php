@@ -141,7 +141,7 @@ class ExportComponent extends Object
         $this->Rubric = new Rubric;
         $this->Mixeval = new Mixeval;
         $this->RubricsCriteria = new RubricsCriteria;
-        $this->MixEvalsQuestionDesc = new MixevalsQuestionDesc;
+        $this->MixEvalsQuestionDesc = new MixevalQuestionDesc;
         $this->EvaluationSimple = new EvaluationSimple;
         $this->EvaluationRubric = new EvaluationRubric;
         $this->EvaluationMixeval = new EvaluationMixeval;

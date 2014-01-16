@@ -52,7 +52,8 @@ class EvaluationSimple extends EvaluationResponseBase
     function getResultsByEvaluator($grpEventId=null, $evaluator=null)
     {
         return $this->find('all', array(
-            'conditions' => array('grp_event_id' => $grpEventId, 'evaluator' => $evaluator)
+            'conditions' => array('grp_event_id' => $grpEventId, 'evaluator' => $evaluator),
+            'contain' => false
         ));
     }
 
@@ -318,19 +319,15 @@ class EvaluationSimple extends EvaluationResponseBase
      */
     function getTeamReleaseStatus($groupEventId=null)
     {
-        $ret = array();
-        //$status = $this->findAll('grp_event_id='.$groupEventId.' GROUP BY evaluatee', 'evaluatee, release_status, grade_release', 'evaluatee');
         $status = $this->find('all', array(
             'conditions' => array('grp_event_id' => $groupEventId),
-            'fields' => array('evaluatee', 'release_status', 'grade_release'),
+            'fields' => array('evaluatee', 
+                'MIN(release_status) as release_status', 'MIN(grade_release) as grade_release'),
             'order' => 'evaluatee',
             'group' => 'evaluatee'
         ));
 
-        foreach ($status as $s) {
-            $ret[$s['EvaluationSimple']['evaluatee']] = $s['EvaluationSimple'];
-        }
-        return $ret;
+        return Set::combine($status, '{n}.EvaluationSimple.evaluatee', '{n}.0');
     }
 
     /**
@@ -349,7 +346,8 @@ class EvaluationSimple extends EvaluationResponseBase
         $this->Penalty = ClassRegistry::init('Penalty');
         $this->Event = ClassRegistry::init('Event');
 
-        $gradeReleaseStatus = 0;
+        $gradeReleased = 0;
+        $commentReleased = 0;
         $aveScore = 0;
         $groupAve = 0;
         $studentResult = array();
@@ -362,117 +360,103 @@ class EvaluationSimple extends EvaluationResponseBase
         $subtractAvgScore = 0;
         $eventId = $event['Event']['id'];
         $results = $this->getResultsByEvaluatee($event['GroupEvent']['id'], $userId);
+        $event_info = $this->Event->findById($eventId);
         if ($results != null) {
-            //Get Grade Release: grade_release will be the same for all evaluatee records
-            $gradeReleaseStatus = $results[0]['EvaluationSimple']['grade_release'];
-            if ($gradeReleaseStatus) {
-                //Grade is released; retrieve all grades
-                //Get total mark each member received
-                $receivedTotalScore = $this->getReceivedTotalScore(
-                    $event['GroupEvent']['id'], $userId);
-                $totalScore = $receivedTotalScore[0][0]['received_total_score'];
-                $numMemberSubmissions = $this->find('count', array(
-                    'conditions' => array(
-                        'EvaluationSimple.evaluatee' => $userId,
-                        'EvaluationSimple.event_id' => $event['Event']['id'],
-                        'EvaluationSimple.grp_event_id' => $event['GroupEvent']['id'])));
+            //Get total mark each member received
+            $receivedTotalScore = $this->getReceivedTotalScore(
+                $event['GroupEvent']['id'], $userId);
+            $totalScore = $receivedTotalScore[0][0]['received_total_score'];
+            $numMemberSubmissions = $this->find('count', array(
+                'conditions' => array(
+                    'EvaluationSimple.evaluatee' => $userId,
+                    'EvaluationSimple.event_id' => $event['Event']['id'],
+                    'EvaluationSimple.grp_event_id' => $event['GroupEvent']['id'])));
 
-                $event_info = $this->Event->find(
-                    'first',
-                    array(
-                        'conditions' => array('Event.id' => $eventId),
-                    )
-                );
-                // storing the timestamp of the due date/end date of the event
-                $event_due = strtotime($event_info['Event']['due_date']);
-                $event_end = strtotime($event_info['Event']['release_date_end']);
-                // assign penalty to user if they submitted late or never submitted by release_date_end
-                $scorePenalty = null;
-                $event_sub = $this->Event->find(
-                    'first',
-                    array(
-                        'conditions' => array('Event.id' => $eventId),
-                        'contain' => array('EvaluationSubmission' => array(
-                            'conditions' => array('EvaluationSubmission.submitter_id' => $userId)
-                    )))
-                );
-                // no submission - if now is after release date end then - gets final deduction
-                if (empty($event_sub['EvaluationSubmission'])) {
-                    if (time() > $event_end) {
-                        $scorePenalty = $this->Penalty->getPenaltyFinal($eventId);
-                    }
-                // there is submission - may be on time or late
-                } else {
-                    $late_diff = strtotime($event_sub['EvaluationSubmission'][0]['date_submitted']) - $event_due;
-                    // late
-                    if (0 < $late_diff) {
-                        $days_late = $late_diff/(24*60*60);
-                        $scorePenalty = $this->Penalty->getPenaltyByEventAndDaysLate($eventId, $days_late);
-                    }
+            $gradeReleased = array_product(Set::extract($results, '/EvaluationSimple/grade_release')) ||
+                $event_info['Event']['auto_release'];
+            // storing the timestamp of the due date/end date of the event
+            $event_due = strtotime($event_info['Event']['due_date']);
+            $event_end = strtotime($event_info['Event']['release_date_end']);
+            // assign penalty to user if they submitted late or never submitted by release_date_end
+            $scorePenalty = null;
+            $event_sub = $this->Event->find(
+                'first',
+                array(
+                    'conditions' => array('Event.id' => $eventId),
+                    'contain' => array('EvaluationSubmission' => array(
+                        'conditions' => array('EvaluationSubmission.submitter_id' => $userId)
+                )))
+            );
+            // no submission - if now is after release date end then - gets final deduction
+            if (empty($event_sub['EvaluationSubmission'])) {
+                if (time() > $event_end) {
+                    $scorePenalty = $this->Penalty->getPenaltyFinal($eventId);
                 }
-                $subtractAvgScore = ((($scorePenalty['Penalty']['percent_penalty']) / 100) * $totalScore) / $numMemberSubmissions;
-
-                $aveScore = $totalScore / $numMemberSubmissions;
-                $studentResult['numMembers'] = $numMemberSubmissions;
-                $studentResult['receivedNum'] = count($receivedTotalScore);
-                $studentResult['penalty'] = $scorePenalty['Penalty']['percent_penalty'];
-
-                $tmp_total = 0;
-                $avg = $this->find('all', array(
-                    'conditions' => array('EvaluationSimple.grp_event_id' => $event['GroupEvent']['id']),
-                    'fields' => array('AVG(score) as avg', 'sum(score) as sum', 'evaluatee', 'grp_event_id'),
-                    'group' => 'evaluatee'
-                ));
-
-                if (isset($avg)) {
-                    $i = 0;
-                    // Deduct marks if the evaluator submitted a late evaluation.
-                    foreach ($avg as $a) {
-                        $user_id = $a['EvaluationSimple']['evaluatee'];
-                        $userPenalty = array();
-                        $event_info = $this->Event->find(
-                            'first',
-                            array(
-                                'conditions' => array('Event.id' => $eventId),
-                            )
-                        );
-                        // storing the timestamp of the due date of the event
-                        $event_due = strtotime($event_info['Event']['due_date']);
-                        $event_end = strtotime($event_info['Event']['release_date_end']);
-                        // assign penalty to groupMember if they submitted late or never submitted by release_date_end
-                        $scorePenalty = null;
-                        $event_sub = $this->Event->find(
-                            'first',
-                            array(
-                                'conditions' => array('Event.id' => $eventId),
-                                'contain' => array('EvaluationSubmission' => array(
-                                'conditions' => array('EvaluationSubmission.submitter_id' => $user_id)
-                            )))
-                        );
-                        // no submission - if now is after release date end then - gets final deduction
-                        if (empty($event_sub['EvaluationSubmission'])) {
-                            if (time() > $event_end) {
-                                $scorePenalty = $this->Penalty->getPenaltyFinal($eventId);
-                            }
-                        // there is submission - may be on time or late
-                        } else {
-                            $late_diff = strtotime($event_sub['EvaluationSubmission'][0]['date_submitted']) - $event_due;
-                            // late
-                            if (0 < $late_diff) {
-                                $days_late = $late_diff/(24*60*60);
-                                $scorePenalty = $this->Penalty->getPenaltyByEventAndDaysLate($eventId, $days_late);
-                            }
-                        }
-                        $avgSubtract = 0;
-                        if (!empty($userPenalty)) {
-                            $avgSubtract = ($scorePenalty['Penalty']['percent_penalty'] / 100) * ($avg[$i][0]['sum']) / $numMemberSubmissions;
-                        }
-                        $tmp_total += $a['0']['avg'] - $avgSubtract;
-                        $i++;
-                    }
+            // there is submission - may be on time or late
+            } else {
+                $late_diff = strtotime($event_sub['EvaluationSubmission'][0]['date_submitted']) - $event_due;
+                // late
+                if (0 < $late_diff) {
+                    $days_late = $late_diff/(24*60*60);
+                    $scorePenalty = $this->Penalty->getPenaltyByEventAndDaysLate($eventId, $days_late);
                 }
-                $groupAve = $tmp_total/count($avg);
             }
+            $subtractAvgScore = ((($scorePenalty['Penalty']['percent_penalty']) / 100) * $totalScore) / $numMemberSubmissions;
+
+            $aveScore = $totalScore / $numMemberSubmissions;
+            $studentResult['numMembers'] = $numMemberSubmissions;
+            $studentResult['receivedNum'] = count($receivedTotalScore);
+            $studentResult['penalty'] = $scorePenalty['Penalty']['percent_penalty'];
+
+            $tmp_total = 0;
+            $avg = $this->find('all', array(
+                'conditions' => array('EvaluationSimple.grp_event_id' => $event['GroupEvent']['id']),
+                'fields' => array('AVG(score) as avg', 'sum(score) as sum', 'evaluatee', 'grp_event_id'),
+                'group' => 'evaluatee'
+            ));
+
+            if (isset($avg)) {
+                $i = 0;
+                // Deduct marks if the evaluator submitted a late evaluation.
+                foreach ($avg as $a) {
+                    $user_id = $a['EvaluationSimple']['evaluatee'];
+                    $userPenalty = array();
+                    $event_info = $this->Event->findById($eventId);
+                    // storing the timestamp of the due date of the event
+                    $event_due = strtotime($event_info['Event']['due_date']);
+                    $event_end = strtotime($event_info['Event']['release_date_end']);
+                    // assign penalty to groupMember if they submitted late or never submitted by release_date_end
+                    $event_sub = $this->Event->find(
+                        'first',
+                        array(
+                            'conditions' => array('Event.id' => $eventId),
+                            'contain' => array('EvaluationSubmission' => array(
+                            'conditions' => array('EvaluationSubmission.submitter_id' => $user_id)
+                        )))
+                    );
+                    // no submission - if now is after release date end then - gets final deduction
+                    if (empty($event_sub['EvaluationSubmission'])) {
+                        if (time() > $event_end) {
+                            $userPenalty = $this->Penalty->getPenaltyFinal($eventId);
+                        }
+                    // there is submission - may be on time or late
+                    } else {
+                        $late_diff = strtotime($event_sub['EvaluationSubmission'][0]['date_submitted']) - $event_due;
+                        // late
+                        if (0 < $late_diff) {
+                            $days_late = $late_diff/(24*60*60);
+                            $userPenalty = $this->Penalty->getPenaltyByEventAndDaysLate($eventId, $days_late);
+                        }
+                    }
+                    $avgSubtract = 0;
+                    if (!empty($userPenalty)) {
+                        $avgSubtract = ($userPenalty['Penalty']['percent_penalty'] / 100) * ($avg[$i][0]['avg']);
+                    }
+                    $tmp_total += $a['0']['avg'] - $avgSubtract;
+                    $i++;
+                }
+            }
+            $groupAve = $tmp_total/count($avg);
             $studentResult['avePenalty'] = $subtractAvgScore;
             $studentResult['aveScore'] = $aveScore;
             $studentResult['groupAve'] = $groupAve;
@@ -480,8 +464,7 @@ class EvaluationSimple extends EvaluationResponseBase
             $releasedComments = array();
             //Get Comment Release: release_status may not be the same for all evaluators
             foreach ($results as $comment) {
-                if ($comment['EvaluationSimple']['release_status']) {
-                    //comment is released
+                if ($comment['EvaluationSimple']['release_status'] || $event_info['Event']['auto_release']) {
                     $releasedComments[] = $this->getComment($comment['EvaluationSimple']['id']);
                 }
             }
@@ -493,7 +476,9 @@ class EvaluationSimple extends EvaluationResponseBase
             $studentResult['penalty'] = null;
             $studentResult['avePenalty'] = null;
         }
-        $studentResult['gradeReleaseStatus'] = $gradeReleaseStatus;
+        $commentReleased = !empty($releasedComments) || $event_info['Event']['auto_release'];
+        $studentResult['gradeReleased'] = $gradeReleased;
+        $studentResult['commentReleased'] = $commentReleased;
         return $studentResult;
     }
 
@@ -510,7 +495,7 @@ class EvaluationSimple extends EvaluationResponseBase
     function simpleEvalScore($eventId, $fields, $conditions) {
         $evalSub = ClassRegistry::init('EvaluationSubmission');
         $pen = ClassRegistry::init('Penalty');
-        $simp = ClassRegistry::init('SimpleEvaluation');
+        //$simp = ClassRegistry::init('SimpleEvaluation');
 
         $list = $this->find('all',
             array('fields' => $fields, 'conditions' => $conditions));
@@ -529,8 +514,8 @@ class EvaluationSimple extends EvaluationResponseBase
 
         $sub = $evalSub->getEvalSubmissionsByEventId($eventId);
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId)));
-        $template = $simp->find('first', array('conditions' => array('SimpleEvaluation.id' => $event['Event']['template_id'])));
-        $max = $template['SimpleEvaluation']['point_per_member'];
+        //$template = $simp->find('first', array('conditions' => array('SimpleEvaluation.id' => $event['Event']['template_id'])));
+        //$max = $template['SimpleEvaluation']['point_per_member'];
 
         foreach($sub as $stu) {
             if (isset($data[$stu['EvaluationSubmission']['submitter_id']])) {

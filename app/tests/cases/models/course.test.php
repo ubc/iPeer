@@ -12,7 +12,9 @@ class CourseTestCase extends CakeTestCase {
         'app.user_enrol', 'app.groups_member', 'app.survey',
         'app.user_faculty', 'app.faculty', 'app.department',
         'app.course_department', 'app.user_tutor', 'app.penalty',
-        'app.evaluation_simple', 'app.survey_input',
+        'app.evaluation_simple', 'app.survey_input', 'app.oauth_token',
+        'app.sys_parameter', 'app.evaluation_rubric', 'app.evaluation_rubric_detail',
+        'app.evaluation_mixeval', 'app.evaluation_mixeval_detail'
     );
     public $Course = null;
 
@@ -92,7 +94,7 @@ class CourseTestCase extends CakeTestCase {
         $this->Course->addInstructor(2, 2);
         //Run tests
         $courseTaught = $this->Course->getCourseByInstructor(2);// assume tested
-        $this->assertEqual($courseTaught[1]['Course']['course'], 'APSC 201');
+        $this->assertEqual($courseTaught[1]['Course']['course'], 'MECH 328');
 
         /*
          * Test adding a valid instructor to an invalid course;
@@ -243,8 +245,11 @@ class CourseTestCase extends CakeTestCase {
         $empty = null;
 
         // super admin: user id 1, should see all courses
-        $uf = $this->UserFaculty->findAllByUserId(1);
-        $dep = $this->Department->getByUserFaculties($uf);
+        $dep = array(
+            array('Department' => array('id' => 1)),
+            array('Department' => array('id' => 2)),
+            array('Department' => array('id' => 3)),
+        );
         $course = $this->Course->getByDepartments($dep, 'list');
         $this->assertEqual($course, $expected);
 
@@ -263,6 +268,14 @@ class CourseTestCase extends CakeTestCase {
     }
 
     function testGetAccessibleCourseById()
+    {
+    }
+    
+    function testGetuserListByCourse()
+    {
+    }
+    
+    function testGetCourseList()
     {
     }
 }

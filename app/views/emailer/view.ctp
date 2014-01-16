@@ -22,7 +22,7 @@
   </tr>
   <tr>
     <td><?php __('Scheduled on')?></td>
-    <td><?php echo $data['EmailSchedule']['date'];?>
+    <td><?php echo Toolkit::formatDate($data['EmailSchedule']['date']);?>
     </td>
   </tr>
   <tr>
@@ -33,20 +33,17 @@
     </td>
   </tr>
   <tr>
-    <td><?php __('Content')?></td>
-    <td><?php echo $form->textarea('Email.content', array(
-          'id' => 'email_content',
-          'value' => $data['EmailSchedule']['content'],
-          'cols' => '60',
-          'rows' => '15',
-          'escape' => false,
-          'readonly' => true
-        ));?>
-    </td>
+    <td><?php __('Content')?></td><td><div id='emailContent'>
+    <?php if (isset($params)) {
+        echo $this->element('email/html/eventReminder', $params);
+    } else {
+        echo $data['EmailSchedule']['content'];
+    } ?>
+    </div></td>
   </tr>
   <tr>
     <td><?php __('Created')?></td>
-    <td><?php echo $data['EmailSchedule']['created'];?>
+    <td><?php echo Toolkit::formatDate($data['EmailSchedule']['created']);?>
     </td>
   </tr>
 </table>

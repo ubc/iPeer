@@ -19,6 +19,9 @@
  */
 set_time_limit(0);
 ini_set('display_errors', 1);
+$timezone = ini_get('date.timezone') ? ini_get('date.timezone') : 'UTC';
+date_default_timezone_set($timezone); // set the default time zone
+
 /**
  * Use the DS to separate the directories in other defines
  */

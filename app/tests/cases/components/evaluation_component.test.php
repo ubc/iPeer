@@ -19,7 +19,8 @@ class EvaluationTestCase extends CakeTestCase
         'app.user_enrol', 'app.groups_member', 'app.survey', 'app.mixeval', 'app.mixevals_question', 'app.mixevals_question_desc',
         'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
         'app.evaluation_simple', 'app.faculty', 'app.user_faculty',
-        'app.department', 'app.course_department'
+        'app.department', 'app.course_department', 'app.oauth_token', 'app.sys_parameter',
+        'app.user_tutor'
     );
 
     function startCase()
@@ -113,43 +114,6 @@ class EvaluationTestCase extends CakeTestCase
         $this->assertEqual($result, $expect);
     }
 
-    function testFormatSimpleEvaluationResultsMatrix()
-    {
-        // Set up test data
-        $evalResult = array();
-        $evalResult[0]['EvaluationSimple']['EvaluationSimple']['grade_release'] = 0;
-        $evalResult[0]['EvaluationSimple']['EvaluationSimple']['evaluatee'] = 'Kevin Luk';
-        $evalResult[0]['EvaluationSimple']['EvaluationSimple']['score'] = 25;
-        $evalResult[1]['EvaluationSimple']['EvaluationSimple']['grade_release'] = 0;
-        $evalResult[1]['EvaluationSimple']['EvaluationSimple']['evaluatee'] = 'Zion Au';
-        $evalResult[1]['EvaluationSimple']['EvaluationSimple']['score'] = 50;
-        $groupMembers = array();
-        $groupMembers[0]['User']['id'] = 1;
-        $groupMembers[1]['User']['id'] = 2;
-        // Run test
-        $result = $this->EvaluationComponentTest->formatSimpleEvaluationResultsMatrix($groupMembers, $evalResult);
-        $expect = array('0' => array('Kevin Luk' => 25),
-            '1' => array('Zion Au' => 50));
-        $this->assertEqual($result, $expect);
-
-        // Run tests for 'N/A' return value
-        $evalResultDuplicate1 = $evalResult;
-        unset($evalResultDuplicate1[0]['EvaluationSimple']['EvaluationSimple']);
-        unset($evalResultDuplicate1[1]['EvaluationSimple']['EvaluationSimple']);
-        $result = $this->EvaluationComponentTest->formatSimpleEvaluationResultsMatrix($groupMembers, $evalResultDuplicate1);
-        $expect = array('0' => array('' => 'n/a'),
-            '1' => array('' => 'n/a'));
-        $this->assertEqual($result, $expect);
-
-        $evalResultDuplicate2 = $evalResult;
-        unset($evalResultDuplicate1[0]['EvaluationSimple']);
-        unset($evalResultDuplicate1[1]['EvaluationSimple']);
-        $result = $this->EvaluationComponentTest->formatSimpleEvaluationResultsMatrix($groupMembers, $evalResultDuplicate1);
-        $expect = array(array('1' => 'n/a', '2' => 'n/a'),
-            array('1' => 'n/a', '2' => 'n/a'));
-        $this->assertEqual($result, $expect);
-    }
-
     function testFilterString()
     {
         $testString = "HELLO THIS IS A TEST";
@@ -203,33 +167,6 @@ class EvaluationTestCase extends CakeTestCase
 
     function saveNGetEvalutionRubricDetail()
     {
-
-    }
-
-
-
-    function testGetRubricResultDetail()
-    {
-
-        $event = array('group_event_id' => 1);
-        $groupMembers = array(array('id' => 4));
-        $result = $this->EvaluationComponentTest->getRubricResultDetail($event, $groupMembers);
-
-        $this->assertEqual($result['scoreRecords'][4]['grade_released'], 0);
-        $this->assertEqual($result['scoreRecords'][4]['comment_released'], 0);
-        $this->assertEqual($result['scoreRecords'][4]['rubric_criteria_ave'][1], 10);
-        $this->assertEqual($result['memberScoreSummary'][4]['received_total_score'], 15.00);
-        $this->assertEqual($result['memberScoreSummary'][4]['received_ave_score'], 15);
-        $this->assertEqual($result['evalResult'][4][0]['EvaluationRubric']['id'], 1);
-        $this->assertEqual($result['evalResult'][4][0]['EvaluationRubric']['evaluator'], 3);
-        $this->assertEqual($result['evalResult'][4][0]['EvaluationRubric']['evaluatee'], 4);
-
-        $result = $this->EvaluationComponentTest->getRubricResultDetail(null, $groupMembers);
-        $this->assertFalse($result);
-        $result = $this->EvaluationComponentTest->getRubricResultDetail($event, null);
-        $this->assertFalse($result);
-        $result = $this->EvaluationComponentTest->getRubricResultDetail(null, null);
-        $this->assertFalse($result);
 
     }
 
@@ -347,17 +284,17 @@ class EvaluationTestCase extends CakeTestCase
 
     }
 
-    function testSaveNGetEvalutionMixevalDetail()
+    function testSaveNGetEvaluationMixevalDetail()
     {
 
         $evalMixevalId = 1;
         $mixeval = array('Mixeval' => array('total_question' => 2));
         $targetEvaluatee = 2;
-        $form = array('data'=> array('Mixeval' => array('question_type0' => 'S', 'question_type1' => 'T')),
+        $form = array('data'=> array('Mixeval' => array('mixeval_question_type_id0' => '1', 'mixeval_question_type_id1' => '2')),
             'form' => array('selected_lom_2_0' => 1, '2criteria_points_0' => 30, 'response_text_2_1' => 'text'));
-        $grade = $this->EvaluationComponentTest->saveNGetEvalutionMixevalDetail ($evalMixevalId, $mixeval, $targetEvaluatee, $form);
+        $grade = $this->EvaluationComponentTest->saveNGetEvaluationMixevalDetail ($evalMixevalId, $mixeval, $targetEvaluatee, $form);
         $this->assertEqual($grade, 30);
-        $grade = $this->EvaluationComponentTest->saveNGetEvalutionMixevalDetail (null, null, null, null);
+        $grade = $this->EvaluationComponentTest->saveNGetEvaluationMixevalDetail (null, null, null, null);
         $this->assertFalse($grade);
 
     }
@@ -367,7 +304,7 @@ class EvaluationTestCase extends CakeTestCase
 
         $groupEventId = 1;
         $groupMembers = array( 1=> array('id' => 1),2=> array ('id' =>2));
-        $eval = $this->EvaluationComponentTest->getMixevalResultDetail($groupEventId, $groupMembers);
+        $eval = $this->EvaluationComponentTest->getMixevalResultDetail($groupEventId, $groupMembers, array(1, 2));
         $expected = array( "scoreRecords"=>
             array(1=> array ( "grade_released"=> "0", "comment_released"=> "0", "mixeval_question_ave"=> array()),
                 2=> array( 1 => "n/a", 2=> "n/a", "mixeval_question_ave"=> array()),
@@ -417,22 +354,10 @@ class EvaluationTestCase extends CakeTestCase
         $eval = $eval = $this->EvaluationComponentTest->getStudentViewMixevalResultDetailReview(1, null);
         $this->assertFalse($eval);
     }
-
+    
     function testFormatMixevalEvaluationResultsMatrix()
     {
-
-        $evalResult = array( array( array('EvaluationMixeval' =>
-            array('grade_release' => 1, 'comment_release' => 1, 'evaluatee' => 1, 'details' => array(
-                array ('EvaluationMixevalDetail' => array('question_number' => 1, 'grade' => 50)))))));
-        $groupMembers = array('Group'=> array (1=> array('id' => 1),2=> array ('id' =>2)));
-
-        $expected = array( 0 => array('mixeval_question_ave' => array(1=>50)),'group_question_ave' => array(1=>50));
-        $matrix = $this->EvaluationComponentTest->formatMixevalEvaluationResultsMatrix($groupMembers, $evalResult);
-        $this->assertEqual($expected, $matrix);
-
-        $matrix = $this->EvaluationComponentTest->formatMixevalEvaluationResultsMatrix(null, null);
-        $this->assertFalse($matrix);
-
+    
     }
 
 
@@ -448,34 +373,6 @@ class EvaluationTestCase extends CakeTestCase
 
         $this->EvaluationComponentTest->changeMixevalEvaluationCommentRelease(1, 1, 1);
         //     $survey =  $this->EvaluationMixeval->find('all', array('conditions' => array('grp_event_id' => 1)));
-        //  var_dump($survey);
-
-    }
-
-    function testFormatMixevalEvaluationResult()
-    {
-
-        // $result = $this->EvaluationComponentTest->formatMixevalEvaluationResult(1, 1, 1);
-        // var_dump($result);
-
-    }
-
-    function testSaveSurveyEvaluation()
-    {
-
-        $params = array();
-        $params['data']['Evaluation']['surveyee_id'] = 1;
-        $params['form']['event_id'] = 1;
-        $params['form']['survey_id'] = 17;
-        $params['form']['question_count'] = 1;
-        $params['form']['question_id1'] = 1;
-        $params['form']['answer_1'] = 'answer 1';
-
-        $this->EvaluationComponentTest->saveSurveyEvaluation($params);
-
-
-
-        $survey =  $this->SurveyInput->find('all', array('conditions' => array('survey_id' => 17)));
         //  var_dump($survey);
 
     }
