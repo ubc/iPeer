@@ -333,7 +333,7 @@ class EventTestCase extends CakeTestCase
         //TODO
     }
 
-    function testTimezone()
+    /*function testTimezone()
     {
         $now = time(); // current php time (eg. not sql time)
         $event = $this->Event->findById(1);
@@ -351,7 +351,7 @@ class EventTestCase extends CakeTestCase
         $this->assertWithinMargin($event['Event']['due_in'], $dueIn, 5);
         // switch timezone back to original
         date_default_timezone_set($serverTZ);
-    }
+    }*/
 
     #####################################################################################################################################################
     ###############################################     HELPER FUNCTIONS     ############################################################################
