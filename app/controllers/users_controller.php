@@ -687,31 +687,19 @@ class UsersController extends AppController
             }
 
             // create the enrolment entry depending on if instructor or student
-
             // and also convert it into a CakePHP dark magic friendly format
-
             $enrollment = explode("||", $this->data['Courses']['enrollment']);
-
             foreach ($enrollment as $index => $val) {
-
-            	$enrollment[$index] = str_replace("|", "", $val);
-
+                $enrollment[$index] = str_replace("|", "", $val);
             }
 
             if (!empty($enrollment)) {
-
-            	$enrolments = $this->_convertCourseEnrolment(
-
-            			$enrollment,
-
-            			$this->data['Role']['RolesUser']['role_id']
-
-            	);
-
+                $enrolments = $this->_convertCourseEnrolment(
+                    $enrollment,
+                    $this->data['Role']['RolesUser']['role_id']
+                );
             } else {
-
-            	$enrolments = array('Enrolment' => array());
-
+                $enrolments = array('Enrolment' => array());
             }
 
             $this->data = array_merge($this->data, $enrolments);
@@ -1576,333 +1564,166 @@ class UsersController extends AppController
     }
     
     /**
-
      * formatDueIn
-
      *
-
      * Take the due interval, which is in seconds, and format
-
      * it something that's easier for users to read.
-
      *
-
      * @param mixed $seconds seconds
-
      *
-
      * @access private
-
      * @return void
-
      */
-
     private function _formatDueIn($seconds)
-
     {
-
-    	$ret = "";
-
-    	if ($seconds > 86400) {
-
-    		$ret = round($seconds / 86400, 1) . __(' days', true);
-
+        $ret = "";
+        if ($seconds > 86400) {
+            $ret = round($seconds / 86400, 1) . __(' days', true);
+        } elseif ($seconds < 3600) {
+            $minutes = (int) ($seconds / 60);
+            $seconds = $seconds % 60;
+            $ret = $minutes . __(' minutes ', true) . $seconds . __(' seconds', true);
+    	} else {
+    	    $hours = (int) ($seconds / 3600);
+            $minutes = (int) ($seconds % 3600 / 60);
+            $ret = $hours . __(' hours ', true) . $minutes . __(' minutes', true);
     	}
 
-    	elseif ($seconds < 3600) {
-
-    		$minutes = (int) ($seconds / 60);
-
-    		$seconds = $seconds % 60;
-
-    		$ret = $minutes . __(' minutes ', true) . $seconds
-
-    		. __(' seconds', true);
-
-    	}
-
-    	else {
-
-    		$hours = (int) ($seconds / 3600);
-
-    		$minutes = (int) ($seconds % 3600 / 60);
-
-    		$ret = $hours . __(' hours ', true) . $minutes .
-
-    		__(' minutes', true);
-
-    	}
-
-    	return $ret;
-
+        return $ret;
     }
     
     /**
-
      * Helper to filter events into 3 different categories and to
-
      * discard inactive events.
-
      *
-
      * The 3 categories are: Upcoming, Submitted, Expired
-
      *
-
      * - Upcoming are events that the user can still make submissions for.
-
      * - Submitted are events that the user has already made a submission.
-
      * - Expired are events that the user hasn't made and can no longer make
-
      * submissions, but they can still view results from their peers.
-
      *
-
      * An evaluation is considered inactive once past its result release
-
      * period. A survey is considered inactive once past its release period.
-
      *
-
      * @param array $events - list of events info returned from the event model,
-
      *  each event MUST have an 'EvaluationSubmission' array or this won't work
-
      *
-
      * @return Discard inactive events and then split the remaining events
-
      * into upcoming, submitted, and expired.
-
      * */
-
     private function _splitSubmittedEvents($events)
-
     {
+        $submitted = $upcoming = $expired = array();
 
-    	$submitted = $upcoming = $expired = array();
+        foreach ($events as $event) {
+            if (empty($event['EvaluationSubmission']) && $event['Event']['is_released']) {
+                // can only take surveys during the release period
+                $upcoming[] = $event;
+            } else if (!empty($event['EvaluationSubmission']) &&
+                strtotime('NOW') < strtotime($event['Event']['result_release_date_end'])) { 
+                // has submission and can or will be able to view results soon
+                // note that we're not using is_released or is_result_released
+                // because of an edge case where if there is a period of time
+                // between the release and result release period, the evaluation
+                // will disappear from view
+                $submitted[] = $event;
+            } else if (!empty($event['EvaluationSubmission']) && $event['Event']['is_released']) {
+                // special case for surveys, which doesn't have
+                // result_release_date_end
+                $submitted[] = $event;
+            } else if (empty($event['EvaluationSubmission']) &&
+                    strtotime('NOW') <
+                    strtotime($event['Event']['result_release_date_end']) &&
+                    strtotime('NOW') >
+                    strtotime($event['Event']['release_date_end'])
+            ) { // student did not do the survey within the allowed time
+                // but we should still let them view results
+                $expired[] = $event;
+            }
+        }
 
-    	foreach ($events as $event) {
-
-    		if (empty($event['EvaluationSubmission']) &&
-
-    				$event['Event']['is_released']
-
-    		) { // can only take surveys during the release period
-
-    			$upcoming[] = $event;
-
-    		}
-
-    		else if (!empty($event['EvaluationSubmission']) &&
-
-    				strtotime('NOW') <
-
-    				strtotime($event['Event']['result_release_date_end'])
-
-    		) { // has submission and can or will be able to view results soon
-
-    			// note that we're not using is_released or is_result_released
-
-    			// because of an edge case where if there is a period of time
-
-    			// between the release and result release period, the evaluation
-
-    			// will disappear from view
-
-    			$submitted[] = $event;
-
-    		}
-
-    		else if (!empty($event['EvaluationSubmission']) &&
-
-    				$event['Event']['is_released']
-
-    		) {
-
-    			// special case for surveys, which doesn't have
-
-    			// result_release_date_end
-
-    			$submitted[] = $event;
-
-    		}
-
-    		else if (empty($event['EvaluationSubmission']) &&
-
-    				strtotime('NOW') <
-
-    				strtotime($event['Event']['result_release_date_end']) &&
-
-    				strtotime('NOW') >
-
-    				strtotime($event['Event']['release_date_end'])
-
-    		) { // student did not do the survey within the allowed time
-
-    			// but we should still let them view results
-
-    			$expired[] = $event;
-
-    		}
-
-    	}
-
-    	return array('upcoming' => $upcoming,
-
-    			'submitted' => $submitted,
-
-    			'expired' => $expired
-
-    	);
-
+        return array('upcoming' => $upcoming, 'submitted' => $submitted, 'expired' => $expired);
     }
     
     /**
-
      * showEvents
-
      *
-
      * @param mixed $id       - user id
-
      *
-
      * @access public
-
      * @return void
-
      */
 
     function showEvents($id)
-
     {
-    	// check what type the logged in user is
-    	if(User::hasPermission('functions/superadmin')) {
-    		$extraId = null;
-    	}
-    	else if (User::hasPermission('controllers/departments')) {
+        // check what type the logged in user is
+        if(User::hasPermission('functions/superadmin')) {
+            $extraId = null;
+        } else if (User::hasPermission('controllers/departments')) {
+            $extraId = User::getAccessibleCourses();
+        } else {
+            $extraId = User::get('id');
+        }
+        // find all the student's events the user is allowed to see
+        $events = $this->Event->getEventsByUserId($id, null, $extraId);
 
-    		$extraId = User::getAccessibleCourses();
-    	}
-    	else {
-    		$extraId = User::get('id');
-    	}
-    	// find all the student's events the user is allowed to see
+        // mark events as late if past due date
+        foreach ($events as &$type) {
+            foreach ($type as &$event) {
+                if ($event['Event']['due_in'] > 0) {
+                    $event['late'] = false;
+                    continue;
+                }
+                $event['late'] = true;
+            }
+        }
 
-    	$events = $this->Event->getEventsByUserId($id, null, $extraId);
+        // determine the proper penalty to be applied to a late eval
+        foreach ($events['Evaluations'] as &$event) {
+            if (!$event['late'] || empty($event['Penalty'])) {
+                continue;
+            }
+            // convert seconds to days
+            $daysLate = abs($event['Event']['due_in']) / 86400;
+            $pctPenalty = 0;
+            foreach ($event['Penalty'] as $penalty) {
+                $pctPenalty = $penalty['percent_penalty'];
+                if ($penalty['days_late'] > $daysLate) {
+                    break;
+                }
+            }
+            $event['percent_penalty'] = $pctPenalty;
+        }
 
-    	
+        // format the 'due in' time interval for display
+        foreach ($events as &$types) {
+            foreach ($types as &$event) {
+                $event['Event']['due_in'] = $this->_formatDueIn(
+                    abs($event['Event']['due_in']));
+            }
+        }
 
-    	// mark events as late if past due date
+        // remove non-current events and split into upcoming/submitted/expired
+        $evals = $this->_splitSubmittedEvents($events['Evaluations']);
+        $surveys = $this->_splitSubmittedEvents($events['Surveys']);
 
-    	foreach ($events as &$type) {
+        // calculate summary statistics
+        $numOverdue = 0;
+        $numDue = 0;
+        $numDue = sizeof($evals['upcoming']) + sizeof($surveys['upcoming']);
+        // only evals can have overdue events right now
+        foreach ($evals['upcoming'] as $e) {
+            $e['late'] ? $numOverdue++ : '';
+        }
 
-    		foreach ($type as &$event) {
+        $this->set('studentId', $id);
+        $this->set('evals', $evals);
 
-    			if ($event['Event']['due_in'] > 0) {
+        $this->set('surveys', $surveys);
+        $this->set('numOverdue', $numOverdue);
 
-    				$event['late'] = false;
-
-    				continue;
-
-    			}
-
-    			$event['late'] = true;
-
-    		}
-
-    	}
-
-    	
-
-    	// determine the proper penalty to be applied to a late eval
-
-    	foreach ($events['Evaluations'] as &$event) {
-
-    		if (!$event['late'] || empty($event['Penalty'])) {
-
-    			continue;
-
-    		}
-
-    		// convert seconds to days
-
-    		$daysLate = abs($event['Event']['due_in']) / 86400;
-
-    		$pctPenalty = 0;
-
-    		foreach ($event['Penalty'] as $penalty) {
-
-    			$pctPenalty = $penalty['percent_penalty'];
-
-    			if ($penalty['days_late'] > $daysLate) {
-
-    				break;
-
-    			}
-
-    		}
-
-    		$event['percent_penalty'] = $pctPenalty;
-
-    	}
-
-    	
-
-    	// format the 'due in' time interval for display
-
-    	foreach ($events as &$types) {
-
-    		foreach ($types as &$event) {
-
-    			$event['Event']['due_in'] = $this->_formatDueIn(
-
-    					abs($event['Event']['due_in']));
-
-    		}
-
-    	}
-
-    	
-
-    	// remove non-current events and split into upcoming/submitted/expired
-
-    	$evals = $this->_splitSubmittedEvents($events['Evaluations']);
-
-    	$surveys = $this->_splitSubmittedEvents($events['Surveys']);
-
-    	
-
-    	// calculate summary statistics
-
-    	$numOverdue = 0;
-
-    	$numDue = 0;
-
-    	$numDue = sizeof($evals['upcoming']) + sizeof($surveys['upcoming']);
-
-    	// only evals can have overdue events right now
-
-    	foreach ($evals['upcoming'] as $e) {
-
-    		$e['late'] ? $numOverdue++ : '';
-
-    	}
-
-    	
-
-    	
-
-    	$this->set('studentId', $id);
-    	$this->set('evals', $evals);
-
-    	$this->set('surveys', $surveys);
-
-    	$this->set('numOverdue', $numOverdue);
-
-    	$this->set('numDue', $numDue);
-    	$this->render('student_events');
+        $this->set('numDue', $numDue);
+        $this->render('student_events');
     }
 }
