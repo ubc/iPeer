@@ -61,10 +61,10 @@ class UpgradeBase
             $sysparameter = ClassRegistry::init('SysParameter');
             $sysparameter->setValue('system.version', $this->toVersion);
             // note that upgrade_300 will run this but it won't do anything
-            // because there's no pre-existing database.version entry, 
+            // because there's no pre-existing database.version entry,
             // upgrade_310 should properly add this back
             $sysparameter->setValue('database.version', $this->dbVersion);
-            $sysparameter->setValue('system.absolute_url', Router::url('/login', true));
+            $sysparameter->setValue('system.absolute_url', Router::url('/', true));
         } else {
             return false;
         }
@@ -78,12 +78,12 @@ class UpgradeBase
      * @param int   $fromVersion from version
      * @param int   $toVersion   to version
      * @param array $additionalDeltas additional delta files to be applied after
-     *              the major patches. 
+     *              the major patches.
      *
      * @access public
      * @return void
      */
-    public function patchDb($fromVersion, $toVersion = null, 
+    public function patchDb($fromVersion, $toVersion = null,
         $additionalDeltas = array())
     {
         $ret = $this->connectDb();

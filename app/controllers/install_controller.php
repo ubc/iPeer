@@ -134,7 +134,7 @@ class InstallController extends Controller
                 return;
             }
         }
-        
+
         $timezones = DateTimeZone::listIdentifiers();
         $this->set('timezones', array_combine($timezones, $timezones));
 
@@ -163,7 +163,7 @@ class InstallController extends Controller
                     'email.port' => $this->data['InstallValidationStep4']['email_port'],
                     'email.username' => $this->data['InstallValidationStep4']['email_username'],
                     'email.password' => $this->data['InstallValidationStep4']['email_password'],
-                    'system.absolute_url' => Router::url('/login', true),
+                    'system.absolute_url' => Router::url('/', true),
                     'system.timezone' => $this->data['InstallValidationStep4']['time_zone'],
                 )
             );

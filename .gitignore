@@ -5,7 +5,7 @@ app/config/bootstrap.local.php
 app/config/guard.php
 app/config/database.php
 app/config/config.local.php
-
+app/webroot/apc.php
 dist
 build/api/
 build/code-browser/

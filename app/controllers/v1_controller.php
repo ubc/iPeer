@@ -16,7 +16,7 @@ class V1Controller extends Controller {
         'Group', 'Course', 'Event', 'EvaluationSimple', 'EvaluationRubric',
         'EvaluationMixeval', 'OauthClient', 'OauthNonce', 'OauthToken',
         'GroupsMembers', 'GroupEvent', 'Department', 'Role', 'CourseDepartment',
-        'UserCourse', 'UserTutor', 'UserEnrol', 'Penalty'
+        'UserCourse', 'UserTutor', 'UserEnrol', 'Penalty','SysParameter'
     );
     public $helpers = array('Session');
     public $components = array('RequestHandler', 'Session');
@@ -129,7 +129,18 @@ class V1Controller extends Controller {
         } else if ($this->RequestHandler->isDelete()) {
             $reqType = "DELETE";
         }
-        $params = "$reqType&" . rawurlencode(Router::url(null, true))
+
+        // use the url set in the settings first. The deploy behind load
+        // balancer with SSL off loading may cause problem if using the URL
+        // directly with Router::url (missing https)
+        $appUrl = $this->SysParameter->get('system.absolute_url');
+        if (empty($appUrl)) {
+            $appUrl = Router::url(null, true);
+        } else {
+            $appUrl .= Router::url(null, false);
+        }
+
+        $params = "$reqType&" . rawurlencode($appUrl)
             . "&" . rawurlencode($params);
         // construct the key used for hmac calculation
         $clientSecret = $this->_getClientSecret($_REQUEST['oauth_consumer_key']);
@@ -642,7 +653,7 @@ class V1Controller extends Controller {
             $status = 'HTTP/1.1 200 OK';
             foreach ($users as $user) {
                 if (!in_array($user['username'], $inClass)) {
-                    $this->log('User '.$user['username'].' is not in the course '.$courseId, 'debug');
+                    $this->log('User '.$user['username'].' is not in the course '.$courseId.' or user is an instructor in the course.', 'debug');
                     continue;
                 }
                 $userId = $this->User->field('id',
@@ -665,6 +676,7 @@ class V1Controller extends Controller {
                         $userId = $this->GroupsMembers->read('user_id');
                         $this->GroupsMembers->id = null;
                         $groupMembers[] = $user;
+                        $this->log('Added user '.$tmp['user_id'].' to group '.$groupId, 'debug');
                     } else {
                         $status = 'HTTP/1.1 500 Internal Server Error';
                         break;
@@ -1055,20 +1067,20 @@ class V1Controller extends Controller {
                 $role = $this->User->getRoleName($userId);
                 if ($role == 'student') {
                     $ret = $this->User->removeStudent($userId, $courseId);
-                    $this->log('Removing student '.$user['username'].' from course '.$courseId, 'debug');
+                    $this->log('Removing student '.$user.' from course '.$courseId, 'debug');
                 } else if ($role == 'instructor') {
                     $ret = $this->User->removeInstructor($userId, $courseId);
-                    $this->log('Removing instructor '.$user['username'].' from course '.$courseId, 'debug');
+                    $this->log('Removing instructor '.$user.' from course '.$courseId, 'debug');
                 } else if ($role == 'tutor') {
                     $ret = $this->User->removeTutor($userId, $courseId);
-                    $this->log('Removing tutor '.$user['username'].' from course '.$courseId, 'debug');
+                    $this->log('Removing tutor '.$user.' from course '.$courseId, 'debug');
                 } else {
-                    $this->set('error', array('code' => 400, 'message' => 'Unsupported role for '.$user['username'].'. Could not unenrol.'));
+                    $this->set('error', array('code' => 400, 'message' => 'Unsupported role for '.$user.'. Could not unenrol.'));
                     $this->render('error');
                     return;
                 }
                 if (!$ret) {
-                    $this->set('error', array('code' => 401, 'message' => 'Fail to unenrol ' . $user['username']));
+                    $this->set('error', array('code' => 401, 'message' => 'Fail to unenrol ' . $user));
                     $this->render('error');
                     return;
                 }
@@ -1091,12 +1103,12 @@ class V1Controller extends Controller {
                 } else if ($role == 'tutor') {
                     $ret = $this->User->removeTutor($userId, $courseId);
                 } else {
-                    $this->set('error', array('code' => 400, 'message' => 'Unsupported role for '.$user['username']));
+                    $this->set('error', array('code' => 400, 'message' => 'Unsupported role for '.$user));
                     $this->render('error');
                     return;
                 }
                 if (!$ret) {
-                    $this->set('error', array('code' => 401, 'message' => 'Fail to enrol ' . $user['username']));
+                    $this->set('error', array('code' => 401, 'message' => 'Fail to enrol ' . $user));
                     $this->render('error');
                     return;
                 }

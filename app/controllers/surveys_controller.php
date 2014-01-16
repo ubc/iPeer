@@ -10,8 +10,8 @@
  */
 class SurveysController extends AppController
 {
-    public $uses =  array('SurveyQuestion', 'Course', 'Survey', 'User', 'Question', 
-        'Response', 'Personalize', 'Event', 'EvaluationSubmission', 'UserEnrol', 
+    public $uses =  array('SurveyQuestion', 'Course', 'Survey', 'User', 'Question',
+        'Response', 'Personalize', 'Event', 'EvaluationSubmission', 'UserEnrol',
         'SurveyInput', 'SurveyGroupMember', 'SurveyGroupSet', 'SurveyGroup',
         'UserCourse');
     public $name = 'Surveys';
@@ -111,9 +111,9 @@ class SurveysController extends AppController
             }
             $extraFilters .= "Survey.creator_id = $myID or availability = 'public')";
         }
-        
+
         $restrictions = "";
-        
+
         $basicRestrictions = array(
             $myID => true,
             "!default" => false);
@@ -126,7 +126,7 @@ class SurveysController extends AppController
                 $basicRestrictions = $basicRestrictions + array($creator => true);
             }
         }
-        
+
         empty($basicRestrictions) ? $restrictions = $basicRestrictions :
             $restrictions['Survey.creator_id'] = $basicRestrictions;
 
@@ -431,7 +431,7 @@ class SurveysController extends AppController
         // Get all required data from each table for every question
         $questions = $this->Survey->getQuestions($survey_id);
 
-        $this->set('breadcrumb', 
+        $this->set('breadcrumb',
             $this->breadcrumb->push('surveys')->
             push(array('survey' => $survey['Survey']))->
             push(__('Edit Questions', true)));
@@ -517,7 +517,7 @@ class SurveysController extends AppController
           $this->data = $this->Question->find('first', array(
             'conditions' => array('id' => $this->data['Question']['template_id'])));
           $this->data['Question']['master'] = 'no';
-      } 
+      }
       else if (!empty($this->data)) {
           $this->data['Survey']['id'] = $survey_id;
           // Strip ID from responses or the original master question will
@@ -535,7 +535,7 @@ class SurveysController extends AppController
               $this->redirect('questionsSummary/'.$survey_id);
               return;
           } else {
-              $this->Session->setFlash(_('Failed to save question.'));
+              $this->Session->setFlash(__('Failed to save question.'));
           }
       }
       $this->set('templates', $this->Question->find('list', array('conditions' => array('master' => 'yes'))));
@@ -570,7 +570,7 @@ class SurveysController extends AppController
           $this->data = $this->Question->find('first', array(
             'conditions' => array('id' => $this->data['Question']['template_id'])));
           $this->data['Question']['master'] = 'no';
-      } 
+      }
       else if (!empty($this->data)) {
           $this->data['Question']['id'] = $question_id;
           // filter - remove the removed answers from the database
