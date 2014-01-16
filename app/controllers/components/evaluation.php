@@ -493,11 +493,12 @@ class EvaluationComponent extends Object
      * Rubric Evaluation functions
      *
      * @param mixed $event
+     * @param mixed $studentId
      *
      * @access public
      * @return void
      */
-    function loadRubricEvaluationDetail($event, $sutdentId = null)
+    function loadRubricEvaluationDetail($event, $studentId = null)
     {
         $this->EvaluationRubric = new EvaluationRubric;
         $this->GroupsMembers = new GroupsMembers;
@@ -507,7 +508,7 @@ class EvaluationComponent extends Object
         
         $Session = new SessionComponent();
         $user = $Session->read('Auth.User');//User or Admin or
-        $evaluator = empty($sutdentId) ? $user['id'] : $sutdentId;
+        $evaluator = empty($studentId) ? $user['id'] : $studentId;
         $result = array();
         //Get Members for this evaluation
         $groupMembers = $this->User->getEventGroupMembersNoTutors(
@@ -612,7 +613,7 @@ class EvaluationComponent extends Object
      * @param mixed $targetEvaluatee target evaluatee
      * @param mixed $form            form
      * @param mixed $viewMode        view mode
-     * $param mixed $targetCriteria  target criteria
+     * @param mixed $targetCriteria  target criteria
      *
      * @access public
      * @return void
@@ -652,7 +653,7 @@ class EvaluationComponent extends Object
                 $evalRubricDetail['EvaluationRubricDetail']['selected_lom'] = $selectedLom;
                 $evalRubricDetail['EvaluationRubricDetail']['grade'] = $grade;
                 
-                if($selectedLom != NULL){
+                if($selectedLom != null){
                     $this->EvaluationRubricDetail->save($evalRubricDetail);
                 }
                 $this->EvaluationRubricDetail->id=null;
@@ -880,6 +881,7 @@ class EvaluationComponent extends Object
      * Mixeval Evaluation functions
      *
      * @param mixed $event
+     * @param mixed $studentId
      *
      * @access public
      * @return void

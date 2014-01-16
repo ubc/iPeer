@@ -207,7 +207,7 @@ class CoursesController extends AppController
     /**
      * Set all the necessary variables for the Add and Edit form elements.
      *
-     * @params mixed $courseId courseId - default null (eg. add)
+     * @param mixed $courseId courseId - default null (eg. add)
      *
      * @return void
      * */

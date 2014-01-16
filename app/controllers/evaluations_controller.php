@@ -329,8 +329,9 @@ class EvaluationsController extends AppController
     /**
      * makeEvaluation proxy method for makeing different evaluations
      *
-     * @param mixed $eventId  event id
-     * @param mixed $objectId object id
+     * @param mixed $eventId   event id
+     * @param mixed $objectId  object id
+     * @param mixed $studentId student id
      *
      * @access public
      * @return void
@@ -383,8 +384,9 @@ class EvaluationsController extends AppController
     /**
      * makeSimpleEvaluation
      *
-     * @param mixed $event   event object
-     * @param mixed $groupId group id
+     * @param mixed $event     event object
+     * @param mixed $groupId   group id
+     * @param mixed $studentId student id
      *
      * @access public
      * @return void
@@ -397,9 +399,10 @@ class EvaluationsController extends AppController
         if (empty($this->params['data'])) {
             $userId = User::get('id');
             
-            	$grpMem = $this->GroupsMembers->find('first', array(
+            $grpMem = $this->GroupsMembers->find('first', array(
                 'conditions' => array('GroupsMembers.user_id' => empty($studentId) ? $userId : $studentId, 
                     'GroupsMembers.group_id' => $groupId)));
+
 
             // filter out users that don't have access to this eval, invalid ids
             if (empty($grpMem)) {
@@ -521,7 +524,8 @@ class EvaluationsController extends AppController
      * no persistence available unlike other forms. This is due to how we
      * redirect to evaluation/makeEvaluation on failure.
      *
-     * @param mixed $event event - The survey event that we're processing.
+     * @param mixed $event     event - The survey event that we're processing.
+     * @param mixed $studentId student id
      *
      * @access public
      * @return void
@@ -534,14 +538,13 @@ class EvaluationsController extends AppController
         $userId = $this->Auth->user('id');
         $courseId = $event['Event']['course_id'];
         if (empty($studentId)) {
-	        // Make sure user is a student in this course
-	        $ret = $this->UserEnrol->field('id',
-	            array('course_id' => $courseId, 'user_id' => $userId ));
-        }
-        else {
-        	// Make sure user is an instructor in this course
+            // Make sure user is a student in this course
+            $ret = $this->UserEnrol->field('id',
+                array('course_id' => $courseId, 'user_id' => $userId ));
+        } else {
+            // Make sure user is an instructor in this course
         	$ret = $this->UserCourse->field('id',
-        			array('course_id' => $courseId, 'user_id' => $userId ));
+                array('course_id' => $courseId, 'user_id' => $userId ));
         }
         if (!$ret) {
                 $this->Session->setFlash(_('Error: Invalid Id'));
@@ -638,8 +641,9 @@ class EvaluationsController extends AppController
     /**
      * makeRubricEvaluation
      *
-     * @param mixed $event   event object
-     * @param mixed $groupId group id
+     * @param mixed $event     event object
+     * @param mixed $groupId   group id
+     * @param mixed $studentId student id
      *
      * @access public
      * @return void
@@ -727,9 +731,9 @@ class EvaluationsController extends AppController
             $this->set('allDone', $allDone);
             $this->set('comReq', $comReq);
             
-			if (!empty($studentId)) {
-				$this->set('studentId', $studentId);
-			}
+            if (!empty($studentId)) {
+                $this->set('studentId', $studentId);
+            }
             $this->render('rubric_eval_form');
         } else {
             $eventId = $this->params['form']['event_id'];
@@ -868,9 +872,9 @@ class EvaluationsController extends AppController
         $evaluators = Set::extract('/GroupsMembers/user_id', $evaluators);
         
         $studentId = $this->params['form']['student_id'];
-		if (!empty($studentId)) {
-			$evaluator = $studentId;
-		}
+        if (!empty($studentId)) {
+            $evaluator = $studentId;
+        }
         $groupEventId = $this->params['form']['group_event_id'];
         //Get the target group event
         $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
@@ -923,8 +927,9 @@ class EvaluationsController extends AppController
     /**
      * makeMixevalEvaluation
      *
-     * @param mixed $event   event object
-     * @param mixed $groupId group id
+     * @param mixed $event     event object
+     * @param mixed $groupId   group id
+     * @param mixed $studentId student id
      *
      * @access public
      * @return void
@@ -1002,9 +1007,9 @@ class EvaluationsController extends AppController
             $this->set('mixeval', $mixeval);
             $this->set('enrol', $enrol);
             
-			if (!empty($studentId)) {
-				$this->set('studentId', $studentId);
-			}
+            if (!empty($studentId)) {
+                $this->set('studentId', $studentId);
+            }
 
             $this->render('mixeval_eval_form');
         } else {
@@ -1023,7 +1028,7 @@ class EvaluationsController extends AppController
                         continue; // only has self-evaluation so skip
                     }
                     if (!empty($studentId)) {
-                    	$eval['Evaluation']['evaluator_id'] = $studentId;
+                        $eval['Evaluation']['evaluator_id'] = $studentId;
                     }
                     $eventId = $eval['Evaluation']['event_id'];
                     $groupId = $eval['Evaluation']['group_id'];
@@ -1304,6 +1309,7 @@ class EvaluationsController extends AppController
      *
      * @param int $eventId
      * @param int $groupId
+     * @param mixed $studentId
      *
      * @access public
      * @return void

@@ -673,39 +673,39 @@ class Event extends AppModel
      *
      * @param mixed $userId user id
      * @param mixed $fields the fields to retreive
+     * @param mixed $extraId
      *
      * @access public
      * @return array array of events with related models, e.g. course, group, submission
      */
     function getEventsByUserId($userId, $fields = null, $extraId = null)
     {
-    	ini_set('display_errors',1);
-    	error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
+        ini_set('display_errors', 1);
+        error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
         $evaluationFields = $surveyFields = $fields;
         if ($evaluationFields != null) {
             $evaluationFields[] = 'GroupEvent.*';
         }
         if ($extraId) {
-        	if (is_array($extraId)) {
-        		$courseIds = array();
-        		foreach ($extraId as $course) {
-    				$courseIds[] = $course;
-        		}
-        	}
-        	else {
-	        	$courses = $this->Course->getCourseByInstructor($extraId);
-	        	$courseIds = array();
-	        	foreach ($courses as $course) {
-	        		$courseIds[] = $course['Course']['id'];
-	        	}
-        	}
-        	$groups = $this->Group->find('all', array(
-        			'fields' => 'id',
-        			'conditions' => array('Member.id' => $userId, 'course_id' => $courseIds),
-        			'contain' => array('Member', 'GroupEvent.id')));
-        	$groupEventIds = Set::extract('/GroupEvent/id', $groups);
-        }
-        else {
+            if (is_array($extraId)) {
+                $courseIds = array();
+                foreach ($extraId as $course) {
+                    $courseIds[] = $course;
+                }
+            } else {
+                $courses = $this->Course->getCourseByInstructor($extraId);
+                $courseIds = array();
+                foreach ($courses as $course) {
+                    $courseIds[] = $course['Course']['id'];
+                }
+            }
+            $groups = $this->Group->find('all', array(
+                'fields' => 'id',
+                'conditions' => array('Member.id' => $userId, 'course_id' => $courseIds),
+                'contain' => array('Member', 'GroupEvent.id')));
+
+            $groupEventIds = Set::extract('/GroupEvent/id', $groups);
+        } else {
 	        // get the groups that this user is in
 	        $groups = $this->Group->find('all', array(
 	            'fields' => 'id',
@@ -753,14 +753,14 @@ class Event extends AppModel
         }
 
         if (empty($courseIds)) {
-	        // to find the surveys, we need to find the courses that user is enrolled in
-	        // can't use find('list') as we are query the conditions on HABTM
-	        $courses = $this->Course->find('all', array(
-	            'fields' => array('id'),
-	            'conditions' => array('Enrol.id' => $userId),
-	            'contain' => 'Enrol',
-	        ));
-	        $courseIds = Set::extract($courses, '/Course/id');
+            // to find the surveys, we need to find the courses that user is enrolled in
+            // can't use find('list') as we are query the conditions on HABTM
+            $courses = $this->Course->find('all', array(
+                'fields' => array('id'),
+                'conditions' => array('Enrol.id' => $userId),
+                'contain' => 'Enrol',
+            ));
+            $courseIds = Set::extract($courses, '/Course/id');
         }
         // find survey events based on the groups this user is in
         $surveyEvents = $this->find('all', array(
