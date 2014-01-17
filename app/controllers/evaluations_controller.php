@@ -541,9 +541,9 @@ class EvaluationsController extends AppController
             $ret = $this->UserEnrol->field('id',
                 array('course_id' => $courseId, 'user_id' => $userId ));
         } else {
-            // Make sure user is an instructor in this course
-            $ret = $this->UserCourse->field('id',
-                array('course_id' => $courseId, 'user_id' => $userId ));
+            // Make sure user has access to the course (eg. instructor, admin)
+            $ret = $this->Course->getAccessibleCourseById($courseId, $userId, 
+                User::getCourseFilterPermission(), array('Instructor', 'Department'));
         }
         if (!$ret) {
                 $this->Session->setFlash(_t('Error: Invalid Id'));
