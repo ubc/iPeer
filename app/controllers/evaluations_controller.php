@@ -533,9 +533,15 @@ class EvaluationsController extends AppController
         $eventId = $event['Event']['id'];
         $userId = $this->Auth->user('id');
         $courseId = $event['Event']['course_id'];
-        // Make sure user is a student in this course
-        $ret = $this->UserEnrol->field('id',
-            array('course_id' => $courseId, 'user_id' => $userId ));
+        if (empty($studentId)) {
+            // Make sure user is a student in this course
+            $ret = $this->UserEnrol->field('id',
+                array('course_id' => $courseId, 'user_id' => $userId ));
+        } else {
+            // Make sure user has access to the course (eg. instructor, admin)
+            $ret = $this->Course->getAccessibleCourseById($courseId, $userId,
+                User::getCourseFilterPermission(), array('Instructor', 'Department'));
+        }
         if (!$ret) {
                 $this->Session->setFlash(_t('Error: Invalid Id'));
                 $this->redirect('/home/index');
