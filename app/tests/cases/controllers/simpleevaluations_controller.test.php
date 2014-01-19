@@ -16,7 +16,7 @@ Mock::generatePartial('SimpleevaluationsController',
     'MockSimpleevaluationsController',
     array('isAuthorized', 'render', 'redirect', '_stop', 'header'));
 
-class SimpleevaluationsControllerTest extends CakeTestCase {
+class SimpleevaluationsControllerTest extends ExtendedAuthTestCase {
     public $controller = null;
 
     public $fixtures = array(
