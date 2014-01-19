@@ -1016,7 +1016,7 @@ class V1Controller extends Controller {
 
                     if (!empty($userId)) {
                         $role = $this->Role->getRoleName($user['role_id']);
-	                	
+
                         if ($role == 'instructor') {
                             if(in_array($userId, $students)) {
                                 $this->User->removeStudent($userId, $courseId);
@@ -1025,8 +1025,8 @@ class V1Controller extends Controller {
                                 $this->log('Adding instructor '.$user['username'].' to course '.$courseId, 'api');
                             } else if(in_array($userId, $tutors)) {
                                 $this->User->removeTutor($userId, $courseId);
-	                			$this->log('Removing tutor '.$user['username'].' from course '.$courseId, 'debug');
-	                			$ret = $this->User->addInstructor($userId, $courseId);
+                                $this->log('Removing tutor '.$user['username'].' from course '.$courseId, 'debug');
+                                $ret = $this->User->addInstructor($userId, $courseId);
                                 $this->log('Adding instructor '.$user['username'].' to course '.$courseId, 'api');
                             }
                         } else if ($role == 'tutor') {
