@@ -1005,7 +1005,7 @@ class EvaluationsController extends AppController
                         $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
                         $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
                         if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
-                            $this->Session->setFlash(__('Error: Unable to submit the evaluation. Please try again.', truej));
+                            $this->Session->setFlash(__('Error: Unable to submit the evaluation. Please try again.', true));
                         }
                     }
 
