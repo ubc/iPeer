@@ -148,11 +148,7 @@ class ExportBaseNewComponent extends Object
      * @return void
      */
     function buildScoreTableByEvaluatee($params, $group, $evaluatee, $event, $responses, $subDate, $peerEval)
-    {
-        // Export all determines whether or not to export all results
-        // including those that don't have values.
-        ($params['include']['export_all'] == 1) ? $exportAll = true : $exportAll = false;
-    
+    {   
         // Build grid
         //$xPosition = 0;
         //$yPosition = 0;
@@ -165,9 +161,14 @@ class ExportBaseNewComponent extends Object
 
         foreach ($group['Member'] as $evaluator) {
             if (!$peerEval && $evaluator['id'] != $evaluatee['id']) {
-                continue; // skip peer evaluations for self-evaluation
+                continue; // skip peer evaluations for self-evaluation section
             }
             
+            if (!$event['Event']['self_eval'] && $evaluator['id'] == $evaluatee['id']) {
+                continue; // skip self-eval when self-evaluation is not set in event
+            }
+            
+            //TODO: change the condition to not depend on Role's name, which can change
             if ($evaluatee['Role']['name'] == 'tutor') {
                 continue; // skip evaluations where the tutor is the evaluatee
             }
@@ -203,24 +204,15 @@ class ExportBaseNewComponent extends Object
                 array_push($row, $evaluator['student_no']);
             }
 
-            // check if we have a reponse for this evaluator
-            if ($exportAll == true) {
-            // Show all users
-                if (!isset($responses[$evaluatee['id']]) || !array_key_exists($evaluator['id'], $responses[$evaluatee['id']])) {
-                $emptyCount = $xDimension - count($row);
-                    for ($i = 0; $i < $emptyCount; $i++) {
-                        array_push($row, '');
-                    }
+            /* Export all determines whether or not to export all results
+            including those that don't have values. */
+            if (!isset($responses[$evaluatee['id']]) || !array_key_exists($evaluator['id'], $responses[$evaluatee['id']])) {
+                if ($params['include']['export_all']) {
+                    $row += array_fill(count($row), $xDimension - count($row), '');
                     $grid[] = $row;
                     $yInc++;
-                    continue;
                 }
-            }
-            else {
-                // Don't show all users
-                if (!isset($responses[$evaluatee['id']]) || !array_key_exists($evaluator['id'], $responses[$evaluatee['id']])) {
-                    continue;
-                }
+                continue;
             }
 
             $response = $responses[$evaluatee['id']][$evaluator['id']];
