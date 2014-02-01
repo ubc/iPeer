@@ -829,11 +829,8 @@ class V1Controller extends Controller {
                     foreach ($dps as $dp) {
                         $departments[] = $dp['Department'];
                     }
-                    $statusCode = 'HTTP/1.1 200 OK';
-                } else {
-                    $departments = null;
-                    $statusCode = 'HTTP/1.1 404 Not Found';
                 }
+                $statusCode = 'HTTP/1.1 200 OK';
             } else {
                 $courseDepts = $this->CourseDepartment->find('list',
                     array('conditions' => array('department_id' => $departmentId),
