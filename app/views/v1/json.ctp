@@ -5,6 +5,7 @@
         $result = array();
     }
     $json = json_encode($result);
+    header("Content-length: ".strlen($json));
     $this->log("Return: $json", 'api');
     echo $json;
 
