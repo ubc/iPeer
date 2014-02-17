@@ -18,6 +18,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         puppet.manifests_path = "puppet/manifests"
         puppet.manifest_file  = "default.pp"
         puppet.module_path = "puppet/modules"
+        puppet.options = "--environment development"
   end
 
   config.vm.provision :shell, :path => "bootstrap.sh"
