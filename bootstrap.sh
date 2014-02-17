@@ -1,0 +1,1 @@
+mysql -u ipeer -pipeer -h `hostname` ipeer < /var/www/app/config/sql/ipeer_samples_data.sql
