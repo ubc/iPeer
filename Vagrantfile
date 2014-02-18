@@ -14,6 +14,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.box_url = "http://developer.nrel.gov/downloads/vagrant-boxes/CentOS-6.4-x86_64-v20130731.box"
 
+  config.vm.define "ipeerdev" do |t|
+  end
+
   config.vm.provision "puppet" do |puppet|
         puppet.manifests_path = "puppet"
         puppet.manifest_file  = "dev.pp"
