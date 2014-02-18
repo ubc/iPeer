@@ -10,18 +10,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # please see the online documentation at vagrantup.com.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "ipeerbox3"
+  config.vm.box = "ipeerbox"
 
   config.vm.box_url = "http://developer.nrel.gov/downloads/vagrant-boxes/CentOS-6.4-x86_64-v20130731.box"
 
   config.vm.provision "puppet" do |puppet|
-        puppet.manifests_path = "puppet/manifests"
-        puppet.manifest_file  = "default.pp"
+        puppet.manifests_path = "puppet"
+        puppet.manifest_file  = "dev.pp"
         puppet.module_path = "puppet/modules"
         puppet.options = "--environment development"
   end
 
-  config.vm.provision :shell, :path => "bootstrap.sh"
+  config.vm.provision :shell, :path => "puppet/bootstrap.sh"
 
   config.vm.network :forwarded_port, host: 8080, guest: 80
 
