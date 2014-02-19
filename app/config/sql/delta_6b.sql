@@ -6,6 +6,9 @@
 
 ALTER TABLE mixeval_question_descs DROP FOREIGN KEY mixeval_question_descs_ibfk_1;
 ALTER TABLE mixeval_question_descs DROP KEY question_num;
+
+-- Remove the orphan records before adding the foreign key so that it will not fail.
+DELETE FROM mixeval_question_descs WHERE question_id NOT IN (SELECT id FROM mixeval_questions);
 ALTER TABLE mixeval_question_descs ADD FOREIGN KEY (`question_id`) REFERENCES `mixeval_questions` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE simple_evaluations ADD UNIQUE KEY `name` (`name`);
