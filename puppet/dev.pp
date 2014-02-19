@@ -6,7 +6,8 @@ ipeer::instance { ipeerdev :
     server_domain => "localhost",
     doc_base => "/var/www",
     db_host => $fqdn,
-    port => 2000
+    port => 2000,
+    local_config => false,
 }
 
 # create ipeer_test database for tests
@@ -15,9 +16,9 @@ if ! defined(Mysql::Db["ipeer_test"]) {
         user => $db_username,
         password => $db_password,
         host => "ipeer_test" ? {
-  	    'localhost' => "ipeer_test",
-        default => $fqdn,
-    },
+            'localhost' => "ipeer_test",
+            default => $fqdn,
+        },
         grant => ['ALL'],
     }
 }
