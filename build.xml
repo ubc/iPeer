@@ -212,8 +212,8 @@
     </target>
 
     <target name="test" description="Run unit tests" depends="init-test-db">
-        <exec command="cake/console/cake -app app testsuite app group model" passthru="true"/>
-        <exec command="cake/console/cake -app app testsuite app group controller" passthru="true"/>
+        <exec command="sh cake/console/cake -app app testsuite app group model" passthru="true"/>
+        <exec command="sh cake/console/cake -app app testsuite app group controller" passthru="true"/>
         <!-- v1_controller test must be last one as it will change the database --> 
         <phingcall target="post-test"/>
     </target>

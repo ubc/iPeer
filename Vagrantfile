@@ -26,7 +26,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision :shell, :path => "puppet/bootstrap.sh"
 
-  config.vm.network :forwarded_port, host: 8080, guest: 80
+  config.vm.network :forwarded_port, host: 8080, guest: 2000
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.

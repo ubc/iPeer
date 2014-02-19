@@ -1,3 +1,25 @@
+Running Virtual Development Server
+---------------------------
+Virtual Environment Setup:
+
+1) Install VirtualBox at http://virtualbox.org
+2) Install Vagrant at http://www.vagrantup.com/downloads
+3) Go to the iPeer root directory in the terminal
+4) Initial the submodules: git submodule init
+5) Update the submodules: git submodule update
+6) Create a Vagrant box: vagrant box add ipeerbox http://developer.nrel.gov/downloads/vagrant-boxes/CentOS-6.4-x86_64-v20130731.box
+7) Install Virtual Box Guest Addition plugin: vagrant plugin install vagrant-vbguest
+8) Start the virtual server: vagrant up
+9) Go to localhost:2000 in your browser.
+
+Running Tests:
+
+1) ssh into the virtual environment: vagrant ssh
+2) Go to the application’s root directory: cd /var/www
+3) Run tests: phing test
+
+For more vagrant commands go to http://docs.vagrantup.com/v2/cli/index.html.
+
 Running Tests
 ---------------------------
 Integration Tests
