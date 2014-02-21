@@ -1288,24 +1288,24 @@ i {
 }
 
 .surveyquestions .top-button {
-    background:url('/img/icons/top.gif') center left no-repeat;
+    background:url('../img/icons/top.gif') center left no-repeat;
     padding: 0 0.5em 0 1.5em;
     white-space:nowrap;
 }
 .surveyquestions .up-button {
-    background:url('/img/icons/up.gif') center left no-repeat;
+    background:url('../img/icons/up.gif') center left no-repeat;
     padding: 0 0.5em 0 1.5em;
     white-space:nowrap;
 }
 
 .surveyquestions .down-button {
-    background:url('/img/icons/down.gif') center left no-repeat;
+    background:url('../img/icons/down.gif') center left no-repeat;
     padding: 0 0.5em 0 1.5em;
     white-space:nowrap;
 }
 
 .surveyquestions .bottom-button {
-    background:url('/img/icons/bottom.gif') center left no-repeat;
+    background:url('../img/icons/bottom.gif') center left no-repeat;
     padding: 0 0.5em 0 1.5em;
     white-space:nowrap;
 }
@@ -1730,42 +1730,42 @@ table.content-table {
 
 
 .add-button {
-    background:url('/img/icons/add.gif') center left no-repeat;
+    background:url('../img/icons/add.gif') center left no-repeat;
     padding: 0 0 0 20px;
     white-space:nowrap;
     font-size: 0.9em;
 }
 
 .delete-button {
-    background:url('/img/icons/delete.gif') center left no-repeat;
+    background:url('../img/icons/delete.gif') center left no-repeat;
     padding: 0 0 0 20px;
     white-space:nowrap;
     font-size: 0.9em;
 }
 
 .edit-button {
-    background:url('/img/icons/edit.gif') center left no-repeat;
+    background:url('../img/icons/edit.gif') center left no-repeat;
     padding: 0 0 0 20px;
     white-space:nowrap;
     font-size: 0.9em;
 }
 
 .merge-button {
-    background:url('/img/icons/merge.png') center left no-repeat;
+    background:url('../img/icons/merge.png') center left no-repeat;
     padding: 0 0 0 20px;
     white-space:nowrap;
     font-size: 0.9em;
 }
 
 .export-excel-button {
-    background:url('/img/icons/export_excel.gif') center left no-repeat;
+    background:url('../img/icons/export_excel.gif') center left no-repeat;
     padding: 0 0 0 20px;
     white-space:nowrap;
     font-size: 0.9em;
 }
 
 .instruction-icon {
-    background:url('/img/icons/instructions.gif') center left no-repeat;
+    background:url('../img/icons/instructions.gif') center left no-repeat;
     padding: 0 0 0 20px;
     white-space:nowrap;
     font-size: 0.9em;
@@ -1934,7 +1934,7 @@ form div.help-text {
 }
 
 .ipeer-icon {
-    background:url('/img/layout/icon_ipeer_logo.gif') center left no-repeat;
+    background:url('../img/layout/icon_ipeer_logo.gif') center left no-repeat;
     padding: 0 0.5em 0 1.5em;
     white-space:nowrap;
 }
