@@ -240,7 +240,7 @@ class AddCourseTestCase extends SystemBaseTestCase
         $this->assertEqual($groups, '2 groups');
 
         $events = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, ".//*[@id='CourseHome']/table/tbody/tr[2]/td[6]")->text();
-        $this->assertEqual($events, '10 events');
+        $this->assertEqual($events, '17 events');
     }
 
     public function testStudentLinks()
