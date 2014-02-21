@@ -16,7 +16,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
 <?php echo $this->Form->input('lom_max', array('id' => 'LOM',
     'options' => array_combine(range(2,10), range(2,10)),
     'default' => 5,
-    'label' => __('Level of Mastery:', true),
+    'label' => __('Level of Mastery', true),
     'style'=>'width:50px;',
     'disabled' => $readonly));?>
 <div class="help-text"><?php __('aka LOM, Evaluation Range (Max 10)')?></div>
