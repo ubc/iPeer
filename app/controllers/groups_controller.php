@@ -50,7 +50,7 @@ class GroupsController extends AppController
     function beforeFilter()
     {
         parent::beforeFilter();
-        
+
         $allowTypes = array(
             'text/plain', 'text/csv', 'application/csv',
             'application/csv.ms-excel', 'application/octet-stream',
@@ -367,7 +367,7 @@ class GroupsController extends AppController
             $courseId = $this->params['data']['Group']['Course'];
             $this->params['data']['Group']['course_id'] = $courseId;
             $filename = $this->params['form']['file']['name'];
-            $update = ($this->params['data']['Group']['update_groups']) ? 
+            $update = ($this->params['data']['Group']['update_groups']) ?
                 true : false;
             $identifier = $this->params['data']['Group']['identifiers'];
 
@@ -414,7 +414,7 @@ class GroupsController extends AppController
      * @return void
      */
     function _addGroupByImport($lines, $courseId, $update, $identifier)
-    {   
+    {
         // Check for parameters
         if (empty($lines) || empty($courseId)) {
             return array();
@@ -422,14 +422,14 @@ class GroupsController extends AppController
 
         // Remove duplicate entries
         $lines = array_map("unserialize", array_unique(array_map("serialize", $lines)));
-        
+
         // pre-process the lines in the file first
         $filter = 'return (count(array_filter($user)) != 2);';
         $invalid = array_filter($lines, create_function('$user', $filter));
-        $valid = array_diff_key($lines, $invalid); 
+        $valid = array_diff_key($lines, $invalid);
         $users = Set::combine($valid, '{n}.'.IMPORT_GROUP_IDENTIFIER, '', '{n}.'.IMPORT_GROUP_GROUP_NAME);
         $names = array_unique(Set::extract($valid, '{n}.'.IMPORT_GROUP_GROUP_NAME));
-        
+
         $groupSuccess = array();
         $groupFailure = array();
         foreach ($names as $name) {
@@ -438,7 +438,7 @@ class GroupsController extends AppController
                 $groupSuccess[$name] = $inGroup;
             } else {
                 $groupNum = $this->Group->getFirstAvailGroupNum($courseId);
-                $tmp = array('Group' => array('group_num' => $groupNum, 'group_name' => $name, 
+                $tmp = array('Group' => array('group_num' => $groupNum, 'group_name' => $name,
                     'course_id' => $courseId, 'creator_id' => $this->Auth->user('id')));
                 $this->Group->id = null;
                 if ($this->Group->save($tmp)) {
@@ -448,7 +448,7 @@ class GroupsController extends AppController
                 }
             }
         }
-        
+
         $memSuccess = array();
         $memFailure = array();
         $tutors = $this->UserTutor->find('list', array(
@@ -463,7 +463,7 @@ class GroupsController extends AppController
                 'fields' => array('User.'.$identifier)
             ));
             $notExist = array_diff($identifiers, $members);
-            
+
             if (!isset($groupSuccess[$groupName])) {
                 $stu = array_keys($members);
                 foreach ($stu as $userId) {
@@ -471,16 +471,16 @@ class GroupsController extends AppController
                 }
                 continue;
             }
-            
+
             $groupId = $groupSuccess[$groupName];
             $old = $this->GroupsMembers->find('list', array(
                 'conditions' => array('group_id' => $groupId), 'fields' => 'user_id'));
-            
+
             if ($update) {
                 $diff = array_diff($old, array_keys($members));
                 $this->GroupsMembers->deleteAll(array('user_id' => $diff));
             }
-            
+
             $stu = array_keys($members);
             foreach ($stu as $userId) {
                 if (in_array($userId, $old)) {
@@ -548,15 +548,15 @@ class GroupsController extends AppController
             $fileContent = array();
             $groups = $this->data['Member']['Member'];
             $GroupColumns = array(
-                'Group.group_num' => array('form' => 'include_group_numbers', 'title' => _t('Group Number')),
-                'Group.group_name' => array('form' => 'include_group_names', 'title' => _t('Group Name')),
+                'Group.group_num' => array('form' => 'include_group_numbers', 'title' => __('Group Number', true)),
+                'Group.group_name' => array('form' => 'include_group_names', 'title' => __('Group Name', true)),
             );
             // took out emails
             $UserColumns = array(
-                'Member.username' => array('form' => 'include_usernames', 'title' => _t('Username')),
-                'Member.student_no' => array('form' => 'include_student_id', 'title' => _t('Student No')),
-                'Member.first_name' => array('form' => 'include_student_name', 'title' => _t('First Name')),
-                'Member.last_name' => array('form' => 'include_student_name', 'title' => _t('Last Name')),
+                'Member.username' => array('form' => 'include_usernames', 'title' => __('Username', true)),
+                'Member.student_no' => array('form' => 'include_student_id', 'title' => __('Student No', true)),
+                'Member.first_name' => array('form' => 'include_student_name', 'title' => __('First Name', true)),
+                'Member.last_name' => array('form' => 'include_student_name', 'title' => __('Last Name', true)),
             );
             $titles = array();
             $gFields = array();

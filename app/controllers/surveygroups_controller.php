@@ -101,7 +101,7 @@ class SurveyGroupsController extends AppController
             $this->redirect('index');
             return;
         }
-        
+
         $this->set('course', $course);
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
@@ -143,13 +143,13 @@ class SurveyGroupsController extends AppController
             $this->redirect('index');
             return;
         }
-        
+
         // checks that the dom extension and DOMDocument class exists which are needed for TeamMaker
         if (!(extension_loaded('dom') && class_exists('DOMDocument'))) {
-            $this->Session->setFlash(_t('DOMDocument could not be found. Please contact your
-                system administrator to use TeamMaker.'));
+            $this->Session->setFlash(__('DOMDocument could not be found. Please contact your
+                system administrator to use TeamMaker.', true));
         }
-        
+
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))
             ->push(__('Create Group Set', true)));
         $this->set('events', $this->Event->find('list', array('conditions' => array('course_id' => $course_id, 'event_template_type_id' => 3))));
@@ -550,7 +550,7 @@ class SurveyGroupsController extends AppController
                 'conditions' => array('group_set_id' => $this->data['SurveyGroup']['survey_group_set']),
                 'contain' => array('Member' => array('fields' => array_keys($fields)))
             ));
-            $members = array_merge(array(implode(',', $header)), 
+            $members = array_merge(array(implode(',', $header)),
                 $this->ExportCsv->buildSurveyGroupSet($groups, $fields, $group_no));
             $members = implode("\n", $members);
             header('Content-Type: application/csv');

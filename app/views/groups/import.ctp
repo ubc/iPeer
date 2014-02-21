@@ -20,7 +20,7 @@
         29978043, <?php __('Team B')?><br>
         29978051, <?php __('Team B')?>
     </pre>
-    
+
 <h2><?php __('Import')?></h2>
 
 <?php
@@ -32,12 +32,12 @@ echo $this->Form->input('identifiers', array(
     'legend' => __('Student Identifier', true),
     'default' => 'username'
 ));
-?><div class="help-text"><?php echo _t('The student identifier used in the CSV file.')?></div><?php
+?><div class="help-text"><?php __('The student identifier used in the CSV file.')?></div><?php
 echo $this->Form->input('Course',
     array('multiple'=>false, 'default' => $courseId));
 echo $this->Form->input('update_groups',
     array('type'=>'checkbox'));;
-?><div class="help-text"><?php echo _t('Update group members for existing groups.')?></div><?php
+?><div class="help-text"><?php __('Update group members for existing groups.')?></div><?php
 echo $this->Form->submit(__('Import', true));
 echo $this->Form->end();
 ?>

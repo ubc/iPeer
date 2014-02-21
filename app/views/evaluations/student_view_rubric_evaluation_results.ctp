@@ -99,8 +99,8 @@
     }
     echo "<br><table class='standardtable'>";
     echo "<tr>";
-    echo "<th width=50%>"._t('Criteria')."</th>";
-    echo "<th width=50%>"._t('Grade')."</th>";
+    echo "<th width=50%>".__('Criteria', true)."</th>";
+    echo "<th width=50%>".__('Grade', true)."</th>";
     echo "</tr>";
     foreach ($rubric['RubricsCriteria'] as $ques) {
         echo "<tr>";

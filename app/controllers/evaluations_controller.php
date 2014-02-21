@@ -36,7 +36,7 @@ class EvaluationsController extends AppController
     function __construct()
     {
         $this->Sanitize = new Sanitize;
-        $this->set('title_for_layout', _t('Evaluations'));
+        $this->set('title_for_layout', __('Evaluations', true));
         parent::__construct();
     }
 
@@ -69,7 +69,7 @@ class EvaluationsController extends AppController
                     (($completedEvaluations == $totalMembers) ? "green_check.gif" : "red_x.gif")
                     . "'>&nbsp;&nbsp;&nbsp;<b>$completedEvaluations</b> / <b>$totalMembers </b></center>";
 
-                $custom['results'] = _t('Results');
+                $custom['results'] = __('Results', true);
 
                 // Include missing submissions into the lates
                 $lates = $this->GroupEvent->getLateGroupMembers($groupEventID) +
@@ -79,9 +79,9 @@ class EvaluationsController extends AppController
                 $eventIsNowLate = $this->Event->checkIfNowLate($eventID);
 
                 if ($eventIsNowLate) {
-                    $custom['lates'] = ($lates > 0) ? " <b>$lates</b> "._t("Late") : _t("No Lates");
+                    $custom['lates'] = ($lates > 0) ? " <b>$lates</b> ".__("Late", true) : __("No Lates", true);
                 } else {
-                    $custom['lates'] = _t("Not Yet");
+                    $custom['lates'] = __("Not Yet", true);
                 }
 
                 $data[$key]['!Custom'] = $custom;
@@ -111,20 +111,20 @@ class EvaluationsController extends AppController
             //    Model   columns       (Display Title) (Type Description)
             array("GroupEvent.id",     "",           "",    "hidden"),
             array("Group.id",          "",           "",    "hidden"),
-            array("Group.group_num",   _t("Group #"),    "7em", "action", "View Group"),
-            array("Group.group_name",  _t("Group Name"), "auto", "action", "View Results"),
-            array("!Custom.completion", _t("Completed"),  "6em", "string"),
-            array("!Custom.results",    _t("View"),      "4em", "action", "View Results"),
-            array("!Custom.lates",     _t("Late?"),      "7em", "action", "View Submission"),
+            array("Group.group_num",   __("Group #", true),    "7em", "action", "View Group"),
+            array("Group.group_name",  __("Group Name", true), "auto", "action", "View Results"),
+            array("!Custom.completion", __("Completed", true),  "6em", "string"),
+            array("!Custom.results",    __("View", true),      "4em", "action", "View Results"),
+            array("!Custom.lates",     __("Late?", true),      "7em", "action", "View Submission"),
 
             // Release and mark status
-            array("GroupEvent.marked", _t("Status"),      "7em",  "map",
-            array("not reviewed" => _t("Not Reviewed"), "to review" => "To Review",
-            "reviewed" => _t("Reviewed"))),
-            array("GroupEvent.grade_release_status",_t("Grade"), "7em",   "map",
-            array("None" => _t("Not Released"), "Some" => _t("Some Released"), "All" => _t("Released"))),
-            array("GroupEvent.comment_release_status", _t("Comment"), "7em",   "map",
-            array("None" => _t("Not Released"), "Some" => _t("Some Released"), "All" => _t("Released"))),
+            array("GroupEvent.marked", __("Status", true),      "7em",  "map",
+            array("not reviewed" => __("Not Reviewed", true), "to review" => "To Review",
+            "reviewed" => __("Reviewed", true))),
+            array("GroupEvent.grade_release_status",__("Grade", true), "7em",   "map",
+            array("None" => __("Not Released", true), "Some" => __("Some Released", true), "All" => __("Released", true))),
+            array("GroupEvent.comment_release_status", __("Comment", true), "7em",   "map",
+            array("None" => __("Not Released", true), "Some" => __("Some Released", true), "All" => __("Released", true))),
 
             // Extra info about course and Event
             array("Event.id", "", "", "hidden"),
@@ -138,11 +138,11 @@ class EvaluationsController extends AppController
         $actions = array(
             //   parameters to cakePHP controller:,
             //   display name, (warning shown), fixed parameters or Column ids
-            array(_t("View Results"),    "", "", "", "viewEvaluationResults", "Event.id", "Group.id"),
-            array(_t("View Submission"), "", "", "", "viewGroupSubmissionDetails", "Event.id", "Group.id"),
-            array(_t("View Group"),      "", "", "groups", "view", "Group.id"),
-            array(_t("View Event"),      "", "", "events", "view", "Event.id"),
-            array(_t("Edit Event"),      "", "", "events", "edit", "Event.id"),
+            array(__("View Results", true),    "", "", "", "viewEvaluationResults", "Event.id", "Group.id"),
+            array(__("View Submission", true), "", "", "", "viewGroupSubmissionDetails", "Event.id", "Group.id"),
+            array(__("View Group", true),      "", "", "groups", "view", "Group.id"),
+            array(__("View Event", true),      "", "", "events", "view", "Event.id"),
+            array(__("Edit Event", true),      "", "", "events", "edit", "Event.id"),
         );
 
         $recursive = 0;
@@ -188,7 +188,7 @@ class EvaluationsController extends AppController
         if (!($event = $this->Event->getAccessibleEventById($eventId,
             User::get('id'), User::getCourseFilterPermission(), array('Course')))) {
 
-            $this->Session->setFlash(_t('Error: Invalid id or you do not have permission to access this event.'));
+            $this->Session->setFlash(__('Error: Invalid id or you do not have permission to access this event.', true));
             $this->redirect('index');
             return;
         }
@@ -208,7 +208,7 @@ class EvaluationsController extends AppController
         $this->set('data', $event);
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $event['Course']))
             ->push(array('event' => $event['Event']))
-            ->push(_t('Results')));
+            ->push(__('Results', true)));
     }
 
     // =-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-
@@ -241,7 +241,7 @@ class EvaluationsController extends AppController
             $this->redirect('/courses');
             return;
         } else if (!is_numeric($id)) {
-            $this->Session->setFlash(_t('Error: Invalid id'));
+            $this->Session->setFlash(__('Error: Invalid id', true));
             $this->redirect('/courses');
             return;
         }
@@ -256,7 +256,7 @@ class EvaluationsController extends AppController
 
             $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
             if (!$course) {
-                $this->Session->setFlash(_t('Error: Course does not exist or you do not have permission to view this course.'));
+                $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
                 $this->redirect('/courses');
                 return;
             }
@@ -272,7 +272,7 @@ class EvaluationsController extends AppController
 
             $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
             if (!$course) {
-                $this->Session->setFlash(_t('Error: Course does not exist or you do not have permission to view this course.'));
+                $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
                 $this->redirect('/courses');
                 return;
             }
@@ -280,7 +280,7 @@ class EvaluationsController extends AppController
             $selectedEvent = $this->Event->getEventById($id);
 
             if ($selectedEvent['Event']['event_template_type_id'] == '3') {
-                $this->Session->setFlash(_t('Error: Invalid Id'));
+                $this->Session->setFlash(__('Error: Invalid Id', true));
                 $this->redirect('/courses');
                 return;
             }
@@ -290,14 +290,14 @@ class EvaluationsController extends AppController
         }
 
         $this->set('id', $id);
-        $this->set('breadcrumb', $this->breadcrumb->push(_t('Export Evaluation Results')));
+        $this->set('breadcrumb', $this->breadcrumb->push(__('Export Evaluation Results', true)));
 
         //do stuff
         if (isset($this->params['form']) && !empty($this->params['form'])) {
             $this->autoRender = false;
 
             if (!($event = $this->Event->getAccessibleEventById($this->params['form']['event_id'], User::get('id'), User::getCourseFilterPermission(), array('Course' => array('Instructor'), 'GroupEvent', 'EventTemplateType', 'Penalty' => array('order' => array('days_late ASC')))))) {
-                $this->Session->setFlash(_t('Error: That event does not exist or you dont have access to it'));
+                $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
                 $this->redirect('index');
                 return;
             }
@@ -339,7 +339,7 @@ class EvaluationsController extends AppController
     function makeEvaluation($eventId, $objectId = null, $studentId = null) {
         // invalid event ids
         if (!is_numeric($eventId) || null == ($event = $this->Event->getEventById($eventId))) {
-            $this->Session->setFlash(_t('Error: Invalid Id'));
+            $this->Session->setFlash(__('Error: Invalid Id', true));
             $this->redirect('/home/index');
             return;
         }
@@ -405,7 +405,7 @@ class EvaluationsController extends AppController
 
             // filter out users that don't have access to this eval, invalid ids
             if (empty($grpMem)) {
-                $this->Session->setFlash(_t('Error: Invalid Id'));
+                $this->Session->setFlash(__('Error: Invalid Id', true));
                 $this->redirect('/home/index');
                 return;
             }
@@ -414,7 +414,7 @@ class EvaluationsController extends AppController
             // students can't submit outside of release date range
             if ($now < strtotime($event['Event']['release_date_begin']) ||
                 $now > strtotime($event['Event']['release_date_end'])) {
-                $this->Session->setFlash(_t('Error: Evaluation is unavailable'));
+                $this->Session->setFlash(__('Error: Evaluation is unavailable', true));
                 $this->redirect('/home/index');
                 return;
             }
@@ -447,7 +447,7 @@ class EvaluationsController extends AppController
             //Setup the courseId to session
             $this->set('courseId', $event['Event']['course_id']);
             $courseId = $event['Event']['course_id'];
-            $this->set('title_for_layout', $this->Course->getCourseName($courseId, 'S')._t(' > Evaluate Peers'));
+            $this->set('title_for_layout', $this->Course->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
 
             //Set userId, first_name, last_name
             $this->set('userId', empty($studentId) ? $userId : $studentId);
@@ -481,7 +481,7 @@ class EvaluationsController extends AppController
             // check that all points given are not negative numbers
             $minimum = min($this->params['form']['points']);
             if ($minimum < 0) {
-                $this->Session->setFlash(_t('One or more of your group members have negative points. Please use positive numbers.'));
+                $this->Session->setFlash(__('One or more of your group members have negative points. Please use positive numbers.', true));
                 $this->redirect("/evaluations/makeEvaluation/$eventId/$groupId");
                 return;
             }
@@ -502,13 +502,13 @@ class EvaluationsController extends AppController
             $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
 
             if ($this->Evaluation->saveSimpleEvaluation($this->params, $groupEvent, $evaluationSubmission)) {
-                $this->Session->setFlash(_t('Your Evaluation was submitted successfully.'), 'good');
+                $this->Session->setFlash(__('Your Evaluation was submitted successfully.', true), 'good');
                 $this->redirect('/home/index/', true);
             } else {
                 //Found error
                 //Validate the error why the Event->save() method returned false
                 $this->validateErrors($this->Event);
-                $this->set('errmsg', _t('Save Evaluation failure.'));
+                $this->set('errmsg', __('Save Evaluation failure.', true));
                 $this->redirect("/evaluations/makeEvaluation/$eventId/$groupId");
             }//end if
         }
@@ -542,11 +542,11 @@ class EvaluationsController extends AppController
                 array('course_id' => $courseId, 'user_id' => $userId ));
         } else {
             // Make sure user has access to the course (eg. instructor, admin)
-            $ret = $this->Course->getAccessibleCourseById($courseId, $userId, 
+            $ret = $this->Course->getAccessibleCourseById($courseId, $userId,
                 User::getCourseFilterPermission(), array('Instructor', 'Department'));
         }
         if (!$ret) {
-                $this->Session->setFlash(_t('Error: Invalid Id'));
+                $this->Session->setFlash(__('Error: Invalid Id', true));
                 $this->redirect('/home/index');
                 return;
         }
@@ -554,7 +554,7 @@ class EvaluationsController extends AppController
         $now = time();
         if ($now < strtotime($event['Event']['release_date_begin']) ||
             $now > strtotime($event['Event']['release_date_end'])) {
-            $this->Session->setFlash(_t('Error: Survey is unavailable'));
+            $this->Session->setFlash(__('Error: Survey is unavailable', true));
             $this->redirect('/home/index');
             return;
         }
@@ -564,7 +564,7 @@ class EvaluationsController extends AppController
             getEvalSubmissionByEventIdSubmitter($eventId, $userId);
         if (!empty($sub)) {
             $this->Session->setFlash(
-                _t('Error: Survey has already been submitted'));
+                __('Error: Survey has already been submitted', true));
             $this->redirect('/home/index');
             return;
         }
@@ -613,12 +613,12 @@ class EvaluationsController extends AppController
                 $this->EvaluationSubmission->save($sub)
             ) {
                 $this->Session->setFlash(
-                    _t('Your survey was submitted successfully!'), 'good');
+                    __('Your survey was submitted successfully!', true), 'good');
                 $this->redirect('/home/index/');
                 return;
             } else {
                 $this->Session->setFlash(
-                    _t('Survey save failed, please try again.'));
+                    __('Survey save failed, please try again.', true));
                 $this->redirect('evaluations/makeEvaluation/'.$eventId);
                 return;
             }
@@ -626,7 +626,7 @@ class EvaluationsController extends AppController
 
         // Display questions
         $this->set('title_for_layout',
-            $this->Course->getCourseName($courseId, 'S')._t(' > Survey'));
+            $this->Course->getCourseName($courseId, 'S').__(' > Survey', true));
 
         // Get all required data from each table for every question
         $this->set('questions', $this->Survey->getQuestions($surveyId));
@@ -673,7 +673,7 @@ class EvaluationsController extends AppController
 
             if ($now < strtotime($event['Event']['release_date_begin']) ||
                 $now > strtotime($event['Event']['release_date_end'])) {
-                $this->Session->setFlash(_t('Error: Evaluation is unavailable'));
+                $this->Session->setFlash(__('Error: Evaluation is unavailable', true));
                 $this->redirect('/home/index');
                 return;
             }
@@ -697,7 +697,7 @@ class EvaluationsController extends AppController
             $rubric = $this->Rubric->getRubricById($rubricId);
             $rubricEvalViewData = $this->Rubric->compileViewData($rubric);
             $this->set('viewData', $rubricEvalViewData);
-            $this->set('title_for_layout', $this->Course->getCourseName($courseId, 'S')._t(' > Evaluate Peers'));
+            $this->set('title_for_layout', $this->Course->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
 
             $rubricDetail = $this->Evaluation->loadRubricEvaluationDetail($event, $studentId);
             $this->set('groupMembers', $rubricDetail['groupMembers']);
@@ -764,13 +764,13 @@ class EvaluationsController extends AppController
                     $msg = array();
                     $sub = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
                     if ($event['Event']['com_req'] && (count($filter) < count($comments))) {
-                        $msg[] = 'some comments are missing';
+                        $msg[] = __('some comments are missing', true);
                     }
                     if (empty($sub)) {
-                        $msg[] = 'you still have to submit the evaluation with the Submit button below';
+                        $msg[] = __('you still have to submit the evaluation with the Submit button below', true);
                     }
                     $suffix = empty($msg) ? '.' : ', but '.implode(' and ', $msg).'.';
-                    $this->Session->setFlash(__('Your evaluation has been saved'.$suffix, true));
+                    $this->Session->setFlash(__('Your evaluation has been saved', true).$suffix);
                     $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
                     return;
                 } else {
@@ -816,13 +816,13 @@ class EvaluationsController extends AppController
                         $msg = array();
                         $sub = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
                         if ($event['Event']['com_req'] && (count($filter) < count($comments))) {
-                            $msg[] = 'some comments are missing';
+                            $msg[] = __('some comments are missing', true);
                         }
                         if (empty($sub)) {
-                            $msg[] = 'you still have to submit the evaluation with the Submit button below';
+                            $msg[] = __('you still have to submit the evaluation with the Submit button below', true);
                         }
                         $suffix = empty($msg) ? '.' : ', but '.implode(' and ', $msg).'.';
-                        $this->Session->setFlash(__('Your evaluation has been saved'.$suffix, true));
+                        $this->Session->setFlash(__('Your evaluation has been saved', true).$suffix);
                     } else {
                         //Found error
                         //Validate the error why the Event->save() method returned false
@@ -913,7 +913,7 @@ class EvaluationsController extends AppController
         }
 
         if ($status) {
-            $this->Session->setFlash(_t('Your Evaluation was submitted successfully.'), 'good');
+            $this->Session->setFlash(__('Your Evaluation was submitted successfully.', true), 'good');
             $this->redirect('/home/index/', true);
             return;
         } else {
@@ -942,7 +942,7 @@ class EvaluationsController extends AppController
 
             // invalid group id
             if (!is_numeric($groupId)) {
-                $this->Session->setFlash(_t('Error: Invalid Id'));
+                $this->Session->setFlash(__('Error: Invalid Id', true));
                 $this->redirect('/home/index');
                 return;
             }
@@ -960,7 +960,7 @@ class EvaluationsController extends AppController
 
             // if group id provided does not match the group id the user belongs to
             if (!in_array($groupId, $group)) {
-                $this->Session->setFlash(_t('Error: Invalid Id'));
+                $this->Session->setFlash(__('Error: Invalid Id', true));
                 $this->redirect('/home/index');
                 return;
             }
@@ -971,7 +971,7 @@ class EvaluationsController extends AppController
 
             if ($now < strtotime($event['Event']['release_date_begin']) ||
                 $now > strtotime($event['Event']['release_date_end'])) {
-                $this->Session->setFlash(_t('Error: Evaluation is unavailable'));
+                $this->Session->setFlash(__('Error: Evaluation is unavailable', true));
                 $this->redirect('/home/index');
                 return;
             }
@@ -993,7 +993,7 @@ class EvaluationsController extends AppController
             $this->set('members', count($members));
             //Setup the courseId to session
             $this->set('courseId', $event['Event']['course_id']);
-            $this->set('title_for_layout', $this->Course->getCourseName($courseId, 'S')._t(' > Evaluate Peers'));
+            $this->set('title_for_layout', $this->Course->getCourseName($courseId, 'S').__(' > Evaluate Peers', true));
             $this->set('groupMembers', $this->Evaluation->loadMixEvaluationDetail($event));
             $self = $this->EvaluationMixeval->find('first', array(
                 'conditions' => array('evaluator' => $userId, 'evaluatee' => $userId, 'event_id' => $eventId)
@@ -1099,24 +1099,24 @@ class EvaluationsController extends AppController
                         $this->GroupEvent->id = $groupEventId;
                         $groupEvent['GroupEvent']['marked'] = 'to review';
                         if (!$this->GroupEvent->save($groupEvent)) {
-                            $this->Session->setFlash(_t('Error'));
+                            $this->Session->setFlash(__('Error', true));
                         } else {
-                            $this->Session->setFlash(_t('Your Evaluation was submitted successfully.'), 'good');
+                            $this->Session->setFlash(__('Your Evaluation was submitted successfully.', true), 'good');
                             $this->redirect('/home');
                         }
                     } else {
-                        $this->Session->setFlash(_t('Your Evaluation was submitted successfully.'), 'good');
+                        $this->Session->setFlash(__('Your Evaluation was submitted successfully.', true), 'good');
                         $this->redirect('/home');
                     }
                 } else {
                     // Supposed to go here
-                    $this->Session->setFlash(_t('Your answers have been saved. Please answer all the required questions before it can be considered submitted.'));
+                    $this->Session->setFlash(__('Your answers have been saved. Please answer all the required questions before it can be considered submitted.', true));
                 }
             } else {
                 $failures = $this->User->getFullNames($failures);
                 $failures = join(' and ', array_filter(array_merge(array(join(
                     ', ', array_slice($failures, 0, -1))), array_slice($failures, -1))));
-                $this->Session->setFlash(_t('Error: It was unsuccessful to save evaluation(s) for ').$failures);
+                $this->Session->setFlash(__('Error: It was unsuccessful to save evaluation(s) for ', true).$failures);
             }
             $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
         }
@@ -1156,7 +1156,7 @@ class EvaluationsController extends AppController
                 $eventId,
                 User::get('id'), User::getCourseFilterPermission(), array('Course')))) {
 
-            $this->Session->setFlash(_t('Error: Invalid id or you do not have permission to access this event.'));
+            $this->Session->setFlash(__('Error: Invalid id or you do not have permission to access this event.', true));
             $this->redirect('/home/index');
             return;
         }
@@ -1166,7 +1166,7 @@ class EvaluationsController extends AppController
             if (!is_numeric($groupId) ||
                 !($group = $this->Group->getGroupWithMemberRoleByGroupIdEventId($groupId, $eventId))) {
 
-                    $this->Session->setFlash(_t('Error: Invalid group id.'));
+                    $this->Session->setFlash(__('Error: Invalid group id.', true));
                     $this->redirect('/home/index');
                     return;
             }
@@ -1179,7 +1179,7 @@ class EvaluationsController extends AppController
         $this->set('event', $event);
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $event['Course']))
             ->push(array('event' => $event['Event']))
-            ->push(_t('Results')));
+            ->push(__('Results', true)));
 
 
         switch ($event['Event']['event_template_type_id'])
@@ -1322,7 +1322,7 @@ class EvaluationsController extends AppController
                 $eventId,
                 User::get('id'), User::getCourseFilterPermission(), array('Course')))) {
 
-            $this->Session->setFlash(_t('Error: Invalid id or you do not have permission to access this event.'));
+            $this->Session->setFlash(__('Error: Invalid id or you do not have permission to access this event.', true));
             $this->redirect('/home/index');
             return;
         }
@@ -1333,13 +1333,13 @@ class EvaluationsController extends AppController
                 //!($group = $this->Group->getGroupByGroupIdEventIdMemberId($groupId, $eventId, User::get('id')))) {
                 !($group = $this->Group->getGroupWithMemberRoleByGroupIdEventId($groupId, $eventId))) {
 
-                    $this->Session->setFlash(_t('Error: Invalid group id or you are not in this group.'));
+                    $this->Session->setFlash(__('Error: Invalid group id or you are not in this group.', true));
                     $this->redirect('/home/index');
                     return;
             }
 
             if (!$event['Event']['is_result_released']) {
-                $this->Session->setFlash(_t('Error: The results are not released.'));
+                $this->Session->setFlash(__('Error: The results are not released.', true));
                 $this->redirect('/home/index');
                 return;
             }
@@ -1352,7 +1352,7 @@ class EvaluationsController extends AppController
         $this->set('event', $event);
         $this->set('breadcrumb', $this->breadcrumb
             ->push('home_student')
-            ->push(_t('View My Results')));
+            ->push(__('View My Results', true)));
 
         $userId = User::get('id');
 
@@ -1579,7 +1579,7 @@ class EvaluationsController extends AppController
 
         // Check whether the event exists or user has permission to access it
         if (!($event = $this->Event->getAccessibleEventById($eventId, User::get('id'), User::getCourseFilterPermission(), array()))) {
-            $this->Session->setFlash(_t('Error: That event does not exist or you dont have access to it'));
+            $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
             $this->redirect('index');
             return;
         }
@@ -1780,12 +1780,12 @@ class EvaluationsController extends AppController
 
         $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
         if (!$course) {
-            $this->Session->setFlash(_t('Error: Course does not exist or you do not have permission to view this course.'));
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('index');
             return;
         }
 
-        $this->set('title_for_layout', _t('Submission Details'));
+        $this->set('title_for_layout', __('Submission Details', true));
 
         $this->Event->id = $eventId;
         $event = $this->Event->read();
@@ -1846,13 +1846,13 @@ class EvaluationsController extends AppController
         // Check that $eventId is valid
         $event = $this->Event->findById($eventId);
         if (null == $event) {
-            $this->Session->setFlash(_t('Error: Invalid event Id'));
+            $this->Session->setFlash(__('Error: Invalid event Id', true));
             $this->redirect('index');
             return;
         }
 
         if ($event['Course']['student_count'] < 1) {
-            $this->Session->setFlash(_t('Error: There are no students in the class'));
+            $this->Session->setFlash(__('Error: There are no students in the class', true));
             $this->redirect('index');
             return;
         }
@@ -1860,7 +1860,7 @@ class EvaluationsController extends AppController
         // Check that $surveyId is valid
         $survey = $this->Survey->findById($event['Event']['template_id']);
         if (null == $survey) {
-            $this->Session->setFlash(_t('Error: Invalid survey Id'));
+            $this->Session->setFlash(__('Error: Invalid survey Id', true));
             $this->redirect('index');
             return;
         }
@@ -1869,7 +1869,7 @@ class EvaluationsController extends AppController
         $course = $this->Course->getAccessibleCourseById(
             $event['Event']['course_id'], User::get('id'), User::getCourseFilterPermission(), array('Enrol'));
         if (!$course) {
-            $this->Session->setFlash(_t('Error: Course does not exist or you do not have permission to view this course.'));
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('index');
             return;
         }
@@ -1884,7 +1884,7 @@ class EvaluationsController extends AppController
         $this->set('breadcrumb',
             $this->breadcrumb->push(array('course' => $course['Course']))
             ->push(array('event' => $event['Event']))
-            ->push(_t('Summary')));
+            ->push(__('Summary', true)));
 
         $submissions = $this->SurveyInput->findAllByEventId($eventId);
         // add submission status for each enroled user
@@ -2034,7 +2034,7 @@ class EvaluationsController extends AppController
                                 if (isset($evalutorToEvaluateesArray[$evaluators[$rowIndex-1]][$evaluators[$columnIndex-1]][$mode][$questionIndex])) {
                                     echo "<td>".$evalutorToEvaluateesArray[$evaluators[$rowIndex-1]][$evaluators[$columnIndex-1]][$mode][$questionIndex]."&nbsp</td>";
                                 } else {
-                                    echo "<td>"._t('N/A')."</td>";
+                                    echo "<td>".__('N/A', true)."</td>";
                                 }
                             }
                         }
@@ -2135,7 +2135,7 @@ class EvaluationsController extends AppController
             fputcsv($fh, array($key, $value));
         }
 
-        $header=array(_t("Group Number"), _t("Group Name"), _t("First Name"), _t("Last Name"), _t("Student Number"), _t("Email"), _t("General Comments"), _t("Score"), _t("Specific Comments"));
+        $header=array(__("Group Number", true), __("Group Name", true), __("First Name", true), __("Last Name", true), __("Student Number", true), __("Email", true), __("General Comments", true), __("Score", true), __("Specific Comments", true));
 
         fputcsv($fh, $header);
         foreach ($user_data as $key => $value) {
@@ -2175,7 +2175,7 @@ class EvaluationsController extends AppController
             unset($line);
         }
         fclose($fh);
-        header(_t("Location:")." ../tmp/test/output.csv");
+        header(__("Location:", true)." ../tmp/test/output.csv");
 
 
 

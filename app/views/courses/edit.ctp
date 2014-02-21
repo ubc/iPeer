@@ -11,7 +11,7 @@ echo $html->div('help-text', __('Course title, e.g. Technical Communication', tr
 function makeInstructor($i, $userId, $fullName, $html, $form) {
     // make instructor text box
     $name = "'$fullName'";
-    $input = $form->label(' ') . $form->text("Instructor.$i.full_name", array('default' => $fullName, 'disabled' => true)) . 
+    $input = $form->label(' ') . $form->text("Instructor.$i.full_name", array('default' => $fullName, 'disabled' => true)) .
         $html->link('X', '#', array('onclick' => "rmInstructor($i, $name, $userId); return false;"));
     $input .= $form->hidden("Instructor.Instructor.$i", array('value' => $userId));
     $ret = $html->div('input text', $input, array('id' => "instructorsList$i"));
@@ -72,9 +72,9 @@ echo $form->input(
     )
 );
 echo $form->input('Department', array(
-    'label' => __($this->Vocabulary->translate('Department'), true),
+    'label' => $this->Vocabulary->translate('Department'),
 ));
-echo $html->div('help-text', __('Selecting correct assoication will allow admin to help troubleshooting.', true)); 
+echo $html->div('help-text', __('Selecting correct assoication will allow admin to help troubleshooting.', true));
 echo $this->Form->input('homepage');
 echo $html->div('help-text', __('e.g. http://mycoursehome.com', true));
 

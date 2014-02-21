@@ -14,21 +14,6 @@ App::import('Lib', 'toolkit');
 App::import('Lib', 'breadcrumb');
 
 /**
- * _t
- * because CakePHP 1.3's internationalization __() call is stupid and wants
- * you to pass an extra parameter for no reason to get a string, use this
- * instead.
- *
- * @param mixed $str
- *
- * @access public
- * @return void
- */
-function _t($str) {
-    return __($str, true);
-}
-
-/**
  * AppController the base controller
  *
  * @uses Controller

@@ -1,12 +1,12 @@
 <div class='surveyquestions'>
 <?php
 if (!empty($event['Event']['description'])) { ?>
-<h2><?php echo _t('Description') ?></h2>
-<div id='description'><?php echo _t($event['Event']['description']) ?></div>
+<h2><?php echo __('Description', true) ?></h2>
+<div id='description'><?php echo $event['Event']['description'] ?></div>
 <?php }
 echo '<h2>' . $event['Event']['title'] . '</h2>';
 if (empty($studentId)) {
-	echo $form->create('SurveyInput', 
+	echo $form->create('SurveyInput',
 	    array('url' => "makeEvaluation/$eventId"));
 }
 else {
@@ -21,7 +21,7 @@ foreach ($questions as $i => $q) {
             "$i.response_id",
             array(
                 'type' => 'radio',
-                'options' => $q['ResponseOptions'], 
+                'options' => $q['ResponseOptions'],
                 'separator' => '<br />',
                 'legend' => false
             )
@@ -30,7 +30,7 @@ foreach ($questions as $i => $q) {
         echo $form->input(
             "$i.response_id",
             array(
-                'options' => $q['ResponseOptions'], 
+                'options' => $q['ResponseOptions'],
                 'multiple' => 'checkbox',
                 'label' => false
             )

@@ -296,4 +296,9 @@
 
         <copy file="readme.md" todir="dist/" />
     </target>
+
+    <target name="extract" description="Extract i18n strings for translation">
+        <delete file="app/locale/default.pot" quiet='true'/>
+        <exec command="cake/console/cake i18n extract -app app -merge yes -output app/locale/ -paths app/" passthru="true"/>
+    </target>
 </project>

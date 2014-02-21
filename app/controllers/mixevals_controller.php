@@ -212,7 +212,7 @@ class MixevalsController extends AppController
 
         // check to see if $id is a valid mixed evaluation
         if (empty($eval)) {
-            $this->Session->setFlash(_t('Error: Invalid Mixeval ID.'));
+            $this->Session->setFlash(__('Error: Invalid Mixeval ID.', true));
             $this->redirect('index');
             return;
         }
@@ -273,7 +273,7 @@ class MixevalsController extends AppController
     {
         // Check that the user has permission to access this page
         if (!User::hasPermission('controllers/Mixevals')) {
-            $this->Session->setFlash(_t('Error: You do not have permission to edit this evaluation'));
+            $this->Session->setFlash(__('Error: You do not have permission to edit this evaluation', true));
             $this->redirect('index');
             return;
         }
@@ -401,7 +401,7 @@ class MixevalsController extends AppController
         // MixevalQuestionDesc.
         if (!$this->Mixeval->saveAll($this->data, array('validate' => 'only'))){
             $this->Session->setFlash(
-                _t('Unable to save, please check below for error messages.'));
+                __('Unable to save, please check below for error messages.', true));
             return;
         }
 
@@ -486,7 +486,7 @@ class MixevalsController extends AppController
             $ret = $this->Mixeval->save($this->data);
             if (!$ret) {
                 $this->Session->setFlash(
-                    _t('Unable to save the mixed evaluation.'));
+                    __('Unable to save the mixed evaluation.', true));
                 $continue = false;
             }
         }
@@ -502,7 +502,7 @@ class MixevalsController extends AppController
                 $this->MixevalQuestion->create();
                 if (!$this->MixevalQuestion->save($saveQ)) {
                     $this->Session->setFlash(
-                        _t("Unable to save this mixed eval's questions."));
+                        __("Unable to save this mixed eval's questions.", true));
                     $continue = false;
                     break;
                 }
@@ -527,7 +527,7 @@ class MixevalsController extends AppController
                 $this->MixevalQuestionDesc->create();
                 if (!$this->MixevalQuestionDesc->save($saveDesc)) {
                     $this->Session->setFlash(
-                        _t('Unable to save the mixed eval question descs.'));
+                        __('Unable to save the mixed eval question descs.', true));
                     $continue = false;
                     break;
                 }
@@ -538,7 +538,7 @@ class MixevalsController extends AppController
         if ($continue) {
             $this->Mixeval->commit();
             $this->Session->setFlash(
-                _t('The mixed evaluation was saved successfully.'), 'good');
+                __('The mixed evaluation was saved successfully.', true), 'good');
             // TODO Maybe redirect to view evaluation instead?
             // And put an Edit button in the view evaluation too
             $this->redirect('index');
@@ -589,7 +589,7 @@ class MixevalsController extends AppController
         if (!is_numeric($id) ||
             !$this->Mixeval->field('id', array('id' => $id))
         ){
-            $this->Session->setFlash(_t('Error: Invalid ID.'));
+            $this->Session->setFlash(__('Error: Invalid ID.', true));
             $this->redirect('index');
             return;
         }
@@ -610,7 +610,7 @@ class MixevalsController extends AppController
                 array('conditions' => array('event_id' => $events)));
             if (!empty($subs)) {
                 $this->Session->setFlash(sprintf(
-                    _t('%s cannot be edited now that submissions have been made. Please make a copy.'),
+                    __('%s cannot be edited now that submissions have been made. Please make a copy.', true),
                     $this->Mixeval->field('name', array('id' => $id))
                 ));
                 $this->redirect('index');

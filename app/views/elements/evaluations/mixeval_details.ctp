@@ -1,13 +1,13 @@
 <?php
 $addOn = '';
 if (!$gradeReleased && !$commentReleased && $details) {
-    $addOn = ' - <font color="red">'._t(' Comments/Grades Not Released Yet').'</font>';
+    $addOn = ' - <font color="red">'.__(' Comments/Grades Not Released Yet', true).'</font>';
 } else if (!$gradeReleased) {
-    $addOn = ' - <font color="red">'._t(' Grades Not Released Yet').'</font>';
+    $addOn = ' - <font color="red">'.__(' Grades Not Released Yet', true).'</font>';
 } else if (!$commentReleased && $details) {
-    $addOn = ' - <font color="red">'._t(' Comments Not Released Yet').'</font>';
+    $addOn = ' - <font color="red">'.__(' Comments Not Released Yet', true).'</font>';
 }
-$header = _t($title).$addOn;
+$header = $title.$addOn;
 
 echo $html->tag('h2', $header);
 $qnum = 1;
@@ -27,10 +27,10 @@ if ($details) {
             echo '<ul>';
             foreach ($ques['Submissions'] as $num => $sub) {
                 if (in_array($type, array(1, 4)) && !$gradeReleased) {
-                    echo '<li>'._t('Grades Not Released Yet').'</li>';
+                    echo '<li>'.__('Grades Not Released Yet', true).'</li>';
                     break;
                 } else if (in_array($type, array(2, 3)) && !$commentReleased) {
-                    echo '<li>'._t('Comments Not Released Yet').'</li>';
+                    echo '<li>'.__('Comments Not Released Yet', true).'</li>';
                     break;
                 }
                 $name = '';
@@ -43,7 +43,7 @@ if ($details) {
                     $start = $zero_mark ? 0 : $step;
                     $options = array_map('number_format',range($start, $multiplier, $step),
                         array_fill(0, $scale, 2));
-                    $grade = '<label class="grade">'._t('Grade: ');
+                    $grade = '<label class="grade">'.__('Grade:', true).' ';
                     $grade .= $sub['grade'].' / '.$multiplier.'</label>';
                     $grade .= (empty($descriptors[$sub['selected_lom']])) ? '' :
                         '<label class="desc">('.$descriptors[$sub['selected_lom']].')</label>';
@@ -78,7 +78,7 @@ if ($details) {
             if (isset($ques['Submissions'])) {
                 echo '<ul>';
                 if (!$gradeReleased) {
-                    echo '<li>'._t('Grades Not Released Yet').'</li></ul>';
+                    echo '<li>'.__('Grades Not Released Yet', true).'</li></ul>';
                     continue;
                 }
                 $grades = Set::extract('/grade', $ques['Submissions']);

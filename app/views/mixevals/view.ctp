@@ -37,7 +37,7 @@
 $totalMarks = $mixeval['total_marks'];
 $id = array('id' => 0);
 $event = array('Event' => $id, 'GroupEvent' => $id, 'Group' => $id);
-  
+
 $params = array('controller'            => 'mixevals',
                 'zero_mark'             => $mixeval['zero_mark'],
                 'questions'             => $questions,
@@ -64,8 +64,8 @@ if ($mixeval['self_eval'] > 0) {
 }
 
 $required = $html->tag('span', '*', array('class' => 'required orangered'));
-echo $html->para('note', $required . ' ' . _t('Indicates response required.'));
-echo $html->para('marks', _t('Total Marks') . ": $totalMarks");
+echo $html->para('note', $required . ' ' . __('Indicates response required.', true));
+echo $html->para('marks', __('Total Marks', true) . ": $totalMarks");
 
 ?>
 </div>
