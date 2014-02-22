@@ -7,7 +7,7 @@
 </ul>
 <h2><?php echo __('Merge Accounts', true); ?></h2>
 <div id='form'>
-<?php echo $this->Form->create('User', 
+<?php echo $this->Form->create('User',
     array('onsubmit' => 'return confirm("Are you sure you want to merge the two users? The merger cannot be undone.");')); ?>
 <!-- secondary account -->
 <?php echo $this->element('users/merge_search', array('account' => 'secondary', 'searchValue' => $searchValue)); ?>
@@ -37,7 +37,7 @@ jQuery().ready(function() {
     });
     jQuery('#UserPrimaryAccount').change(function() {
         var userId = jQuery('#UserPrimaryAccount option:selected').val();
-        jQuery.getJSON('/users/ajax_merge', {action: 'data', userId: userId},
+        jQuery.getJSON('ajax_merge', {action: 'data', userId: userId},
             function(field) {
                 jQuery.each(field, function(index, value) {
                     jQuery('td#primary' + index).html(value);
@@ -46,7 +46,7 @@ jQuery().ready(function() {
     });
     jQuery('#UserSecondaryAccount').change(function() {
         var userId = jQuery('#UserSecondaryAccount option:selected').val();
-        jQuery.getJSON('/users/ajax_merge', {action: 'data', userId: userId},
+        jQuery.getJSON('ajax_merge', {action: 'data', userId: userId},
             function(field) {
                 jQuery.each(field, function(index, value) {
                     jQuery('td#secondary' + index).html(value);
@@ -87,11 +87,11 @@ function primarySearch() {
     var field = jQuery('#UserPrimarySearch option:selected').val();
     var value = jQuery('#UserPrimarySearchValue').val();
     jQuery('#UserPrimaryAccount').attr('disabled', 'disabled');
-    jQuery.getJSON('/users/ajax_merge', {action: 'account', field: field, value: value},
+    jQuery.getJSON('ajax_merge', {action: 'account', field: field, value: value},
         function(users) {
             populate(users, '#UserPrimaryAccount', 'primary');
     });
-    jQuery.getJSON('/users/ajax_merge', {action: 'data', userId: ''},
+    jQuery.getJSON('ajax_merge', {action: 'data', userId: ''},
         function(field) {
             jQuery.each(field, function(index, value) {
                 jQuery('td#primary' + index).html(value);
@@ -105,11 +105,11 @@ function secondarySearch() {
     var field = jQuery('#UserSecondarySearch option:selected').val();
     var value = jQuery('#UserSecondarySearchValue').val();
     jQuery('#UserSecondaryAccount').attr('disabled', 'disabled');
-    jQuery.getJSON('/users/ajax_merge', {action: 'account', field: field, value: value},
+    jQuery.getJSON('ajax_merge', {action: 'account', field: field, value: value},
         function(users) {
             populate(users, '#UserSecondaryAccount', 'secondary');
     });
-    jQuery.getJSON('/users/ajax_merge', {action: 'data', userId: ''},
+    jQuery.getJSON('ajax_merge', {action: 'data', userId: ''},
         function(field) {
             jQuery.each(field, function(index, value) {
                 jQuery('td#secondary' + index).html(value);
@@ -128,6 +128,3 @@ function disableSelection(account) {
 }
 
 </script>
-
-
-
