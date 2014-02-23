@@ -20,7 +20,7 @@ foreach ($questions as $ques) {
     $required = (!$ques['MixevalQuestion']['required']) ? '' :
         $html->tag('span', '*', array('class' => 'required orangered floatright'));
     $title = $ques['MixevalQuestion']['title'];
-    $title = $html->tag('h3', "$peerNum. $title $required");
+    $title = $html->tag('h3', "$peerNum. $title $required", array('class' => 'question-title', 'id' => 'q_'.$user['id'].'_'.$num));
     $class = $ques['MixevalQuestion']['required'] ? 'must' : '';
     $peerNum++;
 

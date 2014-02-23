@@ -936,6 +936,7 @@ class EvaluationsController extends AppController
             $this->set('questions', $questions);
             $this->set('mixeval', $mixeval);
             $this->set('enrol', $enrol);
+            $this->set('userId', $userId);
 
             $this->render('mixeval_eval_form');
         } else {
