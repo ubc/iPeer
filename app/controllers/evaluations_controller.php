@@ -722,7 +722,8 @@ class EvaluationsController extends AppController
             $comReq = ($commentsNeeded && $event['Event']['com_req']);
             $this->set('allDone', $allDone);
             $this->set('comReq', $comReq);
-
+            $this->set('fullName', User::get('full_name'));
+            $this->set('userId', User::get('id'));
 
             $this->render('rubric_eval_form');
         } else {

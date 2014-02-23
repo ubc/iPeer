@@ -148,5 +148,118 @@ class Toolkit
         return (substr($haystack, 0, strlen($needle)) == $needle);
     }
 
+    /**
+     * getSimpleEvalDemoData return demo data for simple evaluation preview
+     *
+     * @param mixed $points the points assign to the students
+     *
+     * @static
+     * @access public
+     * @return array demo data
+     */
+    static function getSimpleEvalDemoData($points)
+    {
+        return array(
+            'event' => array(
+                'Event' => array(
+                    'id' => 0,
+                    'title' => 'Preview Event',
+                    'due_date' => Toolkit::formatDate(time()+(5*24*60*60)),
+                    'description' => 'Preview for simple evaluation event.',
+                    'com_req' => true,
+                ),
+                'Group' => array(
+                    'id' => 0,
+                    'group_name' => 'Demo Group',
+                ),
+            ),
+            'groupMembers' => array(
+                array(
+                    'User' => array(
+                        'id' => 1,
+                        'first_name' => 'Demo',
+                        'last_name'  => 'Student1',
+                    ),
+                ),
+                array(
+                    'User' => array(
+                        'id' => 2,
+                        'first_name' => 'Demo',
+                        'last_name'  => 'Student2',
+                    ),
+                ),
+                array(
+                    'User' => array(
+                        'id' => 3,
+                        'first_name' => 'Demo',
+                        'last_name'  => 'Student3',
+                    ),
+                ),
+            ),
+            'courseId' => 0,
+            'userId' => 0,
+            'evaluateeCount' => 2,
+            'fullName' => User::get('full_name'),
+            'remaining' => $points,
+            'preview' => true,
+        );
+    }
 
+    /**
+     * getRubricEvalDemoData get demo data for rubric evaluation preview
+     *
+     * @param mixed $data rubric data
+     *
+     * @static
+     * @access public
+     * @return array demo data
+     */
+    static function getRubricEvalDemoData($data)
+    {
+        return array(
+            'event' => array(
+                'Event' => array(
+                    'id' => 0,
+                    'title' => 'Preview Event',
+                    'due_date' => Toolkit::formatDate(time()+(5*24*60*60)),
+                    'description' => 'Preview for rubric evaluation event.',
+                    'com_req' => true,
+                ),
+                'Group' => array(
+                    'id' => 0,
+                    'group_name' => 'Demo Group',
+                ),
+            ),
+            'groupMembers' => array(
+                array(
+                    'User' => array(
+                        'id' => 1,
+                        'first_name' => 'Demo',
+                        'last_name'  => 'Student1',
+                    ),
+                ),
+                array(
+                    'User' => array(
+                        'id' => 2,
+                        'first_name' => 'Demo',
+                        'last_name'  => 'Student2',
+                    ),
+                ),
+                array(
+                    'User' => array(
+                        'id' => 3,
+                        'first_name' => 'Demo',
+                        'last_name'  => 'Student3',
+                    ),
+                ),
+            ),
+            'courseId' => 0,
+            'userId' => 0,
+            'evaluateeCount' => 2,
+            'fullName' => User::get('full_name'),
+            'remaining' => $data['SimpleEvaluation']['point_per_member'] * 3,
+            'preview' => true,
+        );
+    }
+    /* }}} */
 }
