@@ -20,11 +20,11 @@
         29978043, <?php __('Team B')?><br>
         29978051, <?php __('Team B')?>
     </pre>
-    
+
 <h2><?php __('Import')?></h2>
 
 <?php
-echo $this->Form->create(null, array('type' => 'file', 'url' => 'import/'.$courseId));
+echo $this->Form->create(null, array('type' => 'file', 'url' => '/import/'.$courseId));
 echo $this->Form->input('file', array('type' => 'file', 'name' => 'file'));
 echo $this->Form->input('identifiers', array(
     'type' => 'radio',

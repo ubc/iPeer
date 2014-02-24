@@ -33,7 +33,7 @@
     <tr>
         <td>
         <?php echo $this->Form->create('EvaluationMixeval', array(
-            'url' => $html->url('makeEvaluation') . '/'.$event['Event']['id'].'/'.$event['Group']['id']));?>
+            'url' => '/evaluations/makeEvaluation' . '/'.$event['Event']['id'].'/'.$event['Group']['id']));?>
         <input type="hidden" name="data[data][submitter_id]" value="<?php echo $userId ?>"/>
         <input type="hidden" name="data[data][event_id]" value="<?php echo $event['Event']['id']?>"/>
         <input type="hidden" name="data[data][template_id]" value="<?php echo $event['Event']['template_id']?>"/>
