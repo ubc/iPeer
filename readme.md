@@ -2,21 +2,33 @@ Running Virtual Development Server
 ---------------------------
 Virtual Environment Setup:
 
-1) Install VirtualBox at http://virtualbox.org
-2) Install Vagrant at http://www.vagrantup.com/downloads
-3) Go to the iPeer root directory in the terminal
-4) Initial the submodules: git submodule init
-5) Update the submodules: git submodule update
-6) Create a Vagrant box: vagrant box add ipeerbox http://developer.nrel.gov/downloads/vagrant-boxes/CentOS-6.4-x86_64-v20130731.box
-7) Install Virtual Box Guest Addition plugin: vagrant plugin install vagrant-vbguest
-8) Start the virtual server: vagrant up
-9) Go to localhost:2000 in your browser.
+1.  Install VirtualBox at http://virtualbox.org
+2.  Install Vagrant at http://www.vagrantup.com/downloads
+3.  Go to the iPeer root directory in the terminal. Then run the following commands:
+    git submodule init
+    git submodule update
+    vagrant box add ipeerbox http://developer.nrel.gov/downloads/vagrant-boxes/CentOS-6.4-x86_64-v20130731.box
+    vagrant plugin install vagrant-vbguest
+    vagrant up
+4.  Go to localhost:2000 in your browser.
+
+Using a different port (must be the same port number in the virtual and host environment):
+
+1. change the line in file puppet/dev.pp from
+    port => 2000,
+to (eg. port 8888)
+    port => 8888,
+2. AND change the line in file app/tests/cases/controllers/v1_controller.test.php from
+    $server = 'http://localhost:2000';
+to
+    $server = 'http://localhost:8888';
 
 Running Tests:
 
-1) ssh into the virtual environment: vagrant ssh
-2) Go to the application’s root directory: cd /var/www
-3) Run tests: phing test
+Go to the iPeer root directory. Then run the following commands
+    vagrant ssh
+    cd /var/www
+    phing test
 
 For more vagrant commands go to http://docs.vagrantup.com/v2/cli/index.html.
 
@@ -29,7 +41,7 @@ Requirements:
 * PHP Webdriver (https://github.com/Element-34/php-webdriver)
 * Firfox
 
-Ruuning the tests:
+Runing the tests:
 
     cd iPeer
     cake/console/cake -app app testsuite app group system
