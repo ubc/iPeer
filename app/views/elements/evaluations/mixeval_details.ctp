@@ -51,7 +51,7 @@ if ($details) {
                         'type' => 'radio',
                         'options' => $options,
                         'disabled' => true,
-                        'default' => $sub['selected_lom'] - 1,
+                        'default' => $sub['selected_lom'],
                         'before' => '<li>'.$name,
                         'after' => $grade.'</li>'
                     ));
