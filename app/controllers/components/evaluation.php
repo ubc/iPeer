@@ -986,18 +986,22 @@ class EvaluationComponent extends Object
             }
             $evalMixevalDetail['EvaluationMixevalDetail']['evaluation_mixeval_id'] = $evalMixevalId;
             $evalMixevalDetail['EvaluationMixevalDetail']['question_number'] = $num;
-      
+
             if (in_array($ques['mixeval_question_type_id'], array('1','4'))) {
-                if (empty($data[$num]['selected_lom']) && $ques['mixeval_question_type_id'] != '4' ) {
+                if (empty($data[$num]['selected_lom']) && $data[$num]['selected_lom'] != 0 && $ques['mixeval_question_type_id'] != '4' ) {
                     continue;
                 }
                 if ($ques['mixeval_question_type_id'] == '1') {
-                    $evalMixevalDetail['EvaluationMixevalDetail']['selected_lom'] = $data[$num]['selected_lom'];   
+                    $evalMixevalDetail['EvaluationMixevalDetail']['selected_lom'] = $data[$num]['selected_lom'];
+                    // Do not grab grade directly as users can edit the HTML to submit illegitimate answers
+                    $grade = $data[$num]['selected_lom'] * ($ques['multiplier']/($ques['scale_level'] - $mixeval['Mixeval']['zero_mark']));
+                } else {
+                    // if the question type is 4 - simply grab the grade
+                    $evalMixevalDetail['EvaluationMixevalDetail']['grade'] = $data[$num]['grade'];
                 }
-                // Do not grab grade directly as users can edit the HTML to submit illegitimate answers
-                $evalMixevalDetail['EvaluationMixevalDetail']['grade'] = $data[$num]['selected_lom'] * ($ques['multiplier']/$ques['scale_level']);
+                $evalMixevalDetail['EvaluationMixevalDetail']['grade'] = $data[$num]['grade'];
                 if ($ques['required'] && !$ques['self_eval']) {
-                    $totalGrade += $data[$num]['grade'];
+                    $totalGrade += $evalMixevalDetail['EvaluationMixevalDetail']['grade'];
                 }
             } else {
                 if (empty($data[$num]['question_comment']) && !empty($evalMixevalDetail)) {
@@ -1008,7 +1012,6 @@ class EvaluationComponent extends Object
                 }
                 $evalMixevalDetail['EvaluationMixevalDetail']['question_comment'] = $data[$num]['question_comment'];
             }
-         
             $this->EvaluationMixevalDetail->save($evalMixevalDetail);
             $this->EvaluationMixevalDetail->id=null;
         }
