@@ -234,6 +234,11 @@
         <phingcall target="post-test"/>
     </target>
 
+    <target name="test-ci-integration" description="Run integration tests for continuous integration(output as xml)" depends="init-test-db">
+        <exec command="cake/console/cake testreport app group system" passthru="true"/>
+        <phingcall target="post-test"/>
+    </target>
+
     <target name="upgrade" description="Upgrade iPeer">
         <exec command="cake/console/cake upgrade" passthru="true"/>
     </target>
