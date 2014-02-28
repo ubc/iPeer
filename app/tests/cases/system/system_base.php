@@ -27,8 +27,14 @@ class SystemBaseTestCase extends CakeTestCase
         $this->browser = getenv('SELENIUM_BROWSER') ? getenv('SELENIUM_BROWSER') : 'firefox';
         $this->capabilities['platform'] = getenv('SELENIUM_PLATFORM') ? getenv('SELENIUM_PLATFORM') : 'ANY';
         $this->capabilities['version'] = getenv('SELENIUM_VERSION') ? getenv('SELENIUM_VERSION') : '';
-        $this->seleniumUrl = getenv('SELENIUM_PLATFORM') ? getenv('SELENIUM_PLATFORM') : 'http://localhost:4444/wd/hub';
+        $this->seleniumUrl = getenv('SELENIUM_URL') ? getenv('SELENIUM_URL') : 'http://localhost:4444/wd/hub';
         $this->url = getenv('SERVER_TEST') ? getenv('SERVER_TEST') : 'http://localhost:2000/';
+
+        echo "SELENIUM_BROWSER = ".$this->browser."\n";
+        echo "SELENIUM_VERSION = ".$this->capabilities['version']."\n";
+        echo "SELENIUM_PLATFORM = ".$this->capabilities['platform']."\n";
+        echo "SELENIUM_URL = ".$this->seleniumUrl."\n";
+        echo "SERVER_TEST = ".$this->url."\n";
 
         $this->web_driver = new SystemWebDriver($this->seleniumUrl);
         $this->session = $this->getSession();
