@@ -27,14 +27,18 @@ class SystemBaseTestCase extends CakeTestCase
         $this->browser = getenv('SELENIUM_BROWSER') ? getenv('SELENIUM_BROWSER') : 'firefox';
         $this->capabilities['platform'] = getenv('SELENIUM_PLATFORM') ? getenv('SELENIUM_PLATFORM') : 'ANY';
         $this->capabilities['version'] = getenv('SELENIUM_VERSION') ? getenv('SELENIUM_VERSION') : '';
-        $this->seleniumUrl = getenv('SELENIUM_URL') ? getenv('SELENIUM_URL') : 'http://localhost:4444/wd/hub';
+        $host = getenv('SELENIUM_HOST') ? getenv('SELENIUM_HOST') : 'localhost';
+        $port = getenv('SELENIUM_PORT') ? getenv('SELENIUM_PORT') : '4444';
+        $username = getenv('SAUCE_USER_NAME') ? getenv('SAUCE_USER_NAME') : '';
+        $apikey = getenv('SAUCE_API_KEY') ? ':'.getenv('SAUCE_API_KEY').'@' : '';
+        $this->seleniumUrl = "http://".$username.$apikey.$host.':'.$port.'/wd/hub';
         $this->url = getenv('SERVER_TEST') ? getenv('SERVER_TEST') : 'http://localhost:2000/';
 
-        echo "SELENIUM_BROWSER = ".$this->browser."\n";
+        /*echo "SELENIUM_BROWSER = ".$this->browser."\n";
         echo "SELENIUM_VERSION = ".$this->capabilities['version']."\n";
         echo "SELENIUM_PLATFORM = ".$this->capabilities['platform']."\n";
         echo "SELENIUM_URL = ".$this->seleniumUrl."\n";
-        echo "SERVER_TEST = ".$this->url."\n";
+        echo "SERVER_TEST = ".$this->url."\n";*/
 
         $this->web_driver = new SystemWebDriver($this->seleniumUrl);
         $this->session = $this->getSession();
