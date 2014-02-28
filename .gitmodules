@@ -37,3 +37,6 @@
 [submodule "puppet/modules/db"]
 	path = puppet/modules/db
 	url = https://github.com/ubc/puppet-db.git
+[submodule "vendors/webdriver"]
+	path = vendors/webdriver
+	url = https://github.com/Element-34/php-webdriver.git

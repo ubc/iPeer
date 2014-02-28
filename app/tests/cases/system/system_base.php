@@ -1,11 +1,11 @@
 <?php
 require_once('SystemWebDriver.php');
 require_once('SystemWebDriverSession.php');
-require_once('PHPWebDriver/WebDriver.php');
-require_once('PHPWebDriver/WebDriverBy.php');
-require_once('PHPWebDriver/WebDriverWait.php');
-require_once('PHPWebDriver/WebDriverKeys.php');
-require_once('PHPWebDriver/WebDriverSession.php');
+require_once(VENDORS.'webdriver/PHPWebDriver/WebDriver.php');
+require_once(VENDORS.'webdriver/PHPWebDriver/WebDriverBy.php');
+require_once(VENDORS.'webdriver/PHPWebDriver/WebDriverWait.php');
+require_once(VENDORS.'webdriver/PHPWebDriver/WebDriverKeys.php');
+require_once(VENDORS.'webdriver/PHPWebDriver/WebDriverSession.php');
 require_once('PageFactory.php');
 
 class SystemBaseTestCase extends CakeTestCase

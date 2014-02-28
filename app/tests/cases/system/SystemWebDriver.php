@@ -1,5 +1,5 @@
 <?php
-require_once('PHPWebDriver/WebDriver.php');
+require_once(VENDORS.'webdriver/PHPWebDriver/WebDriver.php');
 require_once('SystemWebDriverSession.php');
 
 /**

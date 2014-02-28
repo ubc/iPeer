@@ -1,7 +1,7 @@
 <?php
-require_once('PHPWebDriver/WebDriverSession.php');
-require_once('PHPWebDriver/WebDriverWait.php');
-require_once('PHPWebDriver/WebDriverContainer.php');
+require_once(VENDORS.'webdriver/PHPWebDriver/WebDriverSession.php');
+require_once(VENDORS.'webdriver/PHPWebDriver/WebDriverWait.php');
+require_once(VENDORS.'webdriver/PHPWebDriver/WebDriverContainer.php');
 
 class SystemWebDriverSession extends PHPWebDriver_WebDriverSession {
     public function elementWithWait($using, $value) {
