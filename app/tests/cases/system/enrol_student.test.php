@@ -2,34 +2,28 @@
 require_once('system_base.php');
 
 class EnrolStudentTestCase extends SystemBaseTestCase
-{    
+{
     public function startCase()
     {
-        $this->getUrl();
         echo "Start EnrolStudent system test.\n";
-        $wd_host = 'http://localhost:4444/wd/hub';
-        $this->web_driver = new SystemWebDriver($wd_host);
-        $this->session = $this->web_driver->session('firefox');
-        $this->session->open($this->url);
-        
-        $w = new PHPWebDriver_WebDriverWait($this->session);
-        $this->session->deleteAllCookies();
+        $this->getSession()->open($this->url);
+
         $login = PageFactory::initElements($this->session, 'Login');
         $home = $login->login('root', 'ipeeripeer');
     }
-    
+
     public function endCase()
     {
         $this->session->deleteAllCookies();
         $this->session->close();
     }
-    
+
     public function testEnrolStudent()
     {
         $this->session->open($this->url.'users/add/2');
         $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
         $this->assertEqual($title, 'APSC 201 - Technical Communication > Add User');
-        
+
         // enter username: redshirt0004
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'UserUsername')->sendKeys('redshirt0004');
         // wait for "username already exist" warning
@@ -39,24 +33,24 @@ class EnrolStudentTestCase extends SystemBaseTestCase
                 return $session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="usernameErr"]')->text();
             }
         );
-        
+
         $warning = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="usernameErr"]')->text();
         $this->assertEqual(substr($warning, 0, 39), 'Username "redshirt0004" already exists.');
-        
+
         // click here to enrol
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'here')->click();
-        
+
         // wait for the student to be enrolled
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
             }
         );
-        
+
         $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
-        $this->assertEqual($msg, 'User is successfully enrolled.');  
+        $this->assertEqual($msg, 'User is successfully enrolled.');
     }
-    
+
     public function testUnenrolStudent()
     {
         // unenrol Chris Student
@@ -80,7 +74,7 @@ class EnrolStudentTestCase extends SystemBaseTestCase
         $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'Student is successfully unenrolled!');
     }
-    
+
     public function testEnrolTutor()
     {
         $this->session->open($this->url.'users/add/1');
@@ -92,24 +86,24 @@ class EnrolStudentTestCase extends SystemBaseTestCase
                 return $session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="usernameErr"]')->text();
             }
         );
-        
+
         $warning = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="usernameErr"]')->text();
         $this->assertEqual(substr($warning, 0, 33), 'Username "tutor3" already exists.');
-        
+
         // click here to enrol
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'here')->click();
-        
+
         // wait for the student to be enrolled
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
             }
         );
-        
+
         $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
-        $this->assertEqual($msg, 'User is successfully enrolled.');  
+        $this->assertEqual($msg, 'User is successfully enrolled.');
     }
-    
+
     public function testUnenrolTutor()
     {
         // unenrol Tutor3
@@ -126,7 +120,7 @@ class EnrolStudentTestCase extends SystemBaseTestCase
         $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'The course was updated successfully.');
     }
-    
+
     public function testAddingFromUsersIndex()
     {
         $this->session->open($this->url.'users/add');
@@ -138,16 +132,16 @@ class EnrolStudentTestCase extends SystemBaseTestCase
                 return $session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="usernameErr"]')->text();
             }
         );
-        
+
         $warning = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="usernameErr"]')->text();
         $this->assertEqual(substr($warning, 0, 39), 'Username "redshirt0003" already exists.');
-        
+
         $here = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'here');
         $this->assertTrue(empty($here));
     }
-    
+
     public function testEnrollingNonStudent()
-    {        
+    {
         $this->session->open($this->url.'users/add/1');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'UserUsername')->sendKeys('root');
         $w = new PHPWebDriver_WebDriverWait($this->session);
@@ -156,7 +150,7 @@ class EnrolStudentTestCase extends SystemBaseTestCase
                 return $session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="usernameErr"]')->text();
             }
         );
-        
+
         $warning = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="usernameErr"]')->text();
         $this->assertEqual(substr($warning, 0, 31), 'Username "root" already exists.');
         // click here to enrol
@@ -168,9 +162,9 @@ class EnrolStudentTestCase extends SystemBaseTestCase
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::ID, "flashMessage"));
             }
         );
-        
+
         $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, "flashMessage")->text();
-        $this->assertEqual($msg, 'Error: You do not have permission to enrol this user.'); 
+        $this->assertEqual($msg, 'Error: You do not have permission to enrol this user.');
     }
 
     public function testEnrollingEnrolledStudent()
@@ -183,19 +177,19 @@ class EnrolStudentTestCase extends SystemBaseTestCase
                 return $session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="usernameErr"]')->text();
             }
         );
-        
+
         $warning = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="usernameErr"]')->text();
         $this->assertEqual(substr($warning, 0, 39), 'Username "redshirt0001" already exists.');
         // click here to enrol
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'here')->click();
-        
+
         // wait for the student to be enrolled
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::ID, "flashMessage"));
             }
         );
-        
+
         $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, "flashMessage")->text();
         $this->assertEqual($msg, 'Error: The student is already enrolled.');
     }
@@ -210,20 +204,20 @@ class EnrolStudentTestCase extends SystemBaseTestCase
                 return $session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="usernameErr"]')->text();
             }
         );
-        
+
         $warning = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="usernameErr"]')->text();
         $this->assertEqual(substr($warning, 0, 33), 'Username "tutor1" already exists.');
         // click here to enrol
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'here')->click();
-        
+
         // wait for the tutor to be enrolled
         $w->until(
             function($session) {
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::ID, "flashMessage"));
             }
         );
-        
+
         $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, "flashMessage")->text();
-        $this->assertEqual($msg, 'Error: The student is already enrolled.'); 
+        $this->assertEqual($msg, 'Error: The student is already enrolled.');
     }
 }

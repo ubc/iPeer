@@ -8,13 +8,8 @@ class LoginTestCase extends SystemBaseTestCase
 
     public function startCase()
     {
-        $this->getUrl();
         echo "Start Login system test.\n";
-        $wd_host = 'http://localhost:4444/wd/hub';
-        $this->web_driver = new SystemWebDriver($wd_host);
-        //$this->session = $this->web_driver->session('ie', array('version' => '8'));
-        $this->session = $this->web_driver->session('firefox');
-        $this->session->open($this->url);
+        $this->getSession()->open($this->url);
     }
 
     public function endCase()

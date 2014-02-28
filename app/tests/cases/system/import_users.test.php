@@ -2,28 +2,22 @@
 require_once('system_base.php');
 
 class ImportUsersTestCase extends SystemBaseTestCase
-{    
+{
     public function startCase()
     {
-        $this->getUrl();
         echo "Start ImportUsers system test.\n";
-        $wd_host = 'http://localhost:4444/wd/hub';
-        $this->web_driver = new SystemWebDriver($wd_host);
-        $this->session = $this->web_driver->session('firefox');
-        $this->session->open($this->url);
-        
-        $w = new PHPWebDriver_WebDriverWait($this->session);
-        $this->session->deleteAllCookies();
+        $this->getSession()->open($this->url);
+
         $login = PageFactory::initElements($this->session, 'Login');
         $home = $login->login('root', 'ipeeripeer');
     }
-    
+
     public function endCase()
     {
         $this->session->deleteAllCookies();
         $this->session->close();
     }
-    
+
     public function testImportUsersError()
     {
         $this->session->open($this->url.'users/import/2');
@@ -39,15 +33,15 @@ class ImportUsersTestCase extends SystemBaseTestCase
         $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'flashMessage')->text();
         $this->assertEqual($msg, "extension is not allowed.\nFileUpload::processFile() - Unable to save temp file to file system.");
     }
-    
+
     public function testImportUsers()
     {
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Courses')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'APSC 201')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Import Students')->click();
-        
+
         $file = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'UserFile');
-        $file->sendKeys(dirname(__FILE__).'/files/newClass_APSC201.csv');        
+        $file->sendKeys(dirname(__FILE__).'/files/newClass_APSC201.csv');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $w->until(
@@ -57,12 +51,12 @@ class ImportUsersTestCase extends SystemBaseTestCase
             }
         );
         $this->checkSummary();
-        
+
         // check class list - should have 17 students
         $this->session->open($this->url.'users/goToClassList/2');
         $classSize = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[class="dataTables_info"]')->text();
         $this->assertEqual($classSize, 'Showing 1 to 10 of 17 entries');
-        
+
         $search = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[aria-controls="table_id"]');
         $search->sendKeys('New');
         $w->until(
@@ -74,7 +68,7 @@ class ImportUsersTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'td[class="  sorting_1"]')->click();
         $newStudent = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'View')->attribute('href');
         $userId = end(explode('/', $newStudent));
-        
+
         $this->updateClassList();
         $this->session->open($this->url.'users/delete/'.$userId);
         $w->until(
@@ -85,7 +79,7 @@ class ImportUsersTestCase extends SystemBaseTestCase
         $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'Record is successfully deleted!');
     }
-    
+
     public function updateClassList()
     {
         $this->session->open($this->url.'users/import/2');
@@ -99,13 +93,13 @@ class ImportUsersTestCase extends SystemBaseTestCase
         $classSize = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[class="dataTables_info"]')->text();
         $this->assertEqual($classSize, 'Showing 1 to 10 of 15 entries');
     }
-    
+
     public function checkSummary()
     {
         $h3 = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::TAG_NAME, 'h3');
         $this->assertEqual($h3[0]->text(), 'User(s) created successfully:');
         $this->assertEqual($h3[1]->text(), 'User(s) updated successfully:');
-        
+
         $user = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[1]/tbody/tr[2]/td[1]')->text();
         $this->assertEqual($user, 'username11');
         $user = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div/table[2]/tbody/tr[2]/td')->text();

@@ -5,23 +5,17 @@ class AddCourseTestCase extends SystemBaseTestCase
 {
     public function startCase()
     {
-        $this->getUrl();
         echo "Start AddCourse system test.\n";
-        $wd_host = 'http://localhost:4444/wd/hub';
-        $this->web_driver = new SystemWebDriver($wd_host);
-        $this->session = $this->web_driver->session('firefox');
-        $this->session->open($this->url);
+        $this->getSession()->open($this->url);
 
-        $w = new PHPWebDriver_WebDriverWait($this->session);
-        $this->session->deleteAllCookies();
         $login = PageFactory::initElements($this->session, 'Login');
         $home = $login->login('root', 'ipeeripeer');
     }
 
     public function endCase()
     {
-        $this->session->deleteAllCookies();
-        $this->session->close();
+        $this->getSession()->deleteAllCookies();
+        $this->getSession()->close();
     }
 
     public function testAddCourse()

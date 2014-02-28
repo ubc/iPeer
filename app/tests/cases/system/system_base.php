@@ -11,27 +11,44 @@ require_once('PageFactory.php');
 class SystemBaseTestCase extends CakeTestCase
 {
     protected $web_driver;
-    protected $session;
+    protected $session = null;
     protected $url;
-    
-    /**
-     * helper function to get the testing server url
-     **/
-    public function getURL() {
+    protected $browser;
+    protected $capabilities;
+    protected $seleniumUrl;
+
+    public function __construct()
+    {
+        // give it a default timezone
         $timezone = ini_get('date.timezone') ? ini_get('date.timezone') : 'UTC';
         date_default_timezone_set($timezone); // set the default time zone
-        if (!($server = getenv('SERVER_TEST'))) {
-            $server = 'http://localhost:2000/';
-        }
-        $this->url = $server;
+
+        // set up the test environment according to the environment values
+        $this->browser = getenv('SELENIUM_BROWSER') ? getenv('SELENIUM_BROWSER') : 'firefox';
+        $this->capabilities['platform'] = getenv('SELENIUM_PLATFORM') ? getenv('SELENIUM_PLATFORM')) : 'ANY';
+        $this->capabilities['version'] = getenv('SELENIUM_VERSION') ? getenv('SELENIUM_VERSION')) : '';
+        $this->seleniumUrl = getenv('SELENIUM_PLATFORM') ? getenv('SELENIUM_PLATFORM') : 'http://localhost:4444/wd/hub';
+        $this->url = getenv('SERVER_TEST') ? getenv('SERVER_TEST') : 'http://localhost:2000/';
+
+        $this->web_driver = new SystemWebDriver($this->seleniumUrl);
+        $this->session = $this->getSession();
+        $this->session->deleteAllCookies();
     }
-    
+
+    public function getSession($new = false) {
+        if ($this->session == null || $new == true) {
+            return $this->web_driver->session($this->browser, $this->capabilities);
+        } else {
+            return $this->session;
+        }
+    }
+
     public function waitForLogoutLogin($username)
     {
         $this->session->open($this->url);
         $this->logoutLogin($username);
     }
-    
+
     public function logoutLogin($username)
     {
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Logout')->click();
@@ -46,7 +63,7 @@ class SystemBaseTestCase extends CakeTestCase
         $login = PageFactory::initElements($this->session, 'Login');
         $home = $login->login($username, 'ipeeripeer');
     }
-    
+
     public function startTest($method) {
         echo 'Starting method ' . $method . "\n";
     }
