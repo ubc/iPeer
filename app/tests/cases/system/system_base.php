@@ -25,7 +25,7 @@ class SystemBaseTestCase extends CakeTestCase
 
         // set up the test environment according to the environment values
         $this->browser = getenv('SELENIUM_BROWSER') ? getenv('SELENIUM_BROWSER') : 'firefox';
-        $this->capabilities['name'] = get_class(this);
+        $this->capabilities['name'] = get_class($this);
         $this->capabilities['platform'] = getenv('SELENIUM_PLATFORM') ? getenv('SELENIUM_PLATFORM') : 'ANY';
         $this->capabilities['version'] = getenv('SELENIUM_VERSION') ? getenv('SELENIUM_VERSION') : '';
         $host = getenv('SELENIUM_HOST') ? getenv('SELENIUM_HOST') : 'localhost';
