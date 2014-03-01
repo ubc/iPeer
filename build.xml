@@ -214,27 +214,27 @@
     <target name="test" description="Run unit tests" depends="init-test-db">
         <exec command="sh cake/console/cake -app app testsuite app group model" passthru="true"/>
         <exec command="sh cake/console/cake -app app testsuite app group controller" passthru="true"/>
-        <!-- v1_controller test must be last one as it will change the database --> 
+        <!-- v1_controller test must be last one as it will change the database -->
         <phingcall target="post-test"/>
     </target>
 
-    <target name="test-win" description="Run unit tests" depends="init-test-db">
+    <target name="test-win" description="Run unit tests" depends="prepare,init-test-db">
         <exec command="cake\console\cake.bat -app app testsuite app group component" passthru="true"/>
         <exec command="cake\console\cake.bat -app app testsuite app group model" passthru="true"/>
         <exec command="cake\console\cake.bat -app app testsuite app group controller" passthru="true"/>
-        <!-- v1_controller test must be last one as it will change the database --> 
+        <!-- v1_controller test must be last one as it will change the database -->
         <phingcall target="post-test"/>
     </target>
-    
+
     <target name="test-ci" description="Run unit tests for continuous integration(output as xml)" depends="init-test-db">
         <exec command="cake/console/cake testreport app group model" passthru="true"/>
         <exec command="cake/console/cake testreport app group controller" passthru="true"/>
         <exec command="cake/console/cake testreport app group system" passthru="true"/>
-        <!-- v1_controller test must be last one as it will change the database --> 
+        <!-- v1_controller test must be last one as it will change the database -->
         <phingcall target="post-test"/>
     </target>
 
-    <target name="test-ci-integration" description="Run integration tests for continuous integration(output as xml)" depends="init-test-db">
+    <target name="test-ci-integration" description="Run integration tests for continuous integration(output as xml)" depends="prepare,init-test-db">
         <exec command="cake/console/cake testreport app group system" passthru="true"/>
         <phingcall target="post-test"/>
     </target>
