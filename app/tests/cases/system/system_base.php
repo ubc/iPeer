@@ -25,6 +25,7 @@ class SystemBaseTestCase extends CakeTestCase
 
         // set up the test environment according to the environment values
         $this->browser = getenv('SELENIUM_BROWSER') ? getenv('SELENIUM_BROWSER') : 'firefox';
+        $this->capabilities['name'] = get_class(this);
         $this->capabilities['platform'] = getenv('SELENIUM_PLATFORM') ? getenv('SELENIUM_PLATFORM') : 'ANY';
         $this->capabilities['version'] = getenv('SELENIUM_VERSION') ? getenv('SELENIUM_VERSION') : '';
         $host = getenv('SELENIUM_HOST') ? getenv('SELENIUM_HOST') : 'localhost';
@@ -41,16 +42,31 @@ class SystemBaseTestCase extends CakeTestCase
         echo "SERVER_TEST = ".$this->url."\n";*/
 
         $this->web_driver = new SystemWebDriver($this->seleniumUrl);
-        $this->session = $this->getSession();
-        $this->session->deleteAllCookies();
     }
 
     public function getSession($new = false) {
         if ($this->session == null || $new == true) {
-            return $this->web_driver->session($this->browser, $this->capabilities);
+            $this->session = $this->web_driver->session($this->browser, $this->capabilities);
+            $this->session->deleteAllCookies();
+            return $this->session;
         } else {
             return $this->session;
         }
+    }
+
+    public function setSessionName($name)
+    {
+        $this->capabilities['name'] = $name;
+    }
+
+    public function setBuildNumber($build)
+    {
+        $this->capabilities['build'] = $build;
+    }
+
+    public function setTags($tags)
+    {
+        $this->capabilities['tags'] = $tags;
     }
 
     public function waitForLogoutLogin($username)
