@@ -167,12 +167,8 @@ class EvaluationBase extends AppModel
         $event_due = strtotime($event['Event']['due_date']);
         // assign penalty to groupMember if they submitted late or never submitted by release_date_end
         $submissions = $this->EvaluationSubmission->find('all', array(
-            'conditions' => array('submitter_id' => $memberIds, 'EvaluationSubmission.event_id' => $eventId),
-            'contain' => array(
-                'GroupEvent' => array(
-                    'conditions' => array('GroupEvent.group_id' => $groupId, 'GroupEvent.event_id' => $eventId),
-                ),
-            )
+            'conditions' => array('submitter_id' => $memberIds, 'EvaluationSubmission.event_id' => $eventId, 
+                'GroupEvent.group_id' => $groupId),
         ));
 
         foreach ($submissions as $submission) {
