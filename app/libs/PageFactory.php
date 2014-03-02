@@ -3,7 +3,7 @@ class PageFactory
 {
     public static function initElements($session, $page)
     {
-        require_once('pages/'.$page.'Page.php');
+        require_once(TESTS.'cases/system/pages/'.$page.'Page.php');
         $className = $page.'Page';
         $pageObject = new $className($session);
 

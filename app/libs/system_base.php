@@ -12,7 +12,7 @@ require_once(VENDORS.'sausage/src/Sauce/Sausage/SauceMethods.php');
 require_once(VENDORS.'sausage/src/Sauce/Sausage/SauceTestCommon.php');
 require_once('PageFactory.php');
 
-class SystemBaseTestCase extends CakeTestCase
+abstract class SystemBaseTestCase extends CakeTestCase
 {
     protected $web_driver;
     protected $session = null;
@@ -35,10 +35,6 @@ class SystemBaseTestCase extends CakeTestCase
         $this->capabilities['version'] = getenv('SELENIUM_VERSION') ? getenv('SELENIUM_VERSION') : '';
 
         // get the repo info
-        $release = `git describe --tags`;
-        if (!$release) {
-            $release = "Unknown";
-        }
         $branch = `git rev-parse --abbrev-ref HEAD`;
         if (!$branch) {
             $branch = "Unknown";
@@ -47,7 +43,7 @@ class SystemBaseTestCase extends CakeTestCase
         if (!$commit) {
             $commit = "Unknown";
         }
-        $this->capabilities['custom-data'] = array('release' => $release, 'commit' => $commit, 'branch' => $branch);
+        $this->capabilities['custom-data'] = array('commit' => $commit, 'branch' => $branch);
 
         $host = getenv('SELENIUM_HOST') ? getenv('SELENIUM_HOST') : 'localhost';
         $port = getenv('SELENIUM_PORT') ? getenv('SELENIUM_PORT') : '4444';
@@ -121,7 +117,9 @@ class SystemBaseTestCase extends CakeTestCase
 
     public function endCase()
     {
-        SauceTestCommon::ReportStatus($this->getSession()->id, $reporter->getStatus());
+        if (isset($this->reporter)) {
+            \Sauce\Sausage\SauceTestCommon::ReportStatus($this->getSession()->getId(), $this->reporter->getStatus());
+        }
         $this->getSession()->deleteAllCookies();
         $this->getSession()->close();
     }

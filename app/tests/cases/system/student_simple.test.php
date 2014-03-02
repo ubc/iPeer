@@ -1,5 +1,5 @@
 <?php
-require_once('system_base.php');
+App::import('Lib', 'system_base');
 
 class studentSimple extends SystemBaseTestCase
 {

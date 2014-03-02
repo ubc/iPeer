@@ -1,5 +1,5 @@
 <?php
-class ControllerGroupTest extends TestSuite
+class SystemGroupTest extends TestSuite
 {
     public $label = 'System';
     function __construct()

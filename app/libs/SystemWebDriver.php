@@ -41,7 +41,7 @@ class SystemWebDriver extends PHPWebDriver_WebDriver {
                 $curl_opts);
 
         $session = new SystemWebDriverSession($results['info']['url'].$results['sessionId']);
-        $session->id = $results['sessionId'];
+        $session->setId($results['sessionId']);
 
         return $session;
     }
