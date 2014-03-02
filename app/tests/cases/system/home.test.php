@@ -12,12 +12,6 @@ class homeTestCase extends SystemBaseTestCase
         $home = $login->login('root', 'ipeeripeer');
     }
 
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
-    }
-
     public function testSuperAdmin()
     {
         $headers = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::TAG_NAME, 'h2');

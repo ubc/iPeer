@@ -15,12 +15,6 @@ class massMoveTestCase extends SystemBaseTestCase
         $home = $login->login('root', 'ipeeripeer');
     }
 
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
-    }
-
     public function testImportUsers()
     {
         $this->courseId = $this->addCourse('TEST 101 101');

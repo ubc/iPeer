@@ -12,12 +12,6 @@ class MergeUsersTestCase extends SystemBaseTestCase
         $home = $login->login('root', 'ipeeripeer');
     }
 
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
-    }
-
     public function testAddUsers()
     {
         $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();

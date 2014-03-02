@@ -12,12 +12,6 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
         $home = $login->login('root', 'ipeeripeer');
     }
 
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
-    }
-
     public function testAllowAccess()
     {
         // access permission editor

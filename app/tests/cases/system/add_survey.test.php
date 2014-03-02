@@ -11,11 +11,6 @@ class addSurveyTestCase extends SystemBaseTestCase
         $home = $login->login('root', 'ipeeripeer');
     }
 
-    public function endCase() {
-        $this->session->deleteAllCookies();
-        $this->session->close();
-    }
-
     public function testAddSurvey() {
         $this->session->open($this->url.'surveys/add');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'SurveyName')->sendKeys('grp making');

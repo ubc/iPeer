@@ -14,12 +14,6 @@ class AddGroupTestCase extends SystemBaseTestCase
         $home = $login->login('root', 'ipeeripeer');
     }
 
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
-    }
-
     public function testAddGroup()
     {
         $this->session->open($this->url.'courses/home/2');

@@ -14,12 +14,6 @@ class oauthTokenTestCase extends SystemBaseTestCase
         $home = $login->login('root', 'ipeeripeer');
     }
 
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
-    }
-
     public function testAddOauthToken()
     {
         $this->session->open($this->url.'pages/admin');

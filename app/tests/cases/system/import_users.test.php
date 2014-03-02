@@ -12,12 +12,6 @@ class ImportUsersTestCase extends SystemBaseTestCase
         $home = $login->login('root', 'ipeeripeer');
     }
 
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
-    }
-
     public function testImportUsersError()
     {
         $this->session->open($this->url.'users/import/2');

@@ -14,12 +14,6 @@ class autoCreateGroupsTestCase extends SystemBaseTestCase
         $home = $login->login('root', 'ipeeripeer');
     }
 
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
-    }
-
     public function testErrorChecking()
     {
         $this->session->open($this->url.'surveygroups/makegroups/2');

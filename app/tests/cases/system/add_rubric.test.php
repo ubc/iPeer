@@ -14,12 +14,6 @@ class addRubricTestCase extends SystemBaseTestCase
         $home = $login->login('root', 'ipeeripeer');
     }
 
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
-    }
-
     public function testAddRubricErrors()
     {
         $this->session->open($this->url.'rubrics/add');

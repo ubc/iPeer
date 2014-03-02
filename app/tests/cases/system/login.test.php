@@ -12,12 +12,6 @@ class LoginTestCase extends SystemBaseTestCase
         $this->getSession()->open($this->url);
     }
 
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
-    }
-
     public function captureScreen($screenshot)
     {
         $filename = date('ymdHisu').'.png';

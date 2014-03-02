@@ -14,12 +14,6 @@ class addSimpleTestCase extends SystemBaseTestCase
         $home = $login->login('root', 'ipeeripeer');
     }
 
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
-    }
-
     public function testAddError()
     {
         $this->session->open($this->url.'simpleevaluations/add');

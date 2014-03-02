@@ -14,12 +14,6 @@ class MoveStudentTestCase extends SystemBaseTestCase
         $home = $login->login('admin1', 'ipeeripeer');
     }
 
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
-    }
-
     public function testAddSurveyEvent()
     {
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Courses')->click();

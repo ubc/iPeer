@@ -12,12 +12,6 @@ class ImportGroupsTestCase extends SystemBaseTestCase
         $home = $login->login('instructor2', 'ipeeripeer');
     }
 
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
-    }
-
     public function testImportGroupsError()
     {
         $this->session->open($this->url.'groups/import/2');

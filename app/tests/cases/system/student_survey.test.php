@@ -14,12 +14,6 @@ class studentSurvey extends SystemBaseTestCase
         $home = $login->login('root', 'ipeeripeer');
     }
 
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
-    }
-
     public function testCreateEvent()
     {
         $this->session->open($this->url.'events/add/1');

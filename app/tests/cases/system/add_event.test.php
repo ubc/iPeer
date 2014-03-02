@@ -12,12 +12,6 @@ class addEventTestCase extends SystemBaseTestCase
         $home = $login->login('instructor1', 'ipeeripeer');
     }
 
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
-    }
-
     public function testAddEvent()
     {
         $this->session->open($this->url.'events/add/1');

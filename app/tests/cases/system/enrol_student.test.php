@@ -12,12 +12,6 @@ class EnrolStudentTestCase extends SystemBaseTestCase
         $home = $login->login('root', 'ipeeripeer');
     }
 
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
-    }
-
     public function testEnrolStudent()
     {
         $this->session->open($this->url.'users/add/2');

@@ -117,8 +117,8 @@ abstract class SystemBaseTestCase extends CakeTestCase
 
     public function endCase()
     {
-        if (isset($this->reporter)) {
-            \Sauce\Sausage\SauceTestCommon::ReportStatus($this->getSession()->getId(), $this->reporter->getStatus());
+        if (getenv('SAUCE_USERNAME')) {
+            \Sauce\Sausage\SauceTestCommon::ReportStatus($this->getSession()->getId(), $this->_reporter->getStatus());
         }
         $this->getSession()->deleteAllCookies();
         $this->getSession()->close();
