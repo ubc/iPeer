@@ -6,6 +6,10 @@ require_once(VENDORS.'webdriver/PHPWebDriver/WebDriverBy.php');
 require_once(VENDORS.'webdriver/PHPWebDriver/WebDriverWait.php');
 require_once(VENDORS.'webdriver/PHPWebDriver/WebDriverKeys.php');
 require_once(VENDORS.'webdriver/PHPWebDriver/WebDriverSession.php');
+require_once(VENDORS.'sausage/src/Sauce/Sausage/SauceConfig.php');
+require_once(VENDORS.'sausage/src/Sauce/Sausage/SauceAPI.php');
+require_once(VENDORS.'sausage/src/Sauce/Sausage/SauceMethods.php');
+require_once(VENDORS.'sausage/src/Sauce/Sausage/SauceTestCommon.php');
 require_once('PageFactory.php');
 
 class SystemBaseTestCase extends CakeTestCase
@@ -26,8 +30,25 @@ class SystemBaseTestCase extends CakeTestCase
         // set up the test environment according to the environment values
         $this->browser = getenv('SELENIUM_BROWSER') ? getenv('SELENIUM_BROWSER') : 'firefox';
         $this->capabilities['name'] = get_class($this);
+        $this->capabilities['build'] = getenv('BUILD_NUMBER');
         $this->capabilities['platform'] = getenv('SELENIUM_PLATFORM') ? getenv('SELENIUM_PLATFORM') : 'ANY';
         $this->capabilities['version'] = getenv('SELENIUM_VERSION') ? getenv('SELENIUM_VERSION') : '';
+
+        // get the repo info
+        $release = `git describe --tags`;
+        if (!$release) {
+            $release = "Unknown";
+        }
+        $branch = `git rev-parse --abbrev-ref HEAD`;
+        if (!$branch) {
+            $branch = "Unknown";
+        }
+        $commit = `git describe --tags --always`;
+        if (!$commit) {
+            $commit = "Unknown";
+        }
+        $this->capabilities['custom-data'] = array('release' => $release, 'commit' => $commit, 'branch' => $branch);
+
         $host = getenv('SELENIUM_HOST') ? getenv('SELENIUM_HOST') : 'localhost';
         $port = getenv('SELENIUM_PORT') ? getenv('SELENIUM_PORT') : '4444';
         $username = getenv('SAUCE_USER_NAME') ? getenv('SAUCE_USER_NAME') : '';
@@ -96,5 +117,12 @@ class SystemBaseTestCase extends CakeTestCase
 
     public function endTest($method) {
         echo 'Ending method ' . $method . "\n";
+    }
+
+    public function endCase()
+    {
+        SauceTestCommon::ReportStatus($this->getSession()->id, $reporter->getStatus());
+        $this->getSession()->deleteAllCookies();
+        $this->getSession()->close();
     }
 }

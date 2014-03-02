@@ -4,6 +4,7 @@ require_once('SystemWebDriverSession.php');
 
 /**
  * SystemWebDriver This class is a duplication of WebDriver class in order to return a custom session object, which extends a few methods based on WebDriverSession class
+ * This class also stores session id in SystemWebDriverSession
  *
  * @uses PHPWebDriver_WebDriver
  * @package tests
@@ -39,6 +40,9 @@ class SystemWebDriver extends PHPWebDriver_WebDriver {
             array('desiredCapabilities' => $desired_capabilities),
                 $curl_opts);
 
-        return new SystemWebDriverSession($results['info']['url'].$results['sessionId']);
+        $session = new SystemWebDriverSession($results['info']['url'].$results['sessionId']);
+        $session->id = $results['sessionId'];
+
+        return $session;
     }
 }

@@ -12,12 +12,6 @@ class AddCourseTestCase extends SystemBaseTestCase
         $home = $login->login('root', 'ipeeripeer');
     }
 
-    public function endCase()
-    {
-        $this->getSession()->deleteAllCookies();
-        $this->getSession()->close();
-    }
-
     public function testAddCourse()
     {
         $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();

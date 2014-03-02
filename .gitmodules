@@ -40,3 +40,6 @@
 [submodule "vendors/webdriver"]
 	path = vendors/webdriver
 	url = https://github.com/Element-34/php-webdriver.git
+[submodule "vendors/sausage"]
+	path = vendors/sausage
+	url = https://github.com/jlipps/sausage.git

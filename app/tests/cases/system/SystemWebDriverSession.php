@@ -4,6 +4,8 @@ require_once(VENDORS.'webdriver/PHPWebDriver/WebDriverWait.php');
 require_once(VENDORS.'webdriver/PHPWebDriver/WebDriverContainer.php');
 
 class SystemWebDriverSession extends PHPWebDriver_WebDriverSession {
+    protected $id;
+
     public function elementWithWait($using, $value) {
         $selector = array('selector' => $using, 'value' => $value);
         $w = new PHPWebDriver_WebDriverWait($this, 30, 0.5, $selector);
