@@ -5,6 +5,7 @@ class ImportGroupsTestCase extends SystemBaseTestCase
 {
     public function startCase()
     {
+        parent::startCase();
         echo "Start ImportGroups system test.\n";
         $this->getSession()->open($this->url);
 

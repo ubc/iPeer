@@ -3,7 +3,9 @@ App::import('Lib', 'system_base');
 
 class addSurveyTestCase extends SystemBaseTestCase
 {
-    public function startCase() {
+    public function startCase()
+    {
+        parent::startCase();
         echo "Start AddSurvey system test.\n";
         $this->getSession()->open($this->url);
 

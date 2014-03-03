@@ -7,6 +7,7 @@ class studentRubric extends SystemBaseTestCase
 
     public function startCase()
     {
+        parent::startCase();
         echo "Start StudentRubric system test.\n";
         $this->getSession()->open($this->url);
 

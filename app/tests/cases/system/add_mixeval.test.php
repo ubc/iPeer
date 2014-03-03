@@ -8,6 +8,7 @@ class AddMixEvalTestCase extends SystemBaseTestCase
 
     public function startCase()
     {
+        parent::startCase();
         echo "Start AddMixeval system test.\n";
         $this->getSession()->open($this->url);
 

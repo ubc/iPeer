@@ -5,6 +5,7 @@ class homeTestCase extends SystemBaseTestCase
 {
     public function startCase()
     {
+        parent::startCase();
         echo "Start HomeTest system test.\n";
         $this->getSession()->open($this->url);
 

@@ -7,6 +7,7 @@ class addSimpleTestCase extends SystemBaseTestCase
 
     public function startCase()
     {
+        parent::startCase();
         echo "Start AddSimple system test.\n";
         $this->getSession()->open($this->url);
 

@@ -5,6 +5,7 @@ class ImportUsersTestCase extends SystemBaseTestCase
 {
     public function startCase()
     {
+        parent::startCase();
         echo "Start ImportUsers system test.\n";
         $this->getSession()->open($this->url);
 

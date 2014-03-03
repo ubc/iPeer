@@ -7,6 +7,7 @@ class autoCreateGroupsTestCase extends SystemBaseTestCase
 
     public function startCase()
     {
+        parent::startCase();
         echo "Start AutoCreateGroups system test.\n";
         $this->getSession()->open($this->url);
 

@@ -5,6 +5,7 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
 {
     public function startCase()
     {
+        parent::startCase();
         echo "Start PermissionsEditor system test.\n";
         $this->getSession()->open($this->url);
 

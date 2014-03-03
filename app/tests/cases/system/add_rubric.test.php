@@ -7,6 +7,7 @@ class addRubricTestCase extends SystemBaseTestCase
 
     public function startCase()
     {
+        parent::startCase();
         echo "Start AddRubric system test.\n";
         $this->getSession()->open($this->url);
 

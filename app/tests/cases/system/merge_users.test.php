@@ -5,6 +5,7 @@ class MergeUsersTestCase extends SystemBaseTestCase
 {
     public function startCase()
     {
+        parent::startCase();
         echo "Start MergeUsers system test.\n";
         $this->getSession()->open($this->url);
 

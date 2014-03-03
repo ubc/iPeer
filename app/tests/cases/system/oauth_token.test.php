@@ -7,6 +7,7 @@ class oauthTokenTestCase extends SystemBaseTestCase
 
     public function startCase()
     {
+        parent::startCase();
         echo "Start OauthToken system test.\n";
         $this->getSession()->open($this->url);
 

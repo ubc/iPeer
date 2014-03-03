@@ -5,6 +5,7 @@ class EnrolStudentTestCase extends SystemBaseTestCase
 {
     public function startCase()
     {
+        parent::startCase();
         echo "Start EnrolStudent system test.\n";
         $this->getSession()->open($this->url);
 

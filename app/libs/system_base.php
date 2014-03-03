@@ -20,6 +20,17 @@ abstract class SystemBaseTestCase extends CakeTestCase
     protected $browser;
     protected $capabilities;
     protected $seleniumUrl;
+    /**
+     * startFailCount record the failed test count before this test case start.
+     * Since SimpleTest and CakeTestCase doesn't provide any ability to tell if
+     * the current test case has failed tests, we have to compare the failed
+     * tests count at the before and after the test case run.
+     *
+     * @var int
+     * @access protected
+     */
+    protected $startFailCount = 0;
+    protected $startExceptionCount = 0;
 
     public function __construct()
     {
@@ -115,12 +126,30 @@ abstract class SystemBaseTestCase extends CakeTestCase
         echo 'Ending method ' . $method . "\n";
     }
 
+    public function startCase()
+    {
+        $this->startFailCount = $this->_reporter->getFailCount();
+        $this->startExceptionCount = $this->_reporter->getExceptionCount();
+    }
+
     public function endCase()
     {
         if (getenv('SAUCE_USER_NAME')) {
-            \Sauce\Sausage\SauceTestCommon::ReportStatus($this->getSession()->getId(), $this->_reporter->getStatus());
+            \Sauce\Sausage\SauceTestCommon::ReportStatus($this->getSession()->getId(), !$this->isFailed());
         }
         $this->getSession()->deleteAllCookies();
         $this->getSession()->close();
+    }
+
+    /**
+     * isFailed tell if the current case has failed tests
+     *
+     * @access public
+     * @return boolean if the case has failed tests
+     */
+    public function isFailed()
+    {
+        return ($this->startFailCount != $this->_reporter->getFailCount())
+            || ($this->startExceptionCount != $this->_reporter->getExceptionCount());
     }
 }

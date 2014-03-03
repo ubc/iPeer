@@ -5,6 +5,7 @@ class addEventTestCase extends SystemBaseTestCase
 {
     public function startCase()
     {
+        parent::startCase();
         echo "Start AddEvent system test.\n";
         $this->getSession()->open($this->url);
 

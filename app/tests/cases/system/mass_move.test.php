@@ -8,6 +8,7 @@ class massMoveTestCase extends SystemBaseTestCase
 
     public function startCase()
     {
+        parent::startCase();
         echo "Start MassMove system test.\n";
         $this->getSession()->open($this->url);
 

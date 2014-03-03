@@ -5,6 +5,7 @@ class AddCourseTestCase extends SystemBaseTestCase
 {
     public function startCase()
     {
+        parent::startCase();
         echo "Start AddCourse system test.\n";
         $this->getSession()->open($this->url);
 

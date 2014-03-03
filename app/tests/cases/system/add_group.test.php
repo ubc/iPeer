@@ -7,6 +7,7 @@ class AddGroupTestCase extends SystemBaseTestCase
 
     public function startCase()
     {
+        parent::startCase();
         echo "Start AddGroup system test.\n";
         $this->getSession()->open($this->url);
 

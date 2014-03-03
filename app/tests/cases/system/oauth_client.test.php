@@ -7,6 +7,7 @@ class oauthClientTestCase extends SystemBaseTestCase
 
     public function startCase()
     {
+        parent::startCase();
         echo "Start OauthClient system test.\n";
         $this->getSession()->open($this->url);
 

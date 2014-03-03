@@ -7,6 +7,7 @@ class studentSurvey extends SystemBaseTestCase
 
     public function startCase()
     {
+        parent::startCase();
         echo "Start StudentSurvey system test.\n";
         $this->getSession()->open($this->url);
 
