@@ -48,15 +48,20 @@ foreach ($questions as $ques) {
         $options = array();
         $descs = array();
         $marks = array();
-        $markLabel = "Mark: ";
+        $markLabel = __("Mark", true).": ";
         $subIf0 = 0;
         if ($zero_mark) {
             $subIf0 = 1;
             $scale -= $subIf0;
         }
-        foreach ($ques['MixevalQuestionDesc'] as $desc) {
+        foreach ($ques['MixevalQuestionDesc'] as $key => $desc) {
             $descs[] = $desc['descriptor'];
-            $desc['scale_level'] -= $subIf0;
+            if ($desc['scale_level'] == 0) {
+                // upgraded from pre 3.1, scale_levels are set to 0. So use $key as level
+                $desc['scale_level'] = $subIf0 ? $key : $key + 1;
+            } else {
+                $desc['scale_level'] -= $subIf0;
+            }
             $mark = $highestMark * ($desc['scale_level'] / $scale);
             $checked = '';
             if (isset($details[$num])) {
