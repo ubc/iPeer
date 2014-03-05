@@ -22,6 +22,10 @@ $evaluations = ($fromEvent) ? array($selectedEvent['Event']['id'] => $selectedEv
 echo $this->Form->input('event_id', array(
     'name' => 'event_id', 'options' => $evaluations, 'label' => 'Event Name'
 ));
+echo $this->Form->input('export_all', array(
+    'type' => 'checkbox', 'name' => 'include[export_all]', 'checked' => true,
+    'label' => __('Include All Evaluations', true)
+));
 ?>
 <h3><?php echo __('Evaluation Information', true) ?></h3>
 <?php

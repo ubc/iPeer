@@ -142,7 +142,7 @@
         <td><?php echo Toolkit::formatDate($event['Event']['due_date']) ?></td>
     </tr>
     <tr>
-        <td><?php __('Description')?>:&nbsp;</td>
+        <td><?php __('Description')?>:</td>
         <td colspan="3"><?php echo $event['Event']['description'] ?></td>
     </tr>
     <tr>
@@ -152,35 +152,31 @@
             <li><?php __("Rate your peer's relative performance by using the slider. [Weight 1-10]")?></li>
             <li><?php __('Click "Distribute" button to distribute points.')?></li>
             <li><?php __('Allocate any remaining point.')?></li>
-            <li><?php __('Enter Comments')?> <?php echo  $event['Event']['com_req']? '<font color="red"> (Must) </font>' : '(Optional)' ;?> .</li>
+            <li><?php __('Enter Comments')?> <?php echo  $event['Event']['com_req']? '<font color="red"> (Required) </font>' : '(Optional)' ;?> .</li>
             <li><font color="red"><?php __('NOTE:')?></font> <?php __('"Submit Evaluation" button will only be enabled when all points, and comments (if required), are filled!')?></li>
-            <?php $releaseEnd = !isset($event['Event']['release_date_end']) ? '<i>'._t("Evaluation's release end date").'</i>' :
-                date('l, F j, Y g:i a', strtotime($event['Event']['release_date_end'])); ?>
+            <?php $releaseEnd = !isset($event['Event']['release_date_end']) ? '<i>'._t("Evaluation's release end date").'</i>' : Toolkit::formatDate($event['Event']['release_date_end']); ?>
             <li><?php echo _t('The evaluation can be repeatedly submitted until ').$releaseEnd.'.'?></li>
             </ul>
 
             <div style="text-align:left; margin-left:3em;"><a href="#" onClick="javascript:$('penalty').toggle();return false;">( <?php __('Show/Hide late penalty policy')?> )</a></div>
             <div id ="penalty" style ="border:1px solid red; margin: 0.5em 0 0 3em; width: 450px; padding:0.5em; color:darkred; display:none">
-
-<?php if(!empty($penalty)){
-    foreach($penalty as $day){
-        $mult = ($day['Penalty']['days_late']>1)?'s':'';
-        echo $day['Penalty']['days_late'].' day'.$mult.' late: '.$day['Penalty']['percent_penalty'].'% deduction. </br>';
-    }
-    echo $penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';
-} else {
-    echo 'No penalty is specified for this evaluation.';
-}
-
-?>
-
-  </div>
+                <?php if (!empty($penalty)) {
+                    foreach ($penalty as $day) {
+                        $mult = ($day['Penalty']['days_late']>1)?'s':'';
+                        echo $day['Penalty']['days_late'].' day'.$mult.' late: '.$day['Penalty']['percent_penalty'].'% deduction. </br>';
+                    }
+                    echo $penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';
+                } else {
+                    echo 'No penalty is specified for this evaluation.';
+                }
+                ?>
+            </div>
         </td>
     </tr>
 </table>
 
+</br>
 
-    </br>
 <table class="standardtable">
     <tr>
         <th width="20%"><?php __('Member(s)')?></th>

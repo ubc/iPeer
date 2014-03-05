@@ -94,7 +94,7 @@ class ExportBaseNewComponent extends Object
 
         $group = $this->Group->getGroupWithMemberRoleByGroupIdEventId($groupEvent['group_id'], $event['Event']['id']);
         $dropped = $this->User->getDroppedStudentsWithRole($this->responseModelName, $results, $group);
-        
+
         $grid = array();
         $subDate = Set::combine($results, '{n}.EvaluationSubmission.submitter_id', '{n}.EvaluationSubmission.date_submitted');
         $responsesByEvaluatee = Set::combine($results, '{n}.'.$this->responseModelName.'.evaluator', '{n}', '{n}.'.$this->responseModelName.'.evaluatee');
@@ -161,8 +161,18 @@ class ExportBaseNewComponent extends Object
 
         foreach ($group['Member'] as $evaluator) {
             if (!$peerEval && $evaluator['id'] != $evaluatee['id']) {
-                continue; // skip peer evaluations for self-evaluation
+                continue; // skip peer evaluations for self-evaluation section
             }
+
+            if (!$event['Event']['self_eval'] && $evaluator['id'] == $evaluatee['id']) {
+                continue; // skip self-eval when self-evaluation is not set in event
+            }
+
+            //TODO: change the condition to not depend on Role's name, which can change
+            if ($evaluatee['Role']['name'] == 'tutor') {
+                continue; // skip evaluations where the tutor is the evaluatee
+            }
+
             $row = array();
             if ($params['include']['course']) {
                 array_push($row, $event['Course']['course']);
@@ -194,9 +204,14 @@ class ExportBaseNewComponent extends Object
                 array_push($row, $evaluator['student_no']);
             }
 
-            // check if we have a reponse for this evaluator
+            /* Export all determines whether or not to export all results
+            including those that don't have values. */
             if (!isset($responses[$evaluatee['id']]) || !array_key_exists($evaluator['id'], $responses[$evaluatee['id']])) {
-                array_push($row, array_fill(0, $xDimension - count($row), ''));
+                if ($params['include']['export_all']) {
+                    $row += array_fill(count($row), $xDimension - count($row), '');
+                    $grid[] = $row;
+                    $yInc++;
+                }
                 continue;
             }
 
@@ -234,13 +249,13 @@ class ExportBaseNewComponent extends Object
                     }
                 }
             }
-            
+
             if (!$peerEval) {
                 $grid[] = $row;
                 $yInc++;
                 continue; // skip final marks/penalty for self-evaluation
             }
-            
+
             array_push($row, $response[$this->responseModelName]['score']);
             $date = isset($subDate[$evaluatee['id']]) ? $subDate[$evaluatee['id']] : false;
 

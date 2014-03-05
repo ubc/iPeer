@@ -533,9 +533,15 @@ class EvaluationsController extends AppController
         $eventId = $event['Event']['id'];
         $userId = $this->Auth->user('id');
         $courseId = $event['Event']['course_id'];
-        // Make sure user is a student in this course
-        $ret = $this->UserEnrol->field('id',
-            array('course_id' => $courseId, 'user_id' => $userId ));
+        if (empty($studentId)) {
+            // Make sure user is a student in this course
+            $ret = $this->UserEnrol->field('id',
+                array('course_id' => $courseId, 'user_id' => $userId ));
+        } else {
+            // Make sure user has access to the course (eg. instructor, admin)
+            $ret = $this->Course->getAccessibleCourseById($courseId, $userId,
+                User::getCourseFilterPermission(), array('Instructor', 'Department'));
+        }
         if (!$ret) {
                 $this->Session->setFlash(_t('Error: Invalid Id'));
                 $this->redirect('/home/index');
@@ -716,7 +722,8 @@ class EvaluationsController extends AppController
             $comReq = ($commentsNeeded && $event['Event']['com_req']);
             $this->set('allDone', $allDone);
             $this->set('comReq', $comReq);
-
+            $this->set('fullName', User::get('full_name'));
+            $this->set('userId', User::get('id'));
 
             $this->render('rubric_eval_form');
         } else {
@@ -929,6 +936,7 @@ class EvaluationsController extends AppController
             $this->set('questions', $questions);
             $this->set('mixeval', $mixeval);
             $this->set('enrol', $enrol);
+            $this->set('userId', $userId);
 
             $this->render('mixeval_eval_form');
         } else {
@@ -999,7 +1007,7 @@ class EvaluationsController extends AppController
                         $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
                         $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
                         if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
-                            $this->Session->setFlash(__('Error: Unable to submit the evaluation. Please try again.', truej));
+                            $this->Session->setFlash(__('Error: Unable to submit the evaluation. Please try again.', true));
                         }
                     }
 

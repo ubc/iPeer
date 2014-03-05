@@ -41,8 +41,9 @@ if ($details) {
                 if ($type == '1') {
                     $step = $multiplier / ($scale - $zero_mark);
                     $start = $zero_mark ? 0 : $step;
-                    $options = array_map('number_format',range($start, $multiplier, $step),
+                    $marks = array_map('number_format', range($start, $multiplier, $step),
                         array_fill(0, $scale, 2));
+                    $options = array_combine($marks, $marks);
                     $grade = '<label class="grade">'._t('Grade: ');
                     $grade .= $sub['grade'].' / '.$multiplier.'</label>';
                     $grade .= (empty($descriptors[$sub['selected_lom']])) ? '' :
@@ -51,7 +52,7 @@ if ($details) {
                         'type' => 'radio',
                         'options' => $options,
                         'disabled' => true,
-                        'default' => $sub['selected_lom'] - 1,
+                        'default' => $sub['grade'],
                         'before' => '<li>'.$name,
                         'after' => $grade.'</li>'
                     ));

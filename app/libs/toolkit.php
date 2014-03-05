@@ -148,5 +148,184 @@ class Toolkit
         return (substr($haystack, 0, strlen($needle)) == $needle);
     }
 
+    /**
+     * getSimpleEvalDemoData return demo data for simple evaluation preview
+     *
+     * @param mixed $points the points assign to the students
+     *
+     * @static
+     * @access public
+     * @return array demo data
+     */
+    static function getSimpleEvalDemoData($points)
+    {
+        return array(
+            'event' => array(
+                'Event' => array(
+                    'id' => 0,
+                    'title' => 'Preview Event',
+                    'due_date' => Toolkit::formatDate(time()+(5*24*60*60)),
+                    'description' => 'Preview for simple evaluation event.',
+                    'com_req' => true,
+                ),
+                'Group' => array(
+                    'id' => 0,
+                    'group_name' => 'Demo Group',
+                ),
+            ),
+            'groupMembers' => array(
+                array(
+                    'User' => array(
+                        'id' => 1,
+                        'first_name' => 'Demo',
+                        'last_name'  => 'Student1',
+                    ),
+                ),
+                array(
+                    'User' => array(
+                        'id' => 2,
+                        'first_name' => 'Demo',
+                        'last_name'  => 'Student2',
+                    ),
+                ),
+                array(
+                    'User' => array(
+                        'id' => 3,
+                        'first_name' => 'Demo',
+                        'last_name'  => 'Student3',
+                    ),
+                ),
+            ),
+            'courseId' => 0,
+            'userId' => 1,
+            'evaluateeCount' => 2,
+            'fullName' => User::get('full_name'),
+            'remaining' => $points,
+            'preview' => true,
+        );
+    }
 
+    /**
+     * getRubricEvalDemoData get demo data for rubric evaluation preview
+     *
+     * @param mixed $data rubric data
+     *
+     * @static
+     * @access public
+     * @return array demo data
+     */
+    static function getRubricEvalDemoData()
+    {
+        return array(
+            'event' => array(
+                'Event' => array(
+                    'id' => 0,
+                    'title' => 'Preview Event',
+                    'due_date' => Toolkit::formatDate(time()+(5*24*60*60)),
+                    'description' => 'Preview for rubric evaluation event.',
+                    'com_req' => true,
+                ),
+                'Group' => array(
+                    'id' => 0,
+                    'group_name' => 'Demo Group',
+                ),
+            ),
+            'groupMembers' => array(
+                array(
+                    'User' => array(
+                        'id' => 1,
+                        'first_name' => 'Demo',
+                        'last_name'  => 'Student1',
+                    ),
+                ),
+                array(
+                    'User' => array(
+                        'id' => 2,
+                        'first_name' => 'Demo',
+                        'last_name'  => 'Student2',
+                    ),
+                ),
+                array(
+                    'User' => array(
+                        'id' => 3,
+                        'first_name' => 'Demo',
+                        'last_name'  => 'Student3',
+                    ),
+                ),
+            ),
+            'courseId' => 0,
+            'userId' => 1,
+            'evaluateeCount' => 2,
+            'fullName' => User::get('full_name'),
+            'preview' => true,
+        );
+    }
+
+    /**
+     * getMixEvalDemoData get demo data for mix evaluation preview
+     *
+     * @param mixed $data mix data
+     *
+     * @static
+     * @access public
+     * @return array demo data
+     */
+    static function getMixEvalDemoData($mixeval)
+    {
+        return array(
+            'event' => array(
+                'Event' => array(
+                    'id' => 0,
+                    'title' => 'Preview Event',
+                    'due_date' => Toolkit::formatDate(time()+(5*24*60*60)),
+                    'release_date_end' => Toolkit::formatDate(time()+(6*24*60*60)),
+                    'description' => 'Preview for mix evaluation event.',
+                    'com_req' => true,
+                    'template_id' => 0,
+                ),
+                'Group' => array(
+                    'id' => 0,
+                    'group_name' => 'Demo Group',
+                ),
+                'GroupEvent' => array(
+                    'id' => 0,
+                ),
+            ),
+            'groupMembers' => array(
+                array(
+                    'User' => array(
+                        'id' => 1,
+                        'first_name' => 'Demo',
+                        'last_name'  => 'Student1',
+                        'full_name' => 'Demo Student1',
+                    ),
+                ),
+                array(
+                    'User' => array(
+                        'id' => 2,
+                        'first_name' => 'Demo',
+                        'last_name'  => 'Student2',
+                        'full_name' => 'Demo Student2',
+                    ),
+                ),
+                array(
+                    'User' => array(
+                        'id' => 3,
+                        'first_name' => 'Demo',
+                        'last_name'  => 'Student3',
+                        'full_name' => 'Demo Student3',
+                    ),
+                ),
+            ),
+            'mixeval' => array('Mixeval' => $mixeval),
+            'courseId' => 0,
+            'userId' => 1,
+            'evaluateeCount' => 2,
+            'fullName' => User::get('full_name'),
+            'members' => 0,
+            'enrol' => 1,
+            'self' => null,
+            'preview' => true,
+        );
+    }
 }

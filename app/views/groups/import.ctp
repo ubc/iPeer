@@ -20,7 +20,7 @@
         29978043, <?php __('Team B')?><br>
         29978051, <?php __('Team B')?>
     </pre>
-    
+
 <h2><?php __('Import')?></h2>
 
 <?php

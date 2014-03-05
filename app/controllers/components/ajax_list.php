@@ -240,7 +240,7 @@ class AjaxListComponent extends Object
         if (!empty($state->mapFilterSelections)) {
             foreach ($state->mapFilterSelections as $column => $value) {
                 if (!empty($column) && null !== $value && "" != $value) {
-                    $conditions[mysql_real_escape_string($column)] =  mysql_real_escape_string($value);
+                    $conditions[$column] = $value;
                 }
             }
         }
@@ -278,10 +278,10 @@ class AjaxListComponent extends Object
                 if (!empty($filter) && !empty($value)) {
                     // Keywords starting with !!! are a special case
                     if (!$this->isSpecialValue($value)) {
-                        $conditions[mysql_real_escape_string($filter)] = mysql_real_escape_string($value);
+                        $conditions[$filter] = $value;
                     } else {
                         // note: no quotes around special value
-                        $conditions[mysql_real_escape_string($filter)] = mysql_real_escape_string(substr($value, 3));
+                        $conditions[$filter] = substr($value, 3);
                     }
                 }
             }
@@ -301,7 +301,7 @@ class AjaxListComponent extends Object
 
         // Add in the search conditions
         if (!empty($state->searchBy) && !empty($state->searchValue)) {
-            $conditions[mysql_real_escape_string($state->searchBy) . " LIKE"] = '%' .  mysql_real_escape_string($state->searchValue) . '%';
+            $conditions[$state->searchBy . " LIKE"] = '%' .  $state->searchValue . '%';
         }
 
         // The default functions for searhing

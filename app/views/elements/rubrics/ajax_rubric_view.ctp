@@ -14,7 +14,7 @@ $reqCom = isset($event) && $event['Event']['com_req'] ? '<br><font color="red">(
         <!-- // horizontal template type -->
         <?php if ( $rubric_type == "horizontal" ):?>
             <?php foreach($data['RubricsLom'] as $lom): ?>
-                <th><?php __('Level of Mastery')?> <?php echo $lom['lom_num']?>:<br><?php echo $lom['lom_comment']?></th>
+                <th><?php echo $lom['lom_comment']?></th>
             <?php endforeach ?>
             <!-- //Comment for Evaluation Form -->
             <?php if ($evaluate):?>
