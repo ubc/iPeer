@@ -93,7 +93,7 @@ class addEventTestCase extends SystemBaseTestCase
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEventTemplateTypeId"] option[value="3"]')->click();
         $preview = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'prevV')->attribute('href');;
-        $this->assertTrue(strpos($preview, 'surveys/view/1'));
+        $this->assertTrue(strpos($preview, 'surveys/view'));
 
         // check dates toggle
         $date = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDueDate');
@@ -363,6 +363,7 @@ class addEventTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventTitle')->sendKeys('Survey with Email Reminders');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDescription')->sendKeys('Email Reminders are included');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEventTemplateTypeId"] option[value="3"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventSurvey"] option[value="1"]')->click();
 
         // fill in the dates
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->click();

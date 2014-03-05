@@ -230,9 +230,9 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         $zero = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, "html/body/div[1]/div[3]/dl/dd[4]")->text();
         $this->assertEqual($zero, 'On');
         $req = count($this->session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'span[class="required orangered floatright"]'));
-        $this->assertEqual($req, 3);
-        $total = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CLASS_NAME, 'marks')->text();
-        $this->assertEqual($total, 'Total Marks: 18');
+        $this->assertEqual($req, 9);
+        //$total = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CLASS_NAME, 'marks')->text();
+        //$this->assertEqual($total, 'Total Marks: 18');
     }
 
     public function testEditTemplate()
@@ -429,24 +429,24 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         $self = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/dl/dd[6]');
         $this->assertEqual($self->text(), 'On');
         // check section headings
-        $peer = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/h2[2]');
+        $peer = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'peer-title');
         $this->assertEqual($peer->text(), 'Peer Evaluation Questions');
-        $self = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/h2[3]');
+        $self = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'self-title');
         $this->assertEqual($self->text(), 'Self-Evaluation Questions');
-        // check questions' order & numbering
-        $peer1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/div[1]/h3');
+        // check questions' order & numbering, question id = q_USERID_QUESTION#
+        $peer1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'q_1_1');
         $this->assertEqual($peer1->text(), '1. Peer optional');
-        $peer2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/div[2]/h3');
+        $peer2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'q_1_2');
         $this->assertEqual($peer2->text(), "2. Peer required\n*");
-        $self1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/div[3]/h3');
+        $self1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'q_1_3');
         $this->assertEqual($self1->text(), "1. Self 1\n*");
-        $self2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/div[4]/h3');
+        $self2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'q_1_4');
         $this->assertEqual($self2->text(), "2. Self 2\n*");
-        $self3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/div[5]/h3');
+        $self3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'q_1_5');
         $this->assertEqual($self3->text(), "3. Self 3\n*");
         // check total marks - should only include required peer evaluation questions
-        $mark = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CLASS_NAME, 'marks');
-        $this->assertEqual($mark->text(), 'Total Marks: 4');
+        //$mark = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CLASS_NAME, 'marks');
+        //$this->assertEqual($mark->text(), 'Total Marks: 4');
     }
 
     public function testEditSelfEvaluation()
@@ -518,15 +518,15 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         );
 
         $this->session->open($this->mixeval);
-        $peer1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/div[1]/h3');
+        $peer1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'q_1_1');
         $this->assertEqual($peer1->text(), "1. Peer required\n*");
-        $peer2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/div[2]/h3');
+        $peer2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'q_1_2');
         $this->assertEqual($peer2->text(), "2. Peer optional");
-        $self1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/div[3]/h3');
+        $self1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'q_1_3');
         $this->assertEqual($self1->text(), "1. Self 2\n*");
-        $self2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/div[4]/h3');
+        $self2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'q_1_4');
         $this->assertEqual($self2->text(), "2. Self 3\n*");
-        $self3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/div[5]/h3');
+        $self3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'q_1_5');
         $this->assertEqual($self3->text(), "3. Self 1\n*");
 
         // delete mixeval

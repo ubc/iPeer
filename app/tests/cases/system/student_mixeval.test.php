@@ -297,7 +297,7 @@ class studentMixeval extends SystemBaseTestCase
         $likerts = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[checked="checked"]');
 
         $this->assertTrue($likerts[0]->attribute('disabled'));
-        $this->assertEqual($likerts[0]->attribute('value'), 3);
+        $this->assertEqual($likerts[0]->attribute('value'), 0.8);
         $ques1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[1]/div[1]/li/label[7]');
         $this->assertEqual($ques1->text(), 'Grade: 0.80 / 1');
 
@@ -323,7 +323,7 @@ class studentMixeval extends SystemBaseTestCase
         $this->assertEqual($ques4->text(), '(Highest)');
 
         $this->assertTrue($likerts[4]->attribute('disabled'));
-        $this->assertEqual($likerts[4]->attribute('value'), 3);
+        $this->assertEqual($likerts[4]->attribute('value'), 0.8);
         $ques5 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[3]/div[1]/li/label[7]');
         $this->assertEqual($ques5->text(), 'Grade: 0.80 / 1');
 
@@ -373,34 +373,34 @@ class studentMixeval extends SystemBaseTestCase
         $this->assertTrue($likerts[4]->attribute('disabled'));
         $this->assertTrue($likerts[5]->attribute('disabled'));
 
-        if ($mark == '3') {
-            $this->assertEqual($likerts[0]->attribute('value'), 3);
+        if ($mark == '0.8') {
+            $this->assertEqual($likerts[0]->attribute('value'), 0.8);
             $ques1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[1]/div[1]/li/label[6]');
             $this->assertEqual($ques1->text(), 'Grade: 0.80 / 1');
 
-            $this->assertTrue($likerts[1]->attribute('value'), 4);
+            $this->assertTrue($likerts[1]->attribute('value'), 1);
             $ques2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[1]/div[2]/li/label[6]');
             $this->assertEqual($ques2->text(), 'Grade: 1.00 / 1');
             $ques2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[1]/div[2]/li/label[7]');
             $this->assertEqual($ques2->text(), '(Highest)');
 
-            $this->assertTrue($likerts[2]->attribute('value'), 4);
+            $this->assertTrue($likerts[2]->attribute('value'), 1);
             $ques3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[2]/div[1]/li/label[6]');
             $this->assertEqual($ques3->text(), 'Grade: 1.00 / 1');
             $ques3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[2]/div[1]/li/label[7]');
             $this->assertEqual($ques3->text(), '(Highest)');
 
-            $this->assertTrue($likerts[3]->attribute('value'), 4);
+            $this->assertTrue($likerts[3]->attribute('value'), 1);
             $ques4 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[2]/div[2]/li/label[6]');
             $this->assertEqual($ques4->text(), 'Grade: 1.00 / 1');
             $ques4 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[2]/div[2]/li/label[7]');
             $this->assertEqual($ques4->text(), '(Highest)');
 
-            $this->assertEqual($likerts[4]->attribute('value'), 3);
+            $this->assertEqual($likerts[4]->attribute('value'), 0.8);
             $ques5 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[3]/div[1]/li/label[6]');
             $this->assertEqual($ques5->text(), 'Grade: 0.80 / 1');
 
-            $this->assertTrue($likerts[5]->attribute('value'), 4);
+            $this->assertTrue($likerts[5]->attribute('value'), 1);
             $ques6 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[3]/div[2]/li/label[6]');
             $this->assertEqual($ques6->text(), 'Grade: 1.00 / 1');
             $ques6 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[3]/div[2]/li/label[7]');
@@ -419,36 +419,36 @@ class studentMixeval extends SystemBaseTestCase
             $comm6 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[6]/li[2]')->text();
             $this->assertEqual($comm6, 'green');
             return true;
-        } else if ($mark == '4') {
-            $this->assertTrue($likerts[0]->attribute('value'), 4);
+        } else if ($mark == '1') {
+            $this->assertTrue($likerts[0]->attribute('value'), 1);
             $ques1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[1]/div[1]/li/label[6]');
             $this->assertEqual($ques1->text(), 'Grade: 1.00 / 1');
             $ques1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[1]/div[1]/li/label[7]');
             $this->assertEqual($ques1->text(), '(Highest)');
 
-            $this->assertEqual($likerts[1]->attribute('value'), 3);
+            $this->assertEqual($likerts[1]->attribute('value'), 0.8);
             $ques2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[1]/div[2]/li/label[6]');
             $this->assertEqual($ques2->text(), 'Grade: 0.80 / 1');
 
-            $this->assertTrue($likerts[2]->attribute('value'), 4);
+            $this->assertTrue($likerts[2]->attribute('value'), 1);
             $ques3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[2]/div[1]/li/label[6]');
             $this->assertEqual($ques3->text(), 'Grade: 1.00 / 1');
             $ques3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[2]/div[1]/li/label[7]');
             $this->assertEqual($ques3->text(), '(Highest)');
 
-            $this->assertTrue($likerts[3]->attribute('value'), 4);
+            $this->assertTrue($likerts[3]->attribute('value'), 1);
             $ques4 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[2]/div[2]/li/label[6]');
             $this->assertEqual($ques4->text(), 'Grade: 1.00 / 1');
             $ques4 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[2]/div[2]/li/label[7]');
             $this->assertEqual($ques4->text(), '(Highest)');
 
-            $this->assertTrue($likerts[4]->attribute('value'), 4);
+            $this->assertTrue($likerts[4]->attribute('value'), 1);
             $ques5 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[3]/div[1]/li/label[6]');
             $this->assertEqual($ques5->text(), 'Grade: 1.00 / 1');
             $ques5 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[3]/div[1]/li/label[7]');
             $this->assertEqual($ques5->text(), '(Highest)');
 
-            $this->assertEqual($likerts[5]->attribute('value'), 3);
+            $this->assertEqual($likerts[5]->attribute('value'), 0.8);
             $ques6 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/ul[3]/div[2]/li/label[6]');
             $this->assertEqual($ques6->text(), 'Grade: 0.80 / 1');
 
@@ -1078,9 +1078,9 @@ class studentMixeval extends SystemBaseTestCase
         $this->assertTrue(!empty($selfPanel));
         $self1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/h3[1]');
         $this->assertEqual($self1->text(), "1. self likert question *");
-        $ed = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="Ques1001"]');
+        $ed = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="Ques100700"]');
         $this->assertTrue($ed->attribute('checked'));
-        $alex = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="Ques1100"]');
+        $alex = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="Ques110350"]');
         $this->assertTrue($alex->attribute('checked'));
         $self2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/h3[2]');
         $this->assertEqual($self2->text(), "2. self sentence question *");
@@ -1109,7 +1109,7 @@ class studentMixeval extends SystemBaseTestCase
         $this->assertEqual($header->text(), 'Self-Evaluation');
         $self1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/h3[2]');
         $this->assertEqual($self1->text(), "1. self likert question *");
-        $self1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="Ques1051"]');
+        $self1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="Ques105700"]');
         $this->assertTrue($self1->attribute('checked'));
         $self2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="mixeval_result"]/h3[3]');
         $this->assertEqual($self2->text(), "2. self sentence question *");

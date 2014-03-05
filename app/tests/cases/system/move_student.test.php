@@ -37,6 +37,8 @@ class MoveStudentTestCase extends SystemBaseTestCase
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR,
             'select[id="EventEventTemplateTypeId"] option[value="3"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR,
+            'select[id="EventSurvey"] option[value="1"]')->click();
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateBegin')->click();
@@ -286,6 +288,7 @@ class MoveStudentTestCase extends SystemBaseTestCase
         $this->courseId = end(explode('/', $this->session->url()));
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventTitle')->sendKeys('Test Survey');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEventTemplateTypeId"] option[value="3"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventSurvey"] option[value="1"]')->click();
         //set due date and release date end to next month so that the event is opened.
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();

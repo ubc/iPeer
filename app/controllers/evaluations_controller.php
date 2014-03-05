@@ -733,6 +733,10 @@ class EvaluationsController extends AppController
             if (!empty($studentId)) {
                 $this->set('studentId', $studentId);
             }
+
+            $this->set('fullName', User::get('full_name'));
+            $this->set('userId', User::get('id'));
+
             $this->render('rubric_eval_form');
         } else {
             $eventId = $this->params['form']['event_id'];
@@ -1005,6 +1009,7 @@ class EvaluationsController extends AppController
             $this->set('questions', $questions);
             $this->set('mixeval', $mixeval);
             $this->set('enrol', $enrol);
+            $this->set('userId', $userId);
 
             if (!empty($studentId)) {
                 $this->set('studentId', $studentId);

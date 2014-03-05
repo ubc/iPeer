@@ -53,6 +53,29 @@ Runing the tests:
 
 It is better not to touch the mouse or keyboard during the tests.
 
+iPeer 3.1.1
+---------------------------
+This is a maintenance release.
+* Fix mixeval scale was incorrect rendered when upgrade 3.1
+* Modified build script to run in Vagrant and Ticket #548
+* Fix #557, filters are failed on lists on dreamhost
+* Fix #542
+* Update guard plugin
+* Catch the exception with more information printed
+* Fix mixeval result rendering error
+* Fix #558, 404 when student submitting evaluation
+* Refactor mixeval to use unified preview
+* Refactor rubric form to show header in view page
+* Fix #555, merge user search failed when installed on subdirectory
+* Fix #554, confirm button on upgrade page on firefox
+* Fix #556, use relative URL for css background image
+* Fix #543 remove the criteria hint text from rubric
+* Remove the orphan entries in mixeval_question_descs
+* Fix missing Content-length in response of API call
+* Fix API return 404 when no department is setup
+* Fixed problem with exporting evaluation results to csv
+* Fixed the inability to view students' survey
+
 iPeer 3.1.0
 ---------------------------
 This is a feature release that has a few exciting new features:

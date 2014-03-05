@@ -1,5 +1,4 @@
 <div class='MixevalView'>
-<h2>Info</h2>
 <dl>
     <dt><?php __('Name'); ?></dt>
     <dd><?php echo $mixeval['name']; ?></dd>
@@ -47,25 +46,12 @@ $params = array('controller'            => 'mixevals',
                 'eval'                  => 'Evaluation',
                 'self_eval'             => 0);
 ?>
-<?php
-if ($mixeval['peer_question'] > 0) {
-    echo '<h2>Peer Evaluation Questions</h2>';
-    echo $this->element('mixevals/view_mixeval_details', $params);
-}
-?>
-
-<?php
-$params['eval'] = 'Self-Evaluation';
-$params['self_eval'] = 1;
-
-if ($mixeval['self_eval'] > 0) {
-    echo '<h2>Self-Evaluation Questions</h2>';
-    echo $this->element('mixevals/view_mixeval_details', $params);
-}
-
-$required = $html->tag('span', '*', array('class' => 'required orangered'));
-echo $html->para('note', $required . ' ' . __('Indicates response required.', true));
-echo $html->para('marks', __('Total Marks', true) . ": $totalMarks");
-
-?>
+<?php if ($mixeval['peer_question'] > 0): ?>
+    <h1 onclick="$('rpreview').toggle();" class="title" id="rubricPreview">
+        <span class="ipeer-icon"><?php __('MixEval Preview') ?></span>
+    </h1>
+    <div id="rpreview" style="display: block; background: #FFF;">
+        <?php echo $this->element('evaluations/mixeval_eval_form', Toolkit::getMixEvalDemoData($mixeval))?>
+    </div>
+<?php endif; ?>
 </div>

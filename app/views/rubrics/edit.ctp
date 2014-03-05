@@ -16,7 +16,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
 <?php echo $this->Form->input('lom_max', array('id' => 'LOM',
     'options' => array_combine(range(2,10), range(2,10)),
     'default' => 5,
-    'label' => __('Level of Mastery:', true),
+    'label' => __('Level of Mastery', true),
     'style'=>'width:50px;',
     'disabled' => $readonly));?>
 <div class="help-text"><?php __('aka LOM, Evaluation Range (Max 10)')?></div>
@@ -24,7 +24,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
 <?php echo $this->Form->input('criteria', array('id' => 'criteria',
     'options' => array_combine(range(1,25), range(1,25)),
     'default' => 3,
-    'label' => __('Number of Criteria:', true),
+    'label' => __('Number of Criteria', true),
     'style'=>'width:50px;',
     'disabled' => $readonly));?>
 <div class="help-text"><?php __('Number of Evaluation Aspects (Max 25)')?></div>
@@ -93,11 +93,15 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
 
 <?php if(!empty($data)):?>
 <h1 onclick="$('rpreview').toggle();" class="title" id="rubricPreview">
-  <span class="ipeer-icon"><?php __('Rubric Preview')?></span>
+  <span class="ipeer-icon"><?php $readonly ? __('Rubric Preview') : __('Rubric Edit')?></span>
 </h1>
 
-<div id="rpreview" <?php echo empty($data) ? 'style="display: none; background: #FFF;">' : 'style="display: block; background: #FFF;"'; ?>>
-<?php echo $this->element('rubrics/ajax_rubric_'.($this->action == 'view' ? 'view' : 'edit'), array('data' => $data, 'readonly' => $readonly, 'evaluate' => $evaluate)); ?>
+<div id="rpreview" style="display: <?php echo empty($data) ? 'none' : 'block' ?>; background: #FFF;">
+    <?php if (!$readonly): ?>
+        <?php echo $this->element('rubrics/ajax_rubric_edit', array('data' => $data, 'readonly' => $readonly, 'evaluate' => $evaluate)); ?>
+    <?php else: ?>
+        <?php echo $this->element('evaluations/rubric_eval_form', Toolkit::getRubricEvalDemoData($data));?>
+    <?php endif; ?>
 </div>
 <?php endif;?>
 

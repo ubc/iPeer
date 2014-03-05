@@ -183,7 +183,7 @@ class Mixeval extends AppModel
 
         $conditions = array('creator_id' => $user_id);
         $conditions = array('OR' => array_merge(array('availability' => 'public'), $conditions));
-        return $this->find('list', array('conditions' => $conditions, 'fields' => array('name')));
+        return $this->find('list', array('conditions' => $conditions, 'fields' => array('name'), 'order' => 'name'));
     }
     
     /**
@@ -220,12 +220,8 @@ class Mixeval extends AppModel
         $event_due = strtotime($event['Event']['due_date']);
         // assign penalty to groupMember if they submitted late or never submitted by release_date_end
         $submissions = $this->EvaluationSubmission->find('all', array(
-            'conditions' => array('submitter_id' => $memberIds, 'EvaluationSubmission.event_id' => $eventId),
-            'contain' => array(
-                'GroupEvent' => array(
-                    'conditions' => array('GroupEvent.group_id' => $groupId, 'GroupEvent.event_id' => $eventId),
-                ),
-            )
+            'conditions' => array('submitter_id' => $memberIds, 'EvaluationSubmission.event_id' => $eventId,
+                'GroupEvent.group_id' => $groupId),
         ));
 
         foreach ($submissions as $submission) {
