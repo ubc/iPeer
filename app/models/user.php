@@ -1076,6 +1076,28 @@ class User extends AppModel
         ));
         return Set::extract($user, '/Course/id');
     }
+    
+    /**
+     * generates and saves new password
+     *
+     * @param mixed $user_id
+     *
+     * @return boolean
+     */
+    function savePassword($user_id) {
+        App::import('Component', 'PasswordGenerator');
+        $psGen = new PasswordGeneratorComponent();
+        
+        $tmp_password = $psGen->generate();
+        $user_data['User']['tmp_password'] = $tmp_password;
+        $user_data['User']['password'] =  md5($tmp_password);
+        $user_data['User']['id'] =  $user_id;
+        
+        if($this->save($user_data, true, array('password'))) {
+            return $tmp_password;
+        }
+        return false;
+    }
 
     /*********************************
      * Static functions

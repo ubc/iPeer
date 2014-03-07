@@ -319,7 +319,7 @@
   /**
    * iPeer database version
    */
-  Configure::write('DATABASE_VERSION', 8);
+  Configure::write('DATABASE_VERSION', 7);
 
 
   $CWL['LoginURL'] = 'https://www.auth.cwl.ubc.ca/auth/login';

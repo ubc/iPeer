@@ -115,7 +115,8 @@ class UsersController extends AppController
 
         // define action warnings
         $deleteUserWarning = __("Delete this user. Irreversible. Are you sure?", true);
-        $resetPassWarning = __("Resets user Password. Are you sure?", true);
+        $resetPassWarning = __("Resets user's password. Are you sure?", true);
+        $resetPassWOEmail = __("Resets user's password without sending a email. The user will lose access to the system. Are you sure?", true);
 
         $actionRestrictions = "";
 
@@ -165,6 +166,11 @@ class UsersController extends AppController
             array(__("Delete User", true),    $deleteUserWarning,   $actionRestrictions, "", "delete", "User.id"),
             array(__("Reset Password", true), $resetPassWarning,  $actionRestrictions, "", "resetPassword", "User.id")
         );
+        
+        // add the functionality of resetting a user's password without sending the user a email
+        if(User::hasPermission('controllers/users/resetpasswordwithoutemail')) {
+            $actions[] = array(__("Reset Password Without Email", true), $resetPassWOEmail, "", "", "resetPasswordWithoutEmail", "User.id");
+        }
 
         $this->AjaxList->setUp($this->User, $columns, $actions,
             "User.id", "User.username", $joinTables, $extraFilters);
@@ -210,6 +216,8 @@ class UsersController extends AppController
             $this->Session->setFlash('You do not have permission to view users.');
             $this->redirect('/home');
         }
+        
+        $this->_checkResetPasswordPermission(1,1);
 
         // Set the top message
         $this->set('message', $message);
@@ -937,74 +945,21 @@ class UsersController extends AppController
     /**
      * resetPassword
      *
-     * @param mixed $user_id  user id
+     * @param mixed $userId  user id
      * @param mixed $courseId course id
      *
      * @access public
      * @return void
      */
-    function resetPassword($user_id, $courseId = null)
+    function resetPassword($userId, $courseId = null)
     {
-        $role = $this->User->getRoleName($user_id);
-
-        if (!User::hasPermission('functions/user')) {
-            $this->Session->setFlash('Error: You do not have permission to reset passwords', true);
-            $this->redirect('/home');
-        }
-
-        if (!User::hasPermission('functions/user/'.$role)) {
-            $this->Session->setFlash('Error: You do not have permission to reset the password for this user.', true);
-            if (is_null($courseId)) {
-                $this->redirect('index');
-            } else {
-                $this->redirect('/users/goToClassList/'.$courseId);
-            }
-        }
-
-        // Read the user
-        $user_data = $this->User->findById($user_id);
-
-        if (empty($user_data)) {
-            $this->Session->setFlash(__('User Not Found!', true));
-            $this->redirect("index");
-        }
-
-        // super admins and faculty admins can reset passwords for all users
-        // instructors can only reset passwords for students and tutors in their course(s)
-        if (!User::hasPermission('controllers/departments')) {
-            // instructors
-            $courses = User::getMyCourseList();
-            $models = array('UserTutor', 'UserEnrol');
-            $accessibleUsers = array();
-
-            foreach ($models as $model) {
-                $users = $this->$model->find('list', array(
-                    'conditions' => array('course_id' => array_keys($courses)),
-                    'fields' => array('user_id')
-                ));
-                $accessibleUsers = array_merge($accessibleUsers, $users);
-            }
-
-            if (!in_array($user_id, $accessibleUsers)) {
-                $this->Session->setFlash(__('Error: You do not have permission to reset the password for this user', true));
-                if (is_null($courseId)) {
-                    $this->redirect('index');
-                } else {
-                    $this->redirect('/users/goToClassList/'.$courseId);
-                }
-            }
-        }
-
-        //General password
-        $tmp_password = $this->PasswordGenerator->generate();
-        $user_data['User']['tmp_password'] = $tmp_password;
-        $user_data['User']['password'] =  md5($tmp_password);
-        $user_data['User']['id'] =  $user_id;
+        // checks the user's permissions
+        $userData = $this->_checkResetPasswordPermission($userId, $courseId);
 
         //Save Data
-        if ($this->User->save($user_data, true, array('password'))) {
+        if ($tmp_password = $this->User->savePassword($userId)) {
             $message = sprintf(__("Password successfully reset. The new password is %s.", true).'<br />', $tmp_password);
-            $this->User->set('id', $user_id);
+            $this->User->set('id', $userId);
 
             // send email to user
             $this->set('user_data', $user_data);
@@ -1017,6 +972,30 @@ class UsersController extends AppController
             } else {
                 $message .= __('No email has been sent. User does not have email address.', true);
             }
+            $this->Session->setFlash($message, 'good');
+            $this->redirect($this->referer());
+        } else {
+            //Get render page according to the user type
+            $this->redirect($this->referer());
+        }
+    }
+    
+    /**
+     * resetPasswordWithoutEmail
+     *
+     * @param mixed $userId
+     * @param mixed $courseId
+     *
+     * @return boolean: true for success and false for fail
+     */
+    public function resetPasswordWithoutEmail($userId, $courseId = null)
+    {
+        // checks the user's permissions
+        $this->_checkResetPasswordPermission($userId, $courseId);
+        
+        // generate and save new password
+        if ($tmp_password = $this->User->savePassword($userId)) {
+            $message = sprintf(__("Password successfully reset. The new password is %s.", true).'<br />', $tmp_password);
             $this->Session->setFlash($message, 'good');
             $this->redirect($this->referer());
         } else {
@@ -1275,6 +1254,67 @@ class UsersController extends AppController
         $this->Session->write('ipeerSession.email', $userData['email']);
     }
 
+    /**
+     * _checkResetPasswordPermission
+     *
+     * @param mixed $userId
+     * @param mixed $courseId
+     *
+     * @access private
+     * @return array of user data
+     */
+    private function _checkResetPasswordPermission($userId, $courseId)
+    {
+        if (!User::hasPermission('functions/user')) {
+            $this->Session->setFlash('Error: You do not have permission to reset passwords', true);
+            $this->redirect('/home');
+        }
+
+        // Read the user
+        $userData = $this->User->findById($userId);
+        if (empty($userData)) {
+            $this->Session->setFlash(__('User Not Found!', true));
+            $this->redirect("index");
+        }
+
+        $role = $this->User->getRoleName($userId);
+        if (!User::hasPermission('functions/user/'.$role)) {
+            $this->Session->setFlash('Error: You do not have permission to reset the password for this user.', true);
+            if (is_null($courseId)) {
+                $this->redirect('index');
+            } else {
+                $this->redirect('/users/goToClassList/'.$courseId);
+            }
+        }
+
+        // super admins and faculty admins can reset passwords for all users
+        // instructors can only reset passwords for students and tutors in their course(s)
+        if (!User::hasPermission('controllers/departments')) {
+            // instructors
+            $courses = User::getMyCourseList();
+            $models = array('UserTutor', 'UserEnrol');
+            $accessibleUsers = array();
+
+            foreach ($models as $model) {
+                $users = $this->$model->find('list', array(
+                    'conditions' => array('course_id' => array_keys($courses)),
+                    'fields' => array('user_id')
+                ));
+                $accessibleUsers = array_merge($accessibleUsers, $users);
+            }
+
+            if (!in_array($userId, $accessibleUsers)) {
+                $this->Session->setFlash(__('Error: You do not have permission to reset the password for this user', true));
+                if (is_null($courseId)) {
+                    $this->redirect('index');
+                } else {
+                    $this->redirect('/users/goToClassList/'.$courseId);
+                }
+            }
+        }
+        
+        return $userData;
+    }
 
     /**
      * Helper function to send an email notification about to a user about

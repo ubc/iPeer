@@ -498,6 +498,7 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Surveys');
         $this->Acl->allow($role, 'controllers/Surveygroups');
         $this->Acl->allow($role, 'controllers/Users');
+        $this->Acl->deny($role, 'controllers/Users/resetPasswordWithoutEmail');
         $this->Acl->allow($role, 'controllers/Evaluations');
         $this->Acl->allow($role, 'controllers/guard/guard/logout');
         $this->Acl->deny($role, 'functions');
@@ -537,6 +538,7 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Oauthtokens/delete');
         $this->Acl->deny($role, 'controllers/Users/merge');
         $this->Acl->allow($role, 'controllers/Users/showEvents');
+        $this->Acl->deny($role, 'controllers/Users/resetPasswordWithoutEmail');
         $this->Acl->deny($role, 'functions');
         $this->Acl->allow($role, 'functions/evaluation');
         $this->Acl->deny($role, 'functions/evaluation', 'update');

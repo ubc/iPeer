@@ -60,18 +60,23 @@ function fnFormatDetails ( oTable, nTr )
     sOut += '<div style="cursor: default; padding: 4px; font-weight: bold; color: black;">Reset Password';
     sOut += '</div></a>';
 
+    <?php if (User::hasPermission('controllers/users/resetpasswordwithoutemail')) { ?>
+        sOut += '<a href="<?php echo $this->base; ?>/users/resetPasswordWithoutEmail/'+aData[0]+'/<?php echo $courseId?>">';
+        sOut += '<div style="cursor: default; padding: 4px; font-weight: bold; color: black;">Reset Password Without Email';
+        sOut += '</div></a>';
+    <?php } ?>
+
     sOut += '<a href="<?php echo $this->base; ?>/users/delete/'+aData[0]+'/<?php echo $courseId?>" onclick="return dropConfirmed(&quot;'+aData[2]+'&quot;)">';
     sOut += '<div style="cursor: default; padding: 4px; font-weight: bold; color: black;">Drop';
     sOut += '</div></a>';
+    
     <?php
     if (User::hasPermission('controllers/Users/showEvents')) {
     ?>
        	sOut += '<a href="<?php echo $this->base; ?>/users/showEvents/'+aData[0]+'">';
 	    sOut += '<div style="cursor: default; padding: 4px; font-weight: bold; color: black;">Show user\'s events';
 	    sOut += '</div></a>';
-	<?php }
-    ?>
-    
+	<?php } ?>
 
     return sOut;
 }
