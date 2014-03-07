@@ -1,5 +1,7 @@
+include epel
 include ipeer::web
 include ipeer::db
+include ipeer::test
 include git
 
 ipeer::instance { ipeerdev :

@@ -43,3 +43,6 @@
 [submodule "vendors/sausage"]
 	path = vendors/sausage
 	url = https://github.com/jlipps/sausage.git
+[submodule "puppet/modules/epel"]
+	path = puppet/modules/epel
+	url = https://github.com/stahnma/puppet-module-epel.git
