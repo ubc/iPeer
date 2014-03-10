@@ -1,3 +1,21 @@
+Running on PagodaBox
+---------------------------
+1. Create a PagodaBox account at https://dashboard.pagodabox.com/account/register.
+2. On the PagodaBox dashboard, click on "New Application".
+3. Select "Clone an Existing Repo".
+4. Give the application a unique name.
+5. Paste the url below as your "Clone URL".
+        https://github.com/ubc/iPeer.git
+6. Click "Launch Application". Wait for the installation to complete.
+7. When you see the links "View Live App" and "Manage Your App" the installation process is complete. Click "Manage Your App".
+8. Click on "View Live App" (right hand side of the dashboard).
+9. Complete the iPeer installation process. Click Next.
+10. Agree to the License Agreement and click Next. 
+11. Select Basic Installation. Click Next.
+12. Create your account under "Super Admin Configuration".
+13. Select your timezone (Region/City). Click Next.
+14. Go to name.gopagoda.com. Login with the "Super Admin" account you have just created.
+
 Running Virtual Development Server
 ---------------------------
 Virtual Environment Setup:
@@ -44,7 +62,7 @@ Integration Tests
 Requirements:
 * Selenium Server 2.38+
 * PHP Webdriver (https://github.com/Element-34/php-webdriver)
-* Firfox
+* Firefox
 
 Runing the tests:
 
