@@ -319,20 +319,17 @@ class EmailerController extends AppController
                 $this->redirect('index');
             }
         }
+        
+        // event reminders - grab email template's content
+        if (isset($email['EmailSchedule']['event_id'])) {
+            $template = $this->EmailTemplate->findById($email['EmailSchedule']['content']);
+            $email['EmailSchedule']['content'] = $template['EmailTemplate']['content'] ? $template['EmailTemplate']['content'] : "";
+        }
 
         $email['EmailSchedule']['to'] = explode(';', $email['EmailSchedule']['to']);
         $email['EmailSchedule']['content'] = str_replace("\n", '<br/>', $email['EmailSchedule']['content']);
         $this->User->recursive = -1;
         $email['User'] = $this->User->findAllById($email['EmailSchedule']['to']);
-        // event reminders
-        if (isset($email['EmailSchedule']['event_id'])) {
-            $event = $this->Event->findById($email['EmailSchedule']['event_id']);
-            $user = array('User' => array('full_name' => 'Name'));
-            $type = ($event['Event']['event_template_type_id'] == 3) ? 'survey' : 'peer evaluation';
-            $url = Router::url('/', true);
-            $this->set('params', array('event' => $event, 'course' => array('Course' => $event['Course']), 
-                'penalty' => $event['Penalty'], 'user' => $user, 'type' => $type, 'url' => $url));
-        }
         $this->set('data', $email);
     }
 

@@ -401,6 +401,8 @@ class EventsController extends AppController
         }
 
         $emailTemp = $eventData['Event']['EmailTemplate'];
+        $template = $this->EmailTemplate->findById($emailTemp);
+        $subject = $template['EmailTemplate']['subject'];
         $courseId = $this->Event->getCourseByEventId($eventId);
         //Get the startdate, duedate and frequency of emails
         $startDate = $eventData['Event']['release_date_begin'];
@@ -410,14 +412,13 @@ class EventsController extends AppController
         $emailFreq = '+' . $emailFreq . ' day';
 
         $courseName = $this->Course->getCourseName($courseId);
-        $type = ($eventData['Event']['event_template_type_id'] == 3) ? 'Survey' : 'Evaluation';
 
         //Prepare the data for pushing to the email_schedules table
         $data = array();
         $data['course_id']= $courseId;
         $data['event_id'] = $eventId;
         $data['from'] = $this->Auth->user('id');
-        $data['subject'] = '';
+        $data['subject'] = $subject;
         $data['content'] = $emailTemp; //saving email template id
         $data['to'] = 'save_reminder;'.implode(';', $to);
 

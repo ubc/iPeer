@@ -34,11 +34,7 @@
   </tr>
   <tr>
     <td><?php __('Content')?></td><td><div id='emailContent'>
-    <?php if (isset($params)) {
-        echo $this->element('email/html/eventReminder', $params);
-    } else {
-        echo $data['EmailSchedule']['content'];
-    } ?>
+    <?php echo $data['EmailSchedule']['content'];?>
     </div></td>
   </tr>
   <tr>
