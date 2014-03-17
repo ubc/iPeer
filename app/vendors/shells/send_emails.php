@@ -14,7 +14,8 @@ require_once (CORE_PATH.'cake/libs/controller/controller.php');
 class SendEmailsShell extends Shell
 {
     public $uses = array('User', 'EmailSchedule', 'SysParameter', 'EmailMerge', 'Event', 
-        'Group', 'GroupsMembers', 'EvaluationSubmission', 'GroupEvent', 'Course', 'Penalty');
+        'Group', 'GroupsMembers', 'EvaluationSubmission', 'GroupEvent', 'Course', 'Penalty',
+        'EmailTemplate');
     const EMAIL_TASK_LOCK = 'tmp/email_task_lock';
     /**
      * main
@@ -70,18 +71,46 @@ class SendEmailsShell extends Shell
 
             //Returns the modified emaillist if the list contains the 'save_reminder' param, else returns $e['to']
 			$filter_email_list = $this->reminderFilter($event_id, $e['to'], $e['id'], $e['date']);
-			//If event id is set it is a event reminder.
-			$template = isset($event_id) ? 'eventReminder' : 'default';
-			if (isset($event_id)) {
-			    $event = $this->Event->findById($event_id);
-			    $type = ($event['Event']['event_template_type_id'] == 3) ? 'survey' : 'peer evaluation';
-			    $controller->set('event', $event);
-			    $controller->set('course', $this->Course->findById($event['Event']['course_id']));
-			    $controller->set('type', $type);
-			    $controller->set('penalty', $this->Penalty->findAllByEventId($event_id));
-			    $controller->set('url', $this->SysParameter->get('system.absolute_url'));
+			// storing common data for all emails in email_list
+			$commonData = array();
+			if (isset($e['event_id'])) {
+			    $event = $this->Event->getEventById($e['event_id']);
+			    $commonData['Event'] = $event['Event'];
+			    // fill in email template subject/content for event reminders
+			    $emailTemplate = $this->EmailTemplate->findById($e['content']);
+			    $e['subject'] = $emailTemplate['EmailTemplate']['subject'];
+			    $e['content'] = $emailTemplate['EmailTemplate']['content'];
 			}
-			                                                                             
+			if (isset($e['course_id'])) {
+			    $course = $this->Course->getCourseById($e['course_id']);
+			    $commonData['Course'] = $course['Course'];
+			}
+			
+            //Return array $matches that contains all tags
+            preg_match_all('/'.EmailMerge::MERGE_START.'(.*?)'.EmailMerge::MERGE_END.'/', $e['content'], $matches, PREG_OFFSET_CAPTURE);
+            $patterns = array();
+            $replacements = array();
+            $tables = array();
+            foreach ($matches[0] as $key => $match) {
+                $table = $this->EmailMerge->getFieldAndTableNameByValue($match[0]);
+                
+                if (isset($commonData[$table['table_name']])) {
+                    // if in commonData, grab the field's value
+                    $patterns[$key] = '/'.$match[0].'/';
+                    $value = $commonData[$table['table_name']][$table['field_name']];
+                    $replacements[$key] = strtotime($value) ? date('l, F j, Y g:i a',strtotime($value)) : $value;
+                } else {
+                    // if not in commonData, save table attributes for merging later
+                    if (!isset($tables[$table['table_name']])) {
+                        $tables[$table['table_name']] = array();
+                    }
+                    // format: array[table_name][field_name] = pattern
+                    $tables[$table['table_name']][$table['field_name']] = '/'.$match[0].'/';
+                }
+            }
+            // email content after merging common data
+            $content = preg_replace($patterns, $replacements, $e['content']);
+
             $emailList = $this->User->getEmails(explode(';', $filter_email_list));
             foreach ($emailList as $to_id => $to) {
                 if (empty($to)) {
@@ -90,11 +119,11 @@ class SendEmailsShell extends Shell
                 }
 
                 $subject = $e['subject'];
-                if (isset($event_id)) {
-                    $controller->set('user', $this->User->findById($to_id));
+                if (!empty($tables)) {
+                    // merge data not in common data
+                    $content = $this->doMerge($content, EmailMerge::MERGE_START, EmailMerge::MERGE_END, $tables, $to_id);
                 }
-                $content = $this->doMerge($e['content'], EmailMerge::MERGE_START, EmailMerge::MERGE_END, $to_id);
-                if ($this->sendEmail($content, $subject, $from, $to, $template)) {
+                if ($this->sendEmail($content, $subject, $from, $to)) {
                     $successCount++;
                 } else {
                     echo "Failed to send email to ".$to."\n";
@@ -175,30 +204,24 @@ class SendEmailsShell extends Shell
      * @param string $string  string with merge fields
      * @param int    $start   start of merge field
      * @param int    $end     end of merge field
+     * @param array  $tables  list of fields needed to be merged
      * @param int    $user_id user id
      *
      * @return merged string
      */
-    function doMerge($string, $start, $end, $user_id = null)
+    function doMerge($string, $start, $end, $tables, $user_id)
     {
-        //Return array $matches that contains all tags
-        preg_match_all('/'.$start.'(.*?)'.$end.'/', $string, $matches, PREG_OFFSET_CAPTURE);
-        $patterns = array();
-        $replacements = array();
-        $patterns = $matches[0];
-        foreach ($matches[0] as $key => $match) {
-            $patterns[$key] = '/'.$match[0].'/';
-
-            $table = $this->EmailMerge->getFieldAndTableNameByValue($match[0]);
-            $table_name = $table['table_name'];
-            $field_name = $table['field_name'];
-            $this->$table_name->recursive = -1;
-            $value = $this->$table_name->find('first', array(
-                'conditions' => array($table_name.'.id' => $user_id),
-                'fields' => $field_name
+        foreach ($tables as $name => $attributes) {
+            $fields = array_keys($attributes);
+            $patterns = array_values($attributes);
+            $replacements = array();
+            $value = $this->$name->find('first', array(
+                'conditions' => array($name.'.id' => $user_id),
+                'fields' => $fields
             ));
-
-            $replacements[$key] = $value[$table_name][$field_name];
+            foreach ($fields as $key => $field) {
+                $replacements[$key] = $value[$name][$field];
+            }
         }
         return preg_replace($patterns, $replacements, $string);
     }

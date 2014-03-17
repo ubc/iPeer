@@ -514,6 +514,13 @@ ALTER TABLE mixeval_questions ADD show_marks INT(1) AFTER scale_level;
 ALTER TABLE rubrics_criterias ADD show_marks INT(1) AFTER multiplier;
 ALTER TABLE rubrics ADD view_mode VARCHAR(10) AFTER criteria;
 
+-- Insert new email merges
+INSERT INTO `email_merges` (`id`, `key`, `value`, `table_name`, `field_name`, `created`, `modified`) VALUES
+(5, 'Course Name', '{{{COURSENAME}}}', 'Course', 'course', NOW(), NOW()),
+(6, 'Event Title', '{{{EVENTTITLE}}}', 'Event', 'title', NOW(), NOW()),
+(7, 'Event Due Date', '{{{DUEDATE}}}', 'Event', 'due_date', NOW(), NOW()),
+(8, 'Event Close Date', '{{{CLOSEDATE}}}', 'Event', 'release_date_end', NOW(), NOW());
+
 -- Update database version, done as the very last operation as a sign that
 -- the update went well.
 UPDATE `sys_parameters` SET `parameter_value` = '7' WHERE `parameter_code` = 'database.version';

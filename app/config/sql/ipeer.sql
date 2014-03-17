@@ -693,7 +693,11 @@ INSERT INTO `email_merges` (`id`, `key`, `value`, `table_name`, `field_name`, `c
 (1, 'Username', '{{{USERNAME}}}', 'User', 'username', NOW(), NOW()),
 (2, 'First Name', '{{{FIRSTNAME}}}', 'User', 'first_name', NOW(), NOW()),
 (3, 'Last Name', '{{{LASTNAME}}}', 'User', 'last_name', NOW(), NOW()),
-(4, 'Email Address', '{{{Email}}}', 'User', 'email', NOW(), NOW());
+(4, 'Email Address', '{{{Email}}}', 'User', 'email', NOW(), NOW()),
+(5, 'Course Name', '{{{COURSENAME}}}', 'Course', 'course', NOW(), NOW()),
+(6, 'Event Title', '{{{EVENTTITLE}}}', 'Event', 'title', NOW(), NOW()),
+(7, 'Event Due Date', '{{{DUEDATE}}}', 'Event', 'due_date', NOW(), NOW()),
+(8, 'Event Close Date', '{{{CLOSEDATE}}}', 'Event', 'release_date_end', NOW(), NOW());
 
 -- --------------------------------------------------------
 

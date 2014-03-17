@@ -14,7 +14,7 @@ class EventsController extends AppController
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time');
     public $uses = array('GroupEvent', 'User', 'Group', 'Course', 'Event', 'EventTemplateType',
         'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers', 'Penalty', 'Survey','EmailSchedule',
-        'EvaluationSubmission');
+        'EvaluationSubmission', 'EmailTemplate');
     public $components = array("AjaxList", "Session", "RequestHandler","Email");
 
     /**
@@ -348,6 +348,7 @@ class EventsController extends AppController
             $this->Rubric->getBelongingOrPublic($this->Auth->user('id'))
         );
         $emailReminders = array('0'=> 'Disable', '1' => '1 Day', '2'=>'2 Days','3'=>'3 Days','4'=>'4 Days','5'=>'5 Days','6'=>'6 Days','7'=>'7 Days');
+        $this->set('emailTemplates', $this->EmailTemplate->getPermittedEmailTemplate(User::get('id'), 'list'));
         $this->set('emailSchedules', $emailReminders);
         $this->set('course_id', $courseId);
 
@@ -399,6 +400,7 @@ class EventsController extends AppController
             return;
         }
 
+        $emailTemp = $eventData['Event']['EmailTemplate'];
         $courseId = $this->Event->getCourseByEventId($eventId);
         //Get the startdate, duedate and frequency of emails
         $startDate = $eventData['Event']['release_date_begin'];
@@ -415,8 +417,8 @@ class EventsController extends AppController
         $data['course_id']= $courseId;
         $data['event_id'] = $eventId;
         $data['from'] = $this->Auth->user('id');
-        $data['subject'] = $courseName.' - iPeer '.$type.' Reminder';
-        $data['content'] = '';
+        $data['subject'] = '';
+        $data['content'] = $emailTemp; //saving email template id
         $data['to'] = 'save_reminder;'.implode(';', $to);
 
         while (strtotime($startDate) < strtotime($dueDate)) {
@@ -475,6 +477,10 @@ class EventsController extends AppController
 
         $orig_email_frequency = $this->calculateFrequency($eventId);
         $this->set('email_schedule', $orig_email_frequency);
+        $emailTemp = $this->EmailSchedule->find('first', array(
+            'conditions' => array('EmailSchedule.sent' => 0, 'EmailSchedule.event_id' => $eventId)
+        ));
+        $this->set('emailId', $emailTemp['EmailSchedule']['content']);
         $event = $this->Event->getEventById($eventId);
 
         if (!empty($this->data)) {
@@ -516,7 +522,7 @@ class EventsController extends AppController
             $this->data = $this->_multiMap($this->data);
             if ($this->Event->saveAll($this->data)) {
                 $this->Session->setFlash("Edit event successful!", 'good');
-                if ($this->checkIfChanged($event, $this->data, $orig_email_frequency)) {
+                if ($this->checkIfChanged($event, $this->data, $orig_email_frequency, $emailTemp)) {
                     // only delete emails that haven't been sent
                     $this->EmailSchedule->deleteAll(array('event_id' => $eventId, 'sent' => 0), false);
                     $this->setSchedule($eventId, $this->data);
@@ -567,6 +573,7 @@ class EventsController extends AppController
             $this->set('mixevalSelected', $event['Event']['template_id']);
         }
         $emailReminders = array('0'=> 'Disable', '1' => '1 Day', '2'=>'2 Days','3'=>'3 Days','4'=>'4 Days','5'=>'5 Days','6'=>'6 Days','7'=>'7 Days');
+        $this->set('emailTemplates', $this->EmailTemplate->getPermittedEmailTemplate(User::get('id'), 'list'));
         $this->set('emailSchedules', $emailReminders);
 
         $this->set('event', $event);
@@ -581,11 +588,12 @@ class EventsController extends AppController
      * @param mixed $event
      * @param mixed $data
      * @param int $email_frequency
+     * @param int $originalTemp    original template id
      *
      * @access public
      * @return bool -  return 1 if the data has been modified else returns 0
      **/
-    function checkIfChanged($event, $data, $email_frequency)
+    function checkIfChanged($event, $data, $email_frequency, $originalTemp)
     {
         $orig_release_date_begin = $event['Event']['release_date_begin'];
         $orig_due_date = $event['Event']['due_date'];
@@ -593,9 +601,10 @@ class EventsController extends AppController
         $new_due_date = $data['Event']['due_date'];
         $orig_frequency = $email_frequency;
         $new_frequency =  $data['Event']['email_schedule'];
+        $new_template = $data['Event']['EmailTemplate'];
 
         if ($orig_release_date_begin != $new_release_date_begin || $orig_due_date != $new_due_date
-            || $orig_frequency != $new_frequency) {
+            || $orig_frequency != $new_frequency || $originalTemp != $new_template) {
             return 1;
         } else {
             return 0;
