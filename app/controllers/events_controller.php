@@ -589,7 +589,7 @@ class EventsController extends AppController
      * @param mixed $event
      * @param mixed $data
      * @param int $email_frequency
-     * @param int $originalTemp    original template id
+     * @param int $originalTemp   original template id
      *
      * @access public
      * @return bool -  return 1 if the data has been modified else returns 0

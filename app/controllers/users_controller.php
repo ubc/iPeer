@@ -216,8 +216,6 @@ class UsersController extends AppController
             $this->Session->setFlash('You do not have permission to view users.');
             $this->redirect('/home');
         }
-        
-        $this->_checkResetPasswordPermission(1,1);
 
         // Set the top message
         $this->set('message', $message);
