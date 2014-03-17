@@ -224,10 +224,14 @@ class Toolkit
                     'due_date' => Toolkit::formatDate(time()+(5*24*60*60)),
                     'description' => 'Preview for rubric evaluation event.',
                     'com_req' => true,
+                    'course_id' => 0,
                 ),
                 'Group' => array(
                     'id' => 0,
                     'group_name' => 'Demo Group',
+                ),
+                'GroupEvent' => array(
+                    'id' => 0,
                 ),
             ),
             'groupMembers' => array(
@@ -258,6 +262,12 @@ class Toolkit
             'evaluateeCount' => 2,
             'fullName' => User::get('full_name'),
             'preview' => true,
+            'viewData' => array(
+                'id' => 0,
+            ),
+            'allDone' => 0,
+            'comReq' => 0,
+            'userIds' => array(),
         );
     }
 

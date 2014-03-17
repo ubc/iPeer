@@ -154,7 +154,7 @@
             <li><?php __('Allocate any remaining point.')?></li>
             <li><?php __('Enter Comments')?> <?php echo  $event['Event']['com_req']? '<font color="red"> ('.__('Required', true).') </font>' : '('.__('Optional', true).')' ;?> .</li>
             <li><font color="red"><?php __('NOTE:')?></font> <?php __('"Submit Evaluation" button will only be enabled when all points, and comments (if required), are filled!')?></li>
-            <?php $releaseEnd = !isset($event['Event']['release_date_end']) ? '<i>'._t("Evaluation's release end date").'</i>' : Toolkit::formatDate($event['Event']['release_date_end']); ?>
+            <?php $releaseEnd = !isset($event['Event']['release_date_end']) ? '<i>'.__("Evaluation's release end date", true).'</i>' : Toolkit::formatDate($event['Event']['release_date_end']); ?>
             <li><?php echo sprintf(__('The evaluation can be repeatedly submitted until %s.', true), $releaseEnd)?></li>
             </ul>
 
