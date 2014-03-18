@@ -486,7 +486,7 @@ class EvaluationComponent extends Object
         $this->EvaluationRubricDetail = new EvaluationRubricDetail;
         $this->Rubric = new Rubric;
         $this->User = ClassRegistry::init('User');
-        
+
         $Session = new SessionComponent();
         $user = $Session->read('Auth.User');//User or Admin or
         $evaluator = $user['id'];
@@ -715,7 +715,7 @@ class EvaluationComponent extends Object
             $grades = Set::extract($summary, '/grades/'.$num);
             $group['grades'][$num] = array_sum($grades) / count($grades);
         }
-        
+
         return $summary + $group;
     }
 
@@ -826,12 +826,12 @@ class EvaluationComponent extends Object
     /**
      * saveMixevalEvaluation
      *
-     * @param bool $params
+     * @param array $params mixeval array
      *
      * @access public
      * @return void
      */
-    function saveMixevalEvaluation($params=null)
+    function saveMixevalEvaluation($params)
     {
         $this->Event = ClassRegistry::init('Event');
         $this->Mixeval = ClassRegistry::init('Mixeval');
@@ -863,13 +863,14 @@ class EvaluationComponent extends Object
             $this->EvaluationMixeval->save($evalMixeval);
             $evalMixeval = $this->EvaluationMixeval->read();
         }
-        
+
         $score = $this->saveNGetEvaluationMixevalDetail(
             $evalMixeval['EvaluationMixeval']['id'], $mixeval, $params);
         $evalMixeval['EvaluationMixeval']['score'] = $score;
         if (!$this->EvaluationMixeval->save($evalMixeval)) {
             return false;
         }
+
         return true;
     }
 
@@ -890,7 +891,7 @@ class EvaluationComponent extends Object
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
         $totalGrade = 0;
         $data = $form['EvaluationMixeval'];
-        
+
         foreach($mixeval['MixevalQuestion'] as $ques) {
             $num = $ques['question_num'];
             $evalMixevalDetail = $this->EvaluationMixevalDetail->getByEvalMixevalIdCriteria($evalMixevalId, $num);
@@ -899,13 +900,13 @@ class EvaluationComponent extends Object
             }
             $evalMixevalDetail['EvaluationMixevalDetail']['evaluation_mixeval_id'] = $evalMixevalId;
             $evalMixevalDetail['EvaluationMixevalDetail']['question_number'] = $num;
-      
+
             if (in_array($ques['mixeval_question_type_id'], array('1','4'))) {
                 if (empty($data[$num]['selected_lom']) && $ques['mixeval_question_type_id'] != '4' ) {
                     continue;
                 }
                 if ($ques['mixeval_question_type_id'] == '1') {
-                    $evalMixevalDetail['EvaluationMixevalDetail']['selected_lom'] = $data[$num]['selected_lom'];   
+                    $evalMixevalDetail['EvaluationMixevalDetail']['selected_lom'] = $data[$num]['selected_lom'];
                 }
                 $evalMixevalDetail['EvaluationMixevalDetail']['grade'] = $data[$num]['grade'];
                 if ($ques['required'] && !$ques['self_eval']) {
@@ -920,7 +921,7 @@ class EvaluationComponent extends Object
                 }
                 $evalMixevalDetail['EvaluationMixevalDetail']['question_comment'] = $data[$num]['question_comment'];
             }
-         
+
             $this->EvaluationMixevalDetail->save($evalMixevalDetail);
             $this->EvaluationMixevalDetail->id=null;
         }
@@ -962,7 +963,7 @@ class EvaluationComponent extends Object
 
         return $mixevalResultDetail;
     }
-    
+
     /**
      * formatMixevalEvaluationResultsMatrix
      * results matrix format:
@@ -1033,7 +1034,7 @@ class EvaluationComponent extends Object
         }
         return $evalResult;
     }
-    
+
 
     /**
      * changeMixevalEvaluationGradeRelease
@@ -1050,7 +1051,7 @@ class EvaluationComponent extends Object
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
         $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
-        
+
         $sub = $this->EvaluationSubmission->findAllByGrpEventId($groupEventId);
         $sub = Set::extract('/EvaluationSubmission/submitter_id', $sub);
 
@@ -1092,7 +1093,7 @@ class EvaluationComponent extends Object
 
         $this->GroupEvent->id = $groupEventId;
         $groupEvent = $this->GroupEvent->read();
-        
+
         $sub = $this->EvaluationSubmission->findAllByGrpEventId($groupEventId);
         $sub = Set::extract('/EvaluationSubmission/submitter_id', $sub);
 
