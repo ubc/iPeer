@@ -30,3 +30,9 @@ file { "/etc/nginx/conf.d/default.conf" :
     ensure => absent,
     notify => Service["nginx"]
 }
+
+cron { sendemails:
+    command => "cd /var/www && sh cake/console/cake send_emails",
+    user    => root,
+    minute  => "*/5"
+}
