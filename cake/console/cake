@@ -28,6 +28,6 @@ done
 LIB=$(dirname -- "$LIB")/
 APP=`pwd`
 
-exec php -q "$LIB"cake.php -working "$APP" "$@"
+exec php -q -d register_argc_argv=1 "$LIB"cake.php -working "$APP" "$@"
 
 exit;
