@@ -10,6 +10,7 @@ ipeer::instance { ipeerdev :
     db_host => $fqdn,
     port => 2000,
     local_config => false,
+    import_sample_data => true,
 }
 
 # create ipeer_test database for tests
