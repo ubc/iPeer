@@ -51,19 +51,19 @@ function fnFormatDetails (oTable, nTr)
             actions[i-2] = 'Allow';
         }
     }
-    
+
     var sOut = '<div class="userActionPanel"><ul>';
-    
+
     sOut += '<li>';
     sOut += '<a href="<?php echo $this->base; ?>/accesses/edit/allow/'+aData[0]+'/'+roleId+'"';
     sOut += 'onclick="return changeConfirmed(&quot;'+aData[1]+'&quot;)">Allow All</a>';
     sOut += '</li>';
-    
+
     sOut += '<li>';
     sOut += '<a href="<?php echo $this->base; ?>/accesses/edit/deny/'+aData[0]+'/'+roleId+'"';
     sOut += 'onclick="return changeConfirmed(&quot;'+aData[1]+'&quot;)">Deny All</a>';
     sOut += '</li>';
-    
+
     for (var i=0; i<4; i++) {
         sOut += '<li>';
         sOut += '<a href="<?php echo $this->base; ?>/accesses/edit/';
@@ -71,9 +71,9 @@ function fnFormatDetails (oTable, nTr)
         sOut += 'onclick="return changeConfirmed(&quot;'+aData[1]+'&quot;)">'+actions[i]+' '+types[i]+'</a>';
         sOut += '</li>';
     }
-    
+
     sOut += '</ul></div>';
-    
+
     return sOut;
 }
 
@@ -88,16 +88,16 @@ jQuery(document).ready(function() {
         "sPaginationType" : "full_numbers",
         "aoColumnDefs": [
             { "bSearchable": false, "bSortable": false, "aTargets": [2, 3, 4, 5] },
-            { "bSearchable": false, "bVisible": false, "bSortable":false, "aTargets": [ 0 ] }     
+            { "bSearchable": false, "bVisible": false, "bSortable":false, "aTargets": [ 0 ] }
         ],
         "aaSorting" : [[1, 'asc']]
     });
-    
+
     // for changing between roles
     jQuery("#role").change(function() {
-        window.location.href="/accesses/view/" + jQuery(this).val();
+        window.location.href="<?php echo $this->Html->url('/accesses/view')?>/" + jQuery(this).val();
     });
-    
+
     // event listener for action links
     jQuery('#table_id tbody td').live('click', function() {
         var nTr = jQuery(this).parents('tr')[0];

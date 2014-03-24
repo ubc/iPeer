@@ -234,7 +234,7 @@ foreach ($results['evaluatees'] as $evaluatee) {
         $button = $form->button(
             $buttonName,
             array(
-                'onclick' => "location.href='/evaluations/markGradeRelease/$eventId;$groupId;$evaluateeId;$grpEventId;$releaseAction'"
+                'onclick' => "location.href='".$this->Html->url('/evaluations/markGradeRelease')."/$eventId;$groupId;$evaluateeId;$grpEventId;$releaseAction'"
             )
         );
     }
