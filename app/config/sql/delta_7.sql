@@ -510,9 +510,11 @@ INSERT INTO aros_acos (id, aro_id, aco_id, _create, _read, _update, _delete) VAL
 -- This file contains queries that add a single column to three tables.
 -- This column is used to hide/show the evaluation marks to the user.
 
-ALTER TABLE mixeval_questions ADD show_marks INT(1) AFTER scale_level;
-ALTER TABLE rubrics_criterias ADD show_marks INT(1) AFTER multiplier;
-ALTER TABLE rubrics ADD view_mode VARCHAR(10) AFTER criteria;
+ALTER TABLE mixeval_questions ADD show_marks INT(1) NOT NULL DEFAULT '0' AFTER scale_level;
+ALTER TABLE rubrics_criterias ADD show_marks INT(1) NOT NULL DEFAULT '0' AFTER multiplier;
+ALTER TABLE rubrics ADD view_mode VARCHAR(10) NOT NULL DEFAULT 'student' AFTER criteria;
+ALTER TABLE evaluation_rubric_details ADD comment_release INT(1) NOT NULL DEFAULT '0' AFTER grade;
+ALTER TABLE evaluation_mixeval_details ADD comment_release INT(1) NOT NULL DEFAULT '0' AFTER grade;
 
 -- Insert new email merges
 INSERT INTO `email_merges` (`id`, `key`, `value`, `table_name`, `field_name`, `created`, `modified`) VALUES

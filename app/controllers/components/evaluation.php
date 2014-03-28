@@ -782,8 +782,15 @@ class EvaluationComponent extends Object
                     $detail['grade'];
                 $summary[$userId]['individual'][$evaluator][$detail['criteria_number']]['comment'] =
                     $detail['criteria_comment'];
+                $summary[$userId]['individual'][$evaluator][$detail['criteria_number']]['id'] =
+                    $detail['id'];
+                $summary[$userId]['individual'][$evaluator][$detail['criteria_number']]['comment_release'] =
+                    $detail['comment_release'];
             }
-            $summary[$userId]['individual'][$evaluator]['general_comment'] = $result['EvaluationRubric']['comment'];
+            $summary[$userId]['individual'][$evaluator]['general_comment']['comment'] = 
+                $result['EvaluationRubric']['comment'];
+            $summary[$userId]['individual'][$evaluator]['general_comment']['comment_release'] = 
+                $result['EvaluationRubric']['comment_release'];
         }
 
         foreach ($summary as $id => $score) {
@@ -841,16 +848,16 @@ class EvaluationComponent extends Object
 
 
     /**
-     * changeRubricEvaluationCommentRelease
+     * changeRubricEvaluationCommentRelease - DEPRECATED
      *
      * @param mixed $groupEventId  group event id
      * @param mixed $evaluateeId   evaluatee id
-     * @param mixed $releaseStatus release status
+     * @param mixed $params        params
      *
      * @access public
      * @return void
      */
-    function changeRubricEvaluationCommentRelease ($groupEventId, $evaluateeId, $releaseStatus)
+    function changeRubricEvaluationCommentRelease ($groupEventId, $evaluateeId, $params)
     {
         $this->EvaluationRubric  =  ClassRegistry::init('EvaluationRubric');
         $this->GroupEvent =  ClassRegistry::init('GroupEvent');
@@ -875,7 +882,120 @@ class EvaluationComponent extends Object
             $this->GroupEvent->read(), $releaseStatus, $oppositGradeReleaseCount);
         $this->GroupEvent->save($groupEvent);
     }
+    
+    /**
+     * changeIndivRubricEvalCommentRelease
+     *
+     * @param mixed $params params
+     *
+     * @access public
+     * @return void
+     */
+    function changeIndivRubricEvalCommentRelease($params)
+    {
+        $this->EvaluationRubric = ClassRegistry::init('EvaluationRubric');
+        $this->EvaluationRubricDetail = ClassRegistry::init('EvaluationRubricDetail');
+        $this->GroupEvent = ClassRegistry::init('GroupEvent');
+        $this->Event = ClassRegistry::init('Event');
+        
+        $grpEventId = $params['group_event_id'];
+        $evaluatee = $params['evaluatee'];
+        
+        $now = '"'.date("Y-m-d H:i:s").'"';
+        $user = $this->Auth->user('id');
+        
+        $evalRubrIds = $this->EvaluationRubric->find('list', array(
+            'conditions' => array('evaluatee' => $evaluatee, 'grp_event_id' => $grpEventId)
+        ));
+        // change comment release to 0 for the evaluatee in this group event
+        $this->EvaluationRubric->updateAll(
+            array('EvaluationRubric.comment_release' => 0, 'EvaluationRubric.modified' => $now, 'EvaluationRubric.updater_id' => $user),
+            array('EvaluationRubric.id' => $evalRubrIds)
+        );
+        $this->EvaluationRubricDetail->updateAll(
+            array('EvaluationRubricDetail.comment_release' => 0, 'EvaluationRubricDetail.modified' => $now, 'EvaluationRubricDetail.updater_id' => $user),
+            array('EvaluationRubricDetail.evaluation_rubric_id' => $evalRubrIds)
+        );
+        
+        //release general comments
+        $genComment = isset($params['releaseGeneralCom']) ? $params['releaseGeneralCom'] : array();
+        $this->EvaluationRubric->updateAll(
+            array('EvaluationRubric.comment_release' => 1, 'EvaluationRubric.modified' => $now, 'EvaluationRubric.updater_id' => $user),
+            array('EvaluationRubric.evaluatee' => $evaluatee, 'EvaluationRubric.evaluator' => $genComment)
+        );
+        // release detailed comments
+        $detailComment = isset($params['releaseComments']) ? $params['releaseComments'] : array();
+        $this->EvaluationRubricDetail->updateAll(
+            array('EvaluationRubricDetail.comment_release' => 1, 'EvaluationRubricDetail.modified' => $now, 'EvaluationRubricDetail.updater_id' => $user),
+            array('EvaluationRubricDetail.id' => $detailComment)
+        );
+    }
+    
+    /**
+     * changeRubricEvalCommentRelease
+     *
+     * @param mixed $status     status
+     * @param mixed $grpEventId group event id
+     * @param mixed $evaluatee  evaluatee
+     *
+     * @access public
+     * @return void
+     */
+    function changeRubricEvalCommentRelease($status, $grp_event_id, $evaluatee = null)
+    {
+        $this->EvaluationRubric = ClassRegistry::init('EvaluationRubric');
+        $this->EvaluationRubricDetail = ClassRegistry::init('EvaluationRubricDetail');
+        $this->GroupEvent = ClassRegistry::init('GroupEvent');
 
+        $now = '"'.date("Y-m-d H:i:s").'"';
+        $user = $this->Auth->user('id');
+        
+        $conditions = array('grp_event_id' => $grp_event_id);
+        if ($evaluatee) {
+            $conditions['evaluatee'] = $evaluatee;
+        }
+        
+        $evalRubrIds = $this->EvaluationRubric->find('list', array('conditions' => $conditions));
+        // update all comment release status that meets the conditions
+        $this->EvaluationRubric->updateAll(
+            array('EvaluationRubric.comment_release' => $status, 'EvaluationRubric.modified' => $now, 'EvaluationRubric.updater_id' => $user),
+            array('EvaluationRubric.id' => $evalRubrIds)
+        );
+        $this->EvaluationRubricDetail->updateAll(
+            array('EvaluationRubricDetail.comment_release' => $status, 'EvaluationRubricDetail.modified' => $now, 'EvaluationRubricDetail.updater_id' => $user),
+            array('EvaluationRubricDetail.evaluation_rubric_id' => $evalRubrIds)
+        );
+    }
+    
+    /**
+     * markRubricEvalReviewed
+     *
+     * @param mixed $eventId
+     * @param mixed $grpEventId
+     *
+     * @access public
+     * @return void
+     */
+    function markRubricEvalReviewed($eventId, $grpEventId)
+    {
+        $this->EvaluationRubric = ClassRegistry::init('EvaluationRubric');
+        $this->Event = ClassRegistry::init('Event');
+        
+        // set group event to reviewed if all evaluatees' release status has been modified
+        $eval = $this->EvaluationRubric->find('first', array(
+            'conditions' => array('grp_event_id' => $grpEventId),
+            'order' => array('EvaluationRubric.modified ASC')
+        ));
+        $event = $this->Event->findById($eventId);
+        
+        // if the oldest modified date is after the event's close date
+        if (strtotime($event['Event']['release_date_end']) <= strtotime($eval['EvaluationRubric']['modified'])) {
+            // set group event to reviewed
+            $this->GroupEvent->id = $grpEventId;
+            $this->GroupEvent->saveField('marked', 'reviewed');
+        }
+    }
+    
     /**
      * loadMixEvaluationDetail
      * Mixeval Evaluation functions

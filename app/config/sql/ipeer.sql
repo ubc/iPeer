@@ -760,6 +760,7 @@ CREATE TABLE IF NOT EXISTS `evaluation_mixeval_details` (
   `question_comment` text,
   `selected_lom` int(11) NOT NULL DEFAULT '0',
   `grade` double(12,2) NOT NULL DEFAULT '0.00',
+  `comment_release` int(1) NOT NULL DEFAULT '0',
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
   `created` datetime,
@@ -808,6 +809,7 @@ CREATE TABLE IF NOT EXISTS `evaluation_rubric_details` (
   `criteria_comment` varchar(255) DEFAULT NULL,
   `selected_lom` int(11) NOT NULL DEFAULT '0',
   `grade` double(12,2) NOT NULL DEFAULT '0.00',
+  `comment_release` int(1) NOT NULL DEFAULT '0',
   `record_status` char(1) NOT NULL DEFAULT 'A',
   `creator_id` int(11) NOT NULL DEFAULT '0',
   `created` datetime,
@@ -1077,7 +1079,7 @@ CREATE TABLE IF NOT EXISTS `mixeval_questions` (
   `self_eval` tinyint(1) NOT NULL DEFAULT '0',
   `multiplier` int(11) NOT NULL DEFAULT '0',
   `scale_level` int(11) NOT NULL DEFAULT '0',
-  `show_marks` int(1) DEFAULT NULL,
+  `show_marks` int(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   FOREIGN KEY (`mixeval_question_type_id`) REFERENCES `mixeval_question_types` 
 	(`id`) ON DELETE CASCADE,
@@ -1320,7 +1322,7 @@ CREATE TABLE IF NOT EXISTS `rubrics_criterias` (
   `criteria_num` int(11) NOT NULL DEFAULT '999',
   `criteria` varchar(255) DEFAULT NULL,
   `multiplier` int(11) NOT NULL DEFAULT '0',
-  `show_marks` int(1) DEFAULT NULL,
+  `show_marks` int(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 

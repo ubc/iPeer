@@ -1584,7 +1584,7 @@ class EvaluationsController extends AppController
 
         // Check whether the event exists or user has permission to access it
         if (!($event = $this->Event->getAccessibleEventById($eventId, User::get('id'), User::getCourseFilterPermission(), array()))) {
-            $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
+            $this->Session->setFlash(__('Error: That event does not exist or you don\'t have access to it', true));
             $this->redirect('index');
             return;
         }
@@ -1603,11 +1603,29 @@ class EvaluationsController extends AppController
             break;
 
         case "2":
-            $groupId =  strtok(';');
-            $evaluateeId =  strtok(';');
-            $groupEventId = strtok(';');
-            $releaseStatus = strtok(';');
-            $this->Evaluation->changeRubricEvaluationCommentRelease($groupEventId, $evaluateeId, $releaseStatus);
+            $grpEventId = $this->params['form']['group_event_id'];
+            $evaluateee = $this->params['form']['evaluatee'];
+            $eventId = $this->params['form']['event_id'];
+            $groupId = $this->params['form']['group_id'];
+            switch ($this->params['form']['submit']) {
+            case "Save Changes":
+                $this->Evaluation->changeIndivRubricEvalCommentRelease($this->params['form']);
+                break;
+            case "Release All Comments":
+                $this->Evaluation->changeRubricEvalCommentRelease(1, $grpEventId, $evaluateee);
+                break;
+            case "Unrelease All Comments":
+                $this->Evaluation->changeRubricEvalCommentRelease(0, $grpEventId, $evaluateee);
+                break;
+            case "Release Comments":
+                $this->Evaluation->changeRubricEvalCommentRelease(1, $grpEventId);
+                break;
+            case "Unrelease Comments":
+                $this->Evaluation->changeRubricEvalCommentRelease(0, $grpEventId);
+                break;
+            }
+            // mark group event as reviewed when all evaluations have been looked at by an instructor
+            $this->Evaluation->markRubricEvalReviewed($eventId, $grpEventId);
             $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
             break;
 
