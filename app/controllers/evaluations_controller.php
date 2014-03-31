@@ -1386,8 +1386,10 @@ class EvaluationsController extends AppController
             $fullNames = $this->User->getFullNames($userIds);
             $sub = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $userId);
             $penalty = empty($sub) ? $this->Penalty->getPenaltyPercent($event) : $this->Penalty->getPenaltyPercent($sub);
+            $generalCommentRelease = array_sum(Set::extract($evaluateeDetails, '/EvaluationRubric/comment_release'));
+            $detailedCommentRelease = array_sum(Set::extract($evaluateeDetails, '/EvaluationRubricDetail/comment_release'));
             $status = array(
-                'comment' => array_product(Set::extract($evaluateeDetails, '/EvaluationRubric/comment_release')),
+                'comment' => ($generalCommentRelease + $detailedCommentRelease),
                 'grade' => array_product(Set::extract($evaluateeDetails, '/EvaluationRubric/grade_release')),
                 'autoRelease' => $autoRelease
             );
@@ -1670,7 +1672,7 @@ class EvaluationsController extends AppController
             $this->EvaluationSimple->setAllEventCommentRelease($eventId, $releaseStatus);
             break;
         case 2://rubric
-            $this->EvaluationRubric->setAllEventCommentRelease($eventId, $releaseStatus);
+            $this->EvaluationRubric->setAllEventCommentRelease($eventId, $this->Auth->user('id'), $releaseStatus);
             break;
         case 4://mix
             $this->EvaluationMixeval->setAllEventCommentRelease($eventId, $releaseStatus);
@@ -1679,30 +1681,10 @@ class EvaluationsController extends AppController
             break;
         }
 
-        //Update all groupEvent's comment release Status based on submission
+        //Update all groupEvent's comment release status
         $groupEventList = $this->GroupEvent->getGroupListByEventId($eventId);
         foreach ($groupEventList as $groupEvent) {
-            $this->GroupEvent->id = $groupEvent['GroupEvent']['group_id'];
-
-            //Get the total number of members who has completed this evaluation
-            $numOfCompletedCount = $this->EvaluationSubmission->numCountInGroupCompleted($groupEvent['GroupEvent']['id']);
-            //$numMembers = $this->GroupsMembers->find(count, 'group_id='.$groupEvent['GroupEvent']['group_id']);
-            $numMembers = $this->GroupsMembers->find('count', array('conditions' => array('group_id' => $groupEvent['GroupEvent']['group_id'])));
-
-            if (($numOfCompletedCount != 0) && ($numOfCompletedCount < $numMembers)) {
-                $completeStatus = 'Some';
-            } elseif ($releaseStatus && ($numOfCompletedCount == $numMembers)) {
-                $completeStatus = 'All';
-            } else {
-                $completeStatus = 'None';
-            }
-
-            if ($releaseStatus == 0) {
-                $groupEvent['GroupEvent']['comment_release_status'] = 'None';
-            } else {
-                $groupEvent['GroupEvent']['comment_release_status'] = $completeStatus;
-            }
-            $this->GroupEvent->save($groupEvent);
+            $this->Evaluation->markRubricEvalReviewed($eventId, $groupEvent['GroupEvent']['id']);
         }
         $this->redirect('/evaluations/view/'.$eventId);
     }

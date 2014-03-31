@@ -979,6 +979,7 @@ class EvaluationComponent extends Object
     function markRubricEvalReviewed($eventId, $grpEventId)
     {
         $this->EvaluationRubric = ClassRegistry::init('EvaluationRubric');
+        $this->GroupEvent = ClassRegistry::init('GroupEvent');
         $this->Event = ClassRegistry::init('Event');
         
         // set group event to reviewed if all evaluatees' release status has been modified

@@ -71,7 +71,8 @@
         </div>
         <div style="height: 200px;" id="panelReviewsContent" class="panelContent">
             <?php
-            $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'membersList'=>$membersList, 'details'=>$evaluatorDetails, 'penalty'=>$penalty);
+            $status['review'] = 1;  // for student to review evaluations they gave others
+            $params = array('controller'=>'evaluations', 'rubric'=>$rubric, 'membersList'=>$membersList, 'details'=>$evaluatorDetails, 'penalty'=>$penalty, 'status'=>$status);
             echo $this->element('evaluations/student_view_rubric_details', $params);
             ?>
         </div>

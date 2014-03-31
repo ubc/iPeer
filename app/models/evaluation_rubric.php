@@ -339,16 +339,29 @@ class EvaluationRubric extends EvaluationResponseBase
      * setAllEventCommentRelease
      *
      * @param bool $eventId       event id
+     * @param mixed $userId       user id
      * @param bool $releaseStatus release status
      *
      * @access public
      * @return void
      */
-    function setAllEventCommentRelease($eventId, $releaseStatus)
+    function setAllEventCommentRelease($eventId, $userId, $releaseStatus)
     {
-        $fields = array('EvaluationRubric.comment_release' => $releaseStatus);
-        $conditions = array('EvaluationRubric.event_id' => $eventId);
-        return $this->updateAll($fields, $conditions);
+        $this->EvaluationRubricDetail = ClassRegistry::init('EvaluationRubricDetail');
+
+        $now = '"'.date("Y-m-d H:i:s").'"';
+        
+        $conditions = array('event_id' => $eventId);      
+        $evalRubrIds = $this->find('list', array('conditions' => $conditions));
+        // update all comment release status that meets the conditions
+        $this->updateAll(
+            array('EvaluationRubric.comment_release' => $releaseStatus, 'EvaluationRubric.modified' => $now, 'EvaluationRubric.updater_id' => $userId),
+            array('EvaluationRubric.id' => $evalRubrIds)
+        );
+        $this->EvaluationRubricDetail->updateAll(
+            array('EvaluationRubricDetail.comment_release' => $releaseStatus, 'EvaluationRubricDetail.modified' => $now, 'EvaluationRubricDetail.updater_id' => $userId),
+            array('EvaluationRubricDetail.evaluation_rubric_id' => $evalRubrIds)
+        );
     }
 
 

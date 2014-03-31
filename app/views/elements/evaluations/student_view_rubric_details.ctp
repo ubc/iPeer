@@ -21,30 +21,32 @@ $commentReleased = $status['autoRelease'] || (isset($release)? $release['comment
                 $memberRubric = $row['EvaluationRubric']; ?>
                 <tr><td width='15%'><?php echo $membersList[$memberRubric['evaluatee']] ?></td>
                 <?php foreach ($row['EvaluationRubricDetail'] as $detail) { ?>
-                    <td valign="middle"><br />
+                    <td valign="middle">
                     <!-- Points Detail -->
-                    <strong><?php echo __('Points', true) ?>: </strong>
-                    <?php if ($gradeReleased && isset($detail)) {
-                        for ($v = 0; $v < $detail["selected_lom"]; $v++) {
-                            echo $html->image('evaluations/circle.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'circle'));
+                    <?php if ($gradeReleased) {?>
+                        <br /><strong><?php echo __('Points', true) ?>: </strong>
+                        <?php if ($gradeReleased && isset($detail)) {
+                            for ($v = 0; $v < $detail["selected_lom"]; $v++) {
+                                echo $html->image('evaluations/circle.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'circle'));
+                            }
+                            for ($t=0; $t < $rubric["Rubric"]["lom_max"] - $detail["selected_lom"]; $t++) {
+                                echo $html->image('evaluations/circle_empty.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'circle_empty'));
+                            }
+                        } else {
+                            echo __('n/a', true);
                         }
-                        for ($t=0; $t < $rubric["Rubric"]["lom_max"] - $detail["selected_lom"]; $t++) {
-                            echo $html->image('evaluations/circle_empty.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'circle_empty'));
+                        //Grade Detail
+                        echo "<br/><strong>Grade: </strong>";
+                        if ($gradeReleased && isset($detail)) {
+                            echo $detail["grade"];
+                        } else {
+                            echo __('n/a', true);
                         }
-                    } else {
-                        echo __('n/a', true);
-                    }
-                    //Grade Detail
-                    echo "<br/><strong>Grade: </strong>";
-                    if ($gradeReleased && isset($detail)) {
-                        echo $detail["grade"];
-                    } else {
-                        echo __('n/a', true);
                     }
                     //Comments
                     ?>
                     <br/><strong><?php echo __('Comment', true) ?>: </strong>
-                    <?php echo $commentReleased && isset($detail) ? $detail["criteria_comment"]: __('n/a', true)?>
+                    <?php echo isset($detail) && ($detail['comment_release'] || isset($status['review'])) ? $detail["criteria_comment"]: __('n/a', true)?>
                     </td>
                 <?php } ?>
             </tr>
@@ -54,7 +56,7 @@ $commentReleased = $status['autoRelease'] || (isset($release)? $release['comment
             <td> </td>
             <td colspan="<?php echo $col ?>">
                 <strong><?php __('General Comment') ?>: </strong><br>
-                <?php echo ($commentReleased ? $memberRubric['comment'] : __('n/a', true))?><br><br>
+                <?php echo ($memberRubric['comment_release'] || isset($status['review']) ? $memberRubric['comment'] : __('n/a', true))?><br><br>
             </td>
             </tr>
     <?php }}}?>
