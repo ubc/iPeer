@@ -89,7 +89,7 @@ if (isset($course_list['I']))
     </li>
 
     <li>
-      <?php __('To create evaluations, check out the ')?><a href="http://ipeer.ctlt.ubc.ca/wiki/UserDocV3.1" target="_blank">User Documentations</a>.
+      <?php __('To create evaluations, check out the <a href="http://ipeer.ctlt.ubc.ca/wiki/UserDocV3.1" target="_blank">User Documentations</a>')?>.
     </li>
   </ol>
 </div>

@@ -95,7 +95,7 @@ jQuery(document).ready(function() {
 
     // for changing between roles
     jQuery("#role").change(function() {
-        window.location.href="/accesses/view/" + jQuery(this).val();
+        window.location.href="<?php echo $this->Html->url('/accesses/view')?>/" + jQuery(this).val();
     });
 
     // event listener for action links

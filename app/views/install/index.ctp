@@ -15,7 +15,7 @@ $yes = '<b class="green">'.__('Yes', true).'</b>';
 
 // Mandatory requirements init
 $phpver = $no;
-$REQPHPVER = '5.0';
+$REQPHPVER = '5.3';
 $mysql = $no;
 $configwritable = $no;
 $dbconfig = $no;
@@ -70,7 +70,7 @@ $domdoc = (extension_loaded('dom') && class_exists('DOMDocument')) ? $yes : $no;
 // make sure that the php memory limit is at least 64 mb
 $limit = ini_get('memory_limit');
 $unit = substr($limit, -1);
-// convert to bytes 
+// convert to bytes
 if ($limit == -1) $limit = 9999999999999; # no memory limit
 else if (strcasecmp($unit, 'k') == 0) $limit *= 1024;
 else if (strcasecmp($unit, 'm')) $limit *= 1024 * 1024;

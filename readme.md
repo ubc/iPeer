@@ -71,6 +71,15 @@ Runing the tests:
 
 It is better not to touch the mouse or keyboard during the tests.
 
+iPeer 3.1.2
+---------------------------
+This is a maintenance release.
+* Fix #567, grade release button failed when install in subdir
+* Fix cron email job failed when register_argc_argv is off
+* Update guard plugin
+* Update requirement to PHP 5.3
+* Fix #564, students unable to submit 0 mark in the mixeval
+
 iPeer 3.1.1
 ---------------------------
 This is a maintenance release.

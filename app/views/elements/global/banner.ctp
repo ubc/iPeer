@@ -1,6 +1,6 @@
 <div id='bannerLarge' class='banner'>
 <div id='ipeerLogo'>
-<a href='/' id='home'>
+<a href='<?php echo $this->Html->url('/')?>' id='home'>
 <?php
 echo $html->image('layout/ipeer_logo.png',
     array('id'=>'bannerLogoImgLeft', 'alt'=>'logo')

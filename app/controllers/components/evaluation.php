@@ -505,7 +505,7 @@ class EvaluationComponent extends Object
         $this->EvaluationRubricDetail = new EvaluationRubricDetail;
         $this->Rubric = new Rubric;
         $this->User = ClassRegistry::init('User');
-        
+
         $Session = new SessionComponent();
         $user = $Session->read('Auth.User');//User or Admin or
         $evaluator = empty($studentId) ? $user['id'] : $studentId;
@@ -623,7 +623,7 @@ class EvaluationComponent extends Object
         $this->EvaluationRubricDetail = ClassRegistry::init('EvaluationRubricDetail');
         $totalGrade = 0;
         $totalLom = count($rubric['RubricsLom']);
-        
+
         if ($viewMode == 0) {
             $pos = 0;
             for ($i=1; $i <= $rubric['Rubric']['criteria']; $i++) {
@@ -641,7 +641,7 @@ class EvaluationComponent extends Object
                     }
                 }
                 $grade = isset($form['selected_lom_'.$targetEvaluatee.'_'.$i])? $form['selected_lom_'.$targetEvaluatee.'_'.$i] * ($multiplier/$totalLom) : "";
-                
+
                 $selectedLom = $form['selected_lom_'.$targetEvaluatee.'_'.$i];
                 $evalRubricDetail = $this->EvaluationRubricDetail->getByEvalRubricIdCritera($evalRubricId, $i);
                 if (isset($evalRubricDetail)) {
@@ -652,12 +652,12 @@ class EvaluationComponent extends Object
                 $evalRubricDetail['EvaluationRubricDetail']['criteria_comment'] = $form[$targetEvaluatee."comments"][$pos++];
                 $evalRubricDetail['EvaluationRubricDetail']['selected_lom'] = $selectedLom;
                 $evalRubricDetail['EvaluationRubricDetail']['grade'] = $grade;
-                
+
                 if($selectedLom != null){
                     $this->EvaluationRubricDetail->save($evalRubricDetail);
                 }
                 $this->EvaluationRubricDetail->id=null;
-                
+
                 $totalGrade += $grade;
             }
         }
@@ -675,9 +675,9 @@ class EvaluationComponent extends Object
                 }
             }
             $grade = isset($form['selected_lom_'.$targetEvaluatee.'_'.$targetCriteria])? $form['selected_lom_'.$targetEvaluatee.'_'.$targetCriteria] * ($multiplier/$totalLom) : "";
-            
+
             $selectedLom = $form['selected_lom_'.$targetEvaluatee.'_'.$targetCriteria];
-            
+
             // Set up and save EvaluationRubricDetail
             $evalRubricDetail = $this->EvaluationRubricDetail->getByEvalRubricIdCritera($evalRubricId, $targetCriteria);
             if (isset($evalRubricDetail)) {
@@ -690,7 +690,7 @@ class EvaluationComponent extends Object
             $evalRubricDetail['EvaluationRubricDetail']['grade'] = $grade;
             $this->EvaluationRubricDetail->save($evalRubricDetail);
             $this->EvaluationRubricDetail->id=null;
-            
+
             // Loop through all criteria to get total grade
             foreach ($rubric['RubricsCriteria'] as $rubricCriteria) {
                 $criteriaNum = $rubricCriteria['criteria_num'];
@@ -757,12 +757,12 @@ class EvaluationComponent extends Object
     {
         $summary = array();
         $criteria = array();        // for storing criteria numbers
-        
+
         // If array is null, returns false
         if($evalResult == null) {
             return false;
         }
-        
+
         foreach ($evalResult as $result) {
             $userId = $result['EvaluationRubric']['evaluatee'];
             $evaluator = $result['EvaluationRubric']['evaluator'];
@@ -800,7 +800,7 @@ class EvaluationComponent extends Object
             $grades = Set::extract($summary, '/grades/'.$num);
             $group['grades'][$num] = array_sum($grades) / count($grades);
         }
-        
+
         return $summary + $group;
     }
 
@@ -911,12 +911,12 @@ class EvaluationComponent extends Object
     /**
      * saveMixevalEvaluation
      *
-     * @param bool $params
+     * @param array $params mixeval array
      *
      * @access public
      * @return void
      */
-    function saveMixevalEvaluation($params=null)
+    function saveMixevalEvaluation($params)
     {
         $this->Event = ClassRegistry::init('Event');
         $this->Mixeval = ClassRegistry::init('Mixeval');
@@ -948,13 +948,14 @@ class EvaluationComponent extends Object
             $this->EvaluationMixeval->save($evalMixeval);
             $evalMixeval = $this->EvaluationMixeval->read();
         }
-        
+
         $score = $this->saveNGetEvaluationMixevalDetail(
             $evalMixeval['EvaluationMixeval']['id'], $mixeval, $params);
         $evalMixeval['EvaluationMixeval']['score'] = $score;
         if (!$this->EvaluationMixeval->save($evalMixeval)) {
             return false;
         }
+
         return true;
     }
 
@@ -978,6 +979,7 @@ class EvaluationComponent extends Object
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
         $totalGrade = 0;
         $data = $form['EvaluationMixeval'];
+
         foreach($mixeval['MixevalQuestion'] as $ques) {
             $num = $ques['question_num'];
             $evalMixevalDetail = $this->EvaluationMixevalDetail->getByEvalMixevalIdCriteria($evalMixevalId, $num);
@@ -1012,6 +1014,7 @@ class EvaluationComponent extends Object
                 }
                 $evalMixevalDetail['EvaluationMixevalDetail']['question_comment'] = $data[$num]['question_comment'];
             }
+
             $this->EvaluationMixevalDetail->save($evalMixevalDetail);
             $this->EvaluationMixevalDetail->id=null;
         }
@@ -1054,7 +1057,7 @@ class EvaluationComponent extends Object
 
         return $mixevalResultDetail;
     }
-    
+
     /**
      * formatMixevalEvaluationResultsMatrix
      * results matrix format:
@@ -1125,7 +1128,7 @@ class EvaluationComponent extends Object
         }
         return $evalResult;
     }
-    
+
 
     /**
      * changeMixevalEvaluationGradeRelease
@@ -1142,7 +1145,7 @@ class EvaluationComponent extends Object
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
         $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
-        
+
         $sub = $this->EvaluationSubmission->findAllByGrpEventId($groupEventId);
         $sub = Set::extract('/EvaluationSubmission/submitter_id', $sub);
 
@@ -1184,7 +1187,7 @@ class EvaluationComponent extends Object
 
         $this->GroupEvent->id = $groupEventId;
         $groupEvent = $this->GroupEvent->read();
-        
+
         $sub = $this->EvaluationSubmission->findAllByGrpEventId($groupEventId);
         $sub = Set::extract('/EvaluationSubmission/submitter_id', $sub);
 
@@ -1328,7 +1331,7 @@ class EvaluationComponent extends Object
         if(empty($survey)) {
             return false;
         }
-        
+
         foreach ($questions as $i => $question) {
             $questionType = $question['type'];
             $questionTypeAllowed = array('C', 'M');
