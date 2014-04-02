@@ -53,7 +53,7 @@ echo $this->Form->input(
         'default' => '1'
     )
 ); ?>
-<div class='help-text'><?php echo _t('Basic view only show averages of questions') ?></div>
+<div class='help-text'><?php echo _t('Basic view only shows grades. Detailed view shows both grades and comments') ?></div>
 <?php
 echo $this->Form->input('due_date', array('type' => 'text'));
 echo $this->Form->input('release_date_begin', array('label' => 'Evaluation Released From', 'type' => 'text'));
@@ -62,7 +62,7 @@ echo $this->Form->input('result_release_date_begin',
     array('div' => array('id' => 'ResultReleaseBeginDiv'), 'label' => 'Results Released From', 'type' => 'text'));
 echo $this->Form->input('result_release_date_end',
     array('div' => array('id' => 'ResultReleaseEndDiv'), 'label' => 'Until', 'type' => 'text'));
-    
+
 echo $this->Form->input(
     'email_schedule',
     array(
@@ -70,7 +70,7 @@ echo $this->Form->input(
         'options' => $emailSchedules,
         'div' => array('id' => 'emailSchedule')
     )
-); 
+);
 ?>
 <div class='email-help-text'><?php __('Select the number of days in between each email reminder for submitting
     evaluations. The first email is sent when the event is released.') ?></div>
