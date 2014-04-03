@@ -9,7 +9,7 @@ $eventId = $data['Event']['id'];?>
         <?php echo Toolkit::formatDate($data['Event']['due_date']) ?>
   </div>
     <!-- /Auto Release Message-->
-    <?php if ($data['Event']['auto_release']) {
+    <?php if ($data['Event']['auto_release'] && $viewReleaseBtns) {
         echo "<div id='autoRelease_msg' class='green'>";
         echo "<br>".__("Auto Release is ON, you do not need to manually release the grades and comments", true);
         echo "</div>";
@@ -17,10 +17,12 @@ $eventId = $data['Event']['id'];?>
   <div class="button-row">
     <ul>
       <li><?php echo $html->link(__(" Export Evaluations", true), "export/event/".$eventId, array('class' => 'export-excel-button'));?></li>
+      <?php if ($viewReleaseBtns) { ?>
       <li><?php echo $html->link(__('Release All Comments', true), 'changeAllCommentRelease/'.$eventId.';1', array('class' => 'button'));?></li>
       <li><?php echo $html->link(__('Unrelease All Comments', true), 'changeAllCommentRelease/'.$eventId.';0', array('class' => 'button'));?></li>
       <li><?php echo $html->link(__('Release All Grades', true), 'changeAllGradeRelease/'.$eventId.';1',array('class' => 'button'));?></li>
       <li><?php echo $html->link(__('Unrelease All Grades', true),'changeAllGradeRelease/'.$eventId.';0',array('class' => 'button'));?></li>
+      <?php } ?>  
     </ul>
   </div>
   <div>

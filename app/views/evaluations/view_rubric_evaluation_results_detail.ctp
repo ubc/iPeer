@@ -115,6 +115,7 @@ if (!empty($notInGroup)) {
                 'notInGroup' => Set::extract($notInGroup, '/User/id'),
                 'memberList' => $memberList,
                 'rubric' => $rubric['Rubric'],
+                'viewReleaseBtns' => $viewReleaseBtns,
             );
             echo $this->element('evaluations/rubric_details', $params); 
             ?>
@@ -128,10 +129,12 @@ if (!empty($notInGroup)) {
 <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>">
 <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>">
 <input type="hidden" name="group_id" value="<?php echo $event['Group']['id'] ?>" />
+<?php if ($viewReleaseBtns) { ?>
 <input name="submit" type="submit" value="<?php echo __('Release Comments', true); ?>">
 <input name="submit" type="submit" value="<?php echo __('Unrelease Comments', true); ?>">
 <input type="button" name="ReleaseGrades" value="<?php __('Release Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$userId.';'.$event['GroupEvent']['id'].';1'; ?>'">
 <input type="button" name="UnreleaseGrades" value="<?php __('Unrelease Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$userId.';'.$event['GroupEvent']['id'].';0'; ?>'">
+<?php } ?>
 </p>
 </form>
 <?php } else { ?>

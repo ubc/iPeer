@@ -59,7 +59,9 @@ foreach ($result AS $evaluator => $row) {
 }
 ?>
 </table>
+<?php if ($viewReleaseBtns) { ?>
 <input name="submit" type="submit" value="<?php echo __('Release All Comments', true); ?>">
 <input name="submit" type="submit" value="<?php echo __('Save Changes', true); ?>">
 <input name="submit" type="submit" value="<?php echo __('Unrelease All Comments', true); ?>">
+<?php } ?>
 </form>

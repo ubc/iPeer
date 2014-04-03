@@ -201,11 +201,15 @@ class EvaluationsController extends AppController
 
         // Set up the basic static ajax list variables
         $this->setUpAjaxList($eventId);
+        
+        // set status whether instructors can view un/release comments & grades
+        $viewReleaseBtns = time() >= strtotime($event['Event']['release_date_end']);
 
         // Set the display list
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
 
         $this->set('data', $event);
+        $this->set('viewReleaseBtns', $viewReleaseBtns);
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $event['Course']))
             ->push(array('event' => $event['Event']))
             ->push(__('Results', true)));
@@ -1186,6 +1190,9 @@ class EvaluationsController extends AppController
             ->push(array('event' => $event['Event']))
             ->push(__('Results', true)));
 
+        // set status whether instructors can view un/release comments & grades
+        $viewReleaseBtns = time() >= strtotime($event['Event']['release_date_end']);
+        $this->set('viewReleaseBtns', $viewReleaseBtns);
 
         switch ($event['Event']['event_template_type_id'])
         {

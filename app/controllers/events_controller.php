@@ -14,7 +14,7 @@ class EventsController extends AppController
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time');
     public $uses = array('GroupEvent', 'User', 'Group', 'Course', 'Event', 'EventTemplateType',
         'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers', 'Penalty', 'Survey','EmailSchedule',
-        'EvaluationSubmission', 'EmailTemplate');
+        'EvaluationSubmission', 'EmailTemplate', 'EvaluationRubric');
     public $components = array("AjaxList", "Session", "RequestHandler","Email");
 
     /**
@@ -504,6 +504,20 @@ class EventsController extends AppController
             // if all groups unselected - delete groupEvents
             if (empty($this->data['Group']['Group'])) {
                 $this->GroupEvent->deleteAll(array('GroupEvent.event_id' => $eventId));
+            }
+            
+            /* update submitted evaluations release status if:
+            1. after the event has closed AND
+            2. auto-release status has been changed
+            */
+            if (time() >= strtotime($event['Event']['release_date_end']) &&
+                $this->data['Event']['auto_release'] != $event['Event']['auto_release']) {
+                switch ($event['Event']['event_template_type_id']) {
+                case 2://rubric
+                    $this->EvaluationRubric->setAllEventCommentRelease($eventId, User::get('id'), $this->data['Event']['auto_release']);
+                    $this->EvaluationRubric->setAllEventGradeRelease($eventId, $this->data['Event']['auto_release']);
+                    break;
+                }
             }
 
             $penaltyData = $this->Penalty->find('all', array('conditions' => array('event_id' => $eventId), 'contain' => false));

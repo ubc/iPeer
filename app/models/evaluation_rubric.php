@@ -348,10 +348,15 @@ class EvaluationRubric extends EvaluationResponseBase
     function setAllEventCommentRelease($eventId, $userId, $releaseStatus)
     {
         $this->EvaluationRubricDetail = ClassRegistry::init('EvaluationRubricDetail');
+        $this->GroupEvent = ClassRegistry::init('GroupEvent');
 
         $now = '"'.date("Y-m-d H:i:s").'"';
         
-        $conditions = array('event_id' => $eventId);      
+        // only change release status if the group event is NOT marked as reviewed
+        $grpEvents = $this->GroupEvent->find('list', array(
+            'conditions' => array('event_id' => $eventId, 'marked' => 'not reviewed')
+        ));
+        $conditions = array('grp_event_id' => $grpEvents);      
         $evalRubrIds = $this->find('list', array('conditions' => $conditions));
         // update all comment release status that meets the conditions
         $this->updateAll(
@@ -374,10 +379,17 @@ class EvaluationRubric extends EvaluationResponseBase
      * @access public
      * @return void
      */
-    function setAllEventGradeRelease($eventId=null, $releaseStatus=null)
+    function setAllEventGradeRelease($eventId, $releaseStatus)
     {
+        $this->GroupEvent = ClassRegistry::init('GroupEvent');
+        
+        // only change release status if the group event is NOT marked as reviewed
+        $grpEvents = $this->GroupEvent->find('list', array(
+            'conditions' => array('event_id' => $eventId, 'marked' => 'not reviewed')
+        ));
+        
         $fields = array('EvaluationRubric.grade_release' => $releaseStatus);
-        $conditions = array('EvaluationRubric.event_id' => $eventId);
+        $conditions = array('EvaluationRubric.grp_event_id' => $grpEvents);
         return $this->updateAll($fields, $conditions);
     }
 
