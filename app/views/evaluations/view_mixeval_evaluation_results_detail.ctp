@@ -133,7 +133,6 @@ if (!empty($notInGroup)) {
             echo $penaltyNotice;
             ?>
 
-            <div id='mixeval_result'>
             <?php
             $questions = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}');
             $zero_mark = $mixeval['Mixeval']['zero_mark'];
@@ -147,29 +146,10 @@ if (!empty($notInGroup)) {
 
             $params = array('controller'=>'evaluations', 'questions'=>$questions, 'zero_mark'=>$zero_mark,
                 'gradeReleased'=>1, 'commentReleased'=>1, 'details'=>1, 'evaluatee'=>$evaluteeId, 
-                'names'=>$memberList, 'notInGroup'=>$notInGroup, 'peer_eval' => 1, 'title' => 'Questions');
+                'names'=>$memberList, 'notInGroup'=>$notInGroup, 'peer_eval' => 1, 'title' => __('Questions', true),
+                'instructorMode' => 1, 'event' => $event);
             echo $this->element('evaluations/mixeval_details', $params);
             ?>
-            </div>
-
-            <?php
-            $gradeReleased = (!isset($evalResult[$evaluteeId][0]['EvaluationMixeval']['grade_release'])) ? false : 
-                array_product(Set::extract('/EvaluationMixeval/grade_release', $evalResult[$evaluteeId]));
-            $commentReleased = (!isset($evalResult[$evaluteeId][0]['EvaluationMixeval']['comment_release'])) ? false : 
-                array_product(Set::extract('/EvaluationMixeval/comment_release', $evalResult[$evaluteeId]));
-            //Grade Released
-            if ($gradeReleased) {?>
-                <input type="button" name="UnreleaseGrades" value="<?php __('Unrelease Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$evaluteeId.';'.$event['GroupEvent']['id'].';0'; ?>'">
-            <?php } else {?>
-                <input type="button" name="ReleaseGrades" value="<?php __('Release Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$evaluteeId.';'.$event['GroupEvent']['id'].';1'; ?>'">
-            <?php }
-
-            //Comment Released
-            if ($commentReleased) {?>
-                <input type="button" name="UnreleaseComments" value="<?php __('Unrelease Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$evaluteeId.';'.$event['GroupEvent']['id'].';0'; ?>'">
-            <?php } else {?>
-                <input type="button" name="ReleaseComments" value="<?php __('Release Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$evaluteeId.';'.$event['GroupEvent']['id'].';1'; ?>'">
-            <?php } ?>
             <?php if ($event['Event']['auto_release']) {
                 echo "<div id='autoRelease_msg' class='green'>";
                 echo "<br>".__("Auto Release is ON, you do not need to manually release the grades and comments", true);
@@ -180,7 +160,17 @@ if (!empty($notInGroup)) {
 <?php endforeach; ?>
 <?php } ?>
 </div>
-
+<form name="evalFormAllComment" id="evalFormAllComment" method="POST" action="<?php echo $html->url('markCommentRelease') ?>">
+<p style="text-align: center;">
+<input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>">
+<input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>">
+<input type="hidden" name="group_id" value="<?php echo $event['Group']['id'] ?>" />
+<?php if ($viewReleaseBtns) { ?>
+<input name="submit" type="submit" value="<?php echo __('Release Comments', true); ?>">
+<input name="submit" type="submit" value="<?php echo __('Unrelease Comments', true); ?>">
+<?php }?>
+</p>
+</form>
 <script type="text/javascript"> new Rico.Accordion( 'accordion',
             {panelHeight:500,
             hoverClass: 'mdHover',

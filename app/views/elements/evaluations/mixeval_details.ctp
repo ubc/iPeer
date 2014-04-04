@@ -9,9 +9,17 @@ if (!$gradeReleased && !$commentReleased && $details) {
 }
 $header = $title.$addOn;
 
+echo "<div id='mixeval_result'>";
 echo $html->tag('h2', $header);
 $qnum = 1;
 if ($details) {
+    if ($instructorMode && $viewReleaseBtns) { ?>
+        <form name="evalForm<?php echo $evaluatee ?>" id="evalForm<?php echo $evaluatee ?>" method="POST" action="<?php echo $html->url('markCommentRelease') ?>">
+        <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
+        <input type="hidden" name="group_id" value="<?php echo $event['Group']['id'] ?>" />
+        <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>" />
+        <input type="hidden" name="evaluatee" value="<?php echo $evaluatee?>">
+    <?php }
     foreach ($questions as $ques) {
         if ($ques['self_eval'] == $peer_eval) {
             continue; // skip questions not in the desired section
@@ -59,7 +67,15 @@ if ($details) {
                 } else if ($type == '4') {
                     echo '<li>'.$name.$sub['grade'].'</li>';
                 } else {
-                    echo '<li>'.$name.$sub['question_comment'].'</li>';
+                    $chkParam = array(
+                        'value' => $sub['id'],
+                        'hiddenField' => false,
+                        'name' => 'releaseComments[]',
+                        'checked' => $sub['comment_release'], 
+                    );
+                    $comment = ($instructorMode || $sub['comment_release']) ? $sub['question_comment'] : __('n/a', true);
+                    $check = $instructorMode ? $form->checkbox($chkParam['name'], $chkParam) : '';
+                    echo '<li>'.$name.$check.$comment.'</li>';
                 }
             }
             echo '</ul>';
@@ -67,6 +83,15 @@ if ($details) {
             echo '<ul><li>N/A</li></ul>';
         }
         $qnum++;
+    }
+    echo "</div>";
+    if ($instructorMode && $viewReleaseBtns) {?>
+        <input name="submit" type="submit" value="<?php echo __('Unrelease All Comments', true); ?>">
+        <input name="submit" type="submit" value="<?php echo __('Release All Comments', true); ?>">
+        <input name="submit" type="submit" value="<?php echo __('Save Changes', true); ?>">
+        <input type="button" name="ReleaseGrades" value="<?php __('Release Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$evaluatee.';'.$event['GroupEvent']['id'].';1'; ?>'">
+        <input type="button" name="UnreleaseGrades" value="<?php __('Unrelease Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$evaluatee.';'.$event['GroupEvent']['id'].';0'; ?>'">
+        <?php echo '</form>';
     }
     echo '<br>';
 } else {
@@ -95,3 +120,4 @@ if ($details) {
     echo '<br>';
 }
 ?>
+<br>

@@ -845,43 +845,6 @@ class EvaluationComponent extends Object
             $this->GroupEvent->read(), $releaseStatus, $oppositGradeReleaseCount);
         $this->GroupEvent->save($groupEvent);
     }
-
-
-    /**
-     * changeRubricEvaluationCommentRelease - DEPRECATED
-     *
-     * @param mixed $groupEventId  group event id
-     * @param mixed $evaluateeId   evaluatee id
-     * @param mixed $params        params
-     *
-     * @access public
-     * @return void
-     */
-    function changeRubricEvaluationCommentRelease ($groupEventId, $evaluateeId, $params)
-    {
-        $this->EvaluationRubric  =  ClassRegistry::init('EvaluationRubric');
-        $this->GroupEvent =  ClassRegistry::init('GroupEvent');
-        $this->GroupEvent->id = $groupEventId;
-        $groupEvent = $this->GroupEvent->read();
-
-        //changing comment release for each EvaluationRubric
-        $evaluationRubric = $this->EvaluationRubric->getResultsByEvaluatee($groupEventId, $evaluateeId);
-        foreach ($evaluationRubric as $row) {
-            $evalRubric = $row['EvaluationRubric'];
-            if (isset($evalRubric)) {
-                $this->EvaluationRubric->id = $evalRubric['id'];
-                $evalRubric['comment_release'] = $releaseStatus;
-                $this->EvaluationRubric->save($evalRubric);
-            }
-        }
-
-        //changing comment release status for the GroupEvent
-        $this->GroupEvent->id = $groupEventId;
-        $oppositGradeReleaseCount = $this->EvaluationRubric->getOppositeCommentReleaseStatus($groupEventId, $releaseStatus);
-        $groupEvent = $this->formatCommentReleaseStatus(
-            $this->GroupEvent->read(), $releaseStatus, $oppositGradeReleaseCount);
-        $this->GroupEvent->save($groupEvent);
-    }
     
     /**
      * changeIndivRubricEvalCommentRelease
@@ -895,8 +858,6 @@ class EvaluationComponent extends Object
     {
         $this->EvaluationRubric = ClassRegistry::init('EvaluationRubric');
         $this->EvaluationRubricDetail = ClassRegistry::init('EvaluationRubricDetail');
-        $this->GroupEvent = ClassRegistry::init('GroupEvent');
-        $this->Event = ClassRegistry::init('Event');
         
         $grpEventId = $params['group_event_id'];
         $evaluatee = $params['evaluatee'];
@@ -945,7 +906,6 @@ class EvaluationComponent extends Object
     {
         $this->EvaluationRubric = ClassRegistry::init('EvaluationRubric');
         $this->EvaluationRubricDetail = ClassRegistry::init('EvaluationRubricDetail');
-        $this->GroupEvent = ClassRegistry::init('GroupEvent');
 
         $now = '"'.date("Y-m-d H:i:s").'"';
         $user = $this->Auth->user('id');
@@ -1288,48 +1248,102 @@ class EvaluationComponent extends Object
             $this->GroupEvent->read(), $releaseStatus, $oppositGradeReleaseCount);
         $this->GroupEvent->save($groupEvent);
     }
-
-
+    
     /**
-     * changeMixevalEvaluationCommentRelease
+     * changeIndivMixedEvalCommentRelease
      *
-     * @param mixed $groupEventId  group event id
-     * @param mixed $evaluateeId   evaluatee id
-     * @param mixed $releaseStatus release status
+     * @param mixed $params
      *
      * @access public
      * @return void
      */
-    function changeMixevalEvaluationCommentRelease ($groupEventId, $evaluateeId, $releaseStatus)
+    function changeIndivMixedEvalCommentRelease($params) 
     {
-        $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
-        $this->GroupEvent = ClassRegistry::init('GroupEvent');
-        $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
+        $this->EvaluationMixevalDetail = ClassRegistry::init('EvaluationMixevalDetail');
+        $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
+        
+        $grpEventId = $params['group_event_id'];
+        $evaluatee = $params['evaluatee'];
+        
+        $now = '"'.date("Y-m-d H:i:s").'"';
+        $user = $this->Auth->user('id');
+        
+        $mixedIds = $this->EvaluationMixeval->find('list', array(
+            'conditions' => array('evaluatee' => $evaluatee, 'grp_event_id' => $grpEventId)
+        ));
+        // change comment release to 0 for the evaluatee in this group event
+        $this->EvaluationMixevalDetail->updateAll(
+            array('EvaluationMixevalDetail.comment_release' => 0, 'EvaluationMixevalDetail.modified' => $now, 'EvaluationMixevalDetail.updater_id' => $user),
+            array('EvaluationMixevalDetail.evaluation_mixeval_id' => $mixedIds)
+        );
+        
+        //release general comments
+        $mixedDetailIds = isset($params['releaseComments']) ? $params['releaseComments'] : array();
+        $this->EvaluationMixevalDetail->updateAll(
+            array('EvaluationMixevalDetail.comment_release' => 1, 'EvaluationMixevalDetail.modified' => $now, 'EvaluationMixevalDetail.updater_id' => $user),
+            array('EvaluationMixevalDetail.id' => $mixedDetailIds)
+        );
+    }
+    
+    /**
+     * changeMixedEvalCommentRelease
+     *
+     * @param mixed $status     status
+     * @param mixed $grpEventId group event id
+     * @param mixed $evaluatee  evaluatee
+     *
+     * @access public
+     * @return void
+     */
+    function changeMixedEvalCommentRelease($status, $grp_event_id, $evaluatee = null)
+    {
+        $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
+        $this->EvaluationMixevalDetail = ClassRegistry::init('EvaluationMixevalDetail');
 
-        $this->GroupEvent->id = $groupEventId;
-        $groupEvent = $this->GroupEvent->read();
-
-        $sub = $this->EvaluationSubmission->findAllByGrpEventId($groupEventId);
-        $sub = Set::extract('/EvaluationSubmission/submitter_id', $sub);
-
-        //changing comment release for each EvaluationMixeval
-        $evaluationMixeval = $this->EvaluationMixeval->getResultsByEvaluatee($groupEventId, $evaluateeId, $sub);
-        foreach ($evaluationMixeval as $row) {
-            $evalMixeval = $row['EvaluationMixeval'];
-            if (isset($evalMixeval)) {
-                $this->EvaluationMixeval->id = $evalMixeval['id'];
-                $evalMixeval['comment_release'] = $releaseStatus;
-                $this->EvaluationMixeval->save($evalMixeval);;
-            }
+        $now = '"'.date("Y-m-d H:i:s").'"';
+        $user = $this->Auth->user('id');
+        
+        $conditions = array('grp_event_id' => $grp_event_id);
+        if ($evaluatee) {
+            $conditions['evaluatee'] = $evaluatee;
         }
+        
+        $evalRubrIds = $this->EvaluationMixeval->find('list', array('conditions' => $conditions));
+        // update all comment release status that meets the conditions
+        $this->EvaluationMixevalDetail->updateAll(
+            array('EvaluationMixevalDetail.comment_release' => $status, 'EvaluationMixevalDetail.modified' => $now, 'EvaluationMixevalDetail.updater_id' => $user),
+            array('EvaluationMixevalDetail.evaluation_mixeval_id' => $evalRubrIds)
+        );
+    }
 
-        //changing comment release status for the GroupEvent
-        $this->GroupEvent->id = $groupEventId;
-        $oppositGradeReleaseCount = $this->EvaluationMixeval->getOppositeCommentReleaseStatus($groupEventId, $releaseStatus);
-        $groupEvent = $this->formatCommentReleaseStatus($this->GroupEvent->read(), $releaseStatus,
-            $oppositGradeReleaseCount);
-
-        $this->GroupEvent->save($groupEvent);
+    /**
+     * markMixedEvalReviewed
+     *
+     * @param mixed $eventId
+     * @param mixed $grpEventId
+     *
+     * @access public
+     * @return void
+     */
+    function markMixedEvalReviewed($eventId, $grpEventId)
+    {
+        $this->EvaluationMixevalDetail = ClassRegistry::init('EvaluationMixevalDetail');
+        $this->GroupEvent = ClassRegistry::init('GroupEvent');
+        $this->Event = ClassRegistry::init('Event');
+        
+        // set group event to reviewed if all evaluatees' release status has been modified
+        $eval = $this->EvaluationMixevalDetail->find('first', array(
+            'conditions' => array('grp_event_id' => $grpEventId),
+            'order' => array('EvaluationMixevalDetail.modified ASC')
+        ));
+        $event = $this->Event->findById($eventId);
+        
+        // if the oldest modified date is after the event's close date
+        if (strtotime($event['Event']['release_date_end']) <= strtotime($eval['EvaluationMixevalDetail']['modified'])) {
+            // set group event to reviewed
+            $this->GroupEvent->id = $grpEventId;
+            $this->GroupEvent->saveField('marked', 'reviewed');
+        }
     }
 
     /**

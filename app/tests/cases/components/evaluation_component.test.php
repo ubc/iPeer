@@ -382,50 +382,6 @@ class EvaluationTestCase extends CakeTestCase
         }
     }
 
-    /**
-     * testChangeRubricEvaluationCommentRelease
-     *
-     * Tests method to see if comment release can be changed for a single user
-     * and for all users for the event.
-     */
-    function testChangeRubricEvaluationCommentRelease()
-    {
-        // Test case for making comment unreleased (releaseStatus = 0)
-        // Tests change for single user in event
-        $this->EvaluationComponentTest->changeRubricEvaluationCommentRelease(4, 33, 0);
-        $result = $this->EvaluationRubric->find('all', array('conditions' => array('grp_event_id' => 4, 'evaluatee' => 33)));
-        $this->assertEqual($result[0]['EvaluationRubric']['comment_release'], 0);
-
-        // Test case for making comment released (releaseStatus = 1)
-        // Tests change for single user in event
-        $this->EvaluationComponentTest->changeRubricEvaluationCommentRelease(4, 32, 1);
-        $result = $this->EvaluationRubric->find('all', array('conditions' => array('grp_event_id' => 4, 'evaluatee' => 32)));
-        $this->assertEqual($result[0]['EvaluationRubric']['comment_release'], 1);
-
-        // Test case for making comment unreleased (releaseStatus = 0)
-        // Tests change for all users in event
-        $this->EvaluationComponentTest->changeRubricEvaluationCommentRelease(4, null, 0);
-        $result = $this->EvaluationRubric->find('all', array('conditions' => array('grp_event_id' => 4)));
-        foreach ($result as $row) {
-            $this->assertEqual($row['EvaluationRubric']['comment_release'], 0);
-        }
-
-        // Test case for making comment released (releaseStatus = 1)
-        // Tests change for all users in event
-        $this->EvaluationComponentTest->changeRubricEvaluationCommentRelease(4, null, 1);
-        $result = $this->EvaluationRubric->find('all', array('conditions' => array('grp_event_id' => 4)));
-        foreach ($result as $row) {
-            $this->assertEqual($row['EvaluationRubric']['comment_release'], 1);
-        }
-
-        // Test case for null event
-        $this->EvaluationComponentTest->changeRubricEvaluationCommentRelease(null, null, 1);
-        $result = $this->EvaluationRubric->find('all', array('conditions' => array('grp_event_id' => null)));
-        foreach ($result as $row) {
-            $this->assertNull($row['EvaluationRubric']['comment_release']);
-        }
-    }
-
     //TODO
     //Skip, uses Auth
     function testFormatRubricEvaluationResult()
@@ -596,15 +552,6 @@ class EvaluationTestCase extends CakeTestCase
     {
 
 
-
-    }
-
-    function testChangeMixevalEvaluationCommentRelease()
-    {
-
-        $this->EvaluationComponentTest->changeMixevalEvaluationCommentRelease(1, 1, 1);
-        //     $survey =  $this->EvaluationMixeval->find('all', array('conditions' => array('grp_event_id' => 1)));
-        //  var_dump($survey);
 
     }
 

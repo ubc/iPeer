@@ -1371,6 +1371,12 @@ i {
     text-align: left;
 }
 
+#mixeval_result .releaseBtns {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
 /* mixevals/view */
 
 .MixevalView dt {
