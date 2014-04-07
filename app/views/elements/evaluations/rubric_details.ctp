@@ -62,6 +62,8 @@ foreach ($result AS $evaluator => $row) {
 <?php if ($viewReleaseBtns) { ?>
 <input name="submit" type="submit" value="<?php echo __('Release All Comments', true); ?>">
 <input name="submit" type="submit" value="<?php echo __('Save Changes', true); ?>">
-<input name="submit" type="submit" value="<?php echo __('Unrelease All Comments', true); ?>">
+<input name="submit" type="submit" value="<?php echo __('Unrelease All Comments', true); ?>"><br>
+<input type="button" name="ReleaseGrades" value="<?php __('Release Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['GroupEvent']['id'].'/1/'.$evaluatee; ?>'">
+<input type="button" name="UnreleaseGrades" value="<?php __('Unrelease Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['GroupEvent']['id'].'/0/'.$evaluatee; ?>'">
 <?php } ?>
 </form>

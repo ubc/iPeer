@@ -1221,6 +1221,7 @@ class EvaluationsController extends AppController
             $members = $this->User->findAllById($memberList);
             $rubric = $this->Rubric->findById($event['Event']['template_id']);
             $scoreRecords = $this->Evaluation->formatRubricEvaluationResultsMatrix($rubricDetails);
+            debug($scoreRecords);
 
             $this->set('rubric', $rubric);
             $this->set('inCompleteMembers', $inCompleteMembers);
@@ -1518,12 +1519,14 @@ class EvaluationsController extends AppController
     /**
      * markGradeRelease
      *
-     * @param mixed $param
+     * @param mixed $grpEventId
+     * @param mixed $releaseStatus
+     * @param mixed $evaluatee
      *
      * @access public
      * @return void
      */
-    function markGradeRelease($param)
+    function markGradeRelease($grpEventId, $releaseStatus, $evaluatee = null)
     {
         // Make sure the present user has permission
         if (!User::hasPermission('functions/evaluation')) {
@@ -1532,36 +1535,56 @@ class EvaluationsController extends AppController
             return;
         }
 
-        $tok = strtok($param, ';');
-        $eventId = $tok;
-        $groupId =  strtok(';');
-        $evaluateeId =  strtok(';');
-        $groupEventId = strtok(';');
-        $releaseStatus = strtok(';');
-
+        $grpEvent = $this->GroupEvent->findById($grpEventId);
+        $eventId = $grpEvent['GroupEvent']['event_id'];
+        $event = $this->Event->findById($eventId);
         $this->autoRender = false;
 
-        $this->Event->id = $eventId;
-        $event = $this->Event->read();
+        $conditions = array('grp_event_id' => $grpEventId);
+        if (!is_null($evaluatee)) {
+            $conditions['evaluatee'] = $evaluatee;
+        }
+        $url = '';
 
         switch ($event['Event']['event_template_type_id']) {
         case "1":
-            $this->Evaluation->changeSimpleEvaluationGradeRelease($groupEventId, $evaluateeId, $releaseStatus);
-            $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId);
+            $model = 'EvaluationSimple';
             break;
-
         case "2":
-            $this->Evaluation->changeRubricEvaluationGradeRelease($groupEventId,
-                $evaluateeId, $releaseStatus);
-            $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
+            $url = '/Detail';
+            $model = 'EvaluationRubric';
             break;
-
         case "4":
-            $this->Evaluation->changeMixevalEvaluationGradeRelease($groupEventId,
-                $evaluateeId, $releaseStatus);
-            $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
+            $url = '/Detail';
+            $model = 'EvaluationMixeval';
             break;
         }
+        
+        $evalIds = $this->$model->find('list', array('conditions' => $conditions));
+        $this->$model->updateAll(
+            array($model.'.grade_release' => $releaseStatus),
+            array($model.'.id' => $evalIds)
+        );
+        
+        $this->GroupEvent->id = $grpEventId;
+        $evals = $this->$model->find('list', array(
+            'conditions' => array('grp_event_id' => $grpEventId),
+            'fields' => $model.'.grade_release'
+        ));
+        $all = array_product($evals);
+        $some = array_sum($evals);
+        
+        if ($all) {
+            $grpEvent['GroupEvent']['grade_release_status'] = 'All';
+        } else if ($some) {
+            $grpEvent['GroupEvent']['grade_release_status'] = 'Some';
+        } else {
+            $grpEvent['GroupEvent']['grade_release_status'] = 'None';
+        }
+        
+        $this->GroupEvent->save($grpEvent);
+        
+        $this->redirect('viewEvaluationResults/'.$eventId.'/'.$grpEvent['GroupEvent']['group_id'].$url);
 
     }
 
@@ -1743,39 +1766,39 @@ class EvaluationsController extends AppController
         switch ($event['Event']['event_template_type_id']) {
         case 1://simple
             $this->EvaluationSimple->setAllEventGradeRelease($eventId, $releaseStatus);
+            $model = 'EvaluationSimple';
             break;
         case 2://rubric
             $this->EvaluationRubric->setAllEventGradeRelease($eventId, $releaseStatus);
+            $model = 'EvaluationRubric';
             break;
         case 4://mix
             $this->EvaluationMixeval->setAllEventGradeRelease($eventId, $releaseStatus);
+            $model = 'EvaluationMixeval';
             break;
         default:
             break;
         }
-
-        //Update all groupEvent's grade release Status based on submission
-        $groupEventList = $this->GroupEvent->getGroupListByEventId($eventId);
-        foreach ($groupEventList as $groupEvent) {
-            $this->GroupEvent->id = $groupEvent['GroupEvent']['group_id'];
-
-            //Get Members count whom completed evaluation
-            $numOfCompletedCount = $this->EvaluationSubmission->numCountInGroupCompleted($groupEvent['GroupEvent']['id']);
-            $numMembers = $this->GroupsMembers->find('count', array('conditions' => array('group_id' => $groupEvent['GroupEvent']['group_id'])));
-            if (($numOfCompletedCount != 0) && ($numOfCompletedCount < $numMembers)) {
-                $completeStatus = 'Some';
-            } elseif ($releaseStatus && ($numOfCompletedCount == $numMembers)) {
-                $completeStatus = 'All';
+        
+        $grpEventList = $this->GroupEvent->getGroupListByEventId($eventId);
+        foreach ($grpEventList as $grpEvent) {
+            $this->GroupEvent->id = $grpEvent['GroupEvent']['id'];
+            $evals = $this->$model->find('list', array(
+                'conditions' => array('grp_event_id' => $grpEvent['GroupEvent']['id']),
+                'fields' => $model.'.grade_release'
+            ));
+            $all = array_product($evals);
+            $some = array_sum($evals);
+            
+            if ($all) {
+                $grpEvent['GroupEvent']['grade_release_status'] = 'All';
+            } else if ($some) {
+                $grpEvent['GroupEvent']['grade_release_status'] = 'Some';
             } else {
-                $completeStatus = 'None';
+                $grpEvent['GroupEvent']['grade_release_status'] = 'None';
             }
-
-            if ($releaseStatus == 0) {
-                $groupEvent['GroupEvent']['grade_release_status'] = 'None';
-            } else {
-                $groupEvent['GroupEvent']['grade_release_status'] = $completeStatus;
-            }
-            $this->GroupEvent->save($groupEvent);
+            
+            $this->GroupEvent->save($grpEvent);
         }
 
         $this->redirect('/evaluations/view/'.$eventId);

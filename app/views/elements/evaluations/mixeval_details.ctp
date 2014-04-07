@@ -89,8 +89,8 @@ if ($details) {
         <input name="submit" type="submit" value="<?php echo __('Unrelease All Comments', true); ?>">
         <input name="submit" type="submit" value="<?php echo __('Release All Comments', true); ?>">
         <input name="submit" type="submit" value="<?php echo __('Save Changes', true); ?>">
-        <input type="button" name="ReleaseGrades" value="<?php __('Release Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$evaluatee.';'.$event['GroupEvent']['id'].';1'; ?>'">
-        <input type="button" name="UnreleaseGrades" value="<?php __('Unrelease Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$evaluatee.';'.$event['GroupEvent']['id'].';0'; ?>'">
+        <input type="button" name="ReleaseGrades" value="<?php __('Release Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['GroupEvent']['id'].'/1/'.$evaluatee; ?>'">
+        <input type="button" name="UnreleaseGrades" value="<?php __('Unrelease Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['GroupEvent']['id'].'/0/'.$evaluatee; ?>'">
         <?php echo '</form>';
     }
     echo '<br>';
