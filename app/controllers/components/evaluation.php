@@ -209,7 +209,6 @@ class EvaluationComponent extends Object
         $event = $this->Event->getEventById($params['form']['event_id']);
         $simpleEval = $this->SimpleEvaluation->getEvaluation($event['Event']['template_id']);
         $required = $simpleEval['SimpleEvaluation']['point_per_member'] * count($evaluatees);
-        echo $required;
         if ($totalPoints != $required) {
             return false;
         }
@@ -730,8 +729,8 @@ class EvaluationComponent extends Object
         foreach ($evalResult as $result) {
             $userId = $result['EvaluationRubric']['evaluatee'];
             $evaluator = $result['EvaluationRubric']['evaluator'];
-            $summary[$userId]['gradeRelease'][] = $result['EvaluationRubric']['grade_release'];
-            $summary[$userId]['commentRelease'][] = $result['EvaluationRubric']['comment_release'];
+            $summary[$userId]['release_status']['gradeRelease'][] = $result['EvaluationRubric']['grade_release'];
+            $summary[$userId]['release_status']['commentRelease'][] = $result['EvaluationRubric']['comment_release'];
             $summary[$userId]['total']['score'] = (isset($summary[$userId]['total']['score'])) ?
                 $summary[$userId]['total']['score'] + $result['EvaluationRubric']['score'] : $result['EvaluationRubric']['score'];
             $summary[$userId]['evaluator_count'] = (isset($summary[$userId]['evaluator_count'])) ?
@@ -750,6 +749,7 @@ class EvaluationComponent extends Object
                     $detail['id'];
                 $summary[$userId]['individual'][$evaluator][$detail['criteria_number']]['comment_release'] =
                     $detail['comment_release'];
+                $summary[$userId]['release_status']['commentRelease'][] = $detail['comment_release'];
             }
             $summary[$userId]['individual'][$evaluator]['general_comment']['comment'] = 
                 $result['EvaluationRubric']['comment'];
@@ -758,8 +758,8 @@ class EvaluationComponent extends Object
         }
 
         foreach ($summary as $id => $score) {
-            $summary[$id]['gradeRelease'] = array_product($summary[$id]['gradeRelease']);
-            $summary[$id]['commentRelease'] = array_product($summary[$id]['commentRelease']);
+            $summary[$id]['release_status']['gradeRelease'] = array_product($summary[$id]['release_status']['gradeRelease']);
+            $summary[$id]['release_status']['commentRelease'] = array_product($summary[$id]['release_status']['commentRelease']);
             $summary[$id]['total'] = $score['total']['score'] / $score['evaluator_count'];
             foreach ($score['grades'] as $num => $grade) {
                 $summary[$id]['grades'][$num] = $grade['grade']/$grade['evaluator_count'];

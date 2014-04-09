@@ -64,7 +64,17 @@ if (!empty($notInGroup)) {
 <?php } ?>
 </form>
 
-<h3><?php __('Evaluation Results')?></h3>
+<?php if ($viewReleaseBtns) { ?>
+<h3><?php echo __('Evaluation Results Release Status', true) ?></h3>
+<table class="standardtable">
+    <?php 
+    echo $html->tableHeaders($this->Evaluation->getReleaseStatusTableHeader()); 
+    echo $html->tableCells($this->Evaluation->getReleaseStatusTableButtons($memberList, Set::extract($notInGroup, '/User/id'), $grpEventId, $scoreRecords));
+    ?>
+</table>
+<?php } ?>
+
+<h3><?php echo __('Evaluation Results', true) ?></h3>
 <div id='rubric_result'>
 
 <?php if (!empty($scoreRecords)) { ?>
@@ -124,19 +134,6 @@ if (!empty($notInGroup)) {
 
     <?php } ?>
 </div>
-<form name="evalFormAllComment" id="evalFormAllComment" method="POST" action="<?php echo $html->url('markCommentRelease') ?>">
-<p style="text-align: center;">
-<input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>">
-<input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>">
-<input type="hidden" name="group_id" value="<?php echo $event['Group']['id'] ?>" />
-<?php if ($viewReleaseBtns) { ?>
-<input name="submit" type="submit" value="<?php echo __('Release Comments', true); ?>">
-<input name="submit" type="submit" value="<?php echo __('Unrelease Comments', true); ?>">
-<input type="button" name="ReleaseGrades" value="<?php __('Release Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['GroupEvent']['id'].'/1'; ?>'">
-<input type="button" name="UnreleaseGrades" value="<?php __('Unrelease Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['GroupEvent']['id'].'/0'; ?>'">
-<?php } ?>
-</p>
-</form>
 <?php } else { ?>
 <h4><?php echo __('No submissions have been made.', true); ?></h4>
 <?php } ?>

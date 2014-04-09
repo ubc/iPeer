@@ -1221,7 +1221,6 @@ class EvaluationsController extends AppController
             $members = $this->User->findAllById($memberList);
             $rubric = $this->Rubric->findById($event['Event']['template_id']);
             $scoreRecords = $this->Evaluation->formatRubricEvaluationResultsMatrix($rubricDetails);
-            debug($scoreRecords);
 
             $this->set('rubric', $rubric);
             $this->set('inCompleteMembers', $inCompleteMembers);
@@ -1230,6 +1229,7 @@ class EvaluationsController extends AppController
             $this->set('memberList', $fullNames);
             $this->set('penalties', $this->Rubric->formatPenaltyArray($fullNames, $eventId, $groupId));
             $this->set('scoreRecords', $scoreRecords);
+            $this->set('grpEventId', $groupEventId);
 
             if ($displayFormat == 'Detail') {
                 $this->render('view_rubric_evaluation_results_detail');
@@ -1285,14 +1285,25 @@ class EvaluationsController extends AppController
             // only required peer evaluation questions are counted toward the averages
             $required = array_flip(array_intersect(array_keys($required, 1), array_keys($peerQues, 0)));
             $questions = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}');
-            foreach ($details['evalResult'] as $result) {
+            $quesTypes = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}.mixeval_question_type_id');
+            $status = array();
+            foreach ($details['evalResult'] as $id => $result) {
+                $tmpStat = array('gradeRelease' => array(), 'commentRelease' => array());
                 foreach ($result as $eval) {
                     $evaluator = $eval['EvaluationMixeval']['evaluator'];
+                    $tmpStat['gradeRelease'][] = $eval['EvaluationMixeval']['grade_release'];
                     foreach ($eval['EvaluationMixevalDetail'] as $detail) {
                         $detail['evaluator'] = $evaluator;
                         $questions[$detail['question_number']]['Submissions'][] = $detail;
+                        if (in_array($quesTypes[$detail['question_number']], array(2, 3))) {
+                            // short or long answers
+                            $tmpStat['commentRelease'][] = $detail['comment_release'];
+                        }
                     }
                 }
+                $tmpStat['gradeRelease'] = array_product($tmpStat['gradeRelease']);
+                $tmpStat['commentRelease'] = array_product($tmpStat['commentRelease']);
+                $status[$id]['release_status'] = $tmpStat;
             }
             $this->set('mixeval', $mixeval);
             $this->set('memberList', $fullNames);
@@ -1304,6 +1315,8 @@ class EvaluationsController extends AppController
             $this->set('required', $required);
             $this->set('gradeReleaseStatus', $gradeReleaseStatus);
             $this->set('groupByQues', $questions);
+            $this->set('grpEventId', $groupEventId);
+            $this->set('status', $status);
 
             if ($displayFormat == 'Detail') {
                 $this->render('view_mixeval_evaluation_results_detail');
@@ -1568,7 +1581,7 @@ class EvaluationsController extends AppController
         
         $this->GroupEvent->id = $grpEventId;
         $evals = $this->$model->find('list', array(
-            'conditions' => array('grp_event_id' => $grpEventId),
+            'conditions' => array($model.'.grp_event_id' => $grpEventId),
             'fields' => $model.'.grade_release'
         ));
         $all = array_product($evals);
@@ -1611,7 +1624,8 @@ class EvaluationsController extends AppController
             $tok = strtok($param, ';');
             $eventId = $tok;
         } else {
-            $eventId = $this->params['form']['event_id'];
+            $grpEvent = $this->GroupEvent->findById($this->params['form']['group_event_id']);
+            $eventId = $grpEvent['GroupEvent']['event_id'];
         }
 
         // Check whether the event exists or user has permission to access it
@@ -1636,23 +1650,24 @@ class EvaluationsController extends AppController
 
         case "2":
             $grpEventId = $this->params['form']['group_event_id'];
-            $evaluateee = $this->params['form']['evaluatee'];
-            $eventId = $this->params['form']['event_id'];
-            $groupId = $this->params['form']['group_id'];
+            $eventId = $grpEvent['GroupEvent']['event_id'];
+            $groupId = $grpEvent['GroupEvent']['group_id'];
             switch ($this->params['form']['submit']) {
             case "Save Changes":
                 $this->Evaluation->changeIndivRubricEvalCommentRelease($this->params['form']);
                 break;
-            case "Release All Comments":
+            case "Release Comments":
+                $evaluateee = $this->params['form']['evaluatee'];
                 $this->Evaluation->changeRubricEvalCommentRelease(1, $grpEventId, $evaluateee);
                 break;
-            case "Unrelease All Comments":
+            case "Unrelease Comments":
+                $evaluateee = $this->params['form']['evaluatee'];
                 $this->Evaluation->changeRubricEvalCommentRelease(0, $grpEventId, $evaluateee);
                 break;
-            case "Release Comments":
+            case "Release All Comments":
                 $this->Evaluation->changeRubricEvalCommentRelease(1, $grpEventId);
                 break;
-            case "Unrelease Comments":
+            case "Unrelease All Comments":
                 $this->Evaluation->changeRubricEvalCommentRelease(0, $grpEventId);
                 break;
             }
@@ -1662,23 +1677,25 @@ class EvaluationsController extends AppController
             break;
 
         case "4":
-            $groupId = $this->params['form']['group_id'];
-            $evaluateeId = $this->params['form']['evaluatee'];
+            $groupId = $grpEvent['GroupEvent']['group_id'];
+            $eventId = $grpEvent['GroupEvent']['event_id'];
             $groupEventId = $this->params['form']['group_event_id'];
             switch($this->params['form']['submit']) {
             case "Save Changes":
                 $this->Evaluation->changeIndivMixedEvalCommentRelease($this->params['form']);
                 break;
-            case "Release All Comments":
+            case "Release Comments":
+                $evaluateeId = $this->params['form']['evaluatee'];
                 $this->Evaluation->changeMixedEvalCommentRelease(1, $groupEventId, $evaluateeId);
                 break;
-            case "Unrelease All Comments":
+            case "Unrelease Comments":
+                $evaluateeId = $this->params['form']['evaluatee'];
                 $this->Evaluation->changeMixedEvalCommentRelease(0, $groupEventId, $evaluateeId);
                 break;
-            case "Release Comments":
+            case "Release All Comments":
                 $this->Evaluation->changeMixedEvalCommentRelease(1, $groupEventId);
                 break;
-            case "Unrelease Comments":
+            case "Unrelease All Comments":
                 $this->Evaluation->changeMixedEvalcommentRelease(0, $groupEventId);
                 break;
             }

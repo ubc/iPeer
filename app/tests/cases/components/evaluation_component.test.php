@@ -20,7 +20,7 @@ class EvaluationTestCase extends CakeTestCase
         'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
         'app.evaluation_simple', 'app.faculty', 'app.user_faculty',
         'app.department', 'app.course_department', 'app.oauth_token', 'app.sys_parameter',
-        'app.user_tutor'
+        'app.user_tutor', 'app.simple_evaluation'
     );
 
     function startCase()
@@ -58,14 +58,15 @@ class EvaluationTestCase extends CakeTestCase
      */
     function testDaysLate()
     {
+        $year = date("Y") + 1;
         // Before due date (early)
-        $result = $this->EvaluationComponentTest->daysLate(1, '2014-07-01 16:34:43');
+        $result = $this->EvaluationComponentTest->daysLate(1, $year.'-07-01 16:34:43');
         $this->assertEqual($result, 0);
         // On due date (on time)
-        $result = $this->EvaluationComponentTest->daysLate(1, '2014-07-02 16:34:43');
+        $result = $this->EvaluationComponentTest->daysLate(1, $year.'-07-02 16:34:43');
         $this->assertEqual($result, 0);
         //After due date (late)
-        $result = $this->EvaluationComponentTest->daysLate(1, '2014-07-03 16:34:43');
+        $result = $this->EvaluationComponentTest->daysLate(1, $year.'-07-03 16:34:43');
         $this->assertEqual($result, 1);
     }
 
@@ -154,16 +155,17 @@ class EvaluationTestCase extends CakeTestCase
         $searchEvalSubmission = $this->EvaluationSubmission->find('all', array('conditions' => array('grp_event_id' => 999)));
 
         // Run tests
+        $this->assertTrue($result1);
         $this->assertTrue($search1);
         $this->assertTrue($search2);
         $this->assertTrue($searchEvalSubmission);
         $this->assertEqual($search1['EvaluationSimple']['comment'], 'Kevin Luk was smart');
-        $this->assertEqual($search1['EvaluationSimple']['score'], 25);
+        $this->assertEqual($search1['EvaluationSimple']['score'], 80);
         $this->assertEqual($search1['EvaluationSimple']['grp_event_id'], 999);
         $this->assertEqual($search2['EvaluationSimple']['comment'], 'Zion Au was also smart');
-        $this->assertEqual($search2['EvaluationSimple']['score'], 50);
+        $this->assertEqual($search2['EvaluationSimple']['score'], 120);
         $this->assertEqual($search2['EvaluationSimple']['grp_event_id'], 999);
-        $this->assertEqual($searchEvalSubmission[0]['EvaluationSubmission']['event_id'], 999);
+        $this->assertEqual($searchEvalSubmission[0]['EvaluationSubmission']['event_id'], 1);
         $this->assertEqual($searchEvalSubmission[0]['EvaluationSubmission']['grp_event_id'], 999);
     }
 
@@ -241,14 +243,18 @@ class EvaluationTestCase extends CakeTestCase
                 ),
                 'EvaluationRubricDetail' => array(
                     0 => array(
+                        'id' => 999,
                         'criteria_number' => 1,
                         'criteria_comment' => 'Student 1 Criteria 1',
                         'grade' => 5.00,
+                        'comment_release' => 1,
                     ),
                     1 => array(
+                        'id' => 1000,
                         'criteria_number' => 2,
                         'criteria_comment' => 'Student 1 Criteria 2',
                         'grade' => 10.00,
+                        'comment_release' => 1,
                     )
                 )
             ),
@@ -263,14 +269,18 @@ class EvaluationTestCase extends CakeTestCase
                 ),
                 'EvaluationRubricDetail' => array(
                     0 => array(
+                        'id' => 1001,
                         'criteria_number' => 1,
                         'criteria_comment' => 'Student 2 Criteria 1',
-                        'grade' => 10.00
+                        'grade' => 10.00,
+                        'comment_release' => 1,
                     ),
                     1 => array(
+                        'id' => 1002,
                         'criteria_number' => 2,
                         'criteria_comment' => 'Student 2 Criteria 2',
-                        'grade' => 5.00
+                        'grade' => 5.00,
+                        'comment_release' => 1,
                     )
                 )
             )
@@ -280,8 +290,10 @@ class EvaluationTestCase extends CakeTestCase
         // Sets up expected return value
         $expected = array(
             1 => array(
-                "gradeRelease" => 1,
-                "commentRelease" => 1,
+                "release_status" => array(
+                    'gradeRelease' => 1,
+                    'commentRelease' => 1,
+                ),
                 "total" => 15,
                 "evaluator_count" => 1,
                 "grades" => array(
@@ -290,21 +302,30 @@ class EvaluationTestCase extends CakeTestCase
                 ),
                 "individual" => array(
                     2 => array(
-                        "general_comment" => "Gen comment 1",
+                        "general_comment" => array(
+                            'comment' => "Gen comment 1",
+                            'comment_release' => 1,
+                        ),
                         1 => array(
                             'grade' => 5.00,
                             'comment' => 'Student 1 Criteria 1',
+                            'id' => 999,
+                            'comment_release' => 1,
                         ),
                         2 => array(
                             'grade' => 10.00,
                             'comment' => 'Student 1 Criteria 2',
+                            'id' => 1000,
+                            'comment_release' => 1,
                         ),
                     ),
                 )
             ),
             2 => array(
-                "gradeRelease" => 1,
-                "commentRelease" => 1,
+                "release_status" => array(
+                    'gradeRelease' => 1,
+                    'commentRelease' => 1,
+                ),
                 "total" => 15,
                 "evaluator_count" => 1,
                 "grades" => array(
@@ -313,14 +334,21 @@ class EvaluationTestCase extends CakeTestCase
                 ),
                 "individual" => array(
                     1 => array(
-                        "general_comment" => "Gen comment 2",
+                        "general_comment" => array(
+                            'comment' => "Gen comment 2",
+                            'comment_release' => 1,
+                        ),
                         1 => array(
                             'grade' => 10.00,
                             'comment' => 'Student 2 Criteria 1',
+                            'id' => 1001,
+                            'comment_release' => 1,
                         ),
                         2 => array(
                             'grade' => 5.00,
                             'comment' => 'Student 2 Criteria 2',
+                            'id' => 1002,
+                            'comment_release' => 1,
                         ),
                     ),
                 )
@@ -336,50 +364,6 @@ class EvaluationTestCase extends CakeTestCase
         $result = $this->EvaluationComponentTest->formatRubricEvaluationResultsMatrix(null);
         $this->assertFalse($result);
 
-    }
-
-    /**
-     * testChangeRubricEvaluationGradeRelease
-     *
-     * Tests method to see if grade release can be changed for a single user
-     * and for all users for the event.
-     */
-    function testChangeRubricEvaluationGradeRelease()
-    {
-        // Test case for making grade unreleased (releaseStatus = 0)
-        // Tests change for single user in event
-        $this->EvaluationComponentTest->changeRubricEvaluationGradeRelease(4, 33, 0);
-        $result = $this->EvaluationRubric->find('all', array('conditions' => array('grp_event_id' => 4, 'evaluatee' => 33)));
-        $this->assertEqual($result[0]['EvaluationRubric']['grade_release'], 0);
-
-        // Test case for making grade released (releaseStatus = 1)
-        // Tests change for single user in event
-        $this->EvaluationComponentTest->changeRubricEvaluationGradeRelease(4, 32, 1);
-        $result = $this->EvaluationRubric->find('all', array('conditions' => array('grp_event_id' => 4, 'evaluatee' => 32)));
-        $this->assertEqual($result[0]['EvaluationRubric']['grade_release'], 1);
-
-        // Test case for making grade unreleased (releaseStatus = 0)
-        // Tests change for all users in event
-        $this->EvaluationComponentTest->changeRubricEvaluationGradeRelease(4, null, 0);
-        $result = $this->EvaluationRubric->find('all', array('conditions' => array('grp_event_id' => 4)));
-        foreach ($result as $row) {
-            $this->assertEqual($row['EvaluationRubric']['grade_release'], 0);
-        }
-
-        // Test case for making grade released (releaseStatus = 1)
-        // Tests change for all users in event
-        $this->EvaluationComponentTest->changeRubricEvaluationGradeRelease(4, null, 1);
-        $result = $this->EvaluationRubric->find('all', array('conditions' => array('grp_event_id' => 4)));
-        foreach ($result as $row) {
-            $this->assertEqual($row['EvaluationRubric']['grade_release'], 1);
-        }
-        
-        // Tests for null event
-        $this->EvaluationComponentTest->changeRubricEvaluationGradeRelease(null, null, 1);
-        $result = $this->EvaluationRubric->find('all', array('conditions' => array('grp_event_id' => null)));
-        foreach ($result as $row) {
-            $this->assertNull($row['EvaluationRubric']['grade_release']);
-        }
     }
 
     //TODO
@@ -431,24 +415,33 @@ class EvaluationTestCase extends CakeTestCase
         // Set up default values
         $evalMixevalId = 1;
         $mixeval = array(
+            'Mixeval' => array (
+                'zero_mark' => 0,
+            ),
             'MixevalQuestion' => array(
                 0 => array(
                     'question_num' => 1,
                     'mixeval_question_type_id' => 1,
                     'required' => 1,
                     'self_eval' => 0,
+                    'multiplier' => 1,
+                    'scale_level' => 5,
                 ),
                 1 => array(
                     'question_num' => 2,
                     'mixeval_question_type_id' => 2,
                     'required' => 1,
                     'self_eval' => 0,
+                    'multiplier' => 0,
+                    'scale_level' => 5,
                 ),
                 2 => array(
                     'question_num' => 3,
                     'mixeval_question_type_id' => 3,
                     'required' => 1,
                     'self_eval' => 0,
+                    'multiplier' => 0,
+                    'scale_level' => 5,
                 ),
             )
         );
@@ -526,7 +519,8 @@ class EvaluationTestCase extends CakeTestCase
         $eval = $this->EvaluationComponentTest->getStudentViewMixevalResultDetailReview($event, $userId);
 
         // Check due_in time with assertWithinMargin
-        $currentTime = strtotime("2014-07-02 09:00:28") - time();
+        $year = date("Y") + 1;
+        $currentTime = strtotime($year."-07-02 09:00:28") - time();
         $this->assertWithinMargin($currentTime, $eval[5][0]['Event']['due_in'], 5);
         // Null due_in time since we are doing assertEqual
         $eval[5][0]['Event']['due_in'] = null;
@@ -674,17 +668,18 @@ class EvaluationTestCase extends CakeTestCase
         $params = array();
         $params['form']['memberIDs'][0] = 1;
         $params['form']['memberIDs'][1] = 2;
-        $params['form']['points'][0] = 25;
-        $params['form']['points'][1] = 50;
+        $params['form']['points'][0] = 80;
+        $params['form']['points'][1] = 120;
         $params['form']['comments'][0] = "Kevin Luk was smart";
         $params['form']['comments'][1] = "Zion Au was also smart";
         $params['data']['Evaluation']['evaluator_id'] = 1;
         $params['data']['Evaluation']['evaluator_id'] = 2;
         $params['form']['evaluateeCount'] = 2;
+        $params['form']['event_id'] = 1;
 
         $groupEvent = array();
         $groupEvent['GroupEvent']['id'] = 999;
-        $groupEvent['GroupEvent']['event_id'] = 999;
+        $groupEvent['GroupEvent']['event_id'] = 1;
         $groupEvent['GroupEvent']['group_id'] = 999;
 
         $return = array($params, $groupEvent);
@@ -729,6 +724,7 @@ class EvaluationTestCase extends CakeTestCase
                                 "question_comment" => null,
                                 "selected_lom" => 4,
                                 "grade" => 0.80,
+                                "comment_release" => 0,
                                 "record_status" => "A",
                                 "creator_id" => 5,
                                 "created" => "2012-07-13 15:19:26",
@@ -744,6 +740,7 @@ class EvaluationTestCase extends CakeTestCase
                                 "question_comment" => null,
                                 "selected_lom" => 4,
                                 "grade" => 0.80,
+                                "comment_release" => 0,
                                 "record_status" => "A",
                                 "creator_id" => 5,
                                 "created" => "2012-07-13 15:19:26",
@@ -759,6 +756,7 @@ class EvaluationTestCase extends CakeTestCase
                                 "question_comment" => null,
                                 "selected_lom" => 4,
                                 "grade" => 0.80,
+                                "comment_release" => 0,
                                 "record_status" => "A",
                                 "creator_id" => 5,
                                 "created" => "2012-07-13 15:19:26",
@@ -774,6 +772,7 @@ class EvaluationTestCase extends CakeTestCase
                                 "question_comment" => "Yes",
                                 "selected_lom" => 0,
                                 "grade" => 0.00,
+                                "comment_release" => 0,
                                 "record_status" => "A",
                                 "creator_id" => 5,
                                 "created" => "2012-07-13 15:19:26",
@@ -789,6 +788,7 @@ class EvaluationTestCase extends CakeTestCase
                                 "question_comment" => "Yes",
                                 "selected_lom" => 0,
                                 "grade" => 0.00,
+                                "comment_release" => 0,
                                 "record_status" => "A",
                                 "creator_id" => 5,
                                 "created" => "2012-07-13 15:19:26",
@@ -804,6 +804,7 @@ class EvaluationTestCase extends CakeTestCase
                                 "question_comment" => "Yes",
                                 "selected_lom" => 0,
                                 "grade" => 0.00,
+                                "comment_release" => 0,
                                 "record_status" => "A",
                                 "creator_id" => 5,
                                 "created" => "2012-07-13 15:19:26",
@@ -822,6 +823,7 @@ class EvaluationTestCase extends CakeTestCase
 
     function setUpMixevalResultDetailReview()
     {
+        $year = date("Y") + 1;
         $expected = Array (
             5 => Array (
                 0 => Array (
@@ -850,6 +852,7 @@ class EvaluationTestCase extends CakeTestCase
                                     "question_comment" => null,
                                     "selected_lom" => 4,
                                     "grade" => 0.80,
+                                    "comment_release" => 0,
                                     "record_status" => "A",
                                     "creator_id" => 5,
                                     "created" => "2012-07-13 15:19:26",
@@ -867,6 +870,7 @@ class EvaluationTestCase extends CakeTestCase
                                     "question_comment" => null,
                                     "selected_lom" => 4,
                                     "grade" => 0.80,
+                                    "comment_release" => 0,
                                     "record_status" => "A",
                                     "creator_id" => 5,
                                     "created" => "2012-07-13 15:19:26",
@@ -884,6 +888,7 @@ class EvaluationTestCase extends CakeTestCase
                                     "question_comment" => null,
                                     "selected_lom" => 4,
                                     "grade" => 0.80,
+                                    "comment_release" => 0,
                                     "record_status" => "A",
                                     "creator_id" => 5,
                                     "created" => "2012-07-13 15:19:26",
@@ -901,6 +906,7 @@ class EvaluationTestCase extends CakeTestCase
                                     "question_comment" => "Yes",
                                     "selected_lom" => 0,
                                     "grade" => 0.00,
+                                    "comment_release" => 0,
                                     "record_status" => "A",
                                     "creator_id" => 5,
                                     "created" => "2012-07-13 15:19:26",
@@ -918,6 +924,7 @@ class EvaluationTestCase extends CakeTestCase
                                     "question_comment" => "Yes",
                                     "selected_lom" => 0,
                                     "grade" => 0.00,
+                                    "comment_release" => 0,
                                     "record_status" => "A",
                                     "creator_id" => 5,
                                     "created" => "2012-07-13 15:19:26",
@@ -935,6 +942,7 @@ class EvaluationTestCase extends CakeTestCase
                                     "question_comment" => "Yes",
                                     "selected_lom" => 0,
                                     "grade" => 0.00,
+                                    "comment_release" => 0,
                                     "record_status" => "A",
                                     "creator_id" => 5,
                                     "created" => "2012-07-13 15:19:26",
@@ -957,7 +965,7 @@ class EvaluationTestCase extends CakeTestCase
                         "com_req" => 0,
                         "auto_release" => 0,
                         "enable_details" => 1,
-                        "due_date" => "2014-07-02 09:00:28",
+                        "due_date" => $year."-07-02 09:00:28",
                         "release_date_begin" => "2011-06-07 09:00:35",
                         "release_date_end" => "2023-07-09 09:00:39",
                         "result_release_date_begin" => "2023-07-04 09:00:28",
@@ -987,6 +995,7 @@ class EvaluationTestCase extends CakeTestCase
                             "question_comment" => null,
                             "selected_lom" => 4,
                             "grade" => 0.80,
+                            "comment_release" => 0,
                             "record_status" => "A",
                             "creator_id" => 5,
                             "created" => "2012-07-13 15:19:26",
@@ -1002,6 +1011,7 @@ class EvaluationTestCase extends CakeTestCase
                             "question_comment" => null,
                             "selected_lom" => 4,
                             "grade" => 0.80,
+                            "comment_release" => 0,
                             "record_status" => "A",
                             "creator_id" => 5,
                             "created" => "2012-07-13 15:19:26",
@@ -1017,6 +1027,7 @@ class EvaluationTestCase extends CakeTestCase
                             "question_comment" => null,
                             "selected_lom" => 4,
                             "grade" => 0.80,
+                            "comment_release" => 0,
                             "record_status" => "A",
                             "creator_id" => 5,
                             "created" => "2012-07-13 15:19:26",
@@ -1032,6 +1043,7 @@ class EvaluationTestCase extends CakeTestCase
                             "question_comment" => "Yes",
                             "selected_lom" => 0,
                             "grade" => 0.00,
+                            "comment_release" => 0,
                             "record_status" => "A",
                             "creator_id" => 5,
                             "created" => "2012-07-13 15:19:26",
@@ -1047,6 +1059,7 @@ class EvaluationTestCase extends CakeTestCase
                             "question_comment" => "Yes",
                             "selected_lom" => 0,
                             "grade" => 0.00,
+                            "comment_release" => 0,
                             "record_status" => "A",
                             "creator_id" => 5,
                             "created" => "2012-07-13 15:19:26",
@@ -1062,6 +1075,7 @@ class EvaluationTestCase extends CakeTestCase
                             "question_comment" => "Yes",
                             "selected_lom" => 0,
                             "grade" => 0.00,
+                            "comment_release" => 0,
                             "record_status" => "A",
                             "creator_id" => 5,
                             "created" => "2012-07-13 15:19:26",
