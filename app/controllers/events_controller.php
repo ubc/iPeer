@@ -512,11 +512,22 @@ class EventsController extends AppController
             */
             if (time() >= strtotime($event['Event']['release_date_end']) &&
                 $this->data['Event']['auto_release'] != $event['Event']['auto_release']) {
+                $model = null;
                 switch ($event['Event']['event_template_type_id']) {
-                case 2://rubric
-                    $this->EvaluationRubric->setAllEventCommentRelease($eventId, User::get('id'), $this->data['Event']['auto_release']);
-                    $this->EvaluationRubric->setAllEventGradeRelease($eventId, $this->data['Event']['auto_release']);
+                case 1://simple
+                    $model = 'EvaluationSimple';
                     break;
+                case 2://rubric
+                    $model = 'EvaluationRubric';
+                    break;
+                case 4:
+                    $model = 'EvaluationMixeval';
+                    break;
+                }
+                
+                if (!is_null($model)) {
+                    $this->$model->setAllEventCommentRelease($eventId, User::get('id'), $this->data['Event']['auto_release']);
+                    $this->$model->setAllEventGradeRelease($eventId, $this->data['Event']['auto_release']);
                 }
             }
 

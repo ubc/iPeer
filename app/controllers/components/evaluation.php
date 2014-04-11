@@ -116,6 +116,48 @@ class EvaluationComponent extends Object
 
         return $groupEvent;
     }
+    
+    /**
+     * markSimpleEvalReviewed
+     *
+     * @param mixed $eventId
+     * @param mixed $grpEventId
+     *
+     * @access public
+     * @return void
+     */
+    function markSimpleEvalReviewed($eventId, $grpEventId)
+    {
+        $this->EvaluationSimple = ClassRegistry::init('EvaluationSimple');
+        $this->GroupEvent = ClassRegistry::init('GroupEvent');
+        $this->Event = ClassRegistry::init('Event');
+        
+        // set group event to reviewed if all evaluatees' release status has been modified
+        $eval = $this->EvaluationSimple->find('first', array(
+            'conditions' => array('grp_event_id' => $grpEventId),
+            'order' => array('EvaluationSimple.modified ASC')
+        ));
+        $event = $this->Event->findById($eventId);
+        $status = $this->EvaluationSimple->findAllByGrpEventId($grpEventId);
+        $status = Set::extract('/EvaluationSimple/release_status', $status);
+        $all = array_product($status);
+        $some = array_sum($status);
+        $this->GroupEvent->id = $grpEventId;
+        if ($all) {
+            $this->GroupEvent->saveField('comment_release_status', 'All');
+        } else if ($some) {
+            $this->GroupEvent->saveField('comment_release_status', 'Some');
+        } else {
+            $this->GroupEvent->saveField('comment_release_status', 'None');
+        }
+        
+        // if the oldest modified date is after the event's close date
+        if (strtotime($event['Event']['release_date_end']) <= strtotime($eval['EvaluationSimple']['modified'])) {
+            // set group event to reviewed
+            $this->GroupEvent->id = $grpEventId;
+            $this->GroupEvent->saveField('marked', 'reviewed');
+        }
+    }
 
     /**
      * filterString Filters a input string by removing unwanted chars of {"_", "0", "1", "2", "3",...}
@@ -281,64 +323,35 @@ class EvaluationComponent extends Object
      */
     function changeSimpleEvaluationCommentRelease($groupEventId, $evaluatorIds, $params)
     {
-
-        $this->GroupEvent = new GroupEvent;
-        $this->EvaluationSimple = new EvaluationSimple;
+        $this->GroupEvent = ClassRegistry::init('GroupEvent');
+        $this->EvaluationSimple = ClassRegistry::init('EvaluationSimple');
 
         $this->GroupEvent->id = $groupEventId;
-        $groupEvent = $this->GroupEvent->read();
+        
+        $now = "'".date("Y-m-d H:i:s")."'";
+        $user = $this->Auth->user('id');
 
-        //handle comment release by "Save Change"
-        $evaluator = null;
         if ($params['form']['submit']=='Save Changes') {
             //Reset all release status to false first
             $this->EvaluationSimple->setAllGroupCommentRelease($groupEventId, 0);
-            foreach ($evaluatorIds as $value) {
-                if ($evaluator != $value) {
-                    //Check for released guys
-                    if (isset($params['form']['release'.$value])) {
-                        $evaluateeIds = $params['form']['release'.$value];
-                        $idString = array();
-                        $pos = 1;
-                        foreach ($evaluateeIds as $id) {
-                            $idString[$pos] = $id;
-                            $pos ++;
-                        }
-                        $this->EvaluationSimple->setAllGroupCommentRelease($groupEventId, 1, $value, $idString);
-                    }
-                    $evaluator = $value;
-                    $idString = array();
-                }
-            }
-            //check grade release status for the GroupEvent
-            $oppositCommentReleaseCount = $this->EvaluationSimple->getOppositeCommentReleaseStatus($groupEventId, 1);
-            if ($oppositCommentReleaseCount == 0) {
-                $groupEvent = $this->formatCommentReleaseStatus($groupEvent, 1, $oppositCommentReleaseCount);
-            } else {
-                $oppositCommentReleaseCount = $this->EvaluationSimple->getOppositeCommentReleaseStatus($groupEventId, 0);
-                if ($oppositCommentReleaseCount == 0) {
-                    $groupEvent = $this->formatCommentReleaseStatus($groupEvent, 0, $oppositCommentReleaseCount);
-                } else {
-                    $groupEvent['GroupEvent']['comment_release_status'] = "Some";
+            $evaluatorIds = array_unique($evaluatorIds);
+            foreach ($evaluatorIds as $evaluator) {
+                if (isset($params['form']['release'.$evaluator])) {
+                    $evaluateeIds = $params['form']['release'.$evaluator];
+                    $fields = array('EvaluationSimple.release_status' => 1, 'EvaluationSimple.modified' => $now, 'EvaluationSimple.updater_id' => $user);
+                    $conditions = array('EvaluationSimple.evaluator' => $evaluator, 'EvaluationSimple.evaluatee' => $evaluateeIds, 'grp_event_id' => $groupEventId);
+                    $this->EvaluationSimple->updateAll($fields, $conditions);
                 }
             }
         } else if ($params['form']['submit']=='Release All') {
-            //Reset all release status to false first
-            $this->EvaluationSimple->setAllGroupCommentRelease($groupEventId, 1);
-
-            //changing grade release status for the GroupEvent
-            $oppositCommentReleaseCount = $this->EvaluationSimple->getOppositeCommentReleaseStatus($groupEventId, 1);
-            $groupEvent = $this->formatCommentReleaseStatus($groupEvent, 1, $oppositCommentReleaseCount);
+            $fields = array('EvaluationSimple.release_status' => 1, 'EvaluationSimple.modified' => $now, 'EvaluationSimple.updater_id' => $user);
+            $conditions = array('grp_event_id' => $groupEventId);
+            $this->EvaluationSimple->updateAll($fields, $conditions);
         } else if ($params['form']['submit']=='Unrelease All') {
-            //Reset all release status to false first
-            $this->EvaluationSimple->setAllGroupCommentRelease($groupEventId, 0);
-
-            //changing grade release status for the GroupEvent
-            $oppositCommentReleaseCount = $this->EvaluationSimple->getOppositeCommentReleaseStatus($groupEventId, 0);
-            $groupEvent = $this->formatCommentReleaseStatus($groupEvent, 0, $oppositCommentReleaseCount);
-
+            $fields = array('EvaluationSimple.release_status' => 0, 'EvaluationSimple.modified' => $now, 'EvaluationSimple.updater_id' => $user);
+            $conditions = array('grp_event_id' => $groupEventId);
+            $this->EvaluationSimple->updateAll($fields, $conditions);
         }
-        $this->GroupEvent->save($groupEvent);
     }
 
 
@@ -1240,6 +1253,8 @@ class EvaluationComponent extends Object
         $this->EvaluationMixevalDetail = ClassRegistry::init('EvaluationMixevalDetail');
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
         $this->Event = ClassRegistry::init('Event');
+        $this->MixevalQuestion = ClassRegistry::init('MixevalQuestion');
+        $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
         
         // set group event to reviewed if all evaluatees' release status has been modified
         $eval = $this->EvaluationMixevalDetail->find('first', array(
@@ -1247,6 +1262,29 @@ class EvaluationComponent extends Object
             'order' => array('EvaluationMixevalDetail.modified ASC')
         ));
         $event = $this->Event->findById($eventId);
+        $questions = $this->MixevalQuestion->find('list', array(
+            'conditions' => array('mixeval_id' => $event['Event']['template_id'], 'mixeval_question_type_id' => array(2, 3)),
+            'fields' => array('question_num')
+        ));
+        $evalIds = $this->EvaluationMixeval->find('list', array(
+            'conditions' => array('grp_event_id' => $grpEventId)
+        ));
+        $details = $this->EvaluationMixevalDetail->find('all', array(
+            'conditions' => array('evaluation_mixeval_id' => $evalIds, 'question_number' => $questions),
+            'fields' => array('comment_release')
+        ));
+        $details = Set::extract('/EvaluationMixevalDetail/comment_release', $details);
+
+        $this->GroupEvent->id = $grpEventId;
+        $all = array_product($details);
+        $some = array_sum($details);
+        if ($all) {
+            $this->GroupEvent->saveField('comment_release_status', 'All');
+        } else if ($some) {
+            $this->GroupEvent->saveField('comment_release_status', 'Some');
+        } else {
+            $this->GroupEvent->saveField('comment_release_status', 'None');
+        } 
         
         // if the oldest modified date is after the event's close date
         if (strtotime($event['Event']['release_date_end']) <= strtotime($eval['EvaluationMixevalDetail']['modified'])) {

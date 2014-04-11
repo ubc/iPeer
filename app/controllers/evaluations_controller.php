@@ -1643,8 +1643,8 @@ class EvaluationsController extends AppController
                 $groupEventId = $this->params['form']['group_event_id'];
                 $evaluatorIds = $this->params['form']['evaluator_ids'];
                 $this->Evaluation->changeSimpleEvaluationCommentRelease($groupEventId, $evaluatorIds, $this->params);
+                $this->Evaluation->markSimpleEvalReviewed($eventId, $groupEventId);
             }
-
             $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId);
             break;
 
@@ -1733,7 +1733,10 @@ class EvaluationsController extends AppController
         $groupEventList = $this->GroupEvent->getGroupListByEventId($eventId);
         switch ($event['Event']['event_template_type_id']) {
         case 1://simple
-            $this->EvaluationSimple->setAllEventCommentRelease($eventId, $releaseStatus);
+            $this->EvaluationSimple->setAllEventCommentRelease($eventId, $this->Auth->user('id'), $releaseStatus);
+            foreach ($groupEventList as $groupEvent) {
+                $this->Evaluation->markSimpleEvalReviewed($eventId, $groupEvent['GroupEvent']['id']);
+            }
             break;
         case 2://rubric
             $this->EvaluationRubric->setAllEventCommentRelease($eventId, $this->Auth->user('id'), $releaseStatus);
@@ -1742,7 +1745,7 @@ class EvaluationsController extends AppController
                 $this->Evaluation->markRubricEvalReviewed($eventId, $groupEvent['GroupEvent']['id']);
             }
             break;
-        case 4://mix
+        case 4://mixed
             $this->EvaluationMixeval->setAllEventCommentRelease($eventId, $this->Auth->user('id'), $releaseStatus);
             foreach ($groupEventList as $groupEvent) {
                 $this->Evaluation->markMixedEvalReviewed($eventId, $groupEvent['GroupEvent']['id']);

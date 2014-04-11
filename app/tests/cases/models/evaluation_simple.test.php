@@ -110,7 +110,7 @@ class EvaluationSimpleTestCase extends CakeTestCase
     function testSetAllEventCommentRelease()
     {
         // Set up test data
-        $this->EvaluationSimple->setAllEventCommentRelease(1, 1);
+        $this->EvaluationSimple->setAllEventCommentRelease(1, 1, 1);
         // Assert EvaluationSimple.event_id is updated
         $searched = $this->EvaluationSimple->find('all', array('conditions' => array('event_id' => 1)));
         $this->assertTrue(!empty($searched));
@@ -119,7 +119,7 @@ class EvaluationSimpleTestCase extends CakeTestCase
         $this->assertEqual($searched[2]['EvaluationSimple']['release_status'], 1);
 
         // Revert grade release back to 0, and test again
-        $this->EvaluationSimple->setAllEventCommentRelease(1, 0);
+        $this->EvaluationSimple->setAllEventCommentRelease(1, 1, 0);
         $searched = $this->EvaluationSimple->find('all', array('conditions' => array('event_id' => 1)));
         $this->assertTrue(!empty($searched));
         $this->assertEqual($searched[0]['EvaluationSimple']['release_status'], 0);
