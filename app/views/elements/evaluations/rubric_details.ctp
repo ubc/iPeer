@@ -36,7 +36,9 @@ foreach ($result AS $evaluator => $row) {
             'checked' => $grade['comment_release'], 
         );
         echo "<br/>";
-        echo $form->checkbox($chkParam['name'], $chkParam);
+        if ($viewReleaseBtns) {
+            echo $form->checkbox($chkParam['name'], $chkParam);
+        }
         echo "<strong>".__('Comment:', true)." </strong>";
         echo $grade["comment"];
         echo "</td>";
@@ -51,7 +53,9 @@ foreach ($result AS $evaluator => $row) {
         'name' => 'releaseGeneralCom[]', 
         'checked' => $comment['comment_release'],
     );
-    echo $form->checkbox($checkParam['name'], $checkParam);
+    if ($viewReleaseBtns) {
+        echo $form->checkbox($checkParam['name'], $checkParam);
+    }
     echo $comment['comment'];
     echo "<br><br></td></tr>";
 }

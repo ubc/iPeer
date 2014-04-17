@@ -159,12 +159,7 @@ if (!empty($notInGroup)) {
                 'names'=>$memberList, 'notInGroup'=>$notInGroup, 'peer_eval' => 1, 'title' => __('Questions', true),
                 'instructorMode' => 1, 'event' => $event);
             echo $this->element('evaluations/mixeval_details', $params);
-            ?>
-            <?php if ($event['Event']['auto_release']) {
-                echo "<div id='autoRelease_msg' class='green'>";
-                echo "<br>".__("Auto Release is ON, you do not need to manually release the grades and comments", true);
-                echo "</div>";
-            } ?>        
+            ?>       
         </div>
     </div>
 <?php endforeach; ?>

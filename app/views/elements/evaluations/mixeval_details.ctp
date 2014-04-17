@@ -74,7 +74,7 @@ if ($details) {
                         'checked' => $sub['comment_release'], 
                     );
                     $comment = ($instructorMode || $sub['comment_release']) ? $sub['question_comment'] : __('n/a', true);
-                    $check = $instructorMode ? $form->checkbox($chkParam['name'], $chkParam) : '';
+                    $check = $instructorMode && $viewReleaseBtns ? $form->checkbox($chkParam['name'], $chkParam) : '';
                     echo '<li>'.$name.$check.$comment.'</li>';
                 }
             }

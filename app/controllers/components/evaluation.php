@@ -265,8 +265,8 @@ class EvaluationComponent extends Object
                 $evalMarkRecord['EvaluationSimple']['evaluatee'] = $value;
                 $evalMarkRecord['EvaluationSimple']['grp_event_id'] = $groupEvent['GroupEvent']['id'];
                 $evalMarkRecord['EvaluationSimple']['event_id'] = $groupEvent['GroupEvent']['event_id'];
-                $evalMarkRecord['EvaluationSimple']['release_status'] = 0;
-                $evalMarkRecord['EvaluationSimple']['grade_release'] = 0;
+                $evalMarkRecord['EvaluationSimple']['release_status'] = $event['Event']['auto_release'];
+                $evalMarkRecord['EvaluationSimple']['grade_release'] = $event['Event']['auto_release'];
             }
             $evalMarkRecord['EvaluationSimple']['score'] = $points[$pos];
             $totalPoints += $points[$pos];

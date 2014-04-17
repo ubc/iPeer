@@ -8,12 +8,6 @@ $eventId = $data['Event']['id'];?>
         &nbsp;<b>Event Due:</b>&nbsp;
         <?php echo Toolkit::formatDate($data['Event']['due_date']) ?>
   </div>
-    <!-- /Auto Release Message-->
-    <?php if ($data['Event']['auto_release'] && $viewReleaseBtns) {
-        echo "<div id='autoRelease_msg' class='green'>";
-        echo "<br>".__("Auto Release is ON, you do not need to manually release the grades and comments", true);
-        echo "</div>";
-    } ?>
   <div class="button-row">
     <ul>
       <li><?php echo $html->link(__(" Export Evaluations", true), "export/event/".$eventId, array('class' => 'export-excel-button'));?></li>
