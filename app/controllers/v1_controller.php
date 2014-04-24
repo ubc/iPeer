@@ -291,7 +291,7 @@ class V1Controller extends Controller {
             $data = array();
             // all users
             if (null == $id) {
-                $users = $this->User->find('all');
+                $users = $this->User->find('all', array('conditions' => array('User.record_status' => 'A')));
                 if (!empty($users)) {
                     foreach ($users as $user) {
                         $tmp = array();
@@ -311,7 +311,7 @@ class V1Controller extends Controller {
             } else {
                 $user = $this->User->find(
                     'first',
-                    array('conditions' => array('User.id' => $id))
+                    array('conditions' => array('User.id' => $id, 'User.record_status' => 'A'))
                 );
                 if (!empty($user)) {
                     $data = array(
@@ -415,7 +415,12 @@ class V1Controller extends Controller {
             $this->set('result', $body);
         // delete
         } else if ($this->RequestHandler->isDelete()) {
-            if ($this->User->delete($id)) {
+            $delete = array('User' => array(
+                'id' => $id,
+                'record_status' => 'I',
+            ));
+            // soft delete user
+            if ($this->User->save($delete)) {
                 $this->set('statusCode', 'HTTP/1.1 204 No Content');
                 $this->set('result', null);
             } else {
