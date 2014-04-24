@@ -132,10 +132,8 @@ class UsersController extends AppController
             ),
         );
 
-        $extraFilters = array();
-        if (User::hasPermission('functions/superadmin')) {
-            $extraFilters = array();
-        } elseif (User::hasPermission('controllers/departments')) {
+        $extraFilters = array('User.record_status' => 'A');
+        if (User::hasPermission('controllers/departments')) {
             // faculty admins, filter out the admins and instructors from other department/faculty
             // stupid cakephp doesn't support double habtm query. So using raw query
             $conditions = array();
@@ -154,7 +152,7 @@ class UsersController extends AppController
             }
             $result = $this->User->query($query.join(' OR ', $conditions));
             $userIds = Set::extract($result, '/User/id');
-            $extraFilters = array('User.id' => $userIds);
+            $extraFilters['User.id'] = $userIds;
         }
 
         // define right click menu actions
@@ -611,7 +609,7 @@ class UsersController extends AppController
         $userRole = $user['Role']['0']['RolesUser']['role_id'];
         $enrolled = Set::extract('/Tutor/id', $user) + Set::extract('/Enrolment/id', $user);
 
-        if ($userRole <= $roleId || !in_array($userRole, array(4,5))) {
+        if ($userRole <= $roleId || !in_array($userRole, array(4, 5))) {
             $this->Session->setFlash(__('Error: You do not have permission to enrol this user.', true));
             $this->redirect('/courses/home/'.$courseId);
             return;
@@ -619,6 +617,12 @@ class UsersController extends AppController
             $this->Session->setFlash(__('Error: The student is already enrolled.', true));
             $this->redirect('/courses/home/'.$courseId);
             return;
+        }
+        
+        // make the existing user active
+        if ($user['User']['record_status'] == "I" && !$this->User->readdUser($user['User']['id'])) {
+            $this->Session->setFlash(__('Error: Unable to enrol the user.', true));
+            $this->redirect('/courses/home/'.$courseId);
         }
 
         // enrol students
@@ -636,7 +640,37 @@ class UsersController extends AppController
         }
         $this->redirect('/courses/home/'.$courseId);
     }
-
+    
+    /**
+     * Readd users that were previously soft-deleted
+     *
+     * @param mixed $username username
+     * @param mixed $courseId course id
+     *
+     * @access public
+     * @return void
+     */
+    public function readd($username, $courseId = null)
+    {
+        $roleId = $this->User->getRoleId($this->Auth->user('id'));
+        $user = $this->User->getByUsername($username);
+        $userRole = $user['Role']['0']['RolesUser']['role_id'];
+        $url = '/users';
+        $url .= $courseId ? '/goToClassList/'.$courseId : '';
+        
+        if ($userRole <= $roleId || !in_array($userRole, array(4, 5))) {
+            $this->Session->setFlash(__('Error: You do not have permission to readd this user.', true));
+            $this->redirect($url);
+            return;
+        }
+        
+        if ($this->User->readdUser($user['User']['id'])) {
+            $this->Session->setFlash(__('User is successfully readded.', true), 'good');
+        } else {
+            $this->Session->setFlash(__('Error: Unable to readd the user.', true));
+        }
+        $this->redirect($url);
+    }
 
     /**
      * Given a user id, edit the information for that user
@@ -895,12 +929,30 @@ class UsersController extends AppController
             $this->cakeError('error404');
         }
 
+        // soft delete user
         if (is_null($courseId)) {
-            if ($this->User->delete($id)) {
+            $delete = array('User' => array(
+                'id' => $id,
+                'record_status' => 'I',
+            ));
+            $cleanUpModels = array(
+                'SurveyGroupMember',
+                'GroupsMembers',
+                'UserEnrol',
+                'UserCourse',
+                'UserTutor',
+            );
+            if ($this->User->save($delete)) {
                 $this->Session->setFlash(__('Record is successfully deleted!', true), 'good');
+                // unenrol/remove them from courses/groups if they are soft-deleted
+                foreach ($cleanUpModels as $model) {
+                    $condition = array($model.'.user_id' => $id);
+                    $this->$model->deleteAll($condition);
+                }
             } else {
                 $this->Session->setFlash(__('Error: Delete failed!', true));
             }
+        // unenrol user from course
         } else {
             if ($this->User->removeStudent($id, $courseId)) {
                 $this->Session->setFlash(__('Student is successfully unenrolled!', true), 'good');
@@ -927,14 +979,18 @@ class UsersController extends AppController
         }
         $this->layout = 'ajax';
         $this->autoRender = false;
-
-        $message = __('Username "', true).$this->data['User']['username'].__('" already exists.', true);
-        if (!is_null($courseId)) {
-            $message = $message.'<br> To enrol, click '.
-                '<a href="/users/enrol/'.$this->data['User']['username'].'/'.$courseId.'"> here</a>';
-        }
+        $urlSuffix = $courseId ? '/'.$courseId : '';
 
         $sFound = $this->User->getByUsername($this->data['User']['username']);
+        
+        $message = __('Username "', true).$this->data['User']['username'].__('" already exists.', true);
+        if (!is_null($courseId)) {
+            $message .= '<br> To enrol, click '.
+                '<a href="/users/enrol/'.$this->data['User']['username'].'/'.$courseId.'"> here</a>';
+        } else if ($sFound && $sFound['User']['record_status'] == 'I') {
+            $message .= '<br> To readd the user, click '.
+                '<a href="/users/readd/'.$this->data['User']['username'].$urlSuffix.'"> here</a>';
+        }
 
         return ($sFound) ? $message : '';
     }

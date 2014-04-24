@@ -707,6 +707,10 @@ class User extends AppModel
 
                 $existings[$key]['User'] = $temp;
             }
+            
+            //change inactive status to active
+            $this->readdUser($e['User']['id']);
+            
             // remove the existings from the data array
             unset($data[$e['User']['username']]);
         }
@@ -1097,6 +1101,21 @@ class User extends AppModel
             return $tmp_password;
         }
         return false;
+    }
+    
+    /**
+     * unflips user's record status from inactive to active
+     *
+     * @param mixed $userId
+     *
+     * @return boolean
+     */
+    function readdUser($userId)
+    {
+        $userData['User']['record_status'] = 'A';
+        $userData['User']['id'] = $userId;
+        
+        return $this->save($userData, true, array('record_status'));
     }
 
     /*********************************

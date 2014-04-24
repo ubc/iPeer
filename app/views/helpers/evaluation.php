@@ -274,7 +274,7 @@ class EvaluationHelper extends AppHelper
     /**
      * getReleaseStatusButtons
      *
-     * @param mixed $evaluators
+     * @param mixed $evaluatees
      * @param mixed $notInGroup
      * @param mixed $grpEventId
      * @param mixed $status

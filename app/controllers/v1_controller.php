@@ -361,6 +361,8 @@ class V1Controller extends Controller {
                     // set the userId so the user data gets updats with values from BB
                     $person['id'] = $this->User->field('id', array('username' => $person['username']));
                     $pRole = array('Role' => array('RolesUser' => array('role_id' => $person['role_id'])));
+                    // change inactive status to active status; would have no effect for new or active users
+                    $person['record_status'] = 'A';
                     unset($person['role_id']);
                     // do some clean up before we insert the values
                     array_walk($person, create_function('&$val', '$val = trim($val);'));

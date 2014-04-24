@@ -229,6 +229,13 @@ class AppController extends Controller
     {
         if ($this->Auth->isAuthorized()) {
             User::getInstance($this->Auth->user());
+            // deny access for inactive users
+            if (User::get('record_status') == 'I') {
+                $this->Auth->logout();
+                $this->Session->setFlash(__('Your account is currently inactive.', true));
+                $this->redirect('/');
+                return;
+            }
             // after login stuff
             $this->User->loadRoles(User::get('id'));
             $this->AccessControl->loadPermissions();
