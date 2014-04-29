@@ -310,17 +310,18 @@ class EventTestCase extends CakeTestCase
 
     function testGetPendingEventsByUserId()
     {
-        $events = $this->Event->getPendingEventsByUserId(5);
+        $options = array('submission' => 1, 'results' => 0);
+        $events = $this->Event->getPendingEventsByUserId(5, $options);
         $ids = Set::extract($events, '/id');
         sort($ids);
         $this->assertEqual(count($events), 5);
         $this->assertEqual($ids, array(1,2,3,4,5));
 
-        $events = $this->Event->getPendingEventsByUserId(27);
+        $events = $this->Event->getPendingEventsByUserId(27, $options);
         $this->assertEqual(count($events), 0);
 
         // student within two groups in the same event
-        $events = $this->Event->getPendingEventsByUserId(7);
+        $events = $this->Event->getPendingEventsByUserId(7, $options);
         $ids = Set::extract($events, '/id');
         sort($ids);
         $this->assertEqual(count($events), 6);
