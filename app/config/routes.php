@@ -82,6 +82,14 @@ if (IS_INSTALLED) {
   Router::connect('/:controller/courses/:course_id/departments/:department_id',
     array('action'=> 'courseDepartments'),
     array('course_id' => '[0-9]+', 'department_id' => '[0-9]+'));
+  // Connect url to users/events api with filters
+  Router::connect('/:controller/users/:username/events/sub/:sub/results/:results',
+    array('action' => 'userEvents'),
+    array('sub' => '[0-1]', 'results' => '[0-1]'));
+  // connect url to users/events/course api with filters
+  Router::connect('/:controller/courses/:course_id/users/:username/events/sub/:sub/results/:results',
+    array('action' => 'userEvents'),
+    array('course_id' => '[0-9]+', 'sub' => '[0-1]', 'results' => '[0-1]'));
   // Connect url to users/events api
   Router::connect('/:controller/users/:username/events',
     array('action' => 'userEvents'));

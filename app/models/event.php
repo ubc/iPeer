@@ -790,19 +790,28 @@ class Event extends AppModel
      * getPendingEventsByUserId
      * get all the events that are open and user haven't submitted for user with id = userId
      *
-     * @param mixed $userId user id
-     * @param mixed $fields the fields to retreive
+     * @param mixed $userId  user id
+     * @param mixed $options options
+     * @param mixed $fields  the fields to retreive
      *
      * @access public
      * @return void
      */
-    public function getPendingEventsByUserId($userId, $fields = null)
+    public function getPendingEventsByUserId($userId, $options, $fields = null)
     {
         $pendingEvents = array();
         $events = $this->getEventsByUserId($userId, $fields);
         $events = array_merge($events['Evaluations'], $events['Surveys']);
         foreach ($events as $event) {
-            if ($event['Event']['is_released'] && empty($event['EvaluationSubmission'])) {
+            if ($options['submission'] && $event['Event']['is_released'] && empty($event['EvaluationSubmission'])) {
+                // filter for released evaluations that are available for submission
+                $pendingEvents[] = $event['Event'];
+            } else if ($options['results'] && isset($event['Event']['is_result_released']) &&
+                $event['Event']['is_result_released']) {
+                // filter for evaluations that have their results released
+                $pendingEvents[] = $event['Event'];
+            } else if (!$options['submission'] && !$options['results']) {
+                // no filter implemented; return all events
                 $pendingEvents[] = $event['Event'];
             }
         }

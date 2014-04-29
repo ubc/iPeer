@@ -697,7 +697,10 @@ class V1ControllerTest extends CakeTestCase {
                 'id' => '1',
                 'release_date_begin' => "2011-06-16 16:34:49",
                 'release_date_end' => "2023-07-22 16:34:53",
+                'result_release_date_begin' => '2024-07-04 16:34:43',
+                'result_release_date_end' => '2024-07-30 16:34:43',
                 'is_released' => true,
+                'is_result_released' => false,
                 'is_ended' => false,
             ),
             array(
@@ -708,7 +711,10 @@ class V1ControllerTest extends CakeTestCase {
                 'id' => '2',
                 'release_date_begin' => "2011-06-06 08:59:35",
                 'release_date_end' => "2023-07-02 08:59:41",
+                'result_release_date_begin' => '2024-06-09 08:59:29',
+                'result_release_date_end' => '2024-07-08 08:59:29',
                 'is_released' => true,
+                'is_result_released' => false,
                 'is_ended' => false,
             ),
             array(
@@ -719,7 +725,10 @@ class V1ControllerTest extends CakeTestCase {
                 'id' => '3',
                 'release_date_begin' => "2011-06-07 09:00:35",
                 'release_date_end' => "2023-07-09 09:00:39",
+                'result_release_date_begin' => '2023-07-04 09:00:28',
+                'result_release_date_end' => '2024-07-12 09:00:28',
                 'is_released' => true,
+                'is_result_released' => false,
                 'is_ended' => false,
             ),
             array(
@@ -730,6 +739,8 @@ class V1ControllerTest extends CakeTestCase {
                 'id' => '4',
                 'release_date_begin' => "2012-07-01 11:20:00",
                 'release_date_end' => date('Y', strtotime("+1 year"))."-12-31 11:20:00",
+                'result_release_date_begin' => '',
+                'result_release_date_end' => '',
                 'is_released' => true,
                 'is_ended' => false,
             ),
@@ -741,20 +752,343 @@ class V1ControllerTest extends CakeTestCase {
                 'id' => '5',
                 'release_date_begin' => "2012-07-01 11:20:00",
                 'release_date_end' => date('Y', strtotime("+1 year"))."-12-31 11:20:00",
+                'result_release_date_begin' => '',
+                'result_release_date_end' => '',
+                'is_released' => true,
+                'is_ended' => false,
+            ),
+            array(
+                'title' => 'simple evaluation 2',
+                'course_id' => '1',
+                'event_template_type_id' => '1',
+                'due_date' => '2012-11-28 00:00:00',
+                'release_date_begin' => '2012-11-20 00:00:00',
+                'release_date_end' => '2022-11-29 00:00:00',
+                'result_release_date_begin' => '2022-11-30 00:00:00',
+                'result_release_date_end' => '2022-12-12 00:00:00',
+                'id' => '6',
+                'is_released' => true,
+                'is_result_released' => false,
+                'is_ended' => false,
+            ),
+            array(
+                'title' => 'simple evaluation 3',
+                'course_id' => '1',
+                'event_template_type_id' => '1',
+                'due_date' => '2012-11-28 00:00:00',
+                'release_date_begin' => '2012-11-20 00:00:00',
+                'release_date_end' => '2012-11-29 00:00:00',
+                'result_release_date_begin' => '2022-11-30 00:00:00',
+                'result_release_date_end' => '2022-12-12 00:00:00',
+                'id' => '7',
+                'is_released' => false,
+                'is_result_released' => false,
+                'is_ended' => true,
+            ),
+            array(
+                'title' => 'simple evaluation 4',
+                'course_id' => '1',
+                'event_template_type_id' => '1',
+                'due_date' => '2012-11-28 00:00:00',
+                'release_date_begin' => '2012-11-20 00:00:00',
+                'release_date_end' => '2012-11-29 00:00:00',
+                'result_release_date_begin' => '2012-11-30 00:00:00',
+                'result_release_date_end' => '2022-12-12 00:00:00',
+                'id' => '8',
+                'is_released' => false,
+                'is_result_released' => true,
+                'is_ended' => true,
+            ),
+            array(
+                'title' => 'simple evaluation 5',
+                'course_id' => '1',
+                'event_template_type_id' => '1',
+                'due_date' => '2012-11-28 00:00:00',
+                'release_date_begin' => '2012-11-20 00:00:00',
+                'release_date_end' => '2012-11-29 00:00:00',
+                'result_release_date_begin' => '2012-11-30 00:00:00',
+                'result_release_date_end' => '2022-12-12 00:00:00',
+                'id' => '9',
+                'is_released' => false,
+                'is_result_released' => true,
+                'is_ended' => true,
+            ),
+            array(
+                'title' => 'simple evaluation 6',
+                'course_id' => '1',
+                'event_template_type_id' => '1',
+                'due_date' => '2016-07-31 11:20:00',
+                'release_date_begin' => '2015-07-31 11:20:00',
+                'release_date_end' => '2016-07-31 11:20:00',
+                'result_release_date_begin' => '2016-07-31 11:20:00',
+                'result_release_date_end' => '2017-07-31 11:20:00',
+                'id' => '10',
+                'is_released' => false,
+                'is_result_released' => false,
+                'is_ended' => false,
+            ),
+        );
+        
+        $expectedSubmittableEvents = array(
+            array(
+                'title' => 'Term 1 Evaluation',
+                'course_id' => '1',
+                'event_template_type_id' => '1',
+                'due_date' => date('Y', strtotime("+1 year")).'-07-02 16:34:43',
+                'id' => '1',
+                'release_date_begin' => "2011-06-16 16:34:49",
+                'release_date_end' => "2023-07-22 16:34:53",
+                'result_release_date_begin' => '2024-07-04 16:34:43',
+                'result_release_date_end' => '2024-07-30 16:34:43',
+                'is_released' => true,
+                'is_result_released' => false,
+                'is_ended' => false,
+            ),
+            array(
+                'title' => 'Term Report Evaluation',
+                'course_id' => '1',
+                'event_template_type_id' => '2',
+                'due_date' => date('Y', strtotime("+1 year")).'-06-08 08:59:29',
+                'id' => '2',
+                'release_date_begin' => "2011-06-06 08:59:35",
+                'release_date_end' => "2023-07-02 08:59:41",
+                'result_release_date_begin' => '2024-06-09 08:59:29',
+                'result_release_date_end' => '2024-07-08 08:59:29',
+                'is_released' => true,
+                'is_result_released' => false,
+                'is_ended' => false,
+            ),
+            array(
+                'title' => 'Project Evaluation',
+                'course_id' => '1',
+                'event_template_type_id' => '4',
+                'due_date' => date('Y', strtotime("+1 year")).'-07-02 09:00:28',
+                'id' => '3',
+                'release_date_begin' => "2011-06-07 09:00:35",
+                'release_date_end' => "2023-07-09 09:00:39",
+                'result_release_date_begin' => '2023-07-04 09:00:28',
+                'result_release_date_end' => '2024-07-12 09:00:28',
+                'is_released' => true,
+                'is_result_released' => false,
+                'is_ended' => false,
+            ),
+            array(
+                'title' => 'Team Creation Survey',
+                'course_id' => '1',
+                'event_template_type_id' => '3',
+                'due_date' => date('Y', strtotime("+1 year")).'-07-31 11:20:00',
+                'id' => '4',
+                'release_date_begin' => "2012-07-01 11:20:00",
+                'release_date_end' => date('Y', strtotime("+1 year"))."-12-31 11:20:00",
+                'result_release_date_begin' => '',
+                'result_release_date_end' => '',
+                'is_released' => true,
+                'is_ended' => false,
+            ),
+            array(
+                'title' => 'Survey, all Q types',
+                'course_id' => '1',
+                'event_template_type_id' => '3',
+                'due_date' => date('Y', strtotime("+1 year")).'-07-31 11:20:00',
+                'id' => '5',
+                'release_date_begin' => "2012-07-01 11:20:00",
+                'release_date_end' => date('Y', strtotime("+1 year"))."-12-31 11:20:00",
+                'result_release_date_begin' => '',
+                'result_release_date_end' => '',
                 'is_released' => true,
                 'is_ended' => false,
             )
         );
-
-        $url = $this->_getURL('/v1/users/redshirt0001/events');
+        
+        $expectedResultReleasedEvents = array(
+            array(
+                'title' => 'simple evaluation 4',
+                'course_id' => '1',
+                'event_template_type_id' => '1',
+                'due_date' => '2012-11-28 00:00:00',
+                'release_date_begin' => '2012-11-20 00:00:00',
+                'release_date_end' => '2012-11-29 00:00:00',
+                'result_release_date_begin' => '2012-11-30 00:00:00',
+                'result_release_date_end' => '2022-12-12 00:00:00',
+                'id' => '8',
+                'is_released' => false,
+                'is_result_released' => true,
+                'is_ended' => true,
+            ),
+            array(
+                'title' => 'simple evaluation 5',
+                'course_id' => '1',
+                'event_template_type_id' => '1',
+                'due_date' => '2012-11-28 00:00:00',
+                'release_date_begin' => '2012-11-20 00:00:00',
+                'release_date_end' => '2012-11-29 00:00:00',
+                'result_release_date_begin' => '2012-11-30 00:00:00',
+                'result_release_date_end' => '2022-12-12 00:00:00',
+                'id' => '9',
+                'is_released' => false,
+                'is_result_released' => true,
+                'is_ended' => true,
+            )
+        );
+        
+        $expectedFilteredEvents = array(
+            array(
+                'title' => 'Term 1 Evaluation',
+                'course_id' => '1',
+                'event_template_type_id' => '1',
+                'due_date' => date('Y', strtotime("+1 year")).'-07-02 16:34:43',
+                'id' => '1',
+                'release_date_begin' => "2011-06-16 16:34:49",
+                'release_date_end' => "2023-07-22 16:34:53",
+                'result_release_date_begin' => '2024-07-04 16:34:43',
+                'result_release_date_end' => '2024-07-30 16:34:43',
+                'is_released' => true,
+                'is_result_released' => false,
+                'is_ended' => false,
+            ),
+            array(
+                'title' => 'Term Report Evaluation',
+                'course_id' => '1',
+                'event_template_type_id' => '2',
+                'due_date' => date('Y', strtotime("+1 year")).'-06-08 08:59:29',
+                'id' => '2',
+                'release_date_begin' => "2011-06-06 08:59:35",
+                'release_date_end' => "2023-07-02 08:59:41",
+                'result_release_date_begin' => '2024-06-09 08:59:29',
+                'result_release_date_end' => '2024-07-08 08:59:29',
+                'is_released' => true,
+                'is_result_released' => false,
+                'is_ended' => false,
+            ),
+            array(
+                'title' => 'Project Evaluation',
+                'course_id' => '1',
+                'event_template_type_id' => '4',
+                'due_date' => date('Y', strtotime("+1 year")).'-07-02 09:00:28',
+                'id' => '3',
+                'release_date_begin' => "2011-06-07 09:00:35",
+                'release_date_end' => "2023-07-09 09:00:39",
+                'result_release_date_begin' => '2023-07-04 09:00:28',
+                'result_release_date_end' => '2024-07-12 09:00:28',
+                'is_released' => true,
+                'is_result_released' => false,
+                'is_ended' => false,
+            ),
+            array(
+                'title' => 'Team Creation Survey',
+                'course_id' => '1',
+                'event_template_type_id' => '3',
+                'due_date' => date('Y', strtotime("+1 year")).'-07-31 11:20:00',
+                'id' => '4',
+                'release_date_begin' => "2012-07-01 11:20:00",
+                'release_date_end' => date('Y', strtotime("+1 year"))."-12-31 11:20:00",
+                'result_release_date_begin' => '',
+                'result_release_date_end' => '',
+                'is_released' => true,
+                'is_ended' => false,
+            ),
+            array(
+                'title' => 'Survey, all Q types',
+                'course_id' => '1',
+                'event_template_type_id' => '3',
+                'due_date' => date('Y', strtotime("+1 year")).'-07-31 11:20:00',
+                'id' => '5',
+                'release_date_begin' => "2012-07-01 11:20:00",
+                'release_date_end' => date('Y', strtotime("+1 year"))."-12-31 11:20:00",
+                'result_release_date_begin' => '',
+                'result_release_date_end' => '',
+                'is_released' => true,
+                'is_ended' => false,
+            ),
+            array(
+                'title' => 'simple evaluation 4',
+                'course_id' => '1',
+                'event_template_type_id' => '1',
+                'due_date' => '2012-11-28 00:00:00',
+                'release_date_begin' => '2012-11-20 00:00:00',
+                'release_date_end' => '2012-11-29 00:00:00',
+                'result_release_date_begin' => '2012-11-30 00:00:00',
+                'result_release_date_end' => '2022-12-12 00:00:00',
+                'id' => '8',
+                'is_released' => false,
+                'is_result_released' => true,
+                'is_ended' => true,
+            ),
+            array(
+                'title' => 'simple evaluation 5',
+                'course_id' => '1',
+                'event_template_type_id' => '1',
+                'due_date' => '2012-11-28 00:00:00',
+                'release_date_begin' => '2012-11-20 00:00:00',
+                'release_date_end' => '2012-11-29 00:00:00',
+                'result_release_date_begin' => '2012-11-30 00:00:00',
+                'result_release_date_end' => '2022-12-12 00:00:00',
+                'id' => '9',
+                'is_released' => false,
+                'is_result_released' => true,
+                'is_ended' => true,
+            )
+        );
+        
+        // get ALL events for redshirt0001
+        $url = $this->_getURL('/v1/users/redshirt0001/events/sub/0/results/0');
         $actualEvents = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($actualEvents, true), '{n}.id', 'asc');
         $this->assertequal($expectedEvents, $events);
 
-        $url = $this->_getURL('/v1/courses/1/users/redshirt0001/events');
+        // get ALL events course id 1 for redshirt0001
+        $url = $this->_getURL('/v1/courses/1/users/redshirt0001/events/sub/0/results/0');
         $courseUserEvents = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($courseUserEvents, true), '{n}.id', 'asc');
         $this->assertequal($expectedEvents, $events);
+        
+        // get events for redshirt0001 available for submissions
+        $url = $this->_getURL('/v1/users/redshirt0001/events/sub/1/results/0');
+        $eventsSubmittable = $this->_oauthReq("$url");
+        $events = Set::sort(json_decode($eventsSubmittable, true), '{n}.id', 'asc');
+        $this->assertequal($expectedSubmittableEvents, $events);
+        
+        // get events for redshirt0001 that have results released
+        $url = $this->_getURL('/v1/users/redshirt0001/events/sub/0/results/1');
+        $eventsResult = $this->_oauthReq("$url");
+        $events = Set::sort(json_decode($eventsResult, true), '{n}.id', 'asc');
+        $this->assertequal($expectedResultReleasedEvents, $events);
+        
+        // get events for redshirt0001 available for submissions OR have results released
+        $url = $this->_getURL('/v1/users/redshirt0001/events/sub/1/results/1');
+        $filteredEvents = $this->_oauthReq("$url");
+        $events = Set::sort(json_decode($filteredEvents, true), '{n}.id', 'asc');
+        $this->assertequal($expectedFilteredEvents, $events);
+
+        // get events in course id 1 for redshirt0001 available for submissions
+        $url = $this->_getURL('/v1/courses/1/users/redshirt0001/events/sub/1/results/0');
+        $eventsSubmittable = $this->_oauthReq("$url");
+        $events = Set::sort(json_decode($eventsSubmittable, true), '{n}.id', 'asc');
+        $this->assertequal($expectedSubmittableEvents, $events);
+        
+        // get events in course id 1 for redshirt0001 that have results released
+        $url = $this->_getURL('/v1/courses/1/users/redshirt0001/events/sub/0/results/1');
+        $eventsResult = $this->_oauthReq("$url");
+        $events = Set::sort(json_decode($eventsResult, true), '{n}.id', 'asc');
+        $this->assertequal($expectedResultReleasedEvents, $events);
+        
+        // get events in course id 1 for redshirt0001 available for submissions OR have results released
+        $url = $this->_getURL('/v1/courses/1/users/redshirt0001/events/sub/1/results/1');
+        $filteredEvents = $this->_oauthReq("$url");
+        $events = Set::sort(json_decode($filteredEvents, true), '{n}.id', 'asc');
+        $this->assertequal($expectedFilteredEvents, $events);
+        
+        // get ALL events for redshirt0001 - no filters
+        $url = $this->_getURL('/v1/users/redshirt0001/events');
+        $events = $this->_oauthReq("$url");
+        $events = Set::sort(json_decode($events, true), '{n}.id', 'asc');
+        $this->assertequal($expectedEvents, $events);
+        
+        // get ALL events in course id 1 for redshirt0001 - no filters
+        $url = $this->_getURL('/v1/courses/1/users/redshirt0001/events');
+        $events = $this->_oauthReq("$url");
+        $events = Set::sort(json_decode($events, true), '{n}.id', 'asc');
+        $this->assertequal($expectedEvents, $events);           
     }
 
 
