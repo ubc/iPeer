@@ -1057,7 +1057,7 @@ msgstr ""
 
 #: /Users/compass/projects/ipeer/src/controllers/install_controller.php:133
 #: /Users/compass/projects/ipeer/src/libs/upgrade_scripts/upgrade_300.php:64
-msgid "Cannot copy the guard configuration (gurad.php) to the configuration directory."
+msgid "Cannot copy the guard configuration (guard.php) to the configuration directory."
 msgstr ""
 
 #: /Users/compass/projects/ipeer/src/controllers/install_controller.php:174
