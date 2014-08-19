@@ -8,6 +8,15 @@
  * @license   PHP Version 3.0 {@link http://www.php.net/license/3_0.txt}
  * @version   Release: 3.0
  */
+
+// mysql_set_charset is only available PHP 5 >= 5.2.3
+if (!function_exists('mysql_set_charset')) {
+    function mysql_set_charset($charset,$dbh)
+    {
+        return mysql_query("set names $charset",$dbh);
+    }
+}
+
 class UpgradeBase
 {
     public $errors = array();
@@ -135,6 +144,8 @@ class UpgradeBase
         if (!$mysql) {
             return 'Could not connect to database!';
         }
+
+        mysql_set_charset('utf8', $mysql);
 
         //Open the database
         $mysqldb = mysql_select_db($dbConfig['database']);
