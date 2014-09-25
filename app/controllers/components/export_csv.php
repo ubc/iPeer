@@ -160,6 +160,13 @@ Class ExportCsvComponent extends ExportBaseNewComponent
             $header[] = "Evaluator S#";
         }
 
+        // add columns for individual criterion comments (Rubrics only)
+        if (isset($event['Rubric'])) {
+        	foreach ($event['Question'] as $key => $question) {
+        		$header[] = "Q".($key+1)." Comment";
+        	}
+        }
+
         // comment header
         if ($event['Event']['event_template_type_id'] != 4 && $params['include']['comments']) {
             $header[] = 'Comment';
