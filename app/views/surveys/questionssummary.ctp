@@ -48,9 +48,9 @@ foreach ($questions as $i => $q) {
 
 echo $html->div('center',
     $form->button(__('Add Question', true),
-       array('onclick' => "window.location='/surveys/addQuestion/$survey_id'")).
+       array('onclick' => "window.location.href='".$html->url('/surveys/addQuestion/'.$survey_id)."'")).
     $form->button(__('Done', true),
-       array('onclick' => "window.location='/surveys/index'"))
+       array('onclick' => "window.location.href='".$html->url('/surveys/index/')."'"))
 );
 ?>
 </div>
