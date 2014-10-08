@@ -214,13 +214,14 @@ class Toolkit
      * @access public
      * @return array demo data
      */
-    static function getRubricEvalDemoData()
+    static function getRubricEvalDemoData($data)
     {
         return array(
             'event' => array(
                 'Event' => array(
                     'id' => 0,
                     'title' => 'Preview Event',
+                    'course_id' => 0,
                     'due_date' => Toolkit::formatDate(time()+(5*24*60*60)),
                     'description' => 'Preview for rubric evaluation event.',
                     'com_req' => true,
@@ -228,6 +229,9 @@ class Toolkit
                 'Group' => array(
                     'id' => 0,
                     'group_name' => 'Demo Group',
+                ),
+                'GroupEvent' => array(
+                	'id' => 0,
                 ),
             ),
             'groupMembers' => array(
@@ -253,11 +257,15 @@ class Toolkit
                     ),
                 ),
             ),
+            'viewData' => array('id' => $data['Rubric']['id']),
             'courseId' => 0,
             'userId' => 1,
-            'evaluateeCount' => 2,
+            'evaluateeCount' => 3,
             'fullName' => User::get('full_name'),
             'preview' => true,
+            'allDone' => false,
+            'comReq' => false,
+            'userIds' => array(1,2,3),
         );
     }
 
