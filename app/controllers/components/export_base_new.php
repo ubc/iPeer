@@ -216,6 +216,12 @@ class ExportBaseNewComponent extends Object
             }
 
             $response = $responses[$evaluatee['id']][$evaluator['id']];
+                        
+            if ($event['Event']['event_template_type_id'] == 2) {
+                foreach ($response[$this->detailModel[$event['Event']['event_template_type_id']]] as $result) {
+                    array_push($row, $result['criteria_comment']);
+                }
+            }
 
             // comments for Rubric and Simple Evaluation
             if ($event['Event']['event_template_type_id'] != 4 && $params['include']['comments']) {
