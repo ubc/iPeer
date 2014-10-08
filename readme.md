@@ -71,6 +71,12 @@ Runing the tests:
 
 It is better not to touch the mouse or keyboard during the tests.
 
+iPeer 3.1.3
+---------------------------
+This is a maintenance release.
+* Fix a bug causing upgrade from 2.x failed
+* Improved the language on Student Result Mode help text
+
 iPeer 3.1.2
 ---------------------------
 This is a maintenance release.
