@@ -201,7 +201,7 @@ class EvaluationsController extends AppController
 
         // Set up the basic static ajax list variables
         $this->setUpAjaxList($eventId);
-        
+
         // set status whether instructors can view un/release comments & grades
         $viewReleaseBtns = time() >= strtotime($event['Event']['release_date_end']);
 
@@ -239,6 +239,9 @@ class EvaluationsController extends AppController
      */
     function export($type, $id)
     {
+        // increase the execution time
+        ini_set('max_execution_time', 600);
+
         // $type must be course or event
         if ('course' != $type && 'event' != $type) {
             $this->Session->setFlash('Error: Invalid export type', true);
@@ -1572,13 +1575,13 @@ class EvaluationsController extends AppController
             $model = 'EvaluationMixeval';
             break;
         }
-        
+
         $evalIds = $this->$model->find('list', array('conditions' => $conditions));
         $this->$model->updateAll(
             array($model.'.grade_release' => $releaseStatus),
             array($model.'.id' => $evalIds)
         );
-        
+
         $this->GroupEvent->id = $grpEventId;
         $evals = $this->$model->find('list', array(
             'conditions' => array($model.'.grp_event_id' => $grpEventId),
@@ -1586,7 +1589,7 @@ class EvaluationsController extends AppController
         ));
         $all = array_product($evals);
         $some = array_sum($evals);
-        
+
         if ($all) {
             $grpEvent['GroupEvent']['grade_release_status'] = 'All';
         } else if ($some) {
@@ -1594,9 +1597,9 @@ class EvaluationsController extends AppController
         } else {
             $grpEvent['GroupEvent']['grade_release_status'] = 'None';
         }
-        
+
         $this->GroupEvent->save($grpEvent);
-        
+
         $this->redirect('viewEvaluationResults/'.$eventId.'/'.$grpEvent['GroupEvent']['group_id'].$url);
 
     }
@@ -1799,7 +1802,7 @@ class EvaluationsController extends AppController
         default:
             break;
         }
-        
+
         $grpEventList = $this->GroupEvent->getGroupListByEventId($eventId);
         foreach ($grpEventList as $grpEvent) {
             $this->GroupEvent->id = $grpEvent['GroupEvent']['id'];
@@ -1809,7 +1812,7 @@ class EvaluationsController extends AppController
             ));
             $all = array_product($evals);
             $some = array_sum($evals);
-            
+
             if ($all) {
                 $grpEvent['GroupEvent']['grade_release_status'] = 'All';
             } else if ($some) {
@@ -1817,7 +1820,7 @@ class EvaluationsController extends AppController
             } else {
                 $grpEvent['GroupEvent']['grade_release_status'] = 'None';
             }
-            
+
             $this->GroupEvent->save($grpEvent);
         }
 
