@@ -63,8 +63,8 @@ function saveButtonVal(userId) {
             <li><?php __('Press "Save This Section" to save the evaluation for each group member.')?></li>
             <li><?php __('Press "Submit to Complete the Evaluation" to submit your evaluation to all peers.')?> </li>
             <li><?php __('<i>NOTE:</i> You can click the "Submit to Complete the Evaluation" button only <font color ="#FF6666">AFTER</font> all evaluations are completed.')?></li>
-            <?php $releaseEnd = !isset($event['Event']['release_date_end']) ? '<i>'._t("Evaluation's release end date").'</i>' : Toolkit::formatDate($event['Event']['release_date_end']); ?>
-            <li><?php echo _t('The evaluation can be repeatedly submitted until ').$releaseEnd.'.'?></li>
+            <?php $releaseEnd = !isset($event['Event']['release_date_end']) ? '<i>'.__("Evaluation's release end date", true).'</i>' : Toolkit::formatDate($event['Event']['release_date_end']); ?>
+            <li><?php echo __('The evaluation can be repeatedly submitted until ', true).$releaseEnd.'.'?></li>
             </ul>
 
             <div style="text-align:left; margin-left:3em;"><a href="#" onClick="javascript:$('penalty').toggle();return false;">( <?php __('Show/Hide late penalty policy')?> )</a></div>

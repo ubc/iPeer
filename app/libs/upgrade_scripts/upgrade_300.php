@@ -61,7 +61,7 @@ class Upgrade300 extends UpgradeBase
 
         if (!file_exists(CONFIGS.'guard.php')) {
             if (!copy(APP.DS.'plugins'.DS.'guard'.DS.'config'.DS.'guard.php', CONFIGS.'guard.php')) {
-                $this->errors[] = __('Cannot copy the guard configuration (gurad.php) to the configuration directory.', true);
+                $this->errors[] = __('Cannot copy the guard configuration (app/plugins/guard/config/guard.php) to the configuration directory.', true);
                 return false;
             }
         }

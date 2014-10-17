@@ -291,7 +291,7 @@ class V1Controller extends Controller {
             $data = array();
             // all users
             if (null == $id) {
-                $users = $this->User->find('all');
+                $users = $this->User->find('all', array('conditions' => array('User.record_status' => 'A')));
                 if (!empty($users)) {
                     foreach ($users as $user) {
                         $tmp = array();
@@ -311,7 +311,7 @@ class V1Controller extends Controller {
             } else {
                 $user = $this->User->find(
                     'first',
-                    array('conditions' => array('User.id' => $id))
+                    array('conditions' => array('User.id' => $id, 'User.record_status' => 'A'))
                 );
                 if (!empty($user)) {
                     $data = array(
@@ -358,7 +358,11 @@ class V1Controller extends Controller {
                 $data = array();
                 // rearrange the data
                 foreach ($decode as $person) {
+                    // set the userId so the user data gets updats with values from BB
+                    $person['id'] = $this->User->field('id', array('username' => $person['username']));
                     $pRole = array('Role' => array('RolesUser' => array('role_id' => $person['role_id'])));
+                    // change inactive status to active status; would have no effect for new or active users
+                    $person['record_status'] = 'A';
                     unset($person['role_id']);
                     // do some clean up before we insert the values
                     array_walk($person, create_function('&$val', '$val = trim($val);'));
@@ -411,7 +415,12 @@ class V1Controller extends Controller {
             $this->set('result', $body);
         // delete
         } else if ($this->RequestHandler->isDelete()) {
-            if ($this->User->delete($id)) {
+            $delete = array('User' => array(
+                'id' => $id,
+                'record_status' => 'I',
+            ));
+            // soft delete user
+            if ($this->User->save($delete)) {
                 $this->set('statusCode', 'HTTP/1.1 204 No Content');
                 $this->set('result', null);
             } else {
@@ -906,9 +915,15 @@ class V1Controller extends Controller {
         if ($this->RequestHandler->isGet()) {
             $user = $this->User->find('first', array('conditions' => array('User.username' => $username)));
             $user_id = $user['User']['id'];
+            
+            $options = array();
+            $options['submission'] = (!isset($this->params['sub']) || null == $this->params['sub']) ?
+                0 : $this->params['sub'];
+            $options['results'] = (!isset($this->params['results']) || null == $this->params['results']) ?
+                0 : $this->params['results'];
 
-            $fields = array('title', 'course_id', 'event_template_type_id', 'due_date', 'release_date_begin', 'release_date_end', 'id');
-            $events = $this->Event->getPendingEventsByUserId($user_id, $fields);
+            $fields = array('title', 'course_id', 'event_template_type_id', 'due_date', 'release_date_begin', 'release_date_end', 'result_release_date_begin', 'result_release_date_end', 'id');
+            $events = $this->Event->getPendingEventsByUserId($user_id, $options, $fields);
 
             $this->set('statusCode', 'HTTP/1.1 200 OK');
             $this->set('result', $events);
@@ -1004,6 +1019,52 @@ class V1Controller extends Controller {
                     $inClass[] = $user['username'];
 
                     $result[] = $user;
+                }
+                // check if any user's role changed
+                else {
+                    $userId = $this->User->field('id', array('username' => $user['username']));
+
+                    if (!empty($userId)) {
+                        $role = $this->Role->getRoleName($user['role_id']);
+
+                        if ($role == 'instructor') {
+                            if(in_array($userId, $students)) {
+                                $this->User->removeStudent($userId, $courseId);
+                                $this->log('Removing student '.$user['username'].' from course '.$courseId, 'debug');
+                                $ret = $this->User->addInstructor($userId, $courseId);
+                                $this->log('Adding instructor '.$user['username'].' to course '.$courseId, 'api');
+                            } else if(in_array($userId, $tutors)) {
+                                $this->User->removeTutor($userId, $courseId);
+                                $this->log('Removing tutor '.$user['username'].' from course '.$courseId, 'debug');
+                                $ret = $this->User->addInstructor($userId, $courseId);
+                                $this->log('Adding instructor '.$user['username'].' to course '.$courseId, 'api');
+                            }
+                        } else if ($role == 'tutor') {
+                            if(in_array($userId, $students)) {
+                                $this->User->removeStudent($userId, $courseId);
+                                $this->log('Removing student '.$user['username'].' from course '.$courseId, 'debug');
+                                $ret = $this->User->addTutor($userId, $courseId);
+                                $this->log('Adding tutor '.$user['username'].' to course '.$courseId, 'api');
+                            } else if(in_array($userId, $instructors)) {
+                                $this->User->removeInstructor($userId, $courseId);
+                                $this->log('Removing instructor '.$user['username'].' from course '.$courseId, 'debug');
+                                $ret = $this->User->addTutor($userId, $courseId);
+                                $this->log('Adding tutor '.$user['username'].' to course '.$courseId, 'api');
+                            }
+                        } else if ($role == 'student') {
+                            if(in_array($userId, $tutors)) {
+                                $this->User->removeTutor($userId, $courseId);
+                                $this->log('Removing tutor '.$user['username'].' from course '.$courseId, 'debug');
+                                $ret = $this->User->addStudent($userId, $courseId);
+                                $this->log('Adding student '.$user['username'].' to course '.$courseId, 'api');
+                            } else if(in_array($userId, $instructors)) {
+                                $this->User->removeInstructor($userId, $courseId);
+                                $this->log('Removing instructor '.$user['username'].' from course '.$courseId, 'debug');
+                                $ret = $this->User->addStudent($userId, $courseId);
+                                $this->log('Adding student '.$user['username'].' to course '.$courseId, 'api');
+                            }
+                        }
+                    }
                 }
             }
             // unenrol students that are no longer in the class, this will become a problem if

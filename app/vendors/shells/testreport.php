@@ -72,7 +72,7 @@ class TestReportShell extends TestSuiteShell
             }
         } catch (Exception $e) {
             ob_get_clean();
-            $this->out('Unit tests failed to run.');
+            $this->out('Tests failed to run. ' . $e->getMessage());
             $this->_stop(1);
         }
         $xml = ob_get_clean();

@@ -25,18 +25,47 @@ if (User::hasPermission('functions/user/admin', 'update')) {
 }
 echo $this->Form->input('title');
 echo $this->Form->input('student_no', array('label' => 'Student Number'));
-echo $this->Form->input(
-  'Courses.id',
-  array(
-    'type' => 'select',
-    'multiple' => 'checkbox',
-    'options' => $coursesOptions,
-    'label' => "Put User in Course",
-    'selected' => $coursesSelected
-  )
-);
+?>
+	<div class="input text">
+		<label>Put User in Course</label>
+		<div style="width: 35em; display: inline-block; border: 1px solid #999; padding: 5px; border-radius: 3px; margin: 0.35em 0.35em;">
+			<table id="courseTable">
+				<thead>
+					<tr>
+						<th style="border: none"></th>
+						<th style="border: none">Course</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php
+					foreach ($coursesOptions as $key=>$row) {
+						?>
+					<tr>
+						<td style="text-align: center;"><?php 
+						if (in_array($key, $coursesSelected)) {
+							$checked = "checked";
+						}
+						else {
+							$checked = "";
+						}
+						echo $this->Form->checkbox('Courses.id', array('value' => $key, 'hiddenField' => false, 'checked' => $checked, 'style' => 'width: 12px;', 'id' => 'course_'.$key));
+						?>
+						</td>
+						<td style="text-align: left;"><?php echo $this->Form->label('Courses.id', $row, array('style' => 'width: 100%; float: none', 'for' => 'course_'.$key));
+						?>
+						</td>
+					</tr>
+					<?php 
+					}
+					?>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<?php
 ?><div class=buttons><?php
 echo $this->Form->submit('Save');
+echo $this->Form->hidden('Courses.enrollment');
 ?></div><?php
 echo $this->Form->end();
 
@@ -75,3 +104,47 @@ jQuery('#RoleRolesUserRoleId').change();
 </script>";
 }
 ?>
+
+<script>
+	function selectCourse(id) {
+		if (jQuery("#CoursesEnrollment").val().indexOf("|" + id + "|") >= 0) {
+			jQuery("#CoursesEnrollment").val(jQuery("#CoursesEnrollment").val().replace("|" + id + "|", ""));
+		}
+		else {
+			jQuery("#CoursesEnrollment").val(jQuery("#CoursesEnrollment").val() + "|" + id + "|");
+		}
+	}
+
+	/* Create an array with the values of all the checkboxes in a column */
+	jQuery.fn.dataTableExt.afnSortData['dom-checkbox'] = function(oSettings, iColumn) {
+	    var aData = [];
+	    jQuery('td:eq(' + iColumn + ') input', oSettings.oApi._fnGetTrNodes(oSettings)).each(function() {
+	        aData.push(this.checked == false ? "1" : "0");
+	    });
+	    return aData;
+	}
+	
+	jQuery(document).ready(function() {
+
+		jQuery("#courseTable input[type='checkbox'][checked='checked']").each(function(){
+			selectCourse(this.value);
+		});
+
+		jQuery("#courseTable input[type='checkbox']").click(function(){
+			selectCourse(this.value);
+		});
+		
+		jQuery('#courseTable').dataTable({
+			"sPaginationType" : "full_numbers",
+	        "aoColumnDefs" : [
+	            {"bSearchable": false, "sSortDataType": "dom-checkbox", "aTargets": [0] }
+	        ],
+	        "aaSorting" :[[1, 'asc']]
+		});
+
+		jQuery("#courseTable_length select").css({"width": "65px", "margin-top": "0", "margin-bottom": "0", "background": "#ddd", "font-size": "15px"});
+		jQuery("#courseTable_length label").css({"float": "none", "padding": "0"});
+		jQuery("#courseTable_filter label").css({"float": "none", "padding": "0"});
+		jQuery("#courseTable_filter input").css({"width": "175px"});
+	});
+</script>

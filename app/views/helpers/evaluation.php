@@ -256,4 +256,75 @@ class EvaluationHelper extends AppHelper
         return $button;
     }
 
+    /**
+     * getReleaseStatusTableHeader
+     *
+     * @access public
+     * @return array for header
+     */
+    function getReleaseStatusTableHeader()
+    {
+        $header = array(__('Evaluatee', true));
+        $header[] = __('Grades', true);
+        $header[] = __('Comments', true);
+        
+        return $header;
+    }
+    
+    /**
+     * getReleaseStatusButtons
+     *
+     * @param mixed $evaluatees
+     * @param mixed $notInGroup
+     * @param mixed $grpEventId
+     * @param mixed $status
+     *
+     * @access public
+     * @return array for body of table
+     */
+    function getReleaseStatusTableButtons($evaluatees, $notInGroup, $grpEventId, $status)
+    {
+        $body = array();
+        unset($status['grades']);
+        $button = '<form name="evalForm" id="evalForm" method="POST" action="'.$this->Html->url('markCommentRelease').'">'.
+            '<input type="hidden" name="group_event_id" value="'.$grpEventId.'" />';
+        
+        foreach ($status as $id => $details) {
+            $row = array();
+            $class = in_array($id, $notInGroup) ? array('class' => 'blue') : array();
+            $row[] = array($evaluatees[$id], $class);
+            if ($details['release_status']['gradeRelease']) {
+                $row[] = '<input type="button" name="UnreleaseGrades" value="'.__('Unrelease Grades', true).'" onClick="location.href=\''.$this->webroot.$this->theme.'evaluations/markGradeRelease/'.$grpEventId.'/0/'.$id.'\'">';
+            } else {
+                $row[] = '<input type="button" name="ReleaseGrades" value="'.__('Release Grades', true).'" onClick="location.href=\''.$this->webroot.$this->theme.'evaluations/markGradeRelease/'.$grpEventId.'/1/'.$id.'\'">';
+            }
+            $comment = $button.'<input type="hidden" name="evaluatee" value="'.$id.'" />';
+            if ($details['release_status']['commentRelease']) {
+                $comment .= '<input name="submit" type="submit" value="'.__('Unrelease Comments', true).'" /></form>';
+            } else {
+                $comment .= '<input name="submit" type="submit" value="'.__('Release Comments', true).'" /></form>';
+            }
+            $row[] = $comment;
+            $body[] = $row;
+        }
+        
+        $all = array('');
+        $allCommentStatus = array_product(Set::classicExtract($status, '{n}.release_status.commentRelease'));
+        $allGradeStatus = array_product(Set::classicExtract($status, '{n}.release_status.gradeRelease'));
+        if ($allGradeStatus) {
+            $all[] = '<input type="button" name="UnreleaseGrades" value="'.__('Unrelease All Grades', true).'" onClick="location.href=\''.$this->webroot.$this->theme.'evaluations/markGradeRelease/'.$grpEventId.'/0\'">';
+        } else {
+            $all[] = '<input type="button" name="ReleaseGrades" value="'.__('Release All Grades', true).'" onClick="location.href=\''.$this->webroot.$this->theme.'evaluations/markGradeRelease/'.$grpEventId.'/1\'">';
+        }
+        if ($allCommentStatus) {
+            $comment = $button.'<input name="submit" type="submit" value="'.__('Unrelease All Comments', true).'" /></form>';
+        } else {
+            $comment = $button.'<input name="submit" type="submit" value="'.__('Release All Comments', true).'" /></form>';
+        }
+        $all[] = $comment;
+        $body[] = $all;
+        
+        return $body;
+    }
+
 }

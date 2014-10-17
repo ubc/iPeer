@@ -40,14 +40,14 @@ class EmailTemplateTestCase extends CakeTestCase
         //Test on valid input w/ find all
         $templates = $this->EmailTemplate->getPermittedEmailTemplate('1', 'all');
         $this->assertEqual(count($templates), 4);
-        $this->assertEqual($templates[0]['EmailTemplate']['id'], 1);
-        $this->assertEqual($templates[1]['EmailTemplate']['id'], 2);
-        $this->assertEqual($templates[2]['EmailTemplate']['id'], 3);
-        $this->assertEqual($templates[3]['EmailTemplate']['id'], 4);
-        $this->assertEqual($templates[0]['EmailTemplate']['name'], 'Submission Confirmation');
-        $this->assertEqual($templates[1]['EmailTemplate']['name'], 'Email template example');
-        $this->assertEqual($templates[2]['EmailTemplate']['name'], 'Email template example2');
-        $this->assertEqual($templates[3]['EmailTemplate']['name'], 'Email template example3');
+        $this->assertEqual($templates[0]['EmailTemplate']['id'], 2);
+        $this->assertEqual($templates[1]['EmailTemplate']['id'], 3);
+        $this->assertEqual($templates[2]['EmailTemplate']['id'], 4);
+        $this->assertEqual($templates[3]['EmailTemplate']['id'], 1);
+        $this->assertEqual($templates[0]['EmailTemplate']['name'], 'Email template example');
+        $this->assertEqual($templates[1]['EmailTemplate']['name'], 'Email template example2');
+        $this->assertEqual($templates[2]['EmailTemplate']['name'], 'Email template example3');
+        $this->assertEqual($templates[3]['EmailTemplate']['name'], 'Submission Confirmation');
 
         //Test on valid input w/ find list
         $templates = $this->EmailTemplate->getPermittedEmailTemplate('1', 'list');

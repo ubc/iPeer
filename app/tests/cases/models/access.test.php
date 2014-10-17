@@ -41,33 +41,39 @@ class AccessTestCase extends CakeTestCase {
         $this->Aco = ClassRegistry::init('Aco');
         $this->Aro = ClassRegistry::init('Aro');
         
-        $allow = array('create' => 1, 'read' => 1, 'update' => 1, 'delete' => 1, 'id' => 259);
-        $deny = array('create' => -1, 'read' => -1, 'update' => -1, 'delete' => -1, 'id' => 259);
+        //id should not be used since it can change
+        $allow = array('create' => 1, 'read' => 1, 'update' => 1, 'delete' => 1);
+        $deny = array('create' => -1, 'read' => -1, 'update' => -1, 'delete' => -1);
         $acos = $this->Aco->find('threaded');
 
         // Testing for super admin role
         $group_aro = $this->Aro->find('threaded', array('conditions'=>array('Aro.foreign_key'=>1, 'Aro.model'=>'Role')));
         $superadmin = $this->Access->loadPermissions($acos, $group_aro);
+        unset($superadmin["controllers/users/add"]["id"]);
         $this->assertEqual($superadmin['controllers/users/add'], $allow);
         
         // Testing for admin role
         $group_aro = $this->Aro->find('threaded', array('conditions'=>array('Aro.foreign_key'=>2, 'Aro.model'=>'Role')));
         $admin = $this->Access->loadPermissions($acos, $group_aro);
+        unset($admin["controllers/users/add"]["id"]);
         $this->assertEqual($admin['controllers/users/add'], $allow);
         
         // Testing for instructor role
         $group_aro = $this->Aro->find('threaded', array('conditions'=>array('Aro.foreign_key'=>3, 'Aro.model'=>'Role')));
         $instructor = $this->Access->loadPermissions($acos, $group_aro);
+        unset($instructor["controllers/users/add"]["id"]);
         $this->assertEqual($instructor['controllers/users/add'], $allow);
         
         // Testing for tutor role
         $group_aro = $this->Aro->find('threaded', array('conditions'=>array('Aro.foreign_key'=>4, 'Aro.model'=>'Role')));
         $tutor = $this->Access->loadPermissions($acos, $group_aro);
+        unset($tutor["controllers/users/add"]["id"]);
         $this->assertEqual($tutor['controllers/users/add'], $deny);
         
         // Testing for student role
         $group_aro = $this->Aro->find('threaded', array('conditions'=>array('Aro.foreign_key'=>5, 'Aro.model'=>'Role')));
         $student = $this->Access->loadPermissions($acos, $group_aro);
+        unset($student["controllers/users/add"]["id"]);
         $this->assertEqual($student['controllers/users/add'], $deny);
         
         // Testing for invalid role

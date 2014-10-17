@@ -1,19 +1,19 @@
 <div class='MixevalForm'>
 <center><h2><?php echo $event['Event']['title'].' - '.$event['Group']['group_name']?></h2></center>
 <?php if (!empty($event['Event']['description'])) { ?>
-<h2><?php echo _t('Description') ?></h2>
-<div id='description'><?php echo _t($event['Event']['description']) ?></div>
+<h2><?php echo __('Description', true) ?></h2>
+<div id='description'><?php echo $event['Event']['description'] ?></div>
 <?php } ?>
-<h2><?php echo _t('Notes') ?></h2>
+<h2><?php __('Notes') ?></h2>
 <ul>
     <?php $due = Toolkit::formatDate($event['Event']['due_date'])?>
-    <li><?php echo _t('The evaluation is due on ').$due.'.' ?></li>
-    <li><?php echo _t('To resubmit an evaluation, all required questions must be answered.') ?></li>
+    <li><?php printf(__('The evaluation is due on %s.', true), $due) ?></li>
+    <li><?php __('To resubmit an evaluation, all required questions must be answered.') ?></li>
     <?php $releaseEnd = Toolkit::formatDate($event['Event']['release_date_end']); ?>
-    <li><?php echo _t('The evaluation can be repeatedly submitted until ').$releaseEnd.'.'?></li>
-    <li><?php echo $html->tag('span', '*', array('class' => 'required orangered'))._t(' marks required questions.')?></li>
+    <li><?php __('The evaluation can be repeatedly submitted until ').$releaseEnd.'.'?></li>
+    <li><?php echo $html->tag('span', '*', array('class' => 'required orangered')).__(' marks required questions.', true)?></li>
     <li><a href="#" onClick="javascript:$('penalty').toggle(); return false;">
-        <?php echo _t('Show/Hide Late Penalty Policy') ?></a>
+        <?php __('Show/Hide Late Penalty Policy') ?></a>
         <div id='penalty' style="display:none">
             <?php if (!empty($penalty)) {
                 foreach ($penalty as $day) {
@@ -21,9 +21,9 @@
                     echo $day['Penalty']['days_late'].' day'.$mult.' late: '.
                         $day['Penalty']['percent_penalty'].'% deduction. </br>';
                 }
-                echo $penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';
+                printf(__('%s is deducted afterwards.', true), $penaltyFinal['Penalty']['percent_penalty'].'%');
             } else {
-                echo _t('No penalty is specified for this evaluation.');
+                echo __('No penalty is specified for this evaluation.', true);
             } ?>
         </div>
     </li>
@@ -33,7 +33,7 @@
     <tr>
         <td>
         <?php echo $this->Form->create('EvaluationMixeval', array(
-            'url' => '/evaluations/makeEvaluation' . '/'.$event['Event']['id'].'/'.$event['Group']['id']));?>
+            'url' => 'makeEvaluation/'.$event['Event']['id'].'/'.$event['Group']['id'].'/'.(empty($studentId) ? '' : $studentId)));?>
         <input type="hidden" name="data[data][submitter_id]" value="<?php echo $userId ?>"/>
         <input type="hidden" name="data[data][event_id]" value="<?php echo $event['Event']['id']?>"/>
         <input type="hidden" name="data[data][template_id]" value="<?php echo $event['Event']['template_id']?>"/>

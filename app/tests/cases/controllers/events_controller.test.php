@@ -43,7 +43,7 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         'app.rubrics_criteria_comment', 'app.rubrics_lom',
         'app.simple_evaluation', 'app.survey_input', 'app.mixeval_question',
         'app.mixeval_question_desc', 'app.mixeval', 'app.mixeval_question_type',
-        'app.email_schedule'
+        'app.email_schedule', 'app.email_template'
     );
 
     function startCase() {
@@ -84,9 +84,10 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $result = $this->testAction('/events/index', array('return' => 'vars'));
 
         $this->assertEqual(count($result["paramsForList"]['data']['entries']), 
-            10);
+            17);
         $this->assertEqual(sort(Set::extract($result["paramsForList"]['data']['entries'], '/Event/id')), array(1,2,3,6));
         $events = Set::sort($result["paramsForList"]['data']['entries'], '{n}.Event.id', 'asc');
+        
         $this->assertEqual($events[0]['Event']['Title'], 'Term 1 Evaluation');
         $this->assertEqual($events[0]['Event']['event_template_type_id'], 1);
         $this->assertEqual($events[0]['Course']['course'], 'MECH 328');
@@ -182,6 +183,7 @@ class EventsControllerTest extends ExtendedAuthTestCase {
                 'result_release_date_begin' => '2012-11-30 00:00:01',
                 'result_release_date_end' => '2022-12-12 00:00:01',
                 'email_schedule' => 0,
+                'EmailTemplate' => 2,
             ),
             'Group' => array(
                 'Group' => array(1,2)
@@ -194,7 +196,7 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         );
         $model = ClassRegistry::init('Event');
         $event = $model->find('first', array( 'conditions' => array('title' => 'new evaluation'), 'contain' => array('Group', 'GroupEvent', 'EvaluationSubmission')));
-        unset($data['Event']['SimpleEvaluation'], $data['Event']['email_schedule']);
+        unset($data['Event']['SimpleEvaluation'], $data['Event']['email_schedule'], $data['Event']['EmailTemplate']);
         $data['Event']['template_id'] = 1;
         foreach ($data['Event'] as $key => $expected) {
             $this->assertEqual($event['Event'][$key], $expected);
@@ -275,12 +277,14 @@ class EventsControllerTest extends ExtendedAuthTestCase {
                 'self_eval' => 0,
                 'com_req' => 0,
                 'enable_details' => 0,
+                'auto_release' => 0,
                 'due_date' => '2012-11-28 00:00:01',
                 'release_date_begin' => '2012-11-20 00:00:01',
                 'release_date_end' => '2012-11-29 00:00:01',
                 'result_release_date_begin' => '2012-11-30 00:00:01',
                 'result_release_date_end' => '2022-12-12 00:00:01',
                 'email_schedule' => 0,
+                'EmailTemplate' => 2,
             ),
             'Group' => array(
                 'Group' => array(1,2)
@@ -293,7 +297,7 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         );
         $model = ClassRegistry::init('Event');
         $event = $model->find('first', array( 'conditions' => array('id' => $data['Event']['id']), 'contain' => array('Group', 'GroupEvent', 'EvaluationSubmission')));
-        unset($data['Event']['SimpleEvaluation'], $data['Event']['email_schedule']);
+        unset($data['Event']['SimpleEvaluation'], $data['Event']['email_schedule'], $data['Event']['EmailTemplate']);
         $data['Event']['template_id'] = 1;
         foreach ($data['Event'] as $key => $expected) {
             $this->assertEqual($event['Event'][$key], $expected);

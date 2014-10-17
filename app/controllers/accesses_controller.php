@@ -11,7 +11,7 @@
 class AccessesController extends AppController {
     public $name = 'Accesses';
     public $uses = array('Access', 'Role');
-    
+
     /**
      * view
      *
@@ -24,20 +24,20 @@ class AccessesController extends AppController {
     {
         $roles = $this->Role->find('list');
         if (!in_array($roleId, array_keys($roles))) {
-            $this->Session->setFlash(_t('Error: Invalid Id.'));
-            $this->redirect('view'); 
+            $this->Session->setFlash(__('Error: Invalid Id.', true));
+            $this->redirect('view');
         }
-    
+
         $acos = $this->Acl->Aco->find('threaded');
         $group_aro = $this->Acl->Aro->find('threaded', array('conditions'=>array('Aro.foreign_key'=>$roleId, 'Aro.model'=>'Role')));
         $permissions = $this->Access->loadPermissions($acos, $group_aro);
-        
+
         $this->set('roles', $roles);
         $this->set('roleId', $roleId);
         $this->set('permissions', $permissions);
         $this->set('title_for_layout', 'Permissions Editor > '.$roles[$roleId]);
     }
-    
+
     /**
      * edit
      *
@@ -54,21 +54,21 @@ class AccessesController extends AppController {
         $permission = $this->Access->find('first', array(
             'conditions' => array('aro_id' => $aroId, 'aco_id' => $acoId)
         ));
-        
+
         $aco = $this->Acl->Aco->findById($acoId);
         $aro = $this->Acl->Aro->findById($aroId);
         $accesses = array('allow', 'deny');
         if (!$aco || !$aro || !in_array($access, $accesses)) {
-            $this->Session->setFlash(_t('Error: Updating Permissions failed.'));
+            $this->Session->setFlash(__('Error: Updating Permissions failed.', true));
             $this->redirect('view/'.$aroId);
         }
-        
+
         // check acoId and aroId exists, check $access is valid
-        
+
         $newEntry = empty($permission) ? true : false;
         $actions = array('create', 'read', 'update', 'delete');
         $access = ($access == 'deny') ? -1 : 1;
-        
+
         // create a new entry that deny or allow all actions
         if ($newEntry && $action == 'all') {
             $permission['aro_id'] = $aroId;
@@ -107,11 +107,11 @@ class AccessesController extends AppController {
             $permission['_'.$action] = $access;
         }
         $permission = array('Access' => $permission);
-        
+
         if (!empty($permission) && $this->Access->save($permission)) {
-            $this->Session->setFlash(_t('Permissions have been updated'), 'good');
+            $this->Session->setFlash(__('Permissions have been updated', true), 'good');
         } else {
-            $this->Session->setFlash(_t('Error: Updating Permissions failed.'));
+            $this->Session->setFlash(__('Error: Updating Permissions failed.', true));
         }
         $this->redirect('view/'.$aroId);
     }

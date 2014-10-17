@@ -107,6 +107,12 @@ echo $this->Form->input(
 <div class='email-help-text'><?php __('Select the number of days in between each email reminder for submitting
     evaluations. The first email is sent when the event is released.') ?></div>
 <?php
+echo $this->Form->input('EmailTemplate',
+    array('div' => array('id' => 'EmailTemplateDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevE', 'target' => '_blank')),
+            'selected' => $emailId));
+?>
+<div class='email-temp-help-text'><?php __('Select the preferred email template.') ?></div>
+<?php
 echo $this->Form->input('Group',
     array('div' => array('id' => 'GroupsDiv'), 'label' => 'Group(s)')); ?>
 <div class='selectAll'>
@@ -171,6 +177,8 @@ echo "</div>";
 echo $this->Form->submit();
 echo $this->Form->end();
 
+// Removed for enhancement #516 - "Allow duplicate event title"
+/*
 echo $ajax->observeField(
     'EventTitle',
     array(
@@ -181,6 +189,7 @@ echo $ajax->observeField(
         'complete'=>"Element.hide('loading');stripe();"
     )
 );
+*/
 ?>
 </div>
 
@@ -196,6 +205,10 @@ jQuery("#EventSimpleEvaluation").change(updatePreview);
 jQuery("#EventRubric").change(updatePreview);
 jQuery("#EventSurvey").change(updatePreview);
 jQuery("#EventMixeval").change(updatePreview);
+jQuery("#EventEmailSchedule").change(toggleEmailTemplate);
+jQuery("#EventEmailTemplate").change(updateEmailPreview);
+updateEmailPreview();
+toggleEmailTemplate();
 // select all groups
 jQuery("#selectAll").click(function() {
     jQuery("#GroupGroup option").prop('selected', true);
@@ -323,6 +336,25 @@ function updatePreview() {
         var eventIdToPrev = jQuery("#EventMixeval").val();
         url = "<?php echo $this->base; ?>/mixevals/view/";
         prevM.href = url + eventIdToPrev;
+    }
+}
+
+// update email template id for the preview link
+function updateEmailPreview() {
+    var emailId = jQuery("#EventEmailTemplate").val();
+    var url = "<?php echo $this->base; ?>/emailtemplates/view/"
+    jQuery("#prevE").attr("href", url + emailId);
+}
+
+// show / hide email template input
+function toggleEmailTemplate() {
+    var freq = jQuery("#EventEmailSchedule").val();
+    if (freq == 0) {
+        jQuery('div#EmailTemplateDiv').hide();
+        jQuery('.email-temp-help-text').hide();
+    } else {
+        jQuery('div#EmailTemplateDiv').show();
+        jQuery('.email-temp-help-text').show();
     }
 }
 </script>

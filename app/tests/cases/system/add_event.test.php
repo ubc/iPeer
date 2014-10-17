@@ -1,27 +1,16 @@
 <?php
-require_once('system_base.php');
+App::import('Lib', 'system_base');
 
 class addEventTestCase extends SystemBaseTestCase
 {
     public function startCase()
     {
-        $this->getUrl();
+        parent::startCase();
         echo "Start AddEvent system test.\n";
-        $wd_host = 'http://localhost:4444/wd/hub';
-        $this->web_driver = new SystemWebDriver($wd_host);
-        $this->session = $this->web_driver->session('firefox');
-        $this->session->open($this->url);
+        $this->getSession()->open($this->url);
 
-        $w = new PHPWebDriver_WebDriverWait($this->session);
-        $this->session->deleteAllCookies();
         $login = PageFactory::initElements($this->session, 'Login');
         $home = $login->login('instructor1', 'ipeeripeer');
-    }
-
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
     }
 
     public function testAddEvent()
@@ -92,13 +81,14 @@ class addEventTestCase extends SystemBaseTestCase
         $this->assertEqual($courseId[0]->attribute('value'), 1);
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventTitle')->sendKeys('simple evaluation 2');
-        $w = new PHPWebDriver_WebDriverWait($this->session);
+        // duplicate event title is allowed now
+        /*$w = new PHPWebDriver_WebDriverWait($this->session);
         $w->until(
             function($session) {
                 $warning = $session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'titleWarning')->text();
                 return ($warning == 'Event title "simple evaluation 2" already exists in this course.');
             }
-        );
+        );*/
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventTitle')->clear();
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEventTemplateTypeId"] option[value="3"]')->click();

@@ -1,17 +1,25 @@
 <?php
 $addOn = '';
 if (!$gradeReleased && !$commentReleased && $details) {
-    $addOn = ' - <font color="red">'._t(' Comments/Grades Not Released Yet').'</font>';
+    $addOn = ' - <font color="red">'.__(' Comments/Grades Not Released Yet', true).'</font>';
 } else if (!$gradeReleased) {
-    $addOn = ' - <font color="red">'._t(' Grades Not Released Yet').'</font>';
+    $addOn = ' - <font color="red">'.__(' Grades Not Released Yet', true).'</font>';
 } else if (!$commentReleased && $details) {
-    $addOn = ' - <font color="red">'._t(' Comments Not Released Yet').'</font>';
+    $addOn = ' - <font color="red">'.__(' Comments Not Released Yet', true).'</font>';
 }
-$header = _t($title).$addOn;
+$header = $title.$addOn;
 
+echo "<div id='mixeval_result'>";
 echo $html->tag('h2', $header);
 $qnum = 1;
 if ($details) {
+    if ($instructorMode && $viewReleaseBtns) { ?>
+        <form name="evalForm<?php echo $evaluatee ?>" id="evalForm<?php echo $evaluatee ?>" method="POST" action="<?php echo $html->url('markCommentRelease') ?>">
+        <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
+        <input type="hidden" name="group_id" value="<?php echo $event['Group']['id'] ?>" />
+        <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>" />
+        <input type="hidden" name="evaluatee" value="<?php echo $evaluatee?>">
+    <?php }
     foreach ($questions as $ques) {
         if ($ques['self_eval'] == $peer_eval) {
             continue; // skip questions not in the desired section
@@ -27,10 +35,10 @@ if ($details) {
             echo '<ul>';
             foreach ($ques['Submissions'] as $num => $sub) {
                 if (in_array($type, array(1, 4)) && !$gradeReleased) {
-                    echo '<li>'._t('Grades Not Released Yet').'</li>';
+                    echo '<li>'.__('Grades Not Released Yet', true).'</li>';
                     break;
                 } else if (in_array($type, array(2, 3)) && !$commentReleased) {
-                    echo '<li>'._t('Comments Not Released Yet').'</li>';
+                    echo '<li>'.__('Comments Not Released Yet', true).'</li>';
                     break;
                 }
                 $name = '';
@@ -44,7 +52,7 @@ if ($details) {
                     $marks = array_map('number_format', range($start, $multiplier, $step),
                         array_fill(0, $scale, 2));
                     $options = array_combine($marks, $marks);
-                    $grade = '<label class="grade">'._t('Grade: ');
+                    $grade = '<label class="grade">'.__('Grade:', true).' ';
                     $grade .= $sub['grade'].' / '.$multiplier.'</label>';
                     $grade .= (empty($descriptors[$sub['selected_lom']])) ? '' :
                         '<label class="desc">('.$descriptors[$sub['selected_lom']].')</label>';
@@ -59,7 +67,15 @@ if ($details) {
                 } else if ($type == '4') {
                     echo '<li>'.$name.$sub['grade'].'</li>';
                 } else {
-                    echo '<li>'.$name.$sub['question_comment'].'</li>';
+                    $chkParam = array(
+                        'value' => $sub['id'],
+                        'hiddenField' => false,
+                        'name' => 'releaseComments[]',
+                        'checked' => $sub['comment_release'], 
+                    );
+                    $comment = ($instructorMode || $sub['comment_release']) ? $sub['question_comment'] : __('n/a', true);
+                    $check = $instructorMode && $viewReleaseBtns ? $form->checkbox($chkParam['name'], $chkParam) : '';
+                    echo '<li>'.$name.$check.$comment.'</li>';
                 }
             }
             echo '</ul>';
@@ -67,6 +83,11 @@ if ($details) {
             echo '<ul><li>N/A</li></ul>';
         }
         $qnum++;
+    }
+    echo "</div>";
+    if ($instructorMode && $viewReleaseBtns) {?>
+        <input name="submit" type="submit" value="<?php echo __('Save Changes', true); ?>">
+        <?php echo '</form>';
     }
     echo '<br>';
 } else {
@@ -79,7 +100,7 @@ if ($details) {
             if (isset($ques['Submissions'])) {
                 echo '<ul>';
                 if (!$gradeReleased) {
-                    echo '<li>'._t('Grades Not Released Yet').'</li></ul>';
+                    echo '<li>'.__('Grades Not Released Yet', true).'</li></ul>';
                     continue;
                 }
                 $grades = Set::extract('/grade', $ques['Submissions']);
@@ -95,3 +116,4 @@ if ($details) {
     echo '<br>';
 }
 ?>
+<br>

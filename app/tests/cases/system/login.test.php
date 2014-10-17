@@ -1,5 +1,5 @@
 <?php
-require_once('system_base.php');
+App::import('Lib', 'system_base');
 
 class LoginTestCase extends SystemBaseTestCase
 {
@@ -8,19 +8,9 @@ class LoginTestCase extends SystemBaseTestCase
 
     public function startCase()
     {
-        $this->getUrl();
+        parent::startCase();
         echo "Start Login system test.\n";
-        $wd_host = 'http://localhost:4444/wd/hub';
-        $this->web_driver = new SystemWebDriver($wd_host);
-        //$this->session = $this->web_driver->session('ie', array('version' => '8'));
-        $this->session = $this->web_driver->session('firefox');
-        $this->session->open($this->url);
-    }
-
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
+        $this->getSession()->open($this->url);
     }
 
     public function captureScreen($screenshot)

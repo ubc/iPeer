@@ -115,7 +115,8 @@ class UsersController extends AppController
 
         // define action warnings
         $deleteUserWarning = __("Delete this user. Irreversible. Are you sure?", true);
-        $resetPassWarning = __("Resets user Password. Are you sure?", true);
+        $resetPassWarning = __("Resets user's password. Are you sure?", true);
+        $resetPassWOEmail = __("Resets user's password without sending a email. The user will lose access to the system. Are you sure?", true);
 
         $actionRestrictions = "";
 
@@ -131,10 +132,8 @@ class UsersController extends AppController
             ),
         );
 
-        $extraFilters = array();
-        if (User::hasPermission('functions/superadmin')) {
-            $extraFilters = array();
-        } elseif (User::hasPermission('controllers/departments')) {
+        $extraFilters = array('User.record_status' => 'A');
+        if (User::hasPermission('controllers/departments')) {
             // faculty admins, filter out the admins and instructors from other department/faculty
             // stupid cakephp doesn't support double habtm query. So using raw query
             $conditions = array();
@@ -153,7 +152,7 @@ class UsersController extends AppController
             }
             $result = $this->User->query($query.join(' OR ', $conditions));
             $userIds = Set::extract($result, '/User/id');
-            $extraFilters = array('User.id' => $userIds);
+            $extraFilters['User.id'] = $userIds;
         }
 
         // define right click menu actions
@@ -165,6 +164,11 @@ class UsersController extends AppController
             array(__("Delete User", true),    $deleteUserWarning,   $actionRestrictions, "", "delete", "User.id"),
             array(__("Reset Password", true), $resetPassWarning,  $actionRestrictions, "", "resetPassword", "User.id")
         );
+        
+        // add the functionality of resetting a user's password without sending the user a email
+        if(User::hasPermission('controllers/users/resetpasswordwithoutemail')) {
+            $actions[] = array(__("Reset Password Without Email", true), $resetPassWOEmail, "", "", "resetPasswordWithoutEmail", "User.id");
+        }
 
         $this->AjaxList->setUp($this->User, $columns, $actions,
             "User.id", "User.username", $joinTables, $extraFilters);
@@ -605,7 +609,7 @@ class UsersController extends AppController
         $userRole = $user['Role']['0']['RolesUser']['role_id'];
         $enrolled = Set::extract('/Tutor/id', $user) + Set::extract('/Enrolment/id', $user);
 
-        if ($userRole <= $roleId || !in_array($userRole, array(4,5))) {
+        if ($userRole <= $roleId || !in_array($userRole, array(4, 5))) {
             $this->Session->setFlash(__('Error: You do not have permission to enrol this user.', true));
             $this->redirect('/courses/home/'.$courseId);
             return;
@@ -613,6 +617,12 @@ class UsersController extends AppController
             $this->Session->setFlash(__('Error: The student is already enrolled.', true));
             $this->redirect('/courses/home/'.$courseId);
             return;
+        }
+        
+        // make the existing user active
+        if ($user['User']['record_status'] == "I" && !$this->User->readdUser($user['User']['id'])) {
+            $this->Session->setFlash(__('Error: Unable to enrol the user.', true));
+            $this->redirect('/courses/home/'.$courseId);
         }
 
         // enrol students
@@ -630,7 +640,37 @@ class UsersController extends AppController
         }
         $this->redirect('/courses/home/'.$courseId);
     }
-
+    
+    /**
+     * Readd users that were previously soft-deleted
+     *
+     * @param mixed $username username
+     * @param mixed $courseId course id
+     *
+     * @access public
+     * @return void
+     */
+    public function readd($username, $courseId = null)
+    {
+        $roleId = $this->User->getRoleId($this->Auth->user('id'));
+        $user = $this->User->getByUsername($username);
+        $userRole = $user['Role']['0']['RolesUser']['role_id'];
+        $url = '/users';
+        $url .= $courseId ? '/goToClassList/'.$courseId : '';
+        
+        if ($userRole <= $roleId || !in_array($userRole, array(4, 5))) {
+            $this->Session->setFlash(__('Error: You do not have permission to readd this user.', true));
+            $this->redirect($url);
+            return;
+        }
+        
+        if ($this->User->readdUser($user['User']['id'])) {
+            $this->Session->setFlash(__('User is successfully readded.', true), 'good');
+        } else {
+            $this->Session->setFlash(__('Error: Unable to readd the user.', true));
+        }
+        $this->redirect($url);
+    }
 
     /**
      * Given a user id, edit the information for that user
@@ -688,14 +728,20 @@ class UsersController extends AppController
 
             // create the enrolment entry depending on if instructor or student
             // and also convert it into a CakePHP dark magic friendly format
-            if (!empty($this->data['Courses']['id'])) {
+            $enrollment = explode("||", $this->data['Courses']['enrollment']);
+            foreach ($enrollment as $index => $val) {
+                $enrollment[$index] = str_replace("|", "", $val);
+            }
+
+            if (!empty($enrollment)) {
                 $enrolments = $this->_convertCourseEnrolment(
-                    $this->data['Courses']['id'],
+                    $enrollment,
                     $this->data['Role']['RolesUser']['role_id']
                 );
             } else {
                 $enrolments = array('Enrolment' => array());
             }
+
             $this->data = array_merge($this->data, $enrolments);
 
             // Now we actually attempt to save the data
@@ -883,12 +929,30 @@ class UsersController extends AppController
             $this->cakeError('error404');
         }
 
+        // soft delete user
         if (is_null($courseId)) {
-            if ($this->User->delete($id)) {
+            $delete = array('User' => array(
+                'id' => $id,
+                'record_status' => 'I',
+            ));
+            $cleanUpModels = array(
+                'SurveyGroupMember',
+                'GroupsMembers',
+                'UserEnrol',
+                'UserCourse',
+                'UserTutor',
+            );
+            if ($this->User->save($delete)) {
                 $this->Session->setFlash(__('Record is successfully deleted!', true), 'good');
+                // unenrol/remove them from courses/groups if they are soft-deleted
+                foreach ($cleanUpModels as $model) {
+                    $condition = array($model.'.user_id' => $id);
+                    $this->$model->deleteAll($condition);
+                }
             } else {
                 $this->Session->setFlash(__('Error: Delete failed!', true));
             }
+        // unenrol user from course
         } else {
             if ($this->User->removeStudent($id, $courseId)) {
                 $this->Session->setFlash(__('Student is successfully unenrolled!', true), 'good');
@@ -915,14 +979,18 @@ class UsersController extends AppController
         }
         $this->layout = 'ajax';
         $this->autoRender = false;
-
-        $message = __('Username "', true).$this->data['User']['username'].__('" already exists.', true);
-        if (!is_null($courseId)) {
-            $message = $message.'<br> To enrol, click '.
-                '<a href="/users/enrol/'.$this->data['User']['username'].'/'.$courseId.'"> here</a>';
-        }
+        $urlSuffix = $courseId ? '/'.$courseId : '';
 
         $sFound = $this->User->getByUsername($this->data['User']['username']);
+        
+        $message = __('Username "', true).$this->data['User']['username'].__('" already exists.', true);
+        if (!is_null($courseId)) {
+            $message .= '<br> To enrol, click '.
+                '<a href="/users/enrol/'.$this->data['User']['username'].'/'.$courseId.'"> here</a>';
+        } else if ($sFound && $sFound['User']['record_status'] == 'I') {
+            $message .= '<br> To readd the user, click '.
+                '<a href="/users/readd/'.$this->data['User']['username'].$urlSuffix.'"> here</a>';
+        }
 
         return ($sFound) ? $message : '';
     }
@@ -931,74 +999,21 @@ class UsersController extends AppController
     /**
      * resetPassword
      *
-     * @param mixed $user_id  user id
+     * @param mixed $userId  user id
      * @param mixed $courseId course id
      *
      * @access public
      * @return void
      */
-    function resetPassword($user_id, $courseId = null)
+    function resetPassword($userId, $courseId = null)
     {
-        $role = $this->User->getRoleName($user_id);
-
-        if (!User::hasPermission('functions/user')) {
-            $this->Session->setFlash('Error: You do not have permission to reset passwords', true);
-            $this->redirect('/home');
-        }
-
-        if (!User::hasPermission('functions/user/'.$role)) {
-            $this->Session->setFlash('Error: You do not have permission to reset the password for this user.', true);
-            if (is_null($courseId)) {
-                $this->redirect('index');
-            } else {
-                $this->redirect('/users/goToClassList/'.$courseId);
-            }
-        }
-
-        // Read the user
-        $user_data = $this->User->findById($user_id);
-
-        if (empty($user_data)) {
-            $this->Session->setFlash(__('User Not Found!', true));
-            $this->redirect("index");
-        }
-
-        // super admins and faculty admins can reset passwords for all users
-        // instructors can only reset passwords for students and tutors in their course(s)
-        if (!User::hasPermission('controllers/departments')) {
-            // instructors
-            $courses = User::getMyCourseList();
-            $models = array('UserTutor', 'UserEnrol');
-            $accessibleUsers = array();
-
-            foreach ($models as $model) {
-                $users = $this->$model->find('list', array(
-                    'conditions' => array('course_id' => array_keys($courses)),
-                    'fields' => array('user_id')
-                ));
-                $accessibleUsers = array_merge($accessibleUsers, $users);
-            }
-
-            if (!in_array($user_id, $accessibleUsers)) {
-                $this->Session->setFlash(__('Error: You do not have permission to reset the password for this user', true));
-                if (is_null($courseId)) {
-                    $this->redirect('index');
-                } else {
-                    $this->redirect('/users/goToClassList/'.$courseId);
-                }
-            }
-        }
-
-        //General password
-        $tmp_password = $this->PasswordGenerator->generate();
-        $user_data['User']['tmp_password'] = $tmp_password;
-        $user_data['User']['password'] =  md5($tmp_password);
-        $user_data['User']['id'] =  $user_id;
+        // checks the user's permissions
+        $userData = $this->_checkResetPasswordPermission($userId, $courseId);
 
         //Save Data
-        if ($this->User->save($user_data, true, array('password'))) {
+        if ($tmp_password = $this->User->savePassword($userId)) {
             $message = sprintf(__("Password successfully reset. The new password is %s.", true).'<br />', $tmp_password);
-            $this->User->set('id', $user_id);
+            $this->User->set('id', $userId);
 
             // send email to user
             $this->set('user_data', $user_data);
@@ -1011,6 +1026,30 @@ class UsersController extends AppController
             } else {
                 $message .= __('No email has been sent. User does not have email address.', true);
             }
+            $this->Session->setFlash($message, 'good');
+            $this->redirect($this->referer());
+        } else {
+            //Get render page according to the user type
+            $this->redirect($this->referer());
+        }
+    }
+    
+    /**
+     * resetPasswordWithoutEmail
+     *
+     * @param mixed $userId
+     * @param mixed $courseId
+     *
+     * @return boolean: true for success and false for fail
+     */
+    public function resetPasswordWithoutEmail($userId, $courseId = null)
+    {
+        // checks the user's permissions
+        $this->_checkResetPasswordPermission($userId, $courseId);
+        
+        // generate and save new password
+        if ($tmp_password = $this->User->savePassword($userId)) {
+            $message = sprintf(__("Password successfully reset. The new password is %s.", true).'<br />', $tmp_password);
             $this->Session->setFlash($message, 'good');
             $this->redirect($this->referer());
         } else {
@@ -1269,6 +1308,67 @@ class UsersController extends AppController
         $this->Session->write('ipeerSession.email', $userData['email']);
     }
 
+    /**
+     * _checkResetPasswordPermission
+     *
+     * @param mixed $userId
+     * @param mixed $courseId
+     *
+     * @access private
+     * @return array of user data
+     */
+    private function _checkResetPasswordPermission($userId, $courseId)
+    {
+        if (!User::hasPermission('functions/user')) {
+            $this->Session->setFlash('Error: You do not have permission to reset passwords', true);
+            $this->redirect('/home');
+        }
+
+        // Read the user
+        $userData = $this->User->findById($userId);
+        if (empty($userData)) {
+            $this->Session->setFlash(__('User Not Found!', true));
+            $this->redirect("index");
+        }
+
+        $role = $this->User->getRoleName($userId);
+        if (!User::hasPermission('functions/user/'.$role)) {
+            $this->Session->setFlash('Error: You do not have permission to reset the password for this user.', true);
+            if (is_null($courseId)) {
+                $this->redirect('index');
+            } else {
+                $this->redirect('/users/goToClassList/'.$courseId);
+            }
+        }
+
+        // super admins and faculty admins can reset passwords for all users
+        // instructors can only reset passwords for students and tutors in their course(s)
+        if (!User::hasPermission('controllers/departments')) {
+            // instructors
+            $courses = User::getMyCourseList();
+            $models = array('UserTutor', 'UserEnrol');
+            $accessibleUsers = array();
+
+            foreach ($models as $model) {
+                $users = $this->$model->find('list', array(
+                    'conditions' => array('course_id' => array_keys($courses)),
+                    'fields' => array('user_id')
+                ));
+                $accessibleUsers = array_merge($accessibleUsers, $users);
+            }
+
+            if (!in_array($userId, $accessibleUsers)) {
+                $this->Session->setFlash(__('Error: You do not have permission to reset the password for this user', true));
+                if (is_null($courseId)) {
+                    $this->redirect('index');
+                } else {
+                    $this->redirect('/users/goToClassList/'.$courseId);
+                }
+            }
+        }
+        
+        return $userData;
+    }
 
     /**
      * Helper function to send an email notification about to a user about
@@ -1555,5 +1655,169 @@ class UsersController extends AppController
             User::getCourseFilterPermission(), 'list');
 
         return array_diff($userCourses, array_keys($editorCourses));
+    }
+    
+    /**
+     * formatDueIn
+     *
+     * Take the due interval, which is in seconds, and format
+     * it something that's easier for users to read.
+     *
+     * @param mixed $seconds seconds
+     *
+     * @access private
+     * @return void
+     */
+    private function _formatDueIn($seconds)
+    {
+        $ret = "";
+        if ($seconds > 86400) {
+            $ret = round($seconds / 86400, 1) . __(' days', true);
+        } elseif ($seconds < 3600) {
+            $minutes = (int) ($seconds / 60);
+            $seconds = $seconds % 60;
+            $ret = $minutes . __(' minutes ', true) . $seconds . __(' seconds', true);
+        } else {
+            $hours = (int) ($seconds / 3600);
+            $minutes = (int) ($seconds % 3600 / 60);
+            $ret = $hours . __(' hours ', true) . $minutes . __(' minutes', true);
+        }
+
+        return $ret;
+    }
+    
+    /**
+     * Helper to filter events into 3 different categories and to
+     * discard inactive events.
+     *
+     * The 3 categories are: Upcoming, Submitted, Expired
+     *
+     * - Upcoming are events that the user can still make submissions for.
+     * - Submitted are events that the user has already made a submission.
+     * - Expired are events that the user hasn't made and can no longer make
+     * submissions, but they can still view results from their peers.
+     *
+     * An evaluation is considered inactive once past its result release
+     * period. A survey is considered inactive once past its release period.
+     *
+     * @param array $events - list of events info returned from the event model,
+     *  each event MUST have an 'EvaluationSubmission' array or this won't work
+     *
+     * @return Discard inactive events and then split the remaining events
+     * into upcoming, submitted, and expired.
+     * */
+    private function _splitSubmittedEvents($events)
+    {
+        $submitted = $upcoming = $expired = array();
+
+        foreach ($events as $event) {
+            if (empty($event['EvaluationSubmission']) && $event['Event']['is_released']) {
+                // can only take surveys during the release period
+                $upcoming[] = $event;
+            } else if (!empty($event['EvaluationSubmission']) &&
+                strtotime('NOW') < strtotime($event['Event']['result_release_date_end'])) { 
+                // has submission and can or will be able to view results soon
+                // note that we're not using is_released or is_result_released
+                // because of an edge case where if there is a period of time
+                // between the release and result release period, the evaluation
+                // will disappear from view
+                $submitted[] = $event;
+            } else if (!empty($event['EvaluationSubmission']) && $event['Event']['is_released']) {
+                // special case for surveys, which doesn't have
+                // result_release_date_end
+                $submitted[] = $event;
+            } else if (empty($event['EvaluationSubmission']) &&
+                    strtotime('NOW') <
+                    strtotime($event['Event']['result_release_date_end']) &&
+                    strtotime('NOW') >
+                    strtotime($event['Event']['release_date_end'])
+            ) { // student did not do the survey within the allowed time
+                // but we should still let them view results
+                $expired[] = $event;
+            }
+        }
+
+        return array('upcoming' => $upcoming, 'submitted' => $submitted, 'expired' => $expired);
+    }
+    
+    /**
+     * showEvents
+     *
+     * @param mixed $id - user id
+     *
+     * @access public
+     * @return void
+     */
+
+    function showEvents($id)
+    {
+        // check what type the logged in user is
+        if(User::hasPermission('functions/superadmin')) {
+            $extraId = null;
+        } else if (User::hasPermission('controllers/departments')) {
+            $extraId = User::getAccessibleCourses();
+        } else {
+            $extraId = User::get('id');
+        }
+        // find all the student's events the user is allowed to see
+        $events = $this->Event->getEventsByUserId($id, null, $extraId);
+
+        // mark events as late if past due date
+        foreach ($events as &$type) {
+            foreach ($type as &$event) {
+                if ($event['Event']['due_in'] > 0) {
+                    $event['late'] = false;
+                    continue;
+                }
+                $event['late'] = true;
+            }
+        }
+
+        // determine the proper penalty to be applied to a late eval
+        foreach ($events['Evaluations'] as &$event) {
+            if (!$event['late'] || empty($event['Penalty'])) {
+                continue;
+            }
+            // convert seconds to days
+            $daysLate = abs($event['Event']['due_in']) / 86400;
+            $pctPenalty = 0;
+            foreach ($event['Penalty'] as $penalty) {
+                $pctPenalty = $penalty['percent_penalty'];
+                if ($penalty['days_late'] > $daysLate) {
+                    break;
+                }
+            }
+            $event['percent_penalty'] = $pctPenalty;
+        }
+
+        // format the 'due in' time interval for display
+        foreach ($events as &$types) {
+            foreach ($types as &$event) {
+                $event['Event']['due_in'] = $this->_formatDueIn(
+                    abs($event['Event']['due_in']));
+            }
+        }
+
+        // remove non-current events and split into upcoming/submitted/expired
+        $evals = $this->_splitSubmittedEvents($events['Evaluations']);
+        $surveys = $this->_splitSubmittedEvents($events['Surveys']);
+
+        // calculate summary statistics
+        $numOverdue = 0;
+        $numDue = 0;
+        $numDue = sizeof($evals['upcoming']) + sizeof($surveys['upcoming']);
+        // only evals can have overdue events right now
+        foreach ($evals['upcoming'] as $e) {
+            $e['late'] ? $numOverdue++ : '';
+        }
+
+        $this->set('studentId', $id);
+        $this->set('evals', $evals);
+
+        $this->set('surveys', $surveys);
+        $this->set('numOverdue', $numOverdue);
+
+        $this->set('numDue', $numDue);
+        $this->render('student_events');
     }
 }

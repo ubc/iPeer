@@ -37,7 +37,8 @@ class EmailMergeTestCase extends CakeTestCase
     function testGetMergeList()
     {
         $mergeList = $this->EmailMerge->getMergeList();
-        $expectedResults = array('{{{USERNAME}}}' => 'Username', '{{{FIRSTNAME}}}' => 'First Name', '{{{LASTNAME}}}' => 'Last Name', '{{{Email}}}' => 'Email Address');
+        $expectedResults = array('{{{USERNAME}}}' => 'Username', '{{{FIRSTNAME}}}' => 'First Name', '{{{LASTNAME}}}' => 'Last Name', '{{{Email}}}' => 'Email Address',
+            '{{{COURSENAME}}}' => 'Course Name', '{{{EVENTTITLE}}}' => 'Event Title','{{{DUEDATE}}}' => 'Event Due Date', '{{{CLOSEDATE}}}' => 'Event Close Date');
 
         $this->assertEqual($mergeList, $expectedResults);
     }

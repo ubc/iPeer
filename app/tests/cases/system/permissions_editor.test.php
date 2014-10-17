@@ -1,67 +1,56 @@
 <?php
-require_once('system_base.php');
+App::import('Lib', 'system_base');
 
 class PermissionsEditorTestCase extends SystemBaseTestCase
-{    
+{
     public function startCase()
     {
-        $this->getUrl();
+        parent::startCase();
         echo "Start PermissionsEditor system test.\n";
-        $wd_host = 'http://localhost:4444/wd/hub';
-        $this->web_driver = new SystemWebDriver($wd_host);
-        $this->session = $this->web_driver->session('firefox');
-        $this->session->open($this->url);
-        
-        $w = new PHPWebDriver_WebDriverWait($this->session);
-        $this->session->deleteAllCookies();
+        $this->getSession()->open($this->url);
+
         $login = PageFactory::initElements($this->session, 'Login');
         $home = $login->login('root', 'ipeeripeer');
     }
-    
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
-    }
-    
+
     public function testAllowAccess()
     {
         // access permission editor
         $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
         $this->assertEqual($title, 'Home');
-        
+
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Admin')->click();
         $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
         $this->assertEqual($title, 'Admin');
-        
+
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Permissions Editor')->click();
         $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
         $this->assertEqual($title, 'Permissions Editor > superadmin');
-        
+
         // change the role from super admin to instructor
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="role"] option[value="3"]')->click();
         $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
         $this->assertEqual($title, 'Permissions Editor > instructor');
-        
+
         // search for functions/user/index
         $this->findPermissions('controllers/accesses/view');
-        
+
         // allow access
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Allow All')->click();
         $this->updatePermissions();
     }
-    
+
     public function testAccess()
     {
         $this->waitForLogoutLogin('instructor1');
-        
+
         $this->session->open($this->url.'accesses/view/5');
         $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
         $this->assertEqual($title, 'Permissions Editor > student');
-        
+
         $this->waitForLogoutLogin('root');
     }
-    
+
     public function testDenyAccess()
     {
         $this->session->open($this->url.'accesses/view/3');
@@ -70,16 +59,16 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
 
         // search for functions/user/index
         $this->findPermissions('controllers/accesses/view');
-        
+
         // deny access
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny All')->click();
         $this->updatePermissions();
     }
-    
+
     public function testDenyIndividualActions()
     {
         $this->session->open($this->url.'accesses/view/3');
-        
+
         // deny create
         $this->findPermissions('controllers/mixevals/index');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Create')->click();
@@ -108,7 +97,7 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
         $this->assertTrue(!empty($allow));
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Delete')->click();
         $this->updatePermissions();
-        
+
         $this->waitForLogoutLogin('instructor1');
         $this->session->open($this->url.'evaltools');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Mixed Evaluations')->click();
@@ -122,11 +111,11 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
         $this->assertEqual($msg->text(), 'Error: You do not have permission to access the page.');
         $this->waitForLogoutLogin('root');
     }
-    
+
     public function testAllowIndividualActions()
     {
         $this->session->open($this->url.'accesses/view/3');
-        
+
         // allow create
         $this->findPermissions('controllers/mixevals/index');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Allow Create')->click();
@@ -155,19 +144,19 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
         $this->assertTrue(empty($allow));
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Allow Delete')->click();
         $this->updatePermissions();
-        
+
         $this->waitForLogoutLogin('instructor1');
         $this->session->open($this->url.'evaltools');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Mixed Evaluations')->click();
         $this->assertEqual($this->session->url(), $this->url.'mixevals');
     }
-    
+
     public function findPermissions($permission)
     {
         // search for the permission to access users/index
         $search = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[aria-controls="table_id"]');
         $search->sendKeys($permission);
-        
+
         // open the table row for options
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $w->until(
@@ -176,10 +165,10 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
                 return ($count == 1);
             }
         );
-        
+
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'td[class="  sorting_1"]')->click();
     }
-    
+
     public function updatePermissions()
     {
         $this->session->accept_alert();

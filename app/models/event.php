@@ -163,7 +163,7 @@ class Event extends AppModel
     {
         $this->SysParameter = ClassRegistry::init('SysParameter');
         $timezone = $this->SysParameter->findByParameterCode('system.timezone');
-        // default to UTC if no timezone is set    
+        // default to UTC if no timezone is set
         if (!(empty($timezone) || empty($timezone['SysParameter']['parameter_value']))) {
             $timezone = $timezone['SysParameter']['parameter_value'];
         } else if (ini_get('date.timezone')) {
@@ -198,6 +198,8 @@ class Event extends AppModel
             $dueIn = date('Y-m-d H:i:s', time() + 3600);
         }
         $this->virtualFields['due_in'] = sprintf('TIMESTAMPDIFF(SECOND,"%s",due_date)', $dueIn);
+        //$this->virtualFields['due_in'] = sprintf('UNIX_TIMESTAMP(due_date) - UNIX_TIMESTAMP("%s")', date('Y-m-d H:i:s'));
+        //$this->virtualFields['due_in'] = sprintf('TIMESTAMPDIFF(SECOND,"%s",due_date)', date('Y-m-d H:i:s'));
     }
 
     /**
@@ -393,7 +395,7 @@ class Event extends AppModel
             'conditions' => array('course_id' => $courseId, 'event_template_type_id' => '3', 'Event.record_status !='=>'I')
         ));
     }
-    
+
     /**
      * getSurveyByCourseIdTemplateId
      *
@@ -414,7 +416,7 @@ class Event extends AppModel
             )
         ));
     }
-    
+
 
 
     /**
@@ -500,7 +502,7 @@ class Event extends AppModel
         }
         return true;
     }
-    
+
     /**
      * Check if event is late
      *
@@ -669,23 +671,46 @@ class Event extends AppModel
      *
      * @param mixed $userId user id
      * @param mixed $fields the fields to retreive
+     * @param mixed $extraId
      *
      * @access public
      * @return array array of events with related models, e.g. course, group, submission
      */
-    function getEventsByUserId($userId, $fields = null)
+    function getEventsByUserId($userId, $fields = null, $extraId = null)
     {
+        ini_set('display_errors', 1);
+        error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
         $evaluationFields = $surveyFields = $fields;
         if ($evaluationFields != null) {
             $evaluationFields[] = 'GroupEvent.*';
         }
-        // get the groups that this user is in
-        $groups = $this->Group->find('all', array(
-            'fields' => 'id',
-            'conditions' => array('Member.id' => $userId),
-            'contain' => array('Member', 'GroupEvent.id')));
-        $groupEventIds = Set::extract('/GroupEvent/id', $groups);
+        if ($extraId) {
+            if (is_array($extraId)) {
+                $courseIds = array();
+                foreach ($extraId as $course) {
+                    $courseIds[] = $course;
+                }
+            } else {
+                $courses = $this->Course->getCourseByInstructor($extraId);
+                $courseIds = array();
+                foreach ($courses as $course) {
+                    $courseIds[] = $course['Course']['id'];
+                }
+            }
+            $groups = $this->Group->find('all', array(
+                'fields' => 'id',
+                'conditions' => array('Member.id' => $userId, 'course_id' => $courseIds),
+                'contain' => array('Member', 'GroupEvent.id')));
 
+            $groupEventIds = Set::extract('/GroupEvent/id', $groups);
+        } else {
+            // get the groups that this user is in
+            $groups = $this->Group->find('all', array(
+                'fields' => 'id',
+                'conditions' => array('Member.id' => $userId),
+                'contain' => array('Member', 'GroupEvent.id')));
+            $groupEventIds = Set::extract('/GroupEvent/id', $groups);
+        }
         // find evaluation events based on the groups this user is in
         $evaluationEvents = $this->find('all', array(
             'fields' => $evaluationFields,
@@ -725,15 +750,16 @@ class Event extends AppModel
             }
         }
 
-        // to find the surveys, we need to find the courses that user is enrolled in
-        // can't use find('list') as we are query the conditions on HABTM
-        $courses = $this->Course->find('all', array(
-            'fields' => array('id'),
-            'conditions' => array('Enrol.id' => $userId),
-            'contain' => 'Enrol',
-        ));
-        $courseIds = Set::extract($courses, '/Course/id');
-
+        if (empty($courseIds)) {
+            // to find the surveys, we need to find the courses that user is enrolled in
+            // can't use find('list') as we are query the conditions on HABTM
+            $courses = $this->Course->find('all', array(
+                'fields' => array('id'),
+                'conditions' => array('Enrol.id' => $userId),
+                'contain' => 'Enrol',
+            ));
+            $courseIds = Set::extract($courses, '/Course/id');
+        }
         // find survey events based on the groups this user is in
         $surveyEvents = $this->find('all', array(
             'fields' => $surveyFields,
@@ -749,7 +775,6 @@ class Event extends AppModel
                 ),
             )
         ));
-
         // some clean up for submission
         foreach ($surveyEvents as &$event) {
             if (isset($event['EvaluationSubmission'][0])) {
@@ -765,19 +790,28 @@ class Event extends AppModel
      * getPendingEventsByUserId
      * get all the events that are open and user haven't submitted for user with id = userId
      *
-     * @param mixed $userId user id
-     * @param mixed $fields the fields to retreive
+     * @param mixed $userId  user id
+     * @param mixed $options options
+     * @param mixed $fields  the fields to retreive
      *
      * @access public
      * @return void
      */
-    public function getPendingEventsByUserId($userId, $fields = null)
+    public function getPendingEventsByUserId($userId, $options, $fields = null)
     {
         $pendingEvents = array();
         $events = $this->getEventsByUserId($userId, $fields);
         $events = array_merge($events['Evaluations'], $events['Surveys']);
         foreach ($events as $event) {
-            if ($event['Event']['is_released'] && empty($event['EvaluationSubmission'])) {
+            if ($options['submission'] && $event['Event']['is_released'] && empty($event['EvaluationSubmission'])) {
+                // filter for released evaluations that are available for submission
+                $pendingEvents[] = $event['Event'];
+            } else if ($options['results'] && isset($event['Event']['is_result_released']) &&
+                $event['Event']['is_result_released']) {
+                // filter for evaluations that have their results released
+                $pendingEvents[] = $event['Event'];
+            } else if (!$options['submission'] && !$options['results']) {
+                // no filter implemented; return all events
                 $pendingEvents[] = $event['Event'];
             }
         }
@@ -815,7 +849,7 @@ class Event extends AppModel
 
         return $event;
     }
-    
+
     /**
      * getEventSubmission
      *

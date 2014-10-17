@@ -28,6 +28,10 @@ echo $this->Form->input('group_name', array('size'=>'50', 'class'=>'input', 'lab
      </font>
      </div>
 </div>
+<div class="red" style="text-align:center"><?php !empty($status) ? 
+__('There has been submissions in this group. Changing group members may cause data integrity issue. 
+In the evaluation results of events that have already ended, new members will be marked down as having no submissions, 
+which means no participation grades.') : ''?></div>
     <?php echo $this->Form->submit(ucfirst($this->action).__(' Group', true), array(
         'onClick' => "processSubmit(document.getElementById('selected_groups'))")) ?>
 </div>

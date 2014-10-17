@@ -160,6 +160,6 @@ class PasswordGeneratorComponent extends Object {
    * @return void
    */
   private function defaultAlgorithm( $length = 8, $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' ) {
-    return substr( str_shuffle( $chars ), 0, $length );
+    return substr(str_shuffle($chars), 0, $length);
   }
 }

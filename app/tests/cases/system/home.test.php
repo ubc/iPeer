@@ -1,41 +1,30 @@
 <?php
-require_once('system_base.php');
+App::import('Lib', 'system_base');
 
 class homeTestCase extends SystemBaseTestCase
-{    
+{
     public function startCase()
     {
-        $this->getUrl();
+        parent::startCase();
         echo "Start HomeTest system test.\n";
-        $wd_host = 'http://localhost:4444/wd/hub';
-        $this->web_driver = new SystemWebDriver($wd_host);
-        $this->session = $this->web_driver->session('firefox');
-        $this->session->open($this->url);
-        
-        $w = new PHPWebDriver_WebDriverWait($this->session);
-        $this->session->deleteAllCookies();
+        $this->getSession()->open($this->url);
+
         $login = PageFactory::initElements($this->session, 'Login');
         $home = $login->login('root', 'ipeeripeer');
     }
-    
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
-    }
-    
+
     public function testSuperAdmin()
     {
         $headers = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::TAG_NAME, 'h2');
         $this->assertEqual($headers[0]->text(), 'My Courses');
         $this->assertEqual($headers[1]->text(), 'Inactive Courses');
-        
+
         $courses = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::TAG_NAME, 'h3');
         $this->assertEqual(count($courses), 3);
         $this->assertEqual($courses[0]->text(), 'APSC 201');
         $this->assertEqual($courses[1]->text(), 'MECH 328');
         $this->assertEqual($courses[2]->text(), 'CPSC 101');
-        
+
         // navigation
         $home = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Home');
         $this->assertEqual(count($home), 1);
@@ -48,7 +37,7 @@ class homeTestCase extends SystemBaseTestCase
         $admin = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Admin');
         $this->assertEqual(count($admin), 1);
     }
-    
+
     public function testAdmin()
     {
         $this->waitForLogoutLogin('admin2');
@@ -71,7 +60,7 @@ class homeTestCase extends SystemBaseTestCase
         $admin = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Admin');
         $this->assertEqual(count($admin), 0);
     }
-    
+
     public function testInstructor()
     {
         $this->waitForLogoutLogin('instructor2');
@@ -94,14 +83,14 @@ class homeTestCase extends SystemBaseTestCase
         $admin = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Admin');
         $this->assertEqual(count($admin), 0);
     }
-    
+
     public function testTutor()
     {
         $this->waitForLogoutLogin('tutor2');
         $header = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::TAG_NAME, 'h2');
         $this->assertEqual($header[0]->text(), 'Peer Evaluations');
         $this->assertEqual($header[1]->text(), 'Surveys');
-        
+
         $titles = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::TAG_NAME, 'h3');
         $this->assertEqual($titles[0]->text(), 'Due');
         $this->assertEqual($titles[1]->text(), 'Submitted');
@@ -120,14 +109,14 @@ class homeTestCase extends SystemBaseTestCase
         $admin = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Admin');
         $this->assertEqual(count($admin), 0);
     }
-    
+
     public function testStudent()
     {
         $this->waitForLogoutLogin('redshirt0001');
         $header = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::TAG_NAME, 'h2');
         $this->assertEqual($header[0]->text(), 'Peer Evaluations');
         $this->assertEqual($header[1]->text(), 'Surveys');
-        
+
         $titles = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::TAG_NAME, 'h3');
         $this->assertEqual($titles[0]->text(), 'Due');
         $this->assertEqual($titles[1]->text(), 'Submitted');
@@ -147,13 +136,13 @@ class homeTestCase extends SystemBaseTestCase
         $admin = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Admin');
         $this->assertEqual(count($admin), 0);
     }
-    
+
     public function studentTutorHome()
     {
         $header = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::TAG_NAME, 'h2');
         $this->assertEqual($header[0]->text(), 'Peer Evaluations');
         $this->assertEqual($header[1]->text(), 'Surveys');
-        
+
         $titles = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::TAG_NAME, 'h3');
         $this->assertEqual($titles[0]->text(), 'Due');
         $this->assertEqual($titles[1]->text(), 'Submitted');

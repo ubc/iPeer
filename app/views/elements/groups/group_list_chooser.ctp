@@ -19,9 +19,8 @@ $status = isset($status) ? $status : '';
     </td>
 
     <td class='middle-column'>
-        <input type="button" onClick="itemMove($('all_groups'), $('selected_groups'))" value="<?php __('Assign')?> >>" <?php echo $status ?>/>
-        <input type="button" onClick="itemMove($('selected_groups'), $('all_groups'))" value="<< <?php __('Remove')?> " <?php echo $status ?> />
-        <div><?php !empty($status) ? __('There has been submissions in this group. Changing group members may cause data integrity issue.') : ''?></div>
+        <input type="button" onClick="itemMove($('all_groups'), $('selected_groups'))" value="<?php __('Assign')?> >>"/>
+        <input type="button" onClick="itemMove($('selected_groups'), $('all_groups'))" value="<< <?php __('Remove')?> "/>
     </td>
 
     <td>

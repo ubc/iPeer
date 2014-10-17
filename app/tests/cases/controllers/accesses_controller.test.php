@@ -87,30 +87,36 @@ class AccessesControllerTest extends ExtendedAuthTestCase
     
     function testView()
     {
-        $allow = array('create' => 1, 'read' => 1, 'update' => 1, 'delete' => 1, 'id' => 22);
-        $deny = array('create' => -1, 'read' => -1, 'update' => -1, 'delete' => -1, 'id' => 22);
+    	//id should not be used since it can change
+        $allow = array('create' => 1, 'read' => 1, 'update' => 1, 'delete' => 1);
+        $deny = array('create' => -1, 'read' => -1, 'update' => -1, 'delete' => -1);
 
         $superadmin = $this->testAction('/accesses/view/1', array('return' => 'vars'));
+        unset($superadmin['permissions']['controllers/courses/add']["id"]);
         $this->assertEqual($superadmin['permissions']['controllers/courses/add'], $allow);
         $this->assertEqual($superadmin['roleId'], 1);
         $this->assertEqual($superadmin['title_for_layout'], 'Permissions Editor > superadmin');
         
         $admin = $this->testAction('/accesses/view/2', array('return' => 'vars'));
+        unset($admin['permissions']['controllers/courses/add']["id"]);
         $this->assertEqual($admin['permissions']['controllers/courses/add'], $allow);
         $this->assertEqual($admin['roleId'], 2);
         $this->assertEqual($admin['title_for_layout'], 'Permissions Editor > admin');
         
         $instructor = $this->testAction('/accesses/view/3', array('return' => 'vars'));
+        unset($instructor['permissions']['controllers/courses/add']["id"]);
         $this->assertEqual($instructor['permissions']['controllers/courses/add'], $allow);
         $this->assertEqual($instructor['roleId'], 3);
         $this->assertEqual($instructor['title_for_layout'], 'Permissions Editor > instructor');
         
         $tutor = $this->testAction('/accesses/view/4', array('return' => 'vars'));
+        unset($tutor['permissions']['controllers/courses/add']["id"]);
         $this->assertEqual($tutor['permissions']['controllers/courses/add'], $deny);
         $this->assertEqual($tutor['roleId'], 4);
         $this->assertEqual($tutor['title_for_layout'], 'Permissions Editor > tutor');
         
         $student = $this->testAction('/accesses/view/5', array('return' => 'vars'));
+        unset($student['permissions']['controllers/courses/add']["id"]);
         $this->assertEqual($student['permissions']['controllers/courses/add'], $deny);
         $this->assertEqual($student['roleId'], 5);
         $this->assertEqual($student['title_for_layout'], 'Permissions Editor > student');

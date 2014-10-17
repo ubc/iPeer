@@ -56,7 +56,7 @@ class InstallController extends Controller
     function index()
     {
         if (IS_INSTALLED) {
-            $this->Session->setFlash(__('WARNING: It looks like you already have a instance running. Reinstalling will remove all your current data. Remove '.TMP.'installed.txt to proceed.', true));
+            $this->Session->setFlash(sprintf(__('WARNING: It looks like you already have a instance running. Reinstalling will remove all your current data. Remove %s to proceed.', true), TMP.'installed.txt'));
         }
     }
 
@@ -130,7 +130,7 @@ class InstallController extends Controller
 
         if (!file_exists(CONFIGS.'guard.php')) {
             if (!copy(APP.DS.'plugins'.DS.'guard'.DS.'config'.DS.'guard.php', CONFIGS.'guard.php')) {
-                $this->Session->setFlash(__('Cannot copy the guard configuration (gurad.php) to the configuration directory.', true));
+                $this->Session->setFlash(__('Cannot copy the guard configuration (app/plugins/guard/config/guard.php) to the configuration directory.', true));
                 return;
             }
         }

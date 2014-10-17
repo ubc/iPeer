@@ -170,9 +170,9 @@ class EvaluationRubricTestCase extends CakeTestCase
     function testGetOppositeGradeReleaseStatus()
     {
         $ret = $this->EvaluationRubric->getOppositeGradeReleaseStatus(4, 0);
-        $this->assertEqual($ret, 0);
+        $this->assertEqual($ret, 1);
         $ret = $this->EvaluationRubric->getOppositeGradeReleaseStatus(4, 1);
-        $this->assertEqual($ret, 2);
+        $this->assertEqual($ret, 1);
         $ret = $this->EvaluationRubric->getOppositeGradeReleaseStatus(3, 0);
         $this->assertEqual($ret, 0);
     }
@@ -185,7 +185,7 @@ class EvaluationRubricTestCase extends CakeTestCase
         $ret = $this->EvaluationRubric->getOppositeCommentReleaseStatus(3, 1);
         $this->assertEqual($ret, 2);
         $ret = $this->EvaluationRubric->getOppositeCommentReleaseStatus(4, 0);
-        $this->assertEqual($ret, 0);
+        $this->assertEqual($ret, 1);
     }
 
     function testGetTeamReleaseStatus()
@@ -204,11 +204,11 @@ class EvaluationRubricTestCase extends CakeTestCase
     function testSetAllEventCommentRelease()
     {
 
-        $this->EvaluationRubric->setAllEventCommentRelease(2, 1);
+        $this->EvaluationRubric->setAllEventCommentRelease(2, 1, 1);
         $result = $this->EvaluationRubric->getTeamReleaseStatus(3);
         $this->assertEqual($result[1]['EvaluationRubric']['comment_release'], 1);
 
-        $this->EvaluationRubric->setAllEventCommentRelease(999, 1);
+        $this->EvaluationRubric->setAllEventCommentRelease(999, 1, 1);
         $result = $this->EvaluationRubric->getTeamReleaseStatus(999);
         $this->assertFalse($result);
     }

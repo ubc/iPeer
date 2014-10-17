@@ -1,5 +1,5 @@
 <?php
-require_once('system_base.php');
+App::import('Lib', 'system_base');
 
 class MoveStudentTestCase extends SystemBaseTestCase
 {
@@ -7,23 +7,12 @@ class MoveStudentTestCase extends SystemBaseTestCase
 
     public function startCase()
     {
-        $this->getUrl();
+        parent::startCase();
         echo "Start MoveStudent system test.\n";
-        $wd_host = 'http://localhost:4444/wd/hub';
-        $this->web_driver = new SystemWebDriver($wd_host);
-        $this->session = $this->web_driver->session('firefox');
-        $this->session->open($this->url);
+        $this->getSession()->open($this->url);
 
-        $w = new PHPWebDriver_WebDriverWait($this->session);
-        $this->session->deleteAllCookies();
         $login = PageFactory::initElements($this->session, 'Login');
         $home = $login->login('admin1', 'ipeeripeer');
-    }
-
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
     }
 
     public function testAddSurveyEvent()

@@ -18,7 +18,7 @@ if (User::hasPermission('controllers/faculties')) {
 if (User::hasPermission('controllers/departments')) {
     echo '<li>';
     echo $this->Html->link(
-        __(Inflector::pluralize($this->Vocabulary->translate('Department')), true),
+        Inflector::pluralize($this->Vocabulary->translate('Department')),
         array('controller' => 'departments')
     );
     echo '</li>';

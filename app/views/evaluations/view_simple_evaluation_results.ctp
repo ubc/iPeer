@@ -66,13 +66,6 @@ if (!empty($results['Dropped'])) {
 </table>
 
 <h3><?php __('Evaluation Results')?></h3>
-<?php
-if ($event['Event']['auto_release']) {
-    echo "<div id='autoRelease_msg' class='green'>";
-    echo __("Auto Release is ON, you do not need to manually release the grades and comments", true);
-    echo "</div><br>";
-}
-?>
 <!-- Point Distribution Table -->
 <table class='standardtable'>
 <tr>
@@ -213,6 +206,7 @@ foreach ($results['evaluatees'] as $evaluatee) {
 ?>
 </tr>
 
+<?php if ($viewReleaseBtns) { ?>
 <tr class="green">
     <td><?php __('Grade Release')?></td>
 <?php
@@ -242,6 +236,7 @@ foreach ($results['evaluatees'] as $evaluatee) {
 }
 ?>
 </tr>
+<?php } ?>
 
 <tr>
 	<td colspan="<?php echo count($results['evaluatees']) + 1; ?>">
@@ -267,14 +262,13 @@ foreach ($results['evaluatees'] as $evaluatee) {
 <!-- Comment Section -->
 
 <h2><?php __('Comment Sections')?></h2>
-<h3><?php __('Instructions'); ?></h3>
-<ul class="instructions">
-<li><?php __('Check the "Released" checkbox and click "Save Changes" to release individual comments , or')?></li>
-<li><?php __('Click "Release All" or "Unrelease All" buttons to release or unrelease all comments.')?></li>
-<?php if ($event['Event']['auto_release']) {
-    echo "<li class='green'>".__("Auto Release is ON, you do not need to manually release the grades and comments", true)."</li>";
+<?php if ($viewReleaseBtns) {
+    echo '<h3>'.__('Instructions', true).'</h3>';
+    echo '<ul class="instructions">';
+    echo '<li>'.__('Check the "Released" checkbox and click "Save Changes" to release individual comments , or', true).'</li>';
+    echo '<li>'.__('Click "Release All" or "Unrelease All" buttons to release or unrelease all comments.', true).'</li>';
+    echo '</ul>';
 } ?>
-</ul>
 
 <form name="evalForm2" id="evalForm2" method="POST" action="<?php echo $html->url('markCommentRelease') ?>">
 <?php
@@ -287,7 +281,10 @@ if (isset($results['Submissions'])) {
         }
         $evaluatorInfo = $results['evaluators'][$evaluatorId]['User'];
         echo "<h3 $class>Evaluator: ".$evaluatorInfo['full_name'].'</h3>';
-        $headers = array(__('Evaluatee', true), __('Comment', true), __('Released', true));
+        $headers = array(__('Evaluatee', true), __('Comment', true));
+        if ($viewReleaseBtns) {
+            $headers[] = __('Released', true);
+        }
         echo "<table class='standardtable'>";
         echo $html->tableHeaders($headers);
         $cells = array();
@@ -304,20 +301,23 @@ if (isset($results['Submissions'])) {
             $tmp[] = array($evaluateeInfo['full_name'],
                 array('width' => '15%', 'class' => $class));
             $tmp[] = isset($evalMark['comment']) ? $evalMark['comment'] : '-';
-            $releaseChk = "";
-            $releaseChkParams = array(
-                'value' => $evalMark['evaluatee'],
-                'hiddenField' => false,
-                'name' => 'release' . $evalMark['evaluator'] . '[]'
-            );
-            if ($evalMark['release_status'] == 1) {
-                $releaseChkParams['checked'] = 'checked';
+            
+            if ($viewReleaseBtns) {
+                $releaseChk = "";
+                $releaseChkParams = array(
+                    'value' => $evalMark['evaluatee'],
+                    'hiddenField' => false,
+                    'name' => 'release' . $evalMark['evaluator'] . '[]'
+                );
+                if ($evalMark['release_status'] == 1) {
+                    $releaseChkParams['checked'] = 'checked';
+                }
+                $releaseChk = $form->checkbox($releaseChkParams['name'],
+                    $releaseChkParams);
+                $releaseChk .= $form->hidden("evaluator_ids[]", array(
+                    'value' => $evalMark['evaluator'], 'name' => 'evaluator_ids[]'));
+                $tmp[] = array($releaseChk, array('width' => '5%'));
             }
-            $releaseChk = $form->checkbox($releaseChkParams['name'],
-                $releaseChkParams);
-            $releaseChk .= $form->hidden("evaluator_ids[]", array(
-                'value' => $evalMark['evaluator'], 'name' => 'evaluator_ids[]'));
-            $tmp[] = array($releaseChk, array('width' => '5%'));
             $cells[] = $tmp;
         }
         echo $html->tableCells($cells);
@@ -326,11 +326,13 @@ if (isset($results['Submissions'])) {
 }
 ?>
 <p style="text-align: center;">
+<?php if ($viewReleaseBtns) { ?>
 <input type="hidden" name="event_id" value="<?php echo $event['Event']['id']?>" />
 <input type="hidden" name="group_id" value="<?php echo $event['Group']['id']?>" />
 <input type="hidden" name="group_event_id" value="<?php echo $event['GroupEvent']['id']?>" />
 <input type="submit" name="submit" value="<?php __('Save Changes')?>" />
 <input type="submit" name="submit" value="<?php __('Release All')?>" />
 <input type="submit" name="submit" value="<?php __('Unrelease All')?>" />
+<?php } ?>
 </p>
 </form>

@@ -64,7 +64,17 @@ if (!empty($notInGroup)) {
 <?php } ?>
 </form>
 
-<h3><?php __('Evaluation Results')?></h3>
+<?php if ($viewReleaseBtns) { ?>
+<h3><?php echo __('Evaluation Results Release Status', true) ?></h3>
+<table class="standardtable">
+    <?php 
+    echo $html->tableHeaders($this->Evaluation->getReleaseStatusTableHeader()); 
+    echo $html->tableCells($this->Evaluation->getReleaseStatusTableButtons($memberList, Set::extract($notInGroup, '/User/id'), $grpEventId, $scoreRecords));
+    ?>
+</table>
+<?php } ?>
+
+<h3><?php echo __('Evaluation Results', true) ?></h3>
 <div id='rubric_result'>
 
 <?php if (!empty($scoreRecords)) { ?>
@@ -91,16 +101,6 @@ if (!empty($notInGroup)) {
                 $penalties[$userId] > 0 ? $penaltyAddOn = ' - '."<font color=\"red\">".$deduction."</font> = ".number_format($scaled[$userId], 2) :
                     $penaltyAddOn = '';
                 echo $penaltyAddOn.' ('.$percent.'%)';
-                // temporarily removed avgscorepercent
-                /*if (isset($membersAry[$user['id']]['received_ave_score'])) {
-                    $memberAvgScore = number_format($avgPerQues[$user['id']], 2);
-                    $memberAvgScoreDeduction = number_format($avgPerQues[$user['id']] * $penalties[$user['id']] / 100, 2);
-                    $memberAvgScoreScaled = number_format($avgPerQues[$user['id']] * (1 - ($penalties[$user['id']] / 100)), 2);
-                    $memberAvgScorePercent = number_format($avgPerQues[$user['id']] * (1 - ($penalties[$user['id']] / 100)) * 100);
-                } else {
-                    $memberAvgScore = '-';
-                    $memberAvgScorePercent = '-';
-                }*/
                 if ($scaled[$userId] == $groupAve) {
                     echo "&nbsp;&nbsp;((".__("Same Mark as Group Average", true)." ))<br>";
                 } else if ($scaled[$userId] < $groupAve) {
@@ -108,84 +108,27 @@ if (!empty($notInGroup)) {
                 } else if ($scaled[$userId] > $groupAve) {
                     echo "&nbsp;&nbsp;<font color='#000099'><< ".__('Above Group Average', true)." >></font><br>";
                 }
-                // temporarily removed avgscorepercent
-                /*echo __("Average Percentage Per Question: ", true);
-                echo $memberAvgScore;
-                $penalties[$user['id']] > 0 ? $penaltyAddOn = ' - '."<font color=\"red\">".$memberAvgScoreDeduction."</font> = ".$memberAvgScoreScaled :
-                    $penaltyAddOn = '';
-                echo $penaltyAddOn.' ('.$memberAvgScorePercent.'%)<br>';*/
                 (isset($penalties[$userId]) && $penalties[$userId] > 0) ? $penaltyNotice = 'NOTE: <font color=\'red\'>'.$penalties[$userId].'% </font>Late Penalty<br>' :
                     $penaltyNotice = '<br>';
                 echo $penaltyNotice;
                 ?>
             <br><br>
-        <table class="standardtable">
             <?php
             $multiplier = array_combine(Set::extract($rubric['RubricsCriteria'], '/criteria_num'), 
                 Set::extract($rubric['RubricsCriteria'], '/multiplier'));
-            echo $html->tableHeaders($this->Evaluation->getIndividualRubricHeader($rubric['RubricsCriteria']));
-            //Retrieve the individual rubric detail
-            if (isset($scoreRecords[$userId])) {
-                $memberResult = $scoreRecords[$userId]['individual'];
-                foreach ($memberResult AS $evaluator => $row) {
-                    in_array($evaluator, Set::extract($notInGroup, '/User/id')) ? $class=' class="blue" ' : $class='   ';
-                    echo "<tr><td".$class."width='15%'>".$memberList[$evaluator]."</td>";
-                    $comment = array_pop($row);
-                    foreach ($row as $num => $grade) {
-                        echo '<td valign="middle"><br />';
-                        //Points Detail
-                        echo "<strong>".__('Points', true).": </strong>";
-                        $lom = $grade["grade"];
-                        $empty = $rubric["Rubric"]["lom_max"];
-                        for ($v = 0; $v < $lom; $v++) {
-                            echo $html->image('evaluations/circle.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'circle'));
-                            $empty--;
-                        }
-                        for ($t=0; $t < $empty; $t++) {
-                            echo $html->image('evaluations/circle_empty.gif', array('align'=>'middle', 'vspace'=>'1', 'hspace'=>'1','alt'=>'circle_empty'));
-                        }
-                        echo "<br />";
-                        //Grade Detail
-                        echo "<strong>".__('Grade:', true)." </strong>";
-                        echo $grade["grade"] . " / " . $multiplier[$num] . "<br />";
-                        //Comments
-                        echo "<br/><strong>".__('Comment:', true)." </strong>";
-                        echo $grade["comment"];
-                        echo "</td>";
-                    }
-                    echo "</tr>";
-                    //General Comment
-                    echo "<tr><td></td>";
-                    $col = $rubric['Rubric']['criteria'] + 1;
-                    echo "<td colspan=".$col."><strong>".__('General Comment:', true)." </strong><br>";
-                    echo $comment;
-                    echo "<br><br></td></tr>";
-                }
-            } ?>
-    </table>
-    <?php
-        echo "<br>";
-        //Grade Released
-        if (isset($scoreRecords[$userId]['gradeRelease']) && $scoreRecords[$userId]['gradeRelease']) {?>
-
-            <input type="button" name="UnreleaseGrades" value="<?php __('Unrelease Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$userId.';'.$event['GroupEvent']['id'].';0'; ?>'">
-        <?php } else {?>
-            <input type="button" name="ReleaseGrades" value="<?php __('Release Grades')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markGradeRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$userId.';'.$event['GroupEvent']['id'].';1'; ?>'">
-        <?php }
-
-        //Comment Released
-        if (isset($scoreRecords[$userId]['commentRelease']) && $scoreRecords[$userId]['commentRelease']) {?>
-            <input type="button" name="UnreleaseComments" value="<?php __('Unrelease Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$userId.';'.$event['GroupEvent']['id'].';0'; ?>'">
-        <?php } else { ?>
-            <input type="button" name="ReleaseComments" value="<?php __('Release Comments')?>" onClick="location.href='<?php echo $this->webroot.$this->theme.'evaluations/markCommentRelease/'.$event['Event']['id'].';'.$event['Group']['id'].';'.$userId.';'.$event['GroupEvent']['id'].';1'; ?>'">
-        <?php } ?>
-        
-        <!-- /Auto Release Message-->
-        <?php if ($event['Event']['auto_release']) {
-            echo "<div id='autoRelease_msg' class='green'>";
-            echo "<br>".__("Auto Release is ON, you do not need to manually release the grades and comments", true);
-            echo "</div>";
-        } ?>
+            $headers = $this->Evaluation->getIndividualRubricHeader($rubric['RubricsCriteria']);
+            $params = array(
+                'evaluatee' => $userId,
+                'multiplier' => $multiplier,
+                'headers' => $headers,
+                'result' => $scoreRecords[$userId]['individual'],
+                'notInGroup' => Set::extract($notInGroup, '/User/id'),
+                'memberList' => $memberList,
+                'rubric' => $rubric['Rubric'],
+                'viewReleaseBtns' => $viewReleaseBtns,
+            );
+            echo $this->element('evaluations/rubric_details', $params); 
+            ?>
     </div>
     </div>
 

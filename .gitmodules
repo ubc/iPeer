@@ -4,3 +4,45 @@
 [submodule "app/plugins/extended_test_case"]
 	path = app/plugins/extended_test_case
 	url = https://github.com/jeremyharris/extended_test_case.git
+[submodule "puppet/modules/ipeer"]
+	path = puppet/modules/ipeer
+	url = https://github.com/ubc/puppet-ipeer.git
+[submodule "puppet/modules/stdlib"]
+	path = puppet/modules/stdlib
+	url = https://github.com/puppetlabs/puppetlabs-stdlib.git
+[submodule "puppet/modules/vcsrepo"]
+	path = puppet/modules/vcsrepo
+	url = https://github.com/puppetlabs/puppetlabs-vcsrepo.git
+[submodule "puppet/modules/git"]
+	path = puppet/modules/git
+	url = https://github.com/theforeman/puppet-git.git
+[submodule "puppet/modules/apt"]
+	path = puppet/modules/apt
+	url = https://github.com/puppetlabs/puppetlabs-apt.git
+[submodule "puppet/modules/firewall"]
+	path = puppet/modules/firewall
+	url = https://github.com/puppetlabs/puppetlabs-firewall.git
+[submodule "puppet/modules/mysql"]
+	path = puppet/modules/mysql
+	url = https://github.com/puppetlabs/puppetlabs-mysql.git
+[submodule "puppet/modules/php"]
+	path = puppet/modules/php
+	url = https://github.com/thias/puppet-php.git
+[submodule "nginx"]
+	path = puppet/modules/nginx
+	url = https://github.com/ubc/puppet-nginx.git
+[submodule "concat"]
+	path = puppet/modules/concat
+	url = https://github.com/puppetlabs/puppetlabs-concat.git
+[submodule "puppet/modules/db"]
+	path = puppet/modules/db
+	url = https://github.com/ubc/puppet-db.git
+[submodule "vendors/webdriver"]
+	path = vendors/webdriver
+	url = https://github.com/Element-34/php-webdriver.git
+[submodule "vendors/sausage"]
+	path = vendors/sausage
+	url = https://github.com/jlipps/sausage.git
+[submodule "puppet/modules/epel"]
+	path = puppet/modules/epel
+	url = https://github.com/stahnma/puppet-module-epel.git

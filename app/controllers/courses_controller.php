@@ -30,7 +30,7 @@ class CoursesController extends AppController
         $this->set('title_for_layout', 'Courses');
         parent::__construct();
     }
-    
+
     /**
      * beforeFilter
      *
@@ -207,7 +207,7 @@ class CoursesController extends AppController
     /**
      * Set all the necessary variables for the Add and Edit form elements.
      *
-     * @params mixed $courseId courseId - default null (eg. add)
+     * @param mixed $courseId courseId - default null (eg. add)
      *
      * @return void
      * */
@@ -240,7 +240,7 @@ class CoursesController extends AppController
         $this->set('statusOptions', $statusOptions);
 
         $this->set('departments', $departments);
-        
+
         $currentProf = $this->User->getInstructorsByCourse($courseId);
         $currentProf = Set::combine($currentProf, '{n}.User.id', '{n}.User.full_name');
         $instructorList = $currentProf + array_diff($instructorList, $currentProf);
@@ -310,7 +310,7 @@ class CoursesController extends AppController
 
         if (!empty($this->data)) {
             $this->data['Course'] = array_map('trim', $this->data['Course']);
-            $newInstructors = (!isset($this->data['Instructor'])) ? array() : 
+            $newInstructors = (!isset($this->data['Instructor'])) ? array() :
                 $this->data['Instructor']['Instructor'];
             // delete instructors from the course if they are not in the new list
             $instructors = $this->UserCourse->findAllByCourseId($courseId);
@@ -332,7 +332,7 @@ class CoursesController extends AppController
         $course['Instructor']['Instructor'] = Set::extract('/Instructor/id', $course);
         $tutors = $this->UserTutor->findAllByCourseId($courseId);
         $course['Tutor']['Tutor'] = Set::extract('/UserTutor/user_id', $tutors);
-        
+
         $this->data = $course;
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Edit Course', true)));
     }
@@ -369,7 +369,7 @@ class CoursesController extends AppController
         }
         $this->redirect('index');
     }
-    
+
     /**
      * move
      *
@@ -377,7 +377,7 @@ class CoursesController extends AppController
      * @return void
      */
     function move()
-    {       
+    {
         if (!empty($this->data)) {
             $data = $this->data['Course'];
             $move = $data['action'];
@@ -394,7 +394,7 @@ class CoursesController extends AppController
                 $data['sourceSurveys'], $data['submitters']);
             $inputs = $this->SurveyInput->getByEventIdUserId(
                 $data['sourceSurveys'], $data['submitters']);
-            
+
             // if choose to copy set id to null
             if (!$move) {
                 $sub['EvaluationSubmission']['id'] = null;
@@ -414,21 +414,21 @@ class CoursesController extends AppController
             $student = $this->User->field('full_name');
             $this->Course->id = $data['destCourses'];
             $to = $this->Course->field('full_name');
-            
+
             $msg = '';
             if ($this->EvaluationSubmission->save($sub) && $this->SurveyInput->saveAll($sInputs)) {
-                $msg = $student.' was successfully '.$action.' to '.$to.'.';
+                $msg = sprintf(__('%s was successfully %s to %s.', true), $student, $action, $to);
             } else {
-                $this->Session->setFlash(__($student.' was not successfully '.$action.' to '.$from.'.', true));
+                $this->Session->setFlash(sprintf(__('%s was not successfully %s to %s.', true), $student, $action, $from));
                 $this->redirect('move');
                 return;
             }
-            
+
             // if student is not enrolled in destination course - enrol them
             $enrol = $this->Course->getAccessibleCourseById($data['destCourses'], $data['submitters'], Course::FILTER_PERMISSION_ENROLLED);
             if (!$enrol) {
                 if (!$this->User->addStudent($data['submitters'], $data['destCourses'])) {
-                    $msg .= ' '.$student.' was unsuccessfully enrolled to '.$to.'.';
+                    $msg .= sprintf(__(' %s was unsuccessfully enrolled to %s.', true), $student, $to);
                 }
             }
 
@@ -436,14 +436,14 @@ class CoursesController extends AppController
                 $this->Course->id = $data['sourceCourses'];
                 $from = $this->Course->field('full_name');
                 if (!$this->User->removeStudent($data['submitters'], $data['sourceCourses'])) {
-                    $msg .= ' '.$student.' was unsuccessfully unenrolled from '.$from.'.';
+                    $msg .= sprintf(__(' %s was unsuccessfully unenrolled from %s.', true), $student, $from);
                 }
             }
-            $this->Session->setFlash(__($msg, true), 'good');
+            $this->Session->setFlash($msg, 'good');
         }
         // clear data when user is redirected back to this page
         $this->data = null;
-        
+
         $sourceCourses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
         $sourceEvents = $this->Event->getActiveSurveyEvents(array_keys($sourceCourses));
         $courseIds = array_unique(Set::extract('/Event/course_id', $sourceEvents));
@@ -463,8 +463,8 @@ class CoursesController extends AppController
      *
      * @access public
      * @return void
-     */   
-    function ajax_options() 
+     */
+    function ajax_options()
     {
         if (!$this->RequestHandler->isAjax()) {
             $this->cakeError('error404');
@@ -500,7 +500,7 @@ class CoursesController extends AppController
         asort($options);
         $this->set('options', $options);
     }
-    
+
     /**
      * import
      *
@@ -523,8 +523,8 @@ class CoursesController extends AppController
             $data = $this->data['Course'];
             $move = $data['action'];
             $field = $data['identifiers'];
-            $fieldText = ($field == 'student_no') ? 'student number' : 'username';
-            
+            $fieldText = ($field == 'student_no') ? __('student number', true) : __('username', true);
+
             // create a copy of the source survey else grab destSurveys id
             if (isset($data['sourceSurveys'])) {
                 if ($data['surveyChoices']) {
@@ -541,7 +541,7 @@ class CoursesController extends AppController
                     $destEventId = $data['destSurveys'];
                 }
             }
-            
+
             $error = array();
             $success = array();
             $users = array();
@@ -551,10 +551,10 @@ class CoursesController extends AppController
                     'contain' => array('Role')
                 ));
             }
-            
+
             $invalid = array_diff($identifiers, Set::extract('/User/'.$field, $users));
             foreach ($invalid as $inv) {
-                $error[$inv] = __('No student with '.$fieldText.' '.$inv.' exists.', true);
+                $error[$inv] = sprintf(__('No student with %s %s exists.', true), $fieldText, $inv);
             }
             $enrolled = $this->UserEnrol->findAllByCourseId($data['sourceCourses']);
             $enrolled = Set::extract('/UserEnrol/user_id', $enrolled);
@@ -603,7 +603,7 @@ class CoursesController extends AppController
                         }
                         if (!($this->EvaluationSubmission->save($sub) && $this->SurveyInput->saveAll($sInputs))) {
                             $error[$identifier] = __("The student's survey submission could not be transferred, however they are enrolled in the destination course.", true);
-                            continue;  
+                            continue;
                         }
                     }
                 }
@@ -616,27 +616,27 @@ class CoursesController extends AppController
                         $success[$identifier] .= __(' However they were unsuccessfully unenrolled from the source course.', true);
                     }
                 } else if (!in_array($user['User']['id'], $enrolled)) {
-                    $success[$identifier] .= __(' However no student with '.$fieldText.' '.$identifier.' was enrolled in the source course.', true);
-                } 
-                
+                    $success[$identifier] .= sprintf(__(' However no student with %s %s was enrolled in the source course.', true), $fieldText, $identifier);
+                }
+
                 if ($move && isset($submission[$user['User']['id']])) {
                     $success[$identifier] .= "\n".__("The student has already submitted a peer evaluation in the source course.", true);
-                } 
-                
+                }
+
                 if (isset($data['sourceSurveys']) && !empty($destSub) && $sub) {
-                    $success[$identifier] .= "\n".__("The student has already submitted to the 
+                    $success[$identifier] .= "\n".__("The student has already submitted to the
                         destination survey, therefore the survey submission from the source survey was not transferred.", true);
                 }
-            
+
             }
             $this->set('errors', $error);
             $this->set('success', $success);
             $this->set('courseId', $data['destCourses']);
-            $this->set('identifier', __(ucwords($fieldText), true));
+            $this->set('identifier', ucwords($fieldText));
             $this->FileUpload->removeFile($uploadFile);
             $this->render('import_summary');
         }
-        
+
         $destCourses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
         //$sourceEvents = $this->Event->getActiveSurveyEvents(array_keys($destCourses));
         //$courseIds = array_unique(Set::extract('/Event/course_id', $sourceEvents));
@@ -648,7 +648,7 @@ class CoursesController extends AppController
         $this->set('destCourses', $destCourses);
         $this->set('destSurveys', array());
     }
-     
+
 
     /**
      * addInstructor

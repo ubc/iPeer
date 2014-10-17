@@ -46,7 +46,7 @@ class EventTestCase extends CakeTestCase
         $this->Event = & ClassRegistry::init('Event');
 
         //Test a valid course number
-        $course = $this->Event->getCourseEvent(1);
+        $course = Set::sort($this->Event->getCourseEvent(1), '{n}.Event.id', 'asc');
         $this->assertEqual($course[0]['Event']['title'], 'Term 1 Evaluation');
         $this->assertEqual($course[1]['Event']['title'], 'Term Report Evaluation');
         $this->assertEqual($course[2]['Event']['title'], 'Project Evaluation');
@@ -71,7 +71,7 @@ class EventTestCase extends CakeTestCase
 
         //Test a valid course number
 
-        $course = $this->Event->GetCourseEvalEvent(1);
+        $course = Set::sort($this->Event->GetCourseEvalEvent(1), '{n}.Event.id', 'asc');
         $events = $this->toEventNameArray($course);
         $this->assertEqual($events['0'], 'Term 1 Evaluation');
         $this->assertEqual($events['1'], 'Term Report Evaluation');
@@ -91,7 +91,7 @@ class EventTestCase extends CakeTestCase
 
         //Test a valid course number
         $course = $this->Event->getCourseEventCount(1);
-        $this->assertEqual($course, 10);
+        $this->assertEqual($course, 17);
 
         //Test an invalid course number
         $course = $this->Event->getCourseEventCount(999);
@@ -310,17 +310,18 @@ class EventTestCase extends CakeTestCase
 
     function testGetPendingEventsByUserId()
     {
-        $events = $this->Event->getPendingEventsByUserId(5);
+        $options = array('submission' => 1, 'results' => 0);
+        $events = $this->Event->getPendingEventsByUserId(5, $options);
         $ids = Set::extract($events, '/id');
         sort($ids);
         $this->assertEqual(count($events), 5);
         $this->assertEqual($ids, array(1,2,3,4,5));
 
-        $events = $this->Event->getPendingEventsByUserId(27);
+        $events = $this->Event->getPendingEventsByUserId(27, $options);
         $this->assertEqual(count($events), 0);
 
         // student within two groups in the same event
-        $events = $this->Event->getPendingEventsByUserId(7);
+        $events = $this->Event->getPendingEventsByUserId(7, $options);
         $ids = Set::extract($events, '/id');
         sort($ids);
         $this->assertEqual(count($events), 6);
@@ -339,9 +340,20 @@ class EventTestCase extends CakeTestCase
         $event = $this->Event->findById(1);
         $dueDate = strtotime($event['Event']['due_date']);
         $dueIn = $dueDate - $now;
+        $serverTZ = date_default_timezone_get(); // saves the server's timezone
         // the difference between the our calculuation and the model's calcualtion
-        // should be within 5 seconds
-        $this->assertWithinMargin($event['Event']['due_in'], $dueIn, 5);
+        // should be within 10 seconds
+        $this->assertWithinMargin($event['Event']['due_in'], $dueIn, 10);
+        // switch to timezone without daylight savings
+        date_default_timezone_set('America/Regina');
+        $dueIn = $dueDate - time();
+        $this->assertWithinMargin($event['Event']['due_in'], $dueIn, 10);
+        // switch to timezone with daylight savings
+        date_default_timezone_set('America/Vancouver');
+        $dueIn = $dueDate - time();
+        $this->assertWithinMargin($event['Event']['due_in'], $dueIn, 10);
+        // switch timezone back to original
+        date_default_timezone_set($serverTZ);
     }
 
     #####################################################################################################################################################

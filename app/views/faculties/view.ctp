@@ -1,6 +1,6 @@
 <h2><?php echo $faculty; ?></h2>
 
-<h3><?php __($this->Vocabulary->translate('Department'));?></h3>
+<h3><?php $this->Vocabulary->translate('Department');?></h3>
 
 <table id="departments">
     <thead>

@@ -24,7 +24,7 @@ class Upgrade310 extends UpgradeBase
         // determines whether the upgrader will run
         $this->toVersion = '3.1.0';
         // determines which of the delta_*.sql files will be applied
-        $this->dbVersion = 6;
+        $this->dbVersion = Configure::read('DATABASE_VERSION');
     }
 
     /**

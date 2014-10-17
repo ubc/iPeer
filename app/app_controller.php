@@ -14,21 +14,6 @@ App::import('Lib', 'toolkit');
 App::import('Lib', 'breadcrumb');
 
 /**
- * _t
- * because CakePHP 1.3's internationalization __() call is stupid and wants
- * you to pass an extra parameter for no reason to get a string, use this
- * instead.
- *
- * @param mixed $str
- *
- * @access public
- * @return void
- */
-function _t($str) {
-    return __($str, true);
-}
-
-/**
  * AppController the base controller
  *
  * @uses Controller
@@ -244,6 +229,13 @@ class AppController extends Controller
     {
         if ($this->Auth->isAuthorized()) {
             User::getInstance($this->Auth->user());
+            // deny access for inactive users
+            if (User::get('record_status') == 'I') {
+                $this->Auth->logout();
+                $this->Session->setFlash(__('Your account is currently inactive.', true));
+                $this->redirect('/');
+                return;
+            }
             // after login stuff
             $this->User->loadRoles(User::get('id'));
             $this->AccessControl->loadPermissions();

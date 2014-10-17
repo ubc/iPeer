@@ -1,7 +1,7 @@
 <?php
-/* Besides the usual trouble needed to make each question types editable, the 
- * primary complexity here is that there's a lot of fragile state to keep track 
- * of due to the need to keep the questions numbered sequentially as a user 
+/* Besides the usual trouble needed to make each question types editable, the
+ * primary complexity here is that there's a lot of fragile state to keep track
+ * of due to the need to keep the questions numbered sequentially as a user
  * adds and removes questions.
  *
  * The key idea here is that a question's question_num field keeps track of
@@ -9,8 +9,8 @@
  * index does NOT change while in the view.
  */
 
-/* Each question type can have unique options for the user to configure, this 
- * section creates the html template needed for each question type. 
+/* Each question type can have unique options for the user to configure, this
+ * section creates the html template needed for each question type.
  */
 function makeQ($view, $qType, $i, $qTypes, $selfEval, $quesNum, $required=true)
 {
@@ -22,20 +22,20 @@ function makeQ($view, $qType, $i, $qTypes, $selfEval, $quesNum, $required=true)
     $qFields = "";
     switch ($qType) {
     case 'Likert':
-        $qHeader = _t('Likert Answer Question');
+        $qHeader = __('Likert Answer Question', true);
         $qTypeId = array_search($qType, $qTypes);
         $qFields = likertFields($view, $i);
         break;
     case 'Paragraph':
-        $qHeader = _t('Paragraph Answer Question');
+        $qHeader = __('Paragraph Answer Question', true);
         $qTypeId = array_search($qType, $qTypes);
         break;
     case 'Sentence':
-        $qHeader = _t('Sentence Answer Question');
+        $qHeader = __('Sentence Answer Question', true);
         $qTypeId = array_search($qType, $qTypes);
         break;
     case 'ScoreDropdown':
-        $qHeader = _t('Score Dropdown Answer Question');
+        $qHeader = __('Score Dropdown Answer Question', true);
         $qTypeId = array_search($qType, $qTypes);
         $qFields = scoredropdownFields($view, $i);
         break;
@@ -44,23 +44,23 @@ function makeQ($view, $qType, $i, $qTypes, $selfEval, $quesNum, $required=true)
     }
 
     // Build the remove, move up, move down controls
-    $removeLink = $html->link('x', '#', 
+    $removeLink = $html->link('x', '#',
         array(
-            'class' => 'removeQ', 
+            'class' => 'removeQ',
             'onclick' => "removeQ($i, $selfEval); return false;",
             'escape' => false
         )
     );
-    $upLink = $html->link('▲', '#', 
+    $upLink = $html->link('▲', '#',
         array(
-            'class' => 'upQ', 
+            'class' => 'upQ',
             'onclick' => "upQ($i, $selfEval); return false;",
             'escape' => false
         )
     );
-    $downLink = $html->link('▼', '#', 
+    $downLink = $html->link('▼', '#',
         array(
-            'class' => 'downQ', 
+            'class' => 'downQ',
             'onclick' => "downQ($i, $selfEval); return false;",
             'escape' => false
         )
@@ -76,11 +76,11 @@ function makeQ($view, $qType, $i, $qTypes, $selfEval, $quesNum, $required=true)
     // give an ID to the question number for easy renumbering later on
     $qNum = $html->tag('span', $quesNum . ". ", array('id' => "questionIndex$i"));
     $requiredTxt = ($qType != 'Likert') ? '' :
-        $html->div("help-text", _t('Unrequired Likert questions are not counted toward the total rating.'));
+        $html->div("help-text", __('Unrequired Likert questions are not counted toward the total rating.', true));
     $ret = $html->div('MixevalMakeQuestion',
         $html->tag('h3', "$controls $qNum $qHeader") .
         $hiddenIdField .
-        $form->input("MixevalQuestion.$i.title", 
+        $form->input("MixevalQuestion.$i.title",
             array("type" => "text", "label" => "Question")) .
         $form->input("MixevalQuestion.$i.instructions") .
         $form->input("MixevalQuestion.$i.required", array('checked' => $required)) .
@@ -88,7 +88,7 @@ function makeQ($view, $qType, $i, $qTypes, $selfEval, $quesNum, $required=true)
         $requiredTxt .
         $form->hidden("MixevalQuestion.$i.mixeval_question_type_id",
             array('value' => $qTypeId)) .
-        $form->hidden("MixevalQuestion.$i.question_num", 
+        $form->hidden("MixevalQuestion.$i.question_num",
             array('value' => $i + 1)) .
         $qFields
         ,
@@ -104,8 +104,8 @@ function scoredropdownFields($view, $i) {
     $form = $view->Form;
     $ret = $form->hidden("MixevalQuestion.$i.multiplier",
             array('value' => 10));
-    $ret = $ret.$html->div("help-text", 
-        _t('The increments on the drop-down will be based on 10 base points per member, the drop-down will go from 1 to (10 x No. of GroupMembers) in increments of 1 <br>'));
+    $ret = $ret.$html->div("help-text",
+        __('The increments on the drop-down will be based on 10 base points per member, the drop-down will go from 1 to (10 x No. of GroupMembers) in increments of 1 <br>', true));
     return $ret;
 }
 
@@ -125,13 +125,17 @@ function likertFields($view, $i) {
         }
     }
 
-    $ret = $form->input("MixevalQuestion.$i.multiplier", 
+    $ret = $form->input("MixevalQuestion.$i.multiplier",
         array('label' => 'Marks'));
-    $ret .= $html->div("help-text", 
-        _t('This mark will be scaled according to the response. E.g.: If there are 5 scale levels and this is set at 1, the lowest scale will be worth 0.2 marks, the second lowest 0.4 marks, and so on with the highest scale being worth the full 1 mark.'));
+    $ret .= $html->div("help-text",
+        __('This mark will be scaled according to the response. E.g.: If there are 5 scale levels and this is set at 1, the lowest scale will be worth 0.2 marks, the second lowest 0.4 marks, and so on with the highest scale being worth the full 1 mark.', true));
+    $ret .= $form->input("MixevalQuestion.$i.show_marks",
+        array('label' => 'Show Marks', 'type' => 'checkbox'));
+    $ret .= $html->div("help-text",
+        __('This setting will hide/show the mark distribution to those taking the evaluation.', true));
     $ret .= $html->div('',
         $form->label(null, 'Scale', array('class' => 'defLabel')) .
-        $form->button("Add", array('type' => 'button', 
+        $form->button("Add", array('type' => 'button',
             'onclick' => "addDesc($i);")) .
         $html->div('DescsDiv', $descs, array('id' => "DescsDiv$i"))
     );
@@ -151,13 +155,13 @@ function makeDesc($view, $qNum, $descNum) {
     }
 
     $ret = $html->div('MixevalQuestionDesc',
-        $hiddenIdField . 
+        $hiddenIdField .
         $form->text("MixevalQuestionDesc.$descNum.descriptor") .
-        $form->hidden("MixevalQuestionDesc.$descNum.question_index", 
+        $form->hidden("MixevalQuestionDesc.$descNum.question_index",
             array('value' => $qNum, 'class' => "MixevalQuestionDesc$qNum")) .
-        $html->link('x', '#', 
+        $html->link('x', '#',
             array(
-                'class' => 'removeQ', 
+                'class' => 'removeQ',
                 'onclick' => "removeDesc($qNum, $descNum); return false;"
             )
         ),
@@ -166,10 +170,10 @@ function makeDesc($view, $qNum, $descNum) {
     return $ret;
 }
 
-/* Now that we have all the question templates, we need to check whether the 
- * user is visiting this page from a failed submit. If the user is visiting 
- * from a failed submit, we need to reload all the questions they've already 
- * configured, so they don't have to enter them all over again. 
+/* Now that we have all the question templates, we need to check whether the
+ * user is visiting this page from a failed submit. If the user is visiting
+ * from a failed submit, we need to reload all the questions they've already
+ * configured, so they don't have to enter them all over again.
  */
 $numQ = 0; // for initializing the javascript counter that track question
 $numPeer = 1; // for initializing the question number for peer evaluation questions
@@ -219,7 +223,7 @@ echo $html->div('', $reloadedQ, array('id' => 'questions', 'class' => 'questions
 // self evaluation questions section
 echo '<div id="self-eval-ques">';
 echo $html->tag('h3', __('Self-Evaluation Questions', true));
-$addQButton = $form->button(__('Add', true), 
+$addQButton = $form->button(__('Add', true),
     array('type' => 'button', 'onclick' => "insertQ(true);"));
 $selfQTypes = $qTypes;
 unset($selfQTypes[4]); // remove score dropdown from self-evaluation
@@ -235,7 +239,7 @@ var numQ = <?php echo $numQ; ?>; // the total number of questions
 var numPeer = <?php echo $numPeer ?>; // next question number for peer evaluation ques
 var numSelf = <?php echo $numSelf ?>; // next question number for self evaluation ques
 // the total number of descriptors
-var numDesc = <?php echo $numDesc; ?>; 
+var numDesc = <?php echo $numDesc; ?>;
 // keeps track of currently valid user ids, cause users can remove questions
 var questionIds = [<?php echo $numQArray; ?>];
 var peerQuesIds = [<?php echo $numPeerQArray; ?>]; // for peer evaluation section
@@ -379,7 +383,7 @@ function reorderQ() {
     }
 }
 
-// Add a question descriptor, this is used to configure things like scale 
+// Add a question descriptor, this is used to configure things like scale
 // levels in likert questions
 function addDesc(numQ) {
     var insert = desc.replace(/-1/g, numQ);

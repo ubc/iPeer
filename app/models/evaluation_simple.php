@@ -135,19 +135,26 @@ class EvaluationSimple extends EvaluationResponseBase
     /**
      * setAllEventCommentRelease
      *
-     * @param bool $eventId       event id
-     * @param bool $releaseStatus release status
+     * @param int $eventId         event id
+     * @param mixed $userId        user id
+     * @param mixed $releaseStatus release status
      *
      * @access public
      * @return void
      */
-    function setAllEventCommentRelease($eventId=null, $releaseStatus=null)
-    {
-        //    $sql = 'UPDATE evaluation_simples SET release_status = '.$releaseStatus.' WHERE event_id = '.$eventId;
-        //    return $this->query($sql);
-        $fields = array('EvaluationSimple.release_status' => $releaseStatus);
-        $conditions = array('EvaluationSimple.event_id' => $eventId);
-        return $this->updateAll($fields, $conditions);
+    function setAllEventCommentRelease($eventId, $userId, $releaseStatus)
+    {      
+        $this->GroupEvent = ClassRegistry::init('GroupEvent');
+        
+        $now = '"'.date("Y-m-d H:i:s").'"';
+        // only change release status if the group event is NOT marked as reviewed
+        $grpEvents = $this->GroupEvent->find('list', array(
+            'conditions' => array('event_id' => $eventId, 'marked' => 'not reviewed')
+        ));
+        $this->updateAll(
+            array('EvaluationSimple.release_status' => $releaseStatus, 'EvaluationSimple.modified' => $now, 'EvaluationSimple.updater_id' => $userId),
+            array('EvaluationSimple.grp_event_id' => $grpEvents)
+        );
     }
 
 
@@ -161,12 +168,17 @@ class EvaluationSimple extends EvaluationResponseBase
      * @access public
      * @return void
      */
-    function setAllEventGradeRelease($eventId=null, $releaseStatus=null)
-    {
-        //		$sql = 'UPDATE evaluation_simples SET grade_release = '.$releaseStatus.' WHERE event_id = '.$eventId;
-        //	  return $this->query($sql);
+    function setAllEventGradeRelease($eventId, $releaseStatus)
+    {       
+        $this->GroupEvent = ClassRegistry::init('GroupEvent');
+        
+        // only change release status if the group event is NOT marked as reviewed
+        $grpEvents = $this->GroupEvent->find('list', array(
+            'conditions' => array('event_id' => $eventId, 'marked' => 'not reviewed')
+        ));
+        
         $fields = array('EvaluationSimple.grade_release' => $releaseStatus);
-        $conditions = array('EvaluationSimple.event_id' => $eventId);
+        $conditions = array('EvaluationSimple.grp_event_id' => $grpEvents);
         return $this->updateAll($fields, $conditions);
     }
 

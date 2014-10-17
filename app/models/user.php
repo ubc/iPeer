@@ -707,6 +707,10 @@ class User extends AppModel
 
                 $existings[$key]['User'] = $temp;
             }
+            
+            //change inactive status to active
+            $this->readdUser($e['User']['id']);
+            
             // remove the existings from the data array
             unset($data[$e['User']['username']]);
         }
@@ -1075,6 +1079,43 @@ class User extends AppModel
             'contain' => array('Course')
         ));
         return Set::extract($user, '/Course/id');
+    }
+    
+    /**
+     * generates and saves new password
+     *
+     * @param mixed $user_id
+     *
+     * @return boolean
+     */
+    function savePassword($user_id) {
+        App::import('Component', 'PasswordGenerator');
+        $psGen = new PasswordGeneratorComponent();
+        
+        $tmp_password = $psGen->generate();
+        $user_data['User']['tmp_password'] = $tmp_password;
+        $user_data['User']['password'] =  md5($tmp_password);
+        $user_data['User']['id'] =  $user_id;
+        
+        if($this->save($user_data, true, array('password'))) {
+            return $tmp_password;
+        }
+        return false;
+    }
+    
+    /**
+     * unflips user's record status from inactive to active
+     *
+     * @param mixed $userId
+     *
+     * @return boolean
+     */
+    function readdUser($userId)
+    {
+        $userData['User']['record_status'] = 'A';
+        $userData['User']['id'] = $userId;
+        
+        return $this->save($userData, true, array('record_status'));
     }
 
     /*********************************

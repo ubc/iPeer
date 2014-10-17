@@ -40,7 +40,8 @@ class EmailTemplate extends AppModel
             'conditions' => array('OR' => array(
                 array('creator_id' => $user_id),
                 array('availability' => '1')
-            ))
+            )),
+            'order' => 'name ASC'
         ));
     }
 }

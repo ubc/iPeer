@@ -1004,7 +1004,7 @@ i {
     margin-bottom: 0.5em;
 }
 
-#Events form div.email-help-text {
+#Events form div.email-help-text, #Events form div.email-temp-help-text {
     margin: 0.5em 0 1em 24em;
     font-size: 0.8em;
     width: 35em;
@@ -1369,6 +1369,12 @@ i {
 
 #mixeval_result {
     text-align: left;
+}
+
+#mixeval_result .releaseBtns {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
 }
 
 /* mixevals/view */

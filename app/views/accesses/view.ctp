@@ -3,7 +3,7 @@
 echo $form->input('role', array(
     'options' => $roles,
     'default' => $roleId,
-    'label' => _t('Role').':',
+    'label' => __('Role', true).':',
 ));
 ?>
 <table id="table_id">

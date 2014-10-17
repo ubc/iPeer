@@ -41,7 +41,7 @@
       echo "else if (totalPoints > parseFloat(allPoints)) {";
       echo "  diff = totalPoints - parseFloat(allPoints);";
       echo "  if (commentsRequired == 0) {";
-      echo "    $('statusMsg').innerHTML = '".__('Too many points, need to unallocate', true)." <font color=red>' + diff + '</font> ".__('points.')." ';";
+      echo "    $('statusMsg').innerHTML = '".__('Too many points, need to unallocate', true)." <font color=red>' + diff + '</font> ".__('points.', true)." ';";
       echo "  }";
       echo "  else if (commentsRequired == 1 && emptyComments != 0) {";
       echo "    $('statusMsg').innerHTML = '".__('Too many points, need to unallocate', true)." <font color=red>' + diff + '</font> ".__('points.<br />There are still', true)." <font color=red>' + emptyComments + '</font> ".__(' comments to be filled.', true)." ';";
@@ -152,22 +152,21 @@
             <li><?php __("Rate your peer's relative performance by using the slider. [Weight 1-10]")?></li>
             <li><?php __('Click "Distribute" button to distribute points.')?></li>
             <li><?php __('Allocate any remaining point.')?></li>
-            <li><?php __('Enter Comments')?> <?php echo  $event['Event']['com_req']? '<font color="red"> (Required) </font>' : '(Optional)' ;?> .</li>
+            <li><?php __('Enter Comments')?> <?php echo  $event['Event']['com_req']? '<font color="red"> ('.__('Required', true).') </font>' : '('.__('Optional', true).')' ;?> .</li>
             <li><font color="red"><?php __('NOTE:')?></font> <?php __('"Submit Evaluation" button will only be enabled when all points, and comments (if required), are filled!')?></li>
-            <?php $releaseEnd = !isset($event['Event']['release_date_end']) ? '<i>'._t("Evaluation's release end date").'</i>' : Toolkit::formatDate($event['Event']['release_date_end']); ?>
-            <li><?php echo _t('The evaluation can be repeatedly submitted until ').$releaseEnd.'.'?></li>
+            <?php $releaseEnd = !isset($event['Event']['release_date_end']) ? '<i>'.__("Evaluation's release end date", true).'</i>' : Toolkit::formatDate($event['Event']['release_date_end']); ?>
+            <li><?php echo sprintf(__('The evaluation can be repeatedly submitted until %s.', true), $releaseEnd)?></li>
             </ul>
 
             <div style="text-align:left; margin-left:3em;"><a href="#" onClick="javascript:$('penalty').toggle();return false;">( <?php __('Show/Hide late penalty policy')?> )</a></div>
             <div id ="penalty" style ="border:1px solid red; margin: 0.5em 0 0 3em; width: 450px; padding:0.5em; color:darkred; display:none">
                 <?php if (!empty($penalty)) {
                     foreach ($penalty as $day) {
-                        $mult = ($day['Penalty']['days_late']>1)?'s':'';
-                        echo $day['Penalty']['days_late'].' day'.$mult.' late: '.$day['Penalty']['percent_penalty'].'% deduction. </br>';
+                        echo sprintf(__('%d day(s) late: %s deduction.', true), $day['Penalty']['days_late'], $day['Penalty']['percent_penalty'].'%').'</br>';
                     }
-                    echo $penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';
+                    echo sprintf(__('%s is deducted afterwards.', true), $penaltyFinal['Penalty']['percent_penalty'].'%');
                 } else {
-                    echo 'No penalty is specified for this evaluation.';
+                    echo __('No penalty is specified for this evaluation.', true);
                 }
                 ?>
             </div>

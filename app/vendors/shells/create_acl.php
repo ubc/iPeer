@@ -169,6 +169,11 @@ class CreateAclShell extends Shell
         // some users can't explicitly see username
         $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'viewusername'));
         $this->Acl->Aco->save();
+        
+        // functions/submitstudenteval
+        // allow users to submit evaluation/survey for students in student view
+        $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'submitstudenteval'));
+        $this->Acl->Aco->save();
     }
 
 
@@ -493,6 +498,7 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Surveys');
         $this->Acl->allow($role, 'controllers/Surveygroups');
         $this->Acl->allow($role, 'controllers/Users');
+        $this->Acl->deny($role, 'controllers/Users/resetPasswordWithoutEmail');
         $this->Acl->allow($role, 'controllers/Evaluations');
         $this->Acl->allow($role, 'controllers/guard/guard/logout');
         $this->Acl->deny($role, 'functions');
@@ -507,6 +513,7 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'functions/viewusername');
         $this->Acl->allow($role, 'functions/coursemanager');
         $this->Acl->deny($role, 'functions/superadmin');
+        $this->Acl->allow($role, 'functions/submitstudenteval');
 
         $role->id = 3; // instructor
         $this->Acl->deny($role, 'controllers');
@@ -530,6 +537,8 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Oauthtokens/add');
         $this->Acl->allow($role, 'controllers/Oauthtokens/delete');
         $this->Acl->deny($role, 'controllers/Users/merge');
+        $this->Acl->allow($role, 'controllers/Users/showEvents');
+        $this->Acl->deny($role, 'controllers/Users/resetPasswordWithoutEmail');
         $this->Acl->deny($role, 'functions');
         $this->Acl->allow($role, 'functions/evaluation');
         $this->Acl->deny($role, 'functions/evaluation', 'update');
@@ -545,6 +554,7 @@ class CreateAclShell extends Shell
         $this->Acl->deny($role, 'functions/viewemailaddresses');
         $this->Acl->deny($role, 'functions/superadmin');
         $this->Acl->allow($role, 'functions/coursemanager');
+        $this->Acl->deny($role, 'functions/submitstudenteval');
 
         $role->id = 4; // tutor
         $this->Acl->deny($role, 'controllers');

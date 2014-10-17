@@ -1,5 +1,5 @@
 <?php
-require_once('system_base.php');
+App::import('Lib', 'system_base');
 
 class studentSimple extends SystemBaseTestCase
 {
@@ -7,23 +7,12 @@ class studentSimple extends SystemBaseTestCase
 
     public function startCase()
     {
-        $this->getUrl();
+        parent::startCase();
         echo "Start StudentSimple system test.\n";
-        $wd_host = 'http://localhost:4444/wd/hub';
-        $this->web_driver = new SystemWebDriver($wd_host);
-        $this->session = $this->web_driver->session('firefox');
-        $this->session->open($this->url);
+        $this->getSession()->open($this->url);
 
-        $w = new PHPWebDriver_WebDriverWait($this->session);
-        $this->session->deleteAllCookies();
         $login = PageFactory::initElements($this->session, 'Login');
         $home = $login->login('root', 'ipeeripeer');
-    }
-
-    public function endCase()
-    {
-        $this->session->deleteAllCookies();
-        $this->session->close();
     }
 
     public function testCreateEvent()
@@ -87,7 +76,7 @@ class studentSimple extends SystemBaseTestCase
         // check penalty note
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '( Show/Hide late penalty policy )')->click();
         $penalty = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'penalty')->text();
-        $this->assertEqual($penalty, "1 day late: 10% deduction.\n10% is deducted afterwards.");
+        $this->assertEqual($penalty, "1 day(s) late: 10% deduction.\n10% is deducted afterwards.");
 
         // move the sliders
         $this->handleOffset('handle6', 24);

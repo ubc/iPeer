@@ -59,7 +59,7 @@ class RubricsControllerTest extends ExtendedAuthTestCase {
     public function endTest($method)
     {
         // defer logout to end of the test as some of the test need check flash
-        // message. After logging out, message is destoryed.
+        // message. After logging out, message is destroyed.
         if (isset($this->controller->Auth)) {
             $this->controller->Auth->logout();
         }
@@ -73,9 +73,40 @@ class RubricsControllerTest extends ExtendedAuthTestCase {
     }
 
     function testIndex() {
-        //    $result = $this->testAction('/rubrics/index', array('connection' => 'test_suite', 'return' => 'contents'));
-        //   var_dump($result);
-        //   $this->assertEqual($result['paramsForList']['data']['entries'][0]['Course']['course'], 'Math303');
+        $result = $this->testAction('/rubrics/index', array('connection' => 'test_suite', 'return' => 'contents'));
+        //$this->assertEqual($result['paramsForList']['data']['entries'][0]['Course']['course'], 'Math303');
+    }
+    
+    function testPostProcess() {
+        
+    }
+    
+    function testSetUpAjaxList() {
+    
+    }
+    
+    function testAjaxList() {
+    
+    }
+    
+    function testView() {
+    
+    }
+    
+    function testAdd() {
+        $result = $this->testAction('/rubrics/add', array('connection' => 'test_suite', 'return' => 'vars'));
+    }
+    
+    function testEdit() {
+    
+    }
+    
+    function testCopy() {
+    
+    }
+    
+    function testDelete() {
+    
     }
 
 }
