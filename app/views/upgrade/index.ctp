@@ -1,5 +1,7 @@
-<p>Current iPeer Version: <?php echo $currentVersion?></p>
-<p>Current Database Version: <?php echo $currentDbVersion?></p>
+<p>Current iPeer Version: <?php echo $currentVersion?><br>
+Most Recent iPeer Version: <?php echo IPEER_VERSION?></p>
+<p>Current Database Version: <?php echo $currentDbVersion?><br>
+Most Recent Database Version: <?php echo $dbVersion?></p>
 <?php if ($is_upgradable): ?>
 <p>You are about to upgrade your iPeer instance. Please make sure you have <strong>BACKED UP</strong> your database and files before proceeding!</p>
 <p>Upgrade may take some time. Please be patient.</p>
