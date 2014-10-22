@@ -484,7 +484,11 @@ class EventsController extends AppController
         $this->set('emailId', $emailTemp['EmailSchedule']['content']);
         $event = $this->Event->getEventById($eventId);
 
-        if (!empty($this->data)) {
+        if (!empty($this->data) && array_key_exists('formLoaded', $this->data)) {
+            if (!array_key_exists('formLoaded', $this->data)) {
+                $this->Session->setFlash("Edit event failed because the form hasn't finished loading yet.");
+                return;
+            }
             // need to set the template_id based on the event_template_type_id
             $typeId = $this->data['Event']['event_template_type_id'];
             if ($typeId == 1) {
@@ -554,6 +558,8 @@ class EventsController extends AppController
             } else {
                 $this->Session->setFlash("Edit event failed.");
             }
+        } else if (!empty($this->data)) {
+            $this->Session->setFlash("Edit event failed because the form hasn't finished loading yet.");
         }
 
         // Sets up the already assigned groups
