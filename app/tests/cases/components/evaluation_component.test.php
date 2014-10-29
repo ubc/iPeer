@@ -414,6 +414,7 @@ class EvaluationTestCase extends CakeTestCase
     {
         // Set up default values
         $evalMixevalId = 1;
+        $auto_release = 0;
         $mixeval = array(
             'Mixeval' => array (
                 'zero_mark' => 0,
@@ -460,11 +461,11 @@ class EvaluationTestCase extends CakeTestCase
             ),
         );
         // Get the grade with real values
-        $grade = $this->EvaluationComponentTest->saveNGetEvaluationMixevalDetail ($evalMixevalId, $mixeval, $form);
+        $grade = $this->EvaluationComponentTest->saveNGetEvaluationMixevalDetail ($evalMixevalId, $mixeval, $form, $auto_release);
         $this->assertEqual($grade, 0.8);
         
         // Test the method with null values
-        $grade = $this->EvaluationComponentTest->saveNGetEvaluationMixevalDetail (null, null, null);
+        $grade = $this->EvaluationComponentTest->saveNGetEvaluationMixevalDetail (null, null, null, null);
         $this->assertFalse($grade);
     }
 

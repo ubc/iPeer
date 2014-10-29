@@ -149,7 +149,7 @@ class EvaluationSimple extends EvaluationResponseBase
         $now = '"'.date("Y-m-d H:i:s").'"';
         // only change release status if the group event is NOT marked as reviewed
         $grpEvents = $this->GroupEvent->find('list', array(
-            'conditions' => array('event_id' => $eventId, 'marked' => 'not reviewed')
+            'conditions' => array('event_id' => $eventId)
         ));
         $this->updateAll(
             array('EvaluationSimple.release_status' => $releaseStatus, 'EvaluationSimple.modified' => $now, 'EvaluationSimple.updater_id' => $userId),
@@ -174,7 +174,7 @@ class EvaluationSimple extends EvaluationResponseBase
         
         // only change release status if the group event is NOT marked as reviewed
         $grpEvents = $this->GroupEvent->find('list', array(
-            'conditions' => array('event_id' => $eventId, 'marked' => 'not reviewed')
+            'conditions' => array('event_id' => $eventId)
         ));
         
         $fields = array('EvaluationSimple.grade_release' => $releaseStatus);

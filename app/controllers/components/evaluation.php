@@ -214,6 +214,57 @@ class EvaluationComponent extends Object
     }
 
     /**
+     * setGroupEventsReleaseStatus
+     *
+     * @param mixed $groupEventIds  group event ids
+     * @param mixed $status         status
+     *
+     * @access public
+     * @return void
+     */
+    function setGroupEventsReleaseStatus($groupEventIds, $status)
+    {
+        $this->setGroupEventsGradeReleaseStatus($groupEventIds, $status);
+        $this->setGroupEventsCommentReleaseStatus($groupEventIds, $status);
+    }
+    
+    /**
+     * setGroupEventsGradeReleaseStatus
+     *
+     * @param mixed $groupEventIds  group event ids
+     * @param mixed $status         status
+     *
+     * @access public
+     * @return void
+     */
+    function setGroupEventsGradeReleaseStatus($groupEventIds, $status)
+    {
+        $this->GroupEvent = ClassRegistry::init('GroupEvent');
+
+        $fields = array('GroupEvent.grade_release_status' => "'".$status."'");
+        $conditions = array('GroupEvent.id' => $groupEventIds);
+        $this->GroupEvent->updateAll($fields, $conditions);
+    }
+    
+    /**
+     * setGroupEventsCommentReleaseStatus
+     *
+     * @param mixed $groupEventIds  group event ids
+     * @param mixed $status         status
+     *
+     * @access public
+     * @return void
+     */
+    function setGroupEventsCommentReleaseStatus($groupEventIds, $status)
+    {
+        $this->GroupEvent = ClassRegistry::init('GroupEvent');
+
+        $fields = array('GroupEvent.comment_release_status' => "'".$status."'");
+        $conditions = array('GroupEvent.id' => $groupEventIds);
+        $this->GroupEvent->updateAll($fields, $conditions);
+    }
+
+    /**
      * saveSimpleEvaluation
      *
      * @param bool $params               parameters
@@ -545,6 +596,7 @@ class EvaluationComponent extends Object
 
         $this->Event->id = $eventId;
         $event = $this->Event->read();
+        $auto_release = $event['Event']['auto_release'];
 
         //Get simple evaluation tool
         $this->Rubric->id = $event['Event']['template_id'];
@@ -570,8 +622,10 @@ class EvaluationComponent extends Object
 
         $evalRubric['EvaluationRubric']['comment'] = $params['form'][$targetEvaluatee.'gen_comment'];
         $score = $this->saveNGetEvalutionRubricDetail(
-            $evalRubric['EvaluationRubric']['id'], $rubric, $targetEvaluatee, $params['form'], $viewMode, $targetCriteria);
+            $evalRubric['EvaluationRubric']['id'], $rubric, $targetEvaluatee, $params['form'], $viewMode, $auto_release, $targetCriteria);
         $evalRubric['EvaluationRubric']['score'] = $score;
+        $evalRubric['EvaluationRubric']['comment_release'] = $auto_release;
+        $evalRubric['EvaluationRubric']['grade_release'] = $auto_release;
 
         if (!$this->EvaluationRubric->save($evalRubric)) {
             return false;
@@ -589,12 +643,13 @@ class EvaluationComponent extends Object
      * @param mixed $targetEvaluatee target evaluatee
      * @param mixed $form            form
      * @param mixed $viewMode        view mode
+     * @param mixed $auto_release    auto release
      * @param mixed $targetCriteria  target criteria
      *
      * @access public
      * @return void
      */
-    function saveNGetEvalutionRubricDetail ($evalRubricId, $rubric, $targetEvaluatee, $form, $viewMode, $targetCriteria=null)
+    function saveNGetEvalutionRubricDetail ($evalRubricId, $rubric, $targetEvaluatee, $form, $viewMode, $auto_release, $targetCriteria=null)
     {
         $this->EvaluationRubricDetail = ClassRegistry::init('EvaluationRubricDetail');
         $totalGrade = 0;
@@ -628,6 +683,7 @@ class EvaluationComponent extends Object
                 $evalRubricDetail['EvaluationRubricDetail']['criteria_comment'] = $form[$targetEvaluatee."comments"][$pos++];
                 $evalRubricDetail['EvaluationRubricDetail']['selected_lom'] = $selectedLom;
                 $evalRubricDetail['EvaluationRubricDetail']['grade'] = $grade;
+                $evalRubricDetail['EvaluationRubricDetail']['comment_release'] = $auto_release;
 
                 if($selectedLom != null){
                     $this->EvaluationRubricDetail->save($evalRubricDetail);
@@ -839,13 +895,13 @@ class EvaluationComponent extends Object
      * changeRubricEvalCommentRelease
      *
      * @param mixed $status     status
-     * @param mixed $grpEventId group event id
+     * @param mixed $grpEvents  group events
      * @param mixed $evaluatee  evaluatee
      *
      * @access public
      * @return void
      */
-    function changeRubricEvalCommentRelease($status, $grp_event_id, $evaluatee = null)
+    function changeRubricEvalCommentRelease($status, $grpEvents, $evaluatee = null)
     {
         $this->EvaluationRubric = ClassRegistry::init('EvaluationRubric');
         $this->EvaluationRubricDetail = ClassRegistry::init('EvaluationRubricDetail');
@@ -853,20 +909,20 @@ class EvaluationComponent extends Object
         $now = '"'.date("Y-m-d H:i:s").'"';
         $user = $this->Auth->user('id');
         
-        $conditions = array('grp_event_id' => $grp_event_id);
+        $conditions = array('grp_event_id' => $grpEvents);
         if ($evaluatee) {
             $conditions['evaluatee'] = $evaluatee;
         }
         
-        $evalRubrIds = $this->EvaluationRubric->find('list', array('conditions' => $conditions));
+        $evalIds = $this->EvaluationRubric->find('list', array('conditions' => $conditions));
         // update all comment release status that meets the conditions
         $this->EvaluationRubric->updateAll(
             array('EvaluationRubric.comment_release' => $status, 'EvaluationRubric.modified' => $now, 'EvaluationRubric.updater_id' => $user),
-            array('EvaluationRubric.id' => $evalRubrIds)
+            array('EvaluationRubric.id' => $evalIds)
         );
         $this->EvaluationRubricDetail->updateAll(
             array('EvaluationRubricDetail.comment_release' => $status, 'EvaluationRubricDetail.modified' => $now, 'EvaluationRubricDetail.updater_id' => $user),
-            array('EvaluationRubricDetail.evaluation_rubric_id' => $evalRubrIds)
+            array('EvaluationRubricDetail.evaluation_rubric_id' => $evalIds)
         );
     }
     
@@ -973,6 +1029,7 @@ class EvaluationComponent extends Object
         $eventId = $params['Evaluation']['event_id'];
         $this->Event->id = $eventId;
         $event = $this->Event->read();
+        $auto_release = $event['Event']['auto_release'];
 
         //Get simple evaluation tool
         $this->Mixeval->id = $event['Event']['template_id'];
@@ -992,8 +1049,10 @@ class EvaluationComponent extends Object
         }
 
         $score = $this->saveNGetEvaluationMixevalDetail(
-            $evalMixeval['EvaluationMixeval']['id'], $mixeval, $params);
+            $evalMixeval['EvaluationMixeval']['id'], $mixeval, $params, $auto_release);
         $evalMixeval['EvaluationMixeval']['score'] = $score;
+        // save default grade release status 
+        $evalMixeval['EvaluationMixeval']['grade_release'] = $auto_release;
         if (!$this->EvaluationMixeval->save($evalMixeval)) {
             return false;
         }
@@ -1008,13 +1067,14 @@ class EvaluationComponent extends Object
      * @param mixed $evalMixevalId mixeval id
      * @param mixed $mixeval       mixeval
      * @param mixed $form          form
+     * @param mixed $auto_release  auto_release
      *
      * @access public
      * @return void
      */
-    function saveNGetEvaluationMixevalDetail($evalMixevalId, $mixeval, $form)
+    function saveNGetEvaluationMixevalDetail($evalMixevalId, $mixeval, $form, $auto_release)
     {
-        if ($evalMixevalId == null || $mixeval == null || $form == null) {
+        if ($evalMixevalId == null || $mixeval == null || $form == null || $auto_release == null) {
             return false;
         }
         $this->EvaluationMixevalDetail = ClassRegistry::init('EvaluationMixevalDetail');
@@ -1030,6 +1090,7 @@ class EvaluationComponent extends Object
             }
             $evalMixevalDetail['EvaluationMixevalDetail']['evaluation_mixeval_id'] = $evalMixevalId;
             $evalMixevalDetail['EvaluationMixevalDetail']['question_number'] = $num;
+            $evalMixevalDetail['EvaluationMixevalDetail']['comment_release'] = $auto_release;
 
             if (in_array($ques['mixeval_question_type_id'], array('1','4'))) {
                 if (empty($data[$num]['selected_lom']) && $data[$num]['selected_lom'] != 0 && $ques['mixeval_question_type_id'] != '4' ) {
@@ -1191,20 +1252,20 @@ class EvaluationComponent extends Object
         $now = '"'.date("Y-m-d H:i:s").'"';
         $user = $this->Auth->user('id');
         
-        $mixedIds = $this->EvaluationMixeval->find('list', array(
+        $evalIds = $this->EvaluationMixeval->find('list', array(
             'conditions' => array('evaluatee' => $evaluatee, 'grp_event_id' => $grpEventId)
         ));
-        // change comment release to 0 for the evaluatee in this group event
+        // unrelease all comments initially
         $this->EvaluationMixevalDetail->updateAll(
             array('EvaluationMixevalDetail.comment_release' => 0, 'EvaluationMixevalDetail.modified' => $now, 'EvaluationMixevalDetail.updater_id' => $user),
-            array('EvaluationMixevalDetail.evaluation_mixeval_id' => $mixedIds)
+            array('EvaluationMixevalDetail.evaluation_mixeval_id' => $evalIds)
         );
         
-        //release general comments
-        $mixedDetailIds = isset($params['releaseComments']) ? $params['releaseComments'] : array();
+        //release the selected comments
+        $evalDetailIds = isset($params['releaseComments']) ? $params['releaseComments'] : array();
         $this->EvaluationMixevalDetail->updateAll(
             array('EvaluationMixevalDetail.comment_release' => 1, 'EvaluationMixevalDetail.modified' => $now, 'EvaluationMixevalDetail.updater_id' => $user),
-            array('EvaluationMixevalDetail.id' => $mixedDetailIds)
+            array('EvaluationMixevalDetail.id' => $evalDetailIds)
         );
     }
     
@@ -1212,13 +1273,13 @@ class EvaluationComponent extends Object
      * changeMixedEvalCommentRelease
      *
      * @param mixed $status     status
-     * @param mixed $grpEventId group event id
+     * @param mixed $grpEvents  group events
      * @param mixed $evaluatee  evaluatee
      *
      * @access public
      * @return void
      */
-    function changeMixedEvalCommentRelease($status, $grp_event_id, $evaluatee = null)
+    function changeMixedEvalCommentRelease($status, $grpEvents, $evaluatee = null)
     {
         $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
         $this->EvaluationMixevalDetail = ClassRegistry::init('EvaluationMixevalDetail');
@@ -1226,16 +1287,16 @@ class EvaluationComponent extends Object
         $now = '"'.date("Y-m-d H:i:s").'"';
         $user = $this->Auth->user('id');
         
-        $conditions = array('grp_event_id' => $grp_event_id);
+        $conditions = array('grp_event_id' => $grpEvents);
         if ($evaluatee) {
             $conditions['evaluatee'] = $evaluatee;
         }
         
-        $evalRubrIds = $this->EvaluationMixeval->find('list', array('conditions' => $conditions));
+        $evalIds = $this->EvaluationMixeval->find('list', array('conditions' => $conditions));
         // update all comment release status that meets the conditions
         $this->EvaluationMixevalDetail->updateAll(
             array('EvaluationMixevalDetail.comment_release' => $status, 'EvaluationMixevalDetail.modified' => $now, 'EvaluationMixevalDetail.updater_id' => $user),
-            array('EvaluationMixevalDetail.evaluation_mixeval_id' => $evalRubrIds)
+            array('EvaluationMixevalDetail.evaluation_mixeval_id' => $evalIds)
         );
     }
 

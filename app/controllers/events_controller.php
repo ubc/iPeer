@@ -15,7 +15,7 @@ class EventsController extends AppController
     public $uses = array('GroupEvent', 'User', 'Group', 'Course', 'Event', 'EventTemplateType',
         'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers', 'Penalty', 'Survey','EmailSchedule',
         'EvaluationSubmission', 'EmailTemplate', 'EvaluationRubric', 'EvaluationSimple', 'EvaluationMixeval');
-    public $components = array("AjaxList", "Session", "RequestHandler","Email");
+    public $components = array("AjaxList", "Session", "RequestHandler","Email", "Evaluation");
 
     /**
      * __construct
@@ -374,6 +374,14 @@ class EventsController extends AppController
                 $this->Session->setFlash("Add event successful!", 'good');
                 //Call the setSchedule function to Schedule reminder emails
                 $this->setSchedule($this->Event->id, $this->data);
+                // set release status for group event
+                $groupEvents = $this->GroupEvent->find('list', 
+                    array('conditions' => array('event_id'=>$this->Event->id)));
+                if ($this->data['Event']['auto_release']) {
+                    $this->Evaluation->setGroupEventsReleaseStatus($groupEvents, 'Auto');
+                } else {
+                    $this->Evaluation->setGroupEventsReleaseStatus($groupEvents, 'None');
+                }
                 $this->redirect('index/'.$courseId);
                 return;
             } else {
@@ -475,7 +483,7 @@ class EventsController extends AppController
             $this->redirect('index');
             return;
         }
-
+        
         $orig_email_frequency = $this->calculateFrequency($eventId);
         $this->set('email_schedule', $orig_email_frequency);
         $emailTemp = $this->EmailSchedule->find('first', array(
@@ -511,23 +519,30 @@ class EventsController extends AppController
             }
             
             // update submitted evaluations release status if auto-release status has been changed
+            $groupEvents = $this->GroupEvent->find('list', 
+                array('conditions' => array('event_id'=>$eventId)));
             if ($this->data['Event']['auto_release'] != $event['Event']['auto_release']) {
                 $model = null;
                 switch ($event['Event']['event_template_type_id']) {
                 case 1://simple
-                    $model = 'EvaluationSimple';
+                    //$model = 'EvaluationSimple';
+                    $this->EvaluationSimple->setAllEventCommentRelease($eventId, $this->Auth->user('id'), $this->data['Event']['auto_release']);
+                    $this->EvaluationSimple->setAllEventGradeRelease($eventId, $this->data['Event']['auto_release']);
                     break;
                 case 2://rubric
-                    $model = 'EvaluationRubric';
+                    $this->Evaluation->changeRubricEvalCommentRelease($this->data['Event']['auto_release'], $groupEvents);
+                    $this->EvaluationRubric->setAllEventGradeRelease($eventId, $this->data['Event']['auto_release']);
                     break;
                 case 4:
-                    $model = 'EvaluationMixeval';
+                    $this->Evaluation->changeMixedEvalCommentRelease($this->data['Event']['auto_release'], $groupEvents);
+                    $this->EvaluationMixeval->setAllEventGradeRelease($eventId, $this->data['Event']['auto_release']);
                     break;
                 }
                 
-                if (!is_null($model)) {
-                    $this->$model->setAllEventCommentRelease($eventId, User::get('id'), $this->data['Event']['auto_release']);
-                    $this->$model->setAllEventGradeRelease($eventId, $this->data['Event']['auto_release']);
+                if ($this->data['Event']['auto_release']) {
+                    $this->Evaluation->setGroupEventsReleaseStatus($groupEvents, 'Auto');
+                } else {
+                    $this->Evaluation->setGroupEventsReleaseStatus($groupEvents, 'None');
                 }
             }
 

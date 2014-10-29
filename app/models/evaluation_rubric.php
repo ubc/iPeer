@@ -336,41 +336,6 @@ class EvaluationRubric extends EvaluationResponseBase
 
 
     /**
-     * setAllEventCommentRelease
-     *
-     * @param bool $eventId       event id
-     * @param mixed $userId       user id
-     * @param bool $releaseStatus release status
-     *
-     * @access public
-     * @return void
-     */
-    function setAllEventCommentRelease($eventId, $userId, $releaseStatus)
-    {
-        $this->EvaluationRubricDetail = ClassRegistry::init('EvaluationRubricDetail');
-        $this->GroupEvent = ClassRegistry::init('GroupEvent');
-
-        $now = '"'.date("Y-m-d H:i:s").'"';
-        
-        // only change release status if the group event is NOT marked as reviewed
-        $grpEvents = $this->GroupEvent->find('list', array(
-            'conditions' => array('event_id' => $eventId, 'marked' => 'not reviewed')
-        ));
-        $conditions = array('grp_event_id' => $grpEvents);      
-        $evalRubrIds = $this->find('list', array('conditions' => $conditions));
-        // update all comment release status that meets the conditions
-        $this->updateAll(
-            array('EvaluationRubric.comment_release' => $releaseStatus, 'EvaluationRubric.modified' => $now, 'EvaluationRubric.updater_id' => $userId),
-            array('EvaluationRubric.id' => $evalRubrIds)
-        );
-        $this->EvaluationRubricDetail->updateAll(
-            array('EvaluationRubricDetail.comment_release' => $releaseStatus, 'EvaluationRubricDetail.modified' => $now, 'EvaluationRubricDetail.updater_id' => $userId),
-            array('EvaluationRubricDetail.evaluation_rubric_id' => $evalRubrIds)
-        );
-    }
-
-
-    /**
      * setAllEventGradeRelease
      *
      * @param bool $eventId       event id
@@ -385,7 +350,7 @@ class EvaluationRubric extends EvaluationResponseBase
         
         // only change release status if the group event is NOT marked as reviewed
         $grpEvents = $this->GroupEvent->find('list', array(
-            'conditions' => array('event_id' => $eventId, 'marked' => 'not reviewed')
+            'conditions' => array('event_id' => $eventId)
         ));
         
         $fields = array('EvaluationRubric.grade_release' => $releaseStatus);
