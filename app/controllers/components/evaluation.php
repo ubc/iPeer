@@ -1093,7 +1093,7 @@ class EvaluationComponent extends Object
             $evalMixevalDetail['EvaluationMixevalDetail']['comment_release'] = $auto_release;
 
             if (in_array($ques['mixeval_question_type_id'], array('1','4'))) {
-                if (empty($data[$num]['selected_lom']) && $data[$num]['selected_lom'] != 0 && $ques['mixeval_question_type_id'] != '4' ) {
+                if (empty($data[$num]['selected_lom']) && $ques['mixeval_question_type_id'] != '4' ) {
                     continue;
                 }
                 if ($ques['mixeval_question_type_id'] == '1') {

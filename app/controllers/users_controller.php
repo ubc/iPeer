@@ -1756,6 +1756,8 @@ class UsersController extends AppController
 
     function showEvents($id)
     {
+        $this->redirect('/');
+
         // check what type the logged in user is
         if(User::hasPermission('functions/superadmin')) {
             $extraId = null;
