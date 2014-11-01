@@ -70,6 +70,14 @@ Runing the tests:
     cake/console/cake -app app testsuite app group system
 
 It is better not to touch the mouse or keyboard during the tests.
+iPeer 3.1.4
+---------------------------
+This is a maintenance release.
+* Increase the script exec time on export action
+* removed disabling edit group buttons when submissions have already
+* added pseudo data for rubric view
+* fixed broken link for adding survey questions when using
+* added individual criterion comments to the rubric csv export
 
 iPeer 3.1.3
 ---------------------------
