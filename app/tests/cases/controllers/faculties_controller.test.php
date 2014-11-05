@@ -74,32 +74,50 @@ class FacultiesControllerTestCase extends ExtendedAuthTestCase {
     }
 
     function testView() {
+        $departments = array (
+            array (
+                'id' => '1',
+                'Name' => 'MECH',
+            ),
+            array (
+                'id' => '2',
+                'Name' => 'APSC',
+            ),
+        );
+        $userfaculty =array (
+            array (
+                'id' => '2',
+                'Username' => 'instructor1',
+                'Full Name' => 'Instructor 1',
+                'Email' => 'instructor1@email',
+                'Role' => 'instructor',
+            ),
+            array (
+                'id' => '3',
+                'Username' => 'instructor2',
+                'Full Name' => 'Instructor 2',
+                'Email' => '',
+                'Role' => 'instructor',
+            ),
+            array (
+                'id' => '4',
+                'Username' => 'instructor3',
+                'Full Name' => 'Instructor 3',
+                'Email' => '',
+                'Role' => 'instructor',
+            ),
+            array (
+                'id' => '34',
+                'Username' => 'admin1',
+                'Full Name' => 'admin1',
+                'Email' => '',
+                'Role' => 'admin',
+            ),
+        );
         $return = $this->testAction('/faculties/view/1', array('return' => 'vars'));
         $this->assertEqual($return['faculty'], 'Applied Science');
-        $this->assertEqual($return['departments'][0]['id'], 1);
-        $this->assertEqual($return['departments'][0]['Name'], 'MECH');
-        $this->assertEqual($return['departments'][1]['id'], 2);
-        $this->assertEqual($return['departments'][1]['Name'], 'APSC');
-        $this->assertEqual($return['userfaculty'][1]['id'], 2);
-        $this->assertEqual($return['userfaculty'][1]['Username'], 'instructor1');
-        $this->assertEqual($return['userfaculty'][1]['Full Name'], 'Instructor 1');
-        $this->assertEqual($return['userfaculty'][1]['Email'], 'instructor1@email');
-        $this->assertEqual($return['userfaculty'][1]['Role'], 'instructor');
-        $this->assertEqual($return['userfaculty'][2]['id'], 3);
-        $this->assertEqual($return['userfaculty'][2]['Username'], 'instructor2');
-        $this->assertEqual($return['userfaculty'][2]['Full Name'], 'Instructor 2');
-        $this->assertEqual($return['userfaculty'][2]['Email'], '');
-        $this->assertEqual($return['userfaculty'][2]['Role'], 'instructor');
-        $this->assertEqual($return['userfaculty'][3]['id'], 4);
-        $this->assertEqual($return['userfaculty'][3]['Username'], 'instructor3');
-        $this->assertEqual($return['userfaculty'][3]['Full Name'], 'Instructor 3');
-        $this->assertEqual($return['userfaculty'][3]['Email'], '');
-        $this->assertEqual($return['userfaculty'][3]['Role'], 'instructor');
-        $this->assertEqual($return['userfaculty'][4]['id'], 34);
-        $this->assertEqual($return['userfaculty'][4]['Username'], 'admin1');
-        $this->assertEqual($return['userfaculty'][4]['Full Name'], 'admin1');
-        $this->assertEqual($return['userfaculty'][4]['Email'], '');
-        $this->assertEqual($return['userfaculty'][4]['Role'], 'admin');
+        $this->assertEqual($return['departments'], $departments);
+        $this->assertEqual($return['userfaculty'], $userfaculty);
     }
 
     function testAdd() {
@@ -107,7 +125,7 @@ class FacultiesControllerTestCase extends ExtendedAuthTestCase {
     }
 
     function testEdit() {
-    
+
     }
 
     function testDelete() {

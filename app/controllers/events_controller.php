@@ -85,7 +85,7 @@ class EventsController extends AppController
             } else {
                 $entry['!Custom']['resultReleased'] = 'Manual';
             }
-            
+
             // group count
             if ($entry['Event']['event_template_type_id'] == 3) {
                 $entry['!Custom']['group_count'] = 'N/A';
@@ -375,9 +375,9 @@ class EventsController extends AppController
                 //Call the setSchedule function to Schedule reminder emails
                 $this->setSchedule($this->Event->id, $this->data);
                 // set release status for group event
-                $groupEvents = $this->GroupEvent->find('list', 
+                $groupEvents = $this->GroupEvent->find('list',
                     array('conditions' => array('event_id'=>$this->Event->id)));
-                if ($this->data['Event']['auto_release']) {
+                if (isset($this->data['Event']['auto_release']) && $this->data['Event']['auto_release']) {
                     $this->Evaluation->setGroupEventsReleaseStatus($groupEvents, 'Auto');
                 } else {
                     $this->Evaluation->setGroupEventsReleaseStatus($groupEvents, 'None');
@@ -483,7 +483,7 @@ class EventsController extends AppController
             $this->redirect('index');
             return;
         }
-        
+
         $orig_email_frequency = $this->calculateFrequency($eventId);
         $this->set('email_schedule', $orig_email_frequency);
         $emailTemp = $this->EmailSchedule->find('first', array(
@@ -512,14 +512,14 @@ class EventsController extends AppController
                 $this->data['Event']['template_id'] =
                     $this->data['Event']['Mixeval'];
             }
-            
+
             // if all groups unselected - delete groupEvents
             if (empty($this->data['Group']['Group'])) {
                 $this->GroupEvent->deleteAll(array('GroupEvent.event_id' => $eventId));
             }
-            
+
             // update submitted evaluations release status if auto-release status has been changed
-            $groupEvents = $this->GroupEvent->find('list', 
+            $groupEvents = $this->GroupEvent->find('list',
                 array('conditions' => array('event_id'=>$eventId)));
             if ($this->data['Event']['auto_release'] != $event['Event']['auto_release']) {
                 $model = null;
@@ -538,7 +538,7 @@ class EventsController extends AppController
                     $this->EvaluationMixeval->setAllEventGradeRelease($eventId, $this->data['Event']['auto_release']);
                     break;
                 }
-                
+
                 if ($this->data['Event']['auto_release']) {
                     $this->Evaluation->setGroupEventsReleaseStatus($groupEvents, 'Auto');
                 } else {
