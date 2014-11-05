@@ -73,6 +73,7 @@ class UpgradeController extends Controller
         $this->set('is_upgradable', $this->Upgrader->isUpgradable());
         $this->set('currentVersion', $sysv);
         $this->set('currentDbVersion', $dbv);
+        $this->set('dbVersion', Configure::read('DATABASE_VERSION'));
     }
 
     /**

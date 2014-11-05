@@ -68,12 +68,14 @@ class UpgradeBase
     public function upgrade() {
         if ($this->up()) {
             $sysparameter = ClassRegistry::init('SysParameter');
-            $sysparameter->setValue('system.version', $this->toVersion);
             // note that upgrade_300 will run this but it won't do anything
             // because there's no pre-existing database.version entry,
             // upgrade_310 should properly add this back
             $sysparameter->setValue('database.version', $this->dbVersion);
-            $sysparameter->setValue('system.absolute_url', Router::url('/', true));
+            if (!$sysparameter->get('system.absolute_url')) {
+                $sysparameter->setValue('system.absolute_url', Router::url('/', true));
+            }
+            $this->refreshCache();
         } else {
             return false;
         }
@@ -213,5 +215,18 @@ class UpgradeBase
         mysql_query('UPDATE `sys_parameters` SET `parameter_value` = '.$this->dbVersion.' Where `parameter_code` = "database.version";');
         mysql_query("COMMIT");
         return false;
+    }
+
+    /**
+     * refreshCache
+     *
+     * @access protected
+     * @return void
+     */
+    protected function refreshCache()
+    {
+        // refresh cache directory
+        exec('rm -rf '.dirname(__FILE__).'/../../../app/tmp/cache/cake*');
+        exec('rm -rf '.dirname(__FILE__).'/../../../app/tmp/persistent/cake*');
     }
 }

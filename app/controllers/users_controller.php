@@ -133,7 +133,7 @@ class UsersController extends AppController
         );
 
         $extraFilters = array('User.record_status' => 'A');
-        if (User::hasPermission('controllers/departments')) {
+        if (User::hasPermission('controllers/departments') && !User::hasPermission('functions/superadmin')) {
             // faculty admins, filter out the admins and instructors from other department/faculty
             // stupid cakephp doesn't support double habtm query. So using raw query
             $conditions = array();
@@ -145,6 +145,11 @@ class UsersController extends AppController
             $query = "SELECT User.id FROM `users` AS `User` LEFT JOIN `user_faculties` AS `UserFaculty` ON (`UserFaculty`.`user_id` = `User`.`id`) LEFT JOIN `faculties` AS `Faculty` ON (`Faculty`.`id` = `UserFaculty`.`faculty_id`) INNER JOIN `roles_users` AS `RolesUser` ON (`RolesUser`.`user_id` = `User`.`id`) INNER JOIN `roles` AS `Role` ON (`Role`.`id` = `RolesUser`.`role_id`) WHERE ";
             foreach ($viewableRoles as $id => $role) {
                 if ($role == 'admin' || $role == 'instructor') {
+                	// in the case of admins that are not in any faculties
+                	// empty facultyIds array will cause sql error
+                	if (empty($facultyIds)) {
+                		continue;
+                	}
                     $conditions[] = 'Role.id = '.$id.' AND Faculty.id IN ('.join(',', $facultyIds).')';
                 } else {
                     $conditions[] = 'Role.id = '.$id;
@@ -1751,6 +1756,8 @@ class UsersController extends AppController
 
     function showEvents($id)
     {
+        $this->redirect('/');
+
         // check what type the logged in user is
         if(User::hasPermission('functions/superadmin')) {
             $extraId = null;

@@ -122,9 +122,11 @@ class EvaluationsController extends AppController
             array("not reviewed" => __("Not Reviewed", true), "to review" => "To Review",
             "reviewed" => __("Reviewed", true))),
             array("GroupEvent.grade_release_status",__("Grade", true), "7em",   "map",
-            array("None" => __("Not Released", true), "Some" => __("Some Released", true), "All" => __("Released", true))),
+            array("None" => __("Not Released", true), "Some" => __("Some Released", true), 
+                "Auto" => __("Auto-Release", true), "All" => __("Released", true))),
             array("GroupEvent.comment_release_status", __("Comment", true), "7em",   "map",
-            array("None" => __("Not Released", true), "Some" => __("Some Released", true), "All" => __("Released", true))),
+            array("None" => __("Not Released", true), "Some" => __("Some Released", true), 
+                "Auto" => __("Auto-Release", true), "All" => __("Released", true))),
 
             // Extra info about course and Event
             array("Event.id", "", "", "hidden"),
@@ -881,10 +883,10 @@ class EvaluationsController extends AppController
         $evaluators = $this->GroupsMembers->findAllByGroupId($groupId);
         $evaluators = Set::extract('/GroupsMembers/user_id', $evaluators);
 
-        $studentId = $this->params['form']['student_id'];
+        /*$studentId = $this->params['form']['student_id'];
         if (!empty($studentId)) {
             $evaluator = $studentId;
-        }
+        }*/
         $groupEventId = $this->params['form']['group_event_id'];
         //Get the target group event
         $groupEvent = $this->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
@@ -1652,7 +1654,7 @@ class EvaluationsController extends AppController
             break;
 
         case "2":
-            $grpEventId = $this->params['form']['group_event_id'];
+            $grpEvents = array($this->params['form']['group_event_id']);
             $eventId = $grpEvent['GroupEvent']['event_id'];
             $groupId = $grpEvent['GroupEvent']['group_id'];
             switch ($this->params['form']['submit']) {
@@ -1661,48 +1663,50 @@ class EvaluationsController extends AppController
                 break;
             case "Release Comments":
                 $evaluateee = $this->params['form']['evaluatee'];
-                $this->Evaluation->changeRubricEvalCommentRelease(1, $grpEventId, $evaluateee);
+                $this->Evaluation->changeRubricEvalCommentRelease(1, $grpEvents, $evaluateee);
                 break;
             case "Unrelease Comments":
                 $evaluateee = $this->params['form']['evaluatee'];
-                $this->Evaluation->changeRubricEvalCommentRelease(0, $grpEventId, $evaluateee);
+                $this->Evaluation->changeRubricEvalCommentRelease(0, $grpEvents, $evaluateee);
                 break;
             case "Release All Comments":
-                $this->Evaluation->changeRubricEvalCommentRelease(1, $grpEventId);
+                $this->Evaluation->changeRubricEvalCommentRelease(1, $grpEvents);
                 break;
             case "Unrelease All Comments":
-                $this->Evaluation->changeRubricEvalCommentRelease(0, $grpEventId);
+                $this->Evaluation->changeRubricEvalCommentRelease(0, $grpEvents);
                 break;
             }
             // mark group event as reviewed when all evaluations have been looked at by an instructor
-            $this->Evaluation->markRubricEvalReviewed($eventId, $grpEventId);
+            $this->Evaluation->markRubricEvalReviewed($eventId, $grpEvents[0]);
             $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
             break;
 
         case "4":
             $groupId = $grpEvent['GroupEvent']['group_id'];
             $eventId = $grpEvent['GroupEvent']['event_id'];
-            $groupEventId = $this->params['form']['group_event_id'];
+            $groupEvents = array($this->params['form']['group_event_id']);
             switch($this->params['form']['submit']) {
             case "Save Changes":
                 $this->Evaluation->changeIndivMixedEvalCommentRelease($this->params['form']);
                 break;
             case "Release Comments":
                 $evaluateeId = $this->params['form']['evaluatee'];
-                $this->Evaluation->changeMixedEvalCommentRelease(1, $groupEventId, $evaluateeId);
+                $this->Evaluation->changeMixedEvalCommentRelease(1, $groupEvents, $evaluateeId);
                 break;
             case "Unrelease Comments":
                 $evaluateeId = $this->params['form']['evaluatee'];
-                $this->Evaluation->changeMixedEvalCommentRelease(0, $groupEventId, $evaluateeId);
+                $this->Evaluation->changeMixedEvalCommentRelease(0, $groupEvents, $evaluateeId);
                 break;
             case "Release All Comments":
-                $this->Evaluation->changeMixedEvalCommentRelease(1, $groupEventId);
+                $this->Evaluation->changeMixedEvalCommentRelease(1, $groupEvents);
                 break;
             case "Unrelease All Comments":
-                $this->Evaluation->changeMixedEvalcommentRelease(0, $groupEventId);
+                $this->Evaluation->changeMixedEvalcommentRelease(0, $groupEvents);
                 break;
             }
-            $this->Evaluation->markMixedEvalReviewed($eventId, $groupEventId);
+            // TODO: change this
+            $this->Evaluation->markMixedEvalReviewed($eventId, $groupEvents[0]);
+            //$this->Evaluation->markMixedEvalReviewed($eventId, $groupEventId);
             $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
             break;
         }
@@ -1734,24 +1738,25 @@ class EvaluationsController extends AppController
         $event = $this->Event->read();
 
         $groupEventList = $this->GroupEvent->getGroupListByEventId($eventId);
+        $groupEvents = Set::extract('/GroupEvent/id', $groupEventList);
         switch ($event['Event']['event_template_type_id']) {
         case 1://simple
             $this->EvaluationSimple->setAllEventCommentRelease($eventId, $this->Auth->user('id'), $releaseStatus);
-            foreach ($groupEventList as $groupEvent) {
-                $this->Evaluation->markSimpleEvalReviewed($eventId, $groupEvent['GroupEvent']['id']);
+            foreach ($groupEvents as $groupEventId) {
+                $this->Evaluation->markSimpleEvalReviewed($eventId, $groupEventId);
             }
             break;
         case 2://rubric
-            $this->EvaluationRubric->setAllEventCommentRelease($eventId, $this->Auth->user('id'), $releaseStatus);
+            $this->Evaluation->changeRubricEvalCommentRelease($releaseStatus, $groupEvents);
             //Update all groupEvent's comment release status
-            foreach ($groupEventList as $groupEvent) {
-                $this->Evaluation->markRubricEvalReviewed($eventId, $groupEvent['GroupEvent']['id']);
+            foreach ($groupEvents as $groupEventId) {
+                $this->Evaluation->markRubricEvalReviewed($eventId, $groupEventId);
             }
             break;
         case 4://mixed
-            $this->EvaluationMixeval->setAllEventCommentRelease($eventId, $this->Auth->user('id'), $releaseStatus);
-            foreach ($groupEventList as $groupEvent) {
-                $this->Evaluation->markMixedEvalReviewed($eventId, $groupEvent['GroupEvent']['id']);
+            $this->Evaluation->changeMixedEvalCommentRelease($releaseStatus, $groupEvents);
+            foreach ($groupEvents as $groupEventId) {
+                $this->Evaluation->markMixedEvalReviewed($eventId, $groupEventId);
             }
             break;
         default:

@@ -206,6 +206,9 @@ class addEventTestCase extends SystemBaseTestCase
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'unselectAll')->click();
 
+        $warning = $this->session->switch_to_alert();
+        $warning->accept();
+
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $w->until(

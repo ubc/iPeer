@@ -108,7 +108,7 @@ class AppController extends Controller
                 return;
             }
 
-            $this->_checkDatabaseVersion();
+            $this->_checkSystemVersion();
         }
 
         // for setting up google analytics
@@ -128,15 +128,14 @@ class AppController extends Controller
      * @access public
      * @return void
      */
-    public function _checkDatabaseVersion()
+    public function _checkSystemVersion()
     {
-        $dbv = $this->SysParameter->getDatabaseVersion();
+        $sysv = $this->SysParameter->get('system.version');
 
-        if (User::hasPermission('controllers/upgrade') &&
-            Configure::read('DATABASE_VERSION') > $dbv) {
-            $flashMessage  = "Your database version is older than the current version. ";
-            $flashMessage .= "Please do the <a href=" . $this->webroot ."upgrade" .">upgrade</a>.";
-            $this->Session->setFlash($flashMessage);
+        if (User::hasPermission('controllers/upgrade') && $sysv < IPEER_VERSION) {
+        	$flashMessage = "Your system version is older than the current version. ";
+        	$flashMessage .= "Please do the <a href=" . $this->webroot ."upgrade" .">upgrade</a>.";
+        	$this->Session->setFlash($flashMessage);
         }
     }
 

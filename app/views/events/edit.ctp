@@ -1,8 +1,33 @@
+<script type="text/javascript">
+function checkGroups() {
+    <?php
+        $groupIds = array_keys($groups);
+    ?>
+    var oldGroups = [<?php echo implode(',', $groupIds) ?>];
+    var newGroups = jQuery('#GroupGroup').val();
+    var grpRemoved = false;
+    for (i = 0; i < oldGroups.length; i++) {
+        if(jQuery.inArray(oldGroups[i].toString(), newGroups) < 0) {
+            // not in newGroups
+            grpRemoved = true;
+            break;
+        }
+    }
+    var warningMsg = "You have removed one or more groups from the event. " +
+        "If there are submissions made within the groups, they would be permanently deleted. " +
+        "Are you sure you want to remove the groups?";
+    if(!grpRemoved || confirm(warningMsg)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+</script>
 <div id='Events'>
 
 <?php
 $html->script("jquery-ui-timepicker-addon", array("inline"=>false));
-echo $this->Form->create('Event', array('action' => "edit"));
+echo $this->Form->create('Event', array('action' => "edit", "onsubmit" => "return checkGroups()"));
 echo '<input type="hidden" name="required" id="required" value="eventId" />';
 echo $this->Form->input('id');
 ?>
@@ -175,6 +200,7 @@ echo '<a class="addPenaltyButton"
 echo "</div>";
 
 echo $this->Form->submit();
+echo '<input type="hidden" name="data[formLoaded]" id="formLoaded" value="loaded" />';
 echo $this->Form->end();
 
 // Removed for enhancement #516 - "Allow duplicate event title"

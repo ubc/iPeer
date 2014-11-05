@@ -201,18 +201,6 @@ class EvaluationRubricTestCase extends CakeTestCase
         $this->assertFalse($result);
     }
 
-    function testSetAllEventCommentRelease()
-    {
-
-        $this->EvaluationRubric->setAllEventCommentRelease(2, 1, 1);
-        $result = $this->EvaluationRubric->getTeamReleaseStatus(3);
-        $this->assertEqual($result[1]['EvaluationRubric']['comment_release'], 1);
-
-        $this->EvaluationRubric->setAllEventCommentRelease(999, 1, 1);
-        $result = $this->EvaluationRubric->getTeamReleaseStatus(999);
-        $this->assertFalse($result);
-    }
-
     function testSetAllEventGradeRelease()
     {
 
