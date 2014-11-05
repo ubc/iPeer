@@ -83,11 +83,11 @@ class EventsControllerTest extends ExtendedAuthTestCase {
     function testIndex() {
         $result = $this->testAction('/events/index', array('return' => 'vars'));
 
-        $this->assertEqual(count($result["paramsForList"]['data']['entries']), 
+        $this->assertEqual(count($result["paramsForList"]['data']['entries']),
             17);
         $this->assertEqual(sort(Set::extract($result["paramsForList"]['data']['entries'], '/Event/id')), array(1,2,3,6));
         $events = Set::sort($result["paramsForList"]['data']['entries'], '{n}.Event.id', 'asc');
-        
+
         $this->assertEqual($events[0]['Event']['Title'], 'Term 1 Evaluation');
         $this->assertEqual($events[0]['Event']['event_template_type_id'], 1);
         $this->assertEqual($events[0]['Course']['course'], 'MECH 328');
@@ -268,6 +268,7 @@ class EventsControllerTest extends ExtendedAuthTestCase {
 
     function testEditWithData() {
         $data = array(
+            'formLoaded' => true,
             'Event' => array(
                 'id' => 8,
                 'title' => 'simple evaluation 4a',
@@ -295,6 +296,10 @@ class EventsControllerTest extends ExtendedAuthTestCase {
             '/events/edit/8',
             array('fixturize' => true, 'data' => $data, 'method' => 'post')
         );
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Edit event successful!');
+
         $model = ClassRegistry::init('Event');
         $event = $model->find('first', array( 'conditions' => array('id' => $data['Event']['id']), 'contain' => array('Group', 'GroupEvent', 'EvaluationSubmission')));
         unset($data['Event']['SimpleEvaluation'], $data['Event']['email_schedule'], $data['Event']['EmailTemplate']);
@@ -311,9 +316,6 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         // make sure the GroupEvent id is not shifted
         $submissions = Set::sort($event['EvaluationSubmission'], '{n}.id', 'asc');
         $this->assertEqual($submissions[0]['id'], 11);
-
-        $message = $this->controller->Session->read('Message.flash');
-        $this->assertEqual($message['message'], 'Edit event successful!');
     }
 
     function testEditOthersEvent() {
