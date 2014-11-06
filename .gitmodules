@@ -30,7 +30,7 @@
 	url = https://github.com/thias/puppet-php.git
 [submodule "nginx"]
 	path = puppet/modules/nginx
-	url = https://github.com/ubc/puppet-nginx.git
+	url = https://github.com/jfryman/puppet-nginx.git
 [submodule "concat"]
 	path = puppet/modules/concat
 	url = https://github.com/puppetlabs/puppetlabs-concat.git

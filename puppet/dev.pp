@@ -1,8 +1,18 @@
 include epel
 include ipeer::web
-include ipeer::db
 include ipeer::test
 include git
+
+class {'ipeer::db':
+    databases => {
+        'ipeer' => {
+            user => 'ipeer',
+            password => 'ipeer',
+            host => 'localhost',
+            grant => ['ALL'],
+        }
+    }
+}
 
 ipeer::instance { ipeerdev :
     server_domain => "localhost",
@@ -24,11 +34,6 @@ if ! defined(Mysql::Db["ipeer_test"]) {
         },
         grant => ['ALL'],
     }
-}
-
-file { "/etc/nginx/conf.d/default.conf" :
-    ensure => absent,
-    notify => Service["nginx"]
 }
 
 cron { sendemails:
