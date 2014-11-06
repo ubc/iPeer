@@ -12,10 +12,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Every Vagrant virtual environment requires a box to build off of.
   config.vm.box = "ipeerbox"
 
-  config.vm.box_url = "http://developer.nrel.gov/downloads/vagrant-boxes/CentOS-6.4-x86_64-v20130731.box"
+  config.vm.box_url = "puppetlabs/centos-6.5-64-puppet"
 
   config.vm.define "ipeerdev" do |t|
   end
+
+  config.vm.hostname = "ipeer3.dev"
 
   config.vm.provision "puppet" do |puppet|
         puppet.manifests_path = "puppet"
