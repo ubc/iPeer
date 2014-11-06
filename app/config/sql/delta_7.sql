@@ -527,3 +527,6 @@ INSERT INTO `email_merges` (`id`, `key`, `value`, `table_name`, `field_name`, `c
 -- Update database version, done as the very last operation as a sign that
 -- the update went well.
 UPDATE `sys_parameters` SET `parameter_value` = '7' WHERE `parameter_code` = 'database.version';
+
+-- Update system version, Insert if not exists
+INSERT INTO `sys_parameters` (`parameter_code`, `parameter_value`, `parameter_type`) VALUES ('system.version', '3.1.4', 'S') ON DUPLICATE KEY UPDATE parameter_value='3.1.4';
