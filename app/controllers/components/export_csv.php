@@ -379,4 +379,44 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         }
         fclose($resource);
     }
+    
+    /**
+     * exportCSV
+     *
+     * Used for generic CSV file export
+     *
+     * @param Array $rows array of rows
+     * @param String $filename data name (with or without csv)
+     *
+     * @access public
+     * @return boolean (success or failure)
+     */
+    function exportCSV($rows, $filename=false)
+    {
+        if (!empty($rows))
+        {
+            if($filename !== false) {
+                $name = (strpos($filename, '.csv') === false) ? $filename . ".csv" : $filename;
+            } else {
+                $name =  "export.csv";
+            }
+            // Set the HTTP headers
+            header('Content-Type: application/csv');
+            header('Content-Disposition: attachment; filename=' . $name);
+
+            # Start the ouput
+            $output = fopen('php://output', 'w');
+            
+            # Then loop through the rows
+            foreach($rows as $row)
+            {
+                # Add the rows to the body
+                fputcsv($output, $row);
+            }
+            
+            return true;
+        }
+        
+        return false;
+    }
 }

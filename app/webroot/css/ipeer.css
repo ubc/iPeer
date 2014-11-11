@@ -1949,3 +1949,46 @@ form div.help-text {
     background-color: transparent;
 }
 
+/* Event Export/Import */
+
+#portEvent .text label, #portEvent .select label,
+#portEvent .checkbox label {
+    width: 18em;
+}
+
+#portEvent .text input {
+    width: 20em;
+}
+
+#portEvent ul li {
+    list-style-type: circle;
+    list-style-position: inside;
+    margin: 0.5em;
+}
+
+#portEvent div.help-text {
+    margin-left: 24em;
+}
+
+#portEvent table.groupslist {
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #666666;
+	border-collapse: collapse;
+}
+#portEvent .groupslist th {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #dedede;
+}
+#portEvent .groupslist td {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #ffffff;
+}

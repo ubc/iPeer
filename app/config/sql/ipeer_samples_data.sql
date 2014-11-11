@@ -367,7 +367,9 @@ INSERT INTO acos (id, parent_id, model, foreign_key, alias, lft, rght) VALUES
 (329,300,NULL,NULL,'superadmin',656,657),
 (330,300,NULL,NULL,'coursemanager',658,659),
 (331,300,NULL,NULL,'viewusername',660,661),
-(332,300,NULL,NULL,'submitstudenteval',662,663);
+(332,300,NULL,NULL,'submitstudenteval',662,663),
+(333,84,NULL,NULL,'export',193,194),
+(334,84,NULL,NULL,'import',195,196);
 
 -- --------------------------------------------------------
 
