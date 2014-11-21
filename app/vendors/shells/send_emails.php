@@ -108,8 +108,11 @@ class SendEmailsShell extends Shell
                     $tables[$table['table_name']][$table['field_name']] = '/'.$match[0].'/';
                 }
             }
-            // email content after merging common data
-            $content = preg_replace($patterns, $replacements, $e['content']);
+	    // email content after merging common data, common data is non-user
+	    // specific data such as course name and such. User specific data
+	    // is merged in each individual email in the following loop using
+	    // doMerge.
+            $contentWithCommonData = preg_replace($patterns, $replacements, $e['content']);
 
             $emailList = $this->User->getEmails(explode(';', $filter_email_list));
             foreach ($emailList as $to_id => $to) {
@@ -121,7 +124,7 @@ class SendEmailsShell extends Shell
                 $subject = $e['subject'];
                 if (!empty($tables)) {
                     // merge data not in common data
-                    $content = $this->doMerge($content, EmailMerge::MERGE_START, EmailMerge::MERGE_END, $tables, $to_id);
+                    $content = $this->doMerge($contentWithCommonData, EmailMerge::MERGE_START, EmailMerge::MERGE_END, $tables, $to_id);
                 }
                 if ($this->sendEmail($content, $subject, $from, $to)) {
                     $successCount++;
