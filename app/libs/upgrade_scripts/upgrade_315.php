@@ -1,7 +1,7 @@
 <?php
 require_once('upgrade_base.php');
 /**
- * Upgrade314
+ * Upgrade315
  *
  * @uses UpgradeBase
  * @package   CTLT.iPeer
@@ -10,7 +10,7 @@ require_once('upgrade_base.php');
  * @license   PHP Version 3.0 {@link http://www.php.net/license/3_0.txt}
  * @version   Release: 3.1
  */
-class Upgrade314 extends UpgradeBase
+ class Upgrade315 extends UpgradeBase
 {
 	/**
 	 * __construct
@@ -20,8 +20,8 @@ class Upgrade314 extends UpgradeBase
 	 */
 	public function __construct()
 	{
-		$this->fromVersions = array(null, '3.1.0', '3.1.1', '3.1.2', '3.1.3');
-		$this->toVersion = '3.1.4';
+		$this->fromVersions = array(null, '3.1.4');
+		$this->toVersion = '3.1.5';
 		$this->dbVersion = Configure::read('DATABASE_VERSION');
 	}
 	
