@@ -70,6 +70,24 @@ Runing the tests:
     cake/console/cake -app app testsuite app group system
 
 It is better not to touch the mouse or keyboard during the tests.
+iPeer 3.1.5
+---------------------------
+This is a maintenance release.
+* Fixed emails templates filling in wrong names.
+* Fixed bug where empty ipeer evaluation reminder emails were sent
+* Added system.version parameter to delta7
+* Updated vagrant and puppet modules
+* Fixed missing formLoaded parameter in event editing
+* Fixed the failed test and update version in sample data
+* Moved delta 5 into delta 4 and remove sql mode in 6
+* Fixed some bugs && temporarily removed show student events
+* Fixed releasing comments for student view of evaluation results
+* Added commands to refresh the cache directory into the upgrade script
+* Implemented some validations to event edit
+* Fixed super admins unable to view all instructors and faculty admins
+* Created upgrade script to version 3.1.4
+* Fixed events add/edit event forms
+
 iPeer 3.1.4
 ---------------------------
 This is a maintenance release.
