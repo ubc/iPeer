@@ -57,7 +57,7 @@ class EmailTemplateTestCase extends CakeTestCase
             '2' => 'Email template example',
             '3' => 'Email template example2',
             '4' => 'Email template example3',
-            '5' => 'Evaluation Reminder Template'
+            '5' => 'Evaluation Reminder Template',
             '1' => 'Submission Confirmation')
         );
 
