@@ -1,7 +1,7 @@
 <?php
 $gradeReleased = array_product(Set::extract($evalResult[User::get('id')], '/EvaluationMixeval/grade_release')) ||
     $event['Event']['auto_release'];
-$commentReleased = array_product(Set::extract($evalResult[User::get('id')], '/EvaluationMixeval/comment_release')) ||
+$commentReleased = array_sum(Set::extract($evalResult[User::get('id')], '/EvaluationMixevalDetail/comment_release')) ||
     $event['Event']['auto_release'];
 ?>
 <!-- Render Event Info table -->
