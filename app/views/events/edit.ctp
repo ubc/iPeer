@@ -1,9 +1,5 @@
 <script type="text/javascript">
 function checkGroups() {
-    <?php
-        $groupIds = array_keys($groups);
-    ?>
-    var oldGroups = [<?php echo implode(',', $groupIds) ?>];
     var newGroups = jQuery('#GroupGroup').val();
     var grpRemoved = false;
     for (i = 0; i < oldGroups.length; i++) {
@@ -245,6 +241,8 @@ jQuery("#unselectAll").click(function() {
 });
 // keep track of the number of penalties entered.
 var penaltyCount = <?php echo $numPenalties; ?>;
+// save the current selected groups
+var oldGroups = jQuery('#GroupGroup').val();
 
 function initDateTime() {
     var format = { dateFormat: 'yy-mm-dd', timeFormat: 'hh:mm:ss' }
