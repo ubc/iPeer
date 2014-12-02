@@ -333,27 +333,52 @@ class V1Controller extends Controller {
         } else if ($this->RequestHandler->isPost()) {
             $input = $this->body;
             $decode = json_decode($input, true);
-            // adding one user
+            // adding one user !!!
             if (isset($decode['username'])) {
-                $role = array('Role' => array('RolesUser' => array('role_id' => $decode['role_id'])));
-                unset($decode['role_id']);
-                // do some clean up before we insert the values
-                array_walk($decode, create_function('&$val', '$val = trim($val);'));
-                $user = array('User' => $decode);
-                $user = $user + $role;
 
-                // does not save role in RolesUser - need to fix
-                if ($this->User->save($user)) {
-                    $user = $this->User->read(array('id','username','last_name','first_name'));
-                    $role = $this->RolesUser->read('role_id');
-                    $combine = $user['User'] + array('role_id' => $role['RolesUser']['role_id']);
-                    $statusCode = 'HTTP/1.1 201 Created';
-                    $body = $combine;
-                } else {
-                    $statusCode = 'HTTP/1.1 500 Internal Server Error';
-                    $body = null;
+                // Connect role_id
+                $ctRole = $decode['role_id'];
+
+                // If Connect user does not have id, role does not exist (i.e. user does not exist)
+                if (!$decode['id']) {
+                    // add new user in iPeer to current course ???
+                    $course = $this->Course->find('first', array('conditions' => array('id' => $id), 'fields' => array('id', 'course', 'title', 'student_count'),));
+                    $this->User->add($course);
+                    // How can we store new user ID to Connect?
                 }
-            // adding multiple users from import (expected input: array)
+
+                // Queries role_id stored in iPeer
+                $theRole = $this->RolesUser->find('first', array('conditions' => array('user_id' => $decode['id']), 'fields' => 'role_id'));
+                // iPeer role_id set to student by default ???
+                $iprRole = 5;
+                if ($theRole['RolesUser']['role_id']) {
+                    $iprRole = $theRole['RolesUser']['role_id'];  // Cake: list model then attribute
+                }
+
+                // Overwrite role if Connect permission level higher
+                if ($ctRole < $iprRole) {
+                    // prepare to set user's role in iPeer
+                    $role = array('Role' => array('RolesUser' => array('role_id' => $decode['role_id'])));
+                    unset($decode['role_id']);
+                    // do some clean up before we insert the values
+                    array_walk($decode, create_function('&$val', '$val = trim($val);'));
+                    $user = array('User' => $decode);
+                    $user = $user + $role;
+
+                    // does not save role in RolesUser - need to fix
+                    if ($this->User->save($user)) {
+                        $user = $this->User->read(array('id','username','last_name','first_name'));
+                        $role = $this->RolesUser->read('role_id');
+                        $combine = $user['User'] + array('role_id' => $role['RolesUser']['role_id']);
+                        $statusCode = 'HTTP/1.1 201 Created';
+                        $body = $combine;
+                    } else {
+                        $statusCode = 'HTTP/1.1 500 Internal Server Error';
+                        $body = null;
+                    }
+                }
+
+            // adding multiple users from import (expected input: array) !!!
             } else if (isset($decode['0'])) {
                 $data = array();
                 // rearrange the data
@@ -427,15 +452,34 @@ class V1Controller extends Controller {
                 $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
                 $this->set('result', null);
             }
-        // update
+        // update iPeer role_id to lowest of two role_id
         } else if ($this->RequestHandler->isPut()) {
             $edit = $this->body;
-            $decode = json_decode($edit, true);
+            $decode = json_decode($edit, true);  // array of values from Connect
             // at the moment each user only has one role
-            $role = array('Role' => array('RolesUser' => array('role_id' => $decode['role_id'])));
+
+            // Connect role_id
+            $ctRole = $decode['role_id'];
+
+            // iPeer role_id
+            $role = $this->RolesUser->find('first', array('conditions' => array('user_id' => $decode['id']), 'fields' => 'role_id'));
+            $iprRole = $role['RolesUser']['role_id'];  // Cake: list model then attribute
+
+            $test = $iprRole;
+            if ($ctRole < $iprRole) {
+                $test = $ctRole;
+            }
+            $role = array('Role' => array('RolesUser' => array('role_id' => $test)));
             unset($decode['role_id']);
             $user = array('User' => $decode);
             $user = $user + $role;
+
+            // Original lines at 435+
+//            $role = array('Role' => array('RolesUser' => array('role_id' => $decode['role_id'])));
+//            unset($decode['role_id']);
+//            $user = array('User' => $decode);
+//            $user = $user + $role;
+
             // does not save role in RolesUser - need to fix
             if ($this->User->save($user)) {
                 $user = $this->User->read(array('id','username','last_name','first_name'));
