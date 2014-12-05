@@ -283,7 +283,22 @@ class V1ControllerTest extends CakeTestCase {
         $expectedPersonAgain = array('id' => $userIdAgain, 'username' => 's5s5s5s5', 'last_name' => 'Same', 'first_name' => 'Sally', 'role_id' => 3);
         $this->assertEqual($userAgain, $expectedPersonAgain);
 
-        // add user whose role_id will change
+        // add user whose role_id will not change: external role_id > saved role_id
+        $newUserSameL = array('username' => 's0s0s0s0', 'first_name' => 'Also', 'last_name' => 'Same', 'role_id' => 1);
+        $fileSameL = $this->_oauthReq($url, json_encode($newUserSameL), OAUTH_HTTP_METHOD_POST);
+        $userSameL  = json_decode($fileSameL, true);
+        $userIdSameL = $userSameL['id'];
+        $expectedPersonSameL = array('id' => $userIdSameL, 'username' => 's0s0s0s0', 'last_name' => 'Same', 'first_name' => 'Also', 'role_id' => 1);
+        $this->assertEqual($userSameL, $expectedPersonSameL);
+        // add same user again, with higher role_id and id included
+        $newUserAgainL = array('id' => $userIdSameL, 'username' => 's0s0s0s0', 'first_name' => 'Also', 'last_name' => 'Same', 'role_id' => 3);
+        $fileAgainL = $this->_oauthReq($url, json_encode($newUserAgainL), OAUTH_HTTP_METHOD_POST);
+        $userAgainL = json_decode($fileAgainL, true);
+        $userIdAgainL = $userAgainL['id'];
+        $expectedPersonAgainL = array('id' => $userIdAgainL, 'username' => 's0s0s0s0', 'last_name' => 'Same', 'first_name' => 'Also', 'role_id' => 1);
+        $this->assertEqual($userAgainL, $expectedPersonAgainL);
+
+        // add user whose role_id will change: external role_id < saved role_id
         $newUserBefore = array('username' => 'b8b8b8b8', 'first_name' => 'Shifty', 'last_name' => 'Guy', 'role_id' => 5);
         $fileBefore = $this->_oauthReq($url, json_encode($newUserBefore), OAUTH_HTTP_METHOD_POST);
         $userBefore  = json_decode($fileBefore, true);
@@ -329,7 +344,6 @@ class V1ControllerTest extends CakeTestCase {
         foreach ($newUsersSame as $key => $nu) {
             $expectedUsersSame[] = array('id' => $usersSame[$key]['id']) + $nu;
         }
-//        $importUserIdSame = $expectedUsersSame['1']['id'];    // !!! is this used by Delete test?
         $this->assertEqual($usersSame, $expectedUsersSame);
 
         // add users again with same role_id and id included (since values will exist)
@@ -348,10 +362,38 @@ class V1ControllerTest extends CakeTestCase {
         foreach ($newUsersAgain as $key => $nu) {
             $expectedUsersAgain[] = array('id' => $usersAgain[$key]['id']) + $nu;
         }
-//        $importUserIdAgain = $expectedUsersAgain['1']['id'];    // !!! is this used by Delete test?
         $this->assertEqual($usersAgain, $expectedUsersAgain);
 
-        // add two users whose roles will both change
+        // add two users whose roles will not change: external role_id > saved role_id
+        $newUsersSameL = array(
+            array('username' => 'aaaa1111', 'first_name' => 'Alex', 'last_name' => 'G', 'role_id' => 1),
+            array('username' => 'bbbb2222', 'first_name' => 'Tammy', 'last_name' => 'B', 'role_id' => 1)
+        );
+        $fileSameL = $this->_oauthReq($url, json_encode($newUsersSameL), OAUTH_HTTP_METHOD_POST);
+        $usersSameL = json_decode($fileSameL, true);
+        usort($usersSameL, 'compare');
+        $expectedUsersSameL = array();
+        foreach ($newUsersSameL as $key => $nu) {
+            $expectedUsersSameL[] = array('id' => $usersSameL[$key]['id']) + $nu;
+        }
+        $this->assertEqual($usersSameL, $expectedUsersSameL);
+
+        // add users again with same role_id and id included (since values will exist) !!!
+        $usersIdsSameL = array();
+        foreach ($usersSameL as $person) {
+            $usersIdsSameL[] = $person['id'];
+        }
+        $newUsersAgainL = array(
+            array('id' =>  $usersIdsSameL[0], 'username' => 'aaaa1111', 'first_name' => 'Alex', 'last_name' => 'G', 'role_id' => 3),
+            array('id' =>  $usersIdsSameL[1], 'username' => 'bbbb2222', 'first_name' => 'Tammy', 'last_name' => 'B', 'role_id' => 3)
+        );
+        $fileAgainL = $this->_oauthReq($url, json_encode($newUsersAgainL), OAUTH_HTTP_METHOD_POST);
+        $usersAgainL = json_decode($fileAgainL, true);
+        usort($usersAgainL, 'compare');
+        // returned users should be same as original saved users with lower role_id
+        $this->assertEqual($usersAgainL, $expectedUsersSameL);
+
+        // add two users whose roles will both change: external role_id < saved role_id
         $newUsersBefore = array(
             array('username' => 'a4a4a4a4', 'first_name' => 'Shifty', 'last_name' => 'Guy', 'role_id' => 5),
             array('username' => 'c2c2c2c2', 'first_name' => 'Shifty', 'last_name' => 'Gal', 'role_id' => 3)
@@ -363,7 +405,6 @@ class V1ControllerTest extends CakeTestCase {
         foreach ($newUsersBefore as $key => $nu) {
             $expectedUsersBefore[] = array('id' => $usersBefore[$key]['id']) + $nu;
         }
-//        $importUserIdBefore = $expectedUsersBefore['1']['id'];    // !!! is this used by Delete test?
         $this->assertEqual($usersBefore, $expectedUsersBefore);
 
         // add users again with same role_id and id included (since values will exist)
@@ -382,7 +423,6 @@ class V1ControllerTest extends CakeTestCase {
         foreach ($newUsersAfter as $key => $nu) {
             $expectedUsersAfter[] = array('id' => $usersAfter[$key]['id']) + $nu;
         }
-//        $importUserIdAfter = $expectedUsersAfter['1']['id'];    // !!! is this used by Delete test?
         $this->assertEqual($usersAfter, $expectedUsersAfter);
 
         // add two users, only one of their roles will change
@@ -397,7 +437,6 @@ class V1ControllerTest extends CakeTestCase {
         foreach ($newUsersBefore as $key => $nu) {
             $expectedUsersBefore[] = array('id' => $usersBefore[$key]['id']) + $nu;
         }
-//        $importUserIdBefore = $expectedUsersBefore['1']['id'];    // !!! is this used by Delete test?
         $this->assertEqual($usersBefore, $expectedUsersBefore);
 
         // add users again with same role_id and id included (since values will exist)
@@ -416,9 +455,7 @@ class V1ControllerTest extends CakeTestCase {
         foreach ($newUsersAfter as $key => $nu) {
             $expectedUsersAfter[] = array('id' => $usersAfter[$key]['id']) + $nu;
         }
-//        $importUserIdAfter = $expectedUsersAfter['1']['id'];    // !!! is this used by Delete test?
         $this->assertEqual($usersAfter, $expectedUsersAfter);
-
 
         // POST - special characters in the user data
         $users = "[{\"id\":0,\"username\":\"student1111\",\"email\":\"\\tbademail@example.com\",\"role_id\":5,\"first_name\":\"Yu\",\"last_name\":\"Lee\",\"student_no\":\"67777777\"}]";
@@ -429,9 +466,7 @@ class V1ControllerTest extends CakeTestCase {
 
         // PUT - update user
         $updatedPerson = array('id' => $userId, 'username' => 'coolUser20', 'last_name' => 'Hardy', 'first_name' => 'Jane', 'role_id' => 4);
-
         $expectedPerson = array('id' => $userId, 'username' => 'coolUser20', 'last_name' => 'Hardy', 'first_name' => 'Jane', 'role_id' => 4);
-
         $file = $this->_oauthReq($url, json_encode($updatedPerson), OAUTH_HTTP_METHOD_PUT);
         $this->assertEqual(json_decode($file, true), $expectedPerson);
 
@@ -440,6 +475,12 @@ class V1ControllerTest extends CakeTestCase {
         $expectedUserSame = array('id' => $userIdSame, 'username' => 's5s5s5s5', 'last_name' => 'Same', 'first_name' => 'Sally', 'role_id' => 3);
         $fileSame = $this->_oauthReq($url, json_encode($updatedUserSame), OAUTH_HTTP_METHOD_PUT);
         $this->assertEqual(json_decode($fileSame, true), $expectedUserSame);
+
+        // update user with higher role_ide (see POST test for Also Same, id s0s0s0s0)
+        $updatedUserSameL = array('id' => $userIdSameL,'username' => 's0s0s0s0', 'first_name' => 'Also', 'last_name' => 'Same', 'role_id' => 3);
+        $expectedUserSameL = array('id' => $userIdSameL,'username' => 's0s0s0s0', 'first_name' => 'Also', 'last_name' => 'Same', 'role_id' => 1);
+        $fileSameL = $this->_oauthReq($url, json_encode($updatedUserSameL), OAUTH_HTTP_METHOD_PUT);
+        $this->assertEqual(json_decode($fileSameL, true), $expectedUserSameL);
 
         // update user with lower role_id (see POST test for Shifty Guy, id b8b8b8b8)
         $updatedUserUp = array('id' => $userIdOfChange, 'username' => 'b8b8b8b8', 'first_name' => 'Shifty', 'last_name' => 'Guy', 'role_id' => 1);
