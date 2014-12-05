@@ -10,6 +10,12 @@ class {'ipeer::db':
             password => 'ipeer',
             host => 'localhost',
             grant => ['ALL'],
+        },
+        'ipeer_test' => {
+            user => 'ipeer',
+            password => 'ipeer',
+            host => 'localhost',
+            grant => ['ALL'],
         }
     }
 }
