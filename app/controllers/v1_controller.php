@@ -338,7 +338,7 @@ class V1Controller extends Controller {
                 // user's roleId to be updated (external role_id by default)
                 $roleId = $decode['role_id'];
                 // if (ipeer) id does exist
-                if ($decode['id']) {
+                if (isset($decode['id'])) {
                     // Queries role_id saved in iPeer
                     $role = $this->RolesUser->find('first', array('conditions' => array('user_id' => $decode['id']), 'fields' => 'role_id'));
                     $iprRole = $role['RolesUser']['role_id'];
@@ -365,15 +365,13 @@ class V1Controller extends Controller {
                     $statusCode = 'HTTP/1.1 500 Internal Server Error';
                     $body = null;
                 }
-
-
-
             // adding multiple users from import (expected input: array)
             } else if (isset($decode['0'])) {
                 $data = array();
                 // rearrange the data
                 foreach ($decode as $person) {
-
+                    // set the userId so the user data gets updates with external values
+                    $person['id'] = $this->User->field('id', array('username' => $person['username']));
                     // each user's roleId to be updated (external role_id by default)
                     $roleId = $person['role_id'];
                     // if (ipeer) id does exist
@@ -386,12 +384,7 @@ class V1Controller extends Controller {
                             $roleId = $iprRole;
                         }
                     }
-
-                    // set the userId so the user data gets updates with external values
-                    $person['id'] = $this->User->field('id', array('username' => $person['username']));
-//                    $pRole = array('Role' => array('RolesUser' => array('role_id' => $person['role_id'])));
                     $pRole = array('Role' => array('RolesUser' => array('role_id' => $roleId)));
-
                     // change inactive status to active status; would have no effect for new or active users
                     $person['record_status'] = 'A';
                     unset($person['role_id']);

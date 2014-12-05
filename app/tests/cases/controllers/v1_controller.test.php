@@ -106,7 +106,7 @@ class V1ControllerTest extends CakeTestCase {
             // read the server from environment var first
             // so that this can be configured from outside
             if (!($server = getenv('SERVER_TEST'))) {
-                $server = 'http://localhost:2000';
+                $server = 'http://localhost:8888';
             }
             // since the Router isn't handling relative URLs for us, make sure
             // to convert the path to an absolute URL
@@ -268,6 +268,22 @@ class V1ControllerTest extends CakeTestCase {
         $expectedPerson = array('id' => $userId, 'username' => 'coolUser', 'last_name' => 'Hardy', 'first_name' => 'Jack', 'role_id' => 5);
         $this->assertEqual($user, $expectedPerson);
 
+        // add user whose role_id will not change !!!
+        $newUserSameRole = array('username' => 's5s5s5s5', 'first_name' => 'Sally', 'last_name' => 'Same', 'role_id' => 3);
+        $fileSame = $this->_oauthReq($url, json_encode($newUserSameRole), OAUTH_HTTP_METHOD_POST);
+        $userSame  = json_decode($fileSame, true);
+        $userIdSame = $userSame['id'];
+        $expectedPersonSameRole = array('id' => $userIdSame, 'username' => 's5s5s5s5', 'last_name' => 'Same', 'first_name' => 'Sally', 'role_id' => 3);
+        $this->assertEqual($userSame, $expectedPersonSameRole);
+        // try to add again, with same role_id
+        $newUserSameRoleAgain = array('username' => 's5s5s5s5', 'first_name' => 'Sally', 'last_name' => 'Same', 'role_id' => 3);
+        $fileSameAgain = $this->_oauthReq($url, json_encode($newUserSameRoleAgain), OAUTH_HTTP_METHOD_POST);
+        $userSameAgain = json_decode($fileSameAgain, true);
+        $userIdSameAgain = $userSameAgain['id'];
+        $expectedPersonSameRoleAgain = array('id' => $userIdSameAgain, 'username' => 's5s5s5s5', 'last_name' => 'Same', 'first_name' => 'Sally', 'role_id' => 3);
+        $this->assertEqual($userSameAgain, $expectedPersonSameRoleAgain);  // !!! currently returns null
+
+
         // POST - add multiple users - test with 2 users
         $newUsers = array(
             array('username' => 'instructor1', 'first_name' => 'Instructor', 'last_name' => '1', 'role_id' => 3),
@@ -307,6 +323,12 @@ class V1ControllerTest extends CakeTestCase {
 
         $file = $this->_oauthReq($url, json_encode($updatedPerson), OAUTH_HTTP_METHOD_PUT);
         $this->assertEqual(json_decode($file, true), $expectedPerson);
+
+//        $updatedPersonTwo = array('id' => 'zyxvw54321', 'username' => 'deeLee55', 'last_name' => 'Lee', 'first_name' => 'Dee', 'role_id' => 3);
+//        $expectedPersonTwo = array('id' => 'zyxvw54321', 'username' => 'deeLee55', 'last_name' => 'Lee', 'first_name' => 'Dee', 'role_id' => 3);
+//
+//        $file = $this->_oauthReq($url, json_encode($updatedPersonTwo), OAUTH_HTTP_METHOD_PUT);
+//        $this->assertEqual(json_decode($file, true), $expectedPersonTwo);
 
         // DELETE - delete the user
         $ret = $this->_oauthReq("$url/$userId", null, OAUTH_HTTP_METHOD_DELETE);
