@@ -427,10 +427,6 @@ class V1ControllerTest extends CakeTestCase {
         // check if the user is correctly inserted
         $this->assertEqual($users[0]['username'], 'student1111');
 
-
-
-
-
         // PUT - update user
         $updatedPerson = array('id' => $userId, 'username' => 'coolUser20', 'last_name' => 'Hardy', 'first_name' => 'Jane', 'role_id' => 4);
 
@@ -439,16 +435,18 @@ class V1ControllerTest extends CakeTestCase {
         $file = $this->_oauthReq($url, json_encode($updatedPerson), OAUTH_HTTP_METHOD_PUT);
         $this->assertEqual(json_decode($file, true), $expectedPerson);
 
-//        $updatedPersonTwo = array('id' => 'zyxvw54321', 'username' => 'deeLee55', 'last_name' => 'Lee', 'first_name' => 'Dee', 'role_id' => 3);
-//        $expectedPersonTwo = array('id' => 'zyxvw54321', 'username' => 'deeLee55', 'last_name' => 'Lee', 'first_name' => 'Dee', 'role_id' => 3);
-//
-//        $file = $this->_oauthReq($url, json_encode($updatedPersonTwo), OAUTH_HTTP_METHOD_PUT);
-//        $this->assertEqual(json_decode($file, true), $expectedPersonTwo);
+        // update user with no role_id change (see POST test for Sally Same, id s5s5s5s5)
+        $updatedUserSame = array('id' => $userIdSame, 'username' => 's5s5s5s5', 'last_name' => 'Same', 'first_name' => 'Sally', 'role_id' => 3);
+        $expectedUserSame = array('id' => $userIdSame, 'username' => 's5s5s5s5', 'last_name' => 'Same', 'first_name' => 'Sally', 'role_id' => 3);
+        $fileSame = $this->_oauthReq($url, json_encode($updatedUserSame), OAUTH_HTTP_METHOD_PUT);
+        $this->assertEqual(json_decode($fileSame, true), $expectedUserSame);
 
+        // update user with lower role_id (see POST test for Shifty Guy, id b8b8b8b8)
+        $updatedUserUp = array('id' => $userIdOfChange, 'username' => 'b8b8b8b8', 'first_name' => 'Shifty', 'last_name' => 'Guy', 'role_id' => 1);
+        $expectedUserUp = array('id' => $userIdOfChange, 'username' => 'b8b8b8b8', 'first_name' => 'Shifty', 'last_name' => 'Guy', 'role_id' => 1);
+        $fileUp = $this->_oauthReq($url, json_encode($updatedUserUp), OAUTH_HTTP_METHOD_PUT);
+        $this->assertEqual(json_decode($fileUp, true), $expectedUserUp);
 
-
-
-        
         // DELETE - delete the user
         $ret = $this->_oauthReq("$url/$userId", null, OAUTH_HTTP_METHOD_DELETE);
         // there is no output for delete, so we should just expect empty array
