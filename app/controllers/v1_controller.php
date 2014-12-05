@@ -335,13 +335,25 @@ class V1Controller extends Controller {
             $decode = json_decode($input, true);
             // adding one user
             if (isset($decode['username'])) {
-                $role = array('Role' => array('RolesUser' => array('role_id' => $decode['role_id'])));
+                // user's roleId to be updated (external role_id by default)
+                $roleId = $decode['role_id'];
+                // if (ipeer) id does exist
+                if (isset($decode['id'])) {
+                    // Queries role_id saved in iPeer
+                    $role = $this->RolesUser->find('first', array('conditions' => array('user_id' => $decode['id']), 'fields' => 'role_id'));
+                    $iprRole = $role['RolesUser']['role_id'];
+                    // use external id if its number lower
+                    if ($decode['role_id'] > $iprRole) {
+                        $roleId = $iprRole;
+                    }
+                }
+                // prepare to set user's role in iPeer - all cases
+                $role = array('Role' => array('RolesUser' => array('role_id' => $roleId)));
                 unset($decode['role_id']);
                 // do some clean up before we insert the values
                 array_walk($decode, create_function('&$val', '$val = trim($val);'));
                 $user = array('User' => $decode);
                 $user = $user + $role;
-
                 // does not save role in RolesUser - need to fix
                 if ($this->User->save($user)) {
                     $user = $this->User->read(array('id','username','last_name','first_name'));
@@ -358,9 +370,21 @@ class V1Controller extends Controller {
                 $data = array();
                 // rearrange the data
                 foreach ($decode as $person) {
-                    // set the userId so the user data gets updats with values from BB
+                    // set the userId so the user data gets updates with external values
                     $person['id'] = $this->User->field('id', array('username' => $person['username']));
-                    $pRole = array('Role' => array('RolesUser' => array('role_id' => $person['role_id'])));
+                    // each user's roleId to be updated (external role_id by default)
+                    $roleId = $person['role_id'];
+                    // if (ipeer) id does exist
+                    if ($person['id']) {
+                        // Queries role_id saved in iPeer
+                        $role = $this->RolesUser->find('first', array('conditions' => array('user_id' => $person['id']), 'fields' => 'role_id'));
+                        $iprRole = $role['RolesUser']['role_id'];
+                        // use external id if its number lower
+                        if ($person['role_id'] > $iprRole) {
+                            $roleId = $iprRole;
+                        }
+                    }
+                    $pRole = array('Role' => array('RolesUser' => array('role_id' => $roleId)));
                     // change inactive status to active status; would have no effect for new or active users
                     $person['record_status'] = 'A';
                     unset($person['role_id']);
@@ -395,7 +419,6 @@ class V1Controller extends Controller {
                     // at the moment assuming one role per user
                     $body[] = $sb['User'] + array('role_id' => $sb['Role']['0']['id']);
                 }
-
                 foreach ($uUser as $check) {
                     $verify = $this->User->find('first', array(
                         'conditions' => array('username' => $check['username'], 'last_name' => $check['last_name'], 'first_name' => $check['first_name']),
@@ -427,12 +450,21 @@ class V1Controller extends Controller {
                 $this->set('statusCode', 'HTTP/1.1 500 Internal Server Error');
                 $this->set('result', null);
             }
-        // update
+        // update iPeer role_id to lowest of two role_id
         } else if ($this->RequestHandler->isPut()) {
             $edit = $this->body;
             $decode = json_decode($edit, true);
             // at the moment each user only has one role
-            $role = array('Role' => array('RolesUser' => array('role_id' => $decode['role_id'])));
+            // external role_id
+            $extRole = $decode['role_id'];
+            // iPeer role_id
+            $role = $this->RolesUser->find('first', array('conditions' => array('user_id' => $decode['id']), 'fields' => 'role_id'));
+            $iprRole = $role['RolesUser']['role_id'];  // Cake: list model then attribute
+            $theRole = $iprRole;
+            if ($extRole < $iprRole) {
+                $theRole = $extRole;
+            }
+            $role = array('Role' => array('RolesUser' => array('role_id' => $theRole)));
             unset($decode['role_id']);
             $user = array('User' => $decode);
             $user = $user + $role;
