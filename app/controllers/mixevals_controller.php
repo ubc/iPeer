@@ -203,7 +203,7 @@ class MixevalsController extends AppController
      * @access public
      * @return void
      */
-    function view($id)
+    function view($id, $showSelfEval = 1)
     {
         $eval = $this->Mixeval->find('first', array(
             'conditions' => array('id' => $id),
@@ -256,6 +256,7 @@ class MixevalsController extends AppController
 
         $this->set('mixeval', $mixeval['Mixeval']);
         $this->set('questions', $questions);
+        $this->set('selfEval', $showSelfEval);
         $this->set('breadcrumb',
             $this->breadcrumb->push('mixevals')->
             push(Inflector::humanize(Inflector::underscore($this->action)))->

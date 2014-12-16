@@ -220,6 +220,7 @@ echo $ajax->observeField(
 initDateTime();
 // make sure that the correct event template type is selected initially
 toggleEventTemplate();
+toggleSelfEval();
 // attach an event handler to deal with changes in event template type
 jQuery("#EventEventTemplateTypeId").change(toggleEventTemplate);
 // attach event handlers to deal with changes in event template selection
@@ -229,6 +230,7 @@ jQuery("#EventSurvey").change(updatePreview);
 jQuery("#EventMixeval").change(updatePreview);
 jQuery("#EventEmailSchedule").change(toggleEmailTemplate);
 jQuery("#EventEmailTemplate").change(updateEmailPreview);
+jQuery("input:radio[name=data['Event']['self_eval']]").change(toggleSelfEval);
 updateEmailPreview();
 toggleEmailTemplate();
 // select all groups
@@ -358,8 +360,19 @@ function updatePreview() {
     }
     else if (eventType == '4') {
         var eventIdToPrev = jQuery("#EventMixeval").val();
+        var selfEval = jQuery("input:radio[name=data['Event']['self_eval']]:checked").val();
         url = "<?php echo $this->base; ?>/mixevals/view/";
-        prevM.href = url + eventIdToPrev;
+        prevM.href = url + eventIdToPrev + '/' + selfEval;
+    }
+}
+
+function toggleSelfEval() {
+    var eventType = jQuery("#EventEventTemplateTypeId").val();
+    if (eventType = '4') {
+        var templateId = jQuery("#EventMixeval").val();
+        var selfEval = jQuery("input:radio[name=data['Event']['self_eval']]:checked").val();
+        url = "<?php echo $this->base; ?>/mixevals/view/";
+        prevM.href = url + templateId + '/' + selfEval;
     }
 }
 

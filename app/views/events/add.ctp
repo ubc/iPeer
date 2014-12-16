@@ -172,8 +172,10 @@ jQuery("#EventSurvey").change(updatePreview);
 jQuery("#EventMixeval").change(updatePreview);
 jQuery("#EventEmailSchedule").change(toggleEmailTemplate);
 jQuery("#EventEmailTemplate").change(updateEmailPreview);
+jQuery("input:radio[name=data['Event']['self_eval']]").change(toggleSelfEval);
 updateEmailPreview();
 toggleEmailTemplate();
+toggleSelfEval();
 // for redirecting to the add event view for the selected course
 changeCourseId();
 // attach event handlers to deal with changes in course selection
@@ -312,8 +314,19 @@ function updatePreview() {
     }
     else if (eventType == '4') {
         var eventIdToPrev = jQuery("#EventMixeval").val();
+        var selfEval = jQuery("input:radio[name=data['Event']['self_eval']]:checked").val();
         url = "<?php echo $this->base; ?>/mixevals/view/";
-        jQuery("#prevM").attr("href", url + eventIdToPrev);
+        jQuery("#prevM").attr("href", url + eventIdToPrev + '/' + selfEval);
+    }
+}
+
+function toggleSelfEval() {
+    var eventType = jQuery("#EventEventTemplateTypeId").val();
+    if (eventType = '4') {
+        var templateId = jQuery("#EventMixeval").val();
+        var selfEval = jQuery("input:radio[name=data['Event']['self_eval']]:checked").val();
+        url = "<?php echo $this->base; ?>/mixevals/view/";
+        prevM.href = url + templateId + '/' + selfEval;
     }
 }
 

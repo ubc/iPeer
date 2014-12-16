@@ -51,7 +51,7 @@ $params = array('controller'            => 'mixevals',
         <span class="ipeer-icon"><?php __('MixEval Preview') ?></span>
     </h1>
     <div id="rpreview" style="display: block; background: #FFF;">
-        <?php echo $this->element('evaluations/mixeval_eval_form', Toolkit::getMixEvalDemoData($mixeval))?>
+        <?php echo $this->element('evaluations/mixeval_eval_form', Toolkit::getMixEvalDemoData($mixeval, $selfEval))?>
     </div>
 <?php endif; ?>
 </div>

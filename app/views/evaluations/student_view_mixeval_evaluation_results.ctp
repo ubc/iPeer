@@ -56,7 +56,7 @@ if ($mixeval['Mixeval']['peer_question'] > 0) {
     echo $this->element('evaluations/mixeval_details', $params);
 }
 
-if ($mixeval['Mixeval']['self_eval'] > 0) {
+if ($mixeval['Mixeval']['self_eval'] > 0 && $event['Event']['self_eval']) {
     $params = array('controller'=>'evaluations', 'questions'=>$questions, 'zero_mark'=>$zero_mark, 'evaluatee' => User::get('id'),
         'gradeReleased'=> 1, 'commentReleased'=> 1, 'details'=>$event['Event']['enable_details'],
         'peer_eval' => 0, 'title' => __('Self-Evaluation', true), 'instructorMode' => 0);

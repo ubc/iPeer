@@ -168,6 +168,9 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         foreach ($evaluation as $eval) {
             $evaluator = $eval['EvaluationMixeval']['evaluator'];
             $evaluatee = $eval['EvaluationMixeval']['evaluatee'];
+            if (!$event['Event']['self_eval'] && $evaluator == $evaluatee) {
+                continue;
+            }
             $totalScores[$evaluatee] += $eval['EvaluationMixeval']['score'];
             $evalCount[$evaluatee]++;
             foreach ($eval['EvaluationMixevalDetail'] as $ques) {
@@ -241,9 +244,9 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                     $tempEval .= '<li>N/A</li>';
                 }
                 $tempEval .= '</ul></span>';
-                if ($mixQues['self_eval']) {
+                if ($mixQues['self_eval'] && $event['Event']['self_eval']) {
                     $sEval .= $tempEval;
-                } else {
+                } else if (!$mixQues['self_eval']) {
                     $pEval .= $tempEval;
                 }
             }

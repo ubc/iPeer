@@ -64,7 +64,7 @@
             <?php endforeach;
         }?>
 
-        <?php if ($mixeval['Mixeval']['self_eval'] > 0 && $enrol > 0) { ?>
+        <?php if ($mixeval['Mixeval']['self_eval'] > 0 && $event['Event']['self_eval'] && $enrol > 0) { ?>
         <h1 id="self-title" class="title"><?php __("Self-Evaluation Questions")?></h1>
 
         <?php
