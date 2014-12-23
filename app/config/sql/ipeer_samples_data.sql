@@ -582,7 +582,8 @@ CREATE TABLE `courses` (
 INSERT INTO `courses` (`id`, `course`, `title`, `homepage`, `self_enroll`, `password`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
 (1, 'MECH 328', 'Mechanical Engineering Design Project', 'http://www.mech.ubc.ca', 'off', NULL, 'A', 1, '2006-06-20 14:14:45', NULL, '2006-06-20 14:14:45'),
 (2, 'APSC 201', 'Technical Communication', 'http://www.apsc.ubc.ca', 'off', NULL, 'A', 1, '2006-06-20 14:15:38', NULL, '2006-06-20 14:39:31'),
-(3, 'CPSC 101', 'Connecting with Computer Science', 'http://www.ugrad.cs.ubc.ca/~cs101/', 'off', NULL, 'I', 1, '2006-06-20 00:00:00', NULL, NULL);
+(3, 'CPSC 101', 'Connecting with Computer Science', 'http://www.ugrad.cs.ubc.ca/~cs101/', 'off', NULL, 'I', 1, '2006-06-20 00:00:00', NULL, NULL),
+(4, 'CPSC 404', 'Advanced Software Engineering', 'http://www.ugrad.cs.ubc.ca/~cs404/', 'off', NULL, 'A', 1, '2014-12-15 00:00:00', NULL, '2014-12-15 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -657,7 +658,9 @@ INSERT INTO `users` (`id`, `username`, `password`, `first_name`, `last_name`, `s
 (35, 'tutor1', 'b17c3f638781ecd22648b509e138c00f', 'Tutor', '1', '', '', '', NULL, NULL, NULL, 'A', 1, '2012-05-25 15:48:08', 1, '2012-05-25 15:48:08', NULL),
 (36, 'tutor2', 'b17c3f638781ecd22648b509e138c00f', 'Tutor', '2', '', '', '', NULL, NULL, NULL, 'A', 1, '2012-05-25 15:48:08', 1, '2012-05-25 15:48:08', NULL),
 (37, 'tutor3', 'b17c3f638781ecd22648b509e138c00f', 'Tutor', '3', '', '', '', NULL, NULL, NULL, 'A', 1, '2012-05-25 15:48:08', 1, '2012-05-25 15:48:08', NULL),
-(38, 'admin2', 'b17c3f638781ecd22648b509e138c00f', '', '', '', '', '', NULL, NULL, NULL, 'A', 1, '2012-05-25 15:48:08', 1, '2012-05-25 15:48:08', NULL);
+(38, 'admin2', 'b17c3f638781ecd22648b509e138c00f', '', '', '', '', '', NULL, NULL, NULL, 'A', 1, '2012-05-25 15:48:08', 1, '2012-05-25 15:48:08', NULL),
+(39, 'admin3', 'b17c3f638781ecd22648b509e138c00f', '', '', '', '', '', NULL, NULL, NULL, 'A', 1, '2014-12-15 00:00:00', 1, '2014-12-16 00:00:00', NULL),
+(40, 'admin4', 'b17c3f638781ecd22648b509e138c00f', '', '', '', '', '', NULL, NULL, NULL, 'A', 1, '2014-12-15 00:00:00', 1, '2014-12-16 00:00:00', NULL);
 
 -- --------------------------------------------------------
 
@@ -738,7 +741,9 @@ INSERT INTO `course_departments` (`id`, `course_id`, `department_id`) VALUES
 (1, 2, 2),
 (2, 1, 1),
 (3, 3, 3),
-(4, 3, 2);
+(4, 3, 2),
+(5, 4, 3);
+
 
 -- --------------------------------------------------------
 
@@ -1684,7 +1689,9 @@ INSERT INTO `roles_users` (`role_id`, `user_id`, `created`, `modified`) VALUES
 (4, 35, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
 (4, 36, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
 (4, 37, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
-(2, 38, '2010-10-27 16:17:29', '2010-10-27 16:17:29');
+(2, 38, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(2, 39, '2014-12-15 00:00:00', '2014-12-15 00:00:00'),
+(2, 40, '2014-12-15 00:00:00', '2014-12-15 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -2075,6 +2082,8 @@ INSERT INTO `user_courses` VALUES (1, 2, 1, 'A', 'A', 0, '2006-06-20 14:14:45', 
 INSERT INTO `user_courses` VALUES (2, 3, 2, 'A', 'A', 0, '2006-06-20 14:39:31', NULL, '2006-06-20 14:39:31');
 INSERT INTO `user_courses` VALUES (3, 4, 2, 'A', 'A', 0, '2006-06-20 14:39:31', NULL, '2006-06-20 14:39:31');
 INSERT INTO `user_courses` VALUES (4, 4, 3, 'A', 'A', 0, '2006-06-20 14:39:31', NULL, '2006-06-20 14:39:31');
+INSERT INTO `user_courses` VALUES (5, 39, 4, 'A', 'A', 0, '2014-12-16 14:39:31', NULL, '2014-12-16 14:39:31');
+INSERT INTO `user_courses` VALUES (6, 40, 2, 'A', 'A', 0, '2014-12-16 14:39:31', NULL, '2014-12-16 14:39:31');
 
 -- --------------------------------------------------------
 
@@ -2160,7 +2169,9 @@ INSERT INTO `user_faculties` (`id`, `user_id`, `faculty_id`) VALUES
 (3, 3, 2),
 (4, 4, 1),
 (5, 34, 1),
-(6, 38, 2);
+(6, 38, 2),
+(7, 39, 1),
+(8, 40, 1);
 
 -- --------------------------------------------------------
 
