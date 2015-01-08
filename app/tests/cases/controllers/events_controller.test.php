@@ -152,6 +152,7 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->assertEqual($result['courses'], array(
             1 => 'MECH 328 - Mechanical Engineering Design Project',
             2 => 'APSC 201 - Technical Communication',
+            4 => 'CPSC 404 - Advanced Software Engineering',
         ));
         // group list
         ksort($result['groups']);

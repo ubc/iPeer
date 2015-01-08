@@ -106,7 +106,7 @@ class V1ControllerTest extends CakeTestCase {
             // read the server from environment var first
             // so that this can be configured from outside
             if (!($server = getenv('SERVER_TEST'))) {
-                $server = 'http://localhost:8888';
+                $server = 'http://localhost:2000';
             }
             // since the Router isn't handling relative URLs for us, make sure
             // to convert the path to an absolute URL
@@ -997,11 +997,11 @@ class V1ControllerTest extends CakeTestCase {
                 'title' => 'simple evaluation 6',
                 'course_id' => '1',
                 'event_template_type_id' => '1',
-                'due_date' => '2016-07-31 11:20:00',
-                'release_date_begin' => '2015-07-31 11:20:00',
-                'release_date_end' => '2016-07-31 11:20:00',
-                'result_release_date_begin' => '2016-07-31 11:20:00',
-                'result_release_date_end' => '2017-07-31 11:20:00',
+                'due_date' => date('Y', strtotime("+2 year")).'-07-31 11:20:00',
+                'release_date_begin' => date('Y', strtotime("+1 year")).'-07-31 11:20:00',
+                'release_date_end' => date('Y', strtotime("+2 year")).'-07-31 11:20:00',
+                'result_release_date_begin' => date('Y', strtotime("+2 year")).'-07-31 11:20:00',
+                'result_release_date_end' => date('Y', strtotime("+3 year")).'-07-31 11:20:00',
                 'id' => '10',
                 'is_released' => false,
                 'is_result_released' => false,

@@ -835,7 +835,6 @@ CREATE TABLE IF NOT EXISTS `email_templates` (
 --
 
 INSERT INTO `email_templates` (`id`, `name`, `description`, `subject`, `content`, `availability`, `creator_id`, `created`, `updater_id`, `updated`) VALUES
-(1, 'Submission Confirmation', 'template for submission confirmation', 'iPeer: Evaluation Submission Confirmation', 'Hi {{{FIRSTNAME}}}, \nYour evaluation has been submitted successfully. Thank you for your feedback!\n\n iPeer',1, 1, NOW(), NULL, NULL),
 (2, 'Email template example', 'This is an email template example', 'Email Template', 'Hello, {{{USERNAME}}}',1, 1, NOW(), NULL, NULL),
 (3, 'Email template example2', 'email template ex2', 'Email Template2', 'Hello, {{{FIRSTNAME}}}',1, 2, NOW(), NULL, NULL),
 (4, 'Email template example3', 'email temp example3', 'Email Template3', 'Hello,',1, 3, NOW(), NULL, NULL),
@@ -1166,7 +1165,7 @@ CREATE TABLE IF NOT EXISTS `events` (
 -- Dumping data for table `events`
 --
 
-SET @year = YEAR(DATE_ADD(NOW(), INTERVAL 1 YEAR));
+SET @year = YEAR(NOW())+1;
 
 INSERT INTO events (id, title, course_id, description, event_template_type_id, template_id, self_eval, com_req, auto_release, enable_details, due_date, release_date_begin, release_date_end, result_release_date_begin, result_release_date_end, record_status, creator_id, created, updater_id, modified) VALUES
 (1, 'Term 1 Evaluation', 1, '', 1, 1, '0', 0, 0, 1, CONCAT(@year, '-07-02 16:34:43'), '2011-06-16 16:34:49', '2023-07-22 16:34:53', '2024-07-04 16:34:43', '2024-07-30 16:34:43', 'A', 1, '2006-06-20 16:27:33', 1, '2006-06-21 08:51:20'),
@@ -2035,8 +2034,8 @@ INSERT INTO `sys_parameters` (`parameter_code`, `parameter_value`, `parameter_ty
 ('system.super_admin', 'root', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 ('system.admin_email', 'Please enter the iPeer administrator\\''s email address.', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 ('display.date_format', 'D, M j, Y g:i a', 'S', 'date format preference', 'A', 0, NOW(), NULL, NOW()),
-('system.version', '3.1.5', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
-('database.version', '8', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
+('system.version', '3.1.6', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
+('database.version', '9', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
 ('email.port', '25', 'S', 'port number for email smtp option', 'A', '0', NOW(), NULL , NOW()),
 ('email.host', 'localhost', 'S', 'host address for email smtp option', 'A', '0', NOW(), NULL , NOW()),
 ('email.username', '', 'S', 'username for email smtp option', 'A', '0', NOW(), NULL , NOW()),

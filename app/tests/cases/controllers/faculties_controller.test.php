@@ -113,6 +113,20 @@ class FacultiesControllerTestCase extends ExtendedAuthTestCase {
                 'Email' => '',
                 'Role' => 'admin',
             ),
+            array (
+                'id' => '39',
+                'Username' => 'admin3',
+                'Full Name' => 'admin3',
+                'Email' => '',
+                'Role' => 'admin',
+            ),
+            array (
+                'id' => '40',
+                'Username' => 'admin4',
+                'Full Name' => 'admin4',
+                'Email' => '',
+                'Role' => 'admin',
+            ),
         );
         $return = $this->testAction('/faculties/view/1', array('return' => 'vars'));
         $this->assertEqual($return['faculty'], 'Applied Science');
