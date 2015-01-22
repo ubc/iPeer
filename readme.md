@@ -70,6 +70,17 @@ Runing the tests:
     cake/console/cake -app app testsuite app group system
 
 It is better not to touch the mouse or keyboard during the tests.
+
+iPeer 3.1.6
+---------------------------
+This is a maintenance release.
+* Fix #492, incorrect warning on editing event when there is no group changes
+* Fix #498, v1_controller accounts for different role permissions in Connect and iPeer during add/update of user in iPeer
+* Fix #499, if a FacultyAdmin teaches courses outside of their faculty (rare case), both sets of courses now appear in user's Home page and Courses page.
+* Removed ‘Submission Confirmation’ email template
+* Fixed sending email notification to that user that have their password reset
+* Modified the wording to describe the penalty settings
+
 iPeer 3.1.5
 ---------------------------
 This is a maintenance release.
