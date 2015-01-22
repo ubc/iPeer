@@ -115,8 +115,9 @@ for ($i = -1; $i < $numPenalties; $i++) {
     $inputs =
         '<div class="penaltyInput" id="penaltyInput'.$i.'">' .
         $this->Form->label("latep$i", '', array('class' => 'penaltyLabel')) .
+        $this->Form->label("prefix", 'Then until', array('class' => 'penaltyInLabel')) .
         $this->Form->text("Penalty.$i.days_late", array('default' => $i + 1)) .
-        $this->Form->label('days', 'days', array('class' => 'penaltyInLabel')) .
+        $this->Form->label('days', 'days after the due date', array('class' => 'penaltyInLabel')) .
         $this->Form->select(
             "Penalty.$i.percent_penalty",
             $percent,
@@ -211,6 +212,10 @@ function addPenaltyInputs() {
     penaltyInputs = penaltyInputs.replace(/value="0"/g,
         'value="' +(penaltyCount + 1)+ '"');
     penaltyInputs = penaltyInputs.replace(/-1/g, penaltyCount);
+    if (penaltyCount == 0) {
+        penaltyInputs = penaltyInputs.replace("Then until", "From the due date to");
+        penaltyInputs = penaltyInputs.replace("days after the due date", "days late");
+    }
     jQuery(penaltyInputs).appendTo("#penaltyInputs");
 
     penaltyCount++;
