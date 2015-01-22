@@ -1,9 +1,5 @@
 <script type="text/javascript">
 function checkGroups() {
-    <?php
-        $groupIds = array_keys($groups);
-    ?>
-    var oldGroups = [<?php echo implode(',', $groupIds) ?>];
     var newGroups = jQuery('#GroupGroup').val();
     var grpRemoved = false;
     for (i = 0; i < oldGroups.length; i++) {
@@ -175,8 +171,9 @@ for ($i = -1; $i < $numPenalties; $i++) {
         '<input type="hidden" name="required" id="required" value="eventId" />'.
         $this->Form->input("Penalty.$i.id").
         $this->Form->label("latep$i", '', array('class' => 'penaltyLabel')) .
+        $this->Form->label("prefix", 'Then until', array('class' => 'penaltyInLabel')) .
         $this->Form->text("Penalty.$i.days_late", array('default' => $i + 1)) .
-        $this->Form->label('days', 'days', array('class' => 'penaltyInLabel')) .
+        $this->Form->label('days', 'days after the due date', array('class' => 'penaltyInLabel')) .
         $this->Form->select(
             "Penalty.$i.percent_penalty",
             $percent,
@@ -189,8 +186,11 @@ for ($i = -1; $i < $numPenalties; $i++) {
     if ($i < 0) {
         // save for use as a template in javascript, should work in Lin/Win/Mac
         $penaltyInputs = str_replace(array("\n", "\r"), "", $inputs);
-    }
-    else {
+    } else if ($i == 0) {
+        $inputs = str_replace("Then until", "From the due date to", $inputs);
+        $inputs = str_replace("days after the due date", "days late", $inputs);
+        echo $inputs;
+    } else {
         echo $inputs;
     }
 
@@ -224,6 +224,7 @@ echo $ajax->observeField(
 initDateTime();
 // make sure that the correct event template type is selected initially
 toggleEventTemplate();
+toggleSelfEval();
 // attach an event handler to deal with changes in event template type
 jQuery("#EventEventTemplateTypeId").change(toggleEventTemplate);
 // attach event handlers to deal with changes in event template selection
@@ -233,6 +234,7 @@ jQuery("#EventSurvey").change(updatePreview);
 jQuery("#EventMixeval").change(updatePreview);
 jQuery("#EventEmailSchedule").change(toggleEmailTemplate);
 jQuery("#EventEmailTemplate").change(updateEmailPreview);
+jQuery("input:radio[name=data['Event']['self_eval']]").change(toggleSelfEval);
 updateEmailPreview();
 toggleEmailTemplate();
 // select all groups
@@ -245,6 +247,8 @@ jQuery("#unselectAll").click(function() {
 });
 // keep track of the number of penalties entered.
 var penaltyCount = <?php echo $numPenalties; ?>;
+// save the current selected groups
+var oldGroups = jQuery('#GroupGroup').val();
 
 function initDateTime() {
     var format = { dateFormat: 'yy-mm-dd', timeFormat: 'hh:mm:ss' }
@@ -266,6 +270,10 @@ function addPenaltyInputs() {
     penaltyInputs = penaltyInputs.replace(/value="0"/g,
         'value="' +(penaltyCount + 1)+ '"');
     penaltyInputs = penaltyInputs.replace(/-1/g, penaltyCount);
+    if (penaltyCount == 0) {
+        penaltyInputs = penaltyInputs.replace("Then until", "From the due date to");
+        penaltyInputs = penaltyInputs.replace("days after the due date", "days late");
+    }
     jQuery(penaltyInputs).appendTo("#penaltyInputs");
 
     penaltyCount++;
@@ -360,8 +368,19 @@ function updatePreview() {
     }
     else if (eventType == '4') {
         var eventIdToPrev = jQuery("#EventMixeval").val();
+        var selfEval = jQuery("input:radio[name=data['Event']['self_eval']]:checked").val();
         url = "<?php echo $this->base; ?>/mixevals/view/";
-        prevM.href = url + eventIdToPrev;
+        prevM.href = url + eventIdToPrev + '/' + selfEval;
+    }
+}
+
+function toggleSelfEval() {
+    var eventType = jQuery("#EventEventTemplateTypeId").val();
+    if (eventType = '4') {
+        var templateId = jQuery("#EventMixeval").val();
+        var selfEval = jQuery("input:radio[name=data['Event']['self_eval']]:checked").val();
+        url = "<?php echo $this->base; ?>/mixevals/view/";
+        prevM.href = url + templateId + '/' + selfEval;
     }
 }
 

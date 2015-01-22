@@ -97,14 +97,23 @@
         <td>
             <?php
             if (!empty($event['Penalty'])) {
+                $notFirst = false;
                 foreach ($event['Penalty'] as $tmp) {
-                    echo 'Deduct '.$tmp['percent_penalty'].'% if late by '.$tmp['days_late'].' day';
-                    if (1 != $tmp['days_late']) {
-                        echo 's';
+                    if ($notFirst) {
+                        echo 'Then until '.$tmp['days_late'].' days after the due date, ';
+                        echo $tmp['percent_penalty'].'% will be deducted<br>';
+                    } else {
+                        echo 'From the due date to '.$tmp['days_late'].' day';
+                        if (1 != $tmp['days_late'])
+                            echo 's';
+                        echo ' late, '.$tmp['percent_penalty'].'% will be deducted<br>';
+                        $notFirst = true;
                     }
-                    echo '<br>';
-                    $dayslate_count = $tmp['days_late'];
                 }
+                $last = end($event['Penalty']);
+                echo $last['percent_penalty'].'% is deducted after '.$last['days_late'].' day';
+                if (1 != $last['days_late'])
+                    echo 's';
             } else {
                 echo 'No late penalties currently set';
             }

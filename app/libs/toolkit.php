@@ -282,13 +282,14 @@ class Toolkit
      * @access public
      * @return array demo data
      */
-    static function getMixEvalDemoData($mixeval)
+    static function getMixEvalDemoData($mixeval, $selfEval = 1)
     {
         return array(
             'event' => array(
                 'Event' => array(
                     'id' => 0,
                     'title' => 'Preview Event',
+                    'self_eval' => $selfEval,
                     'due_date' => Toolkit::formatDate(time()+(5*24*60*60)),
                     'release_date_end' => Toolkit::formatDate(time()+(6*24*60*60)),
                     'description' => 'Preview for mix evaluation event.',

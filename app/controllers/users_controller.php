@@ -169,7 +169,7 @@ class UsersController extends AppController
             array(__("Delete User", true),    $deleteUserWarning,   $actionRestrictions, "", "delete", "User.id"),
             array(__("Reset Password", true), $resetPassWarning,  $actionRestrictions, "", "resetPassword", "User.id")
         );
-        
+
         // add the functionality of resetting a user's password without sending the user a email
         if(User::hasPermission('controllers/users/resetpasswordwithoutemail')) {
             $actions[] = array(__("Reset Password Without Email", true), $resetPassWOEmail, "", "", "resetPasswordWithoutEmail", "User.id");
@@ -623,7 +623,7 @@ class UsersController extends AppController
             $this->redirect('/courses/home/'.$courseId);
             return;
         }
-        
+
         // make the existing user active
         if ($user['User']['record_status'] == "I" && !$this->User->readdUser($user['User']['id'])) {
             $this->Session->setFlash(__('Error: Unable to enrol the user.', true));
@@ -645,7 +645,7 @@ class UsersController extends AppController
         }
         $this->redirect('/courses/home/'.$courseId);
     }
-    
+
     /**
      * Readd users that were previously soft-deleted
      *
@@ -662,13 +662,13 @@ class UsersController extends AppController
         $userRole = $user['Role']['0']['RolesUser']['role_id'];
         $url = '/users';
         $url .= $courseId ? '/goToClassList/'.$courseId : '';
-        
+
         if ($userRole <= $roleId || !in_array($userRole, array(4, 5))) {
             $this->Session->setFlash(__('Error: You do not have permission to readd this user.', true));
             $this->redirect($url);
             return;
         }
-        
+
         if ($this->User->readdUser($user['User']['id'])) {
             $this->Session->setFlash(__('User is successfully readded.', true), 'good');
         } else {
@@ -987,7 +987,7 @@ class UsersController extends AppController
         $urlSuffix = $courseId ? '/'.$courseId : '';
 
         $sFound = $this->User->getByUsername($this->data['User']['username']);
-        
+
         $message = __('Username "', true).$this->data['User']['username'].__('" already exists.', true);
         if (!is_null($courseId)) {
             $message .= '<br> To enrol, click '.
@@ -1013,11 +1013,12 @@ class UsersController extends AppController
     function resetPassword($userId, $courseId = null)
     {
         // checks the user's permissions
-        $userData = $this->_checkResetPasswordPermission($userId, $courseId);
+        $user_data = $this->_checkResetPasswordPermission($userId, $courseId);
 
         //Save Data
         if ($tmp_password = $this->User->savePassword($userId)) {
             $message = sprintf(__("Password successfully reset. The new password is %s.", true).'<br />', $tmp_password);
+            $user_data['User']['tmp_password'] = $tmp_password;
             $this->User->set('id', $userId);
 
             // send email to user
@@ -1038,7 +1039,7 @@ class UsersController extends AppController
             $this->redirect($this->referer());
         }
     }
-    
+
     /**
      * resetPasswordWithoutEmail
      *
@@ -1051,7 +1052,7 @@ class UsersController extends AppController
     {
         // checks the user's permissions
         $this->_checkResetPasswordPermission($userId, $courseId);
-        
+
         // generate and save new password
         if ($tmp_password = $this->User->savePassword($userId)) {
             $message = sprintf(__("Password successfully reset. The new password is %s.", true).'<br />', $tmp_password);
@@ -1371,7 +1372,7 @@ class UsersController extends AppController
                 }
             }
         }
-        
+
         return $userData;
     }
 
@@ -1661,7 +1662,7 @@ class UsersController extends AppController
 
         return array_diff($userCourses, array_keys($editorCourses));
     }
-    
+
     /**
      * formatDueIn
      *
@@ -1690,7 +1691,7 @@ class UsersController extends AppController
 
         return $ret;
     }
-    
+
     /**
      * Helper to filter events into 3 different categories and to
      * discard inactive events.
@@ -1720,7 +1721,7 @@ class UsersController extends AppController
                 // can only take surveys during the release period
                 $upcoming[] = $event;
             } else if (!empty($event['EvaluationSubmission']) &&
-                strtotime('NOW') < strtotime($event['Event']['result_release_date_end'])) { 
+                strtotime('NOW') < strtotime($event['Event']['result_release_date_end'])) {
                 // has submission and can or will be able to view results soon
                 // note that we're not using is_released or is_result_released
                 // because of an edge case where if there is a period of time
@@ -1744,7 +1745,7 @@ class UsersController extends AppController
 
         return array('upcoming' => $upcoming, 'submitted' => $submitted, 'expired' => $expired);
     }
-    
+
     /**
      * showEvents
      *

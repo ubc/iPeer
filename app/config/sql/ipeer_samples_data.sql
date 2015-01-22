@@ -582,7 +582,8 @@ CREATE TABLE `courses` (
 INSERT INTO `courses` (`id`, `course`, `title`, `homepage`, `self_enroll`, `password`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
 (1, 'MECH 328', 'Mechanical Engineering Design Project', 'http://www.mech.ubc.ca', 'off', NULL, 'A', 1, '2006-06-20 14:14:45', NULL, '2006-06-20 14:14:45'),
 (2, 'APSC 201', 'Technical Communication', 'http://www.apsc.ubc.ca', 'off', NULL, 'A', 1, '2006-06-20 14:15:38', NULL, '2006-06-20 14:39:31'),
-(3, 'CPSC 101', 'Connecting with Computer Science', 'http://www.ugrad.cs.ubc.ca/~cs101/', 'off', NULL, 'I', 1, '2006-06-20 00:00:00', NULL, NULL);
+(3, 'CPSC 101', 'Connecting with Computer Science', 'http://www.ugrad.cs.ubc.ca/~cs101/', 'off', NULL, 'I', 1, '2006-06-20 00:00:00', NULL, NULL),
+(4, 'CPSC 404', 'Advanced Software Engineering', 'http://www.ugrad.cs.ubc.ca/~cs404/', 'off', NULL, 'A', 1, '2014-12-15 00:00:00', NULL, '2014-12-15 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -657,7 +658,9 @@ INSERT INTO `users` (`id`, `username`, `password`, `first_name`, `last_name`, `s
 (35, 'tutor1', 'b17c3f638781ecd22648b509e138c00f', 'Tutor', '1', '', '', '', NULL, NULL, NULL, 'A', 1, '2012-05-25 15:48:08', 1, '2012-05-25 15:48:08', NULL),
 (36, 'tutor2', 'b17c3f638781ecd22648b509e138c00f', 'Tutor', '2', '', '', '', NULL, NULL, NULL, 'A', 1, '2012-05-25 15:48:08', 1, '2012-05-25 15:48:08', NULL),
 (37, 'tutor3', 'b17c3f638781ecd22648b509e138c00f', 'Tutor', '3', '', '', '', NULL, NULL, NULL, 'A', 1, '2012-05-25 15:48:08', 1, '2012-05-25 15:48:08', NULL),
-(38, 'admin2', 'b17c3f638781ecd22648b509e138c00f', '', '', '', '', '', NULL, NULL, NULL, 'A', 1, '2012-05-25 15:48:08', 1, '2012-05-25 15:48:08', NULL);
+(38, 'admin2', 'b17c3f638781ecd22648b509e138c00f', '', '', '', '', '', NULL, NULL, NULL, 'A', 1, '2012-05-25 15:48:08', 1, '2012-05-25 15:48:08', NULL),
+(39, 'admin3', 'b17c3f638781ecd22648b509e138c00f', '', '', '', '', '', NULL, NULL, NULL, 'A', 1, '2014-12-15 00:00:00', 1, '2014-12-16 00:00:00', NULL),
+(40, 'admin4', 'b17c3f638781ecd22648b509e138c00f', '', '', '', '', '', NULL, NULL, NULL, 'A', 1, '2014-12-15 00:00:00', 1, '2014-12-16 00:00:00', NULL);
 
 -- --------------------------------------------------------
 
@@ -738,7 +741,9 @@ INSERT INTO `course_departments` (`id`, `course_id`, `department_id`) VALUES
 (1, 2, 2),
 (2, 1, 1),
 (3, 3, 3),
-(4, 3, 2);
+(4, 3, 2),
+(5, 4, 3);
+
 
 -- --------------------------------------------------------
 
@@ -830,10 +835,10 @@ CREATE TABLE IF NOT EXISTS `email_templates` (
 --
 
 INSERT INTO `email_templates` (`id`, `name`, `description`, `subject`, `content`, `availability`, `creator_id`, `created`, `updater_id`, `updated`) VALUES
-(1, 'Submission Confirmation', 'template for submission confirmation', 'iPeer: Evaluation Submission Confirmation', 'Hi {{{FIRSTNAME}}}, \nYour evaluation has been submitted successfully. Thank you for your feedback!\n\n iPeer',1, 1, NOW(), NULL, NULL),
 (2, 'Email template example', 'This is an email template example', 'Email Template', 'Hello, {{{USERNAME}}}',1, 1, NOW(), NULL, NULL),
 (3, 'Email template example2', 'email template ex2', 'Email Template2', 'Hello, {{{FIRSTNAME}}}',1, 2, NOW(), NULL, NULL),
-(4, 'Email template example3', 'email temp example3', 'Email Template3', 'Hello,',1, 3, NOW(), NULL, NULL);
+(4, 'Email template example3', 'email temp example3', 'Email Template3', 'Hello,',1, 3, NOW(), NULL, NULL),
+(5, 'Evaluation Reminder Template', 'evaluation reminder template', 'iPeer Evaluation Reminder', 'Hello {{{FIRSTNAME}}},\n\nA evaluation for {{{COURSENAME}}} is made available to you in iPeer, which has yet to be completed.\n\nName: {{{EVENTTITLE}}}\nDue Date: {{{DUEDATE}}}\nClose Date: {{{CLOSEDATE}}}\n\nThank You', 1, 1, NOW(), NULL, NULL); 
 
 
 -- --------------------------------------------------------
@@ -1160,7 +1165,7 @@ CREATE TABLE IF NOT EXISTS `events` (
 -- Dumping data for table `events`
 --
 
-SET @year = YEAR(DATE_ADD(NOW(), INTERVAL 1 YEAR));
+SET @year = YEAR(NOW())+1;
 
 INSERT INTO events (id, title, course_id, description, event_template_type_id, template_id, self_eval, com_req, auto_release, enable_details, due_date, release_date_begin, release_date_end, result_release_date_begin, result_release_date_end, record_status, creator_id, created, updater_id, modified) VALUES
 (1, 'Term 1 Evaluation', 1, '', 1, 1, '0', 0, 0, 1, CONCAT(@year, '-07-02 16:34:43'), '2011-06-16 16:34:49', '2023-07-22 16:34:53', '2024-07-04 16:34:43', '2024-07-30 16:34:43', 'A', 1, '2006-06-20 16:27:33', 1, '2006-06-21 08:51:20'),
@@ -1683,7 +1688,9 @@ INSERT INTO `roles_users` (`role_id`, `user_id`, `created`, `modified`) VALUES
 (4, 35, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
 (4, 36, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
 (4, 37, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
-(2, 38, '2010-10-27 16:17:29', '2010-10-27 16:17:29');
+(2, 38, '2010-10-27 16:17:29', '2010-10-27 16:17:29'),
+(2, 39, '2014-12-15 00:00:00', '2014-12-15 00:00:00'),
+(2, 40, '2014-12-15 00:00:00', '2014-12-15 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -2027,8 +2034,8 @@ INSERT INTO `sys_parameters` (`parameter_code`, `parameter_value`, `parameter_ty
 ('system.super_admin', 'root', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 ('system.admin_email', 'Please enter the iPeer administrator\\''s email address.', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 ('display.date_format', 'D, M j, Y g:i a', 'S', 'date format preference', 'A', 0, NOW(), NULL, NOW()),
-('system.version', '3.1.4', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
-('database.version', '7', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
+('system.version', '3.1.6', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
+('database.version', '9', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
 ('email.port', '25', 'S', 'port number for email smtp option', 'A', '0', NOW(), NULL , NOW()),
 ('email.host', 'localhost', 'S', 'host address for email smtp option', 'A', '0', NOW(), NULL , NOW()),
 ('email.username', '', 'S', 'username for email smtp option', 'A', '0', NOW(), NULL , NOW()),
@@ -2074,6 +2081,8 @@ INSERT INTO `user_courses` VALUES (1, 2, 1, 'A', 'A', 0, '2006-06-20 14:14:45', 
 INSERT INTO `user_courses` VALUES (2, 3, 2, 'A', 'A', 0, '2006-06-20 14:39:31', NULL, '2006-06-20 14:39:31');
 INSERT INTO `user_courses` VALUES (3, 4, 2, 'A', 'A', 0, '2006-06-20 14:39:31', NULL, '2006-06-20 14:39:31');
 INSERT INTO `user_courses` VALUES (4, 4, 3, 'A', 'A', 0, '2006-06-20 14:39:31', NULL, '2006-06-20 14:39:31');
+INSERT INTO `user_courses` VALUES (5, 39, 4, 'A', 'A', 0, '2014-12-16 14:39:31', NULL, '2014-12-16 14:39:31');
+INSERT INTO `user_courses` VALUES (6, 40, 2, 'A', 'A', 0, '2014-12-16 14:39:31', NULL, '2014-12-16 14:39:31');
 
 -- --------------------------------------------------------
 
@@ -2159,7 +2168,9 @@ INSERT INTO `user_faculties` (`id`, `user_id`, `faculty_id`) VALUES
 (3, 3, 2),
 (4, 4, 1),
 (5, 34, 1),
-(6, 38, 2);
+(6, 38, 2),
+(7, 39, 1),
+(8, 40, 1);
 
 -- --------------------------------------------------------
 

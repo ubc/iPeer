@@ -94,7 +94,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
             $mixeval = $this->Mixeval->findById($event['Event']['template_id']);
         }
         $peerEval = isset($mixeval) ? $mixeval['Mixeval']['peer_question'] : true;
-        $selfEval = isset($mixeval) ? $mixeval['Mixeval']['self_eval'] : false;
+        $selfEval = isset($mixeval) ? $mixeval['Mixeval']['self_eval'] && $event['Event']['self_eval'] : false;
         $event = array_merge($event, $evaluation);
 
         $grid = array();

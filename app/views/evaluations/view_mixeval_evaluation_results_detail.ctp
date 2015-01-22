@@ -78,7 +78,7 @@ if (!empty($notInGroup)) {
 <h3><?php __('Evaluation Results')?></h3>
 
 <div id="accordion">
-    <?php if ($mixeval['Mixeval']['self_eval'] > 0) { ?>
+    <?php if ($mixeval['Mixeval']['self_eval'] > 0 && $event['Event']['self_eval']) { ?>
     <div id="panelSelf" class="panelName">
         <div id="panelSelfHeader" class="panelheader">
             <?php echo __('Self-Evaluation', true)?>
@@ -89,7 +89,8 @@ if (!empty($notInGroup)) {
             $zero_mark = $mixeval['Mixeval']['zero_mark'];
             $params = array('controller'=>'evaluations', 'questions'=>$groupByQues, 'zero_mark'=>$zero_mark,
                 'gradeReleased'=>1, 'commentReleased'=>1, 'details'=>1, 'evaluatee'=>0, 
-                'names'=>$memberList, 'notInGroup'=>$notInGroup, 'peer_eval' => 0, 'title' => 'Questions');
+                'names'=>$memberList, 'notInGroup'=>$notInGroup, 'peer_eval' => 0, 'title' => 'Questions',
+                'instructorMode' => 1);
             echo $this->element('evaluations/mixeval_details', $params);
             ?>
             </div>

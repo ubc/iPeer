@@ -76,6 +76,16 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'creator' => 'Super Admin'
             ),
         ),
+        array(
+            'Course' => array(
+                'id' => 4,
+                'course' => 'CPSC 404',
+                'title' => 'Advanced Software Engineering',
+                'creator_id' => 1,
+                'record_status' => 'A',
+                'creator' => 'Super Admin'
+            ),
+        ),
     );
 
     private $fixtureView = array(
@@ -278,6 +288,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $expected = array(
             $this->fixtureIndex[1],
             $this->fixtureIndex[2],
+            $this->fixtureIndex[3],
             $this->fixtureIndex[0],
         );
         $this->assertEqual($result['paramsForList']['data']['entries'],
@@ -299,6 +310,41 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->assertEqual($message['message'], 'Error: You do not have permission to access the page.');
     }
 
+    function testIndexFacultyAdminInstructorRareCase() {
+        // test courses admin'd (Fac of AppSci) or taught by admin3
+        $this->login = array(
+            'User' => array(
+                'username' => 'admin3',
+                'password' => md5('ipeeripeer')
+            )
+        );
+        $result = $this->testAction('/courses/index', array('return' => 'vars'));
+        $expected = array(
+            $this->fixtureIndex[1],
+            $this->fixtureIndex[2],
+            $this->fixtureIndex[3],
+            $this->fixtureIndex[0],
+        );
+        $this->assertEqual($result['paramsForList']['data']['entries'],
+            $expected);
+
+        // test courses admin'd (Fac of Sci) or taught by admin4
+        $this->login = array(
+            'User' => array(
+                'username' => 'admin4',
+                'password' => md5('ipeeripeer')
+            )
+        );
+        $result = $this->testAction('/courses/index', array('return' => 'vars'));
+        $expected = array(
+            $this->fixtureIndex[1],
+            $this->fixtureIndex[2],
+            $this->fixtureIndex[0],
+        );
+        $this->assertEqual($result['paramsForList']['data']['entries'],
+            $expected);
+    }
+
     function testView()
     {
         $result1 = $this->testAction('/courses/view/1', array('return' => 'vars'));
@@ -315,7 +361,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->assertEqual($result['Course']['id'], 2);
         $this->assertEqual($result['Course']['course'], $this->fixtureView['Course'][1]['course']);
         $this->assertEqual($result['Course']['student_count'], $this->fixtureView['Course'][1]['student_count']);
-        $this->assertEqual(count($result['Instructor']), 2);
+        $this->assertEqual(count($result['Instructor']), 3);
         $this->assertEqual($result['Instructor'][0]['id'], $this->fixtureView['Instructor'][1]['id']);
         $this->assertEqual($result['Instructor'][1]['id'], $this->fixtureView['Instructor'][2]['id']);
     }
@@ -635,6 +681,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->assertFalse(array_key_exists('Auth', $_SESSION));
         $this->assertFalse(array_key_exists('ipeerSession', $_SESSION));
     }
+
 
 /*    function testAddInstructor() {
         $this->Course = ClassRegistry::init('Course');

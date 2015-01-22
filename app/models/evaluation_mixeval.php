@@ -83,8 +83,17 @@ class EvaluationMixeval extends EvaluationResponseBase
      */
     function getResultsByEvaluatee($grpEventId, $evaluatee, $include)
     {
+        $this->GroupEvent = ClassRegistry::init('GroupEvent');
+        $this->Event = ClassRegistry::init('Event');
+        $grpEvent = $this->GroupEvent->findById($grpEventId);
+        $event = $this->Event->findById($grpEvent['GroupEvent']['event_id']);
+        $conditions = array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee, 'evaluator' => $include);
+        if (!$event['Event']['self_eval']) {
+            $not = array('evaluator != evaluatee');
+            $conditions = array_merge($conditions, $not);
+        }
         return $this->find('all', array(
-            'conditions' => array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee, 'evaluator' => $include),
+            'conditions' => $conditions,
             'order' => 'evaluator ASC',
             'contain' => 'EvaluationMixevalDetail',
         ));
@@ -102,8 +111,17 @@ class EvaluationMixeval extends EvaluationResponseBase
      */
     function getResultsByEvaluateesOrEvaluators($grpEventId=null, $members=null)
     {
+        $this->GroupEvent = ClassRegistry::init('GroupEvent');
+        $this->Event = ClassRegistry::init('Event');
+        $grpEvent = $this->GroupEvent->findById($grpEventId);
+        $event = $this->Event->findById($grpEvent['GroupEvent']['event_id']);
+        $conditions = array('grp_event_id' => $grpEventId, "OR"=>array('evaluatee' => $members, 'evaluator' => $members));
+        if (!$event['Event']['self_eval']) {
+            $not = array('evaluator != evaluatee');
+            $conditions = array_merge($conditions, $not);
+        }
         return $this->find('all', array(
-            'conditions' => array('grp_event_id' => $grpEventId, "OR"=>array('evaluatee' => $members, 'evaluator' => $members)),
+            'conditions' => $conditions,
             'order' => 'evaluator ASC',
             'contain' => 'EvaluationMixevalDetail',
             'group' => array('EvaluationMixeval.evaluator','EvaluationMixeval.evaluatee'),

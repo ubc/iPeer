@@ -115,8 +115,9 @@ for ($i = -1; $i < $numPenalties; $i++) {
     $inputs =
         '<div class="penaltyInput" id="penaltyInput'.$i.'">' .
         $this->Form->label("latep$i", '', array('class' => 'penaltyLabel')) .
+        $this->Form->label("prefix", 'Then until', array('class' => 'penaltyInLabel')) .
         $this->Form->text("Penalty.$i.days_late", array('default' => $i + 1)) .
-        $this->Form->label('days', 'days', array('class' => 'penaltyInLabel')) .
+        $this->Form->label('days', 'days after the due date', array('class' => 'penaltyInLabel')) .
         $this->Form->select(
             "Penalty.$i.percent_penalty",
             $percent,
@@ -172,8 +173,10 @@ jQuery("#EventSurvey").change(updatePreview);
 jQuery("#EventMixeval").change(updatePreview);
 jQuery("#EventEmailSchedule").change(toggleEmailTemplate);
 jQuery("#EventEmailTemplate").change(updateEmailPreview);
+jQuery("input:radio[name=data['Event']['self_eval']]").change(toggleSelfEval);
 updateEmailPreview();
 toggleEmailTemplate();
+toggleSelfEval();
 // for redirecting to the add event view for the selected course
 changeCourseId();
 // attach event handlers to deal with changes in course selection
@@ -209,6 +212,10 @@ function addPenaltyInputs() {
     penaltyInputs = penaltyInputs.replace(/value="0"/g,
         'value="' +(penaltyCount + 1)+ '"');
     penaltyInputs = penaltyInputs.replace(/-1/g, penaltyCount);
+    if (penaltyCount == 0) {
+        penaltyInputs = penaltyInputs.replace("Then until", "From the due date to");
+        penaltyInputs = penaltyInputs.replace("days after the due date", "days late");
+    }
     jQuery(penaltyInputs).appendTo("#penaltyInputs");
 
     penaltyCount++;
@@ -312,8 +319,19 @@ function updatePreview() {
     }
     else if (eventType == '4') {
         var eventIdToPrev = jQuery("#EventMixeval").val();
+        var selfEval = jQuery("input:radio[name=data['Event']['self_eval']]:checked").val();
         url = "<?php echo $this->base; ?>/mixevals/view/";
-        jQuery("#prevM").attr("href", url + eventIdToPrev);
+        jQuery("#prevM").attr("href", url + eventIdToPrev + '/' + selfEval);
+    }
+}
+
+function toggleSelfEval() {
+    var eventType = jQuery("#EventEventTemplateTypeId").val();
+    if (eventType = '4') {
+        var templateId = jQuery("#EventMixeval").val();
+        var selfEval = jQuery("input:radio[name=data['Event']['self_eval']]:checked").val();
+        url = "<?php echo $this->base; ?>/mixevals/view/";
+        prevM.href = url + templateId + '/' + selfEval;
     }
 }
 

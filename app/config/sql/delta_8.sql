@@ -1,0 +1,6 @@
+INSERT INTO `email_templates` (`name`, `description`, `subject`, `content`, `availability`, `creator_id`, `created`, `updater_id`, `updated`) VALUES
+('Evaluation Reminder Template', 'evaluation reminder template', 'iPeer Evaluation Reminder', 'Hello {{{FIRSTNAME}}},\n\nA evaluation for {{{COURSENAME}}} is made available to you in iPeer, which has yet to be completed.\n\nName: {{{EVENTTITLE}}}\nDue Date: {{{DUEDATE}}}\nClose Date: {{{CLOSEDATE}}}\n\nThank You', 1, 1, NOW(), NULL, NULL); 
+
+UPDATE `email_schedules` SET `content` = (SELECT id FROM `email_templates` WHERE `subject`="iPeer Evaluation Reminder" AND `content`="Hello {{{FIRSTNAME}}},\n\nA evaluation for {{{COURSENAME}}} is made available to you in iPeer, which has yet to be completed.\n\nName: {{{EVENTTITLE}}}\nDue Date: {{{DUEDATE}}}\nClose Date: {{{CLOSEDATE}}}\n\nThank You") WHERE `subject` like '%iPeer Evaluation Reminder%' and `sent`=0;
+
+UPDATE `sys_parameters` SET `parameter_value` = '8' WHERE `parameter_code` = 'database.version';
