@@ -70,11 +70,17 @@ function saveButtonVal(userId) {
             <div style="text-align:left; margin-left:3em;"><a href="#" onClick="javascript:$('penalty').toggle();return false;">( <?php __('Show/Hide late penalty policy')?> )</a></div>
             <div id ="penalty" style ="border:1px solid red; margin: 0.5em 0 0 3em; width: 450px; padding:0.5em; color:darkred; display:none">
                 <?php if (!empty($penalty)) {
+                    $notFirst = false;
                     foreach ($penalty as $day) {
-                        $mult = ($day['Penalty']['days_late']>1)?'s':'';
-                        echo $day['Penalty']['days_late'].' day'.$mult.' late: '.$day['Penalty']['percent_penalty'].'% deduction. </br>';
+                        $pen = $day['Penalty'];
+                        if ($notFirst) {
+                            echo sprintf(__('Then until %d day(s) after the due date, %s will be deducted.', true), $pen['days_late'], $pen['percent_penalty'].'%').'<br>';
+                        } else {
+                            echo sprintf(__('From the due date to %d days(s) late, %s will be deducted.', true), $pen['days_late'], $pen['percent_penalty'].'%').'</br>';
+                            $notFirst = true;
+                        }
                     }
-                    echo $penaltyFinal['Penalty']['percent_penalty'].'% is deducted afterwards.';
+                    echo sprintf(__('%s is deducted afterwards.', true), $penaltyFinal['Penalty']['percent_penalty'].'%');
                 } else {
                     echo 'No penalty is specified for this evaluation.';
                 }

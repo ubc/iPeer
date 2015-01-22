@@ -1,7 +1,7 @@
 <?php
 $gradeReleased = array_product(Set::extract($evalResult[User::get('id')], '/EvaluationMixeval/grade_release')) ||
     $event['Event']['auto_release'];
-$commentReleased = array_product(Set::extract($evalResult[User::get('id')], '/EvaluationMixeval/comment_release')) ||
+$commentReleased = array_sum(Set::extract($evalResult[User::get('id')], '/EvaluationMixevalDetail/comment_release')) ||
     $event['Event']['auto_release'];
 ?>
 <!-- Render Event Info table -->
@@ -56,7 +56,7 @@ if ($mixeval['Mixeval']['peer_question'] > 0) {
     echo $this->element('evaluations/mixeval_details', $params);
 }
 
-if ($mixeval['Mixeval']['self_eval'] > 0) {
+if ($mixeval['Mixeval']['self_eval'] > 0 && $event['Event']['self_eval']) {
     $params = array('controller'=>'evaluations', 'questions'=>$questions, 'zero_mark'=>$zero_mark, 'evaluatee' => User::get('id'),
         'gradeReleased'=> 1, 'commentReleased'=> 1, 'details'=>$event['Event']['enable_details'],
         'peer_eval' => 0, 'title' => __('Self-Evaluation', true), 'instructorMode' => 0);
