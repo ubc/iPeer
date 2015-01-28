@@ -11,12 +11,14 @@ echo "<div id='usernameErr' class='red'></div>";
 echo $this->Form->input('first_name');
 echo $this->Form->input('last_name');
 echo $this->Form->input('email');
+echo '<p class="upgradenote message good-message green hide">The user\'s primary role will be upgraded:</p>';
 echo $this->Form->input(
   'Role.RolesUser.role_id',
   array(
     'default' => $roleDefault,
-    'label' => 'Role',
+    'label' => 'Primary Role',
     'options' => $roleOptions,
+    'after' => 'If the user is an instructor below, their primary role should match.'
   )
 );
 if (User::hasPermission('functions/user/admin', 'update')) {
@@ -27,7 +29,7 @@ echo $this->Form->input('title');
 echo $this->Form->input('student_no', array('label' => 'Student Number'));
 ?>
 	<div class="input text">
-		<label>Put User in Course</label>
+		<label>Course Enrollment</label>
 		<div style="width: 35em; display: inline-block; border: 1px solid #999; padding: 5px; border-radius: 3px; margin: 0.35em 0.35em;">
 			<table id="courseTable">
 				<thead>
@@ -38,17 +40,19 @@ echo $this->Form->input('student_no', array('label' => 'Student Number'));
 				</thead>
 				<tbody>
 					<?php
+
 					foreach ($coursesOptions as $key=>$row) {
+                        
+                        $courseRole = 0; // default is none
+                        if(isset($coursesSelected[$key])) {
+                            $courseRole = $coursesSelected[$key];
+                        }
+                        
 						?>
 					<tr>
 						<td style="text-align: center;"><?php 
-						if (in_array($key, $coursesSelected)) {
-							$checked = "checked";
-						}
-						else {
-							$checked = "";
-						}
-						echo $this->Form->checkbox('Courses.id', array('value' => $key, 'hiddenField' => false, 'checked' => $checked, 'style' => 'width: 12px;', 'id' => 'course_'.$key));
+						echo $this->Form->input('CourseEnroll.'.$key, array('default' => $courseRole, 'options' => $courseLevelRoles, 'id' => 'course_'.$key , 'class' => 'role-select', 'label' => false));
+						/* echo $this->Form->checkbox('Courses.id', array('value' => $key, 'hiddenField' => false, 'checked' => $checked, 'style' => 'width: 12px;', 'id' => 'course_'.$key)); */
 						?>
 						</td>
 						<td style="text-align: left;"><?php echo $this->Form->label('Courses.id', $row, array('style' => 'width: 100%; float: none', 'for' => 'course_'.$key));
@@ -88,17 +92,25 @@ echo $ajax->observeField(
 if (User::hasPermission('functions/user/admin')) {
     echo "
 <script type='text/javascript'>
-// If the user is supposed to be a student, disable adding as an
-// instructor. Any other role, disable adding as a student.
+// enable or disable faculty menu as appropriate
 jQuery('#RoleRolesUserRoleId').change(function() {
     var str = jQuery('#RoleRolesUserRoleId option:selected').text();
     if (str == 'admin' || str == 'instructor') {
         jQuery('#FacultyFaculty').removeAttr('disabled');
+        jQuery('#FacultyFaculty').addClass('enabled'); // for edit view testing
     }
     else {
         jQuery('#FacultyFaculty').attr('disabled', 'disabled');
     }
 });
+
+jQuery('.role-select').change(function () {
+    if(jQuery(this).val()==3 && jQuery('#RoleRolesUserRoleId').val()>3) {
+        jQuery('#RoleRolesUserRoleId').val(3).change();
+        jQuery('.upgradenote').show();
+    }
+});
+
 // run once on initial page load
 jQuery('#RoleRolesUserRoleId').change();
 </script>";
@@ -106,34 +118,16 @@ jQuery('#RoleRolesUserRoleId').change();
 ?>
 
 <script>
-	function selectCourse(id) {
-		if (jQuery("#CoursesEnrollment").val().indexOf("|" + id + "|") >= 0) {
-			jQuery("#CoursesEnrollment").val(jQuery("#CoursesEnrollment").val().replace("|" + id + "|", ""));
-		}
-		else {
-			jQuery("#CoursesEnrollment").val(jQuery("#CoursesEnrollment").val() + "|" + id + "|");
-		}
-	}
-
 	/* Create an array with the values of all the checkboxes in a column */
 	jQuery.fn.dataTableExt.afnSortData['dom-checkbox'] = function(oSettings, iColumn) {
 	    var aData = [];
-	    jQuery('td:eq(' + iColumn + ') input', oSettings.oApi._fnGetTrNodes(oSettings)).each(function() {
-	        aData.push(this.checked == false ? "1" : "0");
+	    jQuery('.role-select', oSettings.oApi._fnGetTrNodes(oSettings)).each(function() {
+	        aData.push(jQuery(this).val());
 	    });
 	    return aData;
 	}
 	
 	jQuery(document).ready(function() {
-
-		jQuery("#courseTable input[type='checkbox'][checked='checked']").each(function(){
-			selectCourse(this.value);
-		});
-
-		jQuery("#courseTable input[type='checkbox']").click(function(){
-			selectCourse(this.value);
-		});
-		
 		jQuery('#courseTable').dataTable({
 			"sPaginationType" : "full_numbers",
 	        "aoColumnDefs" : [

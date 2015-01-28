@@ -426,13 +426,13 @@ class UsersController extends AppController
         // set the courses that this user is already in
         $coursesId = array();
         foreach ($user['Course'] as $course) {
-            $coursesId[] = $course['id'];
+            $coursesId[$course['id']] = 3; // insructor = 3
         }
         foreach ($user['Enrolment'] as $course) {
-            $coursesId[] = $course['id'];
+            $coursesId[$course['id']] = 5; // student = 5
         }
         foreach ($user['Tutor'] as $course) {
-            $coursesId[] = $course['id'];
+            $coursesId[$course['id']] = 4; // tutor = 4
         }
         $this->set('coursesSelected', $coursesId);
     }
@@ -450,6 +450,8 @@ class UsersController extends AppController
         asort($coursesOptions);
         $this->set('coursesOptions', $coursesOptions);
 
+        $this->set('courseLevelRoles', array( 0 => 'none', 3 => 'instructor', 4 => 'tutor', 5 => 'student'));
+        
         $this->set('roleOptions', $this->AccessControl->getEditableRoles());
         $this->set('faculties', $this->User->Faculty->find('list',
             array('order' => 'Faculty.name ASC')));
@@ -693,70 +695,103 @@ class UsersController extends AppController
         $instructors = $this->User->getInstructorCourses($userId);
         $role = $this->User->getRoleName($userId);
 
+        if (!$this->User->findById($userId)) {
+            $this->Session->setFlash(__('Error: This user does not exist.', true));
+            $this->redirect($this->referer());
+        }
+        
         if (!User::hasPermission('functions/user')) {
             $this->Session->setFlash(__('Error: You do not have permission to edit users.', true));
             $this->redirect('/home');
         }
-
+        
+        if (!User::hasPermission('functions/user/'.$role, 'update')) {
+            $this->Session->setFlash(__('Error: You do not have permission to edit this user.', true));
+            if (is_null($courseId)) {
+                $this->redirect('index');
+            } else {
+                $this->redirect('goToClassList/'.$courseId);
+            }
+        }
+        
         // save the data which involves:
         if ($this->data) {
             $this->data['User'] = array_map('trim', $this->data['User']);
-            if (!is_array($this->data['Courses']['id'])) {
-                $this->data['Courses']['id'] = array();
-            }
 
             // add list of courses the user is enrolled in but the logged
             // in user does not have access to so that the user would not
             // be unenrolled from the course when their profile is edited.
-            $append = $this->_notUnenrolCourses($this->Auth->user('id'), $userId);
-            $this->data['Courses']['id'] = array_merge($this->data['Courses']['id'], $append);
-
+            $hiddenCourses = $this->_notUnenrolCourses($this->Auth->user('id'), $userId);
+            
+            // REMOVE OLD STUDENT STATUSES
             // unenrol student from course, group, surveygroup
             // only students will go in because only they have records in Enrolment
             foreach ($enrolCourses as $course) {
-                if (!in_array($course, $this->data['Courses']['id'])) {
+                if (!in_array($course, $hiddenCourses) && $this->data['CourseEnroll'][$course] != 5) {
                     $this->User->removeStudent($userId, $course);
                 }
             }
+            
+            // REMOVE OLD TUTOR STATUSES
             // unenrol tutor from course, group
             foreach ($tutorCourses as $course) {
-                if (!in_array($course, $this->data['Courses']['id'])) {
+                if (!in_array($course, $hiddenCourses) && $this->data['CourseEnroll'][$course] != 4) {
                     $this->User->removeTutor($userId, $course);
                 }
             }
+            
+            // REMOVE OLD INSTRUCTOR STATUSES
             // unenrol instructor from course
             foreach ($instructors as $course) {
-                if (!in_array($course, $this->data['Courses']['id'])) {
+                if (!in_array($course, $hiddenCourses) && $this->data['CourseEnroll'][$course] != 3) {
                     $this->User->removeInstructor($userId, $course);
                 }
             }
-
-            // create the enrolment entry depending on if instructor or student
-            // and also convert it into a CakePHP dark magic friendly format
-            $enrollment = explode("||", $this->data['Courses']['enrollment']);
-            foreach ($enrollment as $index => $val) {
-                $enrollment[$index] = str_replace("|", "", $val);
+            
+            $newTutorCourses = array();
+            $newInstructorCourses = array();
+            $newStudentCourses = array();
+            
+            // ADD NEW (possibly existing) STATUSES
+            foreach($this->data['CourseEnroll'] as $currCourseId => $currRoleId) {
+                if(!is_numeric($currCourseId)) {
+                    continue;
+                }
+                switch($currRoleId) {
+                    case 3:
+                        $newInstructorCourses[] = $currCourseId;
+                        break;
+                    case 4:
+                        $newTutorCourses[] = $currCourseId;
+                        break;
+                    case 5:
+                        $newStudentCourses[] = $currCourseId;
+                        break;
+                    default:
+                        // nothing
+                }
             }
+            
+            unset($this->data['CourseEnroll']); //unset to avoid confusing CakePHP model insertion
 
-            if (!empty($enrollment)) {
-                $enrolments = $this->_convertCourseEnrolment(
-                    $enrollment,
-                    $this->data['Role']['RolesUser']['role_id']
-                );
-            } else {
-                $enrolments = array('Enrolment' => array());
+            // combine the query data
+            $this->data = array_merge($this->data, 
+                                      $this->_convertCourseEnrolment($newInstructorCourses,3),
+                                      $this->_convertCourseEnrolment($newTutorCourses,4),
+                                      $this->_convertCourseEnrolment($newStudentCourses,5)
+                                     );
+            
+            // upgrade to instructor, but don't downgrade 
+            if(!empty($newInstructorCourses) && $this->data['Role']['RolesUser']['role_id'] > 3) {
+                $this->data['Role']['RolesUser']['role_id'] = 3;
             }
-
-            $this->data = array_merge($this->data, $enrolments);
-
+            
             // Now we actually attempt to save the data
             if ($this->User->save($this->data)) {
                 // Success!
                 $this->Session->setFlash(__('User successfully updated!', true), 'good');
-                // no course id given - assume not an instructor
-                if (is_null($courseId)) {
-                    $this->redirect('index');
-                } else {
+                // course id given - assume an instructor
+                if (!is_null($courseId)) {
                     $this->redirect('goToClassList/'.$courseId);
                 }
             } else {
@@ -767,20 +802,6 @@ class UsersController extends AppController
             // only load this after save, or we won't get the correct values
             $this->_initEditFormEnv($userId);
             return;
-        }
-
-        if (!($this->data = $this->User->findById($userId))) {
-            $this->Session->setFlash(__('Error: This user does not exist.', true));
-            $this->redirect($this->referer());
-        }
-
-        if (!User::hasPermission('functions/user/'.$role, 'update')) {
-            $this->Session->setFlash(__('Error: You do not have permission to edit this user.', true));
-            if (is_null($courseId)) {
-                $this->redirect('index');
-            } else {
-                $this->redirect('goToClassList/'.$courseId);
-            }
         }
 
         // set up the course and role variables to fill the form elements
@@ -1659,7 +1680,7 @@ class UsersController extends AppController
         // get editor's list of courses
         $editorCourses = $this->Course->getAccessibleCourses(User::get('id'),
             User::getCourseFilterPermission(), 'list');
-
+        
         return array_diff($userCourses, array_keys($editorCourses));
     }
 

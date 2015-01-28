@@ -39,7 +39,9 @@ if (User::isLoggedIn()) {
     }
 
     //Evaluation Tools Tab
-    if (User::hasPermission('controllers/evaltools')) {
+    // Combo condition: user has permission to view evaltools (system instructor)
+    // OR user is instructor in at least one course (and system student/tutor otherwise)
+    if (User::hasPermission('controllers/evaltools') || User::isInstructor()) {
         generateTab($this, 'evaltools',
             array(
                 'evaltools', 'simpleevaluations', 'rubrics',
