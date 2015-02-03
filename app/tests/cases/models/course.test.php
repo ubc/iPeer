@@ -86,6 +86,10 @@ class CourseTestCase extends CakeTestCase {
         $this->assertEqual($course[3]['Course']['course'], "MECH 328");
         $this->assertEqual(sizeof($course), 4);
 
+        // test to get first course admin'd (Fac of AppSci) or taught by admin3
+        $course = $this->Course->getAllAccessibleCourses(34, 1, 'first');
+        $this->assertEqual($course['Course']['course'], "APSC 201"); //all sorted alphabetically
+
         // test courses admin'd (Fac of AppSci) or taught by admin4 - both admin and teach APSC 201
         $course = $this->Course->getAllAccessibleCourses(40, 1);
         $this->assertEqual($course[0]['Course']['course'], "APSC 201"); //admin'd sorted alphabetically
@@ -98,6 +102,9 @@ class CourseTestCase extends CakeTestCase {
         $this->assertEqual($course[0]['Course']['course'], "APSC 201");
         $this->assertEqual($course[1]['Course']['course'], "CPSC 101");
         $this->assertEqual(sizeof($course), 2);
+
+        $course = $this->Course->getAllAccessibleCourses(4, 2, 'first');
+        $this->assertEqual($course['Course']['course'], "APSC 201");
     }
 
 
@@ -308,11 +315,11 @@ class CourseTestCase extends CakeTestCase {
     function testGetAccessibleCourseById()
     {
     }
-    
+
     function testGetuserListByCourse()
     {
     }
-    
+
     function testGetCourseList()
     {
     }
