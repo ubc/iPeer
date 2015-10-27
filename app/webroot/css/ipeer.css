@@ -542,6 +542,12 @@ i {
     background: lightgreen;
 }
 
+/* dual instructor/student home */
+
+.instructorView {
+    margin-bottom: 4em;
+}
+
 /* Emailtemplate Form settings */
 
 /* view */

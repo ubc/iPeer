@@ -23,6 +23,7 @@
   echo $html->script('https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js');
   echo $html->script('https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js');
   echo $html->script('jquery.dataTables.min');
+  echo $html->script('fnGetHiddenNodes');
   ?>
   <script type='text/javascript'>
   jQuery.noConflict(); // prevent conflicts with prototype

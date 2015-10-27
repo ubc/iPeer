@@ -103,7 +103,7 @@ class Toolkit
         $ret = array();
         if (($handle = fopen($file, "r")) !== false) {
             while (($data = fgetcsv($handle, 1000, ",")) !== false) {
-                $ret[] = $data;
+                $ret[] = array_map('trim', $data);
             }
             fclose($handle);
         } else {
