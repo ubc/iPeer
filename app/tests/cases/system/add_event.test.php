@@ -21,12 +21,10 @@ class addEventTestCase extends SystemBaseTestCase
         $this->fillInEventAddForm();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Peer Evaluation')->click();
         $eventId = end(explode('/', $this->session->url()));
-        $this->session->open($this->url.'events/edit/'.$eventId);
-        $this->eventsEdit();
 
         // search that all the email schedules have been created
         $this->session->open($this->url.'emailer');
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'searchInputField')->sendKeys('mech');
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'searchInputField')->sendKeys('iPeer');
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $w->until(
             function($session) {
@@ -35,22 +33,16 @@ class addEventTestCase extends SystemBaseTestCase
             }
         );
 
-        for ($i = 0; $i < 4; $i++) {
-            $this->session->elementWithWait(PHPWebDriver_WebDriverBy::PARTIAL_LINK_TEXT, 'MECH 328')->click();
-            $students = count($this->session->elementsWithWait(PHPWebDriver_WebDriverBy::PARTIAL_LINK_TEXT, 'Student'));
-            $this->assertEqual($students, 6);
-            $tutors = count($this->session->elementsWithWait(PHPWebDriver_WebDriverBy::PARTIAL_LINK_TEXT, 'Tutor'));
-            $this->assertEqual($tutors, 1);
-            $id = end(explode('/', $this->session->url()));
-            $this->session->open($this->url.'emailer/cancel/'.$id);
-            $w->until(
-                function($session) {
-                    return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
-                }
-            );
-            $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
-            $this->assertEqual($msg, 'The Email was canceled successfully.');
-        }
+        // check email recipients
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'iPeer Evaluation Reminder')->click();
+        $students = count($this->session->elementsWithWait(PHPWebDriver_WebDriverBy::PARTIAL_LINK_TEXT, 'Student'));
+        $this->assertEqual($students, 6);
+        $tutors = count($this->session->elementsWithWait(PHPWebDriver_WebDriverBy::PARTIAL_LINK_TEXT, 'Tutor'));
+        $this->assertEqual($tutors, 1);
+
+        // edit event
+        $this->session->open($this->url.'events/edit/'.$eventId);
+        $this->eventsEdit();
 
         // delete the event
         $this->session->open($this->url.'events/delete/'.$eventId);
@@ -159,25 +151,17 @@ class addEventTestCase extends SystemBaseTestCase
 
         // set email reminder frequency to 2 days
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[value="2"]')->click();
+        // select Evaluation Reminder Template
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailTemplate"] option[value="5"]')->click();
         // select all groups
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[id="selectAll"]')->click();
 
         // fill in the dates
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '12')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateBegin')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '4')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '13')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventResultReleaseDateBegin')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '14')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventResultReleaseDateEnd')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '28')->click();
+        $this->selectDayOnCalender('EventDueDate', '12');
+        $this->selectDayOnCalender('EventReleaseDateBegin', '4');
+        $this->selectDayOnCalender('EventReleaseDateEnd', '13');
+        $this->selectDayOnCalender('EventResultReleaseDateBegin', '14');
+        $this->selectDayOnCalender('EventResultReleaseDateEnd', '28');
 
         // submit form
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
@@ -206,10 +190,11 @@ class addEventTestCase extends SystemBaseTestCase
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'unselectAll')->click();
 
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+
         $warning = $this->session->switch_to_alert();
         $warning->accept();
 
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $w->until(
             function($session) {
@@ -232,19 +217,11 @@ class addEventTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDescription')->sendKeys('w/ reminders');
 
         // fill in the dates
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '12')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateBegin')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '13')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventResultReleaseDateBegin')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '14')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventResultReleaseDateEnd')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '28')->click();
+        $this->selectDayOnCalender('EventDueDate', '12');
+        $this->selectDayOnCalender('EventReleaseDateBegin', '4');
+        $this->selectDayOnCalender('EventReleaseDateEnd', '13');
+        $this->selectDayOnCalender('EventResultReleaseDateBegin', '14');
+        $this->selectDayOnCalender('EventResultReleaseDateEnd', '28');
 
         $dueDate = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->attribute('value');
         $releaseEnd = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->attribute('value');
@@ -369,13 +346,9 @@ class addEventTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventSurvey"] option[value="1"]')->click();
 
         // fill in the dates
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '12')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateBegin')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '13')->click();
+        $this->selectDayOnCalender('EventDueDate', '12');
+        $this->selectDayOnCalender('EventReleaseDateBegin', '4');
+        $this->selectDayOnCalender('EventReleaseDateEnd', '13');
 
         // set email reminder frequency to 5 days
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[value="5"]')->click();
@@ -479,15 +452,10 @@ class addEventTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEventTemplateTypeId"] option[value="3"]')->click();
 
         // fill in the dates - interval is 2 days
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '12')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateBegin')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '10')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '12')->click();
+        $this->selectDayOnCalender('EventDueDate', '12');
+        $this->selectDayOnCalender('EventReleaseDateBegin', '10');
+        $this->selectDayOnCalender('EventReleaseDateEnd', '13');
+        $this->selectDayOnCalender('EventResultReleaseDateEnd', '12');
         // set email reminder frequency to 3 days
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[value="3"]')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
