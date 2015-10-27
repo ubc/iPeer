@@ -42,15 +42,15 @@ echo $this->Form->input('student_no', array('label' => 'Student Number'));
 					<?php
 
 					foreach ($coursesOptions as $key=>$row) {
-                        
+
                         $courseRole = 0; // default is none
                         if(isset($coursesSelected[$key])) {
                             $courseRole = $coursesSelected[$key];
                         }
-                        
+
 						?>
 					<tr>
-						<td style="text-align: center;"><?php 
+						<td style="text-align: center;"><?php
 						echo $this->Form->input('CourseEnroll.'.$key, array('default' => $courseRole, 'options' => $courseLevelRoles, 'id' => 'course_'.$key , 'class' => 'role-select', 'label' => false));
 						/* echo $this->Form->checkbox('Courses.id', array('value' => $key, 'hiddenField' => false, 'checked' => $checked, 'style' => 'width: 12px;', 'id' => 'course_'.$key)); */
 						?>
@@ -59,7 +59,7 @@ echo $this->Form->input('student_no', array('label' => 'Student Number'));
 						?>
 						</td>
 					</tr>
-					<?php 
+					<?php
 					}
 					?>
 				</tbody>
@@ -70,7 +70,9 @@ echo $this->Form->input('student_no', array('label' => 'Student Number'));
 ?><div class=buttons><?php
 echo $this->Form->submit('Save');
 echo $this->Form->hidden('Courses.enrollment');
-?></div><?php
+?></div>
+<div style="display:none" id="hidden-table-data"></div>
+<?php
 echo $this->Form->end();
 
 // dynamically check username availability
@@ -126,9 +128,9 @@ jQuery('#RoleRolesUserRoleId').change();
 	    });
 	    return aData;
 	}
-	
+
 	jQuery(document).ready(function() {
-		jQuery('#courseTable').dataTable({
+		var courseTable = jQuery('#courseTable').dataTable({
 			"sPaginationType" : "full_numbers",
 	        "aoColumnDefs" : [
 	            {"bSearchable": false, "sSortDataType": "dom-checkbox", "aTargets": [0] }
@@ -140,5 +142,8 @@ jQuery('#RoleRolesUserRoleId').change();
 		jQuery("#courseTable_length label").css({"float": "none", "padding": "0"});
 		jQuery("#courseTable_filter label").css({"float": "none", "padding": "0"});
 		jQuery("#courseTable_filter input").css({"width": "175px"});
+        jQuery('#UserForm').submit(function() {
+            jQuery(courseTable.fnGetHiddenNodes()).find('select[name^="data[CourseEnroll]"]').appendTo(jQuery('#hidden-table-data'));
+        });
 	});
 </script>
