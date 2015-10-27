@@ -71,6 +71,16 @@ Runing the tests:
 
 It is better not to touch the mouse or keyboard during the tests.
 
+iPeer 3.1.7
+---------------------------
+* Fix course enrolment not saved on hidden page on user edit
+* Add License file
+* changed the box Vagrant is using
+* Merge pull request #506 from tkbaylis/3.1.x
+* Trim the input from CSV file
+* Allow users to hold multiple roles in different courses #413
+* Fix issue showing blank page when admin click on list events
+
 iPeer 3.1.6
 ---------------------------
 This is a maintenance release.
