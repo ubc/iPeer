@@ -118,6 +118,14 @@ abstract class SystemBaseTestCase extends CakeTestCase
         $home = $login->login($username, 'ipeeripeer');
     }
 
+    public function selectDayOnCalender($name, $day)
+    {
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, $name)->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, $day)->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button.ui-priority-primary')->click();
+    }
+
     public function startTest($method) {
         echo 'Starting method ' . $method . "\n";
     }
