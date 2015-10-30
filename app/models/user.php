@@ -707,10 +707,10 @@ class User extends AppModel
 
                 $existings[$key]['User'] = $temp;
             }
-            
+
             //change inactive status to active
             $this->readdUser($e['User']['id']);
-            
+
             // remove the existings from the data array
             unset($data[$e['User']['username']]);
         }
@@ -748,10 +748,10 @@ class User extends AppModel
 
         // set to true if e.g. user is an instructor/student in at least one course
         $Session->write('ipeerSession.IsInstructor', sizeof($this->getInstructorCourses($id)) > 0);
-        $Session->write('ipeerSession.IsStudentOrTutor', 
+        $Session->write('ipeerSession.IsStudentOrTutor',
                         (sizeof($this->getEnrolledCourses($id)) > 0) ||
                         (sizeof($this->getTutorCourses($id)) > 0) );
-        
+
         return $roles;
     }
 
@@ -1017,22 +1017,24 @@ class User extends AppModel
 	 */
     function getEventGroupMembersNoTutors($groupId, $selfEval, $userId)
     {
+        $group = $this->Group->findById($groupId);
+
         $conditions['Group.id'] = $groupId;
-        $conditions['Role.id'] = $this->USER_TYPE_STUDENT;
+        $conditions['Enrolment.id'] = $group['Group']['course_id'];
         if (!$selfEval) {
             $conditions['User.id !='] = $userId;
         }
 
         $members = $this->find('all', array(
             'conditions' => $conditions,
-            'contain' => array('Role', 'Group')
+            'contain' => array('Enrolment', 'Group', 'Role')
         ));
 
         $groupMembers = array();
         foreach($members as $member) {
             $tmp = array();
             $tmp['User'] = $member['User'];
-            $tmp['Role']['0'] = $member['Role'];
+            $tmp['Role']['0'] = array('name' => 'student');
             $groupMembers[] = $tmp;
         }
 
@@ -1086,7 +1088,7 @@ class User extends AppModel
         ));
         return Set::extract($user, '/Course/id');
     }
-    
+
     /**
      * generates and saves new password
      *
@@ -1097,18 +1099,18 @@ class User extends AppModel
     function savePassword($user_id) {
         App::import('Component', 'PasswordGenerator');
         $psGen = new PasswordGeneratorComponent();
-        
+
         $tmp_password = $psGen->generate();
         $user_data['User']['tmp_password'] = $tmp_password;
         $user_data['User']['password'] =  md5($tmp_password);
         $user_data['User']['id'] =  $user_id;
-        
+
         if($this->save($user_data, true, array('password'))) {
             return $tmp_password;
         }
         return false;
     }
-    
+
     /**
      * unflips user's record status from inactive to active
      *
@@ -1120,7 +1122,7 @@ class User extends AppModel
     {
         $userData['User']['record_status'] = 'A';
         $userData['User']['id'] = $userId;
-        
+
         return $this->save($userData, true, array('record_status'));
     }
 
@@ -1404,7 +1406,7 @@ class User extends AppModel
 
         return ($permission == true);
     }
-    
+
     /**
      * isStudent returns true if user is a student in at least once course
      *
