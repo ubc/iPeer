@@ -35,7 +35,7 @@ class AccessesController extends AppController {
         $this->set('roles', $roles);
         $this->set('roleId', $roleId);
         $this->set('permissions', $permissions);
-        $this->set('title_for_layout', 'Permissions Editor > '.$roles[$roleId]);
+        $this->set('title_for_layout', __('Permissions Editor',true).' > '.$roles[$roleId]);
     }
 
     /**

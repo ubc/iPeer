@@ -25,9 +25,23 @@ class EmailerController extends AppController
      */
     function __construct()
     {
-        $this->pageTitle = 'Email';
         parent::__construct();
     }
+
+    /**
+     * beforeFilter
+     *
+     * @access public
+     * @return void
+     */
+    function beforeFilter()
+    {
+        parent::beforeFilter();
+
+        $this->pageTitle = __('Email',true);
+        $this->set('title_for_layout', __('Email',true));
+    }
+
 
     /**
      * setUpAjaxList

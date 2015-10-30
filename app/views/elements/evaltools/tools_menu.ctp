@@ -18,25 +18,25 @@ function generateLink ($view, $url, $name) {
         <!-- Sub menu for Evaluation Event Tools -->
 <?php 
 if (User::hasPermission('controllers/evaltools')) { 
-    generateLink($this, 'evaltools', 'All My Tools');
+    generateLink($this, 'evaltools', __('All My Tools',true));
 }
 if (User::hasPermission('controllers/simpleevaluations')) {
-    generateLink($this, 'simpleevaluations', 'Simple Evaluations');
+    generateLink($this, 'simpleevaluations', __('Simple Evaluations',true));
 }
 if (User::hasPermission('controllers/rubrics')) {
-    generateLink($this, 'rubrics', 'Rubrics');
+    generateLink($this, 'rubrics', __('Rubrics',true));
 }
 if (User::hasPermission('controllers/mixevals')) {
-    generateLink($this, 'mixevals', 'Mixed Evaluations');
+    generateLink($this, 'mixevals', __('Mixed Evaluations',true));
 }
 if (User::hasPermission('controllers/surveys')) {
-    generateLink($this, 'surveys', 'Surveys');
+    generateLink($this, 'surveys', __('Surveys',true));
 }
 if (User::hasPermission('controllers/emailer')) {
-    generateLink($this, 'emailer', 'Emailer');
+    generateLink($this, 'emailer', __('Emailer',true));
 }
 if (User::hasPermission('controllers/emailtemplates')) {
-    generateLink($this, 'emailtemplates', 'Email Templates');
+    generateLink($this, 'emailtemplates', __('Email Templates',true));
 }
 ?>
     </ul>

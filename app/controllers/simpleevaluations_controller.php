@@ -43,12 +43,23 @@ class SimpleevaluationsController extends AppController
         $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
         $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
         $this->order = $this->sortBy.' '.strtoupper($this->direction);
-        $this->set('title_for_layout', __('Simple Evaluations', true));
         $this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
 
         parent::__construct();
     }
 
+    /**
+     * beforeFilter
+     *
+     * @access public
+     * @return void
+     */
+    function beforeFilter()
+    {
+        parent::beforeFilter();
+
+        $this->set('title_for_layout', __('Simple Evaluations', true));
+    }
 
     /**
      * postProcess

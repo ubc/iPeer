@@ -34,7 +34,6 @@ class InstallController extends Controller
      */
     function __construct()
     {
-        $this->set('title_for_layout', __('Installation Wizard', true));
         parent::__construct();
     }
 
@@ -46,6 +45,8 @@ class InstallController extends Controller
      */
     public function beforeFilter()
     {
+        $this->set('title_for_layout', __('Installation Wizard',true));
+
         $timezone = ini_get('date.timezone') ? ini_get('date.timezone') : 'UTC';
         date_default_timezone_set($timezone); // set the default time zone
     }

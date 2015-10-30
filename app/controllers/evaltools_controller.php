@@ -30,10 +30,21 @@ class EvaltoolsController extends AppController
     function __construct()
     {
         $this->Sanitize = new Sanitize;
-        $this->set('title_for_layout', __('Evaluation Tools', true));
         parent::__construct();
     }
 
+    /**
+     * beforeFilter
+     *
+     * @access public
+     * @return void
+     */
+    function beforeFilter()
+    {
+        parent::beforeFilter();
+
+        $this->set('title_for_layout', __('Evaluation Tools',true));
+    }
 
     /**
      * index

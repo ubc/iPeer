@@ -51,6 +51,8 @@ class GroupsController extends AppController
     {
         parent::beforeFilter();
 
+        $this->set('title_for_layout', __('Groups',true));
+
         $allowTypes = array(
             'text/plain', 'text/csv', 'application/csv',
             'application/csv.ms-excel', 'application/octet-stream',

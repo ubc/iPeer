@@ -47,7 +47,6 @@ class SearchsController extends AppController
         $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
         $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
         $this->order = $this->sortBy.' '.strtoupper($this->direction);
-        $this->set('title_for_layout', __('Advanced Search', true));
 
         parent::__construct();
     }
@@ -62,6 +61,8 @@ class SearchsController extends AppController
     function  beforeFilter()
     {
         parent::beforeFilter();
+        $this->set('title_for_layout', __('Advanced Search', true));
+
         $currentUser = $this->User->getCurrentLoggedInUser();
         $this->set('currentUser', $currentUser);
         $coursesList = User::getMyCourseList();

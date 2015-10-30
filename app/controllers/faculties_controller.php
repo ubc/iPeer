@@ -35,7 +35,7 @@ class FacultiesController extends AppController {
      */
     function view($id)
     {
-        $this->set('title_for_layout', 'View Faculty');
+        $this->set('title_for_layout', __('View Faculty',true));
 
         if (!$id) {
             $this->Session->setFlash(__('Invalid faculty', true));

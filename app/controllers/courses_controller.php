@@ -27,7 +27,6 @@ class CoursesController extends AppController
      */
     function __construct()
     {
-        $this->set('title_for_layout', 'Courses');
         parent::__construct();
     }
 
@@ -40,6 +39,8 @@ class CoursesController extends AppController
     function beforeFilter()
     {
         parent::beforeFilter();
+
+        $this->set('title_for_layout', __('Courses',true));
 
         $allowTypes = array(
             'text/plain', 'text/csv', 'application/csv',

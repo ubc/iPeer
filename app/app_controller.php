@@ -80,8 +80,16 @@ class AppController extends Controller
         Security::setHash('md5');
         Configure::write('Security.salt', '');
 
-        // set default language for now
-        Configure::write('Config.language', 'eng');
+        $locale = $this->SysParameter->findByParameterCode('display.locale');
+        // default to eng if no locale is set
+        if (!(empty($locale) || empty($locale['SysParameter']['parameter_value']))) {
+            $locale = $locale['SysParameter']['parameter_value'];
+
+            // TODO: check that the locale is valid
+            Configure::write('Config.language', $locale);
+        } else {
+            Configure::write('Config.language', 'eng');
+        }
 
         // if we have a session transfered to us
         if ($this->_hasSessionTransferData()) {

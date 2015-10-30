@@ -23,7 +23,7 @@ class OauthclientsController extends AppController {
         if (!User::hasPermission('controllers/oauthclients')) {
             $this->redirect('/users/editProfile');
         }
-        $this->set('title_for_layout', 'OAuth Client Credentials');
+        $this->set('title_for_layout', __('OAuth Client Credentials',true));
         $clientCreds = array();
         $allClients = $this->OauthClient->find('all');
         foreach ($allClients as $cred) {

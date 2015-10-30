@@ -21,7 +21,7 @@ if (User::isLoggedIn()) {
     echo "<div id='navigationOuter' class='navigation'><ul>";
 
     //Home Tab
-    generateTab($this, 'home', array('home'), 'Home');
+    generateTab($this, 'home', array('home'), __('Home',true));
 
     if (User::hasPermission('controllers/courses')) {
         // Course Tab
@@ -29,13 +29,13 @@ if (User::isLoggedIn()) {
             $this,
             'courses',
             array('courses', 'events', 'groups', 'evaluations', 'surveygroups'),
-            'Courses'
+            __('Courses',true)
         );
     }
 
     // Users Tab
     if (User::hasPermission('functions/user/index')) {
-        generateTab($this, 'users', array('users'), 'Users');
+        generateTab($this, 'users', array('users'), __('Users',true));
     }
 
     //Evaluation Tools Tab
@@ -47,25 +47,25 @@ if (User::isLoggedIn()) {
                 'evaltools', 'simpleevaluations', 'rubrics',
                 'surveys', 'mixevals', 'emailer', 'emailtemplates'
             ),
-            'Evaluation'
+            __('Evaluation',true)
         );
     }
 
     // Advanced Search Tab
     /*if (User::hasPermission('controllers/searchs')) {
-        generateTab($this, 'searchs', array('searchs'), 'Search');
+        generateTab($this, 'searchs', array('searchs'), __('Search',true));
     }*/
 
     // Admin Tab
     if (User::hasPermission('adminpage')) {
         generateTab($this, 'pages/admin',
             array('pages/admin'),
-            'Admin');
+            __('Admin',true));
     }
 
     echo "<li>";
     echo $this->Html->link(
-        'Logout',
+        __('Logout',true),
         Router::url('/logout', true),
         array('class' => 'miniLinks')
     );
