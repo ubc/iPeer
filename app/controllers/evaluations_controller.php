@@ -25,7 +25,7 @@ class EvaluationsController extends AppController
         'MixevalQuestionDesc');
     public $components = array('ExportBaseNew', 'Auth', 'AjaxList', 'Output',
         'userPersonalize', 'framework',
-        'Evaluation', 'Export', 'ExportCsv', 'ExportExcel','ExportPdf');
+        'Evaluation', 'Export', 'ExportCsv', 'ExportExcel', 'ExportPdf');
 
     /**
      * __construct
@@ -36,8 +36,20 @@ class EvaluationsController extends AppController
     function __construct()
     {
         $this->Sanitize = new Sanitize;
-        $this->set('title_for_layout', __('Evaluations', true));
         parent::__construct();
+    }
+
+    /**
+     * beforeFilter
+     *
+     * @access public
+     * @return void
+     */
+    function beforeFilter()
+    {
+        parent::beforeFilter();
+
+        $this->set('title_for_layout', __('Evaluations', true));
     }
 
     /**

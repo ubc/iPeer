@@ -23,7 +23,7 @@ class OauthtokensController extends AppController {
         if (!User::hasPermission('controllers/oauthtokens')) {
             $this->redirect('/users/editProfile');
         }
-        $this->set('title_for_layout', 'OAuth Token Credentials');
+        $this->set('title_for_layout', __('OAuth Token Credentials',true));
         $tokenCreds = array();
         $allTokens = $this->OauthToken->find('all');
         foreach ($allTokens as $cred) {

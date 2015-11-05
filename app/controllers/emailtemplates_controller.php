@@ -40,11 +40,23 @@ class EmailtemplatesController extends AppController
         $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
         $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
         $this->order = $this->sortBy.' '.strtoupper($this->direction);
-        $this->set('title_for_layout', __('Email', true));
         parent::__construct();
     }
 
     /**
+     * beforeFilter
+     *
+     * @access public
+     * @return void
+     */
+    function beforeFilter()
+    {
+        parent::beforeFilter();
+
+        $this->set('title_for_layout', __('Email',true));
+    }
+
+        /**
      * setUpAjaxList
      *
      * @access public

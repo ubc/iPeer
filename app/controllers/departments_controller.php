@@ -48,7 +48,7 @@ class DepartmentsController extends AppController {
      * @param mixed $id - The department id to be viewed
      */
     public function view($id) {
-        $this->set('title_for_layout', 'View Department');
+        $this->set('title_for_layout', __('View Department',true));
         if (!$id) {
             $this->Session->setFlash(__('Invalid department', true));
             $this->redirect(array('action' => 'index'));

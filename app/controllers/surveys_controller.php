@@ -28,10 +28,21 @@ class SurveysController extends AppController
     function __construct()
     {
         $this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
-        $this->set('title_for_layout', __('Surveys', true));
         parent::__construct();
     }
 
+    /**
+     * beforeFilter
+     *
+     * @access public
+     * @return void
+     */
+    function beforeFilter()
+    {
+        parent::beforeFilter();
+
+        $this->set('title_for_layout', __('Surveys', true));
+    }
 
     /**
      * __postProcess

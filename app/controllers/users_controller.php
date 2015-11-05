@@ -34,7 +34,6 @@ class UsersController extends AppController
      */
     function __construct()
     {
-        $this->set('title_for_layout', __('Users', true));
         parent::__construct();
     }
 
@@ -47,6 +46,8 @@ class UsersController extends AppController
     function beforeFilter()
     {
         parent::beforeFilter();
+
+        $this->set('title_for_layout', __('Users',true));
 
         $allowTypes = array(
             'text/plain', 'text/csv', 'application/csv',

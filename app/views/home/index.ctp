@@ -2,7 +2,7 @@
 // print active courses
 if (isset($course_list['A']))
 {
-  echo "<h2>My Courses</h2>";
+  echo "<h2>".__('My Courses',true)."</h2>";
   foreach ($course_list['A'] as $course)
   {
     $courseid = $course['Course']['id'];
@@ -12,7 +12,7 @@ if (isset($course_list['A']))
     echo "<div class='course'>";
     echo $html->link("<h3>$coursename</h3>", $link, array('escape' => false));
 
-    echo "<h4>Instructors: ";
+    echo "<h4>".__('Instructors',true).": ";
     echo $this->element(
       'list/unordered_list_users',
       array('instructors' => $course['Instructor'])
@@ -20,7 +20,7 @@ if (isset($course_list['A']))
     echo "</h4>";
     echo "<table>";
     echo $this->Html->tableHeaders(
-      array('Events', 'Completion Ratio', 'Due Date'));
+      array(__('Events',true), __('Completion Ratio',true), __('Due Date',true)));
     foreach ($course['Event'] as $event)
     {
       $eventTitle = $this->Html->link(
@@ -30,8 +30,7 @@ if (isset($course_list['A']))
       {
           $eventReview = '<br />('.sprintf(__('%d unreviewed group evaluations', true), $event['to_review_count']).')';
       }
-      $eventRatio = $event['completed_count'] .' of '.
-        $event['student_count'] . ' Students';
+      $eventRatio = printf(__('%d of %d Students', true), $event['completed_count'], $event['student_count']);
       $eventDue = Toolkit::formatDate($event['due_date']);
       echo $this->Html->tableCells(
         array($eventTitle . $eventReview, $eventRatio, $eventDue)
@@ -45,7 +44,7 @@ if (isset($course_list['A']))
 // print inactive courses
 if (isset($course_list['I']))
 {
-  echo "<h2>Inactive Courses</h2>";
+  echo "<h2>".__('Inactive Courses',true)."</h2>";
   foreach ($course_list['I'] as $course)
   {
     $courseid = $course['Course']['id'];
@@ -54,7 +53,7 @@ if (isset($course_list['I']))
     $image = $html->image("icons/home.gif", array('alt' => "$coursename home"));
     $link = "/courses/home/$courseid";
     echo $html->link("<h3>$coursename</h3>", $link, array('escape' => false));
-    echo "<h4>Instructors: ";
+    echo "<h4>".__('Instructors',true).": ";
     echo $this->element(
       'list/unordered_list_users',
       array('instructors' => $course['Instructor'])

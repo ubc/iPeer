@@ -26,11 +26,22 @@ class MixevalsController extends AppController
      */
     function __construct()
     {
-        $this->set('title_for_layout', __('Mixed Evaluations', true));
         $this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
         parent::__construct();
     }
 
+    /**
+     * beforeFilter
+     *
+     * @access public
+     * @return void
+     */
+    function beforeFilter()
+    {
+        parent::beforeFilter();
+
+        $this->set('title_for_layout', __('Mixed Evaluations', true));
+    }
 
     /**
      * _postProcess

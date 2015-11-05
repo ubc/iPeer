@@ -1,114 +1,111 @@
 # LANGUAGE translation of CakePHP Application
 # Copyright YEAR NAME <EMAIL@ADDRESS>
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2015-11-04 22:51+0000\n"
-"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
-"Last-Translator: NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"Project-Id-Version: iPeer 3.1.7\n"
+"POT-Creation-Date: 2015-11-04 23:52+0100\n"
+"PO-Revision-Date: 2015-11-04 23:52+0100\n"
+"Last-Translator: Ion Jaureguialzo Sarasola <ion@jaureguialzo.com>\n"
+"Language-Team: Ion Jaureguialzo Sarasola <ion@jaureguialzo.com>\n"
+"Language: es_ES\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.8.6\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SourceCharset: UTF-8\n"
 
 #: /app_controller.php:74
 msgid "An invalid timezone is provided, please edit \"system.timezone\""
 msgstr ""
+"Se ha proporcionado una zona horaria incorrecta, por favor edite \"system."
+"timezone\""
 
 #: /app_controller.php:242
 msgid "Your account is currently inactive."
-msgstr ""
+msgstr "Su cuenta está actualmente inactiva."
 
 #: /controllers/accesses_controller.php:27
 msgid "Error: Invalid Id."
-msgstr ""
+msgstr "Error: ID no válido"
 
-#: /controllers/accesses_controller.php:38
-#: /views/pages/admin.ctp:59
+#: /controllers/accesses_controller.php:38 /views/pages/admin.ctp:59
 msgid "Permissions Editor"
-msgstr ""
+msgstr "Editor de permisos"
 
 #: /controllers/accesses_controller.php:62;114
 msgid "Error: Updating Permissions failed."
-msgstr ""
+msgstr "Error: Error al actualizar permisos."
 
 #: /controllers/accesses_controller.php:112
 msgid "Permissions have been updated"
-msgstr ""
+msgstr "Se actualizaron los permisos"
 
 #: /controllers/courses_controller.php:43
 #: /views/elements/global/navigation.ctp:32
 msgid "Courses"
-msgstr ""
+msgstr "Cursos"
 
 #: /controllers/courses_controller.php:70
-#: /controllers/events_controller.php:138
-#: /views/courses/view.ctp:6
+#: /controllers/events_controller.php:138 /views/courses/view.ctp:6
 #: /views/elements/searchs/evaluation_result_search_panel.ctp:12
 #: /views/elements/searchs/evaluation_search_panel.ctp:14
 #: /views/elements/searchs/instructor_search_panel.ctp:12
-#: /views/events/edit.ctp:31
-#: /views/events/view.ctp:7
+#: /views/events/edit.ctp:31 /views/events/view.ctp:7
 msgid "Course"
-msgstr ""
+msgstr "Curso"
 
 #: /controllers/courses_controller.php:71
-#: /controllers/events_controller.php:139
-#: /views/courses/view.ctp:21
+#: /controllers/events_controller.php:139 /views/courses/view.ctp:21
 #: /views/elements/events/ajax_event_list.ctp:16
 #: /views/elements/events/ajax_title_validate.ctp:5
 #: /views/elements/framework/view_user_detail.ctp:34
-#: /views/elements/users/merge_search.ctp:21
-#: /views/users/edit_profile.ctp:15
+#: /views/elements/users/merge_search.ctp:21 /views/users/edit_profile.ctp:15
 msgid "Title"
-msgstr ""
+msgstr "Título"
 
 #: /controllers/courses_controller.php:73
 #: /controllers/evaluations_controller.php:133
-#: /controllers/sysparameters_controller.php:75
-#: /views/courses/view.ctp:25
+#: /controllers/sysparameters_controller.php:75 /views/courses/view.ctp:25
 #: /views/elements/evaluations/ajax_evaluation_result_list.ctp:16
 #: /views/elements/searchs/evaluation_result_search_panel.ctp:33
 msgid "Status"
-msgstr ""
+msgstr "Estado"
 
-#: /controllers/courses_controller.php:73
-#: /views/courses/view.ctp:26
+#: /controllers/courses_controller.php:73 /views/courses/view.ctp:26
 msgid "Active"
-msgstr ""
+msgstr "Activo"
 
-#: /controllers/courses_controller.php:73
-#: /views/courses/view.ctp:26
+#: /controllers/courses_controller.php:73 /views/courses/view.ctp:26
 msgid "Inactive"
-msgstr ""
+msgstr "Inactivo"
 
 #: /controllers/courses_controller.php:74
 msgid "Created by"
-msgstr ""
+msgstr "Creado por"
 
 #: /controllers/courses_controller.php:97
 msgid "Are you sure you want to delete this course permanently?"
-msgstr ""
+msgstr "Seguro que quieres eliminar este curso permanentemente?"
 
 #: /controllers/courses_controller.php:100
 #: /controllers/groups_controller.php:128
 msgid "Course Home"
-msgstr ""
+msgstr "Página de inicio del curso"
 
 #: /controllers/courses_controller.php:101
 msgid "View Record"
-msgstr ""
+msgstr "Ver registro"
 
 #: /controllers/courses_controller.php:102;352
 msgid "Edit Course"
-msgstr ""
+msgstr "Editar curso"
 
 #: /controllers/courses_controller.php:103
 msgid "Delete Course"
-msgstr ""
+msgstr "Eliminar curso"
 
 #: /controllers/courses_controller.php:104
 #: /controllers/emailer_controller.php:109
@@ -119,7 +116,7 @@ msgstr ""
 #: /controllers/simpleevaluations_controller.php:177
 #: /controllers/surveys_controller.php:152
 msgid "View Creator"
-msgstr ""
+msgstr "Ver creador"
 
 #: /controllers/courses_controller.php:178;198;321;368
 #: /controllers/evaluations_controller.php:280;296;1877;1966
@@ -127,154 +124,168 @@ msgstr ""
 #: /controllers/groups_controller.php:149;198;222;278;336;361;529
 #: /controllers/surveygroups_controller.php:112;154;513
 #: /controllers/users_controller.php:258;596
-msgid "Error: Course does not exist or you do not have permission to view this course."
-msgstr ""
+msgid ""
+"Error: Course does not exist or you do not have permission to view this "
+"course."
+msgstr "Error: El curso no existe o no tienes permiso para verlo."
 
 #: /controllers/courses_controller.php:339
 msgid "The course was updated successfully."
-msgstr ""
+msgstr "Curso actualizado con éxito."
 
 #: /controllers/courses_controller.php:343
 #: /controllers/sysparameters_controller.php:179
 msgid "Error: Course edits could not be saved."
-msgstr ""
+msgstr "Error: No se pueden guardar las ediciones al curso."
 
 #: /controllers/courses_controller.php:381
 msgid "The course was deleted successfully."
-msgstr ""
+msgstr "El curso se ha eliminado con éxito."
 
 #: /controllers/courses_controller.php:403
 msgid "The student has already submitted to the destination survey"
-msgstr ""
+msgstr "El estudiante ya ha enviado la encuesta de destino"
 
 #: /controllers/courses_controller.php:435
 msgid "%s was successfully %s to %s."
-msgstr ""
+msgstr "%s fue %s con éxito a %s."
 
 #: /controllers/courses_controller.php:437
 msgid "%s was not successfully %s to %s."
-msgstr ""
+msgstr "%s no se pudo %s de %s con éxito."
 
 #: /controllers/courses_controller.php:446
 msgid " %s was unsuccessfully enrolled to %s."
-msgstr ""
+msgstr "%s no se pudo inscribir en %s."
 
 #: /controllers/courses_controller.php:454
 msgid " %s was unsuccessfully unenrolled from %s."
-msgstr ""
+msgstr "%s no se pudo dar de baja de %s."
 
 #: /controllers/courses_controller.php:473
 msgid "Move Students"
-msgstr ""
+msgstr "Mover estudiantes"
 
 #: /controllers/courses_controller.php:541
 msgid "student number"
-msgstr ""
+msgstr "número de estudiante"
 
 #: /controllers/courses_controller.php:541
 msgid "username"
-msgstr ""
+msgstr "Usuario"
 
 #: /controllers/courses_controller.php:550
 msgid "Error: Event was unable to be created."
-msgstr ""
+msgstr "Error: El evento no pudo ser creado."
 
 #: /controllers/courses_controller.php:572
 msgid "No student with %s %s exists."
-msgstr ""
+msgstr "No existe ningún alumno con %s %s."
 
 #: /controllers/courses_controller.php:592
 msgid "The student could not be enrolled to the destination course."
-msgstr ""
+msgstr "El estudiante no puede ser inscrito en el curso de destino."
 
 #: /controllers/courses_controller.php:620
-msgid "The student's survey submission could not be transferred, however they are enrolled in the destination course."
+msgid ""
+"The student's survey submission could not be transferred, however they are "
+"enrolled in the destination course."
 msgstr ""
+"El envío de la encuesta del estudiante no puede ser transferido, sin "
+"embargo, están inscritos en el curso de destino."
 
 #: /controllers/courses_controller.php:626
 msgid "Success."
-msgstr ""
+msgstr "Éxito."
 
 #: /controllers/courses_controller.php:631
 msgid " However they were unsuccessfully unenrolled from the source course."
-msgstr ""
+msgstr "Sin embargo no pudieron ser eliminados en el curso de origen."
 
 #: /controllers/courses_controller.php:634
 msgid " However no student with %s %s was enrolled in the source course."
 msgstr ""
+"Sin embargo ningún estudiante con %s %s fue matriculado en el curso de "
+"origen."
 
 #: /controllers/courses_controller.php:638
-msgid "The student has already submitted a peer evaluation in the source course."
+msgid ""
+"The student has already submitted a peer evaluation in the source course."
 msgstr ""
+"El estudiante ya ha presentado una evaluación por pares en el curso de "
+"origen."
 
 #: /controllers/courses_controller.php:642
-msgid "The student has already submitted to the\n                        destination survey, therefore the survey submission from the source survey was not transferred."
+msgid ""
+"The student has already submitted to the\n"
+"                        destination survey, therefore the survey submission "
+"from the source survey was not transferred."
 msgstr ""
+"El estudiante ya ha enviado la encuesta de destino, por lo tanto, el envío "
+"de la encuesta de origen no fue trasladado."
 
 #: /controllers/departments_controller.php:29
 msgid "You do not have access to any faculties"
-msgstr ""
+msgstr "No tienes acceso a ninguna facultad"
 
 #: /controllers/departments_controller.php:51
 msgid "View Department"
-msgstr ""
+msgstr "Ver departamento"
 
 #: /controllers/departments_controller.php:53;96
 msgid "Invalid department"
-msgstr ""
+msgstr "Departamento no válido"
 
 #: /controllers/departments_controller.php:77;104
 msgid "The department has been saved"
-msgstr ""
+msgstr "El departamento se ha guardado"
 
 #: /controllers/departments_controller.php:80;107
 msgid "The department could not be saved. Please, try again."
 msgstr ""
+"No se ha podido guardar el departamento. Por favor, inténtelo de nuevo mas "
+"tarde."
 
 #: /controllers/departments_controller.php:122
 msgid "Invalid id for department"
-msgstr ""
+msgstr "Id no válido para el departamento"
 
 #: /controllers/departments_controller.php:127
 msgid "Department deleted"
-msgstr ""
+msgstr "Departamento borrado"
 
 #: /controllers/departments_controller.php:131
 msgid "Department was not deleted"
-msgstr ""
+msgstr "No se pudo borrar el departamento"
 
 #: /controllers/emailer_controller.php:41;42
 #: /controllers/emailtemplates_controller.php:56
-#: /controllers/users_controller.php:108
-#: /views/courses/view.ctp:11
+#: /controllers/users_controller.php:108 /views/courses/view.ctp:11
 #: /views/elements/framework/view_user_detail.ctp:41
 #: /views/elements/searchs/instructor_search_panel.ctp:27
 #: /views/elements/users/ajax_user_list.ctp:29
-#: /views/elements/users/merge_search.ctp:23
-#: /views/users/edit_profile.ctp:8
+#: /views/elements/users/merge_search.ctp:23 /views/users/edit_profile.ctp:8
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: /controllers/emailer_controller.php:59
-#: /controllers/emailtemplates_controller.php:74
-#: /views/emailer/view.ctp:19
+#: /controllers/emailtemplates_controller.php:74 /views/emailer/view.ctp:19
 #: /views/evaltools/index.ctp:102
 msgid "Subject"
-msgstr ""
+msgstr "Asunto"
 
 #: /controllers/emailer_controller.php:60
 msgid "Scheduled On"
-msgstr ""
+msgstr "Previsto para el"
 
-#: /controllers/emailer_controller.php:61;62
-#: /views/emailer/view.ctp:29
+#: /controllers/emailer_controller.php:61;62 /views/emailer/view.ctp:29
 msgid "Sent"
-msgstr ""
+msgstr "Enviado"
 
 #: /controllers/emailer_controller.php:62
 #: /controllers/evaluations_controller.php:96
 msgid "Not Yet"
-msgstr ""
+msgstr "Aún no"
 
 #: /controllers/emailer_controller.php:64
 #: /controllers/emailtemplates_controller.php:78
@@ -283,79 +294,84 @@ msgstr ""
 #: /controllers/simpleevaluations_controller.php:112
 #: /controllers/surveys_controller.php:93
 msgid "Creation Date"
-msgstr ""
+msgstr "Fecha de creación"
 
 #: /controllers/emailer_controller.php:72
 msgid "Email to show:"
-msgstr ""
+msgstr "Correo electrónico para mostrar:"
 
 #: /controllers/emailer_controller.php:105
 msgid "Are you sure you want to cancel this email?"
-msgstr ""
+msgstr "¿Estás seguro que quieres cancelar este email?"
 
-#: /controllers/emailer_controller.php:107
-#: /views/emailer/view.ctp:3
+#: /controllers/emailer_controller.php:107 /views/emailer/view.ctp:3
 msgid "View Email"
-msgstr ""
+msgstr "Ver email"
 
 #: /controllers/emailer_controller.php:108
 msgid "Cancel Email"
-msgstr ""
+msgstr "Cancelar email"
 
 #: /controllers/emailer_controller.php:178
 msgid "Invalid Id"
-msgstr ""
+msgstr "Id no válida"
 
 #: /controllers/emailer_controller.php:188
 msgid "Error: You do not have permission to write emails to this course"
 msgstr ""
+"Error: No tienes permiso para escribir correos electrónicos a este curso"
 
 #: /controllers/emailer_controller.php:196
 msgid "Error: You do not have permission to write emails to this group"
 msgstr ""
+"Error: No tienes permiso para escribir mensajes de correo electrónico a este "
+"grupo"
 
 #: /controllers/emailer_controller.php:202
 msgid "Write Email"
-msgstr ""
+msgstr "Escribir mensaje de correo electrónico"
 
 #: /controllers/emailer_controller.php:249
 msgid "The Email was saved successfully"
-msgstr ""
+msgstr "El correo electrónico fue guardado correctamente"
 
 #: /controllers/emailer_controller.php:266;314
 #: /controllers/mixevals_controller.php:799
 #: /controllers/simpleevaluations_controller.php:458
 #: /controllers/surveys_controller.php:428
 msgid "Invalid ID."
-msgstr ""
+msgstr "Id no válido"
 
 #: /controllers/emailer_controller.php:284
 msgid "Error: You do not have permission to cancel this email schedule"
 msgstr ""
+"Error: No tienes permiso para cancelar esta programación de correo "
+"electrónico"
 
 #: /controllers/emailer_controller.php:291
 msgid "The Email was canceled successfully."
-msgstr ""
+msgstr "El correo electrónico fue cancelado con éxito."
 
 #: /controllers/emailer_controller.php:293
 msgid "Email cancellation failed."
-msgstr ""
+msgstr "Falló la cancelación del correo electrónico."
 
 #: /controllers/emailer_controller.php:298
 msgid "Cannot cancel: Email is already sent."
-msgstr ""
+msgstr "No es posible cancelar: ya se envió el correo electrónico."
 
 #: /controllers/emailer_controller.php:332
 msgid "Error: You do not have permission to view this email schedule"
 msgstr ""
+"Error: No tienes permiso para ver esta programación de correo electrónico"
 
 #: /controllers/emailer_controller.php:436
 msgid "All students in course: "
-msgstr ""
+msgstr "Todos los estudiantes del curso: "
 
 #: /controllers/emailer_controller.php:444
 msgid "All students in  group: "
-msgstr ""
+msgstr "Todos los estudiantes del grupo: "
 
 #: /controllers/emailtemplates_controller.php:72
 #: /controllers/mixevals_controller.php:88
@@ -365,32 +381,28 @@ msgstr ""
 #: /views/elements/searchs/instructor_search_panel.ctp:20
 #: /views/evaltools/index.ctp:4;26;52;78;100
 #: /views/evaluations/view_group_submission_details.ctp:46
-#: /views/groups/import_results.ctp:19;27
-#: /views/mixevals/view.ctp:3
+#: /views/groups/import_results.ctp:19;27 /views/mixevals/view.ctp:3
 #: /views/rubrics/edit.ctp:14
 msgid "Name"
-msgstr ""
+msgstr "Nombre"
 
 #: /controllers/emailtemplates_controller.php:73
 #: /controllers/mixevals_controller.php:90
 #: /controllers/rubrics_controller.php:98
 #: /controllers/simpleevaluations_controller.php:107
-#: /controllers/surveys_controller.php:88
-#: /views/mixevals/view.ctp:5
-#: /views/rubrics/edit.ctp:35
-#: /views/simple_evaluations/edit.ctp:43
-#: /views/simple_evaluations/view.ctp:20
-#: /views/surveys/edit.ctp:23
+#: /controllers/surveys_controller.php:88 /views/mixevals/view.ctp:5
+#: /views/rubrics/edit.ctp:35 /views/simple_evaluations/edit.ctp:43
+#: /views/simple_evaluations/view.ctp:20 /views/surveys/edit.ctp:23
 msgid "Availability"
-msgstr ""
+msgstr "Disponibilidad"
 
 #: /controllers/emailtemplates_controller.php:73
 msgid "public"
-msgstr ""
+msgstr "público"
 
 #: /controllers/emailtemplates_controller.php:73
 msgid "private"
-msgstr ""
+msgstr "privado"
 
 #: /controllers/emailtemplates_controller.php:75
 #: /controllers/simpleevaluations_controller.php:105
@@ -406,74 +418,73 @@ msgstr ""
 #: /views/evaluations/student_view_simple_evaluation_results.ctp:20
 #: /views/evaluations/survey_eval_form.ctp:4
 #: /views/evaluations/view_simple_evaluation_results.ctp:20
-#: /views/events/view.ctp:16
-#: /views/simple_evaluations/view.ctp:12
+#: /views/events/view.ctp:16 /views/simple_evaluations/view.ctp:12
 msgid "Description"
-msgstr ""
+msgstr "Descripción"
 
 #: /controllers/emailtemplates_controller.php:77
 #: /controllers/groups_controller.php:90
 #: /controllers/mixevals_controller.php:96
 #: /controllers/rubrics_controller.php:105
 #: /controllers/simpleevaluations_controller.php:111
-#: /controllers/surveys_controller.php:92
-#: /views/elements/creator_block.ctp:2
+#: /controllers/surveys_controller.php:92 /views/elements/creator_block.ctp:2
 #: /views/elements/framework/view_user_detail.ctp:58
-#: /views/elements/users/merge_search.ctp:25
-#: /views/surveys/view.ctp:8
+#: /views/elements/users/merge_search.ctp:25 /views/surveys/view.ctp:8
 msgid "Creator"
-msgstr ""
+msgstr "Creador"
 
 #: /controllers/emailtemplates_controller.php:86
 msgid "Email Templates to show:"
-msgstr ""
+msgstr "Plantillas de correo electrónico para mostrar:"
 
 #: /controllers/emailtemplates_controller.php:134
 msgid "Are you sure you want to delete this email template permanently?"
 msgstr ""
+"¿Está seguro que desea eliminar permanentemente esta plantilla de correo "
+"electrónico?"
 
 #: /controllers/emailtemplates_controller.php:137;326
 msgid "View Email Template"
-msgstr ""
+msgstr "Ver plantilla de email"
 
 #: /controllers/emailtemplates_controller.php:138;234
 msgid "Edit Email Template"
-msgstr ""
+msgstr "Editar plantilla de email"
 
 #: /controllers/emailtemplates_controller.php:139
 msgid "Delete Email Template"
-msgstr ""
+msgstr "Eliminar plantilla de correo electrónico"
 
 #: /controllers/emailtemplates_controller.php:188
-#: /views/email_templates/index.ctp:6
-#: /views/emailer/write.ctp:111
+#: /views/email_templates/index.ctp:6 /views/emailer/write.ctp:111
 #: /views/evaltools/index.ctp:174
 msgid "Add Email Template"
-msgstr ""
+msgstr "Añadir plantilla de correo electrónico"
 
 #: /controllers/emailtemplates_controller.php:199
 msgid "Save Successful!"
-msgstr ""
+msgstr "¡Guardado con éxito!"
 
 #: /controllers/emailtemplates_controller.php:202
 msgid "Save failed."
-msgstr ""
+msgstr "Fallo al guardar."
 
 #: /controllers/emailtemplates_controller.php:223
 msgid "Save Successful"
-msgstr ""
+msgstr "Guardado con éxito"
 
 #: /controllers/emailtemplates_controller.php:226
 msgid "Failed to save"
-msgstr ""
+msgstr "Error al guardar"
 
 #: /controllers/emailtemplates_controller.php:237
 msgid "Error:Invalid ID."
-msgstr ""
+msgstr "Error: ID incorrecto."
 
 #: /controllers/emailtemplates_controller.php:259
 msgid "Error: You do not have permission to edit this email template"
 msgstr ""
+"Error: No tienes permiso para modificar esta plantilla de correo electrónico"
 
 #: /controllers/emailtemplates_controller.php:284;333
 #: /controllers/mixevals_controller.php:604;716
@@ -481,96 +492,95 @@ msgstr ""
 #: /controllers/simpleevaluations_controller.php:230;331;401
 #: /controllers/surveys_controller.php:220;301;349;385
 msgid "Error: Invalid ID."
-msgstr ""
+msgstr "Error: ID no válido"
 
 #: /controllers/emailtemplates_controller.php:306
 msgid "Error: You do not have permission to delete this email template"
 msgstr ""
+"Error: No tienes permiso para borrar esta plantilla de correo electrónico"
 
 #: /controllers/emailtemplates_controller.php:313
 msgid "The Email Template was deleted successfully."
-msgstr ""
+msgstr "La plantilla de email se ha eliminado correctamente."
 
 #: /controllers/emailtemplates_controller.php:315
 msgid "Failed to delete the Email Template."
-msgstr ""
+msgstr "Error al eliminar la plantilla de correo electrónico."
 
 #: /controllers/emailtemplates_controller.php:356
 msgid "Error: You do not have permission to vie this email template"
-msgstr ""
+msgstr "Error: No tienes permiso para ver esta plantilla de correo electrónico"
 
 #: /controllers/evaltools_controller.php:46
 msgid "Evaluation Tools"
-msgstr ""
+msgstr "Herramientas de evaluación"
 
 #: /controllers/evaluations_controller.php:52
 msgid "Evaluations"
-msgstr ""
+msgstr "Evaluaciones"
 
 #: /controllers/evaluations_controller.php:84;229;1208
 #: /controllers/events_controller.php:87
 msgid "Results"
-msgstr ""
+msgstr "Resultados"
 
 #: /controllers/evaluations_controller.php:94
 msgid "Late"
-msgstr ""
+msgstr "Tarde"
 
 #: /controllers/evaluations_controller.php:94
 msgid "No Lates"
-msgstr ""
+msgstr "Sin retrasos"
 
 #: /controllers/evaluations_controller.php:126
 #: /controllers/groups_controller.php:87
 #: /controllers/surveygroups_controller.php:525
 msgid "Group #"
-msgstr ""
+msgstr "Nº de grupo"
 
 #: /controllers/evaluations_controller.php:127
 #: /controllers/groups_controller.php:88;554
 #: /views/elements/events/event_groups_detail.ctp:5
 #: /views/evaluations/view_group_submission_details.ctp:5
-#: /views/groups/edit.ctp:16
-#: /views/groups/view.ctp:4
+#: /views/groups/edit.ctp:16 /views/groups/view.ctp:4
 msgid "Group Name"
-msgstr ""
+msgstr "Nombre de grupo"
 
 #: /controllers/evaluations_controller.php:128
 #: /views/elements/evaluations/ajax_evaluation_result_list.ctp:47
 msgid "Completed"
-msgstr ""
+msgstr "Completado"
 
 #: /controllers/evaluations_controller.php:129
 #: /controllers/events_controller.php:140;315
 #: /controllers/groups_controller.php:206
 #: /controllers/surveys_controller.php:228
-#: /controllers/sysparameters_controller.php:83
-#: /views/departments/index.ctp:37
+#: /controllers/sysparameters_controller.php:83 /views/departments/index.ctp:37
 #: /views/elements/evaluations/ajax_evaluation_list.ctp:45
 #: /views/elements/evaluations/ajax_evaluation_result_list.ctp:11;28
 #: /views/elements/survey_groups/ajax_survey_group_list.ctp:22
 #: /views/faculties/index.ctp:37
 msgid "View"
-msgstr ""
+msgstr "Vista"
 
 #: /controllers/evaluations_controller.php:130
 msgid "Late?"
-msgstr ""
+msgstr "Tarde?"
 
 #: /controllers/evaluations_controller.php:134
 msgid "Not Reviewed"
-msgstr ""
+msgstr "Sin revisar"
 
 #: /controllers/evaluations_controller.php:135
 #: /views/elements/evaluations/ajax_evaluation_result_list.ctp:17
 msgid "Reviewed"
-msgstr ""
+msgstr "Revisado"
 
 #: /controllers/evaluations_controller.php:136
 #: /controllers/components/export_pdf.php:565
 #: /views/evaluations/student_view_rubric_evaluation_results.ctp:104
 msgid "Grade"
-msgstr ""
+msgstr "Calificación"
 
 #: /controllers/evaluations_controller.php:137;140
 #: /views/elements/evaluations/student_view_event_info.ctp:42;53
@@ -578,20 +588,20 @@ msgstr ""
 #: /views/evaluations/student_view_rubric_evaluation_results.ctp:29
 #: /views/evaluations/student_view_simple_evaluation_results.ctp:47;58
 msgid "Not Released"
-msgstr ""
+msgstr "No liberado"
 
 #: /controllers/evaluations_controller.php:137;140
 msgid "Some Released"
-msgstr ""
+msgstr "Algunos liberados"
 
 #: /controllers/evaluations_controller.php:138;141
 msgid "Auto-Release"
-msgstr ""
+msgstr "Auto-liberar"
 
 #: /controllers/evaluations_controller.php:138;141
 #: /views/evaluations/view_simple_evaluation_results.ctp:286
 msgid "Released"
-msgstr ""
+msgstr "Publicado"
 
 #: /controllers/evaluations_controller.php:139
 #: /controllers/components/export_pdf.php:566
@@ -599,159 +609,169 @@ msgstr ""
 #: /views/elements/evaluations/student_view_rubric_details.ctp:48
 #: /views/evaluations/view_simple_evaluation_results.ctp:284
 msgid "Comment"
-msgstr ""
+msgstr "Comentario"
 
 #: /controllers/evaluations_controller.php:155
 msgid "View Results"
-msgstr ""
+msgstr "Ver resultados"
 
 #: /controllers/evaluations_controller.php:156
 msgid "View Submission"
-msgstr ""
+msgstr "Ver envío"
 
 #: /controllers/evaluations_controller.php:157
 #: /controllers/groups_controller.php:126
 msgid "View Group"
-msgstr ""
+msgstr "Ver grupo"
 
 #: /controllers/evaluations_controller.php:158
 msgid "View Event"
-msgstr ""
+msgstr "Ver evento"
 
 #: /controllers/evaluations_controller.php:159
 msgid "Edit Event"
-msgstr ""
+msgstr "Editar evento"
 
 #: /controllers/evaluations_controller.php:205;1185;1368
 msgid "Error: Invalid id or you do not have permission to access this event."
-msgstr ""
+msgstr "Error: Id no válido o no tiene permiso para acceder a este evento."
 
 #: /controllers/evaluations_controller.php:265
 msgid "Error: Invalid id"
-msgstr ""
+msgstr "Error: Id no válido"
 
 #: /controllers/evaluations_controller.php:304;363;429;570;687;970;988
 msgid "Error: Invalid Id"
-msgstr ""
+msgstr "Error: Id no válido"
 
 #: /controllers/evaluations_controller.php:314
 #: /views/elements/courses/ajax_personalize_Course.SubMenu.EvalResults.Show.ctp:10
 msgid "Export Evaluation Results"
-msgstr ""
+msgstr "Exportar los resultados de la evaluación"
 
 #: /controllers/evaluations_controller.php:321
 #: /controllers/events_controller.php:286;494;710
 #: /controllers/surveygroups_controller.php:281;334;368;400;478
 msgid "Error: That event does not exist or you dont have access to it"
-msgstr ""
+msgstr "Error: El evento no existe o no tiene acceso a él"
 
 #: /controllers/evaluations_controller.php:438;697;999
 msgid "Error: Evaluation is unavailable"
-msgstr ""
+msgstr "Error: Evaluación no disponible"
 
 #: /controllers/evaluations_controller.php:471;721;1021
 msgid " > Evaluate Peers"
-msgstr ""
+msgstr "> Evaluar pares"
 
 #: /controllers/evaluations_controller.php:505
-msgid "One or more of your group members have negative points. Please use positive numbers."
+msgid ""
+"One or more of your group members have negative points. Please use positive "
+"numbers."
 msgstr ""
+"Uno o más de los miembros de su grupo tienen puntos negativos. Utilice "
+"números positivos."
 
 #: /controllers/evaluations_controller.php:526;941;1130;1134
 msgid "Your Evaluation was submitted successfully."
-msgstr ""
+msgstr "Su evaluación fue enviada con éxito."
 
 #: /controllers/evaluations_controller.php:532
 msgid "Save Evaluation failure."
-msgstr ""
+msgstr "Fallo al guardar la evaluación."
 
 #: /controllers/evaluations_controller.php:578
 msgid "Error: Survey is unavailable"
-msgstr ""
+msgstr "Error: Evaluación no disponible"
 
 #: /controllers/evaluations_controller.php:588
 msgid "Error: Survey has already been submitted"
-msgstr ""
+msgstr "Error: La encuesta ya ha sido enviada"
 
 #: /controllers/evaluations_controller.php:637
 msgid "Your survey was submitted successfully!"
-msgstr ""
+msgstr "¡La encuesta fue enviada con éxito!"
 
 #: /controllers/evaluations_controller.php:642
 msgid "Survey save failed, please try again."
-msgstr ""
+msgstr "Error al guardar la encuesta, vuelva a intentarlo."
 
 #: /controllers/evaluations_controller.php:650
 msgid " > Survey"
-msgstr ""
+msgstr "> Encuesta"
 
 #: /controllers/evaluations_controller.php:792;844
 msgid "some comments are missing"
-msgstr ""
+msgstr "faltan algunos comentarios"
 
 #: /controllers/evaluations_controller.php:795;847
 msgid "you still have to submit the evaluation with the Submit button below"
 msgstr ""
+"usted todavía tiene que presentar la evaluación con el botón Enviar de debajo"
 
 #: /controllers/evaluations_controller.php:798;850
 msgid "Your evaluation has been saved"
-msgstr ""
+msgstr "Su evaluación se ha guardado"
 
 #: /controllers/evaluations_controller.php:805;855
 msgid "Your evaluation was not saved successfully"
-msgstr ""
+msgstr "Su evaluación no fue guarda con éxito"
 
 #: /controllers/evaluations_controller.php:1111
 msgid "Error: Unable to submit the evaluation. Please try again."
 msgstr ""
+"Error: No se puede enviar la evaluación. Por favor, inténtelo de nuevo."
 
 #: /controllers/evaluations_controller.php:1128
 msgid "Error"
-msgstr ""
+msgstr "Error"
 
 #: /controllers/evaluations_controller.php:1139
-msgid "Your answers have been saved. Please answer all the required questions before it can be considered submitted."
+msgid ""
+"Your answers have been saved. Please answer all the required questions "
+"before it can be considered submitted."
 msgstr ""
+"Tus respuestas han sido guardadas. Por favor, conteste todas las preguntas "
+"necesarias antes de que se puede considerar presentadas."
 
 #: /controllers/evaluations_controller.php:1145
 msgid "Error: It was unsuccessful to save evaluation(s) for "
-msgstr ""
+msgstr "Error: No se pudieron guardar las evaluaciones de "
 
 #: /controllers/evaluations_controller.php:1195
 msgid "Error: Invalid group id."
-msgstr ""
+msgstr "Error: Id de grupo no válido."
 
 #: /controllers/evaluations_controller.php:1379
 msgid "Error: Invalid group id or you are not in this group."
-msgstr ""
+msgstr "Error: Id de grupo no válido o no estás en este grupo."
 
 #: /controllers/evaluations_controller.php:1385
 msgid "Error: The results are not released."
-msgstr ""
+msgstr "Error: Los resultados no están publicados."
 
 #: /controllers/evaluations_controller.php:1398
 msgid "View My Results"
-msgstr ""
+msgstr "Ver mis resultados"
 
 #: /controllers/evaluations_controller.php:1650
 msgid "Error: That event does not exist or you don't have access to it"
-msgstr ""
+msgstr "Error: El evento no existe o no tiene acceso a él"
 
 #: /controllers/evaluations_controller.php:1882
 msgid "Submission Details"
-msgstr ""
+msgstr "Detalles de envío"
 
 #: /controllers/evaluations_controller.php:1943
 msgid "Error: Invalid event Id"
-msgstr ""
+msgstr "Error: Id de evento no válido"
 
 #: /controllers/evaluations_controller.php:1949
 msgid "Error: There are no students in the class"
-msgstr ""
+msgstr "Error: No hay estudiantes en la clase"
 
 #: /controllers/evaluations_controller.php:1957
 msgid "Error: Invalid survey Id"
-msgstr ""
+msgstr "Error: Id de encuesta no válido"
 
 #: /controllers/evaluations_controller.php:1981
 #: /controllers/components/export_pdf.php:60
@@ -765,53 +785,51 @@ msgstr ""
 #: /views/evaluations/view_rubric_evaluation_results_detail.ctp:13
 #: /views/evaluations/view_simple_evaluation_results.ctp:27
 msgid "Summary"
-msgstr ""
+msgstr "Resumen"
 
-#: /controllers/events_controller.php:42;256
-#: /views/home/index.ctp:23
+#: /controllers/events_controller.php:42;256 /views/home/index.ctp:23
 msgid "Events"
-msgstr ""
+msgstr "Eventos"
 
 #: /controllers/events_controller.php:76
 msgid "Not Yet Open"
-msgstr ""
+msgstr "Aún no abierto"
 
 #: /controllers/events_controller.php:78
 msgid "Already Closed"
-msgstr ""
+msgstr "Ya está cerrado"
 
 #: /controllers/events_controller.php:80
 msgid "Open Now"
-msgstr ""
+msgstr "Abrir ahora"
 
 #: /controllers/events_controller.php:141
-#: /controllers/groups_controller.php:54;154
-#: /views/courses/home.ctp:55
+#: /controllers/groups_controller.php:54;154 /views/courses/home.ctp:55
 #: /views/elements/events/ajax_event_list.ctp:20
 msgid "Groups"
-msgstr ""
+msgstr "Grupos"
 
 #: /controllers/events_controller.php:142
 #: /controllers/sysparameters_controller.php:73
 msgid "Type"
-msgstr ""
+msgstr "Tipo"
 
 #: /controllers/events_controller.php:144
 msgid "Simple"
-msgstr ""
+msgstr "Simple"
 
 #: /controllers/events_controller.php:145
 msgid "Rubric"
-msgstr ""
+msgstr "Rúbrica"
 
 #: /controllers/events_controller.php:146
 #: /views/elements/surveys/ajax_survey_validate.ctp:4
 msgid "Survey"
-msgstr ""
+msgstr "Encuesta"
 
 #: /controllers/events_controller.php:147
 msgid "Mixed"
-msgstr ""
+msgstr "Mixto"
 
 #: /controllers/events_controller.php:148
 #: /controllers/components/export_pdf.php:725
@@ -824,174 +842,169 @@ msgstr ""
 #: /views/elements/searchs/evaluation_search_panel.ctp:27
 #: /views/evaluations/student_view_simple_evaluation_results.ctp:7
 #: /views/evaluations/view_simple_evaluation_results.ctp:7
-#: /views/events/view.ctp:54
-#: /views/home/index.ctp:23
+#: /views/events/view.ctp:54 /views/home/index.ctp:23
 msgid "Due Date"
-msgstr ""
+msgstr "Fecha de vencimiento"
 
 #: /controllers/events_controller.php:149
 msgid "Released ?"
-msgstr ""
+msgstr "Publicado ?"
 
 #: /controllers/events_controller.php:150
 msgid "Result Released"
-msgstr ""
+msgstr "Resultado publicado"
 
 #: /controllers/events_controller.php:166;176
 msgid "for Course:"
-msgstr ""
+msgstr "para el curso:"
 
 #: /controllers/events_controller.php:201
 msgid "Are you sure you want to delete this event permanently?"
-msgstr ""
+msgstr "¿Seguro que deseas eliminar este evento?"
 
-#: /controllers/events_controller.php:338
-#: /views/events/index.ctp:5
+#: /controllers/events_controller.php:338 /views/events/index.ctp:5
 msgid "Add Event"
-msgstr ""
+msgstr "Añadir evento"
 
 #: /controllers/events_controller.php:635
 #: /controllers/groups_controller.php:304
-#: /controllers/sysparameters_controller.php:84
-#: /views/departments/index.ctp:43
+#: /controllers/sysparameters_controller.php:84 /views/departments/index.ctp:43
 #: /views/elements/survey_groups/ajax_survey_group_list.ctp:24
-#: /views/faculties/index.ctp:43
-#: /views/surveys/questionssummary.ctp:31
+#: /views/faculties/index.ctp:43 /views/surveys/questionssummary.ctp:31
 msgid "Edit"
-msgstr ""
+msgstr "Editar"
 
 #: /controllers/events_controller.php:722
 msgid "The event has been deleted successfully."
-msgstr ""
+msgstr "El evento se ha eliminado con éxito."
 
 #: /controllers/events_controller.php:726
 msgid "Failed to delete the event"
-msgstr ""
+msgstr "No se pudo eliminar el evento"
 
 #: /controllers/events_controller.php:756
 msgid "Event title \""
-msgstr ""
+msgstr "Título del evento \""
 
 #: /controllers/events_controller.php:756
 msgid "\" already exists in this course."
-msgstr ""
+msgstr "\" ya existe en este curso."
 
 #: /controllers/faculties_controller.php:38
 msgid "View Faculty"
-msgstr ""
+msgstr "Ver facultad"
 
 #: /controllers/faculties_controller.php:41;114
 msgid "Invalid faculty"
-msgstr ""
+msgstr "Facultad no válida"
 
 #: /controllers/faculties_controller.php:99
 msgid "Faculty added!"
-msgstr ""
+msgstr "Facultad añadida!"
 
 #: /controllers/faculties_controller.php:102;123
 msgid "The faculty could not be saved. Please, try again."
 msgstr ""
+"No se ha podido guardar la facultad. Por favor, inténtelo de nuevo mas tarde."
 
 #: /controllers/faculties_controller.php:120
 msgid "Faculty saved."
-msgstr ""
+msgstr "Facultad guardada."
 
 #: /controllers/faculties_controller.php:138
 msgid "Invalid id for faculty"
-msgstr ""
+msgstr "Id no válido para la facultad"
 
 #: /controllers/faculties_controller.php:142
 msgid "Faculty deleted"
-msgstr ""
+msgstr "Facultad eliminada"
 
 #: /controllers/faculties_controller.php:145
 msgid "Faculty was not deleted"
-msgstr ""
+msgstr "No se suprimió la facultad"
 
 #: /controllers/framework_controller.php:45
 msgid "Framework"
-msgstr ""
+msgstr "Framework"
 
 #: /controllers/groups_controller.php:91
 msgid "Date"
-msgstr ""
+msgstr "Fecha"
 
 #: /controllers/groups_controller.php:117
 msgid "Delete this group?\n"
-msgstr ""
+msgstr "Eliminar este grupo?\n"
 
 #: /controllers/groups_controller.php:118
 msgid "(The students themselves will be unaffected).\n"
-msgstr ""
+msgstr "(Los propios alumnos no serán afectados).\n"
 
 #: /controllers/groups_controller.php:119
 msgid "Proceed?"
-msgstr ""
+msgstr "¿Continuar?"
 
 #: /controllers/groups_controller.php:127
 msgid "Edit Group"
-msgstr ""
+msgstr "Editar grupo"
 
 #: /controllers/groups_controller.php:129
 msgid "View Course"
-msgstr ""
+msgstr "Ver curso"
 
 #: /controllers/groups_controller.php:131
 msgid "Delete Group"
-msgstr ""
+msgstr "Eliminar grupo"
 
 #: /controllers/groups_controller.php:191;271;329
 msgid "Error: That group does not exist."
-msgstr ""
+msgstr "Error: No existe ese grupo."
 
 #: /controllers/groups_controller.php:230
 msgid "The group was added successfully."
-msgstr ""
+msgstr "El grupo fue agregado con éxito."
 
-#: /controllers/groups_controller.php:248
-#: /views/groups/index.ctp:5
+#: /controllers/groups_controller.php:248 /views/groups/index.ctp:5
 msgid "Add Group"
-msgstr ""
+msgstr "Añadir grupo"
 
 #: /controllers/groups_controller.php:286
 msgid "The group was updated successfully."
-msgstr ""
+msgstr "El grupo se ha actualizado correctamente"
 
 #: /controllers/groups_controller.php:288
 msgid "Error updating that group."
-msgstr ""
+msgstr "Error al actualizar ese grupo."
 
 #: /controllers/groups_controller.php:342
 msgid "The group was deleted successfully."
-msgstr ""
+msgstr "El grupo se ha eliminado correctamente."
 
 #: /controllers/groups_controller.php:344
 msgid "Group delete failed."
-msgstr ""
+msgstr "Error al eliminar grupo."
 
 #: /controllers/groups_controller.php:378
 #: /plugins/file_upload/controllers/components/file_upload.php:184
 msgid "Please select a file to upload."
-msgstr ""
+msgstr "Seleccione un archivo para cargar."
 
 #: /controllers/groups_controller.php:400
 msgid "Import Groups From Text (.txt) or CSV File (.csv)"
-msgstr ""
+msgstr "Importar grupos de archivos de texto (.txt) o archivos CSV (.csv)"
 
 #: /controllers/groups_controller.php:513
 msgid "Import Groups Results"
-msgstr ""
+msgstr "Importar resultados de grupos"
 
 #: /controllers/groups_controller.php:534
 msgid "Export Groups"
-msgstr ""
+msgstr "Exportar grupos"
 
 #: /controllers/groups_controller.php:553
 #: /views/evaluations/view_group_submission_details.ctp:4
-#: /views/groups/edit.ctp:15
-#: /views/groups/view.ctp:3
+#: /views/groups/edit.ctp:15 /views/groups/view.ctp:3
 msgid "Group Number"
-msgstr ""
+msgstr "Número de grupo"
 
 #: /controllers/groups_controller.php:558
 #: /controllers/surveygroups_controller.php:526
@@ -1005,12 +1018,12 @@ msgstr ""
 #: /views/elements/users/user_summary_list.ctp:5
 #: /views/users/edit_profile.ctp:5
 msgid "Username"
-msgstr ""
+msgstr "Usuario"
 
 #: /controllers/groups_controller.php:559
 #: /controllers/surveygroups_controller.php:527
 msgid "Student No"
-msgstr ""
+msgstr "Número de estudiante"
 
 #: /controllers/groups_controller.php:560
 #: /controllers/surveygroups_controller.php:528
@@ -1020,7 +1033,7 @@ msgstr ""
 #: /views/elements/users/user_summary_list.ctp:6
 #: /views/users/edit_profile.ctp:6
 msgid "First Name"
-msgstr ""
+msgstr "Nombre"
 
 #: /controllers/groups_controller.php:561
 #: /controllers/surveygroups_controller.php:529
@@ -1030,77 +1043,87 @@ msgstr ""
 #: /views/elements/users/user_summary_list.ctp:7
 #: /views/users/edit_profile.ctp:7
 msgid "Last Name"
-msgstr ""
+msgstr "Apellido"
 
-#: /controllers/home_controller.php:43
-#: /views/elements/global/navigation.ctp:24
+#: /controllers/home_controller.php:43 /views/elements/global/navigation.ctp:24
 msgid "Home"
-msgstr ""
+msgstr "Inicio"
 
-#: /controllers/home_controller.php:144
-#: /controllers/users_controller.php:1703
+#: /controllers/home_controller.php:144 /controllers/users_controller.php:1703
 msgid " days"
-msgstr ""
+msgstr "días"
 
-#: /controllers/home_controller.php:149
-#: /controllers/users_controller.php:1707
+#: /controllers/home_controller.php:149 /controllers/users_controller.php:1707
 msgid " minutes "
-msgstr ""
+msgstr "minutos"
 
-#: /controllers/home_controller.php:150
-#: /controllers/users_controller.php:1707
+#: /controllers/home_controller.php:150 /controllers/users_controller.php:1707
 msgid " seconds"
-msgstr ""
+msgstr "segundos"
 
-#: /controllers/home_controller.php:155
-#: /controllers/users_controller.php:1711
+#: /controllers/home_controller.php:155 /controllers/users_controller.php:1711
 msgid " hours "
-msgstr ""
+msgstr "horas"
 
-#: /controllers/home_controller.php:156
-#: /controllers/users_controller.php:1711
+#: /controllers/home_controller.php:156 /controllers/users_controller.php:1711
 msgid " minutes"
-msgstr ""
+msgstr "minutos"
 
 #: /controllers/install_controller.php:48
 msgid "Installation Wizard"
-msgstr ""
+msgstr "Asistente de instalación"
 
 #: /controllers/install_controller.php:60
-msgid "WARNING: It looks like you already have a instance running. Reinstalling will remove all your current data. Remove %s to proceed."
+msgid ""
+"WARNING: It looks like you already have a instance running. Reinstalling "
+"will remove all your current data. Remove %s to proceed."
 msgstr ""
+"ADVERTENCIA: Parece que ya tiene una instancia funcionando. La reinstalación "
+"de eliminará todos sus datos actuales. Eliminar %s para continuar."
 
 #: /controllers/install_controller.php:93
-msgid "Cannot write to the database configuration file. Please change the permission on %s so that it is writable."
+msgid ""
+"Cannot write to the database configuration file. Please change the "
+"permission on %s so that it is writable."
 msgstr ""
+"No se puede escribir en el fichero de configuración de base de datos. Por "
+"favor, cambie los permisos de %s para que sea escribible."
 
 #: /controllers/install_controller.php:102;147
 msgid "Please fill in all fields."
-msgstr ""
+msgstr "Por favor, rellene todos los campos."
 
 #: /controllers/install_controller.php:111
 msgid "Database config failed - %s"
-msgstr ""
+msgstr "Error de configuración de base de datos - %s"
 
 #: /controllers/install_controller.php:128
 #: /libs/upgrade_scripts/upgrade_300.php:58
-msgid "Cannot write to the configuration directory. Please change the permission on %s so that it is writable."
+msgid ""
+"Cannot write to the configuration directory. Please change the permission on "
+"%s so that it is writable."
 msgstr ""
+"No se puede escribir en el directorio de configuración. Por favor, cambie "
+"los permisos de %s para que sea escribible."
 
 #: /controllers/install_controller.php:134
 #: /libs/upgrade_scripts/upgrade_300.php:64
-msgid "Cannot copy the guard configuration (app/plugins/guard/config/guard.php) to the configuration directory."
+msgid ""
+"Cannot copy the guard configuration (app/plugins/guard/config/guard.php) to "
+"the configuration directory."
 msgstr ""
+"No puede copiar la configuración de Guard (app/plugins/guard/config/guard."
+"php) en el directorio de configuración."
 
 #: /controllers/install_controller.php:175
 #: /libs/upgrade_scripts/upgrade_300.php:85
 msgid "Installation failed, unable to write to %s dir"
-msgstr ""
+msgstr "Instalación fallida, no se puede escribir al directorio %s"
 
 #: /controllers/mixevals_controller.php:43
 #: /views/elements/evaltools/tools_menu.ctp:30
 msgid "Mixed Evaluations"
-msgstr ""
+msgstr "Evaluaciones mixtas"
 
 #: /controllers/mixevals_controller.php:70
 #: /controllers/rubrics_controller.php:75
@@ -1108,7 +1131,7 @@ msgstr ""
 #: /views/elements/evaluations/student_view_event_info.ctp:12
 #: /views/install/index.ctp:14
 msgid "Yes"
-msgstr ""
+msgstr "Sí"
 
 #: /controllers/mixevals_controller.php:70
 #: /controllers/rubrics_controller.php:75
@@ -1116,215 +1139,218 @@ msgstr ""
 #: /views/elements/evaluations/student_view_event_info.ctp:14
 #: /views/install/index.ctp:13
 msgid "No"
-msgstr ""
+msgstr "No"
 
 #: /controllers/mixevals_controller.php:89
 #: /controllers/rubrics_controller.php:97
 #: /controllers/simpleevaluations_controller.php:106
-#: /controllers/surveys_controller.php:87
-#: /views/evaltools/index.ctp:5;27;53;79
+#: /controllers/surveys_controller.php:87 /views/evaltools/index.ctp:5;27;53;79
 msgid "In Use"
-msgstr ""
+msgstr "En uso"
 
 #: /controllers/mixevals_controller.php:92
 #: /views/elements/evaluations/mixeval_eval_form.ctp:51
 #: /views/elements/mixevals/questions_editor.ctp:216
 msgid "Peer Evaluation Questions"
-msgstr ""
+msgstr "Preguntas de evaluación por pares"
 
 #: /controllers/mixevals_controller.php:93
 msgid "Self Evaluation Questions"
-msgstr ""
+msgstr "Preguntas de autoevaluación"
 
 #: /controllers/mixevals_controller.php:94
 #: /views/elements/rubrics/ajax_rubric_edit.ctp:80
 #: /views/elements/rubrics/ajax_rubric_view.ctp:75
 #: /views/evaltools/index.ctp:31;56
 msgid "Total Marks"
-msgstr ""
+msgstr "Puntos totales"
 
 #: /controllers/mixevals_controller.php:106
 #: /controllers/rubrics_controller.php:117
 #: /controllers/simpleevaluations_controller.php:120
 msgid "Evaluations to show:"
-msgstr ""
+msgstr "Evaluaciones a mostrar:"
 
 #: /controllers/mixevals_controller.php:164
 #: /controllers/simpleevaluations_controller.php:171
 msgid "Are you sure you want to delete this evaluation permanently?"
-msgstr ""
+msgstr "¿Está seguro que desea eliminar permanentemente esta evaluación?"
 
 #: /controllers/mixevals_controller.php:166
 #: /controllers/simpleevaluations_controller.php:173
 msgid "View Evaluation"
-msgstr ""
+msgstr "Ver evaluación"
 
 #: /controllers/mixevals_controller.php:167
 #: /controllers/simpleevaluations_controller.php:174
 msgid "Edit Evaluation"
-msgstr ""
+msgstr "Editar evaluación"
 
 #: /controllers/mixevals_controller.php:168
 #: /controllers/simpleevaluations_controller.php:175
 msgid "Copy Evaluation"
-msgstr ""
+msgstr "Copiar evaluación"
 
 #: /controllers/mixevals_controller.php:169
 #: /controllers/simpleevaluations_controller.php:176
 msgid "Delete Evaluation"
-msgstr ""
+msgstr "Eliminar evaluación"
 
 #: /controllers/mixevals_controller.php:226
 msgid "Error: Invalid Mixeval ID."
-msgstr ""
+msgstr "Error: Mixeval ID no válido."
 
 #: /controllers/mixevals_controller.php:254
 #: /controllers/simpleevaluations_controller.php:253
 msgid "Error: You do not have permission to view this evaluation"
-msgstr ""
+msgstr "Error: No tienes permiso para ver esta evaluación"
 
 #: /controllers/mixevals_controller.php:288;594
 #: /controllers/simpleevaluations_controller.php:353
 msgid "Error: You do not have permission to edit this evaluation"
-msgstr ""
+msgstr "Error: No tienes permiso para modificar esta evaluación"
 
 #: /controllers/mixevals_controller.php:416
 msgid "Unable to save, please check below for error messages."
-msgstr ""
+msgstr "No se puede guardar, comprueba por favor debajo los mensajes de error."
 
 #: /controllers/mixevals_controller.php:501
 msgid "Unable to save the mixed evaluation."
-msgstr ""
+msgstr "No se puede guardar la evaluación mixta."
 
 #: /controllers/mixevals_controller.php:517
 msgid "Unable to save this mixed eval's questions."
-msgstr ""
+msgstr "No se pueden guardar las preguntas de esta evaluación mixta."
 
 #: /controllers/mixevals_controller.php:542
 msgid "Unable to save the mixed eval question descs."
-msgstr ""
+msgstr "No se pueden guardar las descripciones de esta evaluación mixta."
 
 #: /controllers/mixevals_controller.php:553
 msgid "The mixed evaluation was saved successfully."
-msgstr ""
+msgstr "La evaluación mixta fue guardada correctamente."
 
 #: /controllers/mixevals_controller.php:625
-msgid "%s cannot be edited now that submissions have been made. Please make a copy."
+msgid ""
+"%s cannot be edited now that submissions have been made. Please make a copy."
 msgstr ""
+"%s no se pueden editar ahora que se han hecho los envíos. Por favor haga una "
+"copia."
 
 #: /controllers/mixevals_controller.php:738
 #: /controllers/simpleevaluations_controller.php:424
 msgid "Error: You do not have permission to copy this evaluation"
-msgstr ""
+msgstr "Error: No tienes permiso para copiar esta evaluación"
 
-#: /controllers/mixevals_controller.php:749
-#: /models/rubric.php:255
+#: /controllers/mixevals_controller.php:749 /models/rubric.php:255
 msgid "Copy of "
-msgstr ""
+msgstr "Copia de"
 
 #: /controllers/mixevals_controller.php:786
 msgid "You do not have permission to delete mixed evaluations"
-msgstr ""
+msgstr "Usted no tiene permiso para eliminar evaluaciones mixtas"
 
 #: /controllers/mixevals_controller.php:821
 #: /controllers/simpleevaluations_controller.php:480
 msgid "Error: You do not have permission to delete this evaluation"
-msgstr ""
+msgstr "Error: No tienes permiso para borrar esta evaluación"
 
 #: /controllers/mixevals_controller.php:834
 #: /controllers/simpleevaluations_controller.php:488
 msgid "This evaluation is now in use, and can NOT be deleted.<br />"
-msgstr ""
+msgstr "Esta evaluación está ahora en uso y no se puede eliminar.<br />"
 
 #: /controllers/mixevals_controller.php:835
 msgid "Please remove all the events associated with this evaluation first."
 msgstr ""
+"Por favor, elimine primero todos los eventos asociados con esta evaluación."
 
 #: /controllers/mixevals_controller.php:841
 msgid "The Mixed Evaluation was removed successfully."
-msgstr ""
+msgstr "La evaluación mixta fue quitada con éxito."
 
-#: /controllers/oauthclients_controller.php:26
-#: /views/pages/admin.ctp:30
+#: /controllers/oauthclients_controller.php:26 /views/pages/admin.ctp:30
 #: /views/users/edit_profile.ctp:28
 msgid "OAuth Client Credentials"
-msgstr ""
+msgstr "Credenciales de cliente OAuth"
 
 #: /controllers/oauthclients_controller.php:54
 msgid "A new OAuth client has been created"
-msgstr ""
+msgstr "Se ha creado un nuevo cliente OAuth"
 
 #: /controllers/oauthclients_controller.php:61;114
 msgid "The OAuth client could not be saved. Please, try again."
 msgstr ""
+"El cliente de OAuth no se pudo guardar. Por favor, vuelva a intentarlo."
 
 #: /controllers/oauthclients_controller.php:83
-msgid "Error: You do not have permission to create more than one OAuth Client Credential"
+msgid ""
+"Error: You do not have permission to create more than one OAuth Client "
+"Credential"
 msgstr ""
+"Error: No tienes permiso para crear más de una credencial de cliente OAuth"
 
 #: /controllers/oauthclients_controller.php:103
 msgid "Invalid OAuth client"
-msgstr ""
+msgstr "Cliente OAuth no válido"
 
 #: /controllers/oauthclients_controller.php:111
 msgid "The OAuth client has been saved"
-msgstr ""
+msgstr "El cliente de OAuth se ha guardado"
 
 #: /controllers/oauthclients_controller.php:138;141
 msgid "Invalid id for OAuth client"
-msgstr ""
+msgstr "Id no válido para el cliente OAuth"
 
 #: /controllers/oauthclients_controller.php:143
 msgid "OAuth client deleted"
-msgstr ""
+msgstr "Cliente OAuth eliminado"
 
 #: /controllers/oauthclients_controller.php:145
 msgid "OAuth client was not deleted"
-msgstr ""
+msgstr "El cliente OAuth no fue eliminado"
 
-#: /controllers/oauthtokens_controller.php:26
-#: /views/pages/admin.ctp:39
+#: /controllers/oauthtokens_controller.php:26 /views/pages/admin.ctp:39
 #: /views/users/edit_profile.ctp:45
 msgid "OAuth Token Credentials"
-msgstr ""
+msgstr "Credenciales token OAuth"
 
 #: /controllers/oauthtokens_controller.php:61
 msgid "New OAuth token created!"
-msgstr ""
+msgstr "¡Nuevo token OAuth creado!"
 
 #: /controllers/oauthtokens_controller.php:68;109
 msgid "The OAuth token could not be saved. Please, try again."
-msgstr ""
+msgstr "El token OAuth no se pudo guardar. Por favor, vuelva a intentarlo."
 
 #: /controllers/oauthtokens_controller.php:98
 msgid "Invalid oauth token"
-msgstr ""
+msgstr "Token OAuth no válido"
 
 #: /controllers/oauthtokens_controller.php:106
 msgid "OAuth token saved successfully!"
-msgstr ""
+msgstr "¡Token OAuth guardado correctamente!"
 
 #: /controllers/oauthtokens_controller.php:134;137
 msgid "Invalid id for OAuth token"
-msgstr ""
+msgstr "Id no válido para el token OAuth"
 
 #: /controllers/oauthtokens_controller.php:139
 msgid "OAuth token deleted."
-msgstr ""
+msgstr "Token OAuth eliminado."
 
 #: /controllers/oauthtokens_controller.php:146
 msgid "OAuth token was not deleted."
-msgstr ""
+msgstr "El token OAuth no se eliminó."
 
 #: /controllers/rubrics_controller.php:55
 #: /views/elements/evaltools/tools_menu.ctp:27
 msgid "Rubrics"
-msgstr ""
+msgstr "Rúbricas"
 
-#: /controllers/rubrics_controller.php:100
-#: /views/evaltools/index.ctp:29
+#: /controllers/rubrics_controller.php:100 /views/evaltools/index.ctp:29
 msgid "LOM"
-msgstr ""
+msgstr "ND"
 
 #: /controllers/rubrics_controller.php:101
 #: /views/elements/rubrics/ajax_rubric_edit.ctp:40
@@ -1332,670 +1358,683 @@ msgstr ""
 #: /views/evaluations/student_view_rubric_evaluation_results.ctp:103
 #: /views/rubrics/edit.ctp:50
 msgid "Criteria"
-msgstr ""
+msgstr "Criterios"
 
 #: /controllers/rubrics_controller.php:102
 #: /views/evaluations/view_rubric_evaluation_results.ctp:38
 #: /views/evaluations/view_simple_evaluation_results.ctp:125
 #: /views/helpers/evaluation.php:62;157
 msgid "Total"
-msgstr ""
+msgstr "Total"
 
-#: /controllers/rubrics_controller.php:107
-#: /views/rubrics/edit.ctp:51
+#: /controllers/rubrics_controller.php:107 /views/rubrics/edit.ctp:51
 msgid "View Mode"
-msgstr ""
+msgstr "Modo de vista"
 
 #: /controllers/rubrics_controller.php:168
 msgid "Are you sure you want to delete this Rubric permanently?"
-msgstr ""
+msgstr "¿Está seguro que desea eliminar permanentemente esta rúbrica?"
 
 #: /controllers/rubrics_controller.php:170;264
 msgid "View Rubric"
-msgstr ""
+msgstr "Ver rúbrica"
 
 #: /controllers/rubrics_controller.php:171;396
 msgid "Edit Rubric"
-msgstr ""
+msgstr "Editar rúbrica"
 
 #: /controllers/rubrics_controller.php:172;468
 msgid "Copy Rubric"
-msgstr ""
+msgstr "Copiar rúbrica"
 
 #: /controllers/rubrics_controller.php:173
 msgid "Delete Rubric"
-msgstr ""
+msgstr "Eliminar rúbrica"
 
 #: /controllers/rubrics_controller.php:252
 msgid "Error: You do not have permission to view this rubric"
-msgstr ""
+msgstr "Error: No tienes permiso para ver esta rúbrica"
 
 #: /controllers/rubrics_controller.php:287
 msgid "Add Rubric (Step 2)"
-msgstr ""
+msgstr "Añadir rúbrica (paso 2)"
 
 #: /controllers/rubrics_controller.php:299
 msgid "The rubric was added successfully."
-msgstr ""
+msgstr "La rúbrica fue agregada con éxito."
 
 #: /controllers/rubrics_controller.php:304
 #: /controllers/simpleevaluations_controller.php:288
 msgid "The evaluation was not added successfully."
-msgstr ""
+msgstr "La evaluación no fue agregada con éxito."
 
 #: /controllers/rubrics_controller.php:312
 #: /views/elements/courses/ajax_personalize_Course.SubMenu.Rubric.Show.ctp:6
-#: /views/evaltools/index.ctp:138
-#: /views/rubrics/index.ctp:5
+#: /views/evaltools/index.ctp:138 /views/rubrics/index.ctp:5
 msgid "Add Rubric"
-msgstr ""
+msgstr "Añadir rúbrica"
 
 #: /controllers/rubrics_controller.php:353
 msgid "Error: You do not have permission to edit this rubric"
-msgstr ""
+msgstr "Error: No tienes permiso para editar esta rúbrica"
 
 #: /controllers/rubrics_controller.php:361
 #: /controllers/simpleevaluations_controller.php:362
 #: /controllers/surveys_controller.php:392
 msgid "Submissions had been made. %s cannot be edited. Please make a copy."
 msgstr ""
+"Se ha hecho el envío. %s no puede ser editado. Por favor haga una copia."
 
 #: /controllers/rubrics_controller.php:378
 msgid "The rubric evaluation was updated successfully"
-msgstr ""
+msgstr "La rúbrica de evaluación fue actualizada correctamente"
 
 #: /controllers/rubrics_controller.php:383
 msgid "The evaluation was not updated successfully."
-msgstr ""
+msgstr "La evaluación no se ha actualizado con éxito."
 
 #: /controllers/rubrics_controller.php:460
 msgid "Error: You do not have permission to copy this rubric"
-msgstr ""
+msgstr "Error: No tienes permiso para copiar esta rúbrica"
 
 #: /controllers/rubrics_controller.php:514
 msgid "Error: You do not have permission to delete this rubric"
-msgstr ""
+msgstr "Error: No tienes permiso para borrar esta rúbrica"
 
 #: /controllers/rubrics_controller.php:522
-msgid "This evaluation is in use. Please remove all the events assosiated with this evaluation first."
+msgid ""
+"This evaluation is in use. Please remove all the events assosiated with this "
+"evaluation first."
 msgstr ""
+"Esta evaluación está en uso. Elimine primero todos los eventos asociados con "
+"esta evaluación."
 
 #: /controllers/rubrics_controller.php:526
 msgid "The rubric was deleted successfully."
-msgstr ""
+msgstr "La rúbrica se ha eliminado con éxito."
 
 #: /controllers/searchs_controller.php:64
 msgid "Advanced Search"
-msgstr ""
+msgstr "Búsqueda avanzada"
 
 #: /controllers/simpleevaluations_controller.php:61
 #: /views/elements/evaltools/tools_menu.ctp:24
 msgid "Simple Evaluations"
-msgstr ""
+msgstr "Evaluaciones simples"
 
 #: /controllers/simpleevaluations_controller.php:109
 msgid "Points/Member"
-msgstr ""
+msgstr "Puntos/Miembro"
 
 #: /controllers/simpleevaluations_controller.php:284
 msgid "The evaluation was added successfully."
-msgstr ""
+msgstr "La evaluación fue agregada con éxito."
 
 #: /controllers/simpleevaluations_controller.php:370
 msgid "The simple evaluation was updated successfully."
-msgstr ""
+msgstr "La evaluación simple fue actualizada correctamente."
 
 #: /controllers/simpleevaluations_controller.php:489
 msgid "Please remove all the events assosiated with this evaluation first."
 msgstr ""
+"Por favor, elimine primero todos los eventos asociados con esta evaluación."
 
 #: /controllers/simpleevaluations_controller.php:495
 msgid "The evaluation was deleted successfully."
-msgstr ""
+msgstr "La evaluación se ha eliminado con éxito."
 
 #: /controllers/simpleevaluations_controller.php:497
 msgid "Evaluation delete failed."
-msgstr ""
+msgstr "Error al eliminar la evaluación."
 
 #: /controllers/surveygroups_controller.php:40;123
 msgid "Survey Groups"
-msgstr ""
+msgstr "Grupos de encuesta"
 
 #: /controllers/surveygroups_controller.php:77
 #: /views/elements/email/html/addEvent.ctp:1
 #: /views/elements/evaluations/ajax_evaluation_result_list.ctp:13
 #: /views/elements/searchs/evaluation_result_search_panel.ctp:21
 msgid "Event"
-msgstr ""
+msgstr "Evento"
 
 #: /controllers/surveygroups_controller.php:78
 msgid "Group Set Name"
-msgstr ""
+msgstr "Nombre de grupo"
 
 #: /controllers/surveygroups_controller.php:79
 msgid "Number of Groups"
-msgstr ""
+msgstr "Número de grupos"
 
 #: /controllers/surveygroups_controller.php:80
 #: /views/elements/events/ajax_event_list.ctp:18
 msgid "Released?"
-msgstr ""
+msgstr "Publicado?"
 
 #: /controllers/surveygroups_controller.php:87
 msgid "Are you sure you want to delete this group set permanently?"
-msgstr ""
+msgstr "¿Estás seguro de que quieres borrar este grupo?"
 
 #: /controllers/surveygroups_controller.php:89
 msgid "Release"
-msgstr ""
+msgstr "Publicar"
 
 #: /controllers/surveygroups_controller.php:90
 msgid "View/Edit Group Set"
-msgstr ""
+msgstr "Ver/editar grupo"
 
 #: /controllers/surveygroups_controller.php:91
 msgid "Delete Group Set"
-msgstr ""
+msgstr "Eliminar conjunto de grupos"
 
 #: /controllers/surveygroups_controller.php:161
-msgid "DOMDocument could not be found. Please contact your\n                system administrator to use TeamMaker."
+msgid ""
+"DOMDocument could not be found. Please contact your\n"
+"                system administrator to use TeamMaker."
 msgstr ""
+"No se encontró DOMDocument. Por favor, póngase en contacto con el "
+"administrador del sistema para usar TeamMaker."
 
 #: /controllers/surveygroups_controller.php:166
 msgid "Create Group Set"
-msgstr ""
+msgstr "Crear conjunto de grupos"
 
 #: /controllers/surveygroups_controller.php:212
 msgid "Survey Groups > Teams Summary"
-msgstr ""
+msgstr "Encuesta de grupos > Resumen de equipos"
 
 #: /controllers/surveygroups_controller.php:307
 msgid "The group set was added successfully."
-msgstr ""
+msgstr "El conjunto de grupos se ha añadido correctamente."
 
 #: /controllers/surveygroups_controller.php:309
 msgid "The group set saving failed."
-msgstr ""
+msgstr "Error al guardar el conjunto de grupos."
 
 #: /controllers/surveygroups_controller.php:340
 msgid "The group set was released successfully."
-msgstr ""
+msgstr "El conjunto de grupos fue publicado con éxito."
 
 #: /controllers/surveygroups_controller.php:342
 msgid "Releasing group set failed."
-msgstr ""
+msgstr "Falló la publicación del grupo"
 
 #: /controllers/surveygroups_controller.php:374
 msgid "The group set was deleted successfully."
-msgstr ""
+msgstr "El conjunto de grupos se ha eliminado correctamente."
 
 #: /controllers/surveygroups_controller.php:376
 msgid "Failed to delete group set."
-msgstr ""
+msgstr "Error al eliminar el grupo."
 
 #: /controllers/surveygroups_controller.php:492
 msgid "Group set change failed."
-msgstr ""
+msgstr "Cambio de grupo fallido."
 
 #: /controllers/surveygroups_controller.php:497
 msgid "Group set changed successfully."
-msgstr ""
+msgstr "Grupo cambiado correctamente."
 
 #: /controllers/surveygroups_controller.php:537
 msgid "Export Survey Groups"
-msgstr ""
+msgstr "Exportar grupos de encuesta"
 
 #: /controllers/surveygroups_controller.php:546
 msgid "Please select a survey group set to export."
-msgstr ""
+msgstr "Por favor seleccione un grupo de encuesta para la exportación."
 
 #: /controllers/surveygroups_controller.php:550
 msgid "Please select at least one export field."
-msgstr ""
+msgstr "Por favor, seleccione al menos un campo de exportación."
 
 #: /controllers/surveys_controller.php:44;184
 #: /views/elements/evaltools/tools_menu.ctp:33
 msgid "Surveys"
-msgstr ""
+msgstr "Encuestas"
 
 #: /controllers/surveys_controller.php:85
 #: /controllers/sysparameters_controller.php:70
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
-#: /controllers/surveys_controller.php:90
-#: /views/evaltools/index.ctp:81
+#: /controllers/surveys_controller.php:90 /views/evaltools/index.ctp:81
 #: /views/evaluations/student_view_mixeval_evaluation_results.ctp:55
 #: /views/evaluations/view_mixeval_evaluation_results_detail.ctp:160
 msgid "Questions"
-msgstr ""
+msgstr "Preguntas"
 
 #: /controllers/surveys_controller.php:101
 msgid "Surveys to show:"
-msgstr ""
+msgstr "Encuestas para mostrar:"
 
 #: /controllers/surveys_controller.php:145
 msgid "Are you sure you want to delete this survey permanently?"
-msgstr ""
+msgstr "¿Está seguro que desea eliminar permanentemente esta encuesta?"
 
 #: /controllers/surveys_controller.php:147
 msgid "View Survey"
-msgstr ""
+msgstr "Ver encuesta"
 
 #: /controllers/surveys_controller.php:148
 msgid "Edit Survey"
-msgstr ""
+msgstr "Editar encuesta"
 
 #: /controllers/surveys_controller.php:149;448
 msgid "Edit Questions"
-msgstr ""
+msgstr "Editar preguntas"
 
 #: /controllers/surveys_controller.php:150
 msgid "Copy Survey"
-msgstr ""
+msgstr "Copiar encuesta"
 
 #: /controllers/surveys_controller.php:151
 msgid "Delete Survey"
-msgstr ""
+msgstr "Eliminar encuesta"
 
 #: /controllers/surveys_controller.php:252
 msgid "Survey is saved!"
-msgstr ""
+msgstr "¡Encuesta guardada!"
 
 #: /controllers/surveys_controller.php:256
 msgid "Error on saving survey."
-msgstr ""
+msgstr "Error al guardar la encuesta."
 
 #: /controllers/surveys_controller.php:294;421;518;571
 msgid "Error: You do not have permission to edit this survey"
-msgstr ""
+msgstr "Error: No tienes permiso para modificar esta encuesta"
 
 #: /controllers/surveys_controller.php:309;436
 msgid "Submissions have been made. %s cannot be edited. Please make a copy."
 msgstr ""
+"Se ha hecho el envío. %s no puede ser editado. Por favor haga una copia."
 
 #: /controllers/surveys_controller.php:318
 msgid "The Survey was edited successfully."
-msgstr ""
+msgstr "La encuesta fue editada con éxito."
 
 #: /controllers/surveys_controller.php:322
 msgid "Error: The Survey was not saved successfully."
-msgstr ""
+msgstr "Error: La encuesta no fue guarda correctamente."
 
 #: /controllers/surveys_controller.php:360
 msgid "Copy"
-msgstr ""
+msgstr "Copiar"
 
 #: /controllers/surveys_controller.php:378
 msgid "Error: You do not have permission to delete this survey"
-msgstr ""
+msgstr "Error: No tienes permiso para borrar esta encuesta"
 
 #: /controllers/surveys_controller.php:398
 msgid "The survey was deleted successfully."
-msgstr ""
+msgstr "La encuesta se ha eliminado con éxito."
 
 #: /controllers/surveys_controller.php:400
 msgid "Survey delete failed."
-msgstr ""
+msgstr "Error al eliminar la encuesta."
 
 #: /controllers/surveys_controller.php:499
 msgid "The question was removed successfully."
-msgstr ""
+msgstr "La pregunta fue quitada con éxito."
 
 #: /controllers/surveys_controller.php:542
 msgid "The question was added successfully."
-msgstr ""
+msgstr "La pregunta fue agregada con éxito."
 
 #: /controllers/surveys_controller.php:549
 msgid "Failed to save question."
-msgstr ""
+msgstr "No se pudo guardar la pregunta."
 
 #: /controllers/surveys_controller.php:603
 msgid "The question was updated successfully."
-msgstr ""
+msgstr "La pregunta fue actualizada correctamente."
 
 #: /controllers/surveys_controller.php:606
 msgid "Error in saving question."
-msgstr ""
+msgstr "Error al guardar la pregunta."
 
 #: /controllers/surveys_controller.php:613
 msgid "Edit Question"
-msgstr ""
+msgstr "Editar pregunta"
 
 #: /controllers/sysparameters_controller.php:58
 msgid "Sys Parameters"
-msgstr ""
+msgstr "Parámetros del sistema"
 
 #: /controllers/sysparameters_controller.php:71
 msgid "Code"
-msgstr ""
+msgstr "Código"
 
 #: /controllers/sysparameters_controller.php:72
 msgid "Value"
-msgstr ""
+msgstr "Valor"
 
-#: /controllers/sysparameters_controller.php:77
-#: /views/emailer/view.ctp:41
+#: /controllers/sysparameters_controller.php:77 /views/emailer/view.ctp:41
 #: /views/surveys/view.ctp:12
 msgid "Created"
-msgstr ""
+msgstr "Creado"
 
 #: /controllers/sysparameters_controller.php:78
 msgid "Updated"
-msgstr ""
+msgstr "Actualizado"
 
 #: /controllers/sysparameters_controller.php:80
 msgid "Are you sure you wish to delete this System Parameter?"
-msgstr ""
+msgstr "¿Está seguro que desea eliminar este parámetro del sistema?"
 
-#: /controllers/sysparameters_controller.php:85
-#: /views/departments/index.ctp:49
+#: /controllers/sysparameters_controller.php:85 /views/departments/index.ctp:49
 #: /views/elements/emailer/edit_recipient.ctp:3
 #: /views/elements/events/ajax_event_list.ctp:31
 #: /views/elements/survey_groups/ajax_survey_group_list.ctp:24
-#: /views/faculties/index.ctp:49
-#: /views/surveys/questionssummary.ctp:33
+#: /views/faculties/index.ctp:49 /views/surveys/questionssummary.ctp:33
 msgid "Delete"
-msgstr ""
+msgstr "Eliminar"
 
 #: /controllers/sysparameters_controller.php:135;158;183
 msgid "String"
-msgstr ""
+msgstr "Cadena"
 
 #: /controllers/sysparameters_controller.php:135;158;183
 msgid "Integer"
-msgstr ""
+msgstr "Entero"
 
 #: /controllers/sysparameters_controller.php:135;158;183
 msgid "Boolean"
-msgstr ""
+msgstr "Booleano"
 
 #: /controllers/sysparameters_controller.php:151
 msgid "The record is saved successfully"
-msgstr ""
+msgstr "El registro se ha guardado con éxito"
 
 #: /controllers/sysparameters_controller.php:154
 msgid "Failed to save the record"
-msgstr ""
+msgstr "No se pudo guardar el registro"
 
 #: /controllers/sysparameters_controller.php:176
 msgid "The record is edited successfully."
-msgstr ""
+msgstr "El registro se ha editado con éxito."
 
 #: /controllers/sysparameters_controller.php:199
 msgid "The record is deleted successfully."
-msgstr ""
+msgstr "El registro se ha borrado con éxito."
 
 #: /controllers/upgrade_controller.php:27
 msgid "Upgrade"
-msgstr ""
+msgstr "Actualizar"
 
 #: /controllers/upgrade_controller.php:30
-msgid "It seems you do not have a installation of iPeer. Please install it first!"
+msgid ""
+"It seems you do not have a installation of iPeer. Please install it first!"
 msgstr ""
+"Parece que no tienes una instalación de iPeer. Por favor, ¡instálelo primero!"
 
 #: /controllers/users_controller.php:50
 #: /views/elements/global/navigation.ctp:38
 msgid "Users"
-msgstr ""
+msgstr "Usuarios"
 
 #: /controllers/users_controller.php:99;1178
 msgid "Full Name"
-msgstr ""
+msgstr "Nombre completo"
 
 #: /controllers/users_controller.php:118
 msgid "Delete this user. Irreversible. Are you sure?"
-msgstr ""
+msgstr "Eliminar a este usuario. Irreversible. ¿Está seguro?"
 
 #: /controllers/users_controller.php:119
 msgid "Resets user's password. Are you sure?"
-msgstr ""
+msgstr "Restablece la contraseña del usuario. ¿Estás seguro?"
 
 #: /controllers/users_controller.php:120
-msgid "Resets user's password without sending a email. The user will lose access to the system. Are you sure?"
+msgid ""
+"Resets user's password without sending a email. The user will lose access to "
+"the system. Are you sure?"
 msgstr ""
+"Se restablece la contraseña del usuario sin enviar un correo electrónico. El "
+"usuario perderá el acceso al sistema. ¿Estás seguro?"
 
 #: /controllers/users_controller.php:129
 msgid "Show role:"
-msgstr ""
+msgstr "Mostrar rol:"
 
 #: /controllers/users_controller.php:167;394
 msgid "View User"
-msgstr ""
+msgstr "Ver usuario"
 
 #: /controllers/users_controller.php:168
 msgid "Send Email"
-msgstr ""
+msgstr "Enviar correo electrónico"
 
 #: /controllers/users_controller.php:169
 msgid "Edit User"
-msgstr ""
+msgstr "Editar usuario"
 
 #: /controllers/users_controller.php:170
 msgid "Delete User"
-msgstr ""
+msgstr "Eliminar usuario"
 
 #: /controllers/users_controller.php:171
 msgid "Reset Password"
-msgstr ""
+msgstr "Recuperar contraseña"
 
 #: /controllers/users_controller.php:176
 msgid "Reset Password Without Email"
-msgstr ""
+msgstr "Restablecer contraseña sin correo electrónico"
 
-#: /controllers/users_controller.php:267
-#: /views/courses/home.ctp:49
+#: /controllers/users_controller.php:267 /views/courses/home.ctp:49
 msgid "Students"
-msgstr ""
+msgstr "Estudiantes"
 
 #: /controllers/users_controller.php:289;295;302
 msgid "Failed to save.</br>"
-msgstr ""
+msgstr "Error al guardar.</br>"
 
 #: /controllers/users_controller.php:357
 msgid "Error: You do not have permission to view users"
-msgstr ""
+msgstr "Error: No tienes permiso para ver los usuarios"
 
 #: /controllers/users_controller.php:362
 msgid "Error: This user does not exist"
-msgstr ""
+msgstr "Error: Este usuario no existe"
 
 #: /controllers/users_controller.php:368;389
 msgid "Error: You do not have permission to view this user"
-msgstr ""
+msgstr "Error: No tienes permiso para ver este usuario"
 
-#: /controllers/users_controller.php:601
-#: /views/users/index.ctp:8
+#: /controllers/users_controller.php:601 /views/users/index.ctp:8
 msgid "Add User"
-msgstr ""
+msgstr "Añadir usuario"
 
 #: /controllers/users_controller.php:621
 msgid "Error: You do not have permission to enrol this user."
-msgstr ""
+msgstr "Error: No tienes permiso para matricular a este usuario."
 
 #: /controllers/users_controller.php:625
 msgid "Error: The student is already enrolled."
-msgstr ""
+msgstr "Error: El alumno ya está matriculado."
 
 #: /controllers/users_controller.php:632;647
 msgid "Error: Unable to enrol the user."
-msgstr ""
+msgstr "Error: No puede inscribir al usuario."
 
 #: /controllers/users_controller.php:645
 msgid "User is successfully enrolled."
-msgstr ""
+msgstr "Usuario inscrito con éxito."
 
 #: /controllers/users_controller.php:670
 msgid "Error: You do not have permission to readd this user."
-msgstr ""
+msgstr "Error: No tienes permiso para volver a añadir a este usuario."
 
 #: /controllers/users_controller.php:676
 msgid "User is successfully readded."
-msgstr ""
+msgstr "Usuario añadido de nuevo con éxito."
 
 #: /controllers/users_controller.php:678
 msgid "Error: Unable to readd the user."
-msgstr ""
+msgstr "Error: No se puede volver a añadir al usuario."
 
 #: /controllers/users_controller.php:700
 msgid "Error: This user does not exist."
-msgstr ""
+msgstr "Error: Este usuario no existe."
 
 #: /controllers/users_controller.php:705
 msgid "Error: You do not have permission to edit users."
-msgstr ""
+msgstr "Error: No tienes permiso para editar los usuarios."
 
 #: /controllers/users_controller.php:710
 msgid "Error: You do not have permission to edit this user."
-msgstr ""
+msgstr "Error: No tienes permiso para editar este usuario."
 
 #: /controllers/users_controller.php:793
 msgid "User successfully updated!"
-msgstr ""
+msgstr "¡Usuario actualizado correctamente!"
 
 #: /controllers/users_controller.php:800
 msgid "Error: Unable to update user."
-msgstr ""
+msgstr "Error: No se puede actualizar usuario."
 
 #: /controllers/users_controller.php:831
 msgid "Error: You do not have permission to edit this user"
-msgstr ""
+msgstr "Error: No tienes permiso para editar este usuario"
 
 #: /controllers/users_controller.php:862
 msgid "New passwords do not match"
-msgstr ""
+msgstr "Las nuevas contraseñas no coinciden"
 
 #: /controllers/users_controller.php:866
 msgid "Old password is incorrect"
-msgstr ""
+msgstr "La contraseña anterior es incorrecta"
 
 #: /controllers/users_controller.php:875
 msgid "Your Profile Has Been Updated Successfully."
-msgstr ""
+msgstr "Tu perfil ha sido actualizado correctamente"
 
 #: /controllers/users_controller.php:894
 msgid "Edit Profile"
-msgstr ""
+msgstr "Editar perfil"
 
 #: /controllers/users_controller.php:945
 msgid "Error: You do not have permission to delete this user"
-msgstr ""
+msgstr "Error: No tienes permiso para borrar este usuario"
 
 #: /controllers/users_controller.php:973
 msgid "Record is successfully deleted!"
-msgstr ""
+msgstr "¡Registro borrado con éxito!"
 
 #: /controllers/users_controller.php:980
 msgid "Error: Delete failed!"
-msgstr ""
+msgstr "Error: ¡Error al eliminar!"
 
 #: /controllers/users_controller.php:985
 msgid "Student is successfully unenrolled!"
-msgstr ""
+msgstr "¡Estudiante eliminado con éxito!"
 
 #: /controllers/users_controller.php:987
 msgid "Error: Unenrol failed!"
-msgstr ""
+msgstr "Error: ¡Error al eliminar!"
 
 #: /controllers/users_controller.php:1013
 #: /views/elements/users/ajax_username_validate.ctp:5
 msgid "Username \""
-msgstr ""
+msgstr "Usuario \""
 
 #: /controllers/users_controller.php:1013
 #: /views/elements/users/ajax_username_validate.ctp:5
 msgid "\" already exists."
-msgstr ""
+msgstr "\" ya existe."
 
 #: /controllers/users_controller.php:1042;1080
 msgid "Password successfully reset. The new password is %s."
-msgstr ""
+msgstr "Contraseña restablecida con éxito. La nueva contraseña es %s."
 
 #: /controllers/users_controller.php:1050
 msgid "Email has been sent. "
-msgstr ""
+msgstr "El correo electrónico ha sido enviado."
 
 #: /controllers/users_controller.php:1052
 msgid "Email was <u>not</u> sent to the user. "
-msgstr ""
+msgstr "El correo electrónico <u>no</u> fue enviado al usuario. "
 
 #: /controllers/users_controller.php:1055
 msgid "No email has been sent. User does not have email address."
 msgstr ""
+"No se ha enviado ningún correo electrónico. El usuario no tiene dirección de "
+"correo electrónico."
 
 #: /controllers/users_controller.php:1101
 msgid "Error: That course does not exist."
-msgstr ""
+msgstr "Error: No existe ese curso."
 
 #: /controllers/users_controller.php:1116
 msgid "Import Students From Text (.txt) or CSV File (.csv)"
-msgstr ""
+msgstr "Importar estudiantes de archivos de texto (.txt) o archivos CSV (.csv)"
 
 #: /controllers/users_controller.php:1180
 #: /views/elements/framework/view_user_detail.ctp:27
 msgid "Student No."
-msgstr ""
+msgstr "Nº de estudiante"
 
-#: /controllers/users_controller.php:1182
-#: /views/users/index.ctp:5
+#: /controllers/users_controller.php:1182 /views/users/index.ctp:5
 msgid "Merge Users"
-msgstr ""
+msgstr "Combinar usuarios"
 
 #: /controllers/users_controller.php:1194
 msgid "Error: The secondary account is the currently logged in user."
-msgstr ""
+msgstr "Error: La cuenta secundaria es el usuario actualmente conectado."
 
 #: /controllers/users_controller.php:1199
 msgid "Error: The users do not have the same role."
-msgstr ""
+msgstr "Error: Los usuarios no tienen el mismo rol."
 
 #: /controllers/users_controller.php:1204
-msgid "Error: No merger needed. The primary and secondary accounts are the same."
+msgid ""
+"Error: No merger needed. The primary and secondary accounts are the same."
 msgstr ""
+"Error: No se necesita combinación. Las cuentas primarias y secundarias son "
+"las mismas."
 
 #: /controllers/users_controller.php:1224
 msgid "The two accounts have successfully merged."
-msgstr ""
+msgstr "Las dos cuentas se han fusionado con éxito."
 
 #: /controllers/users_controller.php:1227
 msgid "Error: The two accounts could not be merged."
-msgstr ""
+msgstr "Error: No se pueden combinar las dos cuentas."
 
 #: /controllers/users_controller.php:1358
 msgid "User Not Found!"
-msgstr ""
+msgstr "¡Usuario no encontrado!"
 
 #: /controllers/users_controller.php:1389
 msgid "Error: You do not have permission to reset the password for this user"
-msgstr ""
+msgstr "Error: No tienes permiso para cambiar la contraseña de este usuario"
 
 #: /controllers/components/export.php:343
 msgid "Status(X/OK),"
-msgstr ""
+msgstr "Estado (X/OK),"
 
 #: /controllers/components/export.php:344
 msgid "Group Name,"
-msgstr ""
+msgstr "Nombre de grupo,"
 
 #: /controllers/components/export.php:345
 msgid "First Name,"
-msgstr ""
+msgstr "Nombre,"
 
 #: /controllers/components/export.php:346
 msgid "Last Name,"
-msgstr ""
+msgstr "Apellido,"
 
 #: /controllers/components/export.php:347
 msgid "Student Number,"
-msgstr ""
+msgstr "Número de estudiante,"
 
 #: /controllers/components/export.php:348
 msgid "Email,"
-msgstr ""
+msgstr "Email,"
 
 #: /controllers/components/export.php:349
 msgid "Final Mark,"
-msgstr ""
+msgstr "Nota final,"
 
 #: /controllers/components/export.php:357
 #: /controllers/components/export_pdf.php:97
@@ -2003,11 +2042,11 @@ msgstr ""
 #: /views/evaluations/student_view_simple_evaluation_results.ctp:68
 #: /views/helpers/evaluation.php:269
 msgid "Comments"
-msgstr ""
+msgstr "Comentarios"
 
 #: /controllers/components/export_pdf.php:62
 msgid "Members who have not submitted their evaluations"
-msgstr ""
+msgstr "Miembros que no han enviado sus evaluaciones"
 
 #: /controllers/components/export_pdf.php:67
 #: /views/evaluations/view_mixeval_evaluation_results.ctp:32
@@ -2016,7 +2055,7 @@ msgstr ""
 #: /views/evaluations/view_rubric_evaluation_results_detail.ctp:31
 #: /views/evaluations/view_simple_evaluation_results.ctp:53
 msgid "Left the group, but had submitted or were evaluated"
-msgstr ""
+msgstr "Dejó el grupo, pero ha enviado evaluación o fue evaluado"
 
 #: /controllers/components/export_pdf.php:73
 #: /views/elements/searchs/search_menu.ctp:6
@@ -2026,19 +2065,19 @@ msgstr ""
 #: /views/evaluations/view_rubric_evaluation_results_detail.ctp:77
 #: /views/evaluations/view_simple_evaluation_results.ctp:68
 msgid "Evaluation Results"
-msgstr ""
+msgstr "Resultados de evaluación"
 
 #: /controllers/components/export_pdf.php:198;549
 #: /views/evaluations/view_mixeval_evaluation_results_detail.ctp:104
 #: /views/evaluations/view_simple_evaluation_results.ctp:284
 #: /views/helpers/evaluation.php:48;153;267
 msgid "Evaluatee"
-msgstr ""
+msgstr "Evaluado"
 
 #: /controllers/components/export_pdf.php:211;554
 #: /views/evaluations/view_mixeval_evaluation_results_detail.ctp:115
 msgid "Final Total"
-msgstr ""
+msgstr "Recuento final"
 
 #: /controllers/components/export_pdf.php:256;717
 #: /views/elements/evaluations/student_view_event_info.ctp:9
@@ -2050,14 +2089,14 @@ msgstr ""
 #: /views/evaluations/view_simple_evaluation_results.ctp:8
 #: /views/mixevals/add.ctp:32
 msgid "Self-Evaluation"
-msgstr ""
+msgstr "Autoevaluación"
 
 #: /controllers/components/export_pdf.php:363;460
 #: /views/elements/evaluations/student_view_event_info.ctp:48
 #: /views/evaluations/student_view_simple_evaluation_results.ctp:32
 #: /views/helpers/evaluation.php:124;205
 msgid "Group Average"
-msgstr ""
+msgstr "Media del grupo"
 
 #: /controllers/components/export_pdf.php:533
 #: /views/elements/evaluations/rubric_eval_form.ctp:42
@@ -2065,16 +2104,16 @@ msgstr ""
 #: /views/evaluations/view_simple_evaluation_results.ctp:72
 #: /views/helpers/evaluation.php:225
 msgid "Evaluator"
-msgstr ""
+msgstr "Evaluador"
 
 #: /controllers/components/export_pdf.php:551
 msgid "Number of Evaluators"
-msgstr ""
+msgstr "Número de evaluadores"
 
 #: /controllers/components/export_pdf.php:571
 #: /views/elements/evaluations/student_view_rubric_details.ctp:58
 msgid "General Comment"
-msgstr ""
+msgstr "Observación general"
 
 #: /controllers/components/export_pdf.php:714
 #: /views/elements/evaluations/ajax_evaluation_result_list.ctp:14
@@ -2083,7 +2122,7 @@ msgstr ""
 #: /views/evaluations/view_simple_evaluation_results.ctp:6
 #: /views/groups/import_results.ctp:36;54
 msgid "Group"
-msgstr ""
+msgstr "Grupo"
 
 #: /controllers/components/export_pdf.php:720
 #: /views/elements/evaluations/rubric_eval_form.ctp:48
@@ -2093,49 +2132,52 @@ msgstr ""
 #: /views/evaluations/student_view_simple_evaluation_results.ctp:5
 #: /views/evaluations/view_simple_evaluation_results.ctp:5
 msgid "Event Name"
-msgstr ""
+msgstr "Nombre del evento"
 
 #: /controllers/components/export_pdf.php:723
 msgid "Evaluation Type"
-msgstr ""
+msgstr "Tipo de evaluación"
 
 #: /controllers/components/framework.php:29
 msgid "No filename extension. Must be csv."
-msgstr ""
+msgstr "Sin extensión de nombre de archivo. Debe ser csv."
 
 #: /controllers/components/framework.php:36
 msgid "Error reading file"
-msgstr ""
+msgstr "Error al leer el archivo."
 
 #: /controllers/components/framework.php:39
 msgid "iPeer does not support the file type '."
-msgstr ""
+msgstr "iPeer no admite el tipo de archivo ‘."
 
 #: /controllers/components/framework.php:40
-msgid "'. Please use only text files (.txt) or comma seperated values files (.csv)."
+msgid ""
+"'. Please use only text files (.txt) or comma seperated values files (.csv)."
 msgstr ""
+"'. Utilice sólo archivos de texto (.txt) o archivos de valores de separados "
+"por comas (.csv)."
 
 #: /controllers/components/framework.php:64
 msgid "days"
-msgstr ""
+msgstr "días"
 
 #: /controllers/components/framework.php:66
 msgid "hours"
-msgstr ""
+msgstr "horas"
 
 #: /controllers/components/framework.php:68
 msgid "minutes"
-msgstr ""
+msgstr "minutos"
 
 #: /controllers/components/framework.php:70
 msgid "seconds"
-msgstr ""
+msgstr "segundos"
 
 #: /controllers/components/penalty.php:39;50
 #: /views/evaluations/view_simple_evaluation_results.ctp:216
 #: /views/helpers/evaluation.php:101;107;134;137
 msgid "N/A"
-msgstr ""
+msgstr "No disponible"
 
 #: /libs/upgrade_scripts/upgrade_300.php:77
 #: /libs/upgrade_scripts/upgrade_310.php:81
@@ -2143,830 +2185,879 @@ msgstr ""
 #: /libs/upgrade_scripts/upgrade_315.php:51
 #: /libs/upgrade_scripts/upgrade_316.php:51
 msgid "Database patching failed: %s"
-msgstr ""
+msgstr "Error de actualización de base de datos: %s"
 
 #: /libs/upgrade_scripts/upgrade_base.php:48
 msgid "You need to implemented up() function in the upgrade script."
-msgstr ""
+msgstr "Necesita implementar la función up() en el script de actualización."
 
 #: /libs/upgrade_scripts/upgrade_base.php:59
 msgid "You need to implemented down() function in the upgrade script."
-msgstr ""
+msgstr "Necesita implementar la función down() en el script de actualización."
 
 #: /models/user.php:625
 msgid "Invalid column number on line %d"
-msgstr ""
+msgstr "Número de columna no válido en la línea %d"
 
 #: /models/user.php:630
 msgid "Username can not be empty. line %d"
-msgstr ""
+msgstr "El nombre de usuario no puede estar vacío. Línea %d"
 
 #: /models/user.php:662
 msgid "No valid user to add"
-msgstr ""
+msgstr "Usuario no válido para agregar"
 
 #: /plugins/extended_test_case/libs/extended_test_case.php:203
 msgid "Skipped entire test method: %s"
-msgstr ""
+msgstr "Omite el método de prueba entero: %s"
 
 #: /plugins/file_upload/vendors/uploader.php:91
 msgid "No filename resulting after parsing. Function: %s"
-msgstr ""
+msgstr "Ningún nombre de archivo resultante después del análisis. Función: %s"
 
 #: /plugins/file_upload/vendors/uploader.php:149
 msgid "Unable to save temp file to file system."
-msgstr ""
+msgstr "No se puede guardar el fichero temporal en el sistema de archivos."
 
 #: /plugins/file_upload/vendors/uploader.php:208
 msgid "%s is not an allowed type."
-msgstr ""
+msgstr "%s no es un tipo permitido."
 
 #: /plugins/file_upload/vendors/uploader.php:217
 msgid "extension is not allowed."
-msgstr ""
+msgstr "extensión no está permitida."
 
 #: /plugins/file_upload/vendors/uploader.php:258
 msgid "File exceeds %s byte limit."
-msgstr ""
+msgstr "El archivo supera el límite de %s bytes."
 
 #: /plugins/guard/controllers/components/guard.php:258
-msgid "Could not find AclComponent. Please include Acl in Controller::$components."
+msgid ""
+"Could not find AclComponent. Please include Acl in Controller::$components."
 msgstr ""
+"No se pudo encontrar AclComponent. Por favor incluya la Acl en Controller::"
+"$components."
 
-#: /views/accesses/view.ctp:6
-#: /views/elements/framework/view_user_detail.ctp:5
+#: /views/accesses/view.ctp:6 /views/elements/framework/view_user_detail.ctp:5
 #: /views/elements/users/ajax_user_list.ctp:26
 #: /views/elements/users/merge_search.ctp:20
 msgid "Role"
-msgstr ""
+msgstr "Rol"
 
 #: /views/courses/edit.ctp:6
 msgid "Course subjects and course numbers, e.g. APSC 201 001"
-msgstr ""
+msgstr "Temas del curso y número de curso, por ejemplo, APSC 201 001"
 
 #: /views/courses/edit.ctp:8
 msgid "Course title, e.g. Technical Communication"
-msgstr ""
+msgstr "Título del curso, por ejemplo, comunicación técnica"
 
 #: /views/courses/edit.ctp:25
 msgid "Add Instructor"
-msgstr ""
+msgstr "Añadir profesor"
 
 #: /views/courses/edit.ctp:54
 msgid "Add Tutor"
-msgstr ""
+msgstr "Añadir tutor"
 
 #: /views/courses/edit.ctp:77
 msgid "Selecting correct assoication will allow admin to help troubleshooting."
 msgstr ""
+"La selección correcta de la asociación permitirá ayudar a la solución de "
+"problemas por el administrador."
 
 #: /views/courses/edit.ctp:79
 msgid "e.g. http://mycoursehome.com"
-msgstr ""
+msgstr "por ejemplo, http://mycoursehome.com"
 
-#: /views/courses/edit.ctp:81
-#: /views/departments/edit.ctp:6
-#: /views/faculties/edit.ctp:9
-#: /views/mixevals/add.ctp:49
-#: /views/rubrics/edit.ctp:89
-#: /views/simple_evaluations/edit.ctp:51
-#: /views/sys_parameters/add.ctp:8
-#: /views/sys_parameters/edit.ctp:9
+#: /views/courses/edit.ctp:81 /views/departments/edit.ctp:6
+#: /views/faculties/edit.ctp:9 /views/mixevals/add.ctp:49
+#: /views/rubrics/edit.ctp:89 /views/simple_evaluations/edit.ctp:51
+#: /views/sys_parameters/add.ctp:8 /views/sys_parameters/edit.ctp:9
 #: /views/users/edit_profile.ctp:61
 msgid "Save"
-msgstr ""
+msgstr "Guardar"
 
-#: /views/courses/home.ctp:60
-#: /views/elements/searchs/search_menu.ctp:5
+#: /views/courses/home.ctp:60 /views/elements/searchs/search_menu.ctp:5
 msgid "Evaluation Events"
-msgstr ""
+msgstr "Eventos de evaluación"
 
 #: /views/courses/home.ctp:66
 msgid "Team Maker"
-msgstr ""
+msgstr "Creador de equipos"
 
-#: /views/courses/import.ctp:2
-#: /views/courses/move.ctp:2
+#: /views/courses/import.ctp:2 /views/courses/move.ctp:2
 #: /views/evaluations/export.ctp:2
 #: /views/evaluations/view_simple_evaluation_results.ctp:266
-#: /views/groups/import.ctp:2
-#: /views/survey_groups/export.ctp:2
-#: /views/users/import.ctp:2
-#: /views/users/merge.ctp:2
+#: /views/groups/import.ctp:2 /views/survey_groups/export.ctp:2
+#: /views/users/import.ctp:2 /views/users/merge.ctp:2
 msgid "Instructions"
-msgstr ""
+msgstr "Instrucciones"
 
-#: /views/courses/import.ctp:4
-#: /views/courses/move.ctp:4
+#: /views/courses/import.ctp:4 /views/courses/move.ctp:4
 msgid "All fields are mandatory."
-msgstr ""
+msgstr "Todos los campos son obligatorios"
 
 #: /views/courses/import.ctp:5
 msgid "When all fields are filled, the Submit button will become available."
-msgstr ""
+msgstr "Cuando se llenen todos los campos, el botón Enviar estará disponible."
 
 #: /views/courses/import.ctp:6
-msgid "If the source course does not have a survey, the source survey and destination survey fields are not required."
+msgid ""
+"If the source course does not have a survey, the source survey and "
+"destination survey fields are not required."
 msgstr ""
+"Si el curso de origen no tiene una encuesta, los campos encuesta de origen y "
+"destino no son obligatorios."
 
 #: /views/courses/import.ctp:7
-msgid "You can choose to import into a duplicate of the source survey or choose an existing survey."
+msgid ""
+"You can choose to import into a duplicate of the source survey or choose an "
+"existing survey."
 msgstr ""
+"Usted puede elegir importar en un duplicado de la encuesta de origen o "
+"elegir una encuesta existente."
 
-#: /views/courses/import.ctp:8
-#: /views/courses/move.ctp:6
+#: /views/courses/import.ctp:8 /views/courses/move.ctp:6
 msgid "The conditions below must be met for the move to be successful."
 msgstr ""
+"Deben cumplirse las condiciones siguientes para que el traslado tenga éxito."
 
-#: /views/courses/import.ctp:10
-#: /views/courses/move.ctp:8
+#: /views/courses/import.ctp:10 /views/courses/move.ctp:8
 msgid "Conditions"
-msgstr ""
+msgstr "Condiciones"
 
 #: /views/courses/import.ctp:12
 msgid "Only Text (.txt) and CSV File (.csv) can be used."
-msgstr ""
+msgstr "Sólo se pueden utilizar archivos de texto (.txt) y CSV (.csv)."
 
 #: /views/courses/import.ctp:13
-msgid "Only student numbers and usernames can be used in the file but not both."
+msgid ""
+"Only student numbers and usernames can be used in the file but not both."
 msgstr ""
+"Sólo número de alumnos y nombres de usuario pueden utilizarse en el archivo, "
+"pero no ambos."
 
-#: /views/courses/import.ctp:14
-#: /views/courses/move.ctp:12
+#: /views/courses/import.ctp:14 /views/courses/move.ctp:12
 msgid "The Destination Course must be accessible to you."
-msgstr ""
+msgstr "El curso de destino debe ser accesible para usted."
 
 #: /views/courses/import.ctp:15
-msgid "The existing Destination Survey needs to use the same template as the Source Survey."
+msgid ""
+"The existing Destination Survey needs to use the same template as the Source "
+"Survey."
 msgstr ""
+"La encuesta de destino existente tiene que usar la misma plantilla que la "
+"encuesta de origen."
 
-#: /views/courses/import.ctp:17
-#: /views/groups/import.ctp:16
+#: /views/courses/import.ctp:17 /views/groups/import.ctp:16
 #: /views/users/import.ctp:17
 msgid "Examples:"
-msgstr ""
+msgstr "Ejemplos:"
 
 #: /views/courses/import.ctp:30
 msgid "Move or Copy Group of Students"
-msgstr ""
+msgstr "Mover o copiar grupo de estudiantes"
 
-#: /views/courses/import.ctp:37
-#: /views/groups/import.ctp:32
+#: /views/courses/import.ctp:37 /views/groups/import.ctp:32
 msgid "Student Identifier"
-msgstr ""
+msgstr "Identificador de estudiante"
 
 #: /views/courses/import.ctp:43;53
 msgid "No surveys were found in the Source Course."
-msgstr ""
+msgstr "No se han encontrado encuestas en el curso de origen."
 
 #: /views/courses/import.ctp:49
 msgid "Destination Survey"
-msgstr ""
+msgstr "Encuesta de destino"
 
 #: /views/courses/import.ctp:57
 msgid "Move or Copy?"
-msgstr ""
+msgstr "¿Mover o copiar?"
 
-#: /views/courses/import.ctp:60
-#: /views/courses/move.ctp:29
+#: /views/courses/import.ctp:60 /views/courses/move.ctp:29
 msgid "\"Move\" will unenrol the student from the Source Course."
-msgstr ""
+msgstr "\"Mover\" desmatricula al alumno en el curso de origen."
 
 #: /views/courses/import_summary.ctp:2
 msgid "User(s) failed to transfer:"
-msgstr ""
+msgstr "Error al transferir los usuarios:"
 
 #: /views/courses/import_summary.ctp:3
 msgid "Reason"
-msgstr ""
+msgstr "Razón"
 
 #: /views/courses/import_summary.ctp:6
 msgid "User(s) successfully transferred:"
-msgstr ""
+msgstr "Usuario(s) transferido(s) con éxito:"
 
 #: /views/courses/import_summary.ctp:7
 msgid "Note"
-msgstr ""
+msgstr "Nota"
 
-#: /views/courses/import_summary.ctp:11
-#: /views/users/user_summary.ctp:22
+#: /views/courses/import_summary.ctp:11 /views/users/user_summary.ctp:22
 msgid "Back to Course"
-msgstr ""
+msgstr "Volver al curso"
 
 #: /views/courses/index.ctp:7
 msgid "Add Course"
-msgstr ""
+msgstr "Añadir curso"
 
 #: /views/courses/move.ctp:5
-msgid "When all fields have been filled, the Submit button will become available."
+msgid ""
+"When all fields have been filled, the Submit button will become available."
 msgstr ""
+"Cuando se hayan rellenado todos los campos, el botón Enviar estará "
+"disponible."
 
 #: /views/courses/move.ctp:10
 msgid "The Source Course must have a survey."
-msgstr ""
+msgstr "El curso de origen debe tener una encuesta."
 
 #: /views/courses/move.ctp:11
-msgid "The Student being moved must have made a submission to the Source Survey."
+msgid ""
+"The Student being moved must have made a submission to the Source Survey."
 msgstr ""
+"El estudiante que se está desplazando debe haber hecho un envío a la "
+"encuesta de origen."
 
 #: /views/courses/move.ctp:13
 msgid "The Source Survey needs to use the same template as the Source Survey."
 msgstr ""
+"La encuesta fuente necesita utilizar la misma plantilla que la encuesta "
+"fuente."
 
 #: /views/courses/move.ctp:15
 msgid "Move or Copy Student"
-msgstr ""
+msgstr "Mover o copiar estudiante"
 
 #: /views/courses/view.ctp:8
 msgid "Instructor(s)"
-msgstr ""
+msgstr "Profesor(es)"
 
 #: /views/courses/view.ctp:16
 msgid " Email To All"
-msgstr ""
+msgstr "Email a todos"
 
 #: /views/courses/view.ctp:16
 msgid " Email To All Instructors"
-msgstr ""
+msgstr "Correo electrónico a todos los instructores"
 
 #: /views/courses/view.ctp:27
 msgid "Homepage"
-msgstr ""
+msgstr "Sitio web"
 
 #: /views/courses/view.ctp:33
 msgid "Created By"
-msgstr ""
+msgstr "Creado por"
 
 #: /views/courses/view.ctp:35
 msgid "Updated By"
-msgstr ""
+msgstr "Actualizado por"
 
 #: /views/courses/view.ctp:39
 msgid "Created At"
-msgstr ""
+msgstr "Creado en"
 
 #: /views/courses/view.ctp:41
 msgid "Updated At"
-msgstr ""
+msgstr "Actualizado el"
 
-#: /views/courses/view.ctp:46
-#: /views/rubrics/edit.ctp:80
-#: /views/simple_evaluations/edit.ctp:50
-#: /views/simple_evaluations/view.ctp:28
-#: /views/surveys/edit.ctp:27
-#: /views/surveys/view.ctp:54
+#: /views/courses/view.ctp:46 /views/rubrics/edit.ctp:80
+#: /views/simple_evaluations/edit.ctp:50 /views/simple_evaluations/view.ctp:28
+#: /views/surveys/edit.ctp:27 /views/surveys/view.ctp:54
 msgid "Back"
-msgstr ""
+msgstr "Atrás"
 
 #: /views/departments/add.ctp:5
 #: /views/elements/mixevals/questions_editor.ctp:217;226
 msgid "Add"
-msgstr ""
+msgstr "Añadir"
 
 #: /views/departments/index.ctp:4
 msgid "Add Department"
-msgstr ""
+msgstr "Añadir departamento"
 
-#: /views/departments/index.ctp:54
-#: /views/faculties/index.ctp:54
+#: /views/departments/index.ctp:54 /views/faculties/index.ctp:54
 msgid "Are you sure you want to delete %s?"
-msgstr ""
+msgstr "¿Seguro que quieres eliminar %s?"
 
 #: /views/elements/creator_block.ctp:11
 #: /views/elements/framework/view_user_detail.ctp:64
-#: /views/elements/users/merge_search.ctp:26
-#: /views/sys_parameters/view.ctp:8
+#: /views/elements/users/merge_search.ctp:26 /views/sys_parameters/view.ctp:8
 msgid "Create Date"
-msgstr ""
+msgstr "Fecha de creación"
 
 #: /views/elements/creator_block.ctp:16
 #: /views/elements/framework/view_user_detail.ctp:60
 #: /views/elements/users/merge_search.ctp:27
 msgid "Updater"
-msgstr ""
+msgstr "Actualizador"
 
 #: /views/elements/creator_block.ctp:25
 #: /views/elements/framework/view_user_detail.ctp:66
-#: /views/elements/users/merge_search.ctp:28
-#: /views/sys_parameters/view.ctp:9
+#: /views/elements/users/merge_search.ctp:28 /views/sys_parameters/view.ctp:9
 msgid "Update Date"
-msgstr ""
+msgstr "Fecha de actualización"
 
 #: /views/elements/courses/ajax_personalize_Course.SubMenu.EvalResults.Show.ctp:6
 msgid "List Evaluation Results"
-msgstr ""
+msgstr "Listar resultados de evaluación"
 
 #: /views/elements/courses/ajax_personalize_Course.SubMenu.Rubric.Show.ctp:11
 msgid "List Rubrics"
-msgstr ""
+msgstr "Listar rúbricas"
 
 #: /views/elements/courses/ajax_personalize_Course.SubMenu.SimpleEvals.Show.ctp:6
-#: /views/evaltools/index.ctp:126
-#: /views/simple_evaluations/index.ctp:6
+#: /views/evaltools/index.ctp:126 /views/simple_evaluations/index.ctp:6
 msgid "Add Simple Evaluation"
-msgstr ""
+msgstr "Añadir evaluación simple"
 
 #: /views/elements/courses/ajax_personalize_Course.SubMenu.SimpleEvals.Show.ctp:11
 msgid "List Simple Evaulations"
-msgstr ""
+msgstr "Listar rúbricas"
 
 #: /views/elements/courses/course_selection_box.ctp:13
 msgid " --- No Course Selected --- "
-msgstr ""
+msgstr "--- Ningún curso seleccionado ---"
 
 #: /views/elements/courses/course_selection_box.ctp:14
 msgid " --- All Courses --- "
-msgstr ""
+msgstr "--- Todos los cursos ---"
 
 #: /views/elements/courses/edit_instructor.ctp:7
 msgid "Are you sure to remove instructor "
-msgstr ""
+msgstr "Está seguro de eliminar el instructor"
 
 #: /views/elements/courses/edit_instructor.ctp:7
 msgid " from this course?"
-msgstr ""
+msgstr "de este curso?"
 
 #: /views/elements/courses/edit_instructor.ctp:10
 msgid "Communication error!"
-msgstr ""
+msgstr "¡Error de comunicación!"
 
 #: /views/elements/email/html/addEvent.ctp:1
 msgid "is created"
-msgstr ""
+msgstr "creado por"
 
 #: /views/elements/email/html/addEvent.ctp:3
 #: /views/elements/email/text/addEvent.ctp:3
 msgid "Due"
-msgstr ""
+msgstr "Vencido"
 
 #: /views/elements/email/html/resetPassword.ctp:1
 #: /views/elements/email/text/addUser.ctp:2
 #: /views/elements/email/text/resetPassword.ctp:2
 msgid "Hello "
-msgstr ""
+msgstr "Hola"
 
 #: /views/elements/email/html/resetPassword.ctp:2
 #: /views/elements/email/text/resetPassword.ctp:3
 msgid "Your iPeer password has been reset to the password below."
-msgstr ""
+msgstr "Su contraseña iPeer se ha restablecido a la contraseña de debajo."
 
 #: /views/elements/email/html/resetPassword.ctp:4
 #: /views/elements/email/text/addUser.ctp:5
 #: /views/elements/email/text/resetPassword.ctp:5
 #: /views/elements/users/user_summary_list.ctp:9
 msgid "Password"
-msgstr ""
+msgstr "Contraseña"
 
 #: /views/elements/email/text/addEvent.ctp:1
 msgid "Event "
-msgstr ""
+msgstr "Evento "
 
 #: /views/elements/email/text/addEvent.ctp:1
 msgid " is created"
-msgstr ""
+msgstr " creado"
 
 #: /views/elements/email/text/addUser.ctp:3
 msgid "An instructor or admin has created an account for you in iPeer."
 msgstr ""
+"Un instructor o administrador ha creado una cuenta para usted en iPeer."
 
 #: /views/elements/email/text/addUser.ctp:6
 msgid "You can login at "
-msgstr ""
+msgstr "Puede acceder a "
 
 #: /views/elements/emailer/edit_recipient.ctp:7
 msgid " will be removed from the To: field..."
-msgstr ""
+msgstr "será eliminado del campo Para: ..."
 
 #: /views/elements/emailer/edit_recipient.ctp:15
 msgid "Removal error!"
-msgstr ""
+msgstr "¡Error de eliminación!"
 
 #: /views/elements/evaltools/tools_menu.ctp:21
 msgid "All My Tools"
-msgstr ""
+msgstr "Todas mis herramientas"
 
 #: /views/elements/evaltools/tools_menu.ctp:36
 msgid "Emailer"
-msgstr ""
+msgstr "Correo electrónico"
 
 #: /views/elements/evaltools/tools_menu.ctp:39
 msgid "Email Templates"
-msgstr ""
+msgstr "Plantillas de correo electrónico"
 
 #: /views/elements/evaluations/ajax_evaluation_list.ctp:8
 msgid "Page Size"
-msgstr ""
+msgstr "Tamaño de página"
 
 #: /views/elements/evaluations/ajax_evaluation_list.ctp:26
 msgid "Evaluation Event Title"
-msgstr ""
+msgstr "Título del evento de evaluación"
 
 #: /views/elements/evaluations/ajax_evaluation_list.ctp:30
 #: /views/elements/events/ajax_event_list.ctp:19
 msgid "Self Evaluation"
-msgstr ""
+msgstr "Autoevaluación"
 
 #: /views/elements/evaluations/ajax_evaluation_list.ctp:45
 msgid "View "
-msgstr ""
+msgstr "Vista"
 
 #: /views/elements/evaluations/ajax_evaluation_list.ctp:85
 #: /views/elements/users/ajax_user_list.ctp:93
-msgid "Page %page% of %pages%, showing %current% records out of %count% total<br/>"
+msgid ""
+"Page %page% of %pages%, showing %current% records out of %count% total<br/>"
 msgstr ""
+"Página %page% de %pages%, mostrando %current% registros de %count% en "
+"total<br/>"
 
 #: /views/elements/evaluations/ajax_evaluation_result_list.ctp:15
 msgid "Completion Rate"
-msgstr ""
+msgstr "Ratio de finalización"
 
 #: /views/elements/evaluations/ajax_evaluation_result_list.ctp:18
 msgid "Released Comments"
-msgstr ""
+msgstr "Comentarios publicados"
 
 #: /views/elements/evaluations/ajax_evaluation_result_list.ctp:19
 msgid "Released Grades"
-msgstr ""
+msgstr "Calificaciones publicadas"
 
 #: /views/elements/evaluations/ajax_evaluation_result_list.ctp:28
 msgid "View Evaluation Result"
-msgstr ""
+msgstr "Ver resultado de la evaluación"
 
 #: /views/elements/evaluations/ajax_evaluation_result_list.ctp:34
 #: /views/events/view.ctp:12
 msgid "Event Title"
-msgstr ""
+msgstr "Título del evento"
 
 #: /views/elements/evaluations/ajax_evaluation_result_list.ctp:37
 msgid "Group Submission Detail"
-msgstr ""
+msgstr "Detalle de envío grupal"
 
 #: /views/elements/evaluations/ajax_evaluation_result_list.ctp:37
 msgid "Group "
-msgstr ""
+msgstr "Grupo"
 
 #: /views/elements/evaluations/ajax_evaluation_result_list.ctp:39
 msgid "completed"
-msgstr ""
+msgstr "completado"
 
 #: /views/elements/evaluations/ajax_evaluation_result_list.ctp:50
 msgid "Not Completed"
-msgstr ""
+msgstr "No completado"
 
 #: /views/elements/evaluations/ajax_evaluation_result_list.ctp:61
 msgid "marked"
-msgstr ""
+msgstr "marcado"
 
 #: /views/elements/evaluations/ajax_evaluation_result_list.ctp:64
 msgid "Ready to Review"
-msgstr ""
+msgstr "Listo para revisión"
 
 #: /views/elements/evaluations/ajax_evaluation_result_list.ctp:67
 msgid "Not Ready to Review"
-msgstr ""
+msgstr "No está listo para revisión"
 
 #: /views/elements/evaluations/mixeval_details.ctp:4
 msgid " Comments/Grades Not Released Yet"
-msgstr ""
+msgstr "Comentarios/calificaciones no liberados aún"
 
 #: /views/elements/evaluations/mixeval_details.ctp:6
 msgid " Grades Not Released Yet"
-msgstr ""
+msgstr "Calificaciones no liberadas aún"
 
 #: /views/elements/evaluations/mixeval_details.ctp:8
 msgid " Comments Not Released Yet"
-msgstr ""
+msgstr "Comentario no publicado todavía"
 
 #: /views/elements/evaluations/mixeval_details.ctp:38;103
 msgid "Grades Not Released Yet"
-msgstr ""
+msgstr "Calificaciones no liberadas aún"
 
 #: /views/elements/evaluations/mixeval_details.ctp:41
 msgid "Comments Not Released Yet"
-msgstr ""
+msgstr "Comentarios no publicados todavía"
 
 #: /views/elements/evaluations/mixeval_details.ctp:55
 #: /views/elements/evaluations/rubric_details.ctp:29
 msgid "Grade:"
-msgstr ""
+msgstr "Nota:"
 
 #: /views/elements/evaluations/mixeval_details.ctp:76
 #: /views/elements/evaluations/student_view_rubric_details.ctp:36;43;49;59
 msgid "n/a"
-msgstr ""
+msgstr "no disponible"
 
 #: /views/elements/evaluations/mixeval_details.ctp:89
 #: /views/elements/evaluations/rubric_details.ctp:65
 #: /views/evaluations/view_simple_evaluation_results.ctp:333
 msgid "Save Changes"
-msgstr ""
+msgstr "Guardar cambios"
 
 #: /views/elements/evaluations/mixeval_eval_form.ctp:7
 msgid "Notes"
-msgstr ""
+msgstr "Notas"
 
 #: /views/elements/evaluations/mixeval_eval_form.ctp:10
 msgid "The evaluation is due on %s."
-msgstr ""
+msgstr "La evaluación es el %s."
 
 #: /views/elements/evaluations/mixeval_eval_form.ctp:11
 msgid "To resubmit an evaluation, all required questions must be answered."
 msgstr ""
+"Para presentar una evaluación, deben contestarse todas las preguntas "
+"necesarias."
 
 #: /views/elements/evaluations/mixeval_eval_form.ctp:13
 #: /views/elements/evaluations/rubric_eval_form.ctp:67
 msgid "The evaluation can be repeatedly submitted until "
-msgstr ""
+msgstr "La evaluación puede presentarse repetidamente hasta"
 
 #: /views/elements/evaluations/mixeval_eval_form.ctp:14
 msgid " marks required questions."
-msgstr ""
+msgstr " señala las preguntas obligatorias."
 
 #: /views/elements/evaluations/mixeval_eval_form.ctp:16
 msgid "Show/Hide Late Penalty Policy"
-msgstr ""
+msgstr "Mostrar/Ocultar Política de penalización por retraso"
 
 #: /views/elements/evaluations/mixeval_eval_form.ctp:23
 #: /views/elements/evaluations/rubric_eval_form.ctp:77
 #: /views/elements/evaluations/simple_eval_form.ctp:168
 msgid "Then until %d day(s) after the due date, %s will be deducted."
 msgstr ""
+"Despues, hasta %d días después de la fecha de vencimiento, se deducirá %s."
 
 #: /views/elements/evaluations/mixeval_eval_form.ctp:25
 #: /views/elements/evaluations/rubric_eval_form.ctp:79
 #: /views/elements/evaluations/simple_eval_form.ctp:170
 msgid "From the due date to %d days(s) late, %s will be deducted."
-msgstr ""
+msgstr "Desde la fecha de vencimiento hasta %d días(s) tarde, se deducirá %s."
 
 #: /views/elements/evaluations/mixeval_eval_form.ctp:29
 #: /views/elements/evaluations/rubric_eval_form.ctp:83
 #: /views/elements/evaluations/simple_eval_form.ctp:174
 msgid "%s is deducted afterwards."
-msgstr ""
+msgstr "%s se deduce después."
 
 #: /views/elements/evaluations/mixeval_eval_form.ctp:31
 #: /views/elements/evaluations/simple_eval_form.ctp:176
 msgid "No penalty is specified for this evaluation."
-msgstr ""
+msgstr "No se ha especificado penalización para esta evaluación."
 
 #: /views/elements/evaluations/mixeval_eval_form.ctp:73
 #: /views/elements/mixevals/questions_editor.ctp:225
 #: /views/evaltools/index.ctp:55
 msgid "Self-Evaluation Questions"
-msgstr ""
+msgstr "Preguntas de autoevaluación"
 
 #: /views/elements/evaluations/mixeval_eval_form.ctp:83
 msgid "Submit the Evaluation"
-msgstr ""
+msgstr "Enviar la evaluación"
 
 #: /views/elements/evaluations/mixeval_eval_form.ctp:93;125
-msgid "Please make sure that the total of the grades in the drop-downs equals %s and then press \"Submit\" again."
+msgid ""
+"Please make sure that the total of the grades in the drop-downs equals %s "
+"and then press \"Submit\" again."
 msgstr ""
+"Por favor, asegúrese de que el total de las calificaciones en los menús "
+"desplegables es igual a %s y presione \"Enviar\" de nuevo."
 
 #: /views/elements/evaluations/mixeval_eval_form.ctp:130
-msgid "Please fill in all required questions before resubmitting the evaluation."
+msgid ""
+"Please fill in all required questions before resubmitting the evaluation."
 msgstr ""
+"Por favor, rellene todas las preguntas necesarias antes de volver a "
+"presentar la evaluación."
 
 #: /views/elements/evaluations/rubric_details.ctp:17
 #: /views/elements/evaluations/student_view_rubric_details.ctp:27
 msgid "Points"
-msgstr ""
+msgstr "Puntos"
 
 #: /views/elements/evaluations/rubric_details.ctp:42
 msgid "Comment:"
-msgstr ""
+msgstr "Comentario:"
 
 #: /views/elements/evaluations/rubric_details.ctp:49
 msgid "General Comment:"
-msgstr ""
+msgstr "Observación general"
 
 #: /views/elements/evaluations/rubric_eval_form.ctp:39
 #: /views/elements/evaluations/simple_eval_form.ctp:130
 #: /views/elements/evaluations/view_event_info.ctp:2
 #: /views/evaluations/view_simple_evaluation_results.ctp:1
 msgid "Evaluation Event Detail"
-msgstr ""
+msgstr "Detalles del evento de evaluación"
 
 #: /views/elements/evaluations/rubric_eval_form.ctp:44
 #: /views/elements/evaluations/simple_eval_form.ctp:135
 msgid "Evaluating"
-msgstr ""
+msgstr "Evaluando"
 
 #: /views/elements/evaluations/rubric_eval_form.ctp:59
 #: /views/elements/evaluations/simple_eval_form.ctp:150
 msgid " Instructions"
-msgstr ""
+msgstr "Instrucciones"
 
 #: /views/elements/evaluations/rubric_eval_form.ctp:61
-msgid "Click <font color =\"#FF6666\"><i>EACH</i></font> of your peer's name to rate his/her performance."
+msgid ""
+"Click <font color =\"#FF6666\"><i>EACH</i></font> of your peer's name to "
+"rate his/her performance."
 msgstr ""
+"Haga clic en <font color=\"#FF6666\"><i>cada</i></font> nombre de sus "
+"compañeros para calificar su desempeño."
 
 #: /views/elements/evaluations/rubric_eval_form.ctp:62
 #: /views/elements/evaluations/simple_eval_form.ctp:155
 msgid "Enter Comments"
-msgstr ""
+msgstr "Introducir comentarios"
 
 #: /views/elements/evaluations/rubric_eval_form.ctp:62
 #: /views/elements/evaluations/simple_eval_form.ctp:155
 msgid "Required"
-msgstr ""
+msgstr "Obligatorio"
 
 #: /views/elements/evaluations/rubric_eval_form.ctp:62
 #: /views/elements/evaluations/simple_eval_form.ctp:155
 msgid "Optional"
-msgstr ""
+msgstr "Opcional"
 
 #: /views/elements/evaluations/rubric_eval_form.ctp:63
-msgid "Press \"Save This Section\" to save the evaluation for each group member."
+msgid ""
+"Press \"Save This Section\" to save the evaluation for each group member."
 msgstr ""
+"Pulse \"guardar esta sección\" para guardar la evaluación de cada miembro "
+"del grupo."
 
 #: /views/elements/evaluations/rubric_eval_form.ctp:64
-msgid "Press \"Submit to Complete the Evaluation\" to submit your evaluation to all peers."
+msgid ""
+"Press \"Submit to Complete the Evaluation\" to submit your evaluation to all "
+"peers."
 msgstr ""
+"Pulse \"enviar para completar la evaluación\" para presentar su evaluación "
+"de todos sus compañeros."
 
 #: /views/elements/evaluations/rubric_eval_form.ctp:65
-msgid "<i>NOTE:</i> You can click the \"Submit to Complete the Evaluation\" button only <font color =\"#FF6666\">AFTER</font> all evaluations are completed."
+msgid ""
+"<i>NOTE:</i> You can click the \"Submit to Complete the Evaluation\" button "
+"only <font color =\"#FF6666\">AFTER</font> all evaluations are completed."
 msgstr ""
+"<i>NOTA:</i> Puede hacer clic en el botón \"Enviar para completar la <font "
+"color =\"#FF6666\">evaluación\"</font> Sólo después de todas las "
+"evaluaciones se han completado."
 
 #: /views/elements/evaluations/rubric_eval_form.ctp:66
 #: /views/elements/evaluations/simple_eval_form.ctp:157
 msgid "Evaluation's release end date"
-msgstr ""
+msgstr "Fecha final de publicación de evaluación"
 
 #: /views/elements/evaluations/rubric_eval_form.ctp:70
 #: /views/elements/evaluations/simple_eval_form.ctp:161
 msgid "Show/Hide late penalty policy"
-msgstr ""
+msgstr "Mostrar/Ocultar Política de penalización por retraso"
 
 #: /views/elements/evaluations/rubric_eval_form.ctp:105
 msgid "(click to expand)"
-msgstr ""
+msgstr "(Haga clic para expandir)"
 
 #: /views/elements/evaluations/rubric_eval_form.ctp:118;120
 msgid "Save This Section"
-msgstr ""
+msgstr "Guardar esta sección"
 
 #: /views/elements/evaluations/rubric_eval_form.ctp:121;151
 msgid "This is a preview. All submissions are disabled."
-msgstr ""
+msgstr "Esta es una vista previa. Todos los envíos deshabilitados."
 
 #: /views/elements/evaluations/rubric_eval_form.ctp:123
 msgid "Please complete all the questions marked red before saving."
 msgstr ""
+"Por favor complete todas las preguntas marcado en rojo antes de guardar."
 
 #: /views/elements/evaluations/rubric_eval_form.ctp:124
 msgid "Make sure you save this section before moving on to the other ones!"
-msgstr ""
+msgstr "¡Asegúrese de guardar esta sección antes de pasar a las demás!"
 
 #: /views/elements/evaluations/rubric_eval_form.ctp:148;150
 msgid "Submit to Complete the Evaluation"
-msgstr ""
+msgstr "Enviar para completar la evaluación"
 
 #: /views/elements/evaluations/rubric_eval_form.ctp:152
-msgid "Please complete the questions for all group members, pressing 'Save This Section' button for each one."
+msgid ""
+"Please complete the questions for all group members, pressing 'Save This "
+"Section' button for each one."
 msgstr ""
+"Por favor complete las preguntas para todos los miembros del grupo, pulsando "
+"el botón de guardar en esta sección para cada uno."
 
 #: /views/elements/evaluations/rubric_eval_form.ctp:153
-msgid "Please enter all the comments for all the group members before submitting."
+msgid ""
+"Please enter all the comments for all the group members before submitting."
 msgstr ""
+"Por favor, introduzca todos los comentarios para todos los miembros del "
+"grupo antes del envío."
 
 #: /views/elements/evaluations/simple_eval_form.ctp:27
 msgid "All points are allocated."
-msgstr ""
+msgstr "Se han asignado todos los puntos."
 
 #: /views/elements/evaluations/simple_eval_form.ctp:32
 msgid "All points are allocated.<br />There are still "
-msgstr ""
+msgstr "Se han asignado todos los puntos.<br>Todavía hay "
 
 #: /views/elements/evaluations/simple_eval_form.ctp:32;47;61
 msgid " comments to be filled."
-msgstr ""
+msgstr "comentarios pendientes de rellenar."
 
 #: /views/elements/evaluations/simple_eval_form.ctp:36
 msgid "All points are allocated.<br />All comments are filled."
 msgstr ""
+"Se han asignado todos los puntos.<br>Todos los comentarios están completados."
 
 #: /views/elements/evaluations/simple_eval_form.ctp:44;47;50
 msgid "Too many points, need to unallocate"
-msgstr ""
+msgstr "Demasiados puntos, necesita anular la asignación"
 
 #: /views/elements/evaluations/simple_eval_form.ctp:44
 msgid "points."
-msgstr ""
+msgstr "puntos."
 
 #: /views/elements/evaluations/simple_eval_form.ctp:47
 msgid "points.<br />There are still"
-msgstr ""
+msgstr "puntos.<br />Todavía hay"
 
 #: /views/elements/evaluations/simple_eval_form.ctp:50
 msgid "points.<br />All comments are filled."
-msgstr ""
+msgstr "puntos.<br/>Todos los comentarios están completados."
 
 #: /views/elements/evaluations/simple_eval_form.ctp:58;61;64
 msgid "Please allocate"
-msgstr ""
+msgstr "Por favor, asignar"
 
 #: /views/elements/evaluations/simple_eval_form.ctp:58
 msgid "more points."
-msgstr ""
+msgstr "más puntos."
 
 #: /views/elements/evaluations/simple_eval_form.ctp:61
 msgid " more points.<br />There are still"
-msgstr ""
+msgstr " más puntos.<br/>Todavía hay"
 
 #: /views/elements/evaluations/simple_eval_form.ctp:64
 msgid " more points.<br />All comments are filled."
-msgstr ""
+msgstr " más puntos.<br/>Todos los comentarios están completados."
 
 #: /views/elements/evaluations/simple_eval_form.ctp:152
-msgid "Rate your peer's relative performance by using the slider. [Weight 1-10]"
+msgid ""
+"Rate your peer's relative performance by using the slider. [Weight 1-10]"
 msgstr ""
+"Califique el rendimiento relativo de sus pares utilizando el control "
+"deslizante. [Peso 1-10]"
 
 #: /views/elements/evaluations/simple_eval_form.ctp:153
 msgid "Click \"Distribute\" button to distribute points."
-msgstr ""
+msgstr "Haz clic en el botón \"Distribuir\" para repartir puntos."
 
 #: /views/elements/evaluations/simple_eval_form.ctp:154
 msgid "Allocate any remaining point."
-msgstr ""
+msgstr "Asignar cualquier punto restante."
 
 #: /views/elements/evaluations/simple_eval_form.ctp:156
 msgid "NOTE:"
-msgstr ""
+msgstr "NOTA:"
 
 #: /views/elements/evaluations/simple_eval_form.ctp:156
-msgid "\"Submit Evaluation\" button will only be enabled when all points, and comments (if required), are filled!"
+msgid ""
+"\"Submit Evaluation\" button will only be enabled when all points, and "
+"comments (if required), are filled!"
 msgstr ""
+"El botón \"Enviar evaluación\" sólo puede activarse cuando se llenan todos "
+"los puntos y comentarios (si procede)."
 
 #: /views/elements/evaluations/simple_eval_form.ctp:158
 msgid "The evaluation can be repeatedly submitted until %s."
-msgstr ""
+msgstr "La evaluación puede presentarse repetidamente hasta %s."
 
 #: /views/elements/evaluations/simple_eval_form.ctp:188
 msgid "Member(s)"
-msgstr ""
+msgstr "Miembro(s)"
 
 #: /views/elements/evaluations/simple_eval_form.ctp:189
 msgid "Relative Weight"
-msgstr ""
+msgstr "Peso relativo"
 
 #: /views/elements/evaluations/simple_eval_form.ctp:190
 #: /views/elements/mixevals/view_mixeval_details.ctp:51
 #: /views/elements/rubrics/ajax_rubric_view.ctp:59;152
 msgid "Mark"
-msgstr ""
+msgstr "Marcar"
 
 #: /views/elements/evaluations/simple_eval_form.ctp:191
 msgid "(Optional)"
-msgstr ""
+msgstr "(Opcional)"
 
 #: /views/elements/evaluations/simple_eval_form.ctp:239
 msgid "Points Allocated/Total:"
-msgstr ""
+msgstr "Puntos asignado/Total:"
 
 #: /views/elements/evaluations/simple_eval_form.ctp:242
 msgid "Distribute"
-msgstr ""
+msgstr "Distribuir"
 
 #: /views/elements/evaluations/simple_eval_form.ctp:249
 msgid "Submit Evaluation"
-msgstr ""
+msgstr "Enviar evaluación"
 
 #: /views/elements/evaluations/student_view_event_info.ctp:4
 #: /views/evaluations/student_view_simple_evaluation_results.ctp:1
 msgid "Evaluation Result Detail"
-msgstr ""
+msgstr "Detalle de resultado de evaluación"
 
 #: /views/elements/evaluations/student_view_event_info.ctp:7
 #: /views/evaluations/student_view_simple_evaluation_results.ctp:6
 msgid "Evaluated By"
-msgstr ""
+msgstr "Evaluado por"
 
 #: /views/elements/evaluations/student_view_event_info.ctp:30
 #: /views/evaluations/student_view_mixeval_evaluation_results.ctp:13
 #: /views/evaluations/student_view_rubric_evaluation_results.ctp:6
 #: /views/evaluations/student_view_simple_evaluation_results.ctp:30
 msgid "Rating"
-msgstr ""
+msgstr "Calificación"
 
 #: /views/elements/evaluations/student_view_rubric_details.ctp:7
 msgid "Person Being Evaluated"
-msgstr ""
+msgstr "Persona en evaluación"
 
 #: /views/elements/evaluations/student_view_rubric_details.ctp:15
 msgid " Comments/Grades Not Released Yet."
-msgstr ""
+msgstr "Comentarios/calificaciones no liberados aún."
 
 #: /views/elements/evaluations/student_view_survey_info.ctp:12
 msgid "Team Maker Survey"
-msgstr ""
+msgstr "Encuesta de creación de equipos"
 
 #: /views/elements/evaluations/student_view_survey_info.ctp:72
-#: /views/oauth_clients/add.ctp:12
-#: /views/oauth_clients/edit.ctp:11
-#: /views/oauth_tokens/add.ctp:13
-#: /views/oauth_tokens/edit.ctp:12
+#: /views/oauth_clients/add.ctp:12 /views/oauth_clients/edit.ctp:11
+#: /views/oauth_tokens/add.ctp:13 /views/oauth_tokens/edit.ctp:12
 msgid "Submit"
-msgstr ""
+msgstr "Enviar"
 
 #: /views/elements/evaluations/summary_info.ctp:2
 #: /views/evaluations/view_mixeval_evaluation_results.ctp:15
@@ -2974,7 +3065,7 @@ msgstr ""
 #: /views/evaluations/view_rubric_evaluation_results.ctp:5
 #: /views/evaluations/view_rubric_evaluation_results_detail.ctp:14
 msgid "Basic"
-msgstr ""
+msgstr "Básico"
 
 #: /views/elements/evaluations/summary_info.ctp:3
 #: /views/evaluations/view_mixeval_evaluation_results.ctp:16
@@ -2982,694 +3073,713 @@ msgstr ""
 #: /views/evaluations/view_rubric_evaluation_results.ctp:6
 #: /views/evaluations/view_rubric_evaluation_results_detail.ctp:15
 msgid "Detail"
-msgstr ""
+msgstr "Detalle"
 
 #: /views/elements/evaluations/summary_info.ctp:9
 msgid "These people have not yet submitted their evaluations"
-msgstr ""
+msgstr "Estas personas no han presentado todavía sus evaluaciones"
 
 #: /views/elements/events/ajax_event_list.ctp:14
 msgid "Actions"
-msgstr ""
+msgstr "Acciones"
 
 #: /views/elements/events/ajax_event_list.ctp:31
 msgid "Are you sure you want to delete event"
-msgstr ""
+msgstr "¿Seguro que deseas eliminar este evento?"
 
 #: /views/elements/events/ajax_event_list.ctp:39;42
 msgid "YES"
-msgstr ""
+msgstr "SÍ"
 
 #: /views/elements/events/ajax_event_list.ctp:39;42
 msgid "NO"
-msgstr ""
+msgstr "NO"
 
 #: /views/elements/events/ajax_event_list.ctp:45;45
 msgid "View Groups"
-msgstr ""
+msgstr "Ver grupos"
 
 #: /views/elements/events/ajax_event_list.ctp:54
 #: /views/elements/users/ajax_user_list.ctp:81
 msgid "Record Not Found"
-msgstr ""
+msgstr "Registro no encontrado"
 
 #: /views/elements/events/ajax_event_list.ctp:63
 #: /views/elements/survey_groups/ajax_survey_group_list.ctp:52
 msgid "Results: "
-msgstr ""
+msgstr "Resultados: "
 
 #: /views/elements/events/ajax_event_list.ctp:67
 #: /views/elements/survey_groups/ajax_survey_group_list.ctp:54
 msgid "Prev"
-msgstr ""
+msgstr "Anterior"
 
 #: /views/elements/events/ajax_event_list.ctp:69
 #: /views/elements/survey_groups/ajax_survey_group_list.ctp:54
 #: /views/rubrics/edit.ctp:83
 msgid "Next"
-msgstr ""
+msgstr "Siguiente"
 
 #: /views/elements/events/ajax_title_validate.ctp:5
 #: /views/elements/surveys/ajax_survey_validate.ctp:4
 msgid "already exists."
-msgstr ""
+msgstr "ya existe."
 
 #: /views/elements/events/event_groups_detail.ctp:4
 msgid "Group No."
-msgstr ""
+msgstr "Nº de grupo"
 
-#: /views/elements/events/event_groups_detail.ctp:6
-#: /views/groups/edit.ctp:20
+#: /views/elements/events/event_groups_detail.ctp:6 /views/groups/edit.ctp:20
 msgid "Members"
-msgstr ""
+msgstr "Miembros"
 
 #: /views/elements/events/event_selection_box.ctp:12
 #: /views/elements/searchs/ajax_event_box.ctp:12
 msgid "No event Selected"
-msgstr ""
+msgstr "Ningún evento seleccionado"
 
 #: /views/elements/events/event_selection_box.ctp:14
 msgid "All events"
-msgstr ""
+msgstr "Todos los eventos"
 
 #: /views/elements/global/debug.ctp:66;79;89;101;116
 msgid "(Empty)"
-msgstr ""
+msgstr "(Vacío)"
 
 #: /views/elements/global/debug.ctp:133;142
 msgid "(No SQL Data)"
-msgstr ""
+msgstr "(No hay datos SQL)"
 
 #: /views/elements/global/footer.ctp:3
 msgid "Powered by iPeer and TeamMaker - Created by UBC and Rose-Hulman"
-msgstr ""
+msgstr "Funciona con iPeer y TeamMaker - Creado por UBC y Rose-Hulman"
 
-#: /views/elements/global/navigation.ctp:50
-#: /views/events/view.ctp:26
+#: /views/elements/global/navigation.ctp:50 /views/events/view.ctp:26
 msgid "Evaluation"
-msgstr ""
+msgstr "Evaluación"
 
 #: /views/elements/global/navigation.ctp:63
 msgid "Admin"
-msgstr ""
+msgstr "Administración"
 
 #: /views/elements/global/navigation.ctp:68
 msgid "Logout"
-msgstr ""
+msgstr "Cerrar sesión"
 
 #: /views/elements/groups/ajax_group_validate.ctp:6
 msgid "already exists"
-msgstr ""
+msgstr "ya existe"
 
 #: /views/elements/groups/group_list_chooser.ctp:22
 msgid "Assign"
-msgstr ""
+msgstr "Asignar"
 
 #: /views/elements/groups/group_list_chooser.ctp:23
 msgid "Remove"
-msgstr ""
+msgstr "Eliminar"
 
 #: /views/elements/list/ajaxList.ctp:22
 msgid "You need the PHP json extension."
-msgstr ""
+msgstr "Necesita la extensión PHP json."
 
 #: /views/elements/list/ajaxList.ctp:23
 msgid "  Please use PHP >= 5.2 and enable it in php.ini <br />"
-msgstr ""
+msgstr "Por favor, use PHP >= 5.2 y habilítelo en el php.ini <br>"
 
 #: /views/elements/list/ajaxList.ctp:24
 msgid "  (uncomment or create the line:<br />"
-msgstr ""
+msgstr "(descomentar o crear la línea:<br>"
 
 #: /views/elements/list/ajaxList.ctp:28;30;32
 msgid " variable not set or empty!"
-msgstr ""
+msgstr " ¡variable no establecida o vacía!"
 
 #: /views/elements/list/checkBoxList.ctp:8
 msgid "Error: Please set all parameters for checkBoxList.<br/>"
 msgstr ""
+"Error: Por favor, establecer todos los parámetros para el checkBoxList.<br/>"
 
 #: /views/elements/list/checkBoxList.ctp:56
 msgid "Use the checkmarks to"
-msgstr ""
+msgstr "Utilizar las casillas de verificación para"
 
 #: /views/elements/list/checkBoxList.ctp:57
 msgid "in <b><u>bold</u></b> are the ones selected initially.)<br/>"
-msgstr ""
+msgstr "en <b><u>negrita</u></b> son los seleccionados inicialmente.)<br/>"
 
 #: /views/elements/list/checkBoxList.ctp:59
 msgid "(The selected %s are check-marked and in <b><u>bold</u></b>)</br />"
 msgstr ""
+"(El %s seleccionado se marca con un tick y en <b><u>negrita</u></b>)<br />"
 
 #: /views/elements/mixevals/questions_editor.ctp:25
 msgid "Likert Answer Question"
-msgstr ""
+msgstr "Pregunta con respuesta tipo Likert"
 
 #: /views/elements/mixevals/questions_editor.ctp:30
 msgid "Paragraph Answer Question"
-msgstr ""
+msgstr "Pregunta de respuesta de párrafo"
 
 #: /views/elements/mixevals/questions_editor.ctp:34
 msgid "Sentence Answer Question"
-msgstr ""
+msgstr "Pregunta de respuesta de párrafo"
 
 #: /views/elements/mixevals/questions_editor.ctp:38
 msgid "Score Dropdown Answer Question"
-msgstr ""
+msgstr "Pregunta de respuesta de puntuación desplegable"
 
 #: /views/elements/mixevals/questions_editor.ctp:79
 msgid "Unrequired Likert questions are not counted toward the total rating."
 msgstr ""
+"Las preguntas Likert innecesarias no cuentan para la calificación total."
 
 #: /views/elements/mixevals/questions_editor.ctp:108
-msgid "The increments on the drop-down will be based on 10 base points per member, the drop-down will go from 1 to (10 x No. of GroupMembers) in increments of 1 <br>"
+msgid ""
+"The increments on the drop-down will be based on 10 base points per member, "
+"the drop-down will go from 1 to (10 x No. of GroupMembers) in increments of "
+"1 <br>"
 msgstr ""
+"Los incrementos en el menú desplegable se basará en 10 puntos por cada "
+"miembro, el menú desplegable irá de 1 a (10 x Nº de miembros) en incrementos "
+"de 1<br>"
 
 #: /views/elements/mixevals/questions_editor.ctp:131
-msgid "This mark will be scaled according to the response. E.g.: If there are 5 scale levels and this is set at 1, the lowest scale will be worth 0.2 marks, the second lowest 0.4 marks, and so on with the highest scale being worth the full 1 mark."
+msgid ""
+"This mark will be scaled according to the response. E.g.: If there are 5 "
+"scale levels and this is set at 1, the lowest scale will be worth 0.2 marks, "
+"the second lowest 0.4 marks, and so on with the highest scale being worth "
+"the full 1 mark."
 msgstr ""
+"Esta puntuación se ampliará de acuerdo a la respuesta. Por ejemplo: Si hay 5 "
+"niveles de escala y esto se fija en 1, la escala más baja tendrá un valor de "
+"0,2 puntos, la segunda más baja de 0,4 puntos, y así sucesivamente con la "
+"más alta escala valiendo 1 punto completo."
 
 #: /views/elements/mixevals/questions_editor.ctp:135
-msgid "This setting will hide/show the mark distribution to those taking the evaluation."
+msgid ""
+"This setting will hide/show the mark distribution to those taking the "
+"evaluation."
 msgstr ""
+"Esta configuración oculta/muestr la distribución de la puntuación a aquellos "
+"que toman la evaluación."
 
-#: /views/elements/rubrics/ajax_rubric_edit.ctp:22
-#: /views/rubrics/edit.ctp:96
+#: /views/elements/rubrics/ajax_rubric_edit.ctp:22 /views/rubrics/edit.ctp:96
 msgid "Rubric Preview"
-msgstr ""
+msgstr "Vista previa de la rúbrica"
 
 #: /views/elements/rubrics/ajax_rubric_edit.ctp:25
-#: /views/elements/rubrics/ajax_rubric_view.ctp:92
-#: /views/rubrics/edit.ctp:19
+#: /views/elements/rubrics/ajax_rubric_view.ctp:92 /views/rubrics/edit.ctp:19
 msgid "Level of Mastery"
-msgstr ""
+msgstr "Nivel de dominio"
 
 #: /views/elements/rubrics/ajax_rubric_edit.ctp:31
 msgid "Criteria Weight"
-msgstr ""
+msgstr "Peso del criterio"
 
 #: /views/elements/rubrics/ajax_rubric_edit.ctp:45
 msgid "Show Marks"
-msgstr ""
+msgstr "Mostrar notas"
 
 #: /views/elements/rubrics/ajax_rubric_edit.ctp:52
 msgid "Specific Comment"
-msgstr ""
+msgstr "Comentario específico"
 
 #: /views/elements/rubrics/ajax_rubric_view.ctp:9
 msgid "required"
-msgstr ""
+msgstr "obligatorio"
 
 #: /views/elements/rubrics/ajax_rubric_view.ctp:40;124
 msgid " mark(s)"
-msgstr ""
+msgstr " calificación(es)"
 
 #: /views/elements/rubrics/ajax_rubric_view.ctp:77
 msgid "General Comments"
-msgstr ""
+msgstr "Comentarios generales"
 
 #: /views/elements/searchs/ajax_event_box.ctp:14
 msgid " --- All events --- "
-msgstr ""
+msgstr "--- Todos los eventos ---"
 
 #: /views/elements/searchs/evaluation_result_search_panel.ctp:9
 msgid "Evaluation Result Search Panel"
-msgstr ""
+msgstr "Panel de búsqueda de resultado de evaluación"
 
 #: /views/elements/searchs/evaluation_result_search_panel.ctp:36
 msgid "--- None ---"
-msgstr ""
+msgstr "--- Ninguno ---"
 
 #: /views/elements/searchs/evaluation_result_search_panel.ctp:37
 msgid "List Not Reviewed Evaluations"
-msgstr ""
+msgstr "Listar evaluaciones sin revisar"
 
 #: /views/elements/searchs/evaluation_result_search_panel.ctp:38
 msgid "List Late Evaluations"
-msgstr ""
+msgstr "Listar evaluaciones atrasadas"
 
 #: /views/elements/searchs/evaluation_result_search_panel.ctp:39
 msgid "List Ranged Mark Evaluations (set mark range below)"
 msgstr ""
+"Listar evaluaciones con rangos de calificación (establezca el rango debajo)"
 
 #: /views/elements/searchs/evaluation_result_search_panel.ctp:54
 msgid "Result Mark(%)"
-msgstr ""
+msgstr "Nota(%)"
 
 #: /views/elements/searchs/evaluation_result_search_panel.ctp:56
 #: /views/elements/searchs/evaluation_search_panel.ctp:30;48
 msgid "FROM"
-msgstr ""
+msgstr "DE"
 
 #: /views/elements/searchs/evaluation_result_search_panel.ctp:60
 #: /views/elements/searchs/evaluation_search_panel.ctp:35;52
 msgid "TO"
-msgstr ""
+msgstr "A"
 
 #: /views/elements/searchs/evaluation_search_panel.ctp:11
 msgid "Evaluation Event Search Panel"
-msgstr ""
+msgstr "Panel de búsqueda de evento de evaluación"
 
 #: /views/elements/searchs/evaluation_search_panel.ctp:21
 msgid "Event Type"
-msgstr ""
+msgstr "Tipo de evento"
 
 #: /views/elements/searchs/evaluation_search_panel.ctp:23
 msgid "--- All Event Types ---"
-msgstr ""
+msgstr "--- Todos los tipos de eventos ---"
 
 #: /views/elements/searchs/evaluation_search_panel.ctp:45
 msgid "Release Date:"
-msgstr ""
+msgstr "Fecha de publicación:"
 
 #: /views/elements/searchs/evaluation_search_panel.ctp:58
-msgid "specify a date range to search any event that are being released during that period of time."
+msgid ""
+"specify a date range to search any event that are being released during that "
+"period of time."
 msgstr ""
+"especificar un rango de fecha para buscar cualquier evento que estén siendo "
+"publicados durante ese periodo de tiempo."
 
 #: /views/elements/searchs/instructor_search_panel.ctp:9
 msgid "Instructor Search Panel"
-msgstr ""
+msgstr "Panel de búsqueda de profesor"
 
-#: /views/elements/searchs/search_menu.ctp:7
-#: /views/home/index.ctp:15;56
+#: /views/elements/searchs/search_menu.ctp:7 /views/home/index.ctp:15;56
 msgid "Instructors"
-msgstr ""
+msgstr "Profesores"
 
 #: /views/elements/survey_groups/ajax_survey_group_list.ctp:17
 msgid "Release Now"
-msgstr ""
+msgstr "Publicar ahora"
 
 #: /views/elements/survey_groups/ajax_survey_group_list.ctp:24
 msgid "Are you sure you want to delete survey group set"
-msgstr ""
+msgstr "Está seguro que desea eliminar el grupo de encuesta"
 
 #: /views/elements/survey_groups/ajax_survey_group_list.ctp:38
 msgid "Confirm Survey Release"
-msgstr ""
+msgstr "Confirmar liberación de encuesta"
 
 #: /views/elements/survey_groups/ajax_survey_makegroups.ctp:13
 msgid "Team Making - Step One"
-msgstr ""
+msgstr "Creación de equipos - Paso uno"
 
 #: /views/elements/survey_groups/ajax_survey_makegroups.ctp:16
 msgid " students were specified for this survey, "
-msgstr ""
+msgstr " estudiantes fueron especificados para esta encuesta, "
 
 #: /views/elements/survey_groups/ajax_survey_makegroups.ctp:16
 msgid " students responded"
-msgstr ""
+msgstr " estudiantes respondieron"
 
 #: /views/elements/survey_groups/ajax_survey_makegroups.ctp:21
 msgid "Group Configuration"
-msgstr ""
+msgstr "Configuración del grupo"
 
 #: /views/elements/survey_groups/ajax_survey_makegroups.ctp:28
 msgid "There must be at least one question."
-msgstr ""
+msgstr "Debe haber al menos una pregunta."
 
 #: /views/elements/survey_groups/ajax_survey_makegroups.ctp:45
 msgid "Gather<br />Similar"
-msgstr ""
+msgstr "Reunir<br/>Similares"
 
 #: /views/elements/survey_groups/ajax_survey_makegroups.ctp:45
 msgid "Ignore"
-msgstr ""
+msgstr "Ignorar"
 
 #: /views/elements/survey_groups/ajax_survey_makegroups.ctp:46
 msgid "Gather<br />Dissimilar"
-msgstr ""
+msgstr "Reunir<br/>Diferentes"
 
 #: /views/elements/survey_groups/ajax_survey_makegroups.ctp:54
 msgid "Note: It may take up to 10mins to create groups."
-msgstr ""
+msgstr "Nota: Puede tomar hasta 10 minutos crear los grupos."
 
 #: /views/elements/users/ajax_user_list.ctp:53
 msgid "Are you sure you want to delete user"
-msgstr ""
+msgstr "Seguro que quieres eliminar el usuario"
 
 #: /views/elements/users/ajax_user_list.ctp:61
 msgid "Reset "
-msgstr ""
+msgstr "Reiniciar"
 
 #: /views/elements/users/ajax_user_list.ctp:61
 msgid "'s password"
-msgstr ""
+msgstr "contraseña"
 
 #: /views/elements/users/ajax_user_list.ctp:63
 msgid "Are you sure you want to reset password for user"
-msgstr ""
+msgstr "Está seguro de que desea restablecer la contraseña de usuario"
 
 #: /views/elements/users/ajax_user_list.ctp:98
 msgid "Prev "
-msgstr ""
+msgstr "Anterior"
 
 #: /views/elements/users/ajax_user_list.ctp:102
 msgid " Next"
-msgstr ""
+msgstr "Siguiente"
 
 #: /views/elements/users/merge_search.ctp:5
 msgid "%s Account"
-msgstr ""
+msgstr "cuenta de %s"
 
 #: /views/elements/users/merge_search.ctp:11
 msgid "User"
-msgstr ""
+msgstr "Usuario"
 
 #: /views/elements/users/merge_search.ctp:11
 msgid "-- Search for the %s account --"
-msgstr ""
+msgstr "-- Buscar la cuenta %s --"
 
 #: /views/elements/users/user_summary_list.ctp:8
 msgid "E-mail"
-msgstr ""
+msgstr "Correo Electronico"
 
-#: /views/email_templates/add.ctp:13
-#: /views/email_templates/edit.ctp:13
-#: /views/mixevals/add.ctp:22
-#: /views/rubrics/edit.ctp:34
-#: /views/simple_evaluations/edit.ctp:42
-#: /views/surveys/edit.ctp:22
+#: /views/email_templates/add.ctp:13 /views/email_templates/edit.ctp:13
+#: /views/mixevals/add.ctp:22 /views/rubrics/edit.ctp:34
+#: /views/simple_evaluations/edit.ctp:42 /views/surveys/edit.ctp:22
 msgid "Private"
-msgstr ""
+msgstr "Privado"
 
-#: /views/email_templates/add.ctp:14
-#: /views/email_templates/edit.ctp:14
-#: /views/evaltools/index.ctp:6;28;54;80;101
-#: /views/mixevals/add.ctp:22
-#: /views/rubrics/edit.ctp:34
-#: /views/simple_evaluations/edit.ctp:42
+#: /views/email_templates/add.ctp:14 /views/email_templates/edit.ctp:14
+#: /views/evaltools/index.ctp:6;28;54;80;101 /views/mixevals/add.ctp:22
+#: /views/rubrics/edit.ctp:34 /views/simple_evaluations/edit.ctp:42
 #: /views/surveys/edit.ctp:22
 msgid "Public"
-msgstr ""
+msgstr "Público"
 
-#: /views/email_templates/add.ctp:19
-#: /views/email_templates/edit.ctp:19
+#: /views/email_templates/add.ctp:19 /views/email_templates/edit.ctp:19
 msgid "Public lets you share this email template with other instructors."
 msgstr ""
+"Público le permite compartir esta plantilla de correo electrónico con otros "
+"profesores."
 
-#: /views/email_templates/add.ctp:28
-#: /views/email_templates/edit.ctp:28
-#: /views/email_templates/view.ctp:24
-#: /views/emailer/write.ctp:134
+#: /views/email_templates/add.ctp:28 /views/email_templates/edit.ctp:28
+#: /views/email_templates/view.ctp:24 /views/emailer/write.ctp:134
 msgid "-- Select Merge Field --"
-msgstr ""
+msgstr "-- Seleccione el campo de combinación --"
 
 #: /views/emailer/view.ctp:6
 msgid "To"
-msgstr ""
+msgstr "A"
 
 #: /views/emailer/view.ctp:24
 msgid "Scheduled on"
-msgstr ""
+msgstr "Previsto para el"
 
 #: /views/emailer/view.ctp:36
 msgid "Content"
-msgstr ""
+msgstr "Contenido"
 
 #: /views/emailer/write.ctp:16
 msgid "Add Additional Recipient"
-msgstr ""
+msgstr "Añadir un destinatario adicional"
 
 #: /views/emailer/write.ctp:23
 msgid "Please select a recipient!"
-msgstr ""
+msgstr "¡Por favor, seleccione un destinatario!"
 
 #: /views/emailer/write.ctp:51
 msgid "Single Email"
-msgstr ""
+msgstr "Email único"
 
 #: /views/emailer/write.ctp:52
 msgid "Multiple Emails"
-msgstr ""
+msgstr "Múltiples correos electrónicos"
 
 #: /views/emailer/write.ctp:64
 msgid "(send "
-msgstr ""
+msgstr "(enviar"
 
 #: /views/emailer/write.ctp:72
 msgid " times, with "
-msgstr ""
+msgstr " veces, con "
 
 #: /views/emailer/write.ctp:79
 msgid "minute(s)"
-msgstr ""
+msgstr "minuto(s)"
 
 #: /views/emailer/write.ctp:80
 msgid "hour(s)"
-msgstr ""
+msgstr "hora(s)"
 
 #: /views/emailer/write.ctp:81
 msgid "day(s)"
-msgstr ""
+msgstr "día(s)"
 
 #: /views/emailer/write.ctp:98
 msgid "-- No Template --"
-msgstr ""
+msgstr "-- Sin plantilla --"
 
 #: /views/errors/missing_connection.ctp:2
-msgid "No iPeer database found. You may want to run %s first. Otherwise make sure you define in it <u><tt>app/config/database.php</tt></u> in the following format:"
+msgid ""
+"No iPeer database found. You may want to run %s first. Otherwise make sure "
+"you define in it <u><tt>app/config/database.php</tt></u> in the following "
+"format:"
 msgstr ""
+"Ninguna base de datos iPeer encontrada. Puede que desee ejecutar <a href=\"/"
+"install\">instalación</a> primero. De lo contrario, asegúrese de definir en "
+"ella <u><tt>app/config/database.php</tt></u> en el siguiente formato:"
 
 #: /views/errors/missing_connection.ctp:15
 msgid "For more details, also see this file:"
-msgstr ""
+msgstr "Para más detalles, consulte también el archivo:"
 
 #: /views/errors/permission_denied.ctp:2
 msgid "Access Denied"
-msgstr ""
+msgstr "Acceso denegado"
 
 #: /views/errors/permission_denied.ctp:4
 msgid "You don't have permission to access this page."
-msgstr ""
+msgstr "Usted no tiene permiso para acceder a esta página."
 
 #: /views/errors/permission_denied.ctp:5
 msgid "Click here to go back"
-msgstr ""
+msgstr "Haz clic aquí para regresar"
 
-#: /views/evaltools/index.ctp:7
-#: /views/simple_evaluations/view.ctp:16
+#: /views/evaltools/index.ctp:7 /views/simple_evaluations/view.ctp:16
 msgid "Base Point Per Member"
-msgstr ""
+msgstr "Punto base por cada miembro"
 
 #: /views/evaltools/index.ctp:125
 msgid "My Simple Evaluations"
-msgstr ""
+msgstr "Mis evaluaciones simples"
 
 #: /views/evaltools/index.ctp:126
 msgid "All Simple Evaluations"
-msgstr ""
+msgstr "Todas las evaluaciones simples"
 
 #: /views/evaltools/index.ctp:137
 msgid "My Rubrics Evaluations"
-msgstr ""
+msgstr "Mis rúbricas"
 
 #: /views/evaltools/index.ctp:138
 msgid "All Rubric Evaluations"
-msgstr ""
+msgstr "Todas las evaluaciones tipo rúbrica"
 
 #: /views/evaltools/index.ctp:149
 msgid "My Mixed Evaluations"
-msgstr ""
+msgstr "Mis evaluaciones mixtas"
 
-#: /views/evaltools/index.ctp:150
-#: /views/mixevals/index.ctp:4
+#: /views/evaltools/index.ctp:150 /views/mixevals/index.ctp:4
 msgid "Add Mixed Evaluation"
-msgstr ""
+msgstr "Añadir evaluación mixta"
 
 #: /views/evaltools/index.ctp:150
 msgid "All Mixed Evaluations"
-msgstr ""
+msgstr "Todas las evaluaciones mixtas"
 
 #: /views/evaltools/index.ctp:161
 msgid "My Surveys"
-msgstr ""
+msgstr "Mis encuestas"
 
 #: /views/evaltools/index.ctp:162
 msgid "Add Survey"
-msgstr ""
+msgstr "Añadir encuesta"
 
 #: /views/evaltools/index.ctp:162
 msgid "All Surveys"
-msgstr ""
+msgstr "Todas las encuestas"
 
 #: /views/evaltools/index.ctp:173
 msgid "My Email Templates"
-msgstr ""
+msgstr "Mis plantillas de correo electrónico"
 
 #: /views/evaltools/index.ctp:174
 msgid "All Email Templates"
-msgstr ""
+msgstr "Todas las plantillas de correo electrónico"
 
 #: /views/evaluations/export.ctp:4
 msgid "Give the export file a name, which is default to today's date."
 msgstr ""
+"Dar al archivo de exportación un nombre, que por defecto será la fecha "
+"actual."
 
 #: /views/evaluations/export.ctp:5
 msgid "Choose one of the two export formats."
-msgstr ""
+msgstr "Elija uno de los dos formatos de exportación."
 
 #: /views/evaluations/export.ctp:6
 msgid "Please check at least one from each similarly coloured group."
-msgstr ""
+msgstr "Por favor, marque al menos uno de cada grupo del mismo color."
 
 #: /views/evaluations/export.ctp:7
-msgid "Dropped Students that have evaluated or have been evaluated are marked with an asterisk (*)"
+msgid ""
+"Dropped Students that have evaluated or have been evaluated are marked with "
+"an asterisk (*)"
 msgstr ""
+"Los estudiantes de baja que han evaluado o han sido evaluados están marcados "
+"con un asterisco (*)"
 
-#: /views/evaluations/export.ctp:9;82
-#: /views/survey_groups/export.ctp:8;24
+#: /views/evaluations/export.ctp:9;82 /views/survey_groups/export.ctp:8;24
 msgid "Export"
-msgstr ""
+msgstr "Exportar"
 
-#: /views/evaluations/export.ctp:14
-#: /views/survey_groups/export.ctp:12
+#: /views/evaluations/export.ctp:14 /views/survey_groups/export.ctp:12
 msgid "Export Filename"
-msgstr ""
+msgstr "Nombre de archivo de exportación"
 
 #: /views/evaluations/export.ctp:18
 msgid "Export File Type"
-msgstr ""
+msgstr "Tipo de fichero de exportación"
 
 #: /views/evaluations/export.ctp:27
 msgid "Include All Evaluations"
-msgstr ""
+msgstr "Incluir todas las evaluaciones"
 
 #: /views/evaluations/export.ctp:30
 msgid "Evaluation Information"
-msgstr ""
+msgstr "Información de evaluación"
 
 #: /views/evaluations/export.ctp:34
 msgid "Include Course Name"
-msgstr ""
+msgstr "Incluir nombre del curso"
 
 #: /views/evaluations/export.ctp:38
 msgid "Include Event Name"
-msgstr ""
+msgstr "Incluir nombre del evento"
 
 #: /views/evaluations/export.ctp:41
 msgid "Please include at least one of the red fields"
-msgstr ""
+msgstr "Por favor, incluya al menos uno de los campos en rojo"
 
 #: /views/evaluations/export.ctp:45
 msgid "Include Evaluation Type"
-msgstr ""
+msgstr "Incluir el tipo de evaluación"
 
 #: /views/evaluations/export.ctp:48
 msgid "Group and Result"
-msgstr ""
+msgstr "Grupo y el resultado"
 
 #: /views/evaluations/export.ctp:52
 msgid "Include Group Names"
-msgstr ""
+msgstr "Incluir nombres de grupo"
 
 #: /views/evaluations/export.ctp:56
 msgid "Include Student Name"
-msgstr ""
+msgstr "Incluir nombre del estudiante"
 
 #: /views/evaluations/export.ctp:61
 msgid "Include Student Id"
-msgstr ""
+msgstr "Incluir el id del estudiante"
 
 #: /views/evaluations/export.ctp:65
 msgid "Please include at least one of the green fields"
-msgstr ""
+msgstr "Por favor, incluya al menos uno de los campos en verde"
 
 #: /views/evaluations/export.ctp:69
 msgid "Include Comments"
-msgstr ""
+msgstr "Incluir comentarios"
 
 #: /views/evaluations/export.ctp:73
 msgid "Include Grades"
-msgstr ""
+msgstr "incluir notas"
 
 #: /views/evaluations/export.ctp:76
 msgid "Please include at least one of the orange fields"
-msgstr ""
+msgstr "Por favor, incluya al menos uno de los campos en naranja"
 
 #: /views/evaluations/export.ctp:80
 msgid "Include Final Marks"
-msgstr ""
+msgstr "Incluir notas finales"
 
 #: /views/evaluations/student_view_rubric_evaluation_results.ctp:48
 msgid "Evaluation Results From Your Teammates. (Randomly Ordered)"
 msgstr ""
+"Resultados de la evaluación de sus compañeros de equipo. (Ordenados al azar)"
 
 #: /views/evaluations/student_view_rubric_evaluation_results.ctp:51
 msgid "Comments/Grades Not Released Yet."
-msgstr ""
+msgstr "Comentarios/calificaciones no liberados aún."
 
 #: /views/evaluations/student_view_rubric_evaluation_results.ctp:53
 msgid "Grades Not Released Yet."
-msgstr ""
+msgstr "Calificaciones no liberadas aún"
 
 #: /views/evaluations/student_view_rubric_evaluation_results.ctp:55
 msgid "Comments Not Released Yet."
-msgstr ""
+msgstr "Comentarios no publicado todavía."
 
 #: /views/evaluations/student_view_simple_evaluation_results.ctp:68
 msgid "Randomly Ordered"
-msgstr ""
+msgstr "Ordenados al azar"
 
 #: /views/evaluations/student_view_simple_evaluation_results.ctp:82
 msgid "Not Released."
-msgstr ""
+msgstr "No liberado."
 
 #: /views/evaluations/view.ctp:13
 msgid " Export Evaluations"
-msgstr ""
+msgstr "Exportar evaluaciones"
 
-#: /views/evaluations/view.ctp:15
-#: /views/helpers/evaluation.php:322
+#: /views/evaluations/view.ctp:15 /views/helpers/evaluation.php:322
 msgid "Release All Comments"
-msgstr ""
+msgstr "Publicar todos los comentarios"
 
-#: /views/evaluations/view.ctp:16
-#: /views/helpers/evaluation.php:320
+#: /views/evaluations/view.ctp:16 /views/helpers/evaluation.php:320
 msgid "Unrelease All Comments"
-msgstr ""
+msgstr "Dejar de publicar todos los comentarios"
 
-#: /views/evaluations/view.ctp:17
-#: /views/helpers/evaluation.php:317
+#: /views/evaluations/view.ctp:17 /views/helpers/evaluation.php:317
 msgid "Release All Grades"
-msgstr ""
+msgstr "Publicar todas las calificaciones"
 
-#: /views/evaluations/view.ctp:18
-#: /views/helpers/evaluation.php:315
+#: /views/evaluations/view.ctp:18 /views/helpers/evaluation.php:315
 msgid "Unrelease All Grades"
-msgstr ""
+msgstr "Dejar de publicar todos las calificaciones"
 
 #: /views/evaluations/view.ctp:26
 msgid "Back to Evaluation Event Listing"
-msgstr ""
+msgstr "Regresar al listado de eventos de evaluación"
 
 #: /views/evaluations/view.ctp:29
 msgid "Back to Course Home"
-msgstr ""
+msgstr "Volver a la página inicial del curso"
 
 #: /views/evaluations/view_group_submission_details.ctp:29
 msgid "(not submitted)"
-msgstr ""
+msgstr "(no enviado)"
 
 #: /views/evaluations/view_group_submission_details.ctp:33
 msgid " day(s)"
-msgstr ""
+msgstr "día(s)"
 
 #: /views/evaluations/view_group_submission_details.ctp:36
 msgid "(on time)"
-msgstr ""
+msgstr "(a tiempo)"
 
 #: /views/evaluations/view_group_submission_details.ctp:47
 #: /views/users/edit_profile.ctp:12
 msgid "Student Number"
-msgstr ""
+msgstr "Número de estudiante"
 
 #: /views/evaluations/view_group_submission_details.ctp:48
 msgid "Date Submitted"
-msgstr ""
+msgstr "Fecha de envío"
 
 #: /views/evaluations/view_group_submission_details.ctp:49
 msgid "Late By"
-msgstr ""
+msgstr "Tarde por"
 
 #: /views/evaluations/view_mixeval_evaluation_results.ctp:20
 #: /views/evaluations/view_mixeval_evaluation_results_detail.ctp:32
@@ -3677,1026 +3787,1374 @@ msgstr ""
 #: /views/evaluations/view_rubric_evaluation_results_detail.ctp:19
 #: /views/evaluations/view_simple_evaluation_results.ctp:33
 msgid "Have not submitted their evaluations"
-msgstr ""
+msgstr "No han presentado sus evaluaciones"
 
 #: /views/evaluations/view_mixeval_evaluation_results.ctp:54
 msgid "Question"
-msgstr ""
+msgstr "Pregunta"
 
 #: /views/evaluations/view_mixeval_evaluation_results.ctp:55
 msgid "Average Grade Per Question"
-msgstr ""
+msgstr "Promedio por pregunta"
 
 #: /views/evaluations/view_mixeval_evaluation_results.ctp:69
 msgid "Student Name:"
-msgstr ""
+msgstr "Nombre del estudiante:"
 
 #: /views/evaluations/view_mixeval_evaluation_results.ctp:70
 msgid "Total:"
-msgstr ""
+msgstr "Total:"
 
 #: /views/evaluations/view_mixeval_evaluation_results_detail.ctp:69
 #: /views/evaluations/view_rubric_evaluation_results_detail.ctp:68
 msgid "Evaluation Results Release Status"
-msgstr ""
+msgstr "Estado de publicación de los resultados de evaluación"
 
 #: /views/evaluations/view_mixeval_evaluation_results_detail.ctp:131
 #: /views/evaluations/view_rubric_evaluation_results_detail.ctp:105
 msgid "Same Mark as Group Average"
-msgstr ""
+msgstr "Misma puntuación que el promedio del grupo"
 
 #: /views/evaluations/view_mixeval_evaluation_results_detail.ctp:133
 #: /views/evaluations/view_rubric_evaluation_results_detail.ctp:107
 msgid "Below Group Average"
-msgstr ""
+msgstr "Por debajo de la media del grupo"
 
 #: /views/evaluations/view_mixeval_evaluation_results_detail.ctp:135
 #: /views/evaluations/view_rubric_evaluation_results_detail.ctp:109
 msgid "Above Group Average"
-msgstr ""
+msgstr "Por encima de la media del grupo"
 
 #: /views/evaluations/view_mixeval_evaluation_results_detail.ctp:142
 msgid "NOTE: "
-msgstr ""
+msgstr "NOTA:"
 
 #: /views/evaluations/view_mixeval_evaluation_results_detail.ctp:143
 msgid " Late Penalty"
-msgstr ""
+msgstr "Penalización por retraso"
 
 #: /views/evaluations/view_rubric_evaluation_results.ctp:37
 msgid "Student Name"
-msgstr ""
+msgstr "Nombre del estudiante"
 
 #: /views/evaluations/view_rubric_evaluation_results.ctp:68
 msgid "Group Average: "
-msgstr ""
+msgstr "Media del grupo: "
 
 #: /views/evaluations/view_rubric_evaluation_results_detail.ctp:57
 #: /views/evaluations/view_simple_evaluation_results.ctp:250
 #: /views/helpers/evaluation.php:250
 msgid "Mark Peer Evaluations as Not Reviewed"
-msgstr ""
+msgstr "Marcar evaluaciones de pares como no revisadas"
 
 #: /views/evaluations/view_rubric_evaluation_results_detail.ctp:59
 #: /views/evaluations/view_simple_evaluation_results.ctp:253
 #: /views/helpers/evaluation.php:252
 msgid "Mark Peer Evaluations as Reviewed"
-msgstr ""
+msgstr "Marcar evaluaciones de pares como revisadas"
 
 #: /views/evaluations/view_rubric_evaluation_results_detail.ctp:92
 msgid "Evaluatee: "
-msgstr ""
+msgstr "Evaluado:"
 
 #: /views/evaluations/view_rubric_evaluation_results_detail.ctp:99
 msgid " (Number of Evaluator(s): "
-msgstr ""
+msgstr "(Número de evaluadores(s):"
 
 #: /views/evaluations/view_rubric_evaluation_results_detail.ctp:100
 msgid "Final Total: "
-msgstr ""
+msgstr "Recuento final: "
 
 #: /views/evaluations/view_rubric_evaluation_results_detail.ctp:138
 msgid "No submissions have been made."
-msgstr ""
+msgstr "No se han realizado envíos."
 
 #: /views/evaluations/view_simple_evaluation_results.ctp:74
 msgid "Members Evaluated"
-msgstr ""
+msgstr "Miembros evaluados"
 
 #: /views/evaluations/view_simple_evaluation_results.ctp:140
 msgid "Penalty"
-msgstr ""
+msgstr "Penalización"
 
 #: /views/evaluations/view_simple_evaluation_results.ctp:161
 msgid "Final Mark"
-msgstr ""
+msgstr "Nota final"
 
 #: /views/evaluations/view_simple_evaluation_results.ctp:176
 msgid "# of Evaluator(s)"
-msgstr ""
+msgstr "Nº de evaluadores(s):"
 
 #: /views/evaluations/view_simple_evaluation_results.ctp:191
 msgid "Average Received"
-msgstr ""
+msgstr "Promedio recibido"
 
 #: /views/evaluations/view_simple_evaluation_results.ctp:211
 msgid "Grade Release"
-msgstr ""
+msgstr "Liberación de nota"
 
 #: /views/evaluations/view_simple_evaluation_results.ctp:264
 msgid "Comment Sections"
-msgstr ""
+msgstr "Secciones de comentarios"
 
 #: /views/evaluations/view_simple_evaluation_results.ctp:268
-msgid "Check the \"Released\" checkbox and click \"Save Changes\" to release individual comments , or"
+msgid ""
+"Check the \"Released\" checkbox and click \"Save Changes\" to release "
+"individual comments , or"
 msgstr ""
+"Marque la casilla \"Liberado\" y haga clic en \"Guardar cambios\" para "
+"liberar los comentarios individuales, o"
 
 #: /views/evaluations/view_simple_evaluation_results.ctp:269
-msgid "Click \"Release All\" or \"Unrelease All\" buttons to release or unrelease all comments."
+msgid ""
+"Click \"Release All\" or \"Unrelease All\" buttons to release or unrelease "
+"all comments."
 msgstr ""
+"Haga clic en \"Publicar todo\" o \"Dejar de publicar\" para publicar o dejar "
+"de publicar todos los comentarios."
 
 #: /views/evaluations/view_simple_evaluation_results.ctp:334
 msgid "Release All"
-msgstr ""
+msgstr "Publicar todos"
 
 #: /views/evaluations/view_simple_evaluation_results.ctp:335
 msgid "Unrelease All"
-msgstr ""
+msgstr "Dejar de publicar todos"
 
 #: /views/evaluations/view_survey_summary.ctp:13;33
 msgid "responses"
-msgstr ""
+msgstr "respuestas"
 
 #: /views/evaluations/view_survey_summary.ctp:43
 msgid "Responders"
-msgstr ""
+msgstr "Encuestados"
 
 #: /views/evaluations/view_survey_summary.ctp:86
 msgid "Result"
-msgstr ""
+msgstr "Resultado"
 
 #: /views/evaluations/view_survey_summary.ctp:91
 msgid "Not Submitted"
-msgstr ""
+msgstr "Sin enviar"
 
-#: /views/events/add.ctp:37
-#: /views/events/edit.ctp:89
-msgid "Doesn't apply to Mix Evaluation. Required questions are set in the template."
+#: /views/events/add.ctp:37 /views/events/edit.ctp:89
+msgid ""
+"Doesn't apply to Mix Evaluation. Required questions are set in the template."
 msgstr ""
+"No se aplica a la evaluación mixta. Las preguntas obligatorias se fijan en "
+"la plantilla."
 
-#: /views/events/add.ctp:56
-#: /views/events/edit.ctp:108
-msgid "Basic view only shows grades. Detailed view shows both grades and comments"
+#: /views/events/add.ctp:56 /views/events/edit.ctp:108
+msgid ""
+"Basic view only shows grades. Detailed view shows both grades and comments"
 msgstr ""
+"La vista básica sólo muestra calificaciones. La vista detallada muestra "
+"calificaciones y comentarios"
 
-#: /views/events/add.ctp:75
-#: /views/events/edit.ctp:128
-msgid "Select the number of days in between each email reminder for submitting\n    evaluations. The first email is sent when the event is released."
+#: /views/events/add.ctp:75 /views/events/edit.ctp:128
+msgid ""
+"Select the number of days in between each email reminder for submitting\n"
+"    evaluations. The first email is sent when the event is released."
 msgstr ""
+"Seleccione el número de días entre cada aviso de correo electrónico para la "
+"presentación de\n"
+" evaluaciones. El primer correo electrónico se envía cuando se publica el "
+"evento."
 
-#: /views/events/add.ctp:81
-#: /views/events/edit.ctp:135
+#: /views/events/add.ctp:81 /views/events/edit.ctp:135
 msgid "Select the preferred email template."
-msgstr ""
+msgstr "Seleccione la plantilla de correo electrónico preferida."
 
-#: /views/events/add.ctp:89
-#: /views/events/edit.ctp:143
+#: /views/events/add.ctp:89 /views/events/edit.ctp:143
 msgid "Holding \"ctrl\" or \"command\" key to select multiple groups."
 msgstr ""
+"Manteniendo la tecla \"ctrl\" o \"comando\" para seleccionar varios grupos."
 
 #: /views/events/view.ctp:20
 msgid "Evaluation Format"
-msgstr ""
+msgstr "Formato de evaluación"
 
 #: /views/events/view.ctp:32
 msgid "Allow Self-Evaluation?"
-msgstr ""
+msgstr "¿Permite la autoevaluación?"
 
 #: /views/events/view.ctp:38
 msgid "Require Student Comments?"
-msgstr ""
+msgstr "¿Requerir comentarios de los estudiantes?"
 
 #: /views/events/view.ctp:42
 msgid "Auto-Release Results?"
-msgstr ""
+msgstr "¿Auto-liberar resultados?"
 
 #: /views/events/view.ctp:48
 msgid "Student Result Mode"
-msgstr ""
+msgstr "Modo de resultado de estudiante"
 
 #: /views/events/view.ctp:58
 msgid "Evaluation Release Date"
-msgstr ""
+msgstr "Fecha de publicación de la evaluación"
 
 #: /views/events/view.ctp:62;81
 msgid "FROM:"
-msgstr ""
+msgstr "DE:"
 
 #: /views/events/view.ctp:68;87
 msgid "TO:"
-msgstr ""
+msgstr "PARA:"
 
 #: /views/events/view.ctp:77
 msgid "Result Release Date"
-msgstr ""
+msgstr "Fecha de publicación del resultado"
 
 #: /views/events/view.ctp:96
 msgid "Late Penalty"
-msgstr ""
+msgstr "Penalización por retraso"
 
 #: /views/events/view.ctp:124
 msgid "Groups Assignment"
-msgstr ""
+msgstr "Asignación de grupos"
 
 #: /views/events/view.ctp:135
 msgid "Edit this Event"
-msgstr ""
+msgstr "Editar este evento"
 
 #: /views/events/view.ctp:136
 msgid "Back to Event Listing"
-msgstr ""
+msgstr "Regresar al listado de eventos"
 
 #: /views/faculties/add.ctp:8
 msgid "Create"
-msgstr ""
+msgstr "Crear"
 
 #: /views/faculties/index.ctp:4
 msgid "Add Faculty"
-msgstr ""
+msgstr "Añadir facultad"
 
 #: /views/faculties/view.ctp:37
 msgid "Admins/Instructors"
-msgstr ""
+msgstr "Administradores/profesores"
 
 #: /views/groups/edit.ctp:24
 msgid "Filtered Students"
-msgstr ""
+msgstr "Estudiantes filtrados"
 
 #: /views/groups/edit.ctp:24
 msgid "Students in Group"
-msgstr ""
+msgstr "Estudiantes en el grupo"
 
 #: /views/groups/edit.ctp:27
 msgid "Note: Students already in one or more groups are marked with *"
 msgstr ""
+"Nota: Los alumnos que pertenecen a uno o más grupos están marcados con *"
 
 #: /views/groups/edit.ctp:32
-msgid "There has been submissions in this group. Changing group members may cause data integrity issue. \nIn the evaluation results of events that have already ended, new members will be marked down as having no submissions, \nwhich means no participation grades."
+msgid ""
+"There has been submissions in this group. Changing group members may cause "
+"data integrity issue. \n"
+"In the evaluation results of events that have already ended, new members "
+"will be marked down as having no submissions, \n"
+"which means no participation grades."
 msgstr ""
+"Ha habido envíos en este grupo. Cambiar los miembros del grupo puede causar "
+"problema de integridad de datos. En los resultados de la evaluación de los "
+"eventos que ya han terminado, los nuevos miembros serán marcados como sin "
+"envíos, lo que significa que no tendrán puntuaciones de participación."
 
-#: /views/groups/edit.ctp:35
-#: /views/groups/export.ctp:54
+#: /views/groups/edit.ctp:35 /views/groups/export.ctp:54
 msgid " Group"
-msgstr ""
+msgstr "Grupo"
 
 #: /views/groups/export.ctp:47
 msgid "Available Groups"
-msgstr ""
+msgstr "Grupos disponibles"
 
 #: /views/groups/export.ctp:47
 msgid "Participating Groups"
-msgstr ""
+msgstr "Grupos participantes"
 
 #: /views/groups/import.ctp:4
 msgid "Please make sure to remove the header in CSV file."
-msgstr ""
+msgstr "Por favor, asegúrese de quitar el encabezado de archivo CSV."
 
 #: /views/groups/import.ctp:5
 msgid "All fields are mandatory. The system will generate the group numbers."
 msgstr ""
+"Todos los campos son obligatorios. El sistema generará los números de grupo."
 
 #: /views/groups/import.ctp:6
 msgid "All group names must be unique within the class."
-msgstr ""
+msgstr "Todos los nombres de grupo deben ser únicos dentro de la clase."
 
 #: /views/groups/import.ctp:7
-msgid "The student identifiers that can be used are usernames or student numbers."
+msgid ""
+"The student identifiers that can be used are usernames or student numbers."
 msgstr ""
+"Los identificadores de estudiante que pueden utilizarse son nombres de "
+"usuario o números de estudiante."
 
 #: /views/groups/import.ctp:8
-msgid "Please make sure the column matches the username/student number in the students' profile"
+msgid ""
+"Please make sure the column matches the username/student number in the "
+"students' profile"
 msgstr ""
+"Por favor, asegúrese de que la columna coincide con el nombre de usuario/"
+"número de estudiante en el perfil del estudiante"
 
-#: /views/groups/import.ctp:11
-#: /views/users/import.ctp:12
+#: /views/groups/import.ctp:11 /views/users/import.ctp:12
 msgid "Formatting:"
-msgstr ""
+msgstr "Formato:"
 
 #: /views/groups/import.ctp:13
 msgid "Student Identifier, Group Name"
-msgstr ""
+msgstr "Identificador de estudiante, nombre del grupo"
 
 #: /views/groups/import.ctp:18;19
 msgid "Team A"
-msgstr ""
+msgstr "Equipo A"
 
 #: /views/groups/import.ctp:20;21
 msgid "Team B"
-msgstr ""
+msgstr "Equipo B"
 
-#: /views/groups/import.ctp:24;41
-#: /views/users/import.ctp:25;35
+#: /views/groups/import.ctp:24;41 /views/users/import.ctp:25;35
 msgid "Import"
-msgstr ""
+msgstr "Importar"
 
 #: /views/groups/import.ctp:35
 msgid "The student identifier used in the CSV file."
-msgstr ""
+msgstr "El identificador del estudiante utilizado en el archivo CSV."
 
 #: /views/groups/import.ctp:40
 msgid "Update group members for existing groups."
-msgstr ""
+msgstr "Actualización de los miembros del grupo para los grupos existentes."
 
 #: /views/groups/import_results.ctp:2
 msgid "The group CSV file was processed."
-msgstr ""
+msgstr "El archivo CSV de grupo fue procesado."
 
 #: /views/groups/import_results.ctp:3
-msgid "Click OK to return to the list of groups, or look below\nfor the results of the import."
+msgid ""
+"Click OK to return to the list of groups, or look below\n"
+"for the results of the import."
 msgstr ""
+"Haga clic en Aceptar para volver a la lista de grupos, o mire debajo los "
+"resultados de la importación."
 
 #: /views/groups/import_results.ctp:9
 msgid "Invalid Entries"
-msgstr ""
+msgstr "Entradas no válidas"
 
 #: /views/groups/import_results.ctp:10
 msgid "There are more or less than 2 columns."
-msgstr ""
+msgstr "Hay más o menos de 2 columnas."
 
 #: /views/groups/import_results.ctp:11
 msgid "Entry"
-msgstr ""
+msgstr "Entrada"
 
 #: /views/groups/import_results.ctp:18
 msgid "Groups Created"
-msgstr ""
+msgstr "Grupos creados"
 
 #: /views/groups/import_results.ctp:26
 msgid "Groups that could not be created."
-msgstr ""
+msgstr "Grupos que no se pudieran crear."
 
 #: /views/groups/import_results.ctp:34
 msgid "Students Placed"
-msgstr ""
+msgstr "Estudiantes asignados"
 
-#: /views/groups/import_results.ctp:35;53
-#: /views/rubrics/edit.ctp:50
+#: /views/groups/import_results.ctp:35;53 /views/rubrics/edit.ctp:50
 msgid "Student"
-msgstr ""
+msgstr "Estudiante"
 
 #: /views/groups/import_results.ctp:46
 msgid "Students Not Placed"
-msgstr ""
+msgstr "Estudiantes sin asignar"
 
 #: /views/groups/import_results.ctp:47
 msgid "Possible Reasons:"
-msgstr ""
+msgstr "Posibles motivos:"
 
 #: /views/groups/import_results.ctp:49
-msgid "The student identifier does not exist in the system. Please add them first."
+msgid ""
+"The student identifier does not exist in the system. Please add them first."
 msgstr ""
+"El identificador de alumno no existe en el sistema. Por favor, agréguelos "
+"primero."
 
 #: /views/groups/import_results.ctp:50
 msgid "The student is not enrolled in the course. Please enrol them first."
-msgstr ""
+msgstr "El estudiante no está matriculado en el curso. Matricúlelo primero."
 
 #: /views/groups/import_results.ctp:51
 msgid "The group was unable to be created or does not exist."
-msgstr ""
+msgstr "El grupo no pudo ser creado o no existe."
 
 #: /views/groups/index.ctp:6
 msgid " Import Group(s)"
-msgstr ""
+msgstr "Importar grupo(s)"
 
 #: /views/groups/view.ctp:23
 msgid "Email to "
-msgstr ""
+msgstr "Email a "
 
 #: /views/groups/view.ctp:43
 msgid " Email To All Members"
-msgstr ""
+msgstr "Correo electrónico a todos los miembros"
 
 #: /views/groups/view.ctp:57
 msgid "Edit this Group"
-msgstr ""
+msgstr "Editar este grupo"
 
 #: /views/groups/view.ctp:58
 msgid "Back to Group Listing"
-msgstr ""
+msgstr "Volver a listado de grupos"
 
 #: /views/helpers/evaluation.php:268
 msgid "Grades"
-msgstr ""
+msgstr "Calificaciones"
 
 #: /views/helpers/evaluation.php:297
 msgid "Unrelease Grades"
-msgstr ""
+msgstr "Dejar de publicar calificaciones"
 
 #: /views/helpers/evaluation.php:299
 msgid "Release Grades"
-msgstr ""
+msgstr "Publicar calificaciones"
 
 #: /views/helpers/evaluation.php:303
 msgid "Unrelease Comments"
-msgstr ""
+msgstr "Dejar de publicar comentarios"
 
 #: /views/helpers/evaluation.php:305
 msgid "Release Comments"
-msgstr ""
+msgstr "Publicar comentarios"
 
-#: /views/home/combined.ctp:40
-#: /views/home/index.ctp:31
+#: /views/home/combined.ctp:40 /views/home/index.ctp:31
 msgid "%d unreviewed group evaluations"
-msgstr ""
+msgstr "%d evaluaciones de grupo sin revisar"
 
-#: /views/home/combined.ctp:80
-#: /views/home/index.ctp:74
+#: /views/home/combined.ctp:80 /views/home/index.ctp:74
 msgid "Short Help"
-msgstr ""
+msgstr "Ayuda rápida"
 
-#: /views/home/combined.ctp:85
-#: /views/home/index.ctp:79
+#: /views/home/combined.ctp:85 /views/home/index.ctp:79
 msgid "To use iPeer you have to add a course."
-msgstr ""
+msgstr "Para utilizar iPeer tienes que añadir un curso."
 
-#: /views/home/combined.ctp:87
-#: /views/home/index.ctp:81
+#: /views/home/combined.ctp:87 /views/home/index.ctp:81
 msgid "Please <i>add a course</i> from the \"Courses\" tab above"
-msgstr ""
+msgstr "Por favor <i>añada un curso</i> desde la pestaña \"Cursos\" de arriba"
 
-#: /views/home/combined.ctp:90
-#: /views/home/index.ctp:84
-msgid "Then <i>register students</i> into that course from that course's home page. This display will be available (once the course is created) by clicking on the course's name from most menus."
+#: /views/home/combined.ctp:90 /views/home/index.ctp:84
+msgid ""
+"Then <i>register students</i> into that course from that course's home page. "
+"This display will be available (once the course is created) by clicking on "
+"the course's name from most menus."
 msgstr ""
+"Entonces <i>inscribir a los estudiantes</i> en este curso desde la página "
+"principal de ese curso. Esta pantalla estará disponible (una vez que se ha "
+"creado el curso) haciendo clic en el nombre del curso de la mayoría de los "
+"menús."
 
-#: /views/home/combined.ctp:93
-#: /views/home/index.ctp:87
-msgid "Put your students into <i>groups</i> manually, (or, if you have the students complete a survey, iPeer can do it for you, using TeamMaker)."
+#: /views/home/combined.ctp:93 /views/home/index.ctp:87
+msgid ""
+"Put your students into <i>groups</i> manually, (or, if you have the students "
+"complete a survey, iPeer can do it for you, using TeamMaker)."
 msgstr ""
+"Asigne a sus estudiantes a <i>grupos</i> de forma manual, (o, si quiere "
+"asignarlos mediante una encuesta, iPeer puede hacerlo por usted, usando "
+"TeamMaker)."
 
-#: /views/home/combined.ctp:97
-#: /views/home/index.ctp:91
-msgid "To create evaluations, check out the <a href=\"http://ipeer.ctlt.ubc.ca/wiki/UserDocV3.1\" target=\"_blank\">User Documentations</a>"
+#: /views/home/combined.ctp:97 /views/home/index.ctp:91
+msgid ""
+"To create evaluations, check out the <a href=\"http://ipeer.ctlt.ubc.ca/wiki/"
+"UserDocV3.1\" target=\"_blank\">User Documentations</a>"
 msgstr ""
+"Para crear evaluaciones, consulte el <a href=\"http://ipeer.ctlt.ubc.ca/wiki/"
+"UserDocV3.1\" target=\"_blank\">Manual de usuario</a>"
 
 #: /views/home/index.ctp:5
 msgid "My Courses"
-msgstr ""
+msgstr "Mis cursos"
 
 #: /views/home/index.ctp:23
 msgid "Completion Ratio"
-msgstr ""
+msgstr "Ratio de finalización"
 
 #: /views/home/index.ctp:33
 msgid "%d of %d Students"
-msgstr ""
+msgstr "%d de %d estudiantes"
 
 #: /views/home/index.ctp:47
 msgid "Inactive Courses"
-msgstr ""
+msgstr "Cursos inactivos"
 
 #: /views/home/index.ctp:69
 msgid "You do not have any courses."
-msgstr ""
+msgstr "No tienes cursos."
 
 #: /views/install/index.ctp:131
 msgid "PHP version"
-msgstr ""
+msgstr "Versión de PHP"
 
 #: /views/install/index.ctp:135
 msgid "MySQL support"
-msgstr ""
+msgstr "Soporte para MySQL"
 
 #: /views/install/index.ctp:140
 msgid "Directory app/config writable "
-msgstr ""
+msgstr "Directorio app/config escribirle"
 
 #: /views/install/index.ctp:144
 msgid "File app/config/database.php writable "
-msgstr ""
+msgstr "Archivo app/config/database.php escribible "
 
 #: /views/install/index.ctp:149
 msgid "magic_quotes_gpc is off "
-msgstr ""
+msgstr "magic_quotes_gpc está desactivado"
 
 #: /views/install/index.ctp:153
 msgid "Guard Plugin"
-msgstr ""
+msgstr "Plugin Guard"
 
 #: /views/install/index.ctp:154
-msgid "If you cloned iPeer from git, you may need to run git submodule init and git submodule update."
+msgid ""
+"If you cloned iPeer from git, you may need to run git submodule init and git "
+"submodule update."
 msgstr ""
+"Si usted ha clonado iPeer desde git, puede que necesite ejecutar \"git "
+"submodule init\" y \"git submodule update\"."
 
 #: /views/install/index.ctp:164
 msgid "Sendmail or Sendmail Wrapper"
-msgstr ""
+msgstr "Sendmail o envoltura de Sendmail"
 
 #: /views/install/index.ctp:165
 msgid "Required if you want email functions."
-msgstr ""
+msgstr "Necesaria si quieres funciones de correo electrónico."
 
 #: /views/install/index.ctp:170
 msgid "Permissions for email scheduling."
-msgstr ""
+msgstr "Permisos para la programación de correo electrónico."
 
 #: /views/install/index.ctp:171
-msgid "If failed, remove Apache user from \"/etc/at.deny\" or \"/var/at/at.deny\""
+msgid ""
+"If failed, remove Apache user from \"/etc/at.deny\" or \"/var/at/at.deny\""
 msgstr ""
+"Si no, eliminar el usuario Apache de \"/etc/at.deny\" o \"/var/at/at.deny\""
 
 #: /views/install/index.ctp:176
 msgid "PHP LDAP Extension."
-msgstr ""
+msgstr "Extensión PHP LDAP."
 
 #: /views/install/index.ctp:177
 msgid "Required if you are planning to use LDAP authentication."
-msgstr ""
+msgstr "Necesaria si desea utilizar la autenticación LDAP."
 
 #: /views/install/index.ctp:182
 msgid "PHP DOMDocument."
-msgstr ""
+msgstr "PHP DOMDocument."
 
 #: /views/install/index.ctp:183
 msgid "Required if you are planning to use TeamMaker."
-msgstr ""
+msgstr "Necesaria si usted está planeando utilizar TeamMaker."
 
 #: /views/install/index.ctp:192
 msgid "PHP memory limit at least 64 MB"
-msgstr ""
+msgstr "Límite de memoria PHP de al menos 64 MB"
 
 #: /views/install/index.ctp:193
-msgid "Some operations, such as export, requires more memory when dealing with large courses."
+msgid ""
+"Some operations, such as export, requires more memory when dealing with "
+"large courses."
 msgstr ""
+"Algunas operaciones, tales como la exportación, requieren más memoria cuando "
+"se trata de cursos grandes."
 
 #: /views/install/index.ctp:200
 msgid "PHP Directive"
-msgstr ""
+msgstr "Directiva PHP"
 
 #: /views/install/index.ctp:201
 msgid "Recommended"
-msgstr ""
+msgstr "Recomendado"
 
 #: /views/install/index.ctp:202
 msgid "Actual"
-msgstr ""
+msgstr "Actual"
 
 #: /views/install/install2.ctp:21
 msgid " is Free Software released under the GNU/GPL License."
-msgstr ""
+msgstr "es software libre publicado bajo la licencia GNU/GPL."
 
 #: /views/install/install3.ctp:3
 msgid "Step 3: iPeer Database Configuration"
-msgstr ""
+msgstr "Paso 3: Configuración de la base de datos de iPeer"
 
 #: /views/install/install3.ctp:12
 msgid "Data Setup Option"
-msgstr ""
+msgstr "Opción de configuración de datos"
 
 #: /views/install/install3.ctp:38
 msgid "MySQL Database Configuration Parameters"
-msgstr ""
+msgstr "Parámetros de configuración de base de datos MySQL"
 
 #: /views/install/install4.ctp:2
 msgid "Step 4: System Parameters Configuration"
-msgstr ""
+msgstr "Paso 4: Configuración de parámetros del sistema"
 
 #: /views/install/install5.ctp:9
 msgid "Important!"
-msgstr ""
+msgstr "¡Importante!"
 
 #: /views/install/install5.ctp:10
-msgid "For security reasons, please set the configuration directory (%s) and database.php (%s) back to read only."
+msgid ""
+"For security reasons, please set the configuration directory (%s) and "
+"database.php (%s) back to read only."
 msgstr ""
+"Por razones de seguridad, establezca el directorio de configuración (%s) y "
+"el fichero database.php (%s) a solo lectura."
 
 #: /views/install/install5.ctp:13
-msgid "If you opted to install with example data, you can login to the example user accounts with the password 'ipeeripeer'"
+msgid ""
+"If you opted to install with example data, you can login to the example user "
+"accounts with the password 'ipeeripeer'"
 msgstr ""
+"Si usted optó por instalar datos de ejemplo, se puede acceder a las cuentas "
+"de usuario de ejemplo con la contraseña 'ipeeripeer'"
 
 #: /views/layouts/tutorial_pop_up.ctp:4
 msgid "iPeer V2 with TeamMaker"
-msgstr ""
+msgstr "iPeer V2 con TeamMaker"
 
 #: /views/mixevals/add.ctp:15
 msgid "Info"
-msgstr ""
+msgstr "Información"
 
-#: /views/mixevals/add.ctp:26
-#: /views/mixevals/view.ctp:10
+#: /views/mixevals/add.ctp:26 /views/mixevals/view.ctp:10
 msgid "Public lets you share this mixed evaluation with other instructors."
 msgstr ""
+"Público le permite compartir esta evaluación mixta con otros profesores."
 
-#: /views/mixevals/add.ctp:29
-#: /views/mixevals/view.ctp:18
+#: /views/mixevals/add.ctp:29 /views/mixevals/view.ctp:18
 msgid "Start marks from zero for all Likert questions."
-msgstr ""
+msgstr "Inicia las puntuaciones en cero para todas las preguntas tipo Likert."
 
 #: /views/mixevals/add.ctp:35
 msgid "Adds a reflective questions section for evaluators."
-msgstr ""
+msgstr "Agrega una sección de preguntas reflexivas para los evaluados."
 
-#: /views/mixevals/add.ctp:50
-#: /views/survey_groups/edit.ctp:98
+#: /views/mixevals/add.ctp:50 /views/survey_groups/edit.ctp:98
 #: /views/surveys/add_question.ctp:60
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #: /views/mixevals/view.ctp:25
 msgid "Reflective Questions for the evaluator are included."
-msgstr ""
+msgstr "Se incluyen preguntas reflexivas para el evaluador."
 
 #: /views/mixevals/view.ctp:51
 msgid "MixEval Preview"
-msgstr ""
+msgstr "Vista previa de evaluación mixta"
 
 #: /views/oauth_clients/index.ctp:6
 msgid "Add Client"
-msgstr ""
+msgstr "Añadir cliente"
 
 #: /views/oauth_tokens/index.ctp:5
 msgid "Add Token"
-msgstr ""
+msgstr "Añadir token"
 
 #: /views/pages/admin.ctp:12
 msgid "Faculties"
-msgstr ""
+msgstr "Facultades"
 
 #: /views/pages/admin.ctp:21
 msgid "Departments"
-msgstr ""
+msgstr "Departamentos"
 
 #: /views/pages/admin.ctp:49
 msgid "System Parameters"
-msgstr ""
+msgstr "Parámetros del sistema"
 
 #: /views/plugins/guard/guard/login.ctp:2
 msgid "iPeer Login"
-msgstr ""
+msgstr "Acceder a iPeer"
 
 #: /views/rubrics/edit.ctp:22
 msgid "aka LOM, Evaluation Range (Max 10)"
-msgstr ""
+msgstr "también conocido como ND, rango de evaluación (max. 10)"
 
 #: /views/rubrics/edit.ctp:27
 msgid "Number of Criteria"
-msgstr ""
+msgstr "Número de criterios"
 
 #: /views/rubrics/edit.ctp:30
 msgid "Number of Evaluation Aspects (Max 25)"
-msgstr ""
+msgstr "Número de aspectos de evaluación (Max 25)"
 
 #: /views/rubrics/edit.ctp:38
 msgid "Public lets you share this rubric evaluation with other instructors."
 msgstr ""
+"Público le permite compartir esta evaluación de rúbrica con otros profesores."
 
 #: /views/rubrics/edit.ctp:43
 msgid "Zero Mark"
-msgstr ""
+msgstr "Calificación cero"
 
 #: /views/rubrics/edit.ctp:46
 msgid "No Marks Given for Level of Mastery of 1"
-msgstr ""
+msgstr "Ninguna marca para un nivel de dominio de 1"
 
 #: /views/rubrics/edit.ctp:55
-msgid "View mode determines the rubric layout that will be visible to the students."
+msgid ""
+"View mode determines the rubric layout that will be visible to the students."
 msgstr ""
+"El modo de vista determina el diseño de rúbrica que será visible para los "
+"estudiantes."
 
 #: /views/rubrics/edit.ctp:57
-msgid "\"Criteria\" mode separates the rubric into sections for each criteria. Under each section, all users will be listed for that particular criteria. This mode is useful as it provides easy comparisons between students."
+msgid ""
+"\"Criteria\" mode separates the rubric into sections for each criteria. "
+"Under each section, all users will be listed for that particular criteria. "
+"This mode is useful as it provides easy comparisons between students."
 msgstr ""
+"El modo de \"Criterios\" separa la rúbrica en secciones para cada criterio. "
+"En cada sección, se listarán todos los usuarios de ese criterio particular. "
+"Este modo es útil ya que proporciona fácil comparación entre los estudiantes."
 
 #: /views/rubrics/edit.ctp:59
-msgid "\"Student\" mode separates the rubric into sections for each student. Under each section, all criteria will be listed for that particular student. This mode is useful as students can be evaluated one at a time."
+msgid ""
+"\"Student\" mode separates the rubric into sections for each student. Under "
+"each section, all criteria will be listed for that particular student. This "
+"mode is useful as students can be evaluated one at a time."
 msgstr ""
+"El modo de \"Estudiante\" separa la rúbrica en secciones para cada "
+"estudiante. En cada sección, se listarán todos los criterios para cada "
+"alumno particular. Este modo es útil para evaluar a los estudiantes de uno "
+"en uno."
 
 #: /views/rubrics/edit.ctp:61
 msgid "Show/Hide Criteria mode example"
-msgstr ""
+msgstr "Mostrar/Ocultar Ejemplo de modo criterio"
 
 #: /views/rubrics/edit.ctp:62
 msgid "Show/Hide Student mode example"
-msgstr ""
+msgstr "Mostrar/Ocultar Ejemplo de modo de estudiante"
 
 #: /views/rubrics/edit.ctp:66
 msgid "<strong>Criteria Example</strong><br><br>"
-msgstr ""
+msgstr "<strong>Ejemplo de criterios</strong><br><br>"
 
 #: /views/rubrics/edit.ctp:73
 msgid "<strong>Student Example</strong><br><br>"
-msgstr ""
+msgstr "<strong>Ejemplo de estudiante</strong><br><br>"
 
 #: /views/rubrics/edit.ctp:88
 msgid "Preview (Update Format)"
-msgstr ""
+msgstr "Previsualizar (actualizar formato)"
 
 #: /views/rubrics/edit.ctp:96
 msgid "Rubric Edit"
-msgstr ""
+msgstr "Editar rúbrica"
 
 #: /views/simple_evaluations/edit.ctp:31
 msgid "Points Per Member"
-msgstr ""
+msgstr "Puntos por miembro"
 
 #: /views/simple_evaluations/edit.ctp:48
 msgid "Public lets you share this simple evaluation with other instructors."
 msgstr ""
+"Público le permite compartir esta evaluación simple con otros profesores."
 
 #: /views/simple_evaluations/view.ctp:6
 msgid "View Simple Evaluation"
-msgstr ""
+msgstr "Ver evaluación simple"
 
 #: /views/simple_evaluations/view.ctp:8
 msgid "Evaluation Name"
-msgstr ""
+msgstr "Nombre de la evaluación"
 
 #: /views/simple_evaluations/view.ctp:26
 msgid "Close"
-msgstr ""
+msgstr "Cerrar"
 
 #: /views/simple_evaluations/view.ctp:38
 msgid " Simple Evaluation Preview"
-msgstr ""
+msgstr "Vista previa de evaluación simple"
 
 #: /views/survey_groups/edit.ctp:13
 msgid "Edit Survey Group Set"
-msgstr ""
+msgstr "Editar encuesta de conjunto de grupos"
 
 #: /views/survey_groups/edit.ctp:24
 msgid "match score"
-msgstr ""
+msgstr "puntuación"
 
 #: /views/survey_groups/edit.ctp:33
 msgid "Show responses for question:"
-msgstr ""
+msgstr "Mostrar respuestas para la pregunta:"
 
 #: /views/survey_groups/edit.ctp:61
 msgid "Move to ..."
-msgstr ""
+msgstr "Mover a …"
 
-#: /views/survey_groups/edit.ctp:97
-#: /views/survey_groups/maketmgroups.ctp:55
+#: /views/survey_groups/edit.ctp:97 /views/survey_groups/maketmgroups.ctp:55
 msgid "Save Groups"
-msgstr ""
+msgstr "Guardar grupos"
 
 #: /views/survey_groups/export.ctp:4
 msgid "Give the export file a name."
-msgstr ""
+msgstr "Dar al archivo de exportación un nombre."
 
 #: /views/survey_groups/export.ctp:5
 msgid "Select the survey group set you would like to export."
-msgstr ""
+msgstr "Seleccione el conjunto de grupo de estudio que desea exportar."
 
 #: /views/survey_groups/export.ctp:6
 msgid "Please select at least one of the export fields."
-msgstr ""
+msgstr "Por favor seleccione al menos uno de los campos de exportación."
 
 #: /views/survey_groups/export.ctp:18
 msgid "Export Fields"
-msgstr ""
+msgstr "Exportar campos"
 
 #: /views/survey_groups/index.ctp:5
 msgid "Add Survey Group Set"
-msgstr ""
+msgstr "Añadir encuesta de conjunto de grupos"
 
 #: /views/survey_groups/makegroups.ctp:4
 msgid "Please Select a survey event to make groups"
-msgstr ""
+msgstr "Por favor, seleccione un evento de encuesta para hacer grupos"
 
 #: /views/survey_groups/makegroups.ctp:5
 msgid "Select a survey"
-msgstr ""
+msgstr "Seleccione una encuesta"
 
 #: /views/survey_groups/makegroups.ctp:10
 msgid " No survey event found for this course!"
-msgstr ""
+msgstr "¡No se encontró ninguna encuesta para este curso!"
 
 #: /views/survey_groups/makegroups.ctp:11
 msgid "Please create a survey first, and have your students complete it."
 msgstr ""
+"Por favor, cree una encuesta primero, y haga que sus estudiantes completen "
+"la misma."
 
 #: /views/survey_groups/makegroups.ctp:13
 msgid "Go Back"
-msgstr ""
+msgstr "Retroceder"
 
 #: /views/survey_groups/maketmgroups.ctp:13
 msgid "Click on any user name to view their answers to this survey."
 msgstr ""
+"Haga clic en cualquier nombre de usuario para ver sus respuestas a esta "
+"encuesta."
 
 #: /views/survey_groups/maketmgroups.ctp:14
 msgid "To adjust weightings and create a new set of teams, just go "
 msgstr ""
+"Para ajustar las ponderaciones y crear un nuevo conjunto de equipos, sólo "
+"vaya "
 
 #: /views/survey_groups/maketmgroups.ctp:14
 msgid "back"
-msgstr ""
+msgstr "atrás"
 
 #: /views/survey_groups/maketmgroups.ctp:15
 msgid "To edit these teams, first save them below."
-msgstr ""
+msgstr "Para editar estos equipos, primero guardarlos a continuación."
 
 #: /views/survey_groups/maketmgroups.ctp:16
 msgid "Note:"
-msgstr ""
+msgstr "Nota:"
 
 #: /views/survey_groups/maketmgroups.ctp:16
 msgid "Higher 'Match Score' is better."
-msgstr ""
+msgstr "Una puntuación más alta es mejor."
 
 #: /views/survey_groups/maketmgroups.ctp:26
 msgid "Match Score"
-msgstr ""
+msgstr "Puntuación"
 
 #: /views/survey_groups/maketmgroups.ctp:27
 msgid "Team Members"
-msgstr ""
+msgstr "Miembros del equipo"
 
 #: /views/survey_groups/maketmgroups.ctp:51
 msgid "Group Set Name: "
-msgstr ""
+msgstr "Nombre de grupo:"
 
 #: /views/surveys/add_question.ctp:7
 msgid "(Select Question to Load)"
-msgstr ""
+msgstr "(Seleccione la pregunta a cargar)"
 
 #: /views/surveys/add_question.ctp:9
 msgid "Load"
-msgstr ""
+msgstr "Carga"
 
 #: /views/surveys/add_question.ctp:13
 msgid "Load a master question as your template."
-msgstr ""
+msgstr "Carga una pregunta maestra como plantilla."
 
 #: /views/surveys/add_question.ctp:17
 msgid "Whether this question can be used as a template for new questions."
 msgstr ""
+"Si esta cuestión puede utilizarse como una plantilla para nuevas preguntas."
 
 #: /views/surveys/add_question.ctp:22
 msgid "Multiple Choice (Single Answer)"
-msgstr ""
+msgstr "Opción múltiple (respuesta única)"
 
 #: /views/surveys/add_question.ctp:23
 msgid "Choose Any Of... (Multiple Answers)"
-msgstr ""
+msgstr "Elegir cualquiera de… (Varias respuestas)"
 
 #: /views/surveys/add_question.ctp:24
 msgid "Single Line Text Input"
-msgstr ""
+msgstr "Entrada de texto de línea simple"
 
 #: /views/surveys/add_question.ctp:25
 msgid "Long Answer Text Input"
-msgstr ""
+msgstr "Entrada de texto de respuesta larga"
 
 #: /views/surveys/add_question.ctp:59
 msgid "Save Question"
-msgstr ""
+msgstr "Guardar pregunta"
 
 #: /views/surveys/edit.ctp:15
 msgid "(No Template)"
-msgstr ""
+msgstr "(Sin plantilla)"
 
 #: /views/surveys/edit.ctp:24
 msgid "Public lets you share this survey template with other instructors."
 msgstr ""
+"Público le permite compartir esta plantilla de encuesta con otros profesores."
 
 #: /views/surveys/edit.ctp:28
 msgid " Survey"
-msgstr ""
+msgstr " Encuesta"
 
 #: /views/surveys/index.ctp:5
 msgid " Add Survey"
-msgstr ""
+msgstr "Agregar encuesta"
 
 #: /views/surveys/questionssummary.ctp:35
 msgid "Are you sure you want to delete"
-msgstr ""
+msgstr "Seguro que quieres eliminar"
 
 #: /views/surveys/questionssummary.ctp:37
 msgid "Top"
-msgstr ""
+msgstr "Ir arriba"
 
 #: /views/surveys/questionssummary.ctp:39
 msgid "Up"
-msgstr ""
+msgstr "Subir"
 
 #: /views/surveys/questionssummary.ctp:41
 msgid "Down"
-msgstr ""
+msgstr "Abajo"
 
 #: /views/surveys/questionssummary.ctp:43
 msgid "Bottom"
-msgstr ""
+msgstr "Abajo"
 
 #: /views/surveys/questionssummary.ctp:51
 msgid "Add Question"
-msgstr ""
+msgstr "Añadir pregunta"
 
 #: /views/surveys/questionssummary.ctp:53
 msgid "Done"
-msgstr ""
+msgstr "Hecho"
 
 #: /views/surveys/view.ctp:4
 msgid "Survey Title"
-msgstr ""
+msgstr "Título de la encuesta"
 
 #: /views/surveys/view.ctp:16
 msgid "Modified"
-msgstr ""
+msgstr "Modificado"
 
 #: /views/sys_parameters/index.ctp:4
 msgid "Add Sys Parameter"
-msgstr ""
+msgstr "Añadir parámetro del sistema"
 
 #: /views/users/edit_profile.ctp:17
 msgid "Change Password"
-msgstr ""
+msgstr "Cambiar contraseña"
 
 #: /views/users/edit_profile.ctp:19
 msgid "Old Password"
-msgstr ""
+msgstr "Contraseña anterior"
 
 #: /views/users/edit_profile.ctp:20
 msgid "New Password"
-msgstr ""
+msgstr "Nueva contraseña"
 
 #: /views/users/edit_profile.ctp:21
 msgid "Confirm New Password"
-msgstr ""
+msgstr "Confirmar nueva contraseña"
 
 #: /views/users/edit_profile.ctp:30
 msgid "Add Client Credential"
-msgstr ""
+msgstr "Añadir credenciales de cliente"
 
 #: /views/users/edit_profile.ctp:34;49
 msgid "Key"
-msgstr ""
+msgstr "Clave"
 
 #: /views/users/edit_profile.ctp:35;50
 msgid "Secret"
-msgstr ""
+msgstr "Secreto"
 
 #: /views/users/edit_profile.ctp:39;55
 msgid "&nbsp;Comment: "
-msgstr ""
+msgstr "&nbsp;Comentario: "
 
 #: /views/users/edit_profile.ctp:46
 msgid "Add Token Credential"
-msgstr ""
+msgstr "Agregar credencial de token"
 
 #: /views/users/edit_profile.ctp:51
 msgid "Expires"
-msgstr ""
+msgstr "Caduca"
 
 #: /views/users/import.ctp:4
 msgid "All fields mandatory, except email and password."
 msgstr ""
+"Todos los campos obligatorios, excepto correo electrónico y contraseña."
 
 #: /views/users/import.ctp:5
-msgid "If email column is missing, students can update their profiles by clicking on their name (near the Logout link)."
+msgid ""
+"If email column is missing, students can update their profiles by clicking "
+"on their name (near the Logout link)."
 msgstr ""
+"Si falta la columna de correo electrónico, los estudiantes pueden actualizar "
+"sus perfiles haciendo clic sobre su nombre (cerca del enlace de cerrar "
+"sesión)."
 
 #: /views/users/import.ctp:6
-msgid "If password column is missing, system will generate random password for each student."
+msgid ""
+"If password column is missing, system will generate random password for each "
+"student."
 msgstr ""
+"Si falta la columna password, el sistema genera contraseñas aleatorias para "
+"cada estudiante."
 
 #: /views/users/import.ctp:7
 msgid "If the user already exists, their password will NOT be changed."
-msgstr ""
+msgstr "Si el usuario ya existe, no se modificará la contraseña."
 
 #: /views/users/import.ctp:8
-msgid "If an external authentication module is enabled (e.g. CWL or Shibboleth), password column can be ignored. Students will use external authentication module to login."
+msgid ""
+"If an external authentication module is enabled (e.g. CWL or Shibboleth), "
+"password column can be ignored. Students will use external authentication "
+"module to login."
 msgstr ""
+"Si se habilita un módulo de autenticación externa (CWL o Shibboleth), puede "
+"omitirse la columna password. Los estudiantes usarán el módulo de "
+"autenticación externa para iniciar sesión."
 
 #: /views/users/import.ctp:9
 msgid "Please make sure to remove the header from the CSV file."
-msgstr ""
+msgstr "Por favor, asegúrese de quitar el encabezado del archivo CSV."
 
 #: /views/users/import.ctp:14
-msgid "Username,First Name,Last Name,Student#,<i>Email(optional),Password(optional)</i>"
+msgid ""
+"Username,First Name,Last Name,Student#,<i>Email(optional),"
+"Password(optional)</i>"
 msgstr ""
+"Nombre de usuario,Nombre,Apellidos,ID de estudiante,<i>Email (opcional),"
+"Contraseña (opcional)</i>"
 
 #: /views/users/import.ctp:34
 msgid "Remove old students and add new students."
-msgstr ""
+msgstr "Eliminar estudiantes antiguos y añadir nuevos estudiantes."
 
 #: /views/users/index.ctp:11
 msgid "Import User"
-msgstr ""
+msgstr "Importar usuario"
 
 #: /views/users/merge.ctp:4
-msgid "Search for the primary account on the left by name, username, or student number."
+msgid ""
+"Search for the primary account on the left by name, username, or student "
+"number."
 msgstr ""
+"Búsqueda de la cuenta principal a la izquierda por nombre, nombre de usuario "
+"o número de estudiante."
 
 #: /views/users/merge.ctp:5
-msgid "Search for the secondary account on the right by name, username, or student number."
+msgid ""
+"Search for the secondary account on the right by name, username, or student "
+"number."
 msgstr ""
+"Búsqueda de la cuenta secundaria a la derecha por nombre, nombre de usuario "
+"o número de estudiante."
 
 #: /views/users/merge.ctp:6
 msgid "WARNING: The merger of two accounts cannot be undone."
-msgstr ""
+msgstr "ADVERTENCIA: La fusión de las dos cuentas no se puede deshacer."
 
 #: /views/users/merge.ctp:8
 msgid "Merge Accounts"
-msgstr ""
+msgstr "Combinar cuentas"
 
 #: /views/users/merge.ctp:16
 msgid "Merge"
-msgstr ""
+msgstr "Combinar"
 
 #: /views/users/user_summary.ctp:2
 msgid "User(s) failed on creation:"
-msgstr ""
+msgstr "Error al crear los usuarios:"
 
 #: /views/users/user_summary.ctp:6;13
 msgid "User(s) modified successfully:"
-msgstr ""
+msgstr "Usuario(s) modificado(s) con éxito:"
 
 #: /views/users/user_summary.ctp:6
 msgid "User(s) created successfully:"
-msgstr ""
+msgstr "Usuario(s) creado(s) correctamente:"
 
 #: /views/users/user_summary.ctp:13
 msgid "User(s) updated successfully:"
-msgstr ""
+msgstr "Usuario(s) actualizad(s) correctamente:"
 
 #: /webroot/test.php:91
 msgid "Debug setting does not allow access to this url."
-msgstr ""
+msgstr "La configuración de depuración no permite el acceso a esta url."
 
+#, fuzzy
+#~ msgid "Created Aco node for controllers"
+#~ msgstr "Nodo de Aco creado para controladores"
+
+#, fuzzy
+#~ msgid "Created Aco node for "
+#~ msgstr "Crear nodo de Aco"
+
+#, fuzzy
+#~ msgid " Plugin"
+#~ msgstr "Plugin"
+
+#, fuzzy
+#~ msgid " Plugin Controller"
+#~ msgstr "Controlador plugin"
+
+#, fuzzy
+#~ msgid "Error importing "
+#~ msgstr "Error importar"
+
+#, fuzzy
+#~ msgid " for plugin "
+#~ msgstr "para plugin"
+
+#, fuzzy
+#~ msgid "Schema file (%s) could not be found."
+#~ msgstr "No se encontró archivo de esquema (%s)."
+
+#, fuzzy
+#~ msgid "Generating Schema..."
+#~ msgstr "Generación de esquema..."
+
+#, fuzzy
+#~ msgid "Schema file: %s generated"
+#~ msgstr "Archivo de esquema: %s generados"
+
+#, fuzzy
+#~ msgid "Schema could not be loaded"
+#~ msgstr "No se pudo cargar el esquema"
+
+#, fuzzy
+#~ msgid "SQL dump file created in %s"
+#~ msgstr "Archivo de volcado de SQL creado en %s"
+
+#, fuzzy
+#~ msgid "SQL dump could not be created"
+#~ msgstr "No se pudo crear el volcado SQL"
+
+#, fuzzy
+#~ msgid "Performing a dry run."
+#~ msgstr "Realización de una marcha en seco."
+
+#, fuzzy
+#~ msgid "%s could not be loaded"
+#~ msgstr "no se ha podido cargar %s."
+
+#, fuzzy
+#~ msgid "Schema is up to date."
+#~ msgstr "El esquema es hasta la fecha."
+
+#, fuzzy
+#~ msgid "Dropping table(s)."
+#~ msgstr "Colocar tablas."
+
+#, fuzzy
+#~ msgid "Creating table(s)."
+#~ msgstr "Creación de tablas."
+
+#, fuzzy
+#~ msgid "End create."
+#~ msgstr "Fin crear."
+
+#, fuzzy
+#~ msgid "Comparing Database to Schema..."
+#~ msgstr "Comparación de esquema de la base de datos..."
+
+#, fuzzy
+#~ msgid "The following statements will run."
+#~ msgstr "Se ejecutarán las siguientes afirmaciones."
+
+#, fuzzy
+#~ msgid "Are you sure you want to alter the tables?"
+#~ msgstr "¿Está seguro que desea modificar las mesas?"
+
+#, fuzzy
+#~ msgid "Updating Database..."
+#~ msgstr "Actualización de base de datos..."
+
+#, fuzzy
+#~ msgid "End update."
+#~ msgstr "Actualización final."
+
+#, fuzzy
+#~ msgid "Sql could not be run"
+#~ msgstr "No se podía ejecutar SQL"
+
+#, fuzzy
+#~ msgid "%s is up to date."
+#~ msgstr "%s es hasta la fecha."
+
+#, fuzzy
+#~ msgid "Dry run for %s :"
+#~ msgstr "Funcionamiento en seco para %s:"
+
+#, fuzzy
+#~ msgid "%s updated."
+#~ msgstr "%s actualizados."
+
+#, fuzzy
+#~ msgid ""
+#~ "You must install Xdebug to use the CakePHP(tm) Code Coverage Analyzation. "
+#~ "Download it from http://www.xdebug.org/docs/install"
+#~ msgstr ""
+#~ "Debe instalar Xdebug para utilizar la medición de cobertura de código "
+#~ "CakePHP(tm). Descargar desde http://www.xdebug.org/docs/install"
+
+#, fuzzy
+#~ msgid "A "
+#~ msgstr "Un"
+
+#, fuzzy
+#~ msgid " for "
+#~ msgstr "durante"
+
+#, fuzzy
+#~ msgid " is made available to "
+#~ msgstr "no se pone a disposición de"
+
+#, fuzzy
+#~ msgid "you in iPeer, which has yet to be completed."
+#~ msgstr "le iPeer, que todavía tiene que completarse."
+
+#, fuzzy
+#~ msgid "Close Date"
+#~ msgstr "fecha de cierre"
+
+#, fuzzy
+#~ msgid "You can login "
+#~ msgstr "Puede iniciar sesión"
+
+#, fuzzy
+#~ msgid "here"
+#~ msgstr "aquí"
+
+#, fuzzy
+#~ msgid " to complete the "
+#~ msgstr "para completar la"
+
+#~ msgid " before it closes."
+#~ msgstr "antes de que se cierre."
+
+#, fuzzy
+#~ msgid " There is a penalty for submitting after the due date."
+#~ msgstr ""
+#~ "Hay una pena para la presentación después de la fecha de vencimiento."
+
+#, fuzzy
+#~ msgid "Thank you"
+#~ msgstr "Gracias"
+
+#, fuzzy
+#~ msgid ""
+#~ "you in iPeer, which has yet to be completed.\n"
+#~ "\n"
+#~ msgstr "le iPeer, que todavía tiene que completarse."
+
+#, fuzzy
+#~ msgid "%f day(s) late: %s deduction."
+#~ msgstr "%f día (s) tarde: %s deducción."
+
+#, fuzzy
+#~ msgid "%d is deducted afterwards."
+#~ msgstr "%d se deduce después."
+
+#, fuzzy
+#~ msgid ""
+#~ "There has been submissions in this group. Changing group members may "
+#~ "cause data integrity issue."
+#~ msgstr ""
+#~ "Ha habido propuestas en este grupo. Cambio de los miembros del grupo "
+#~ "puede causar problema de integridad de datos."
+
+#, fuzzy
+#~ msgid "Evaluator:"
+#~ msgstr "evaluador"
+
+#, fuzzy
+#~ msgid "Evaluating:"
+#~ msgstr "Evaluación de:"
+
+#, fuzzy
+#~ msgid "Event Name:"
+#~ msgstr "ESDEVENIMENT: / EVENTO: / EVENT:"
+
+#, fuzzy
+#~ msgid "Due Date:"
+#~ msgstr "Fecha de vencimiento"
+
+#, fuzzy
+#~ msgid "Description:"
+#~ msgstr "Descripción:"
+
+#, fuzzy
+#~ msgid ""
+#~ "This section will be available once the previous sections are completed.</"
+#~ "div>"
+#~ msgstr ""
+#~ "Esta sección estará disponible una vez que se completan las secciones "
+#~ "anteriores."
+
+#, fuzzy
+#~ msgid ""
+#~ "Auto Release is ON, you do not need to manually release the grades and "
+#~ "comments"
+#~ msgstr ""
+#~ "Liberación automática está activada, no es necesario liberar de forma "
+#~ "manual las notas y comentarios"
+
+#, fuzzy
+#~ msgid "Basic view only show averages of questions"
+#~ msgstr "Vista básica sólo muestran promedios de preguntas"
+
+#, fuzzy
+#~ msgid "To create evaluations, check out the "
+#~ msgstr "Para crear evaluaciones, revisa la"
+
+#, fuzzy
+#~ msgid "Indicates response required."
+#~ msgstr "Indica la respuesta requerida."
+
+#, fuzzy
+#~ msgid "Level of Mastery:"
+#~ msgstr "Nivel de dominio"

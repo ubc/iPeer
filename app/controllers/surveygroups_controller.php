@@ -24,8 +24,20 @@ class SurveyGroupsController extends AppController
      */
     function __construct()
     {
-        $this->set('title_for_layout', __('Survey Groups', true));
         parent::__construct();
+    }
+
+    /**
+     * beforeFilter
+     *
+     * @access public
+     * @return void
+     */
+    function beforeFilter()
+    {
+        parent::beforeFilter();
+
+        $this->set('title_for_layout', __('Survey Groups', true));
     }
 
     /**

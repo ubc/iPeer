@@ -39,10 +39,21 @@ class RubricsController extends AppController
         $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
         $this->order = $this->sortBy.' '.strtoupper($this->direction);
         $this->mine_only = (!empty($_REQUEST['show_my_tool']) && ('on' == $_REQUEST['show_my_tool'] || 1 == $_REQUEST['show_my_tool'])) ? true : false;
-        $this->set('title_for_layout', __('Rubrics', true));
         parent::__construct();
     }
 
+    /**
+     * beforeFilter
+     *
+     * @access public
+     * @return void
+     */
+    function beforeFilter()
+    {
+        parent::beforeFilter();
+
+        $this->set('title_for_layout', __('Rubrics', true));
+    }
 
     /**
      * postProcess
