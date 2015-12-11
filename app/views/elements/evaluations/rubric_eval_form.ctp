@@ -144,14 +144,14 @@ function saveButtonVal(userId) {
     <input type="hidden" name="data[Evaluation][evaluator_id]" value="<?php echo User::get('id')?>"/>
     <input type="hidden" name="evaluateeCount" value="<?php echo $evaluateeCount?>"/>
     <?php
-    if ($allDone && !$comReq && !isset($preview)) {
+    if ( !$comReq && !isset($preview)) {
         echo $form->submit(__('Submit to Complete the Evaluation', true), array('div'=>'submitComplete'));
     } else {
         echo $form->submit(__('Submit to Complete the Evaluation', true), array('disabled'=>'true','div'=>'submitComplete')); echo "<br />";
         echo isset($preview) ? "<div style='color: red'>".__('This is a preview. All submissions are disabled.', true).'</div>' : "";
-        echo !$allDone ? "<div style='color: red'>".__("Please complete the questions for all group members, pressing 'Save This Section' button for each one.", true).'</div>' : "";
         echo $comReq ? "<div style='color: red'>".__('Please enter all the comments for all the group members before submitting.', true).'</div>' : "";
     }
+    echo !$allDone ? "<div style='color: red'>".__("You haven't completed evaluations for all your teammates. You can submit now and modify your submission by the due date.", true).'</div>' : "";
     ?>
 </form></td></tr>
 </table>
