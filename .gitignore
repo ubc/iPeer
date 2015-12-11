@@ -16,3 +16,5 @@ lint.cache
 tags
 .project
 .vagrant
+vendor/
+.idea

@@ -1,0 +1,8 @@
+{
+  "require-dev": {
+    "phing/phing": "2.*",
+    "pdepend/pdepend" : "2.2.2",
+    "phpmd/phpmd" : "@stable",
+    "squizlabs/php_codesniffer": "2.*"
+  }
+}
