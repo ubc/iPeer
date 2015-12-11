@@ -1,0 +1,1 @@
+ALTER TABLE `evaluation_rubric_details` MODIFY COLUMN `criteria_comment` TEXT DEFAULT NULL;

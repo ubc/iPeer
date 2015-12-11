@@ -807,7 +807,7 @@ CREATE TABLE IF NOT EXISTS `evaluation_rubric_details` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `evaluation_rubric_id` int(11) NOT NULL DEFAULT '0',
   `criteria_number` int(11) NOT NULL DEFAULT '0',
-  `criteria_comment` varchar(255) DEFAULT NULL,
+  `criteria_comment` TEXT DEFAULT NULL,
   `selected_lom` int(11) NOT NULL DEFAULT '0',
   `grade` double(12,2) NOT NULL DEFAULT '0.00',
   `comment_release` int(1) NOT NULL DEFAULT '0',

@@ -51,7 +51,7 @@ class UpgraderComponent extends Object
      * isUpgradable check if the current instance is upgradable
      *
      * @access public
-     * @return void
+     * @return bool
      */
     public function isUpgradable()
     {
@@ -68,7 +68,7 @@ class UpgraderComponent extends Object
      * upgrade
      *
      * @access public
-     * @return void
+     * @return bool
      */
     public function upgrade()
     {

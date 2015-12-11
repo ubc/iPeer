@@ -319,7 +319,7 @@
   /**
    * iPeer database version
    */
-  Configure::write('DATABASE_VERSION', 9);
+  Configure::write('DATABASE_VERSION', 10);
 
 
   $CWL['LoginURL'] = 'https://www.auth.cwl.ubc.ca/auth/login';
@@ -342,7 +342,7 @@
   $CWL['applicationID'] = '';
   $CWL['applicationPassword'] = '';
 
-  define('IPEER_VERSION', '3.1.7');
+  define('IPEER_VERSION', '3.1.8');
 
 
 /**
@@ -352,6 +352,6 @@
  * Configure::write('debug', 2);
  * To turn on the debug
  */
-if (file_exists(dirname(__FILE__).'/config.local.php')) {
+if (file_exists(__DIR__ . '/config.local.php')) {
   include('config.local.php');
 }
