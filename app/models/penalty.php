@@ -126,6 +126,43 @@ class Penalty extends AppModel
             return $this->getPenaltyFinal($eventId);
         }
     }
+
+    function getPenaltyByEventSubmissionAndDue($eventId, $event_due, $submissionDate)
+    {
+        $late_diff = strtotime($submissionDate) - strtotime($event_due);
+        // late
+        if (0 < $late_diff) {
+            $days_late = $late_diff/(24*60*60);
+            $penalty = $this->getPenaltyByEventAndDaysLate($eventId, $days_late);
+            return $penalty['Penalty']['percent_penalty'];
+        } else {
+            return 0;
+        }
+    }
+
+    function getPenaltyForMembers($memberIds, $event, $submissions) {
+        $userPenalty = array();
+        $userPenalty = array_fill_keys($memberIds, 0);
+        $end = strtotime($event['release_date_end']);
+        $now = time();
+        foreach ($submissions as $submission) {
+            $userPenalty[$submission['EvaluationSubmission']['submitter_id']] =
+                $this->getPenaltyByEventSubmissionAndDue(
+                    $event['id'], $event['due_date'], $submission['EvaluationSubmission']['date_submitted']
+                );
+        }
+
+        // no submission - if now is after release date end then - gets final deduction
+        $penalty = $this->getPenaltyFinal($event['id']);
+        if ($now >= $end) {
+            $noSubmissions = array_diff($memberIds, Set::extract($submissions, '/EvaluationSubmission/submitter_id'));
+            foreach ($noSubmissions as $userId) {
+                $userPenalty[$userId] = $penalty['Penalty']['percent_penalty'];
+            }
+        }
+
+        return $userPenalty;
+    }
     
     /**
      * getPenaltyPercent

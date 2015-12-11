@@ -215,6 +215,7 @@
         <exec command="sh cake/console/cake -app app testsuite app group model" passthru="true"/>
         <exec command="sh cake/console/cake -app app testsuite app group controller" passthru="true"/>
         <!-- v1_controller test must be last one as it will change the database -->
+        <!--<exec command="sh cake/console/cake testsuite app case controllers/V1Controller" passthru="true"/>-->
         <phingcall target="post-test"/>
     </target>
 

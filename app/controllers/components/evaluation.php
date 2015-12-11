@@ -501,7 +501,7 @@ class EvaluationComponent extends Object
 
         // calculate penalty
         $ret['Penalties'] = $this->SimpleEvaluation->formatPenaltyArray(
-            $ret['evaluatees'], $eventId, $groupId);
+            $eventId, $groupId, $ret['evaluatees']);
         foreach ($ret['TotalGrades'] as $userid => $grade) {
             $ret['FinalGrades'][$userid] = $grade -
                 ($grade * ($ret['Penalties'][$userid] / 100));
@@ -777,74 +777,6 @@ class EvaluationComponent extends Object
     }
 
 
-    /**
-     * formatRubricEvaluationResultsMatrix
-     *
-     * @param mixed $evalResult evel result
-     *
-     * @access public
-     * @return void
-     */
-    function formatRubricEvaluationResultsMatrix($evalResult)
-    {
-        $summary = array();
-        $criteria = array();        // for storing criteria numbers
-
-        // If array is null, returns false
-        if($evalResult == null) {
-            return false;
-        }
-
-        foreach ($evalResult as $result) {
-            $userId = $result['EvaluationRubric']['evaluatee'];
-            $evaluator = $result['EvaluationRubric']['evaluator'];
-            $summary[$userId]['release_status']['gradeRelease'][] = $result['EvaluationRubric']['grade_release'];
-            $summary[$userId]['release_status']['commentRelease'][] = $result['EvaluationRubric']['comment_release'];
-            $summary[$userId]['total']['score'] = (isset($summary[$userId]['total']['score'])) ?
-                $summary[$userId]['total']['score'] + $result['EvaluationRubric']['score'] : $result['EvaluationRubric']['score'];
-            $summary[$userId]['evaluator_count'] = (isset($summary[$userId]['evaluator_count'])) ?
-                $summary[$userId]['evaluator_count'] + 1 : 1;
-            foreach ($result['EvaluationRubricDetail'] as $detail) {
-                $criteria[] = $detail['criteria_number'];
-                $summary[$userId]['grades'][$detail['criteria_number']]['grade'] = (isset($summary[$userId]['grades'][$detail['criteria_number']]['grade'])) ?
-                    $summary[$userId]['grades'][$detail['criteria_number']]['grade'] + $detail['grade'] : $detail['grade'];
-                $summary[$userId]['grades'][$detail['criteria_number']]['evaluator_count'] = (isset($summary[$userId]['grades'][$detail['criteria_number']]['evaluator_count'])) ?
-                    $summary[$userId]['grades'][$detail['criteria_number']]['evaluator_count'] + 1 : 1;
-                $summary[$userId]['individual'][$evaluator][$detail['criteria_number']]['grade'] =
-                    $detail['grade'];
-                $summary[$userId]['individual'][$evaluator][$detail['criteria_number']]['comment'] =
-                    $detail['criteria_comment'];
-                $summary[$userId]['individual'][$evaluator][$detail['criteria_number']]['id'] =
-                    $detail['id'];
-                $summary[$userId]['individual'][$evaluator][$detail['criteria_number']]['comment_release'] =
-                    $detail['comment_release'];
-                $summary[$userId]['release_status']['commentRelease'][] = $detail['comment_release'];
-            }
-            $summary[$userId]['individual'][$evaluator]['general_comment']['comment'] = 
-                $result['EvaluationRubric']['comment'];
-            $summary[$userId]['individual'][$evaluator]['general_comment']['comment_release'] = 
-                $result['EvaluationRubric']['comment_release'];
-        }
-
-        foreach ($summary as $id => $score) {
-            $summary[$id]['release_status']['gradeRelease'] = array_product($summary[$id]['release_status']['gradeRelease']);
-            $summary[$id]['release_status']['commentRelease'] = array_product($summary[$id]['release_status']['commentRelease']);
-            $summary[$id]['total'] = $score['total']['score'] / $score['evaluator_count'];
-            foreach ($score['grades'] as $num => $grade) {
-                $summary[$id]['grades'][$num] = $grade['grade']/$grade['evaluator_count'];
-            }
-        }
-
-        $group = array();
-        foreach (array_unique($criteria) as $num) {
-            $grades = Set::extract($summary, '/grades/'.$num);
-            $group['grades'][$num] = array_sum($grades) / count($grades);
-        }
-
-        return $summary + $group;
-    }
-
-    
     /**
      * changeIndivRubricEvalCommentRelease
      *

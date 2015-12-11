@@ -286,7 +286,7 @@ class EvaluationTestCase extends CakeTestCase
             )
         );
         // Gets the result
-        $result = $this->EvaluationComponentTest->formatRubricEvaluationResultsMatrix($evalResult);
+        $result = Toolkit::formatRubricEvaluationResultsMatrix($evalResult);
         // Sets up expected return value
         $expected = array(
             1 => array(
@@ -361,7 +361,7 @@ class EvaluationTestCase extends CakeTestCase
         $this->assertEqual($expected, $result);
         
         // Tests null instance
-        $result = $this->EvaluationComponentTest->formatRubricEvaluationResultsMatrix(null);
+        $result = Toolkit::formatRubricEvaluationResultsMatrix(null);
         $this->assertFalse($result);
 
     }

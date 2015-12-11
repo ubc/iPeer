@@ -381,57 +381,40 @@ class EvaluationRubric extends EvaluationResponseBase
      * rubricEvalScore
      *
      * @param mixed $eventId
-     * @param mixed $fields
      * @param mixed $conditions
      *
      * @access public
      * @return void
      */
-    function rubricEvalScore($eventId, $fields, $conditions) {
+    function rubricEvalScore($eventId, $conditions) {
         $evalSub = ClassRegistry::init('EvaluationSubmission');
         $pen = ClassRegistry::init('Penalty');
 
-        $list = $this->find('all',
-            array('fields' => $fields, 'conditions' => $conditions));
-
-        $data = array();
-        foreach ($list as $mark) {
-            if (!isset($data[$mark['EvaluationRubric']['evaluatee']])) {
-                $data[$mark['EvaluationRubric']['evaluatee']]['user_id'] = $mark['EvaluationRubric']['evaluatee'];
-                $data[$mark['EvaluationRubric']['evaluatee']]['score'] = $mark['EvaluationRubric']['score'];
-                $data[$mark['EvaluationRubric']['evaluatee']]['numEval']= 1;
-            } else {
-                $data[$mark['EvaluationRubric']['evaluatee']]['score'] += $mark['EvaluationRubric']['score'];
-                $data[$mark['EvaluationRubric']['evaluatee']]['numEval']++;
-            }
-        }
-
         $sub = $evalSub->getEvalSubmissionsByEventId($eventId);
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId)));
+        $submitted = Set::extract('/EvaluationSubmission/submitter_id', $sub);
 
-        foreach ($sub as $stu) {
-            if (isset($data[$stu['EvaluationSubmission']['submitter_id']])) {
-                $diff = strtotime($stu['EvaluationSubmission']['date_submitted']) - strtotime($event['Event']['due_date']);
-                $days = $diff/(60*60*24);
-                $penalty = $pen->getPenaltyByEventAndDaysLate($eventId, $days);
-                $data[$stu['EvaluationSubmission']['submitter_id']]['penalty'] = (isset($penalty['Penalty']['percent_penalty'])) ? $penalty['Penalty']['percent_penalty'] :
-                        0;
-            }
+        $rubricDetails = $this->find('all', array(
+            'conditions' => array_merge(array('evaluator' => $submitted), $conditions)
+        ));
+        $scoreRecords = Toolkit::formatRubricEvaluationResultsMatrix($rubricDetails);
+        # we don't need grades key
+        if (array_key_exists('grades', $scoreRecords)) {
+            unset($scoreRecords['grades']);
         }
 
-        foreach ($data as $demo) {
-            if (!isset($demo['penalty'])) {
-                $data[$demo['user_id']]['penalty'] = 0;
-            }
-        }
+        # get penalties
+        $penalties = $pen->getPenaltyForMembers(array_keys($scoreRecords), $event['Event'], $sub);
 
         $grades = array();
-        foreach ($data as $student) {
-            $tmp = array();
-            $tmp['id'] = 0;
-            $tmp['evaluatee'] = $student['user_id'];
-            $tmp['score'] = $student['score']/$student['numEval']*(1-$student['penalty']/100);
-            $grades[]['EvaluationRubric'] = $tmp;
+        foreach ($scoreRecords as $user_id => $record) {
+            $grades[] = array(
+                'EvaluationRubric' => array(
+                    'id' => 0,
+                    'evaluatee' => $user_id,
+                    'score' => $record['total'] * (1 - $penalties[$user_id] / 100),
+                )
+            );
         }
 
         return $grades;

@@ -142,60 +142,37 @@ class EvaluationBase extends AppModel
      * be the user id and value will be the penalty. The student without
      * penalty will be value 0.
      *
-     * @param mixed $groupMembers group members
      * @param mixed $eventId      event id
      * @param mixed $groupId      group id
+     * @param mixed $groupMembers group members
      *
      * @access public
-     * @return void
+     * @return array
      */
-    function formatPenaltyArray($groupMembers, $eventId, $groupId)
+    function formatPenaltyArray($eventId, $groupId, $groupMembers)
     {
         $this->Penalty = ClassRegistry::init('Penalty');
         $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
 
         $memberIds = array_keys($groupMembers);
-        $userPenalty = array_fill_keys($memberIds, 0);
-        $now = time();
 
         // find the event
         $event = $this->Event->findById($eventId);
-        $end = strtotime($event['Event']['release_date_end']);
 
         // not due yet. no penalty
         if ($event['Event']['due_in'] >= 0) {
-            return $userPenalty;
+            return array_fill_keys($memberIds, 0);
         }
 
-        // storing the timestamp of the due date of the event
-        $event_due = strtotime($event['Event']['due_date']);
         // assign penalty to groupMember if they submitted late or never submitted by release_date_end
-        $submissions = $this->EvaluationSubmission->find('all', array(
-            'conditions' => array('submitter_id' => $memberIds, 'EvaluationSubmission.event_id' => $eventId, 
-                'GroupEvent.group_id' => $groupId),
-        ));
+        $conditions = array(
+            'EvaluationSubmission.event_id' => $eventId,
+            'GroupEvent.group_id' => $groupId,
+            'submitter_id' => $memberIds,
+        );
+        $submissions = $this->EvaluationSubmission->find('all', array('conditions' => $conditions));
 
-        foreach ($submissions as $submission) {
-            // there is submission - may be on time or late
-            $late_diff = strtotime($submission['EvaluationSubmission']['date_submitted']) - $event_due;
-            // late
-            if (0 < $late_diff) {
-                $days_late = $late_diff/(24*60*60);
-                $penalty = $this->Penalty->getPenaltyByEventAndDaysLate($eventId, $days_late);
-                $userPenalty[$submission['EvaluationSubmission']['submitter_id']] = $penalty['Penalty']['percent_penalty'];
-            }
-        }
-
-        // no submission - if now is after release date end then - gets final deduction
-        $penalty = $this->Penalty->getPenaltyFinal($eventId);
-        if ($now >= $end) {
-            $noSubmissions = array_diff($memberIds, Set::extract($submissions, '/EvaluationSubmission/submitter_id'));
-            foreach ($noSubmissions as $userId) {
-                $userPenalty[$userId] = $penalty['Penalty']['percent_penalty'];
-            }
-        }
-
-        return $userPenalty;
+        return $this->Penalty->getPenaltyForMembers($memberIds, $event['Event'], $submissions);
     }
     
     /**
@@ -204,7 +181,7 @@ class EvaluationBase extends AppModel
      * @param mixed $evalId eval id
      *
      * @access public
-     * @return void
+     * @return array
      */
     function getEventSub($evalId) {
         return $this->find('first', array(

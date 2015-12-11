@@ -30,7 +30,7 @@ class EvaluationSubmission extends AppModel
      * @param mixed $eventId event id
      *
      * @access public
-     * @return void
+     * @return array submissions
      */
     function getEvalSubmissionsByEventId($eventId)
     {
@@ -49,7 +49,7 @@ class EvaluationSubmission extends AppModel
      * @param mixed $groupEventId
      *
      * @access public
-     * @return void
+     * @return array submissions
      */
     function getEvalSubmissionsByGroupEventId($groupEventId)
     {     

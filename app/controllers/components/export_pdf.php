@@ -160,7 +160,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         $evaluatees = Set::extract('/EvaluationMixeval/evaluatee', $evaluation);
         $dropped = array_diff(array_unique(array_merge($evaluators, $evaluatees)), $groupMembers);
         $names = $this->User->getFullNames(array_merge($evaluators, $evaluatees));
-        $penalties = $this->Mixeval->formatPenaltyArray($names, $event['Event']['id'], $grp_id);
+        $penalties = $this->Mixeval->formatPenaltyArray($event['Event']['id'], $grp_id, $names);
         
         $totalScores = array_fill_keys($evaluatees, 0);
         $evalCount = $totalScores;
@@ -337,7 +337,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         $quesAvg = array_fill_keys($quesNums, 0);
         $evalNum = $quesAvg;
         $evaluateeAvg = array_fill_keys(array_keys($grades), 0);
-        $penalties = $this->Mixeval->formatPenaltyArray($evaluateeNames, $event['Event']['id'], $grp_id);
+        $penalties = $this->Mixeval->formatPenaltyArray($event['Event']['id'], $grp_id, $evaluateeNames);
 
         foreach ($grades as $evaluateeId => $questions) {
             $suffix = in_array($evaluateeId, $dropped) ? ' *' : '';
@@ -435,7 +435,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         $quesAvg = array_fill_keys(Set::extract('/RubricsCriteria/criteria_num', $rubric_criteria_array), 0);
         $evalNum = $quesAvg;
         $evaluateeAvg = array_fill_keys(array_keys($grades), 0);
-        $penalties = $this->Rubric->formatPenaltyArray($evaluateeNames, $event['Event']['id'], $grp_id);
+        $penalties = $this->Rubric->formatPenaltyArray($event['Event']['id'], $grp_id, $evaluateeNames);
         foreach ($grades as $userId => $marks) {
             $suffix = in_array($userId, $dropped) ? ' *' : '';
             $rSTBL .= '<tr><td>'.$evaluateeNames[$userId].$suffix.'</td>';
@@ -505,7 +505,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         $names = $this->User->getFullNames(array_merge($evaluators, $evaluatees));
         $scores = Set::combine($eval, '{n}.EvaluationRubric.evaluator', '{n}.EvaluationRubricDetail', '{n}.EvaluationRubric.evaluatee');        
         $comments = Set::combine($eval, '{n}.EvaluationRubric.evaluator', '{n}.EvaluationRubric.comment', '{n}.EvaluationRubric.evaluatee');
-        $penalties = $this->Rubric->formatPenaltyArray($names, $event['Event']['id'], $grp_id);
+        $penalties = $this->Rubric->formatPenaltyArray($event['Event']['id'], $grp_id, $names);
 
         $grades = array();
         $numEval = array();
@@ -633,7 +633,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         $evaluatees = array_unique(Set::extract('/EvaluationSimple/evaluatee', $eval));
         $dropped = array_diff(array_unique(array_merge($evaluators, $evaluatees)), $groupMembers);
         $names = $this->User->getFullNames(array_merge($evaluators, $evaluatees));
-        $penalty = $this->SimpleEvaluation->formatPenaltyArray($names, $event['Event']['id'], $grp_id);    
+        $penalty = $this->SimpleEvaluation->formatPenaltyArray($event['Event']['id'], $grp_id, $names);
         $colspan = count($evaluatees);
         
         if ($colspan <= 0) {

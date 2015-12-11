@@ -16,16 +16,16 @@ class V1ControllerTest extends CakeTestCase {
     );
 
     public function startCase() {
-        echo '<h1>Starting Test Case</h1>';
+        echo "<h1>Starting Test Case</h1>\n";
         $this->User =& ClassRegistry::init('User');
         $this->RolesUser =& ClassRegistry::init('RolesUser');
         $this->Group =& ClassRegistry::init('Group');
     }
     public function endCase() {
-        echo '<h1>Ending Test Case</h1>';
+        echo "<h1>Ending Test Case</h1>\n";
     }
     public function startTest($method) {
-        echo '<h3>Starting method ' . $method . '</h3>';
+        echo '<h3>Starting method ' . $method . "</h3>\n";
         $clients = $this->_fixtures['app.oauth_client']->records;
         $tokens = $this->_fixtures['app.oauth_token']->records;
         $this->clientKey = $clients['0']['key'];
@@ -35,7 +35,7 @@ class V1ControllerTest extends CakeTestCase {
     }
     public function endTest($method) {
         echo '<h3>Ending method ' . $method . '</h3>';
-        echo '<hr />';
+        echo "<hr />\n";
     }
 
     private function _get_http_response_code($url) {
@@ -67,7 +67,7 @@ class V1ControllerTest extends CakeTestCase {
             if (is_null($reqType)) {
                 $reqType = OAUTH_HTTP_METHOD_GET;
             }
-            $oauth->fetch("$url", $content, $reqType);
+            $oauth->fetch($url, $content, $reqType, array('Content-Type' => 'application/json'));
             $ret = $oauth->getLastResponse();
 
             return $ret;

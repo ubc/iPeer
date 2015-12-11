@@ -1237,14 +1237,14 @@ class EvaluationsController extends AppController
             $fullNames = $this->User->getFullNames($memberList);
             $members = $this->User->findAllById($memberList);
             $rubric = $this->Rubric->findById($event['Event']['template_id']);
-            $scoreRecords = $this->Evaluation->formatRubricEvaluationResultsMatrix($rubricDetails);
+            $scoreRecords = Toolkit::formatRubricEvaluationResultsMatrix($rubricDetails);
 
             $this->set('rubric', $rubric);
             $this->set('inCompleteMembers', $inCompleteMembers);
             $this->set('notInGroup', $notInGroup);
             $this->set('members', $members);
             $this->set('memberList', $fullNames);
-            $this->set('penalties', $this->Rubric->formatPenaltyArray($fullNames, $eventId, $groupId));
+            $this->set('penalties', $this->Rubric->formatPenaltyArray($eventId, $groupId, $fullNames));
             $this->set('scoreRecords', $scoreRecords);
             $this->set('grpEventId', $groupEventId);
 
@@ -1326,7 +1326,7 @@ class EvaluationsController extends AppController
             $this->set('memberList', $fullNames);
             $this->set('mixevalDetails', $details['scoreRecords']);
             $this->set('evalResult', $details['evalResult']);
-            $this->set('penalty', $this->Mixeval->formatPenaltyArray($fullNames, $eventId, $groupId));
+            $this->set('penalty', $this->Mixeval->formatPenaltyArray($eventId, $groupId, $fullNames));
             $this->set('inCompleteMembers', $inCompleteMembers);
             $this->set('notInGroup', $notInGroup);
             $this->set('required', $required);

@@ -821,16 +821,13 @@ class V1Controller extends Controller {
             $res = array();
             $key = ""; // name of the table we're querying
             if ($type == 1) {
-                $res = $this->EvaluationSimple->simpleEvalScore($event_id,
-                    $fields, $conditions);
+                $res = $this->EvaluationSimple->simpleEvalScore($event_id, $fields, $conditions);
                 $key = "EvaluationSimple";
             } else if ($type == 2) {
-                $res = $this->EvaluationRubric->rubricEvalScore($event_id,
-                    $fields, $conditions);
+                $res = $this->EvaluationRubric->rubricEvalScore($event_id, $conditions);
                 $key = "EvaluationRubric";
             } else if ($type == 4) {
-                $res = $this->EvaluationMixeval->mixedEvalScore($event_id,
-                    $fields, $conditions);
+                $res = $this->EvaluationMixeval->mixedEvalScore($event_id, $fields, $conditions);
                 $key = "EvaluationMixeval";
             }
             foreach ($res as $val) {
