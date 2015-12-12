@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2015-12-14 12:48-0800\n"
+"POT-Creation-Date: 2015-12-14 13:35-0800\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -3812,31 +3812,31 @@ msgstr ""
 msgid "Evaluation Release Date"
 msgstr ""
 
-#: /Users/compass/projects/ipeer/src//events/view.ctp:62;81
+#: /Users/compass/projects/ipeer/src//events/view.ctp:62;82
 msgid "FROM:"
 msgstr ""
 
-#: /Users/compass/projects/ipeer/src//events/view.ctp:68;87
+#: /Users/compass/projects/ipeer/src//events/view.ctp:68;88
 msgid "TO:"
 msgstr ""
 
-#: /Users/compass/projects/ipeer/src//events/view.ctp:77
+#: /Users/compass/projects/ipeer/src//events/view.ctp:78
 msgid "Result Release Date"
 msgstr ""
 
-#: /Users/compass/projects/ipeer/src//events/view.ctp:96
+#: /Users/compass/projects/ipeer/src//events/view.ctp:98
 msgid "Late Penalty"
 msgstr ""
 
-#: /Users/compass/projects/ipeer/src//events/view.ctp:124
+#: /Users/compass/projects/ipeer/src//events/view.ctp:126
 msgid "Groups Assignment"
 msgstr ""
 
-#: /Users/compass/projects/ipeer/src//events/view.ctp:135
+#: /Users/compass/projects/ipeer/src//events/view.ctp:137
 msgid "Edit this Event"
 msgstr ""
 
-#: /Users/compass/projects/ipeer/src//events/view.ctp:136
+#: /Users/compass/projects/ipeer/src//events/view.ctp:138
 msgid "Back to Event Listing"
 msgstr ""
 
