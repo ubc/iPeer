@@ -1433,7 +1433,7 @@ class User extends AppModel
      *
      * @static
      * @access public
-     * @return void
+     * @return integer permission bit integer
      */
     static function getCourseFilterPermission()
     {

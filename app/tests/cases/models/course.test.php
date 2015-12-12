@@ -66,20 +66,20 @@ class CourseTestCase extends CakeTestCase {
 
     function testGetCourseByUserIdFilterPermission() {
         // test courses admin'd by admin1 (Fac of AppSci)
-        $course = $this->Course->getAllAccessibleCourses(34, 1);
+        $course = $this->Course->getAllAccessibleCourses(34, Course::FILTER_PERMISSION_FACULTY);
         $this->assertEqual($course[0]['Course']['course'], "APSC 201");
         $this->assertEqual($course[1]['Course']['course'], "CPSC 101"); // is both AppSci and Sci
         $this->assertEqual($course[2]['Course']['course'], "MECH 328");
         $this->assertEqual(sizeof($course), 3);
 
         // test courses admin'd by admin2 (Fac of Science)
-        $course = $this->Course->getAllAccessibleCourses(38, 1);
+        $course = $this->Course->getAllAccessibleCourses(38, Course::FILTER_PERMISSION_FACULTY);
         $this->assertEqual($course[0]['Course']['course'], "CPSC 101");
         $this->assertEqual($course[1]['Course']['course'], "CPSC 404");
         $this->assertEqual(sizeof($course), 2);
 
         // test courses admin'd (Fac of AppSci) or taught by admin3
-        $course = $this->Course->getAllAccessibleCourses(39, 1);
+        $course = $this->Course->getAllAccessibleCourses(39, Course::FILTER_PERMISSION_FACULTY);
         $this->assertEqual($course[0]['Course']['course'], "APSC 201"); //all sorted alphabetically
         $this->assertEqual($course[1]['Course']['course'], "CPSC 101");
         $this->assertEqual($course[2]['Course']['course'], "CPSC 404");
@@ -87,23 +87,23 @@ class CourseTestCase extends CakeTestCase {
         $this->assertEqual(sizeof($course), 4);
 
         // test to get first course admin'd (Fac of AppSci) or taught by admin3
-        $course = $this->Course->getAllAccessibleCourses(34, 1, 'first');
+        $course = $this->Course->getAllAccessibleCourses(34, Course::FILTER_PERMISSION_FACULTY, 'first');
         $this->assertEqual($course['Course']['course'], "APSC 201"); //all sorted alphabetically
 
         // test courses admin'd (Fac of AppSci) or taught by admin4 - both admin and teach APSC 201
-        $course = $this->Course->getAllAccessibleCourses(40, 1);
+        $course = $this->Course->getAllAccessibleCourses(40, Course::FILTER_PERMISSION_FACULTY);
         $this->assertEqual($course[0]['Course']['course'], "APSC 201"); //admin'd sorted alphabetically
         $this->assertEqual($course[1]['Course']['course'], "CPSC 101");
         $this->assertEqual($course[2]['Course']['course'], "MECH 328");
         $this->assertEqual(sizeof($course), 3);
 
         // test courses taught by instructor3
-        $course = $this->Course->getAllAccessibleCourses(4, 2);
+        $course = $this->Course->getAllAccessibleCourses(4, Course::FILTER_PERMISSION_OWNER);
         $this->assertEqual($course[0]['Course']['course'], "APSC 201");
         $this->assertEqual($course[1]['Course']['course'], "CPSC 101");
         $this->assertEqual(sizeof($course), 2);
 
-        $course = $this->Course->getAllAccessibleCourses(4, 2, 'first');
+        $course = $this->Course->getAllAccessibleCourses(4, Course::FILTER_PERMISSION_OWNER, 'first');
         $this->assertEqual($course['Course']['course'], "APSC 201");
     }
 

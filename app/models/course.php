@@ -286,10 +286,10 @@ class Course extends AppModel
     /**
      * Get course data by instructor id
      *
-     * @param mixed $instructorId instructor id
-     * @param bool  $type         type
-     * @param int   $contain      contained models
-     * @param array $conditions   conditions for find
+     * @param mixed  $instructorId instructor id
+     * @param string $type         type
+     * @param array  $contain      contained models
+     * @param array  $conditions   conditions for find
      *
      * @return course data
      */
@@ -300,7 +300,7 @@ class Course extends AppModel
             $fields = array('Course.full_name');
         }*/
 
-        // we need two queries to find the courses. becuase if we specifiy the instructor id condition
+        // we need two queries to find the courses. because if we specify the instructor id condition
         // we can only get one instructor with the id we specified. If the course has more than one
         // instructor, we will fail to retrieve them.
 
@@ -457,7 +457,7 @@ class Course extends AppModel
      * @access public
      * @return void
      */
-    function getByDepartmentIds($departmentIds, $findType = "all", $options = array())
+    function getByDepartmentIds($departmentIds, $findType = 'all', $options = array())
     {
         $options['group'] = 'Course.id'; // prevent dups when a course is in
                                         // multiple faculties
@@ -586,7 +586,7 @@ class Course extends AppModel
      * @param array  $options    find options
      *
      * @access protected
-     * @return void
+     * @return array list of courses
      */
     protected function getCoursesByUserIdFilterPermission($userId, $permission, $type = 'all', $options = array())
     {
@@ -601,30 +601,32 @@ class Course extends AppModel
             $adminCourses = $this->getByDepartmentIds($departmentIds, $type, $options);
             $options = array_merge(array('contain' => array(), 'conditions' => array()), $options);
             $instCourses = $this->getCourseByInstructor($userId, $type, $options['contain'], $options['conditions']);
+            $courses = array();
 
-            if ('first' == $type) {
-                $courses = !empty($adminCourses) ? $adminCourses : $instCourses;
-                break;
+            switch($type) {
+                case 'first':
+                    $courses = !empty($adminCourses) ? $adminCourses : $instCourses;
+                    break;
+                case 'list':
+                    $courses = $adminCourses + $instCourses;
+                    asort($courses);
+                    break;
+                case 'all':
+                    $courses = $adminCourses;
+                    $instCourseIds = Set::extract('/Course/id', $instCourses);
+                    if (!empty($instCourseIds)) {
+                        // merge two sets of courses
+                        $adminCourseIds = Set::extract('/Course/id', $adminCourses);
+                        foreach ($instCourses as $course) {
+                            if (!in_array($course['Course']['id'], $adminCourseIds)) {
+                                $courses[] = $course;
+                            }
+                        }
+                    }
+
+                    // sort the result
+                    $courses = Set::sort($courses, '{n}.Course.course', 'asc');
             }
-
-            // for "all" type
-            $courses = $adminCourses;
-            $instCourseIds = Set::extract('/Course/id', $instCourses);
-            if (empty($instCourseIds)) {
-                // no instructing course
-                break;
-            }
-
-            // merge two sets of courses
-            $adminCourseIds = Set::extract('/Course/id', $adminCourses);
-            foreach ($instCourses as $course) {
-                if (!in_array($course['Course']['id'], $adminCourseIds)) {
-                    $courses[] = $course;
-                }
-            }
-
-            // sort the result
-            $courses = Set::sort($courses, '{n}.Course.course', 'asc');
             break;
         case Course::FILTER_PERMISSION_OWNER:
             $options = array_merge(array('contain' => array(), 'conditions' => array()), $options);
@@ -650,7 +652,7 @@ class Course extends AppModel
      * @param array  $options    find options
      *
      * @access public
-     * @return void
+     * @return array list of courses
      */
     function getAccessibleCourses($userId, $permission, $type = 'all', $options = array())
     {
@@ -669,7 +671,7 @@ class Course extends AppModel
      * @param array  $options    find options
      *
      * @access public
-     * @return void
+     * @return array list of courses
      */
     function getAllAccessibleCourses($userId, $permission, $type = 'all', $options = array())
     {
@@ -686,7 +688,7 @@ class Course extends AppModel
      * @param array $contain    contain relationship
      *
      * @access public
-     * @return void
+     * @return array list of courses
      */
     function getAccessibleCourseById($courseId, $userId,  $permission, $contain = array())
     {
@@ -698,7 +700,7 @@ class Course extends AppModel
      *
      * @param mixed $course_id
      *
-     * @return list of user ids
+     * @return array list of user ids
      */
     function getUserListbyCourse($course_id) {
         $users = $this->find('first', array(
