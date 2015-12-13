@@ -73,6 +73,7 @@
             </table>
         </td>
     </tr>
+    <?php if($event['EventTemplateType']['type_name'] != 'SURVEY'): ?>
     <tr>
         <th><?php __('Result Release Date')?></th>
         <td id="result_release_date_begin">
@@ -92,6 +93,7 @@
             </table>
         </td>
     </tr>
+    <?php endif; ?>
     <tr>
         <th><?php __('Late Penalty')?></th>
         <td>
