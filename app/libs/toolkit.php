@@ -408,4 +408,90 @@ class Toolkit
 
         return $summary + $group;
     }
+
+    function getUpcomingTableArray($html, $events) {
+        $ret = array();
+        foreach ($events as $event) {
+            $tmp = array();
+            if (isset($event['Group']['group_name'])) {
+                $tmp[] = $html->link($event['Event']['title'],
+                    '/evaluations/makeEvaluation/'.$event['Event']['id'].'/'.
+                    $event['Group']['id']);
+                $tmp[] = $event['Group']['group_name'];
+            }
+            else {
+                $tmp[] = $html->link($event['Event']['title'],
+                    '/evaluations/makeEvaluation/'.$event['Event']['id']);
+            }
+            $tmp[] = $event['Course']['course'];
+            $tmp[] = Toolkit::formatDate($event['Event']['due_date']);
+
+            $due = $event['Event']['due_in'];
+            if ($event['late']) {
+                $penalty = isset($event['percent_penalty']) ?
+                    ', ' . $event['percent_penalty'] . '&#37; penalty' : '';
+                $tmp[] = "<span class='red'>$due</span>$penalty";
+            }
+            else {
+                $tmp[] = $due;
+            }
+
+            $ret[] = $tmp;
+        }
+        return $ret;
+    }
+
+    function getNonUpcomingTableArray($html, $events) {
+        $ret = array();
+        foreach ($events as $event) {
+            $tmp = array();
+            if (isset($event['Event']['is_result_released']) &&
+                $event['Event']['is_result_released']
+            ) { // we're in the result release period, so link to the results
+                $tmp[] = $html->link($event['Event']['title'],
+                    '/evaluations/studentViewEvaluationResult/' .
+                    $event['Event']['id'] . '/' . $event['Group']['id']);
+                $tmp[] = $event['Event']['result_release_date_end'];
+            }
+            else if ($event['Event']['event_template_type_id'] == 3) {
+                // this is a survey, no release period, so link to the results
+                $tmp[] = $html->link($event['Event']['title'],
+                    '/evaluations/studentViewEvaluationResult/' .
+                    $event['Event']['id']);
+            }
+            else {
+                // we're not in the result release period, notify user when they can
+                // view the results
+                if ($event['Event']['is_released']) {
+                    // can let students edit their submissions
+                    if (isset($event['Group']['group_name'])) {
+                        $tmp[] = $html->link($event['Event']['title'],
+                            '/evaluations/makeEvaluation/'.$event['Event']['id'].
+                            '/'. $event['Group']['id']);
+                    }
+                    else {
+                        $tmp[] = $html->link($event['Event']['title'],
+                            '/evaluations/makeEvaluation/'.$event['Event']['id']);
+                    }
+                }
+                else {
+                    $tmp[] = $event['Event']['title'];
+                }
+                $tmp[] = "<span class='orangered'>" .
+                    $event['Event']['result_release_date_begin'] . "</span>";
+            }
+            if (isset($event['Group']['group_name'])) {
+                // NOTE: surveys don't have group names
+                $tmp[] = $event['Group']['group_name'];
+            }
+            $tmp[] = $event['Course']['course'];
+            $tmp[] = Toolkit::formatDate($event['Event']['due_date']);
+            if (!empty($event['EvaluationSubmission'])) {
+                // expired events have no submissions
+                $tmp[] = $event['EvaluationSubmission']['date_submitted'];
+            }
+            $ret[] = $tmp;
+        }
+        return $ret;
+    }
 }

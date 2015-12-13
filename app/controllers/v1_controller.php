@@ -765,24 +765,14 @@ class V1Controller extends Controller {
     {
         $course_id = $this->params['course_id'];
         $results = array();
-        $fields = array('title', 'course_id', 'event_template_type_id', 'due_date');
+        $fields = array('id', 'title', 'course_id', 'event_template_type_id', 'due_date');
 
         if ($this->RequestHandler->isGet()) {
             if (!isset($this->params['event_id']) || empty($this->params['event_id'])) {
-                $list = $this->Event->getEventFieldsByCourseId($course_id, $fields);
-
-                if (!empty($list)) {
-                    foreach ($list as $data) {
-                        $results[] = $data['Event'];
-                    }
-                }
+                $results = $this->Event->getEventFieldsByCourseId($course_id, $fields);
                 $statusCode = 'HTTP/1.1 200 OK';
             } else {
-                $list = $this->Event->getEventFieldsByEventId($this->params['event_id'], $fields);
-
-                if (!empty($list)) {
-                    $results = $list['Event'];
-                }
+                $results = $this->Event->getEventFieldsByEventId($this->params['event_id'], $fields);
                 $statusCode = 'HTTP/1.1 200 OK';
             }
             $this->set('statusCode', $statusCode);

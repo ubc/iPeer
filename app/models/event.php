@@ -149,6 +149,8 @@ class Event extends AppModel
         ),
     );
 
+    private $timezone = null;
+
     /**
      * __construct
      *
@@ -178,6 +180,7 @@ class Event extends AppModel
                 ini_get('date.timezone') : 'UTC';
         }
         date_default_timezone_set($timezone);
+        $this->timezone = $timezone;
         parent::__construct($id, $table, $ds);
         $this->virtualFields['response_count'] = sprintf('SELECT count(*) as count FROM evaluation_submissions as sub WHERE sub.event_id = %s.id', $this->alias);
         $this->virtualFields['to_review_count'] = sprintf('SELECT count(*) as count FROM group_events as ge WHERE ge.event_id = %s.id AND marked LIKE "to review"', $this->alias);
@@ -190,14 +193,14 @@ class Event extends AppModel
          * SQL does not recognize daylight savings, therefore when not in a daylight savings period, the timezone is 1hr (3600s) behind the actual time.
          * NOTE: UNIX_TIMESTAMP() appears to work, but online sources say otherwise.
          */
-        $dueIn = "";
-        if(date('I') == 1){
-            $dueIn = date('Y-m-d H:i:s', time());
-        }
-        else{
-            $dueIn = date('Y-m-d H:i:s', time() + 3600);
-        }
-        $this->virtualFields['due_in'] = sprintf('TIMESTAMPDIFF(SECOND,"%s",due_date)', $dueIn);
+//        $dueIn = "";
+//        if(date('I') == 1){
+//            $dueIn = date('Y-m-d H:i:s', time());
+//        }
+//        else{
+//            $dueIn = date('Y-m-d H:i:s', time() + 3600);
+//        }
+//        $this->virtualFields['due_in'] = sprintf('TIMESTAMPDIFF(SECOND,"%s",due_date)', $dueIn);
         //$this->virtualFields['due_in'] = sprintf('UNIX_TIMESTAMP(due_date) - UNIX_TIMESTAMP("%s")', date('Y-m-d H:i:s'));
         //$this->virtualFields['due_in'] = sprintf('TIMESTAMPDIFF(SECOND,"%s",due_date)', date('Y-m-d H:i:s'));
     }
@@ -209,11 +212,11 @@ class Event extends AppModel
      * @param mixed $primary
      *
      * @access public
-     * @return void
+     * @return mixed
      */
     function afterFind(array $results, $primary)
     {
-        $currentDate = strtotime('NOW');
+        $currentDate = time();
         foreach ($results as $key => $event) {
             if (isset($event['Event']['release_date_begin'])) {
                 $results[$key]['Event']['is_released']  =
@@ -228,6 +231,10 @@ class Event extends AppModel
             if (isset($event['Event']['release_date_end'])) {
                 $results[$key]['Event']['is_ended']  =
                     ($currentDate > strtotime($event['Event']['release_date_end']));
+            }
+            if (isset($event['Event']['due_date'])) {
+                $due = new DateTime($event['Event']['due_date'], new DateTimeZone($this->timezone));
+                $results[$key]['Event']['due_in']  = $due->getTimestamp() - $currentDate;
             }
         }
 
@@ -645,9 +652,12 @@ class Event extends AppModel
      */
     function getEventFieldsByCourseId($courseId, $fields)
     {
-        return $this->find('all', array(
+        $events = $this->find('all', array(
             'conditions' => array('course_id' => $courseId),
-            'fields' => $fields));
+            'fields' => $fields,
+            'contain' => array()));
+
+        return $this->filterFields($events, $fields);
     }
 
     /**
@@ -660,11 +670,38 @@ class Event extends AppModel
      */
     function getEventFieldsByEventId($eventId, $fields)
     {
-        return $this->find('first', array(
+        $events = $this->find('first', array(
             'conditions' => array('Event.id' => $eventId),
-            'fields' => $fields));
+            'fields' => $fields,
+            'contain' => array()));
+
+        $result = $this->filterFields($events, $fields);
+        if (!empty($result)) {
+            $result = $result[0];
+        }
+        return $result;
     }
 
+    function filterFields($events, $fields) {
+        $result = array();
+        if (!$events) {
+            return array();
+        }
+
+        if (array_key_exists('Event', $events)) {
+            $events = array($events);
+        }
+        foreach ($events as $e) {
+            foreach ($e['Event'] as $key => $value) {
+                if (!in_array($key, $fields)) {
+                    unset($e['Event'][$key]);
+                }
+            }
+            $result[] = $e['Event'];
+        }
+
+        return $result;
+    }
     /**
      * Get evaluations and surveys assigned to the given user. Also gets the
      * evaluation submission entries made by this specific user.
@@ -715,7 +752,7 @@ class Event extends AppModel
         $evaluationEvents = $this->find('all', array(
             'fields' => $evaluationFields,
             'conditions' => array('GroupEvent.id' => $groupEventIds),
-            'order' => array('due_in ASC'),
+            'order' => array('due_date ASC'),
             'contain' => array(
                 'Course',
                 'Group',
@@ -764,7 +801,7 @@ class Event extends AppModel
         $surveyEvents = $this->find('all', array(
             'fields' => $surveyFields,
             'conditions' => array('event_template_type_id' => '3', 'course_id' => $courseIds),
-            'order' => array('due_in ASC'),
+            'order' => array('due_date ASC'),
             'contain' => array(
                 'Course',
                 'EvaluationSubmission' => array(
@@ -795,14 +832,19 @@ class Event extends AppModel
      * @param mixed $fields  the fields to retreive
      *
      * @access public
-     * @return void
+     * @return array
      */
-    public function getPendingEventsByUserId($userId, $options, $fields = null)
+    public function getPendingEventsByUserId($userId, $options, $fields = array())
     {
         $pendingEvents = array();
         $events = $this->getEventsByUserId($userId, $fields);
         $events = array_merge($events['Evaluations'], $events['Surveys']);
         foreach ($events as $event) {
+            # temporary hack for removing due_in field as it is not a virtualfield anymore
+            if (!array_key_exists('due_in', $fields)) {
+                unset($event['Event']['due_in']);
+            }
+
             if ($options['submission'] && $event['Event']['is_released'] && empty($event['EvaluationSubmission'])) {
                 // filter for released evaluations that are available for submission
                 $pendingEvents[] = $event['Event'];

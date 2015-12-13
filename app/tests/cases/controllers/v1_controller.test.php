@@ -735,11 +735,11 @@ class V1ControllerTest extends CakeTestCase {
 
         foreach ($events as $data) {
             $tmp = array();
+            $tmp['id'] = $data['id'];
             $tmp['title'] = $data['title'];
             $tmp['course_id'] = $data['course_id'];
             $tmp['event_template_type_id'] = $data['event_template_type_id'];
             $tmp['due_date'] = $data['due_date'];
-            $tmp['id'] = $data['id'];
             $expectedEvents[] = $tmp;
         }
 
@@ -750,7 +750,8 @@ class V1ControllerTest extends CakeTestCase {
 
         // test get specific event from a course
         $actualEvent = $this->_oauthReq("$url/1/events/3");
-        $expectedEvent = array("title" => "Project Evaluation", "course_id" => "1", "event_template_type_id" => "4", "due_date" => date('Y', strtotime("+1 year"))."-07-02 09:00:28", "id" => "3");
+        $expectedEvent = array("id" => "3", "title" => "Project Evaluation", "course_id" => "1",
+            "event_template_type_id" => "4", "due_date" => date('Y', strtotime("+1 year"))."-07-02 09:00:28");
         $this->assertEqual($actualEvent, json_encode($expectedEvent));
         $this->assertEqual(json_decode($actualEvent, true), $expectedEvent);
     }
@@ -874,7 +875,6 @@ class V1ControllerTest extends CakeTestCase {
                 'course_id' => '1',
                 'event_template_type_id' => '1',
                 'due_date' => date('Y', strtotime("+1 year")).'-07-02 16:34:43',
-                'id' => '1',
                 'release_date_begin' => "2011-06-16 16:34:49",
                 'release_date_end' => "2023-07-22 16:34:53",
                 'result_release_date_begin' => '2024-07-04 16:34:43',
@@ -882,13 +882,13 @@ class V1ControllerTest extends CakeTestCase {
                 'is_released' => true,
                 'is_result_released' => false,
                 'is_ended' => false,
+                'id' => '1',
             ),
             array(
                 'title' => 'Term Report Evaluation',
                 'course_id' => '1',
                 'event_template_type_id' => '2',
                 'due_date' => date('Y', strtotime("+1 year")).'-06-08 08:59:29',
-                'id' => '2',
                 'release_date_begin' => "2011-06-06 08:59:35",
                 'release_date_end' => "2023-07-02 08:59:41",
                 'result_release_date_begin' => '2024-06-09 08:59:29',
@@ -896,13 +896,13 @@ class V1ControllerTest extends CakeTestCase {
                 'is_released' => true,
                 'is_result_released' => false,
                 'is_ended' => false,
+                'id' => '2',
             ),
             array(
                 'title' => 'Project Evaluation',
                 'course_id' => '1',
                 'event_template_type_id' => '4',
                 'due_date' => date('Y', strtotime("+1 year")).'-07-02 09:00:28',
-                'id' => '3',
                 'release_date_begin' => "2011-06-07 09:00:35",
                 'release_date_end' => "2023-07-09 09:00:39",
                 'result_release_date_begin' => '2023-07-04 09:00:28',
@@ -910,32 +910,33 @@ class V1ControllerTest extends CakeTestCase {
                 'is_released' => true,
                 'is_result_released' => false,
                 'is_ended' => false,
+                'id' => '3',
             ),
             array(
                 'title' => 'Team Creation Survey',
                 'course_id' => '1',
                 'event_template_type_id' => '3',
                 'due_date' => date('Y', strtotime("+1 year")).'-07-31 11:20:00',
-                'id' => '4',
                 'release_date_begin' => "2012-07-01 11:20:00",
                 'release_date_end' => date('Y', strtotime("+1 year"))."-12-31 11:20:00",
                 'result_release_date_begin' => '',
                 'result_release_date_end' => '',
                 'is_released' => true,
                 'is_ended' => false,
+                'id' => '4',
             ),
             array(
                 'title' => 'Survey, all Q types',
                 'course_id' => '1',
                 'event_template_type_id' => '3',
                 'due_date' => date('Y', strtotime("+1 year")).'-07-31 11:20:00',
-                'id' => '5',
                 'release_date_begin' => "2012-07-01 11:20:00",
                 'release_date_end' => date('Y', strtotime("+1 year"))."-12-31 11:20:00",
                 'result_release_date_begin' => '',
                 'result_release_date_end' => '',
                 'is_released' => true,
                 'is_ended' => false,
+                'id' => '5',
             ),
             array(
                 'title' => 'simple evaluation 2',
@@ -946,10 +947,10 @@ class V1ControllerTest extends CakeTestCase {
                 'release_date_end' => '2022-11-29 00:00:00',
                 'result_release_date_begin' => '2022-11-30 00:00:00',
                 'result_release_date_end' => '2022-12-12 00:00:00',
-                'id' => '6',
                 'is_released' => true,
                 'is_result_released' => false,
                 'is_ended' => false,
+                'id' => '6',
             ),
             array(
                 'title' => 'simple evaluation 3',
@@ -960,10 +961,10 @@ class V1ControllerTest extends CakeTestCase {
                 'release_date_end' => '2012-11-29 00:00:00',
                 'result_release_date_begin' => '2022-11-30 00:00:00',
                 'result_release_date_end' => '2022-12-12 00:00:00',
-                'id' => '7',
                 'is_released' => false,
                 'is_result_released' => false,
                 'is_ended' => true,
+                'id' => '7',
             ),
             array(
                 'title' => 'simple evaluation 4',
@@ -974,10 +975,10 @@ class V1ControllerTest extends CakeTestCase {
                 'release_date_end' => '2012-11-29 00:00:00',
                 'result_release_date_begin' => '2012-11-30 00:00:00',
                 'result_release_date_end' => '2022-12-12 00:00:00',
-                'id' => '8',
                 'is_released' => false,
                 'is_result_released' => true,
                 'is_ended' => true,
+                'id' => '8',
             ),
             array(
                 'title' => 'simple evaluation 5',
@@ -988,10 +989,10 @@ class V1ControllerTest extends CakeTestCase {
                 'release_date_end' => '2012-11-29 00:00:00',
                 'result_release_date_begin' => '2012-11-30 00:00:00',
                 'result_release_date_end' => '2022-12-12 00:00:00',
-                'id' => '9',
                 'is_released' => false,
                 'is_result_released' => true,
                 'is_ended' => true,
+                'id' => '9',
             ),
             array(
                 'title' => 'simple evaluation 6',
@@ -1002,10 +1003,10 @@ class V1ControllerTest extends CakeTestCase {
                 'release_date_end' => date('Y', strtotime("+2 year")).'-07-31 11:20:00',
                 'result_release_date_begin' => date('Y', strtotime("+2 year")).'-07-31 11:20:00',
                 'result_release_date_end' => date('Y', strtotime("+3 year")).'-07-31 11:20:00',
-                'id' => '10',
                 'is_released' => false,
                 'is_result_released' => false,
                 'is_ended' => false,
+                'id' => '10',
             ),
         );
         
@@ -1015,7 +1016,6 @@ class V1ControllerTest extends CakeTestCase {
                 'course_id' => '1',
                 'event_template_type_id' => '1',
                 'due_date' => date('Y', strtotime("+1 year")).'-07-02 16:34:43',
-                'id' => '1',
                 'release_date_begin' => "2011-06-16 16:34:49",
                 'release_date_end' => "2023-07-22 16:34:53",
                 'result_release_date_begin' => '2024-07-04 16:34:43',
@@ -1023,13 +1023,13 @@ class V1ControllerTest extends CakeTestCase {
                 'is_released' => true,
                 'is_result_released' => false,
                 'is_ended' => false,
+                'id' => '1',
             ),
             array(
                 'title' => 'Term Report Evaluation',
                 'course_id' => '1',
                 'event_template_type_id' => '2',
                 'due_date' => date('Y', strtotime("+1 year")).'-06-08 08:59:29',
-                'id' => '2',
                 'release_date_begin' => "2011-06-06 08:59:35",
                 'release_date_end' => "2023-07-02 08:59:41",
                 'result_release_date_begin' => '2024-06-09 08:59:29',
@@ -1037,13 +1037,13 @@ class V1ControllerTest extends CakeTestCase {
                 'is_released' => true,
                 'is_result_released' => false,
                 'is_ended' => false,
+                'id' => '2',
             ),
             array(
                 'title' => 'Project Evaluation',
                 'course_id' => '1',
                 'event_template_type_id' => '4',
                 'due_date' => date('Y', strtotime("+1 year")).'-07-02 09:00:28',
-                'id' => '3',
                 'release_date_begin' => "2011-06-07 09:00:35",
                 'release_date_end' => "2023-07-09 09:00:39",
                 'result_release_date_begin' => '2023-07-04 09:00:28',
@@ -1051,32 +1051,33 @@ class V1ControllerTest extends CakeTestCase {
                 'is_released' => true,
                 'is_result_released' => false,
                 'is_ended' => false,
+                'id' => '3',
             ),
             array(
                 'title' => 'Team Creation Survey',
                 'course_id' => '1',
                 'event_template_type_id' => '3',
                 'due_date' => date('Y', strtotime("+1 year")).'-07-31 11:20:00',
-                'id' => '4',
                 'release_date_begin' => "2012-07-01 11:20:00",
                 'release_date_end' => date('Y', strtotime("+1 year"))."-12-31 11:20:00",
                 'result_release_date_begin' => '',
                 'result_release_date_end' => '',
                 'is_released' => true,
                 'is_ended' => false,
+                'id' => '4',
             ),
             array(
                 'title' => 'Survey, all Q types',
                 'course_id' => '1',
                 'event_template_type_id' => '3',
                 'due_date' => date('Y', strtotime("+1 year")).'-07-31 11:20:00',
-                'id' => '5',
                 'release_date_begin' => "2012-07-01 11:20:00",
                 'release_date_end' => date('Y', strtotime("+1 year"))."-12-31 11:20:00",
                 'result_release_date_begin' => '',
                 'result_release_date_end' => '',
                 'is_released' => true,
                 'is_ended' => false,
+                'id' => '5',
             )
         );
         
@@ -1090,10 +1091,10 @@ class V1ControllerTest extends CakeTestCase {
                 'release_date_end' => '2012-11-29 00:00:00',
                 'result_release_date_begin' => '2012-11-30 00:00:00',
                 'result_release_date_end' => '2022-12-12 00:00:00',
-                'id' => '8',
                 'is_released' => false,
                 'is_result_released' => true,
                 'is_ended' => true,
+                'id' => '8',
             ),
             array(
                 'title' => 'simple evaluation 5',
@@ -1104,10 +1105,10 @@ class V1ControllerTest extends CakeTestCase {
                 'release_date_end' => '2012-11-29 00:00:00',
                 'result_release_date_begin' => '2012-11-30 00:00:00',
                 'result_release_date_end' => '2022-12-12 00:00:00',
-                'id' => '9',
                 'is_released' => false,
                 'is_result_released' => true,
                 'is_ended' => true,
+                'id' => '9',
             )
         );
         
@@ -1117,7 +1118,6 @@ class V1ControllerTest extends CakeTestCase {
                 'course_id' => '1',
                 'event_template_type_id' => '1',
                 'due_date' => date('Y', strtotime("+1 year")).'-07-02 16:34:43',
-                'id' => '1',
                 'release_date_begin' => "2011-06-16 16:34:49",
                 'release_date_end' => "2023-07-22 16:34:53",
                 'result_release_date_begin' => '2024-07-04 16:34:43',
@@ -1125,13 +1125,13 @@ class V1ControllerTest extends CakeTestCase {
                 'is_released' => true,
                 'is_result_released' => false,
                 'is_ended' => false,
+                'id' => '1',
             ),
             array(
                 'title' => 'Term Report Evaluation',
                 'course_id' => '1',
                 'event_template_type_id' => '2',
                 'due_date' => date('Y', strtotime("+1 year")).'-06-08 08:59:29',
-                'id' => '2',
                 'release_date_begin' => "2011-06-06 08:59:35",
                 'release_date_end' => "2023-07-02 08:59:41",
                 'result_release_date_begin' => '2024-06-09 08:59:29',
@@ -1139,13 +1139,13 @@ class V1ControllerTest extends CakeTestCase {
                 'is_released' => true,
                 'is_result_released' => false,
                 'is_ended' => false,
+                'id' => '2',
             ),
             array(
                 'title' => 'Project Evaluation',
                 'course_id' => '1',
                 'event_template_type_id' => '4',
                 'due_date' => date('Y', strtotime("+1 year")).'-07-02 09:00:28',
-                'id' => '3',
                 'release_date_begin' => "2011-06-07 09:00:35",
                 'release_date_end' => "2023-07-09 09:00:39",
                 'result_release_date_begin' => '2023-07-04 09:00:28',
@@ -1153,32 +1153,33 @@ class V1ControllerTest extends CakeTestCase {
                 'is_released' => true,
                 'is_result_released' => false,
                 'is_ended' => false,
+                'id' => '3',
             ),
             array(
                 'title' => 'Team Creation Survey',
                 'course_id' => '1',
                 'event_template_type_id' => '3',
                 'due_date' => date('Y', strtotime("+1 year")).'-07-31 11:20:00',
-                'id' => '4',
                 'release_date_begin' => "2012-07-01 11:20:00",
                 'release_date_end' => date('Y', strtotime("+1 year"))."-12-31 11:20:00",
                 'result_release_date_begin' => '',
                 'result_release_date_end' => '',
                 'is_released' => true,
                 'is_ended' => false,
+                'id' => '4',
             ),
             array(
                 'title' => 'Survey, all Q types',
                 'course_id' => '1',
                 'event_template_type_id' => '3',
                 'due_date' => date('Y', strtotime("+1 year")).'-07-31 11:20:00',
-                'id' => '5',
                 'release_date_begin' => "2012-07-01 11:20:00",
                 'release_date_end' => date('Y', strtotime("+1 year"))."-12-31 11:20:00",
                 'result_release_date_begin' => '',
                 'result_release_date_end' => '',
                 'is_released' => true,
                 'is_ended' => false,
+                'id' => '5',
             ),
             array(
                 'title' => 'simple evaluation 4',
@@ -1189,10 +1190,10 @@ class V1ControllerTest extends CakeTestCase {
                 'release_date_end' => '2012-11-29 00:00:00',
                 'result_release_date_begin' => '2012-11-30 00:00:00',
                 'result_release_date_end' => '2022-12-12 00:00:00',
-                'id' => '8',
                 'is_released' => false,
                 'is_result_released' => true,
                 'is_ended' => true,
+                'id' => '8',
             ),
             array(
                 'title' => 'simple evaluation 5',
@@ -1203,10 +1204,10 @@ class V1ControllerTest extends CakeTestCase {
                 'release_date_end' => '2012-11-29 00:00:00',
                 'result_release_date_begin' => '2012-11-30 00:00:00',
                 'result_release_date_end' => '2022-12-12 00:00:00',
-                'id' => '9',
                 'is_released' => false,
                 'is_result_released' => true,
                 'is_ended' => true,
+                'id' => '9',
             )
         );
         
@@ -1214,61 +1215,61 @@ class V1ControllerTest extends CakeTestCase {
         $url = $this->_getURL('/v1/users/redshirt0001/events/sub/0/results/0');
         $actualEvents = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($actualEvents, true), '{n}.id', 'asc');
-        $this->assertequal($expectedEvents, $events);
+        $this->assertEqual($expectedEvents, $events);
 
         // get ALL events course id 1 for redshirt0001
         $url = $this->_getURL('/v1/courses/1/users/redshirt0001/events/sub/0/results/0');
         $courseUserEvents = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($courseUserEvents, true), '{n}.id', 'asc');
-        $this->assertequal($expectedEvents, $events);
+        $this->assertEqual($expectedEvents, $events);
         
         // get events for redshirt0001 available for submissions
         $url = $this->_getURL('/v1/users/redshirt0001/events/sub/1/results/0');
         $eventsSubmittable = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($eventsSubmittable, true), '{n}.id', 'asc');
-        $this->assertequal($expectedSubmittableEvents, $events);
+        $this->assertEqual($expectedSubmittableEvents, $events);
         
         // get events for redshirt0001 that have results released
         $url = $this->_getURL('/v1/users/redshirt0001/events/sub/0/results/1');
         $eventsResult = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($eventsResult, true), '{n}.id', 'asc');
-        $this->assertequal($expectedResultReleasedEvents, $events);
+        $this->assertEqual($expectedResultReleasedEvents, $events);
         
         // get events for redshirt0001 available for submissions OR have results released
         $url = $this->_getURL('/v1/users/redshirt0001/events/sub/1/results/1');
         $filteredEvents = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($filteredEvents, true), '{n}.id', 'asc');
-        $this->assertequal($expectedFilteredEvents, $events);
+        $this->assertEqual($expectedFilteredEvents, $events);
 
         // get events in course id 1 for redshirt0001 available for submissions
         $url = $this->_getURL('/v1/courses/1/users/redshirt0001/events/sub/1/results/0');
         $eventsSubmittable = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($eventsSubmittable, true), '{n}.id', 'asc');
-        $this->assertequal($expectedSubmittableEvents, $events);
+        $this->assertEqual($expectedSubmittableEvents, $events);
         
         // get events in course id 1 for redshirt0001 that have results released
         $url = $this->_getURL('/v1/courses/1/users/redshirt0001/events/sub/0/results/1');
         $eventsResult = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($eventsResult, true), '{n}.id', 'asc');
-        $this->assertequal($expectedResultReleasedEvents, $events);
+        $this->assertEqual($expectedResultReleasedEvents, $events);
         
         // get events in course id 1 for redshirt0001 available for submissions OR have results released
         $url = $this->_getURL('/v1/courses/1/users/redshirt0001/events/sub/1/results/1');
         $filteredEvents = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($filteredEvents, true), '{n}.id', 'asc');
-        $this->assertequal($expectedFilteredEvents, $events);
+        $this->assertEqual($expectedFilteredEvents, $events);
         
         // get ALL events for redshirt0001 - no filters
         $url = $this->_getURL('/v1/users/redshirt0001/events');
         $events = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($events, true), '{n}.id', 'asc');
-        $this->assertequal($expectedEvents, $events);
+        $this->assertEqual($expectedEvents, $events);
         
         // get ALL events in course id 1 for redshirt0001 - no filters
         $url = $this->_getURL('/v1/courses/1/users/redshirt0001/events');
         $events = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($events, true), '{n}.id', 'asc');
-        $this->assertequal($expectedEvents, $events);           
+        $this->assertEqual($expectedEvents, $events);
     }
 
 
