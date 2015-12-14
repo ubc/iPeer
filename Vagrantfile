@@ -10,9 +10,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # please see the online documentation at vagrantup.com.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "ipeerbox"
-
-  config.vm.box_url = "puppetlabs/centos-6.6-64-puppet"
+  config.vm.box = "puppetlabs/centos-6.6-64-puppet"
 
   config.vm.define "ipeerdev" do |t|
   end

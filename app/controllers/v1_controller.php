@@ -944,7 +944,7 @@ class V1Controller extends Controller {
         if ($this->RequestHandler->isGet()) {
             $user = $this->User->find('first', array('conditions' => array('User.username' => $username)));
             $user_id = $user['User']['id'];
-            
+
             $options = array();
             $options['submission'] = (!isset($this->params['sub']) || null == $this->params['sub']) ?
                 0 : $this->params['sub'];
@@ -1165,7 +1165,7 @@ class V1Controller extends Controller {
      * @param mixed $body
      *
      * @access protected
-     * @return void
+     * @return string request info
      */
     protected function getRequestInfo($request, $body)
     {

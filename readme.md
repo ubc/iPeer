@@ -71,6 +71,18 @@ Runing the tests:
 
 It is better not to touch the mouse or keyboard during the tests.
 
+iPeer 3.1.8
+---------------------------
+* Fix #494 the incorrect timezone adjustment
+* Remove result release date from survey event view
+* Extract only model,view and controller for i18n, fix #508
+* Fix the issue that no event listed when user has dual roles
+* Allow partial submission for rubric eval
+* Add composer
+* Change criteria comment field in evaluation_rubric_details to text
+* Fix wrong calculation in grade API
+* Fix missing student in eval when he/she has non student role
+
 iPeer 3.1.7
 ---------------------------
 * Fix course enrolment not saved on hidden page on user edit
