@@ -30,7 +30,7 @@ if (isset($course_list['A']))
       {
           $eventReview = '<br />('.sprintf(__('%d unreviewed group evaluations', true), $event['to_review_count']).')';
       }
-      $eventRatio = printf(__('%d of %d Students', true), $event['completed_count'], $event['student_count']);
+      $eventRatio = sprintf(__('%d of %d Students', true), $event['completed_count'], $event['student_count']);
       $eventDue = Toolkit::formatDate($event['due_date']);
       echo $this->Html->tableCells(
         array($eventTitle . $eventReview, $eventRatio, $eventDue)
