@@ -1078,9 +1078,9 @@ class EvaluationComponent extends Object
                 $userId = isset($user['User'])? $user['User']['id'] : $user['id'];
 
                 // filter out the people who are not student, they should not get result
-                if ($user['Role'][0]['name'] != 'student') {
-                    continue;
-                }
+//                if ($user['Role'][0]['name'] != 'student') {
+//                    continue;
+//                }
 
                 // get the results for students
                 $evalResult[$userId] = $this->EvaluationMixeval->getResultsByEvaluatee($groupEventId, $userId, $include);
