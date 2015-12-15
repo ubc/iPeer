@@ -39,7 +39,7 @@ class EventsController extends AppController
     {
         parent::beforeFilter();
 
-        $this->set('title_for_layout', __('Events'));
+        $this->set('title_for_layout', __('Events', true));
     }
 
     /**
