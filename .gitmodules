@@ -25,9 +25,6 @@
 [submodule "puppet/modules/mysql"]
 	path = puppet/modules/mysql
 	url = https://github.com/puppetlabs/puppetlabs-mysql.git
-[submodule "puppet/modules/php"]
-	path = puppet/modules/php
-	url = https://github.com/thias/puppet-php.git
 [submodule "nginx"]
 	path = puppet/modules/nginx
 	url = https://github.com/jfryman/puppet-nginx.git
@@ -46,3 +43,6 @@
 [submodule "puppet/modules/epel"]
 	path = puppet/modules/epel
 	url = https://github.com/stahnma/puppet-module-epel.git
+[submodule "puppet/modules/php"]
+	path = puppet/modules/php
+	url = https://github.com/mayflower/puppet-php.git
