@@ -838,7 +838,7 @@ INSERT INTO `email_templates` (`id`, `name`, `description`, `subject`, `content`
 (2, 'Email template example', 'This is an email template example', 'Email Template', 'Hello, {{{USERNAME}}}',1, 1, NOW(), NULL, NULL),
 (3, 'Email template example2', 'email template ex2', 'Email Template2', 'Hello, {{{FIRSTNAME}}}',1, 2, NOW(), NULL, NULL),
 (4, 'Email template example3', 'email temp example3', 'Email Template3', 'Hello,',1, 3, NOW(), NULL, NULL),
-(5, 'Evaluation Reminder Template', 'evaluation reminder template', 'iPeer Evaluation Reminder', 'Hello {{{FIRSTNAME}}},\n\nA evaluation for {{{COURSENAME}}} is made available to you in iPeer, which has yet to be completed.\n\nName: {{{EVENTTITLE}}}\nDue Date: {{{DUEDATE}}}\nClose Date: {{{CLOSEDATE}}}\n\nThank You', 1, 1, NOW(), NULL, NULL); 
+(5, 'Evaluation Reminder Template', 'evaluation reminder template', 'iPeer Evaluation Reminder', 'Hello {{{FIRSTNAME}}},\n\nA evaluation for {{{COURSENAME}}} is made available to you in iPeer, which has yet to be completed.\n\nName: {{{EVENTTITLE}}}\nDue Date: {{{DUEDATE}}}\nClose Date: {{{CLOSEDATE}}}\n\nThank You', 1, 1, NOW(), NULL, NULL);
 
 
 -- --------------------------------------------------------
@@ -1353,9 +1353,9 @@ CREATE TABLE IF NOT EXISTS `mixeval_questions` (
   `scale_level` int(11) NOT NULL DEFAULT '0',
   `show_marks` int(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`mixeval_question_type_id`) REFERENCES `mixeval_question_types` 
+  FOREIGN KEY (`mixeval_question_type_id`) REFERENCES `mixeval_question_types`
 	(`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`mixeval_id`) REFERENCES `mixevals` 
+  FOREIGN KEY (`mixeval_id`) REFERENCES `mixevals`
 	(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
@@ -1384,7 +1384,7 @@ CREATE TABLE IF NOT EXISTS `mixeval_question_descs` (
   `scale_level` int(11) NOT NULL DEFAULT '0',
   `descriptor` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`question_id`) REFERENCES `mixeval_questions` 
+  FOREIGN KEY (`question_id`) REFERENCES `mixeval_questions`
 	(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
@@ -2035,7 +2035,7 @@ INSERT INTO `sys_parameters` (`parameter_code`, `parameter_value`, `parameter_ty
 ('system.admin_email', 'Please enter the iPeer administrator\\''s email address.', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 ('display.date_format', 'D, M j, Y g:i a', 'S', 'date format preference', 'A', 0, NOW(), NULL, NOW()),
 ('system.version', '3.1.6', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
-('database.version', '9', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
+('database.version', '10', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
 ('email.port', '25', 'S', 'port number for email smtp option', 'A', '0', NOW(), NULL , NOW()),
 ('email.host', 'localhost', 'S', 'host address for email smtp option', 'A', '0', NOW(), NULL , NOW()),
 ('email.username', '', 'S', 'username for email smtp option', 'A', '0', NOW(), NULL , NOW()),
@@ -2110,7 +2110,7 @@ CREATE TABLE IF NOT EXISTS `user_enrols` (
 -- Dumping data for table `user_enrols`
 --
 
-INSERT INTO `user_enrols` (`course_id`, `user_id`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) VALUES 
+INSERT INTO `user_enrols` (`course_id`, `user_id`, `record_status`, `creator_id`, `created`, `updater_id`, `modified`) VALUES
 (1, 5, 'A', 1, '2006-06-20 14:19:18', NULL, '2006-06-20 14:19:18'),
 (1, 6, 'A', 1, '2006-06-20 14:26:59', NULL, '2006-06-20 14:26:59'),
 (1, 7, 'A', 1, '2006-06-20 14:27:24', NULL, '2006-06-20 14:27:24'),
