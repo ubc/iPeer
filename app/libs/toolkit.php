@@ -360,7 +360,7 @@ class Toolkit
             return false;
         }
 
-        foreach ($evalResult as $result) {
+        foreach ($evalResult as &$result) {
             $userId = $result['EvaluationRubric']['evaluatee'];
             $evaluator = $result['EvaluationRubric']['evaluator'];
             $summary[$userId]['release_status']['gradeRelease'][] = $result['EvaluationRubric']['grade_release'];
@@ -369,7 +369,7 @@ class Toolkit
                 $summary[$userId]['total']['score'] + $result['EvaluationRubric']['score'] : $result['EvaluationRubric']['score'];
             $summary[$userId]['evaluator_count'] = (isset($summary[$userId]['evaluator_count'])) ?
                 $summary[$userId]['evaluator_count'] + 1 : 1;
-            foreach ($result['EvaluationRubricDetail'] as $detail) {
+            foreach ($result['EvaluationRubricDetail'] as &$detail) {
                 $criteria[] = $detail['criteria_number'];
                 $summary[$userId]['grades'][$detail['criteria_number']]['grade'] = (isset($summary[$userId]['grades'][$detail['criteria_number']]['grade'])) ?
                     $summary[$userId]['grades'][$detail['criteria_number']]['grade'] + $detail['grade'] : $detail['grade'];
@@ -390,12 +390,14 @@ class Toolkit
             $summary[$userId]['individual'][$evaluator]['general_comment']['comment_release'] =
                 $result['EvaluationRubric']['comment_release'];
         }
+        //cleanup
+        unset($evalResult);
 
-        foreach ($summary as $id => $score) {
+        foreach ($summary as $id => &$score) {
             $summary[$id]['release_status']['gradeRelease'] = array_product($summary[$id]['release_status']['gradeRelease']);
             $summary[$id]['release_status']['commentRelease'] = array_product($summary[$id]['release_status']['commentRelease']);
             $summary[$id]['total'] = $score['total']['score'] / $score['evaluator_count'];
-            foreach ($score['grades'] as $num => $grade) {
+            foreach ($score['grades'] as $num => &$grade) {
                 $summary[$id]['grades'][$num] = $grade['grade']/$grade['evaluator_count'];
             }
         }

@@ -409,42 +409,54 @@ class EvaluationMixeval extends EvaluationResponseBase
         $evalSub = ClassRegistry::init('EvaluationSubmission');
         $pen = ClassRegistry::init('Penalty');
 
-        $list = $this->find('all',
-            array('fields' => $fields, 'conditions' => $conditions));
-
         $data = array();
-        foreach ($list as $mark) {
-            if (!isset($data[$mark['EvaluationMixeval']['evaluatee']])) {
-                $data[$mark['EvaluationMixeval']['evaluatee']]['user_id'] = $mark['EvaluationMixeval']['evaluatee'];
-                $data[$mark['EvaluationMixeval']['evaluatee']]['score'] = $mark['EvaluationMixeval']['score'];
-                $data[$mark['EvaluationMixeval']['evaluatee']]['numEval']= 1;
-            } else {
-                $data[$mark['EvaluationMixeval']['evaluatee']]['score'] += $mark['EvaluationMixeval']['score'];
-                $data[$mark['EvaluationMixeval']['evaluatee']]['numEval']++;
+        
+        //chunk find
+        $total = $this->find('count', array('conditions' => $conditions));
+        $limit = 500;
+        $pages = ceil($total / $limit);
+        for ($page = 1; $page < $pages + 1; $page++) {
+            $list = $this->find('all', array('fields' => $fields, 'conditions' => $conditions, 'limit' => $limit, 'page' => $page));
+            
+            foreach($list as &$mark) {
+                if (!isset($data[$mark['EvaluationMixeval']['evaluatee']])) {
+                    $data[$mark['EvaluationMixeval']['evaluatee']]['user_id'] = $mark['EvaluationMixeval']['evaluatee'];
+                    $data[$mark['EvaluationMixeval']['evaluatee']]['score'] = $mark['EvaluationMixeval']['score'];
+                    $data[$mark['EvaluationMixeval']['evaluatee']]['numEval']= 1;
+                } else {
+                    $data[$mark['EvaluationMixeval']['evaluatee']]['score'] += $mark['EvaluationMixeval']['score'];
+                    $data[$mark['EvaluationMixeval']['evaluatee']]['numEval']++;
+                }
             }
         }
+        //cleanup
+        unset($list);
 
         $sub = $evalSub->getEvalSubmissionsByEventId($eventId);
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId)));
+        $penalties = $pen->getPenaltyByEventId($eventId);
 
-        foreach ($sub as $stu) {
+        foreach ($sub as &$stu) {
             if (isset($data[$stu['EvaluationSubmission']['submitter_id']])) {
                 $diff = strtotime($stu['EvaluationSubmission']['date_submitted']) - strtotime($event['Event']['due_date']);
                 $days = $diff/(60*60*24);
-                $penalty = $pen->getPenaltyByEventAndDaysLate($eventId, $days);
+                $penalty = $pen->getPenaltyByPenaltiesAndDaysLate($penalties, $days);
+                //$penalty = $pen->getPenaltyByEventAndDaysLate($eventId, $days);
                 $data[$stu['EvaluationSubmission']['submitter_id']]['penalty'] = (isset($penalty['Penalty']['percent_penalty'])) ? $penalty['Penalty']['percent_penalty'] :
                         0;
             }
         }
+        //cleanup
+        unset($sub);
 
-        foreach ($data as $demo) {
+        foreach ($data as &$demo) {
             if (!isset($demo['penalty'])) {
                 $data[$demo['user_id']]['penalty'] = 0;
             }
         }
 
         $grades = array();
-        foreach ($data as $student) {
+        foreach ($data as &$student) {
             $tmp = array();
             $tmp['id'] = 0;
             $tmp['evaluatee'] = $student['user_id'];
