@@ -393,10 +393,22 @@ class EvaluationRubric extends EvaluationResponseBase
         $sub = $evalSub->getEvalSubmissionsByEventId($eventId);
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId)));
         $submitted = Set::extract('/EvaluationSubmission/submitter_id', $sub);
-
-        $rubricDetails = $this->find('all', array(
-            'conditions' => array_merge(array('evaluator' => $submitted), $conditions)
-        ));
+        
+        
+        $rubricDetails = array();
+        
+        //chunk find
+        $total = $this->find('count', array('conditions' => array_merge(array('evaluator' => $submitted), $conditions) ));
+        $limit = 500;
+        $pages = ceil($total / $limit);
+        for ($page = 1; $page < $pages + 1; $page++) {
+            $list = $this->find('all', array('conditions' => array_merge(array('evaluator' => $submitted), $conditions), 'limit' => $limit, 'page' => $page));
+            
+            $rubricDetails = array_merge_recursive($rubricDetails, $list);
+        }
+        //cleanup
+        unset($list);
+        
         $scoreRecords = Toolkit::formatRubricEvaluationResultsMatrix($rubricDetails);
         # we don't need grades key
         if (array_key_exists('grades', $scoreRecords)) {
@@ -407,7 +419,7 @@ class EvaluationRubric extends EvaluationResponseBase
         $penalties = $pen->getPenaltyForMembers(array_keys($scoreRecords), $event['Event'], $sub);
 
         $grades = array();
-        foreach ($scoreRecords as $user_id => $record) {
+        foreach ($scoreRecords as $user_id => &$record) {
             $grades[] = array(
                 'EvaluationRubric' => array(
                     'id' => 0,
