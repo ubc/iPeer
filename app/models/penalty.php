@@ -127,6 +127,31 @@ class Penalty extends AppModel
         }
     }
 
+
+    /**
+     * getPenaltyByPenaltiesAndDaysLate
+     *
+     * @param mixed $penalties penalty list
+     * @param mixed $daysLate days late
+     *
+     * @access public
+     * @return void
+     */
+    function getPenaltyByPenaltiesAndDaysLate($penalties, $daysLate)
+    {
+        if(empty($penalties) || 0.0 >= $daysLate) {
+            return null;
+        } else {
+            $return_penalty = null;
+            foreach($penalties as $penalty) {
+                if($penalty["Penalty"]["days_late"] <= ceil($daysLate)) {
+                    $return_penalty = $penalty;
+                }
+            }
+            return $return_penalty;
+        }
+    }
+
     function getPenaltyByEventSubmissionAndDue($eventId, $event_due, $submissionDate)
     {
         $late_diff = strtotime($submissionDate) - strtotime($event_due);

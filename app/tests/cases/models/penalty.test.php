@@ -111,6 +111,64 @@ class PenaltyTestCase extends CakeTestCase
         $ret = $this->Penalty->getPenaltyDays(999);
         $this->assertEqual($ret, null);
     }
+    
+    function testGetPenaltyByPenaltiesAndDaysLate()
+    {
+        // valid event penalties set
+        $penalties = $this->Penalty->getPenaltyByEventId(2);
+        $this->assertEqual($penalties['0']['Penalty']['percent_penalty'], 15);
+        $this->assertEqual($penalties['1']['Penalty']['percent_penalty'], 30);
+        $this->assertEqual($penalties['2']['Penalty']['percent_penalty'], 45);
+        $this->assertEqual($penalties['3']['Penalty']['percent_penalty'], 60);
+        $this->assertEqual($penalties['0']['Penalty']['days_late'], 1);
+        $this->assertEqual($penalties['1']['Penalty']['days_late'], 2);
+        $this->assertEqual($penalties['2']['Penalty']['days_late'], 3);
+        $this->assertEqual($penalties['3']['Penalty']['days_late'], 4);
+        
+        // valid event - right on time
+        $ret = $this->Penalty->getPenaltyByPenaltiesAndDaysLate($penalties, 0);
+        $this->assertEqual($ret, null);
+
+        // valid event - not late
+        $ret = $this->Penalty->getPenaltyByPenaltiesAndDaysLate($penalties, -1.5);
+        $this->assertEqual($ret, null);
+
+        // valid event - late
+        $ret = $this->Penalty->getPenaltyByPenaltiesAndDaysLate($penalties, 1.5);
+        $this->assertEqual($ret['Penalty']['percent_penalty'], 30);
+
+        // valid event - final deduction
+        $ret = $this->Penalty ->getPenaltyByPenaltiesAndDaysLate($penalties, 5);
+        $this->assertEqual($ret['Penalty']['percent_penalty'], 60);
+        
+        // valid empty event penalties set
+        $penalties = $this->Penalty->getPenaltyByEventId(3);
+        $this->assertEqual(empty($penalties), true);
+
+        // valid event but no penalty - not late
+        $ret = $this->Penalty->getPenaltyByPenaltiesAndDaysLate($penalties, -1.5);
+        $this->assertEqual($ret, null);
+
+        // valid event but no penalty - late
+        $ret = $this->Penalty->getPenaltyByPenaltiesAndDaysLate($penalties, 1.5);
+        $this->assertEqual($ret, null);
+
+        // valid event but no penalty - final deduction
+        $ret = $this->Penalty->getPenaltyByPenaltiesAndDaysLate($penalties, 5);
+        $this->assertEqual($ret, null);
+
+        // penalties = null - not late
+        $ret = $this->Penalty->getPenaltyByPenaltiesAndDaysLate(null, -1.5);
+        $this->assertEqual($ret, null);
+
+        // penalties = null - late
+        $ret = $this->Penalty->getPenaltyByPenaltiesAndDaysLate(null, 1.5);
+        $this->assertEqual($ret, null);
+
+        // penalties = null - final deduction
+        $ret = $this->Penalty->getPenaltyByPenaltiesAndDaysLate(null, 5);
+        $this->assertEqual($ret, null);
+    }
 
     function testGetPenaltyByEventAndDaysLate()
     {
