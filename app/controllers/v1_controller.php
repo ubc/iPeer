@@ -820,10 +820,11 @@ class V1Controller extends Controller {
                 $res = $this->EvaluationMixeval->mixedEvalScore($event_id, $fields, $conditions);
                 $key = "EvaluationMixeval";
             }
-            foreach ($res as $val) {
+            foreach ($res as &$val) {
                 unset($val[$key]['id']);
                 $results[] = $val[$key];
             }
+            unset($res);
             $statusCode = 'HTTP/1.1 200 OK';
         }
 
@@ -833,10 +834,18 @@ class V1Controller extends Controller {
             $results = $results[0];
             $results['username'] = $username;
         } else {
+            //get all user ids
+            $user_ids = Set::extract('/evaluatee', $results);
+            //get username for all users
+            $users = $this->User->find('list', array('conditions' => array('User.id' => $user_ids), 'fields' => array('User.username')));
+            
+            //insert username into results
             foreach ($results as &$result) {
-                $username = $this->User->field('username',
-                    array('id' => $result['evaluatee']));
-                $result['username'] = $username;
+                if(isset($users[$result['evaluatee']]) ) {
+                    $result['username'] = $users[$result['evaluatee']];
+                } else {
+                    $result['username'] = false;
+                }
             }
         }
 
