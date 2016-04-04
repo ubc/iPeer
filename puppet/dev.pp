@@ -26,12 +26,9 @@ ipeer::instance { ipeerdev :
 # create ipeer_test database for tests
 if ! defined(Mysql::Db["ipeer_test"]) {
     @@mysql::db { "ipeer_test":
-        user => $db_username,
-        password => $db_password,
-        host => "ipeer_test" ? {
-            'localhost' => "ipeer_test",
-            default => $fqdn,
-        },
+        user => 'ipeer',
+        password => 'ipeer',
+        host => 'localhost',
         grant => ['ALL'],
     }
 }
