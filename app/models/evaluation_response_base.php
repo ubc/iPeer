@@ -40,8 +40,27 @@ class EvaluationResponseBase extends AppModel
             $submission = $submission['EvaluationSubmission'];
             $conditions[] = sprintf('(grp_event_id = %d AND evaluator = %d)', $submission['grp_event_id'], $submission['submitter_id']);
         }
-
-        $responses = $this->find('all', array('conditions' => array(join(' OR ', $conditions)), 'contain' => $contain));
+        
+        
+        $responses = array();
+        /*
+         * Note: The reason for using paging for results even though we are retrieving everthing is because in cakephp 1.3 associated are fetched 
+         * using the list of result ids in a where id in (list of ids). This is very bad for MySQL performance with very large lists which can happen
+         * in larger classes. 100 items seems to be a good balance based on development enviroment testing.$_COOKIE
+         * See cake/libs/model/datasources/dbo_source.php functions queryAssociation and fetchAssociated 
+        */
+        // chunk find
+        $total = $this->find('count', array('conditions' => array(join(' OR ', $conditions)), 'contain' => $contain));
+        $limit = 100;
+        $pages = ceil($total / $limit);
+        for ($page = 1; $page < $pages + 1; $page++) {
+            $list = $this->find('all', array('conditions' => array(join(' OR ', $conditions)), 'contain' => $contain, 'limit' => $limit, 'page' => $page));
+            
+            $responses = array_merge_recursive($responses, $list);
+        }
+        // cleanup
+        unset($list);
+        
         // combine submission information into responses;
         foreach ($responses as $key => $response) {
             foreach ($submissions as $submission) {
