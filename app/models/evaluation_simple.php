@@ -536,9 +536,17 @@ class EvaluationSimple extends EvaluationResponseBase
                 $diff = strtotime($stu['EvaluationSubmission']['date_submitted']) - strtotime($event['Event']['due_date']);
                 $days = $diff/(60*60*24);
                 $penalty = $pen->getPenaltyByPenaltiesAndDaysLate($penalties, $days);
-                //$penalty = $pen->getPenaltyByEventAndDaysLate($eventId, $days);
                 $data[$stu['EvaluationSubmission']['submitter_id']]['penalty'] = (isset($penalty['Penalty']['percent_penalty'])) ? $penalty['Penalty']['percent_penalty'] :
                         0;
+            }
+        }
+        $end = strtotime($event['Event']['release_date_end']);
+        $now = time();
+        if ($now >= $end) {
+            $final_penalty = $pen->getPenaltyFinal($eventId);
+            $noSubmissions = array_diff(Set::extract($data, '/user_id'), Set::extract($sub, '/EvaluationSubmission/submitter_id'));
+            foreach ($noSubmissions as $userId) {
+                $data[$userId]['penalty'] = $final_penalty['Penalty']['percent_penalty'];
             }
         }
         //cleanup
