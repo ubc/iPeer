@@ -141,15 +141,18 @@ class Penalty extends AppModel
     {
         if(empty($penalties) || 0.0 >= $daysLate) {
             return null;
-        } else {
-            $return_penalty = null;
-            foreach($penalties as $penalty) {
-                if($penalty["Penalty"]["days_late"] <= ceil($daysLate)) {
-                    $return_penalty = $penalty;
-                }
-            }
-            return $return_penalty;
         }
+        
+        $max_penalty = null;
+        foreach($penalties as $penalty) {
+            $max_penalty = $penalty;
+            //return first penalty that if above daysLate
+            if($penalty["Penalty"]["days_late"] >= $daysLate) {
+                return $penalty;
+            }
+        }
+        //else daysLate after last penalty so return max penalty
+        return $max_penalty;
     }
 
     function getPenaltyByEventSubmissionAndDue($eventId, $event_due, $submissionDate)
