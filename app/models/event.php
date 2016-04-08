@@ -1084,6 +1084,17 @@ class Event extends AppModel
             
             // add course id info
             $eventData['course_id'] = $courseId;
+            
+            //convert DateTime String to standard format (some programs like excel change date foramts while editing)
+            $event_date_fields = array('due_date', 'release_date_begin', 'release_date_end', 'result_release_date_begin', 'result_release_date_end');
+            foreach ($event_date_fields as $eventDate) {
+                if (is_string($eventData[$eventDate])) {
+                    $timeStamp = strtotime($eventData[$eventDate]);
+                    if($timeStamp) {
+                        $eventData[$eventDate] = date("Y-m-d H:i:s", $timeStamp);
+                    }
+                }
+            }
             // tell the model we are working with the current event (we later use model data validation)
             $this->create($eventData);
             

@@ -7,8 +7,6 @@
     <li><?php echo __('Event templates are entered by their id. To get it, go to the template\'s edit page and check the URL for the number.',true); ?></li>
     <li><?php echo __('For Student Result Mode: 0=basic (grades only); 1=detailed (grades and comments)',true); ?></li>
     <li><?php echo __('For the other 0 or 1 fields: 0=no/off; 1=on/yes',true); ?></li>
-    <li><?php echo __('Dates must be entered in iPeer format. Example: 2014-10-13 00:00:00',true); ?></li>
-    <li><strong><?php echo __("Microsoft Excel may try to reformat the dates. To avoid this, mark the cells as being 'text' or use LibreOffice.",true); ?></strong></li>
 </ul>
     
 <h2><?php echo __('Groups', true) ?></h2>
