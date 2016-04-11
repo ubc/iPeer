@@ -16,6 +16,31 @@ class Event extends AppModel
     public $RUBRIC_EVAL_HEIGHT = array('2'=>'200', '3'=>'250');
     const DATETIMEREGEX = '/^(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])( ([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d)*$/';
 
+    // key => values; values are column names in events table
+    public static $importSurveyCutoff = 6; // last column that applies to surveys
+    public static $importColumns = array(
+            'Title' => 'title', //0
+            'Description' => 'description', //1
+            'Type' => 'event_template_type_id', //2
+            'Template' => 'template_id', //3
+            'Opens' => 'release_date_begin', //4
+            'Due' => 'due_date', //5
+            'Closes' => 'release_date_end', //6
+            // surveys don't have the following fields
+            'Results Open' => 'result_release_date_begin',
+            'Results Close' => 'result_release_date_end',
+            'Self-Evaluation?' => 'self_eval',
+            'Comments required?' => 'com_req',
+            'Auto-release results?' => 'auto_release',
+            'Student result mode' => 'enable_details'
+            /* Groups will always be the last item
+            but is not listed here because it belongs 
+            to a different table */
+            
+    );
+    
+    private $insertedAutoRelease = array();
+    
     public $_backupValidate = null;
     public $validate = array(
         'title' => array(
@@ -291,6 +316,9 @@ class Event extends AppModel
         if (null != $this->_backupValidate) {
             $this->validate = $this->_backupValidate;
             $this->_backupValidate = null;
+        }
+        if($created && isset($this->data['Event']['auto_release']) && $this->data['Event']['auto_release']==1) {
+            $this->insertedAutoRelease[] = $this->getInsertID();
         }
     }
     /**
@@ -909,4 +937,305 @@ class Event extends AppModel
                 'conditions' => array('EvaluationSubmission.submitter_id' => $userId)
         ))));
     }
+    
+    /**
+     * csvExportEventsByCourseId
+     *
+     * @param mixed $courseId course id
+     *
+     * @return events
+     */
+    function csvExportEventsByCourseId($courseId)
+    {
+        $exportData = array(); // will get plugged into the csv generator
+        $csvHeader = array(); // array for csv header / first row
+        $tableColumns = array(); // names of relevant columns in events table
+        
+        foreach(Event::$importColumns as $key => $value) {
+            $csvHeader[] = $key;
+            $tableColumns[] = $value;
+        }
+        
+        // add "Groups" to the header row
+        $csvHeader[] = "Groups";
+
+        // get number of groups in course for later
+        $numGroups = $this->Group->getCourseGroupCount($courseId);
+        
+        $Survey = ClassRegistry::init('Survey'); // get survey type id later
+        
+        $events = $this->find('all', array(
+            'conditions' => array('course_id' => $courseId),
+            'fields' => $tableColumns,
+            'callbacks' => false)); // avoid afterfind() which injects unneeded columns
+        
+        $exportData[] = $csvHeader; // add header to csv
+        foreach($events as $value) {
+            unset($value['Event']['id']); // id comes by default, so needs to be removed
+            
+            $groups = "";
+            
+            if($value['Event']['event_template_type_id'] == $Survey::TEMPLATE_TYPE_ID) {
+                // remove release dates if a survey (sometimes have all zero dates)
+                $value['Event']['result_release_date_begin'] = "";
+                $value['Event']['result_release_date_end'] = "";
+                // remove booleans 
+                $value['Event']['self_eval'] = "";
+                $value['Event']['com_req'] = "";
+                $value['Event']['auto_release'] = "";
+                $value['Event']['enable_details'] = "";
+            } else if(isset($value['Group'])) {
+                // otherwise, a non-survey event, so we can populate the groups
+                if(count($value['Group'])==$numGroups) {
+                    $groups = "*"; // event included all groups
+                } else if(count($value['Group'])>0) {
+                    // semi-colon separated list of groups (not all of the course groups)
+                    $groups = implode(';',Set::classicExtract($value['Group'],'{n}.group_name'));
+                }
+            }
+            
+            $value['Event'][] = $groups; // add group to row
+            $exportData[] = $value['Event']; // add current event row
+        }
+        
+        return $exportData;
+    }
+    
+    /**
+     * importEventsByCsv
+     *
+     * @param int $courseId course id
+     * @param mixed $events  $events
+     * @param int $userId
+     *
+     * @return Integer || "Error Message"
+     * (a number of successfully imported events or the error message)
+     */
+    function importEventsByCsv($courseId,$events,$userId)
+    {
+        
+        // the row we are currently on (used for error reporting)
+        $csvRow = 1;
+        
+        // if the header row is present, remove it
+        if(isset($events[0][0]) && isset($events[0][1]) && $events[0][0] == "Title" && $events[0][1] == "Description") {
+            unset($events[0]);
+            $csvRow += 1;
+        }
+        
+        if(empty($events)) {
+            return __('Error: No events to import.',true);
+        }
+        
+        $validatedEvents = array();
+        
+        // load up the models that are needed for validation
+        $SimpleEvaluation = ClassRegistry::init('SimpleEvaluation');
+        $Rubric = ClassRegistry::init('Rubric');
+        $Survey = ClassRegistry::init('Survey');
+        $Mixeval = ClassRegistry::init('Mixeval');
+        $Group = ClassRegistry::init('Group');
+        
+        // get ids for event types; used later in validation
+        $SimpleEvaluationId = $SimpleEvaluation::TEMPLATE_TYPE_ID;
+        $RubricId = $Rubric::TEMPLATE_TYPE_ID;
+        $SurveyId = $Survey::TEMPLATE_TYPE_ID;
+        $MixevalId = $Mixeval::TEMPLATE_TYPE_ID;
+        
+        // have caches for retrieved events from the database
+        // due to the tendency for the same template to be used multiple times
+        // validated = template exists and user has access to it
+        $validatedEventCache = array(
+            $SimpleEvaluationId => array(), // all validated simpleevals
+            $RubricId => array(), // all validated rubrics
+            $SurveyId => array(), // all validated survey
+            $MixevalId => array() // all validated mixevals
+        );
+        
+        // get all groups once for validation
+        $validGroupIds = array_keys($Group->getGroupsByCourseId($courseId));
+        
+        // validate all the events
+        foreach($events as $event) {
+            $eventData = array();
+            $i = 0;
+            
+            $isSurvey = false;
+            
+            // format csv row into proper key/value pairs
+            foreach(Event::$importColumns as $description => $column) {
+                if($isSurvey && $i>Event::$importSurveyCutoff) {
+                    $event[$i] = ""; //insert temporary dummy data for the survey
+                } else if(!isset($event[$i])) {
+                    return 'Event on row ' . $csvRow . ' does not have an entry for column: ' . $description;
+                }
+                if($column==='event_template_type_id' && $event[$i]==$SurveyId) {
+                    $isSurvey = true;
+                }
+                $eventData[$column] = $event[$i];
+                $i += 1;
+            }
+            
+            if(!empty($event[$i+1])) {
+                return 'Event on row ' . $csvRow . ' has too many columns';
+            }
+            
+            // DO NOT RESET $i, it will later determine the index of the groups info
+            
+            // add course id info
+            $eventData['course_id'] = $courseId;
+            
+            //convert DateTime String to standard format (some programs like excel change date foramts while editing)
+            $event_date_fields = array('due_date', 'release_date_begin', 'release_date_end', 'result_release_date_begin', 'result_release_date_end');
+            foreach ($event_date_fields as $eventDate) {
+                if (is_string($eventData[$eventDate])) {
+                    $timeStamp = strtotime($eventData[$eventDate]);
+                    if($timeStamp) {
+                        $eventData[$eventDate] = date("Y-m-d H:i:s", $timeStamp);
+                    }
+                }
+            }
+            // tell the model we are working with the current event (we later use model data validation)
+            $this->create($eventData);
+            
+            // template for error message
+            $eventErrorPreamble = 'Event "' . $eventData['title'] . '" (on row ' . $csvRow . '), has ';
+            
+            // model based validation
+            // takes care of dates and checks for non-empty fields
+            if (!$this->validates()) {
+                // didn't validate logic, reset the errors array to get an error message (so we can access the first element)
+                $value = reset($this->validationErrors);
+                // extract the first error from the validation errors array
+                return $eventErrorPreamble . 'an invalid field: "' . array_search(key($this->validationErrors), Event::$importColumns) . '": ' . $value;
+            }
+            
+            // date validation
+            // users may forget to change the dates after exporting
+            if (strtotime('NOW') > strtotime($eventData['release_date_end'])) {
+                return $eventErrorPreamble . 'a closing date in the past. Please check that you have updated the dates for the new session/term';
+            }
+            
+            // do a switch based on event_template_type_id; catch invalid types
+            // in each switch case, check if template exists and the user has permissions to access it
+            $templateId = $eventData['template_id'];
+            $templateType = intval($eventData['event_template_type_id']);
+
+            if(empty($validatedEventCache[$templateType]) ||
+               empty($validatedEventCache[$templateType][$templateId])) {
+                // cache miss - need to check the DB if its valid
+                switch($templateType) {
+                    case $SimpleEvaluationId: // simple
+                        $template = $SimpleEvaluation->getEvaluation($templateId);
+                        if(empty($template)) {
+                            return $eventErrorPreamble . "a non-existent simple evaluation of id: " . $templateId;
+                        }
+                        if($template['SimpleEvaluation']['creator_id'] != $userId && $template['SimpleEvaluation']['availability']!= "public") {
+                            return $eventErrorPreamble . "a non-accessible template: " . $templateId;
+                        }
+                        $validatedEventCache[$SimpleEvaluationId][$templateId] = true; // save in cache
+                        break;
+                    case $RubricId: // rubric
+                        $template = $Rubric->getEvaluation($templateId);
+                        if(empty($template)) {
+                            return $eventErrorPreamble . "a non-existent rubric of id: " . $templateId;
+                        }
+                        if($template['Rubric']['creator_id'] != $userId && $template['Rubric']['availability']!= "public") {
+                            return $eventErrorPreamble . "a non-accessible template: " . $templateId;
+                        }
+                        $validatedEventCache[2][1] = "hello"; // save in cache
+                        break;
+                    case $SurveyId: // survey
+                        $template = $Survey->getSurveyWithQuestionsById($templateId);
+                        if(empty($template)) {
+                            return $eventErrorPreamble . "a non-existent survey of id: " . $templateId;
+                        }
+                        if($template['Survey']['creator_id'] != $userId && $template['Survey']['availability']!= "public") {
+                            return $eventErrorPreamble . "a non-accessible template: " . $templateId;
+                        }
+
+                        $validatedEventCache[$SurveyId][$templateId] = true; // save in cache
+                        break;
+                    case $MixevalId: // mixed
+                        $template = $Mixeval->getEvaluation($templateId);
+                        if(empty($template)) {
+                            return $eventErrorPreamble . "a non-existent mixed eval of id: " . $templateId;
+                        }
+                        if($template['Mixeval']['creator_id'] != $userId && $template['Mixeval']['availability']!= "public") {
+                            return $eventErrorPreamble . "a non-accessible template: " . $templateId;
+                        }
+                        $validatedEventCache[$MixevalId][$templateId] = true; // save in cache
+                        break;
+                    case 0: // not a number
+                    default: // some other number
+                        return $eventErrorPreamble . "an invalid template type \"" . $eventData['event_template_type_id'] .  "\"";
+                }
+            }
+             
+            // validate the groups and then format the data correctly
+            $groupsData = array();
+            // $i is from the loop that mapped columns to db keys
+            // $i now has the array index of the group column 
+            
+            // if (there is a column for groups)
+            if(!empty($event[$i])) {
+                if($event[$i]=="*") { // add all the groups
+                    $groupsData = $validGroupIds; //add all ids
+                } else { // add semi-colon delimited ids
+                    $groupIds = array_filter(explode(";",$event[$i])); 
+                    if(!empty($groupIds)) {
+                        foreach($groupIds as $groupId) {
+                            if(!is_numeric($groupId) || array_search($groupId,$validGroupIds)===false) {
+                                return $eventErrorPreamble . 'an invalid group of id: "' . $groupId . '"';
+                            } else {
+                                $groupsData[] = $groupId;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Surveys cannot have groups - report an error
+            if(!empty($groupsData) && $templateType == $SurveyId) {
+                return $eventErrorPreamble . "groups, which are not allowed for a survey.";
+            }
+
+            // Put in default booleans if not selected
+            if($eventData['self_eval']!=="1") { // if not the non-default (ie. is default or invalid)
+                $eventData['self_eval'] = 0; // default 
+            }
+            if($eventData['com_req']!=="1") {
+                $eventData['com_req'] = 0;
+            }
+            if($eventData['auto_release']!=="1") {
+                $eventData['auto_release'] = 0;
+            }
+            if($eventData['enable_details']!=="0") {
+                $eventData['enable_details'] = 1;
+            }
+            
+            // add this event to the validated events
+            $validatedEvents[] = array( 'Event' => $eventData , 'Group' => array ( 'Group' => $groupsData ));
+            
+            $csvRow += 1; // we will now parse the new row in the csv ($csvRow used for error reporting)
+        }
+        
+        // now add the events
+        if ($this->saveAll($validatedEvents)) {
+            // We do not set the (email) scheduler because we don't import that
+
+            // before completing, we need to set the release status for the groupEvent
+            // $insertedAutoRelease has the event ids we just added that have ['Event']['auto_release']===true
+            $groupEvents = $this->GroupEvent->find('list',
+                array('conditions' => array('event_id'=>$this->insertedAutoRelease)));
+            App::import('Component','Evaluation');
+            $evalComponent = new EvaluationComponent();
+            $evalComponent->setGroupEventsReleaseStatus($groupEvents, 'Auto');  
+        } else {
+            return 'Final save of events failed.';
+        }
+        
+        return count($validatedEvents);
+    }
+    
 }

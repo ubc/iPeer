@@ -161,7 +161,9 @@ new Rico.Accordion( 'accordion',
     hoverClass: 'mdHover',
     selectedClass: 'mdSelected',
     clickedClass: 'mdClicked',
-    unselectedClass: 'panelheader'});
+    unselectedClass: 'panelheader',
+    initHideAll: true});
+    
 var userIds = [<?php echo $userIds ?>];
 jQuery.each(userIds, function(index, userId) {
     jQuery('#'+userId+'likert').hide();

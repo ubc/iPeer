@@ -11,11 +11,11 @@
 class EventsController extends AppController
 {
     public $name = 'Events';
-    public $helpers = array('Html', 'Ajax', 'Javascript', 'Time');
+    public $helpers = array('Html', 'Ajax', 'Javascript', 'Time','FileUpload.FileUpload');
     public $uses = array('GroupEvent', 'User', 'Group', 'Course', 'Event', 'EventTemplateType',
         'SimpleEvaluation', 'Rubric', 'Mixeval', 'Personalize', 'GroupsMembers', 'Penalty', 'Survey','EmailSchedule',
         'EvaluationSubmission', 'EmailTemplate', 'EvaluationRubric', 'EvaluationSimple', 'EvaluationMixeval');
-    public $components = array("AjaxList", "Session", "RequestHandler","Email", "Evaluation");
+    public $components = array("AjaxList", "Session", "RequestHandler","Email", "Evaluation","ExportBaseNew","ExportCsv","FileUpload.FileUpload");
 
     /**
      * __construct
@@ -40,8 +40,16 @@ class EventsController extends AppController
         parent::beforeFilter();
 
         $this->set('title_for_layout', __('Events', true));
-    }
 
+        $this->FileUpload->allowedTypes(array(
+            'csv' => null,
+        ));
+        $this->FileUpload->uploadDir(TMP);
+        $this->FileUpload->fileModel(null);
+        $this->FileUpload->attr('required', true);
+        $this->FileUpload->attr('forceWebroot', false);
+    }
+    
     /**
      * postProcessData Post Process Data : add released column
      *
@@ -756,6 +764,125 @@ class EventsController extends AppController
         return ($sFound) ? __('Event title "', true).$this->data['Event']['title'].__('" already exists in this course.', true) : '';
     }
 
+    /**
+     * export 
+     *
+     * Exports the event listings for a course in csv format
+     * Intended to be used in tandem with /events/import
+     *
+     * @param mixed $courseId
+     *
+     * @access public
+     * @return void
+     */
+    function export($courseId)
+    {
+        
+        if (!is_numeric($courseId)) {
+            $this->Session->setFlash(__('Error: Invalid course id', true));
+            $this->redirect('/courses');
+            return;
+        }
+        
+        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
+        if (!$course) {
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
+            $this->redirect('/courses');
+            return;
+        }
+        
+        $this->breadcrumb->push(array('course' => $course['Course']));
+        $this->set('breadcrumb', $this->breadcrumb->push(__('Export Events', true)));
+        
+        $fileName = "Events-" . date('m.y') . "-" . str_replace(' ', '.', $course['Course']['course']);
+        
+        // form submission
+        if (isset($this->params['form']) && !empty($this->params['form'])) {
+            $this->autoRender = false;
+            
+            $fileName = isset($this->params['form']['file_name']) && !empty($this->params['form']['file_name']) ? $this->params['form']['file_name']: $fileName;
+            
+            if(!$this->ExportCsv->exportCSV($this->Event->csvExportEventsByCourseId($courseId),$fileName)) {
+                $this->autoRender = true;
+                $this->Session->setFlash(__('Error: could not generate csv', true));
+            };
+            
+        }
+        
+        $this->set('file_name', $fileName);
+    }
+    
+    /**
+     * Imports the event listings for a course from csv format
+     *
+     * Intended to be used in tandem with /events/export
+     *
+     * @param mixed $courseId
+     *
+     * @access public
+     * @return void
+     */
+    function import($courseId)
+    {   
+        if (!is_numeric($courseId)) {
+            $this->Session->setFlash(__('Error: Invalid course id', true));
+            $this->redirect('/courses');
+            return;
+        }
+        
+        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
+        if (!$course) {
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
+            $this->redirect('/courses');
+            return;
+        }
+        
+        $this->breadcrumb->push(array('course' => $course['Course']));
+        $this->set('breadcrumb', $this->breadcrumb->push(__('Import Events', true))); 
+        $this->set('groups', $this->Group->getGroupsByCourseId($courseId));
+
+        
+        // File got uploaded
+        // ensure file got submitted!
+        if (!empty($this->params['form'])) {
+            // did the file submit properly
+            if ($this->FileUpload->success) {
+                $uploadFile = $this->FileUpload->uploadDir.DS.$this->FileUpload->finalFile;
+            } else {
+                $this->Session->setFlash($this->FileUpload->showErrors());
+                return;
+            }
+            
+            // attempt to parse the csv
+            $eventData = Toolkit::parseCSV($uploadFile);
+            
+            // we can now remove the file so we can "return" from the function whenever
+            $this->FileUpload->removeFile($uploadFile);
+            
+            // something wrong with the file
+            if(empty($eventData) || empty($eventData[0])) { 
+                $this->Session->setFlash(__('Error: The file got uploaded, but could not be processed as a csv.',true));
+                return;
+            }
+            
+            // attempt to import
+            $importResult = $this->Event->importEventsByCsv($courseId,$eventData,User::get('id'));
+            
+            if(is_numeric($importResult)) {
+                // success
+                $this->Session->setFlash("$importResult event(s) were imported successfully.", 'good');
+                $this->redirect('index/'.$courseId);
+            } else {
+                // failure
+                $this->Session->setFlash("Import Failed <br />" . $importResult);
+                return;
+            }
+            
+        }
+
+        
+    }
+    
     /**
      * _multiMap
      *
