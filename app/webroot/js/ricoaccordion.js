@@ -3,6 +3,7 @@ Rico.Accordion.prototype = {
    initialize: function(container, options) {
         this.container  = $(container);
         this.options    = {
+            initHideAll         : false,
             onHideTab           : null,
             onShowTab           : null,
             animate             : true,
@@ -15,6 +16,12 @@ Rico.Accordion.prototype = {
         options.onSelect = function(panel) {myOnSelect(panel); if (onSelect) onSelect(panel)};
         this.panelManager = new Rico.PanelManager(container, options);
         var panels = this.panelManager.panels;
+        
+        if (this.options.initHideAll) {
+            var panelToClose = this.panelManager.selectedPanels.shift();
+            panelToClose.markUnselected();
+        }
+        
         for ( var i=0 ; i < panels.length ; i++ ){
             if (!panels[i].selected) panels[i].content.style.display = 'none';
         }
@@ -68,10 +75,14 @@ Rico.AccordionEffect.prototype = {
       this.animation = new Rico.Effect.Animation(duration, steps, {step : this.animateStep.bind(this), onFinish : this.options.onFinish});
     },
     animateStep: function(stepsLeft) {
-       delta = (parseInt(this.e1.offsetHeight))/stepsLeft;
-       var h1 = (this.e1.offsetHeight - delta) + "px";
+       var delta = this.e1 ?
+            this.e1.offsetHeight/stepsLeft :
+            (this.endHeight - this.e2.offsetHeight)/stepsLeft;
+       if(this.e1) {
+           var h1 = (this.e1.offsetHeight - delta) + "px";
+           this.e1.style.height = h1;
+       } 
        var h2 = (this.e2.offsetHeight + delta) + "px";
-       this.e1.style.height = h1;
        this.e2.style.height = h2
     }
 };
