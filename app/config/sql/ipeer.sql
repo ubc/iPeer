@@ -1511,7 +1511,7 @@ INSERT INTO `sys_parameters` (`parameter_code`, `parameter_value`, `parameter_ty
 ('system.super_admin', 'root', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 ('system.admin_email', 'Please enter the iPeer administrator\\''s email address.', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 ('display.date_format', 'D, M j, Y g:i a', 'S', 'date format preference', 'A', 0, NOW(), NULL, NOW()),
-('system.version', '3.1.8', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
+('system.version', '3.1.9', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 ('database.version', '13', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
 ('email.port', '25', 'S', 'port number for email smtp option', 'A', '0', NOW(), NULL , NOW()),
 ('email.host', 'localhost', 'S', 'host address for email smtp option', 'A', '0', NOW(), NULL , NOW()),
