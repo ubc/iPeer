@@ -1500,7 +1500,7 @@ INSERT INTO `sys_parameters` (`parameter_code`, `parameter_value`, `parameter_ty
 ('system.admin_email', 'Please enter the iPeer administrator\\''s email address.', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 ('display.date_format', 'D, M j, Y g:i a', 'S', 'date format preference', 'A', 0, NOW(), NULL, NOW()),
 ('system.version', '3.1.8', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
-('database.version', '11', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
+('database.version', '12', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
 ('email.port', '25', 'S', 'port number for email smtp option', 'A', '0', NOW(), NULL , NOW()),
 ('email.host', 'localhost', 'S', 'host address for email smtp option', 'A', '0', NOW(), NULL , NOW()),
 ('email.username', '', 'S', 'username for email smtp option', 'A', '0', NOW(), NULL , NOW()),
@@ -1512,7 +1512,9 @@ INSERT INTO `sys_parameters` (`parameter_code`, `parameter_value`, `parameter_ty
 ('google_analytics.tracking_id', '', 'S', 'tracking id for Google Analytics', 'A', 0, NOW(), 0, NOW()),
 ('google_analytics.domain', '', 'S', 'domain name for Google Analytics', 'A', 0, NOW(), 0, NOW()),
 ('banner.custom_logo', '', 'S', 'custom logo that appears on the left side of the banner', 'A', 0, NOW(), 0, NOW()),
-('system.timezone', '', 'S', 'timezone', 'A', 0, NOW(), 0, NOW());
+('system.timezone', '', 'S', 'timezone', 'A', 0, NOW(), 0, NOW()),
+('system.student_number', 'false', 'B', 'allow students to change their student number', 'A', 0, NOW(), 0, NOW()),
+('course.creation.instructions', '', 'S', 'Display course creation instructions', 'A', 0, NOW(), 0, NOW());
 
 -- --------------------------------------------------------
 
