@@ -13,7 +13,7 @@ class CoursesController extends AppController
     public $name = 'Courses';
     public $uses =  array('GroupEvent', 'Course', 'Personalize', 'UserCourse',
         'UserEnrol', 'Group', 'Event', 'User', 'UserFaculty', 'Department',
-        'CourseDepartment', 'EvaluationSubmission', 'SurveyInput', 'UserTutor');
+        'CourseDepartment', 'EvaluationSubmission', 'SurveyInput', 'UserTutor', 'SysParameter');
     public $helpers = array('Html', 'Ajax', 'excel', 'Javascript', 'Time',
         'Js' => array('Prototype'), 'FileUpload.FileUpload');
     public $components = array('ExportBaseNew', 'AjaxList', 'ExportCsv', 'ExportExcel',
@@ -277,6 +277,11 @@ class CoursesController extends AppController
         $this->set('title_for_layout', 'Add Course');
         $this->_initFormEnv();
         $this->set('instructorSelected', User::get('id'));
+        
+        $instructions = $this->SysParameter->find('first', array('conditions' => array('parameter_code' => 'course.creation.instructions')));
+        if (!empty($instructions) && !empty($instructions['SysParameter']['parameter_value'])) {
+            $this->set('instructions', $instructions['SysParameter']['parameter_value']);
+        }
 
         if (!empty($this->data)) {
             $this->data['Course'] = array_map('trim', $this->data['Course']);

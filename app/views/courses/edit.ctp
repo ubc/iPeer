@@ -1,5 +1,9 @@
 <div id='CourseEditForm'>
 <?php
+if (isset($instructions)) {
+    echo $instructions;
+}
+
 echo $this->Form->create('Course');
 echo $this->Form->input('id');
 echo $form->input('Course.course');

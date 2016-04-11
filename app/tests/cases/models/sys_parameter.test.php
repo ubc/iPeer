@@ -71,7 +71,8 @@ class SysParameterTestCase extends CakeTestCase
             'system.super_admin', 'system.admin_email', 'display.date_format', 'system.version',
             'database.version', 'email.port', 'email.host', 'email.username', 'email.password',
             'display.contact_info', 'display.login.header', 'display.login.footer', 'system.absolute_url',
-            'google_analytics.tracking_id', 'google_analytics.domain', 'banner.custom_logo', 'system.timezone', 'system.student_number');
+            'google_analytics.tracking_id', 'google_analytics.domain', 'banner.custom_logo', 'system.timezone', 
+            'system.student_number', 'course.creation.instructions');
         $this->assertEqual(array_values($result), $expected);
     }
 }
