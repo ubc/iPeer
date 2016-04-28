@@ -18,6 +18,59 @@ function saveButtonVal(userId) {
     }
     return complete;
 }
+var groupMembers = [<?php echo implode(",", Set::extract('/User/id', $groupMembers)); ?>];
+jQuery( document ).ready(function() {
+    jQuery("#submitForm").submit(function(e) {
+        e.preventDefault();
+        var thisForm = this;
+        var usersToSubmit = [];
+        
+        for (var count = 0; count < groupMembers.length; count++) {
+            var userId = groupMembers[count];
+            var wasUpdated = jQuery("input[name='member_"+userId+"_updated']").val() == "1";
+            if (!wasUpdated) {
+                continue;
+            }
+            
+            // check if form complete for user
+            var complete = saveButtonVal(userId);
+            
+            if (complete) {
+                usersToSubmit.push(userId); // if complete, submit form for this user
+            } else {
+                // else we need to warn user that they will lose data for incompelte forms
+                
+                var fullname = jQuery("#panel"+userId).data("fullname");
+                var message = "<?php __('You have not completed all the questions for %fullname%. Would you like to discard changes?'); ?>";
+                message = message.replace("%fullname%", fullname);
+                if (!confirm(message)) { 
+                    return; 
+                }
+            }
+        }
+        
+        // update button text indicating user should wait
+        jQuery(thisForm).find("input[type='submit']").attr("disabled", true).val("<?php echo __('Saving... Please wait.', true); ?>");
+        
+        if (usersToSubmit.length == 0) {
+            thisForm.submit();
+        } else {
+            var ajaxCalls = [];
+            var userEvalForm = jQuery('#evalForm');
+            
+            for (count = 0; count < usersToSubmit.length; count++) {
+                var formData = userEvalForm.serialize();
+                formData += "&" + usersToSubmit[count] + "=Submit";
+                ajaxCalls.push(jQuery.post(userEvalForm.attr('action'), formData));
+            }
+            
+            // when all the ajax calls are finished
+            jQuery.when.apply(jQuery, ajaxCalls).then(function() {
+                thisForm.submit();
+            });
+        }
+    });
+});
 </script>
 <?php echo $html->script('ricobase')?>
 <?php echo $html->script('ricoeffects')?>
@@ -96,7 +149,7 @@ function saveButtonVal(userId) {
         <div id="accordion">
         <?php foreach($groupMembers as $row): $user = $row['User'];?>
             <input type="hidden" name="memberIDs[]" value="<?php echo $user['id']?>"/>
-            <div id="panel<?php echo $user['id']?>" class="panelName">
+            <div id="panel<?php echo $user['id']?>" class="panelName" data-fullname="<?php echo $user['first_name'].' '.$user['last_name'];?>">
                 <div id="panel<?php echo $user['id']?>Header" class="panelheader">
                 <?php echo $user['first_name'].' '.$user['last_name'];?>
                 <?php if (isset($row['User']['Evaluation'])): ?>

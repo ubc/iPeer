@@ -25,7 +25,8 @@ class EvaluationsController extends AppController
         'MixevalQuestionDesc');
     public $components = array('ExportBaseNew', 'Auth', 'AjaxList', 'Output',
         'userPersonalize', 'framework',
-        'Evaluation', 'Export', 'ExportCsv', 'ExportExcel', 'ExportPdf');
+        'Evaluation', 'Export', 'ExportCsv', 'ExportExcel', 'ExportPdf',
+        'RequestHandler');
 
     /**
      * __construct
@@ -796,14 +797,18 @@ class EvaluationsController extends AppController
                     }
                     $suffix = empty($msg) ? '.' : ', but '.implode(' and ', $msg).'.';
                     $this->Session->setFlash(__('Your evaluation has been saved', true).$suffix);
-                    $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
+                    if (!$this->RequestHandler->isAjax()) {
+                        $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
+                    }
                     return;
                 } else {
                     //Found error
                     //Validate the error why the Event->save() method returned false
                     $this->validateErrors($this->Event);
                     $this->Session->setFlash(__('Your evaluation was not saved successfully', true));
-                    $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
+                    if (!$this->RequestHandler->isAjax()) {
+                        $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
+                    }
                     return;
                 }
             }

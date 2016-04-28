@@ -14,6 +14,7 @@ if(!isset($viewMode)){
 
 <!-- Sort by Student -->
 <?php if($viewMode == 0): ?>
+<input type="hidden" name="member_<?php echo $userId; ?>_updated" value="">
 <table class="standardtable">
     <tr>
         <th width=150 valign="top"></th>
@@ -51,7 +52,8 @@ if(!isset($viewMode)){
             }?>
             <div>
                 <input name="<?php echo $userId.'criteria_points_'.$i?>" type="radio" value="<?php echo $mark_value?>"
-                onClick="document.evalForm.selected_lom_<?php echo $userId."_".$i?>.value=<?php echo $lom['lom_num']?>;" <?php echo $check?>/>
+                    onClick="document.evalForm.selected_lom_<?php echo $userId."_".$i?>.value=<?php echo $lom['lom_num']?>;document.evalForm.member_<?php echo $userId; ?>_updated.value=1;" 
+                    <?php echo $check?>/>
             </div>
 
             <?php if ($criteria['show_marks'] == 1): ?>
@@ -64,7 +66,10 @@ if(!isset($viewMode)){
 
         <?php if ($evaluate): ?>
         <td>
-            <textarea cols="20" rows="2" name="<?php echo $userId?>comments[]"><?php echo (isset($evaluation['EvaluationDetail'][$i-1]['EvaluationRubricDetail']['criteria_comment']) ? $evaluation['EvaluationDetail'][$i-1]['EvaluationRubricDetail']['criteria_comment'] : '')?></textarea>
+            <textarea cols="20" rows="2" name="<?php echo $userId?>comments[]"
+                onChange="document.evalForm.member_<?php echo $userId; ?>_updated.value=1;"
+                ><?php echo (isset($evaluation['EvaluationDetail'][$i-1]['EvaluationRubricDetail']['criteria_comment']) ? 
+                    $evaluation['EvaluationDetail'][$i-1]['EvaluationRubricDetail']['criteria_comment'] : ''); ?></textarea>
         </td>
         <?php endif;?>
     </tr>
@@ -75,7 +80,9 @@ if(!isset($viewMode)){
         <td colspan="<?php echo $LOM_num+1?>" align="right"><?php __('Total Marks')?>: <?php echo $data['Rubric']['total_marks']?></td>
         <?php else: ?>
         <td colspan="<?php echo $LOM_num+2?>" align="center" class="tableheader2"><?php __('General Comments')?><br>
-            <textarea cols="80" rows="2" name="<?php echo $userId?>gen_comment" ><?php echo (isset($evaluation) ? $evaluation['EvaluationRubric']['comment'] : '')?></textarea>
+            <textarea cols="80" rows="2" name="<?php echo $userId?>gen_comment" 
+                onchange="document.evalForm.member_<?php echo $userId; ?>_updated.value=1;"
+                ><?php echo (isset($evaluation) ? $evaluation['EvaluationRubric']['comment'] : '')?></textarea>
         </td>
         <?php endif;?>
     </tr>
@@ -144,7 +151,8 @@ if(!isset($viewMode)){
             ?>
             <div>
                 <input name="<?php echo $userId.'criteria_points_'.$i?>" type="radio" value="<?php echo $mark_value?>"
-                onClick="document.evalForm.selected_lom_<?php echo $userId."_".$i?>.value=<?php echo $lom['lom_num']?>;" <?php echo $check?>/>
+                    onClick="document.evalForm.selected_lom_<?php echo $userId."_".$i?>.value=<?php echo $lom['lom_num']?>;document.evalForm.member_<?php echo $userId; ?>_updated.value=1;" 
+                    <?php echo $check?>/>
             </div>
 
             <?php if ($criteria['show_marks'] == 1): ?>
