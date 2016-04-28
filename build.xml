@@ -123,7 +123,7 @@
 
     <target name="phpcs"
         description="Find coding standard violations using PHP_CodeSniffer and print human readable output. Intended for usage on the command line before committing.">
-        <phpcodesniffer standard="${project.basedir}/build/phpcs.xml">
+        <phpcodesniffer standard="PSR2">
             <fileset dir="${project.basedir}/app">
                 <include name="**/*.php" />
                 <exclude name="tests/**" />
@@ -137,7 +137,7 @@
 
     <target name="phpcs-ci"
         description="Find coding standard violations using PHP_CodeSniffer creating a log file for the continuous integration server">
-        <phpcodesniffer standard="${project.basedir}/build/phpcs.xml">
+        <phpcodesniffer standard="PSR2">
             <fileset dir="${project.basedir}/app">
                 <include name="**/*.php" />
                 <exclude name="tests/**" />
@@ -166,7 +166,7 @@
 
     <target name="phpdoc"
         description="Generate API documentation using PHPDocumentor">
-        <phpdoc destdir="${project.basedir}/build/api" output="HTML:Smarty:PHP" sourcecode="false" >
+        <phpdoc2 destdir="${project.basedir}/build/api" template="responsive-twig">
             <fileset dir="${project.basedir}/app">
                 <include name="**/*.php" />
                 <exclude name="tests/**" />
@@ -175,7 +175,7 @@
                 <exclude name="config/**" />
                 <exclude name="webroot/**" />
             </fileset>
-        </phpdoc>
+        </phpdoc2>
     </target>
 
     <target name="pre-test" description="prepare to run tests">
