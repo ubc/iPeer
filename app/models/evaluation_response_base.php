@@ -19,13 +19,14 @@ class EvaluationResponseBase extends AppModel
      * getSubmittedResultsByGroupEvent
      * Return already submitted responses with submission information
      *
-     * @param mixed $groupEventId group event id
-     * @param mixed $contain      contain
+     * @param mixed $groupEventId       group event id
+     * @param mixed $include_partial    include partial submissions
+     * @param mixed $contain            contain
      *
      * @access public
      * @return void
      */
-    public function getSubmittedResultsByGroupEvent($groupEventId, $contain = false)
+    public function getSubmittedResultsByGroupEvent($groupEventId, $include_partial = false, $contain = false)
     {
         // find all submissions
         $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
@@ -33,14 +34,20 @@ class EvaluationResponseBase extends AppModel
             'conditions' => array('grp_event_id' => $groupEventId, 'submitted' => 1),
             'contain' => false
         ));
-
-        // build conditions
-        $conditions = array();
-        foreach ($submissions as $submission) {
-            $submission = $submission['EvaluationSubmission'];
-            $conditions[] = sprintf('(grp_event_id = %d AND evaluator = %d)', $submission['grp_event_id'], $submission['submitter_id']);
-        }
         
+        if($include_partial) {
+            // get partial and compelted evalutation data for all group members 
+            $conditions = array('grp_event_id' => $groupEventId);
+        } else {
+            // get evalutation dataonly for group members who have submitted the evalutations
+            $conditions = array();
+            foreach ($submissions as $submission) {
+                $submission = $submission['EvaluationSubmission'];
+                $conditions[] = sprintf('(grp_event_id = %d AND evaluator = %d)', $submission['grp_event_id'], $submission['submitter_id']);
+            }
+            
+            $conditions = array(join(' OR ', $conditions));
+        }
         
         $responses = array();
         /*
@@ -50,11 +57,11 @@ class EvaluationResponseBase extends AppModel
          * See cake/libs/model/datasources/dbo_source.php functions queryAssociation and fetchAssociated 
         */
         // chunk find
-        $total = $this->find('count', array('conditions' => array(join(' OR ', $conditions)), 'contain' => $contain));
+        $total = $this->find('count', array('conditions' => $conditions, 'contain' => $contain));
         $limit = 100;
         $pages = ceil($total / $limit);
         for ($page = 1; $page < $pages + 1; $page++) {
-            $list = $this->find('all', array('conditions' => array(join(' OR ', $conditions)), 'contain' => $contain, 'limit' => $limit, 'page' => $page));
+            $list = $this->find('all', array('conditions' => $conditions, 'contain' => $contain, 'limit' => $limit, 'page' => $page));
             
             $responses = array_merge_recursive($responses, $list);
         }

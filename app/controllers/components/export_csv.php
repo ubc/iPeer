@@ -80,7 +80,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         $this->responseModel = ClassRegistry::init($this->responseModelName);
         $this->evaluationModelName = EvaluationBase::$types[$event['Event']['event_template_type_id']];
         $this->evaluationModel = ClassRegistry::init($this->evaluationModelName);
-        $results = $this->responseModel->getSubmittedResultsByGroupEvent($groupEventIds, $this->detailModel[$event['Event']['event_template_type_id']]);
+        $results = $this->responseModel->getSubmittedResultsByGroupEvent($groupEventIds, true, $this->detailModel[$event['Event']['event_template_type_id']]);
         $results = Set::combine($results, '{n}.'.$this->responseModelName.'.id', '{n}', '{n}.'.$this->responseModelName.'.grp_event_id');
         $evaluation = $this->evaluationModel->getEvaluation($event['Event']['template_id']);
         unset($evaluation['Event']);
