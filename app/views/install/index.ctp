@@ -43,7 +43,7 @@ if (get_magic_quotes_gpc()) {
     // magic quotes need to be off or json gets escaped, ref ticket #330
     $magicquotes = $no;
 }
-if (file_exists(APP.DS.'plugins'.DS.'guard'.DS.'config'.DS.'guard.php') || file_exists(CONFIGS.'guard.php')) {
+if (file_exists(APP.DS.'plugins'.DS.'guard'.DS.'config'.DS.'guard_default.php') || file_exists(CONFIGS.'guard.php')) {
     $guard_plugin = $yes;
 }
 

@@ -1,6 +1,6 @@
 {
   "require": {
-      "compass/cake-guard": "1.0.0"
+      "compass/cake-guard": "1.0.1"
   },
   "require-dev": {
     "phing/phing": "2.*",

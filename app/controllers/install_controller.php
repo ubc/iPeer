@@ -130,8 +130,8 @@ class InstallController extends Controller
         }
 
         if (!file_exists(CONFIGS.'guard.php')) {
-            if (!copy(APP.DS.'plugins'.DS.'guard'.DS.'config'.DS.'guard.php', CONFIGS.'guard.php')) {
-                $this->Session->setFlash(__('Cannot copy the guard configuration (app/plugins/guard/config/guard.php) to the configuration directory.', true));
+            if (!copy(APP.DS.'plugins'.DS.'guard'.DS.'config'.DS.'guard_default.php', CONFIGS.'guard.php')) {
+                $this->Session->setFlash(__('Cannot copy the guard configuration (app/plugins/guard/config/guard_default.php) to the configuration directory as guard.php.', true));
                 return;
             }
         }
