@@ -800,7 +800,7 @@ class V1Controller extends Controller {
         $statusCode = 'HTTP/1.1 400 Bad Request'; // unrecognized request type
 
         // initialize find parameters
-        $fields = array('id', 'evaluatee', 'score');
+        $fields = array('id', 'evaluatee', 'evaluator', 'score');
         $conditions = array('event_id' => $event_id);
         // add additional conditions if they only want 1 user
         if ($user_id) {

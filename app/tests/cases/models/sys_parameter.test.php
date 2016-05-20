@@ -64,7 +64,7 @@ class SysParameterTestCase extends CakeTestCase
     function testNumberSysParam()
     {
         $result = $this->SysParameter->find('count');
-        $this->assertEqual($result, 18);
+        $this->assertEqual($result, 19);
         
         $result = $this->SysParameter->find('list', array('fields' => array('SysParameter.parameter_code')));
         $expected = array(

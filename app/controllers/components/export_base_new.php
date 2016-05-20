@@ -239,6 +239,25 @@ class ExportBaseNewComponent extends Object
                     // mixed evaluation
                     $results = $response[$this->detailModel[$event['Event']['event_template_type_id']]];
                     $results = Set::combine($results, '{n}.question_number', '{n}');
+                    
+                    $missing_required_question = false;
+                    
+                    foreach ($event['Question'] as $question) {
+                        if ($question['self_eval'] == $peerEval) {
+                            continue; // skip questions that don't belong in the desired section
+                        }
+                        if ($question['required'] && !isset($results[$question['question_num']])) {
+                            $missing_required_question = true;
+                        }
+                    }
+                    
+                    if ($missing_required_question) {
+                        //skip the rest of output
+                        $grid[] = $row;
+                        $yInc++;
+                        continue;
+                    }
+                    
                     foreach ($event['Question'] as $question) {
                         if ($question['self_eval'] == $peerEval) {
                             continue; // skip questions that don't belong in the desired section

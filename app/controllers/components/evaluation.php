@@ -1063,31 +1063,25 @@ class EvaluationComponent extends Object
      * @param mixed $groupEventId group event id
      * @param mixed $groupMembers group members
      * @param mixed $include      members that have submitted
+     * @param mixed $required_questions required questions for the mixed eval
      *
      * @access public
      * @return void
      */
-    function getMixevalResultDetail($groupEventId, $groupMembers, $include)
+    function getMixevalResultDetail($groupEventId, $groupMembers, $include, $required_questions)
     {
-
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
         $mixevalResultDetail = array();
         $evalResult = array();
         if ($groupEventId && $groupMembers) {
             foreach ($groupMembers as $user) {
                 $userId = isset($user['User'])? $user['User']['id'] : $user['id'];
-
-                // filter out the people who are not student, they should not get result
-//                if ($user['Role'][0]['name'] != 'student') {
-//                    continue;
-//                }
-
                 // get the results for students
                 $evalResult[$userId] = $this->EvaluationMixeval->getResultsByEvaluatee($groupEventId, $userId, $include);
             }
         }
 
-        $mixevalResultDetail['scoreRecords'] =  $this->formatMixevalEvaluationResultsMatrix($evalResult);
+        $mixevalResultDetail['scoreRecords'] =  $this->formatMixevalEvaluationResultsMatrix($evalResult, $required_questions);
         $mixevalResultDetail['evalResult'] = $evalResult;
 
         return $mixevalResultDetail;
@@ -1099,17 +1093,31 @@ class EvaluationComponent extends Object
      * Matrix[evaluatee_id][question_index] = score
      *
      * @param mixed $evalResults evaluation result
+     * @param mixed $required_questions required questions for the mixed eval
      *
      * @access public
      * @return array
      */
-    function formatMixevalEvaluationResultsMatrix($evalResults)
+    function formatMixevalEvaluationResultsMatrix($evalResults, $required_questions)
     {
         $matrix = array();
         foreach ($evalResults as $userId => $evals) {
             $counter = array();
             $matrix[$userId] = array();
             foreach ($evals as $eval) {
+                $questions_evaluated = Set::extract('/EvaluationMixevalDetail/question_number', $eval);
+                // skip incomplete submissions
+                $missing_required_question = false;
+                foreach ($required_questions as $question_num) {                    
+                    if (!in_array($question_num, $questions_evaluated)) {
+                        $missing_required_question = true;
+                    }
+                }
+                // skip incomplete evaluations for a user
+                if ($missing_required_question) {
+                    continue;
+                }
+                
                 foreach ($eval['EvaluationMixevalDetail'] as $detail) {
                     // skip the comment question
                     if ($detail['question_comment'] !== null) {
