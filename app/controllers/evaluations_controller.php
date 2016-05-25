@@ -1294,18 +1294,21 @@ class EvaluationsController extends AppController
             $fullNames = $this->User->getFullNames($memberList);
             $members = $this->User->findAllById($memberList);
             $sub = Set::extract('/EvaluationSubmission/submitter_id', $sub);
-            $details = $this->Evaluation->getMixevalResultDetail($groupEventId, $members, $sub);
+            
             $mixeval = $this->Mixeval->find('first', array(
                 'conditions' => array('Mixeval.id' => $event['Event']['template_id']),
                 'recursive' => 2
             ));
-            $inCompleteMembers = $this->User->getUsers($inCompleteMembers, array('Role'), array('User.full_name'));
-            $notInGroup = $this->User->getUsers($notInGroup, array('Role'), array('User.id', 'User.full_name'));
-            $gradeReleaseStatus = $this->EvaluationMixeval->getTeamReleaseStatus($groupEventId);
             $required = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}.required');
             $peerQues = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}.self_eval');
             // only required peer evaluation questions are counted toward the averages
             $required = array_flip(array_intersect(array_keys($required, 1), array_keys($peerQues, 0)));
+            
+            $member_ids = Set::extract($groupMembers, '/GroupsMembers/user_id');
+            $details = $this->Evaluation->getMixevalResultDetail($groupEventId, $members, $member_ids, array_keys($required));
+            $inCompleteMembers = $this->User->getUsers($inCompleteMembers, array('Role'), array('User.full_name'));
+            $notInGroup = $this->User->getUsers($notInGroup, array('Role'), array('User.id', 'User.full_name'));
+            $gradeReleaseStatus = $this->EvaluationMixeval->getTeamReleaseStatus($groupEventId);
             $questions = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}');
             $quesTypes = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}.mixeval_question_type_id');
             $status = array();
@@ -1467,17 +1470,17 @@ class EvaluationsController extends AppController
                 'conditions' => array('Mixeval.id' => $event['Event']['template_id']),
                 'recursive' => 2
             ));
-
-            $user = $this->User->findById($userId);
-            $sub = $this->EvaluationSubmission->findAllByGrpEventId($groupEventId);
-            $sub = Set::extract('/EvaluationSubmission/submitter_id', $sub);
-            $details = $this->Evaluation->getMixevalResultDetail($groupEventId, array($user), $sub);
-            $eventSub = $this->Event->getEventSubmission($eventId, $userId);
-            $penalty = $this->Penalty->getPenaltyPercent($eventSub);
             $required = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}.required');
             $peerQues = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}.self_eval');
             // only required peer evaluation questions are counted toward the averages
             $required = array_flip(array_intersect(array_keys($required, 1), array_keys($peerQues, 0)));
+
+            $user = $this->User->findById($userId);
+            $groupMembers = $this->GroupEvent->getGroupMembers($groupEventId);
+            $member_ids = Set::extract($groupMembers, '/GroupsMembers/user_id');
+            $details = $this->Evaluation->getMixevalResultDetail($groupEventId, array($user), $member_ids, array_keys($required));
+            $eventSub = $this->Event->getEventSubmission($eventId, $userId);
+            $penalty = $this->Penalty->getPenaltyPercent($eventSub);
             $score[$userId]['received_ave_score'] = array_sum(array_intersect_key($details['scoreRecords'][$userId], $required));
             $avePenalty = $score[$userId]['received_ave_score'] * ($penalty / 100);
 

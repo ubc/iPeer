@@ -492,19 +492,20 @@ class EvaluationTestCase extends CakeTestCase
             ),
         );
         $include = array(5);
-        $eval = $this->EvaluationComponentTest->getMixevalResultDetail($groupEventId, $groupMembers, $include);
+        $required = array(1, 2, 3, 4, 5);
+        $eval = $this->EvaluationComponentTest->getMixevalResultDetail($groupEventId, $groupMembers, $include, $require);
         // Set up expected results
         $expected = $this->setUpMixevalResultDetail();
         $this->assertEqual($eval, $expected);
 
         // Null test cases
-        $eval = $this->EvaluationComponentTest->getMixevalResultDetail(null, $groupMembers, null);
+        $eval = $this->EvaluationComponentTest->getMixevalResultDetail(null, $groupMembers, null, null);
         $expected = array(
             "scoreRecords"=>array(),
             "evalResult"=> array(),
         );
         $this->assertEqual($eval, $expected);
-        $eval = $this->EvaluationComponentTest->getMixevalResultDetail(null, null, null);
+        $eval = $this->EvaluationComponentTest->getMixevalResultDetail(null, null, null, null);
         $this->assertEqual($eval, $expected);
 
     }
