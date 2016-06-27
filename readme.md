@@ -71,27 +71,57 @@ Runing the tests:
 
 It is better not to touch the mouse or keyboard during the tests.
 
+iPeer 3.1.9
+---------------------------
+* Fixed #527 wrong grades calculated during the grade through API
+* Updated guard template file to guard_default.php
+* Fixed #530 CI tests
+* Fixed System Parameter unit test
+* Fixed #526 Sections will be submitted automatically before the evaluation is submitted
+* Added travis CI support
+* Added course creation instructions system parameter
+* Merge pull request #519 from ubc/andrew-3.1.x
+* Merge pull request #521 from ubc/448-3.1.x
+* Merge pull request #520 from ubc/491-3.1.x
+* Fixed #448 - Rubric evaluation form has accordion closed by default
+* Added permissions for event/export and event/import in delta 11
+* Event CSV import date format restriction loosened (will use any date string with compatible with strtotime function) - Fixed testCsvExport unit test data
+* Fixed a range calculation issue with the getPenaltyByPenaltiesAndDaysLate function (added case to unit tests)
+* Fixed #517 - Simple Eval and Mixed Eval now take into account penalties for students who do not submit their evaluations
+* Improved Performance on PDF export although it still takes a long time
+* Improved performance to export CSV
+* Improved performance for simpleEvalScore and mixedEvalScore by removing the unneeded associated results from the query (no longer requires paging) - Further improved performance for rubricEvalScore by only fetching the EvaluationRubricDetail association (event is not needed) - Added some documentation to rubricEvalScore for why it is fetching in chunks
+* Improved performance for simpleEvalScore, mixedEvalScore, and rubricEvalScore functions to handle larger class sizes
+* Improved general performance for Grades API
+* Added new function getPenaltyByPenaltiesAndDaysLate to Penalty model with unit tests
+* Fixed issues with installation steps for Vagrant and Puppet
+* Moved guard into composer
+* Switched mayflower php module
+* Added missing fixtures
+* Fixed #491 Implemented event import and export
+* Fixed emails templates filling in wrong names.
+* Added ipeer_test database to puppet dev.pp
+
 iPeer 3.1.8
 ---------------------------
-* Fix #494 the incorrect timezone adjustment
-* Remove result release date from survey event view
-* Extract only model,view and controller for i18n, fix #508
-* Fix the issue that no event listed when user has dual roles
-* Allow partial submission for rubric eval
-* Add composer
-* Change criteria comment field in evaluation_rubric_details to text
-* Fix wrong calculation in grade API
-* Fix missing student in eval when he/she has non student role
+* Fixed #494 the incorrect timezone adjustment
+* Removed result release date from survey event view
+* Fixed #508, Extract only model,view and controller for i18n
+* Fixed the issue that no event listed when user has dual roles
+* Allowed partial submission for rubric eval
+* Added composer
+* Changed criteria comment field in evaluation_rubric_details to text
+* Fixed wrong calculation in grade API
+* Fixed missing student in eval when he/she has non student role
 
 iPeer 3.1.7
 ---------------------------
-* Fix course enrolment not saved on hidden page on user edit
-* Add License file
-* changed the box Vagrant is using
-* Merge pull request #506 from tkbaylis/3.1.x
-* Trim the input from CSV file
-* Allow users to hold multiple roles in different courses #413
-* Fix issue showing blank page when admin click on list events
+* Fixed course enrolment not saved on hidden page on user edit
+* Added License file
+* Changed the box Vagrant is using
+* Trimed the input from CSV file
+* Allowed users to hold multiple roles in different courses #413
+* Fixed issue showing blank page when admin click on list events
 
 iPeer 3.1.6
 ---------------------------
