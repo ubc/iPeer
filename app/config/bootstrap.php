@@ -60,6 +60,7 @@ if (!file_exists(dirname(__FILE__).'/../tmp/installed.txt') && file_exists(dirna
     copy(dirname(__FILE__).'/installed.txt', dirname(__FILE__).'/../tmp/installed.txt');
     // in case we can't remove the old file, we will leave it there
     @unlink(dirname(__FILE__).'/installed.txt');
+    define('IS_INSTALLED', 1);
 } else if (!file_exists(dirname(__FILE__).'/../tmp/installed.txt') && !file_exists(dirname(__FILE__).'/installed.txt')) {
     define('IS_INSTALLED', 0);
 } else {

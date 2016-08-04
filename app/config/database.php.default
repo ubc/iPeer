@@ -83,4 +83,20 @@ class DATABASE_CONFIG {
 		'prefix' => '',
 		//'encoding' => 'utf8',
 	);
+
+    public function __construct() {
+        $vars = array(
+            'host'     => 'IPEER_DB_HOST',
+            'login'    => 'IPEER_DB_USER',
+            'password' => 'IPEER_DB_PASSWORD',
+            'database' => 'IPEER_DB_NAME',
+            'prefix'   => 'IPEER_DB_PREFIX'
+        );
+
+        foreach($vars as $key => $var) {
+            if(getenv($var)) {
+                $this->default[$key] = getenv($var);
+            }
+        }
+    }
 }

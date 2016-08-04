@@ -51,14 +51,6 @@ if (file_exists(APP.DS.'plugins'.DS.'guard'.DS.'config'.DS.'guard_default.php') 
 if (ini_get("sendmail_path")) { // send mail
   $sendmail = $yes;
 }
-// email scheduling
-$output;
-$return_var;
-exec("atq",$output,$return_var); //won't work on windows
-if($return_var == 0)
-{
-  $emailperm = $yes;
-}
 // ldap
 $ldap = function_exists('ldap_connect') ? $yes : $no;
 
@@ -165,12 +157,6 @@ foreach ($php_recommended_settings as $key => $setting)
         <div class="help"><?php __('Required if you want email functions.')?></div>
     </td>
     <td width="30%"><?php echo $sendmail ?></td>
-  </tr>
-  <tr>
-      <td><?php __('Permissions for email scheduling.')?>
-        <div class="help"><?php __('If failed, remove Apache user from "/etc/at.deny" or "/var/at/at.deny"')?></div>
-      </td>
-      <td><?php echo $emailperm; ?></td>
   </tr>
   <tr>
       <td><?php __('PHP LDAP Extension.')?>
