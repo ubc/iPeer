@@ -35,13 +35,13 @@ echo $this->Form->input(
 ?>
 
 <div id='db-config'>
-<h4><?php __('MySQL Database Configuration Parameters')?></h4>
+<!--<h4><?php __('MySQL Database Configuration Parameters')?></h4>-->
 
 <?php
-echo $form->input('host', array('value'=>$default['host']));
+/*echo $form->input('host', array('value'=>$default['host']));
 echo $form->input('login', array('label' => 'Username', 'value'=>$default['login']));
 echo $form->input('password', array('value' => $default['password']));
-echo $form->input('database', array('value' => $default['database']));
+echo $form->input('database', array('value' => $default['database']));*/
 
 echo $form->submit('Next >>', array('id'=>'next', 'div' => 'dbform'));
 

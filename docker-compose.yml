@@ -19,6 +19,8 @@ services:
       - IPEER_DB_HOST=db
       - IPEER_DB_USER=ipeer
       - IPEER_DB_PASSWORD=ipeer
+      - IPEER_DEBUG=2
+      - IPEER_SESSION_SAVE=database
     depends_on:
       - db
   web:
