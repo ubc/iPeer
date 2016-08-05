@@ -1,10 +1,12 @@
 FROM php:5.6.24-fpm
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests  -y \
         libpng12-dev \
         libxml2-dev \
         libldap2-dev \
         libldb-dev \
+        unzip \
+    && rm -rf /var/lib/apt/lists/* \
     && ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so \
     && ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so \
     && docker-php-ext-install -j$(nproc) xml gd ldap mysql \
