@@ -18,7 +18,7 @@ class InstallValidationStep3 extends AppModel
             'type' => 'string',
             'length' => '1',
         ),
-        'host' => array(
+/*        'host' => array(
             'type' => 'string',
             'length' => '9001', // practically, we won't see urls this long,
             // but I don't remember exactly what the rfc for uris limit it to
@@ -34,7 +34,7 @@ class InstallValidationStep3 extends AppModel
         'database' => array(
             'type' => 'string',
             'length' => '255',
-        ),
+        ),*/
     );
     public $validate = array(
         'data_setup_option' => array(
@@ -46,7 +46,7 @@ class InstallValidationStep3 extends AppModel
                 'message' => 'Invalid selection for data setup option',
             )
         ),
-        'host' => array(
+        /*'host' => array(
             'rule' => 'notEmpty',
         ),
         'login' => array(
@@ -54,6 +54,6 @@ class InstallValidationStep3 extends AppModel
         ),
         'database' => array(
             'rule' => 'notEmpty',
-        ),
+        ),*/
     );
 }

@@ -1,0 +1,45 @@
+version: '2'
+services:
+  db:
+    image: mariadb:10.1
+    container_name: ipeer_db
+    environment:
+      - MYSQL_ROOT_PASSWORD=randompassword
+      - MYSQL_DATABASE=ipeer
+      - MYSQL_USER=ipeer
+      - MYSQL_PASSWORD=ipeer
+    volumes:
+      - ./.data:/var/lib/mysql
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile-app
+    container_name: ipeer_app
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "9000:9000"
+    environment:
+      - IPEER_DB_HOST=db
+      - IPEER_DB_USER=ipeer
+      - IPEER_DB_PASSWORD=ipeer
+      - IPEER_DEBUG=2
+      - IPEER_SESSION_SAVE=database
+      #- IPEER_AUTH=Ldap
+      #- IPEER_AUTH_LDAP_host=ldap.example.com
+      #- IPEER_AUTH_LDAP_port=636
+    depends_on:
+      - db
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile-web
+    container_name: ipeer_web
+    #volumes:
+    #  - ./app/webroot:/var/www/html
+    environment:
+      - NGINX_FASTCGI_PASS=ipeer_app:9000
+    ports:
+      - "8080:80"
+    depends_on:
+      - app

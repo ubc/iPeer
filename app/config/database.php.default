@@ -73,6 +73,8 @@
  */
 class DATABASE_CONFIG {
 
+    private static $instance = null;
+
 	public $default = array(
 		'driver' => 'mysql',
 		'persistent' => false,
@@ -83,4 +85,28 @@ class DATABASE_CONFIG {
 		'prefix' => '',
 		//'encoding' => 'utf8',
 	);
+
+    public function __construct() {
+        $vars = array(
+            'host'     => 'IPEER_DB_HOST',
+            'login'    => 'IPEER_DB_USER',
+            'password' => 'IPEER_DB_PASSWORD',
+            'database' => 'IPEER_DB_NAME',
+            'prefix'   => 'IPEER_DB_PREFIX'
+        );
+
+        foreach($vars as $key => $var) {
+            if(getenv($var) !== false) {
+                $this->default[$key] = getenv($var);
+            }
+        }
+    }
+
+    public static function getInstance() {
+        if (!$instance) {
+            $instance = new DATABASE_CONFIG();
+        }
+
+        return $instance;
+    }
 }

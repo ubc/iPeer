@@ -56,15 +56,17 @@ if (file_exists(dirname(__FILE__).'/bootstrap.local.php')) {
 // because the installed.txt file has been moved from CONFIG to TMP
 // we need the following to move the file if the install.txt is still in the old
 // place
+/*
 if (!file_exists(dirname(__FILE__).'/../tmp/installed.txt') && file_exists(dirname(__FILE__).'/installed.txt')) {
     copy(dirname(__FILE__).'/installed.txt', dirname(__FILE__).'/../tmp/installed.txt');
     // in case we can't remove the old file, we will leave it there
     @unlink(dirname(__FILE__).'/installed.txt');
+    define('IS_INSTALLED', 1);
 } else if (!file_exists(dirname(__FILE__).'/../tmp/installed.txt') && !file_exists(dirname(__FILE__).'/installed.txt')) {
     define('IS_INSTALLED', 0);
 } else {
     define('IS_INSTALLED', 1);
-}
+}*/
 
 /**
  * Create an empty database.php file if one isn't found.
@@ -82,4 +84,39 @@ if (!file_exists(CONFIGS.'database.php')) {
 require_once(CONFIGS.'database.php');
 if (!defined('DB_PREDEFINED')) {
     define('DB_PREDEFINED', false);
+}
+
+function table_exists($table) {
+    $val = mysql_query("SELECT 1 FROM $table LIMIT 1");
+    return $val !== false;
+}
+
+// test if the system has been installed
+$db_config = new DATABASE_CONFIG();
+if ($db_config->default['driver'] === 'mysql') {
+    $conn = mysql_connect($db_config->default['host'], $db_config->default['login'], $db_config->default['password']);
+    if (mysql_errno()) {
+        throw new RuntimeException('Please setup database config first in app/config/database.php.');
+    }
+    mysql_select_db($db_config->default['database']);
+    $table_name = $db_config->default['prefix'] . 'users';
+    if (table_exists($table_name)) {
+        define('IS_INSTALLED', 1);
+    } else {
+        define('IS_INSTALLED', 0);
+    }
+
+    // create session table if needed
+    if (Configure::read('Session.save') === 'database' && !table_exists('cake_session')) {
+        mysql_query('
+            CREATE TABLE `cake_sessions` (
+            `id` varchar(255) NOT NULL,
+            `data` text DEFAULT NULL,
+            `expires` int(11) DEFAULT NULL, PRIMARY KEY  (`id`)
+            );
+        ');
+    }
+    mysql_close($conn);
+} else {
+    throw new RuntimeException('Database driver is not supported!');
 }

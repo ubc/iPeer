@@ -1,7 +1,8 @@
 <?php
 /**
  * This is core configuration file. It should be set up as production
- * configuration. To customize it for development, please use config.local.php.
+ * configuration. To customize it for development, please use config.local.php
+ * or environment variables.
  *
  * Use it to configure core behavior of Cake.
  *
@@ -134,7 +135,7 @@
  *
  * The model name set here should *not* be used elsewhere in your application.
  */
-	//Configure::write('Session.model', 'Session');
+	Configure::write('Session.model', 'Session');
 
 /**
  * The name of the table used to store CakePHP database sessions.
@@ -354,4 +355,26 @@
  */
 if (file_exists(__DIR__ . '/config.local.php')) {
   include('config.local.php');
+}
+
+/**
+ * Environment variable overrides
+ * Use IPEER_VARIABLE_ALL_UPPERCASE to override configurations
+ */
+$keys = array('debug', 'Session', 'App', 'Security');
+foreach ($keys as $key) {
+  $value = Configure::read($key);
+  if (is_array($value)) {
+    foreach ($value as $k => $v) {
+      $env_key = 'IPEER_' . strtoupper($key . '_' . $k);
+      if (getenv($env_key)) {
+        Configure::write($key . '.' . $k, getenv($env_key));
+      }
+    }
+  } else {
+    $env_key = 'IPEER_' . strtoupper($key);
+    if (getenv($env_key)) {
+      Configure::write($key, getenv($env_key));
+    }
+  }
 }

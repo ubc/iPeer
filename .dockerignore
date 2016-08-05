@@ -1,0 +1,9 @@
+.git
+.idea
+.data
+build
+build.xml
+Boxfile
+Vagrantfile
+app/tmp
+vendor/

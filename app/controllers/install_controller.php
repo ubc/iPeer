@@ -57,7 +57,7 @@ class InstallController extends Controller
     function index()
     {
         if (IS_INSTALLED) {
-            $this->Session->setFlash(sprintf(__('WARNING: It looks like you already have a instance running. Reinstalling will remove all your current data. Remove %s to proceed.', true), TMP.'installed.txt'));
+            $this->Session->setFlash(__('WARNING: It looks like you already have a instance running. Please remove the existing database tables before proceeding.', true));
         }
     }
 
@@ -84,14 +84,14 @@ class InstallController extends Controller
      */
     function install3()
     {
-        if ($this->data['InstallValidationStep3']['data_setup_option'] == 'C') {
+        /*if ($this->data['InstallValidationStep3']['data_setup_option'] == 'C') {
             $this->redirect(array('controller' => 'upgrade'));
             return;
         }
 
         if (!DB_PREDEFINED && !is_writable(CONFIGS.'database.php')) {
             $this->Session->setFlash(sprintf(__('Cannot write to the database configuration file. Please change the permission on %s so that it is writable.', true), CONFIGS.'/database.php'));
-        }
+        }*/
 
 
         if ($this->data) {
@@ -105,12 +105,7 @@ class InstallController extends Controller
 
             // Try to configure the database, configureDatabase() will setFlash
             // with error msg so don't need to do it again
-            $ret = $this->configureDatabase();
-            if ($ret) {
-                // Failed to configure database
-                $this->Session->setFlash(sprintf(__('Database config failed - %s', true), $ret));
-                return;
-            }
+            $this->Session->write('data_setup_option', $this->data['InstallValidationStep3']['data_setup_option']);
 
             // Success
             $this->redirect(array('action' => 'install4'));
@@ -149,6 +144,20 @@ class InstallController extends Controller
             }
 
             // validation successful
+
+            // create tables
+            $ret = $this->configureDatabase($this->Session->read('data_setup_option'));
+            if ($ret) {
+                // Failed to configure database
+                $this->Session->setFlash(sprintf(__('Database config failed - %s', true), $ret));
+                return;
+            }
+
+            // force cake to reload the source list (tables) from database
+            // so that the query below will have most up-to-date tables
+            $db = ConnectionManager::getDataSource('default');
+            $db->cacheSources = false;
+
             $this->createSuperAdmin(
                 $this->data['InstallValidationStep4']['super_admin'],
                 $this->data['InstallValidationStep4']['password'],
@@ -224,17 +233,20 @@ class InstallController extends Controller
      * @access private
      * @return void
      */
-    private function configureDatabase()
+    private function configureDatabase($option)
     {
         // We have user credentials for the database, write it to conf file
-        $dbConfig = $this->createDBConfigFile();
+        //$dbConfig = $this->createDBConfigFile();
+        $db = new DATABASE_CONFIG();
+        $dbConfig = $db->default;
+
         if (!$dbConfig) {
             // Writing to config file failed
             return "Unable to write to ".CONFIGS."database.php";
         }
 
         // Get the data setup option: A-With Sample,B-Basic,C-Import from iPeer 1.6
-        $dbConfig['data_setup_option'] = $this->data['InstallValidationStep3']['data_setup_option'];
+        $dbConfig['data_setup_option'] = $option;
         $ret = $this->installHelper->runInsertDataStructure($dbConfig);
 
         //Found error
@@ -253,7 +265,7 @@ class InstallController extends Controller
      * @access private
      * @return void
      */
-    private function createDBConfigFile()
+    /*private function createDBConfigFile()
     {
         // Workaround for Windows portability
         $endl = (substr(PHP_OS, 0, 3)=='WIN')? "\r\n" : "\n";
@@ -290,7 +302,7 @@ class InstallController extends Controller
         }
 
         return $dbConfig;
-    }
+    }*/
 
 
     /**

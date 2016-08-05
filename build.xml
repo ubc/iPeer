@@ -3,24 +3,27 @@
 <project name="iPeer" basedir="." default="build">
 
     <target name="load-db-config">
-        <phingcall target="pre-test"/>
         <loadfile property="dbfile" file="app/config/database.php">
             <filterchain>
                 <stripphpcomments />
                 <linecontainsregexp>
-                        <regexp pattern="^((?!\?php).)*$" />
+                    <regexp pattern="^((?!\?php).)*$" />
                 </linecontainsregexp>
-                <replaceregexp>
-                    <regexp pattern="public" replace="public static"/>
-                </replaceregexp>
             </filterchain>
         </loadfile>
         <php expression="${dbfile}"/>
-        <php expression="DATABASE_CONFIG::$default['driver']" returnProperty="db.driver"/>
-        <php expression="DATABASE_CONFIG::$default['host']"   returnProperty="db.host"/>
-        <php expression="DATABASE_CONFIG::$default['login']"  returnProperty="db.username"/>
-        <php expression="DATABASE_CONFIG::$default['password']" returnProperty="db.password"/>
-        <php expression="DATABASE_CONFIG::$default['database']" returnProperty="db.name"/>
+        <php expression="DATABASE_CONFIG::getInstance()->default['driver']" returnProperty="db.driver"/>
+        <php expression="DATABASE_CONFIG::getInstance()->default['host']"   returnProperty="db.host"/>
+        <php expression="DATABASE_CONFIG::getInstance()->default['login']"  returnProperty="db.username"/>
+        <php expression="DATABASE_CONFIG::getInstance()->default['password']" returnProperty="db.password"/>
+        <php expression="DATABASE_CONFIG::getInstance()->default['database']" returnProperty="db.name"/>
+        <if>
+            <!-- we need to override default database to run tests to avoid wiping out development data-->
+            <not><isset property="env.IPEER_DB_NAME"/></not>
+            <then>
+                <property name="db.name" value="ipeer_test" override="true"/>
+            </then>
+        </if>
     </target>
 
     <target name="build"
@@ -45,9 +48,6 @@
         <mkdir dir="${project.basedir}/build/coverage"/>
         <mkdir dir="${project.basedir}/build/logs"/>
         <mkdir dir="${project.basedir}/build/pdepend"/>
-        <!-- Needed to enable the API controller tests -->
-        <!-- make ipeer seem to be installed -->
-        <touch file="${project.basedir}/app/tmp/installed.txt" />
         <!-- let Apache write to cache -->
         <exec command="chmod -R 777 ${project.basedir}/app/tmp"/>
     </target>
@@ -178,65 +178,36 @@
         </phpdoc2>
     </target>
 
-    <target name="pre-test" description="prepare to run tests">
-        <copy file="app/config/database.php.default" tofile="app/config/database.php" overwrite="false"/>
-        <copy file="app/plugins/guard/config/guard_default.php" tofile="app/config/guard.php" overwrite="false"/>
-        <copy file="app/config/database.php" tofile="app/config/database_test_backup.php" overwrite="true"/>
-        <if>
-            <!-- set up database name for Jenkins. Using different db name for different job to avoid conflict when running simultaneously -->
-            <isset property="env.JOB_NAME"/>
-            <then>
-                <reflexive file="app/config/database.php">
-                    <filterchain>
-                        <replaceregexp>
-                            <regexp pattern="'database'.*=>.*'(.*)'" replace="'database'  => '${env.JOB_NAME}'"/>
-                        </replaceregexp>
-                    </filterchain>
-                </reflexive>
-            </then>
-            <else>
-                <reflexive file="app/config/database.php">
-                    <filterchain>
-                        <replaceregexp>
-                            <regexp pattern="'database'.*=>.*'(.*)'" replace="'database'  => '\1_test'"/>
-                        </replaceregexp>
-                    </filterchain>
-                </reflexive>
-            </else>
-        </if>
-    </target>
-
     <target name="post-test" description="clean up after running tests">
-        <move file="app/config/database_test_backup.php" tofile="app/config/database.php" overwrite="true"/>
         <chmod file="app/tmp" mode="0777"/>
     </target>
 
     <target name="test" description="Run unit tests" depends="init-test-db">
-        <exec command="sh cake/console/cake -app app testsuite app group model" passthru="true"/>
-        <exec command="sh cake/console/cake -app app testsuite app group controller" passthru="true"/>
+        <exec command="IPEER_DB_NAME=${db.name} sh cake/console/cake -app app testsuite app group model" passthru="true"/>
+        <exec command="IPEER_DB_NAME=${db.name} sh cake/console/cake -app app testsuite app group controller" passthru="true"/>
         <!-- v1_controller test must be last one as it will change the database -->
         <!--<exec command="sh cake/console/cake testsuite app case controllers/V1Controller" passthru="true"/>-->
         <phingcall target="post-test"/>
     </target>
 
     <target name="test-win" description="Run unit tests" depends="prepare,init-test-db">
-        <exec command="cake\console\cake.bat -app app testsuite app group component" passthru="true"/>
-        <exec command="cake\console\cake.bat -app app testsuite app group model" passthru="true"/>
-        <exec command="cake\console\cake.bat -app app testsuite app group controller" passthru="true"/>
+        <exec command="IPEER_DB_NAME=${db.name} cake\console\cake.bat -app app testsuite app group component" passthru="true"/>
+        <exec command="IPEER_DB_NAME=${db.name} cake\console\cake.bat -app app testsuite app group model" passthru="true"/>
+        <exec command="IPEER_DB_NAME=${db.name} cake\console\cake.bat -app app testsuite app group controller" passthru="true"/>
         <!-- v1_controller test must be last one as it will change the database -->
         <phingcall target="post-test"/>
     </target>
 
     <target name="test-ci" description="Run unit tests for continuous integration" depends="init-test-db">
-        <exec command="cake/console/cake -app app testsuite app group model" passthru="true"/>
-        <exec command="cake/console/cake -app app testsuite app group controller" passthru="true"/>
+        <exec command="IPEER_DB_NAME=${db.name} cake/console/cake -app app testsuite app group model" passthru="true"/>
+        <exec command="IPEER_DB_NAME=${db.name} cake/console/cake -app app testsuite app group controller" passthru="true"/>
         <!-- <exec command="cake/console/cake testreport app group system" passthru="true"/> -->
         <!-- v1_controller test must be last one as it will change the database -->
         <phingcall target="post-test"/>
     </target>
 
     <target name="test-ci-integration" description="Run integration tests for continuous integration(output as xml)" depends="prepare,init-test-db">
-        <exec command="cake/console/cake testreport app group system" passthru="true"/>
+        <exec command="IPEER_DB_NAME=${db.name} cake/console/cake testreport app group system" passthru="true"/>
         <phingcall target="post-test"/>
     </target>
 
