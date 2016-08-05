@@ -14,7 +14,8 @@
       "post-install-cmd": [
           "[ -e app/config/database.php ] || cp app/config/database.php.default app/config/database.php",
           "[ -L app/plugins/guard ] || [ -d app/plugins/guard ] || ln -s ../../vendor/compass/cake-guard app/plugins/guard",
-          "[ -e app/config/guard.php ] || cp app/plugins/guard/config/guard_default.php app/config/guard.php"
+          "[ -e app/config/guard.php ] || cp app/plugins/guard/config/guard_default.php app/config/guard.php",
+          "mkdir -p app/tmp && chmod 777 app/tmp"
       ]
   },
   "config": {

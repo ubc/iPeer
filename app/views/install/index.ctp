@@ -33,12 +33,6 @@ if (version_compare(phpversion(), $REQPHPVER) >= 0) {
 if (function_exists('mysql_connect')) {
   $mysql = $yes;
 }
-if (is_writable(CONFIGS)) {
-  $configwritable = $yes;
-}
-if (is_writable(CONFIGS.'database.php')) {
-  $dbconfig = $yes;
-}
 if (get_magic_quotes_gpc()) {
     // magic quotes need to be off or json gets escaped, ref ticket #330
     $magicquotes = $no;
@@ -127,16 +121,6 @@ foreach ($php_recommended_settings as $key => $setting)
     <td><?php __('MySQL support')?></td>
     <td><?php echo $mysql; ?></td>
   </tr>
-  <?php if(!DB_PREDEFINED): ?>
-  <tr>
-    <td><?php __('Directory app/config writable ')?></td>
-    <td><?php echo $configwritable; ?></td>
-  </tr>
-  <tr>
-    <td><?php __('File app/config/database.php writable ')?></td>
-    <td><?php echo $dbconfig; ?></td>
-  </tr>
-  <?php endif; ?>
   <tr>
     <td><?php __('magic_quotes_gpc is off ')?></td>
     <td><?php echo $magicquotes; ?></td>
