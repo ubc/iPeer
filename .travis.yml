@@ -6,7 +6,7 @@ php:
   - '5.6'
 
 env:
-  - SERVER_TEST=http://localhost
+  - SERVER_TEST=http://localhost IPEER_DB_NAME=ipeer_test IPEER_DB_USER=root IPEER_DB_PASSWORD=
 
 services:
   - mysql
@@ -30,8 +30,6 @@ before_script:
   - sudo service apache2 restart
   # setup mysql
   - mysql -e "create database IF NOT EXISTS ipeer_test;" -uroot
-  - sed -e "s?'login' => 'ipeer'?'login' => 'root'?g" --in-place $TRAVIS_BUILD_DIR/app/config/database.php.default
-  - sed -e "s?'password' => 'ipeer'?'password' => ''?g" --in-place $TRAVIS_BUILD_DIR/app/config/database.php.default
 
 script: vendor/bin/phing build-ci
 
