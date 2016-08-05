@@ -135,7 +135,7 @@
  *
  * The model name set here should *not* be used elsewhere in your application.
  */
-	//Configure::write('Session.model', 'Session');
+	Configure::write('Session.model', 'Session');
 
 /**
  * The name of the table used to store CakePHP database sessions.
