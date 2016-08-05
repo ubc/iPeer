@@ -96,7 +96,7 @@ class DATABASE_CONFIG {
         );
 
         foreach($vars as $key => $var) {
-            if(getenv($var)) {
+            if(getenv($var) !== false) {
                 $this->default[$key] = getenv($var);
             }
         }

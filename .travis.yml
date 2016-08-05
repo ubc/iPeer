@@ -6,7 +6,7 @@ php:
   - '5.6'
 
 env:
-  - SERVER_TEST=http://localhost IPEER_DB_NAME=ipeer_test IPEER_DB_USER=root IPEER_DB_PASSWORD=
+  - SERVER_TEST=http://localhost IPEER_DB_NAME=ipeer_test IPEER_DB_USER=root IPEER_DB_PASSWORD=""
 
 services:
   - mysql
