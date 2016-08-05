@@ -1,6 +1,6 @@
 {
   "require": {
-      "compass/cake-guard": "1.0.1"
+      "compass/cake-guard": "1.0.2"
   },
   "require-dev": {
     "phing/phing": "2.*",
@@ -12,7 +12,9 @@
   },
   "scripts": {
       "post-install-cmd": [
-          "[ -L app/plugins/guard ] || [ -d app/plugins/guard ] || ln -s ../../vendor/compass/cake-guard app/plugins/guard"
+          "[ -e app/config/database.php ] || cp app/config/database.php.default app/config/database.php",
+          "[ -L app/plugins/guard ] || [ -d app/plugins/guard ] || ln -s ../../vendor/compass/cake-guard app/plugins/guard",
+          "[ -e app/config/guard.php ] || cp app/plugins/guard/config/guard_default.php app/config/guard.php"
       ]
   },
   "config": {
