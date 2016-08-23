@@ -11,6 +11,7 @@ services:
     volumes:
       - ./.data:/var/lib/mysql
   app:
+    image: ubcctlt/ipeer-app
     build:
       context: .
       dockerfile: Dockerfile-app
@@ -31,6 +32,7 @@ services:
     depends_on:
       - db
   web:
+    image: ubcctlt/ipeer-web
     build:
       context: .
       dockerfile: Dockerfile-web
