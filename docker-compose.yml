@@ -16,8 +16,8 @@ services:
       context: .
       dockerfile: Dockerfile-app
     container_name: ipeer_app
-    volumes:
-      - .:/var/www/html
+    #volumes:
+    #  - .:/var/www/html
     ports:
       - "9000:9000"
     environment:

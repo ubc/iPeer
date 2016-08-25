@@ -15,7 +15,7 @@ docker pull ubcctlt/ipeer-web
 
 #### Running iPeer
 
-Note: if you are planning to develop iPeer and did not run docker pull with above, you will need to run `composer install` to install the dependencies and generate database configuration file.
+Note: if you are planning to develop iPeer and did not run docker pull with above commands, you will need to run `composer install` to install the dependencies and generate database configuration file.
 
 ```
 docker-compose up -d
