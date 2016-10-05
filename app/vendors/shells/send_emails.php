@@ -13,7 +13,7 @@ require_once (CORE_PATH.'cake/libs/controller/controller.php');
  */
 class SendEmailsShell extends Shell
 {
-    public $uses = array('User', 'EmailSchedule', 'SysParameter', 'EmailMerge', 'Event', 
+    public $uses = array('User', 'EmailSchedule', 'SysParameter', 'EmailMerge', 'Event',
         'Group', 'GroupsMembers', 'EvaluationSubmission', 'GroupEvent', 'Course', 'Penalty',
         'EmailTemplate');
     const EMAIL_TASK_LOCK = 'tmp/email_task_lock';
@@ -46,7 +46,7 @@ class SendEmailsShell extends Shell
          * send them if they're due and mark them them as sent.
          */
         $timezone = $this->SysParameter->findByParameterCode('system.timezone');
-        // default to UTC if no timezone is set 
+        // default to UTC if no timezone is set
         if (!(empty($timezone) || empty($timezone['SysParameter']['parameter_value']))) {
             $timezone = $timezone['SysParameter']['parameter_value'];
         } else if (ini_get('date.timezone')) {
@@ -65,7 +65,7 @@ class SendEmailsShell extends Shell
             echo "Processing email schedule id ".$e['id']."\n";
             $from_id = $e['from'];
 			$event_id = $e['event_id'];
-			
+
             $from = $this->User->getEmails($from_id);
             $from = (isset($from[$from_id]) && empty($from[$from_id])) ? $defaultFrom : $from[$from_id];
 
@@ -85,7 +85,7 @@ class SendEmailsShell extends Shell
 			    $course = $this->Course->getCourseById($e['course_id']);
 			    $commonData['Course'] = $course['Course'];
 			}
-			
+
             //Return array $matches that contains all tags
             preg_match_all('/'.EmailMerge::MERGE_START.'(.*?)'.EmailMerge::MERGE_END.'/', $e['content'], $matches, PREG_OFFSET_CAPTURE);
             $patterns = array();
@@ -93,7 +93,7 @@ class SendEmailsShell extends Shell
             $tables = array();
             foreach ($matches[0] as $key => $match) {
                 $table = $this->EmailMerge->getFieldAndTableNameByValue($match[0]);
-                
+
                 if (isset($commonData[$table['table_name']])) {
                     // if in commonData, grab the field's value
                     $patterns[$key] = '/'.$match[0].'/';
@@ -122,6 +122,7 @@ class SendEmailsShell extends Shell
                 }
 
                 $subject = $e['subject'];
+                $content = $contentWithCommonData;
                 if (!empty($tables)) {
                     // merge data not in common data
                     $content = $this->doMerge($contentWithCommonData, EmailMerge::MERGE_START, EmailMerge::MERGE_END, $tables, $to_id);
@@ -146,15 +147,15 @@ class SendEmailsShell extends Shell
 
    /*
     * If the email is an event reminder, returns the list of users that have not submitted
-    * 
+    *
     * @param mixed $event_id
     * @param mixed $to
     * @param mixed $email_id
     * @param mixed $date
-    * 
-    */ 
+    *
+    */
     private function reminderFilter($event_id, $to, $email_id, $date)
-    {   
+    {
         $to = explode(';', $to);
         if (isset($event_id) && $to[0]=='save_reminder') {
             //If the date on the reminder is past the due date, delete the corresponding reminder from the table
@@ -163,10 +164,10 @@ class SendEmailsShell extends Shell
                 //Delete the corresponding row and return an empty to[] list
                 $this->EmailSchedule->delete($email_id, false);
                 return array();
-            } else { 
+            } else {
                 $submissions = $this->EvaluationSubmission->getEvalSubmissionsByEventId($event_id);
                 $submitter_list = Set::extract('/EvaluationSubmission/submitter_id', $submissions);
-                
+
                 if ($event['Event']['event_template_type_id'] == 3) {
                     $members = $this->User->getEnrolledStudents($event['Event']['course_id']);
                     $members = Set::extract('/User/id', $members);
