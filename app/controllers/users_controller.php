@@ -666,7 +666,7 @@ class UsersController extends AppController
         $url = '/users';
         $url .= $courseId ? '/goToClassList/'.$courseId : '';
 
-        if ($userRole <= $roleId || !in_array($userRole, array(4, 5))) {
+        if ($roleId != 1 && ($userRole <= $roleId || !in_array($userRole, array(3, 4, 5)))) {
             $this->Session->setFlash(__('Error: You do not have permission to readd this user.', true));
             $this->redirect($url);
             return;
