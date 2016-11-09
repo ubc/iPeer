@@ -602,6 +602,24 @@ class EvaluationComponent extends Object
         $this->Rubric->id = $event['Event']['template_id'];
         $rubric = $this->Rubric->read();
 
+        // validate
+        $valid_lom_nums = SET::extract($rubric['RubricsLom'], '/lom_num');
+        if ($viewMode == 0) {
+            for ($i=1; $i <= $rubric['Rubric']['criteria']; $i++) {
+                $selectedLom = $params['form']['selected_lom_'.$targetEvaluatee.'_'.$i];
+                if (!in_array($selectedLom, $valid_lom_nums)) {
+                    return false;
+                }
+            }
+        } elseif ($viewMode == 1) {
+            $selectedLom = $params['form']['selected_lom_'.$targetEvaluatee.'_'.$targetCriteria];
+            if (!in_array($selectedLom, $valid_lom_nums)) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+
         // Save evaluation data
         // total grade for evaluatee from evaluator
         $evalRubric = $this->EvaluationRubric->getEvalRubricByGrpEventIdEvaluatorEvaluatee($groupEventId, $evaluator, $targetEvaluatee);
@@ -951,6 +969,7 @@ class EvaluationComponent extends Object
         $this->Event = ClassRegistry::init('Event');
         $this->Mixeval = ClassRegistry::init('Mixeval');
         $this->EvaluationMixeval = ClassRegistry::init('EvaluationMixeval');
+        $this->MixevalQuestion = ClassRegistry::init('MixevalQuestion');
 
         // assuming all are in the same order and same size
         $evaluator = $params['Evaluation']['evaluator_id'];
@@ -966,6 +985,39 @@ class EvaluationComponent extends Object
         //Get simple evaluation tool
         $this->Mixeval->id = $event['Event']['template_id'];
         $mixeval = $this->Mixeval->read();
+
+        // validate
+        $data = $params['EvaluationMixeval'];
+        $questions = $this->MixevalQuestion->findAllByMixevalId($event['Event']['template_id']);
+        foreach($questions as $ques) {
+            $num = $ques['MixevalQuestion']['question_num'];
+            $multiplier = $ques['MixevalQuestion']['multiplier'];
+            $zero_mark = $mixeval['Mixeval']['zero_mark'];
+
+            if ($ques['MixevalQuestion']['mixeval_question_type_id'] == '1') {
+                $scale = count($ques['MixevalQuestionDesc']);
+                if (empty($data[$num]['selected_lom'])) {
+                    continue;
+                }
+                $valid_loms = array();
+                $valid_grades = array();
+                foreach ($ques['MixevalQuestionDesc'] as $key => $desc) {
+                    $lom = $desc['scale_level'];
+                    if ($lom == 0) {
+                        // upgraded from pre 3.1, scale_levels are set to 0. So use $key as level, scale_level starts from 1
+                        $lom = $key + 1;
+                    }
+                    $valid_loms[]=$lom;
+                    $valid_grades[]=$multiplier * (($lom - $zero_mark) / ($scale - $zero_mark));
+                }
+                if (!in_array($data[$num]['selected_lom'], $valid_loms)) {
+                    return false;
+                }
+                if (!in_array($data[$num]['grade'], $valid_grades)) {
+                    return false;
+                }
+            }
+        }
 
         $evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee(
             $groupEventId, $evaluator, $evaluatee);
