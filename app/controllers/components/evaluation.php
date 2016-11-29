@@ -671,7 +671,9 @@ class EvaluationComponent extends Object
                         break;
                     }
                 }
-                $grade = isset($form['selected_lom_'.$targetEvaluatee.'_'.$i])? $form['selected_lom_'.$targetEvaluatee.'_'.$i] * ($multiplier/$totalLom) : "";
+                $grade = isset($form['selected_lom_'.$targetEvaluatee.'_'.$i]) ?
+                    ($form['selected_lom_'.$targetEvaluatee.'_'.$i] - $rubric['Rubric']['zero_mark']) *
+                    ($multiplier/($totalLom - $rubric['Rubric']['zero_mark'])) : "";
 
                 $selectedLom = $form['selected_lom_'.$targetEvaluatee.'_'.$i];
                 $evalRubricDetail = $this->EvaluationRubricDetail->getByEvalRubricIdCritera($evalRubricId, $i);
@@ -706,7 +708,9 @@ class EvaluationComponent extends Object
                     break;
                 }
             }
-            $grade = isset($form['selected_lom_'.$targetEvaluatee.'_'.$targetCriteria])? $form['selected_lom_'.$targetEvaluatee.'_'.$targetCriteria] * ($multiplier/$totalLom) : "";
+            $grade = isset($form['selected_lom_'.$targetEvaluatee.'_'.$targetCriteria]) ?
+                ($form['selected_lom_'.$targetEvaluatee.'_'.$targetCriteria] - $rubric['Rubric']['zero_mark']) *
+                ($multiplier/($totalLom - $rubric['Rubric']['zero_mark'])) : "";
 
             $selectedLom = $form['selected_lom_'.$targetEvaluatee.'_'.$targetCriteria];
 
