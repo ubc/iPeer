@@ -269,7 +269,7 @@ class Toolkit
             ),
             'allDone' => 0,
             'comReq' => 0,
-            'userIds' => array(1,2,3),
+            'userIds' => "1,2,3",
         );
     }
 
