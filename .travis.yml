@@ -29,13 +29,13 @@ before_script:
   - mysql -e "create database IF NOT EXISTS ipeer_test;" -uroot
 
 script: vendor/bin/phing build-ci
-deploy:
-  provider: releases
-  skip_cleanup: true
-  api_key:
-    secure: JqPtCTP6y1zJqmtShDvvQOSsQ/Vf5iAmk4wfIuw2ATV2puQH7/ojQNmLRb7b59Ek5dJzHzIx3RmK+JZtAPHV7HHEZ4sH0qhEM4GZQjmWre4fqmYS5+XnFjQ7C0iLYmVCklAQ3ziinzzESwrfVxtehq5/XNnt6kUCJorRvS22ee8=
-  file: ipeer-release.zip
-  on:
-    repo: ubc/iPeer
-    tags: true
-    php: 5.3
+#deploy:
+#  provider: releases
+#  skip_cleanup: true
+#  api_key:
+#    secure: JqPtCTP6y1zJqmtShDvvQOSsQ/Vf5iAmk4wfIuw2ATV2puQH7/ojQNmLRb7b59Ek5dJzHzIx3RmK+JZtAPHV7HHEZ4sH0qhEM4GZQjmWre4fqmYS5+XnFjQ7C0iLYmVCklAQ3ziinzzESwrfVxtehq5/XNnt6kUCJorRvS22ee8=
+#  file: ipeer-release.zip
+#  on:
+#    repo: ubc/iPeer
+#    tags: true
+#    php: 5.3

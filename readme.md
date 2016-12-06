@@ -76,6 +76,30 @@ Runing the tests:
 
 It is better not to touch the mouse or keyboard during the tests.
 
+iPeer 3.2.0
+-----------
+* Fixed wrong score calculation when using rubric with zero mark enabled
+* Validated Rubric and Mixeval form data
+* Fixed #532 permission issue when re-add user
+* Fixed empty email body when there is no special merge field
+* Commented out volume mount for ipeer app docker image
+* Fixed the permission issue in docker image
+* Added docker instructions to readme
+* Added image directive in docker-compose
+* Added AWS deployment script
+* Added a simple health endpoint
+* Added deployment instruction/scripts for GCE
+* Removed config dir and database writable checking
+* More strict checking for env vars
+* Updateed build.xml and travis.yml to use environment vars
+* Set default Session.model value
+* Added web container for static file serving
+* Updated cake guard
+* Used table to detect installation and refactor installation
+* Added docker support
+* Updated translation file
+* Updated deployment script for travis
+
 iPeer 3.1.9
 ---------------------------
 * Fixed #527 wrong grades calculated during the grade through API
