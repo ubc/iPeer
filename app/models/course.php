@@ -491,7 +491,7 @@ class Course extends AppModel
      * @param mixed $courseIds course id
      *
      * @access public
-     * @return void
+     * @return array
      */
     function getCourseList($courseIds)
     {
@@ -506,7 +506,7 @@ class Course extends AppModel
      * @param mixed $courseId course id
      *
      * @access public
-     * @return void
+     * @return array
      */
     function getCourseById($courseId)
     {
@@ -522,7 +522,7 @@ class Course extends AppModel
      * @param mixed $courseId course id
      *
      * @access public
-     * @return void
+     * @return array
      */
     function getCourseWithInstructorsById($courseId)
     {

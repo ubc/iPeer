@@ -1367,11 +1367,13 @@ class EvaluationsController extends AppController
     {
         $this->autoRender = false;
 
-        // check to see if the ids are numeric
+        // check to see if the ids are numeric and the user can view the event
+        // only need FILTER_PERMISSION_ENROLLED permission as this view is only for student. If user is an instructor,
+        // he/she should not use this view
         if (!is_numeric($eventId) ||
             !($event = $this->Event->getAccessibleEventById(
                 $eventId,
-                User::get('id'), User::getCourseFilterPermission(), array('Course')))) {
+                User::get('id'), Course::FILTER_PERMISSION_ENROLLED, array('Course')))) {
 
             $this->Session->setFlash(__('Error: Invalid id or you do not have permission to access this event.', true));
             $this->redirect('/home/index');

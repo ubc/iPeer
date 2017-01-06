@@ -135,7 +135,7 @@ class HomeController extends AppController
      * @param mixed $seconds seconds
      *
      * @access private
-     * @return void
+     * @return string due date
      */
     private function _formatDueIn($seconds)
     {
