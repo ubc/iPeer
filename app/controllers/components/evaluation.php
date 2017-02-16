@@ -1017,9 +1017,8 @@ class EvaluationComponent extends Object
                 if (!in_array($data[$num]['selected_lom'], $valid_loms)) {
                     return false;
                 }
-                if (!in_array($data[$num]['grade'], $valid_grades)) {
-                    return false;
-                }
+                // recalculate and override the grades from user
+                $params['EvaluationMixeval'][$num]['grade'] = $valid_grades[$data[$num]['selected_lom'] - 1];
             }
         }
 
