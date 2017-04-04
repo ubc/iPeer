@@ -74,6 +74,7 @@ if (isset($course_list['I']))
 }
 
 ?>
+<?php __('Please use "course" tab for complete list of courses.') ?>
 
 <div class='toggle' style="text-align:right">
 <a href="#" onclick="javascript:$('short_help').toggle();return false;">

@@ -69,6 +69,8 @@ if (isset($course_list['I']))
     <?php echo __('You do not have any courses.') ?>
 <?php endif; ?>
 
+<?php __('Please use "course" tab for complete list of courses.') ?>
+
 <div class='toggle' style="text-align:right">
 <a href="#" onclick="javascript:$('short_help').toggle();return false;">
 (<?php __('Short Help')?>)

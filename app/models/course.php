@@ -593,7 +593,9 @@ class Course extends AppModel
         switch($permission) {
         case Course::FILTER_PERMISSION_SUPERADMIN:
             // sort courses alphabetically
-            $options['order'] = 'Course.course';
+            if (!array_key_exists('order', $options)) {
+                $options['order'] = 'Course.course';
+            }
             $courses = $this->find($type, $options);
             break;
         case Course::FILTER_PERMISSION_FACULTY:
