@@ -411,25 +411,35 @@ class EvaluationMixeval extends EvaluationResponseBase
         $mixeval = ClassRegistry::init('Mixeval');
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId)));
         
+        // get required questions for event
+        $event_mixeval = $mixeval->find('first', array(
+            'conditions' => array('Mixeval.id' => $event['Event']['template_id']),
+            'recursive' => 2
+        ));
+        $required = Set::combine($event_mixeval['MixevalQuestion'], '{n}.question_num', '{n}.required');
+        $peerQues = Set::combine($event_mixeval['MixevalQuestion'], '{n}.question_num', '{n}.self_eval');
+        // only required peer evaluation questions are counted toward the averages
+        $required = array_intersect(array_keys($required, 1), array_keys($peerQues, 0));
+
         $sub = $evalSub->getEvalSubmissionsByEventId($eventId);
         $submitted_user_ids = Set::extract('/EvaluationSubmission/submitter_id', $sub);
-        $partial_submission_user_ids = array();
-
         $data = array();
-        
-        $list = $this->find('all', array('fields' => $fields, 'conditions' => $conditions, 'contain' => false));
+        $list = $this->find('all', array('fields' => $fields, 'conditions' => $conditions, 'recursive' => 1 ));
         foreach($list as $mark) {
-            $evaluator_id = $mark['EvaluationMixeval']['evaluator'];
-            $evaluatee_id = $mark['EvaluationMixeval']['evaluatee'];
-            $score = $mark['EvaluationMixeval']['score'];
-            
-            // if evaluator has only partially submitted results, 
-            // skip adding htier score for now
-            if (!in_array($evaluator_id, $submitted_user_ids)) {
-                $partial_submission_user_ids[] = $evaluator_id;
+            $questions_evaluated = Set::extract('/EvaluationMixevalDetail/question_number', $mark);
+            $missing_required_question = false;
+            foreach ($required as $question_num) {
+                if (!in_array($question_num, $questions_evaluated)) {
+                    $missing_required_question = true;
+                }
+            }
+            // skip incomplete evaluatee submissions
+            if ($missing_required_question) {
                 continue;
             }
             
+            $evaluatee_id = $mark['EvaluationMixeval']['evaluatee'];
+            $score = $mark['EvaluationMixeval']['score'];
             if (!isset($data[$evaluatee_id])) {
                 $data[$evaluatee_id]['user_id'] = $evaluatee_id;
                 $data[$evaluatee_id]['score'] = $score;
@@ -437,48 +447,6 @@ class EvaluationMixeval extends EvaluationResponseBase
             } else {
                 $data[$evaluatee_id]['score'] += $score;
                 $data[$evaluatee_id]['numEval']++;
-            }
-        }
-        
-        if (!empty($partial_submission_user_ids)) {
-            // get requried questions for event
-            $event_mixeval = $mixeval->find('first', array(
-                'conditions' => array('Mixeval.id' => $event['Event']['template_id']),
-                'recursive' => 2
-            ));
-            $required = Set::combine($event_mixeval['MixevalQuestion'], '{n}.question_num', '{n}.required');
-            $peerQues = Set::combine($event_mixeval['MixevalQuestion'], '{n}.question_num', '{n}.self_eval');
-            // only required peer evaluation questions are counted toward the averages
-            $required = array_intersect(array_keys($required, 1), array_keys($peerQues, 0));
-            
-            # get evalutation for partially submitted users with details
-            $partial_submission_user_ids = array_unique($partial_submission_user_ids);
-            $conditions['evaluator'] = $partial_submission_user_ids;
-            $list = $this->find('all', array('fields' => $fields, 'conditions' => $conditions, 'recursive' => 1 ));
-            foreach($list as $mark) {
-                $questions_evaluated = Set::extract('/EvaluationMixevalDetail/question_number', $mark);
-                $missing_required_question = false;
-                foreach ($required as $question_num) {
-                    if (!in_array($question_num, $questions_evaluated)) {
-                        $missing_required_question = true;
-                    }
-                }
-                // skip incomplete evaluatee submissions
-                if ($missing_required_question) {
-                    continue;
-                }
-                
-                $evaluatee_id = $mark['EvaluationMixeval']['evaluatee'];
-                $score = $mark['EvaluationMixeval']['score'];
-                
-                if (!isset($data[$evaluatee_id])) {
-                    $data[$evaluatee_id]['user_id'] = $evaluatee_id;
-                    $data[$evaluatee_id]['score'] = $score;
-                    $data[$evaluatee_id]['numEval']= 1;
-                } else {
-                    $data[$evaluatee_id]['score'] += $score;
-                    $data[$evaluatee_id]['numEval']++;
-                }
             }
         }
         //cleanup
