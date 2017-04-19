@@ -601,40 +601,48 @@ class EventsController extends AppController
         $this->set('groups', $this->Group->getGroupsByCourseId($event['Event']['course_id']));
 
         // Populate the template selections
-        $this->set(
-            'mixevals',
-            $this->Mixeval->getBelongingOrPublic($this->Auth->user('id'))
-        );
-        $this->set(
-            'simpleEvaluations',
-            $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'))
-        );
-        $this->set(
-            'surveys',
-            $this->Survey->getBelongingOrPublic($this->Auth->user('id'))
-        );
-        $this->set(
-            'rubrics',
-            $this->Rubric->getBelongingOrPublic($this->Auth->user('id'))
-        );
-        $this->set(
-            'eventTemplateTypes',
-            $this->EventTemplateType->getEventTemplateTypeList(true)
-        );
         $this->set('simpleSelected', '');
         $this->set('rubricSelected', '');
         $this->set('surveySelected', '');
         $this->set('mixevalSelected', '');
         $typeId = $event['Event']['event_template_type_id'];
+        $simpleSelected = NULL;
+        $rubricSelected = NULL;
+        $surveySelected = NULL;
+        $mixevalSelected = NULL;
         if ($typeId == 1) {
+            $simpleSelected = $event['Event']['template_id'];
             $this->set('simpleSelected', $event['Event']['template_id']);
         } else if ($typeId == 2) {
+            $rubricSelected = $event['Event']['template_id'];
             $this->set('rubricSelected', $event['Event']['template_id']);
         } else if ($typeId == 3) {
+            $surveySelected = $event['Event']['template_id'];
             $this->set('surveySelected', $event['Event']['template_id']);
         } else if ($typeId == 4) {
+            $mixevalSelected = $event['Event']['template_id'];
             $this->set('mixevalSelected', $event['Event']['template_id']);
         }
+        $this->set(
+            'mixevals',
+            $this->Mixeval->getBelongingOrPublic($this->Auth->user('id'), $mixevalSelected)
+        );
+        $this->set(
+            'simpleEvaluations',
+            $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'), $simpleSelected)
+        );
+        $this->set(
+            'surveys',
+            $this->Survey->getBelongingOrPublic($this->Auth->user('id'), $surveySelected)
+        );
+        $this->set(
+            'rubrics',
+            $this->Rubric->getBelongingOrPublic($this->Auth->user('id'), $rubricSelected)
+        );
+        $this->set(
+            'eventTemplateTypes',
+            $this->EventTemplateType->getEventTemplateTypeList(true)
+        );
         $emailReminders = array('0'=> 'Disable', '1' => '1 Day', '2'=>'2 Days','3'=>'3 Days','4'=>'4 Days','5'=>'5 Days','6'=>'6 Days','7'=>'7 Days');
         $this->set('emailTemplates', $this->EmailTemplate->getPermittedEmailTemplate(User::get('id'), 'list'));
         $this->set('emailSchedules', $emailReminders);
