@@ -21,4 +21,4 @@ COPY . /var/www/html
 RUN cd /var/www/html \
     && composer install \
     && mkdir -p /var/www/html/app/tmp/cache/persistent /var/www/html/app/tmp/cache/models \
-    && chown www-data:www-data /var/www/html/app/tmp/cache/persistent /var/www/html/app/tmp/cache/models
+    && chown www-data:www-data -R /var/www/html/app/tmp/cache

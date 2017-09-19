@@ -16,8 +16,8 @@ services:
       context: .
       dockerfile: Dockerfile-app
     container_name: ipeer_app
-    #volumes:
-    #  - .:/var/www/html
+    volumes:
+      - .:/var/www/html
     ports:
       - "9000:9000"
     environment:
@@ -37,8 +37,8 @@ services:
       context: .
       dockerfile: Dockerfile-web
     container_name: ipeer_web
-    #volumes:
-    #  - ./app/webroot:/var/www/html
+    volumes:
+      - ./app/webroot:/var/www/html
     environment:
       - NGINX_FASTCGI_PASS=ipeer_app:9000
     ports:
