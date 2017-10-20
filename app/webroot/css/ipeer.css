@@ -47,7 +47,7 @@ table {
 /* GLOBAL */
 body {
     font-family: 'Lato', serif; /* provided by Google Web Fonts */
-    background-image: url(bg.gif);
+    background: #eee;
 }
 
 /* Open Sans to enable font-weight: 600 */
@@ -147,12 +147,12 @@ button {
     padding: 0.3em 0.5em;
 }
 
-a:link, a:visited {
+a:link, a:visited, a:hover {
     text-decoration: none;
 }
 
-a:hover {
-    text-decoration: underline;
+a:hover, a:hover * {
+    color: green !important;
 }
 
 .center {
@@ -178,7 +178,7 @@ strong {
 
 .standardtable th {
     padding: 0.4em 0.1em;
-    background-color: khaki;
+    background-color: #ddd;
     font-weight: 600;
     font-size: 0.95em;
     border-left: 2px solid white;
@@ -189,7 +189,7 @@ strong {
     border-left: 2px solid white;
     border-bottom: 2px solid white;
     padding: 0.4em 0.1em;
-    background-color: lightgoldenrodyellow;
+    background-color: #f6f6f6;
     text-align: center;
 }
 
@@ -225,8 +225,9 @@ div.ui-datepicker { font-size: 0.85em; }
 
 #bannerLarge {
     height: 40px;
-    margin-bottom: 0.5em;
-    margin-top: 0.5em;
+    margin: -2em;
+    padding: 2em 1em;
+    background: #eee;
 }
 
 #customLogo {
@@ -269,9 +270,13 @@ a#home, a#home:hover, a#home:active {
 
 /* NAVIGATION */
 #navigationOuter {
-    border-left: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
-    border-top: none;
+    float: left;
+    width: 100%;
+    padding: 3px 0 0;
+    margin: 1em 0 1.5em;
+    border: solid 1px #ccc;
+    background: #fff;
+    box-shadow: 0 0 25px rgba(85, 85, 85, 0.28);
 }
 
 .navigation ul {
@@ -286,42 +291,41 @@ a#home, a#home:hover, a#home:active {
 }
 
 .navigation a {
-    border-right: 1px solid #ddd;
-    border-top: 1px solid #ddd;
-    color: white;
+    color: #0a2a64;
     font-weight: 600;
     text-align: center;
-    padding: 0.5em;
-    padding-bottom: 0.43em;
-    padding-left: 0.6em;
+    padding: 9px 0.5em;
     text-decoration: none;
-    background-color: #0a2a64;
+    background-color: #fff;
 }
 
-.navigation a:hover,a:active {
-    background-color: yellow;
-    color: #111;
+.navigation ul li:first-child a {
+    padding-left: 1em;
 }
 
-.navigation #current a {
-    color: #111;
-    background-color: gold;
+.navigation #current a,
+.navigation a:hover, 
+.navigation a:active {
+    background: none;
+    border-bottom: solid 3px gold;
 }
 
 .navigation .miniLinks {
     font-family: 'Open Sans', serif;
     font-size: 0.8em;
-    padding: 0.4em 1em;
+    padding: 7px 0.8em;
     float: right;
+    border-bottom: solid 3px #fff;
 }
 
 /* CONTENT CONTAINER */
 .containerOuter {
     border-radius: 10px; 
-    border: 1px solid #777;
-    padding: 0.4em; 
+    border: 1px solid #ccc;
+    padding: 2em;
     background: white;
-    box-shadow: 0 0 5px #555;
+    box-shadow: 0 0 25px rgba(85, 85, 85, 0.28);
+    min-width: 540px;
 }
 
 .message, .error-message {
@@ -360,11 +364,11 @@ a#home, a#home:hover, a#home:active {
 }
 
 h1.title {
-    margin: 0.5em 0;
+    margin: 0.5em 0 1em;
+    font-size: 1.5em;
     font-weight: 600;
-    background: #eee;
-    border: 1px solid #ddd;
-    padding: 0.3em 0.5em;
+    color: #be9ad3;
+    padding: 0;
 }
 
 h2 {
@@ -452,13 +456,18 @@ i {
 /* HOME */
 /* for admins and instructors */
 .course {
-    margin-bottom: 1em;
-    background-color: lightgoldenrodyellow;
+    margin: 1.5em auto;
+    background-color: #f9f9f9;
+    padding-bottom: 1em;
+    border: solid 1px #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 25px rgba(85, 85, 85, 0.10);
 }
 
 .course h3 {
-    background-color: khaki;
+    background-color: #ececec;
     padding: 0.5em;
+    margin: 0;
 }
 
 .course a:link h3, .course a:visited h3 {
@@ -514,8 +523,7 @@ i {
 #short_help ol {
     list-style-type: decimal;
     margin-left: 0;
-    padding-left: 3em;
-    padding-bottom: 0.5em;
+    padding: 1em 0 0.5em 1em;
 }
 
 #short_help li {
@@ -1740,53 +1748,58 @@ table.content-table {
     margin: 0 auto 0 auto;
 }
 
-
-.add-button {
-    background:url('../img/icons/add.gif') center left no-repeat;
-    padding: 0 0 0 20px;
+.add-button,
+.delete-button,
+.edit-button,
+.merge-button,
+.export-excel-button,
+.instruction-icon,
+.button {
+    background-color: #eee;
+    padding: 5px 5px 5px 25px;
+    background-position: 5px 6px;
+    border: solid 1px #ccc;
+    border-radius: 3px;
     white-space:nowrap;
     font-size: 0.9em;
+    background-repeat: no-repeat;
+    box-shadow: 0 0 5px rgba(85, 85, 85, 0.28);
+}
+
+.add-button:hover,
+.delete-button:hover,
+.edit-button:hover,
+.merge-button:hover,
+.export-excel-button:hover,
+.instruction-icon:hover,
+.button:hover {
+    background-color: #fbf9ea;
+    border-color: gold;
+    box-shadow: 0 0 5px rgb(222, 204, 124);
+}
+
+.add-button {
+    background-image: url('../img/icons/add.gif');
 }
 
 .delete-button {
-    background:url('../img/icons/delete.gif') center left no-repeat;
-    padding: 0 0 0 20px;
-    white-space:nowrap;
-    font-size: 0.9em;
+    background-image: url('../img/icons/delete.gif');
 }
 
 .edit-button {
-    background:url('../img/icons/edit.gif') center left no-repeat;
-    padding: 0 0 0 20px;
-    white-space:nowrap;
-    font-size: 0.9em;
+    background-image: url('../img/icons/edit.gif');
 }
 
 .merge-button {
-    background:url('../img/icons/merge.png') center left no-repeat;
-    padding: 0 0 0 20px;
-    white-space:nowrap;
-    font-size: 0.9em;
+    background-image: url('../img/icons/merge.gif');
 }
 
 .export-excel-button {
-    background:url('../img/icons/export_excel.gif') center left no-repeat;
-    padding: 0 0 0 20px;
-    white-space:nowrap;
-    font-size: 0.9em;
+    background-image: url('../img/icons/export_excel.gif');
 }
 
 .instruction-icon {
-    background:url('../img/icons/instructions.gif') center left no-repeat;
-    padding: 0 0 0 20px;
-    white-space:nowrap;
-    font-size: 0.9em;
-}
-
-.button {
-    padding: 0 0 0 20px;
-    white-space:nowrap;
-    font-size: 0.9em;
+    background-image: url('../img/icons/instructions.gif');
 }
 
 .question {

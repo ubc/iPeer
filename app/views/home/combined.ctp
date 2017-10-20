@@ -1,5 +1,5 @@
 <div class="instructorView">
-    <h1 class="title"><img src="/img/layout/icon_ipeer_logo.gif" alt="icon_ipeer_logo"> Instructor View</h1>
+    <h1 class="title">Instructor View</h1>
 <?php
 
 /*
@@ -107,7 +107,7 @@ Modified version of student view (student_index.ctp)
 =================================================
 */
 ?>
-<h1 class="title"><img src="/img/layout/icon_ipeer_logo.gif" alt="icon_ipeer_logo"> Student View</h1>
+<h1 class="title">Student View</h1>
 
 <div id='StudentHome'>
 <?php
