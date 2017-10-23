@@ -839,6 +839,24 @@ class UsersController extends AppController
     }
 
     /**
+     * canvasoauthreturn
+     *
+     * @access public
+     * @return void
+     */
+    function canvasoauthreturn()
+    {
+        // No security checks here, since we're editing the logged-in user
+        $id = $this->Auth->user('id');
+        
+        echo '<h1>Request Parameters</h1>';
+        print_r($this->params);
+
+        echo '<h1>Data</h1>';
+        print_r($this->data);
+    }
+
+    /**
      * editProfile
      *
      * @access public

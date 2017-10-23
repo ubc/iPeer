@@ -21,6 +21,12 @@ echo $this->Form->input('temp_password', array('type'=>'password', 'size'=>'50',
 echo $this->Form->input('confirm_password', array('type'=>'password', 'size'=>'50', 'label'=>__('Confirm New Password', true), 'disabled'=>$viewPage));
 ?>
 
+<div class="connected-apps">
+    <h3>Canvas</h3>
+    You are not connected to Canvas. 
+    <?php echo $html->link(__('Connect to Canvas', true), 'http://localhost:8900/login/oauth2/auth?client_id=10000000000001&response_type=code&state=YYY&redirect_uri=http://localhost:8080/users/canvasoauthreturn', array('class' => 'add-button')); ?>
+</div>
+
 <div class="oauth">
 <?php if (User::hasPermission('controllers/Oauthclients')): ?>
 <h2>OAuths</h2>
