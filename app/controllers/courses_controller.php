@@ -17,7 +17,7 @@ class CoursesController extends AppController
     public $helpers = array('Html', 'Ajax', 'excel', 'Javascript', 'Time',
         'Js' => array('Prototype'), 'FileUpload.FileUpload');
     public $components = array('ExportBaseNew', 'AjaxList', 'ExportCsv', 'ExportExcel',
-        'FileUpload.FileUpload', 'RequestHandler');
+        'FileUpload.FileUpload', 'RequestHandler', 'CanvasCourse');
 
     /**
      * __construct
@@ -39,7 +39,6 @@ class CoursesController extends AppController
     function beforeFilter()
     {
         parent::beforeFilter();
-
         $this->set('title_for_layout', __('Courses',true));
 
         $allowTypes = array(
@@ -56,6 +55,20 @@ class CoursesController extends AppController
         $this->FileUpload->attr('forceWebroot', false);
     }
 
+    /*
+    public function postProcessCanvasIdForDisplay($data)
+    {
+        foreach ($data as $key => $theCourse) {
+            if (!empty($theCourse['Course']['canvas_id'])) {
+                $data[$key]['!Custom'] = array('canvas_linked' => __('Yes', true));
+            } else {
+                $data[$key]['!Custom'] = array('canvas_linked' => __('', true));
+            }
+        }
+        return $data;
+    }
+    */
+
     /**
      * _setUpAjaxList
      *
@@ -71,8 +84,8 @@ class CoursesController extends AppController
             array("Course.title",         __("Title", true),       "auto", "action", "Course Home"),
             array("Course.creator_id",           "",            "",     "hidden"),
             array("Course.record_status", __("Status", true),      "5em",  "map",     array("A" => __("Active", true), "I" => __("Inactive", true))),
-            array("Course.creator",     __("Created by", true),  "10em", "action", "View Creator"));
-
+            array("Course.creator",     __("Created by", true),  "10em", "action", "View Creator")
+        );
 
         // put all the joins together
         $joinTables = array();
@@ -86,7 +99,7 @@ class CoursesController extends AppController
             $adminList = User::getMyDepartmentsCourseList('list');
             $adminKeys = array_keys($adminList);
             $instrList = $this->Course->getCourseByInstructor($this->Auth->user('id'));
-            $instrKeys = (Set::extract('/Course/id', $instrList));
+            $linstrKeys = (Set::extract('/Course/id', $instrList));
             $extraFilters = array('Course.id' => array_merge($adminKeys, $instrKeys));
         // instructors
         } else {
@@ -105,6 +118,18 @@ class CoursesController extends AppController
 
         $recursive = 0;
 
+        // add custom columns if Canvas integration is enabled
+        /*
+        if ($this->SysParameter->get('system.canvas_enabled', 'false') == 'true') {
+            array_push($columns, array("Course.canvas_id", "", "", "hidden"));
+            array_push($columns, array("!Custom.canvas_linked", __("Linked with Canvas?", true), "auto", "string"));
+            $this->AjaxList->setUp($this->Course, $columns, $actions,
+                'Course.course', 'Course.course', $joinTables, $extraFilters, $recursive, 'postProcessCanvasIdForDisplay');
+        } else {
+            $this->AjaxList->setUp($this->Course, $columns, $actions,
+                'Course.course', 'Course.course', $joinTables, $extraFilters, $recursive);
+        }
+        */
         $this->AjaxList->setUp($this->Course, $columns, $actions,
             'Course.course', 'Course.course', $joinTables, $extraFilters, $recursive);
     }
@@ -277,7 +302,7 @@ class CoursesController extends AppController
         $this->set('title_for_layout', 'Add Course');
         $this->_initFormEnv();
         $this->set('instructorSelected', User::get('id'));
-        
+
         $instructions = $this->SysParameter->find('first', array('conditions' => array('parameter_code' => 'course.creation.instructions')));
         if (!empty($instructions) && !empty($instructions['SysParameter']['parameter_value'])) {
             $this->set('instructions', $instructions['SysParameter']['parameter_value']);
@@ -306,6 +331,17 @@ class CoursesController extends AppController
                 $this->Session->setFlash('Add course failed.');
             }
         }
+        $this->render('edit');
+    }
+
+    /**
+     * link
+     *
+     * @access public
+     * @return void
+     */
+    public function link() {
+
         $this->render('edit');
     }
 

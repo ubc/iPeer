@@ -9,6 +9,15 @@
             }
             ?>
             </li>
+            <li>
+            <?php
+            // TODO: add checking if user has Canvas OAuth2 token
+            if (User::hasPermission('controllers/Courses/add')) {
+                echo $html->link( __('Link Course with Canvas', true),
+                    '/courses/link', array('class' => 'add-button'));
+            }
+            ?>
+            </li>
         </ul>
     </div>
 
