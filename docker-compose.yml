@@ -10,6 +10,8 @@ services:
       - MYSQL_PASSWORD=ipeer
     volumes:
       - ./.data:/var/lib/mysql
+    ports:
+      - "13306:3306"
   app:
     image: ubcctlt/ipeer-app
     build:
