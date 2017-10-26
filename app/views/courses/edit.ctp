@@ -6,6 +6,22 @@ if (isset($instructions)) {
 
 echo $this->Form->create('Course');
 echo $this->Form->input('id');
+
+// canvas courses
+if ($canvasCourses) {
+    $cCourse = $form->input(
+        'Course.canvas_course',
+        array(
+            'type' => 'select',
+            'id' => 'CanvasCourses',
+            'label' => __('Populate from Canvas course', true),
+            'options' => $canvasCourses,
+            'after' => $html->link(__('Populate', true), '#', array('onclick' => 'javascript: if (CanvasCourses.value == "") { return false; } document.forms[0].submit(); return false;'))
+        )
+    );
+    echo $html->div('input text', $cCourse, array('id' => 'canvas_courses'));
+}
+
 echo $form->input('Course.course');
 echo $html->div('help-text', __('Course subjects and course numbers, e.g. APSC 201 001', true));
 echo $form->input('Course.title');
@@ -82,12 +98,13 @@ echo $html->div('help-text', __('Selecting correct assoication will allow admin 
 echo $this->Form->input('homepage');
 echo $html->div('help-text', __('e.g. http://mycoursehome.com', true));
 
-echo $html->div('center', $form->submit(__('Save', true), array('div' => false)));
+echo $html->div('center', $form->submit(__('Save', true), array('div' => false, 'onclick' => 'javascript: CanvasCourses.value=""; return true;')));
 echo $form->end(); ?>
 </div>
 
 <script type="text/javascript">
 
+jQuery('#CanvasCourses').prepend('<option value="" selected="selcted"</option>');
 
 // remove all already added instructors from the drop down
 var selected = <?php echo json_encode($selected); ?>;

@@ -916,7 +916,7 @@ i {
 
 /* courses/add, courses/edit */
 
-#CourseEditForm .select #CourseInstructors, #CourseEditForm .select #CourseTutors {
+#CourseEditForm .select #CourseInstructors, #CourseEditForm .select #CourseTutors, #CourseEditForm .select #CanvasCourses {
     width: 20em;
 }
 
@@ -936,7 +936,7 @@ i {
     margin-right: 1em;
 }
 
-#CourseEditForm #instructors a, #CourseEditForm #tutors a {
+#CourseEditForm #instructors a, #CourseEditForm #tutors a, #CourseEditForm #canvas_courses a  {
     padding: 0.5em;
 }
 

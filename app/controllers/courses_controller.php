@@ -17,7 +17,7 @@ class CoursesController extends AppController
     public $helpers = array('Html', 'Ajax', 'excel', 'Javascript', 'Time',
         'Js' => array('Prototype'), 'FileUpload.FileUpload');
     public $components = array('ExportBaseNew', 'AjaxList', 'ExportCsv', 'ExportExcel',
-        'FileUpload.FileUpload', 'RequestHandler', 'CanvasCourse');
+        'FileUpload.FileUpload', 'RequestHandler', 'CanvasCourse', 'CanvasCourseUser');
 
     /**
      * __construct
@@ -99,7 +99,7 @@ class CoursesController extends AppController
             $adminList = User::getMyDepartmentsCourseList('list');
             $adminKeys = array_keys($adminList);
             $instrList = $this->Course->getCourseByInstructor($this->Auth->user('id'));
-            $linstrKeys = (Set::extract('/Course/id', $instrList));
+            $instrKeys = (Set::extract('/Course/id', $instrList));
             $extraFilters = array('Course.id' => array_merge($adminKeys, $instrKeys));
         // instructors
         } else {
@@ -130,6 +130,8 @@ class CoursesController extends AppController
                 'Course.course', 'Course.course', $joinTables, $extraFilters, $recursive);
         }
         */
+        $canvas_courses = CanvasCourseComponent::getCanvasCoursesByIPeerUser(User::get('id'));
+
         $this->AjaxList->setUp($this->Course, $columns, $actions,
             'Course.course', 'Course.course', $joinTables, $extraFilters, $recursive);
     }
@@ -289,8 +291,61 @@ class CoursesController extends AppController
         // set the list of instructors/tutors
         $this->set('instructors', $instructorList);
         $this->set('tutors', $tutorList);
-    }
 
+        // TODO: check if user has Canvas token setup
+        if ($this->SysParameter->get('system.canvas_enabled', 'false') == 'true') {
+            // map function to keep only the course name
+            $map_func = function($value) {
+                return $value->name;
+            };
+            $this->set('canvasCourses',
+                array_map($map_func,
+                    CanvasCourseComponent::getCanvasCoursesByIPeerUser(User::get('id'))));
+        } else {
+            $this->set('canvasCourses', array());
+        }
+    }
+    
+    /**
+     * Finds the corresponding iPeer user with specific role
+     */
+    protected function _getCorrespondingUser($canvas_course_users, $role)
+    {
+        $result = array();
+        foreach ($canvas_course_users as $ccuser) {
+            if (in_array($role, $ccuser->enrollment_roles)) {
+                $iuser = $ccuser->getMatchingiPeerUser($this->User);
+
+                if ($iuser) {
+                    $result[$iuser['id']] = $iuser;
+                }
+            }
+        }
+        return $result;
+    }
+    
+    /**
+     * Retrieves course data from Canvas and populate into $this->data
+     */
+   protected function _populateWithCanvasCourseData($canvas_course_id)
+   {
+       $cCourses = CanvasCourseComponent::getCanvasCoursesByIPeerUser(User::get('id'));
+       $selectedCanvasCourse = $cCourses[$canvas_course_id];
+       if (!empty($selectedCanvasCourse)) {
+           $this->data['Course']['course'] = $selectedCanvasCourse->course_code;
+           $this->data['Course']['title'] = $selectedCanvasCourse->name;
+           
+           $canvasusers = $selectedCanvasCourse->getCanvasCourseUsers(User::get('id'));
+           error_log(json_encode($canvasusers));
+           $iInstructors = $this->_getCorrespondingUser($canvasusers, CanvasCourseUserComponent::ENROLLMENT_TYPE_TEACHER);
+           $iTAs = $this->_getCorrespondingUser($canvasusers, CanvasCourseUserComponent::ENROLLMENT_TYPE_TA);
+           $this->data['Instructor'] = $iInstructors;
+           $this->data['Instructor']['Instructor'] = array_keys($iInstructors);
+           $this->data['Tutor'] = $iTAs;
+           $this->data['Tutor']['Tutor'] = array_keys($iTAs);
+       }
+   }
+    
     /**
      * add
      *
@@ -307,7 +362,14 @@ class CoursesController extends AppController
         if (!empty($instructions) && !empty($instructions['SysParameter']['parameter_value'])) {
             $this->set('instructions', $instructions['SysParameter']['parameter_value']);
         }
-
+        
+        // populate data from Canvas
+        if (!empty($this->data) && !empty($this->data['Course']) && !empty($this->data['Course']['canvas_course'])) {
+            $this->_populateWithCanvasCourseData($this->data['Course']['canvas_course']);
+            $this->render('edit');
+            return;
+        }
+        
         if (!empty($this->data)) {
             $this->data['Course'] = array_map('trim', $this->data['Course']);
             if ($this->Course->save($this->data)) {
@@ -335,17 +397,6 @@ class CoursesController extends AppController
     }
 
     /**
-     * link
-     *
-     * @access public
-     * @return void
-     */
-    public function link() {
-
-        $this->render('edit');
-    }
-
-    /**
      * edit
      *
      * @param int $courseId
@@ -364,6 +415,13 @@ class CoursesController extends AppController
             return;
         }
 
+        // populate data from Canvas
+        if (!empty($this->data) && !empty($this->data['Course']) && !empty($this->data['Course']['canvas_course'])) {
+            $this->_populateWithCanvasCourseData($this->data['Course']['canvas_course']);
+            $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Edit Course', true)));
+            return;
+        }
+        
         if (!empty($this->data)) {
             $this->data['Course'] = array_map('trim', $this->data['Course']);
             $newInstructors = (!isset($this->data['Instructor'])) ? array() :
@@ -388,7 +446,7 @@ class CoursesController extends AppController
         $course['Instructor']['Instructor'] = Set::extract('/Instructor/id', $course);
         $tutors = $this->UserTutor->findAllByCourseId($courseId);
         $course['Tutor']['Tutor'] = Set::extract('/UserTutor/user_id', $tutors);
-
+        
         $this->data = $course;
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Edit Course', true)));
     }

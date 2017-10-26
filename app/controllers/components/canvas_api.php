@@ -1,6 +1,6 @@
 <?php
 App::import('Model', 'SysParameter');
-App::import('Vendor', 'Httpful', array('file' => 'nategood/httpful/bootstrap.php'));
+App::import('Vendor', 'Httpful', array('file' => 'nategood'.DS.'httpful'.DS.'bootstrap.php'));
 
 /**
  * CanvasApiComponent
@@ -21,21 +21,36 @@ class CanvasApiComponent extends Object
         $this->SysParameter = ClassRegistry::init('SysParameter');
     }
 
-    public function getBaseUrl() {
+    public function getBaseUrl()
+    {
         return $this->SysParameter->get('system.canvas_baseurl');
     }
 
-    public function getVersion() {
+    public function getVersion()
+    {
         return '/api/v1';
     }
 
-    public function getCanvasData($uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=True) {
-
+    public function getCanvasData($uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=True)
+    {
         try {
+            // For Canvas API, multiple parameters can have the same key.
+            // In this case, the value of the passed in $params will be an array
+            $params_expanded = '';
+            foreach ($params as $key => $value) {
+                if (is_array($value)) {
+                    foreach ($value as $val) {
+                        $params_expanded = $params_expanded . '&' . http_build_query(array($key => $val));
+                    }
+                } else {
+                    $params_expanded = $params_expanded . '&' . http_build_query(array($key => $value));
+                }
+            }
+            
             // TODO: get proper OAuth2 token
             $response = \Httpful\Request::get($this->getBaseUrl() .
                 $this->getVersion() . $uri .
-                ($params? '?' . http_build_query($params) : ''))
+                ($params? '?' . $params_expanded : ''))
                     ->expectsJson()
                     ->addHeaders(array('Authorization' => 'Bearer JlKm0lJpGiM9HoeFp7GRLnnJ0trkGKYv5sir2CgxT4IUChgusM9PXPesV0m8ro5p'))
                     ->addHeaders($additionalHeader? $additionalHeader : array())
@@ -47,8 +62,5 @@ class CanvasApiComponent extends Object
             // TODO: better error handling
             error_log($e->getMessage());
         }
-
-
     }
-
 }
