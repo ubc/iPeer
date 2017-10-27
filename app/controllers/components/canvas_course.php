@@ -44,10 +44,10 @@ class CanvasCourseComponent extends Object
      * @access public
      * @return array Array of CanvasCourseComponent with id as key
      */
-    static public function getCanvasCoursesByIPeerUser($user_id, $enrollment_type=CanvasCourseUserComponent::ENROLLMENT_QUERY_TEACHER)
+    static public function getCanvasCoursesByIPeerUser($_controller, $user_id, $force_auth=true, $enrollment_type=CanvasCourseUserComponent::ENROLLMENT_QUERY_TEACHER)
     {
         $api = new CanvasApiComponent($user_id);
-        $courses_json = $api->getCanvasData('/courses', array('enrollment_type' => $enrollment_type));
+        $courses_json = $api->getCanvasData($_controller, Router::url(null, true), $force_auth, '/courses', array('enrollment_type' => $enrollment_type));
 
         $courses = array();
         if (!empty($courses_json)) {

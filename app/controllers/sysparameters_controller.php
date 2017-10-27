@@ -71,7 +71,7 @@ class SysParametersController extends AppController
             array("SysParameter.parameter_code", __("Code", true),    "15em", "string"),
             array("SysParameter.parameter_value",__("Value", true),   "auto", "string"),
             array("SysParameter.parameter_type", __("Type", true),    "6em",   "map",
-            array("I" => "Interger", "B" => "Boolean", "S" => "String")),
+            array("I" => "Interger", "B" => "Boolean", "S" => "String", "E" => "Encrypted String")),
             array("SysParameter.record_status",  __("Status", true),   "5em", "map",
             array("A" => "Active", "I" => "Inactive")),
             array("SysParameter.created",        __("Created", true), "10em", "date"),
@@ -85,7 +85,22 @@ class SysParametersController extends AppController
             array(__("Delete", true), $warning, "", "", "delete", "SysParameter.id"));
 
         $this->AjaxList->setUp($this->SysParameter, $columns, $actions,
-            "SysParameter.id", "SysParameter.parameter_code");
+            "SysParameter.id", "SysParameter.parameter_code", null, null, 0, 'postProcessAjaxList');
+    }
+
+    /**
+     * postProcessAjaxList
+     *
+     * @access public
+     * @return array
+     */
+    function postProcessAjaxList ($data){
+        foreach ($data as $k => $v) {
+            if ($v['SysParameter']['parameter_type'] == 'E'){
+                $data[$k]['SysParameter']['parameter_value'] = '(hidden)';
+            }
+        }
+        return $data;
     }
 
     /**
@@ -132,9 +147,14 @@ class SysParametersController extends AppController
     function view($id)
     {
         $this->data = $this->SysParameter->findById($id);
-        $types = array('S'=>__('String', true),'I'=>__('Integer', true), 'B'=>__('Boolean', true));
+        $types = array('S'=>__('String', true),'I'=>__('Integer', true), 'B'=>__('Boolean', true), 'E'=>__('Encrypted String', true));
         $this->set('types', $types);
         $this->set('title_for_layout', 'View Sys Parameters');
+        $this->set('parameter_value_input_type', 'text');
+        if ($this->data['SysParameter']['parameter_type'] == 'E') {
+            $this->set('parameter_value_input_type', 'password');
+            $this->data['SysParameter']['parameter_value'] = 'protected';
+        }
     }
 
     /**
@@ -155,7 +175,7 @@ class SysParametersController extends AppController
             }
         }
 
-        $types = array('S'=>__('String', true),'I'=>__('Integer', true), 'B'=>__('Boolean', true));
+        $types = array('S'=>__('String', true),'I'=>__('Integer', true), 'B'=>__('Boolean', true), 'E'=>__('Encrypted String', true));
         $this->set('types', $types);
         $this->set('title_for_layout', 'Add Sys Parameters');
     }
@@ -180,9 +200,14 @@ class SysParametersController extends AppController
             }
         }
         $this->data = $this->SysParameter->findById($id);
-        $types = array('S'=>__('String', true),'I'=>__('Integer', true), 'B'=>__('Boolean', true));
+        $types = array('S'=>__('String', true),'I'=>__('Integer', true), 'B'=>__('Boolean', true), 'E'=>__('Encrypted String', true));
         $this->set('types', $types);
         $this->set('title_for_layout', 'Edit Sys Parameters');
+        $this->set('parameter_value_input_type', 'text');
+        if ($this->data['SysParameter']['parameter_type'] == 'E') {
+            $this->set('parameter_value_input_type', 'password');
+            $this->data['SysParameter']['parameter_value'] = 'protected';
+        }
     }
 
     /**

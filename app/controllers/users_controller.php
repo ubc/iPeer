@@ -839,24 +839,6 @@ class UsersController extends AppController
     }
 
     /**
-     * canvasoauthreturn
-     *
-     * @access public
-     * @return void
-     */
-    function canvasoauthreturn()
-    {
-        // No security checks here, since we're editing the logged-in user
-        $id = $this->Auth->user('id');
-        
-        echo '<h1>Request Parameters</h1>';
-        print_r($this->params);
-
-        echo '<h1>Data</h1>';
-        print_r($this->data);
-    }
-
-    /**
      * editProfile
      *
      * @access public
@@ -1111,76 +1093,86 @@ class UsersController extends AppController
      *
      * @return void
      */
-    public function import($courseId = null)
+    public function import($courseId = null, $importFrom = 'csv')
     {
-        if (!is_null($courseId)) {
-            $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
-            if (empty($course)) {
-                $this->Session->setFlash(__('Error: That course does not exist.', true));
-                $this->redirect('/courses');
-            }
-            $this->breadcrumb->push(array('course' => $course['Course']));
+        if ($importFrom == 'canvas') {
+            $userId = $this->Auth->user('id');
+
+            App::import('Component', 'CanvasApi');
+            $canvasApi = new CanvasApiComponent($userId);
+            
+            // TODO: do the import
         }
-
-        $courses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
-        $this->set('courses', $courses);
-
-        // make sure we know the course we're importing users into
-        if ($courseId == null && !empty($this->data)) {
-            $courseId = $this->data['Course']['Course'];
-        }
-        $this->set('courseId', $courseId);
-
-        $this->set('breadcrumb', $this->breadcrumb->push(__('Import Students From Text (.txt) or CSV File (.csv)', true)));
-
-
-        if (!empty($this->data)) {
-            // check that file upload worked
-            if ($this->FileUpload->success) {
-                $uploadFile = $this->FileUpload->uploadDir.DS.$this->FileUpload->finalFile;
-            } else {
-                $this->Session->setFlash($this->FileUpload->showErrors());
-                return;
-            }
-
-            $data = Toolkit::parseCSV($uploadFile);
-            $usernames = array();
-            // generation password for users who weren't given one
-            foreach ($data as &$user) {
-                if (empty($user[User::IMPORT_PASSWORD])) {
-                    $user[User::GENERATED_PASSWORD] = $this->PasswordGenerator->generate();
-                } else {
-                    $user[User::GENERATED_PASSWORD] = '';
+        else {
+            if (!is_null($courseId)) {
+                $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
+                if (empty($course)) {
+                    $this->Session->setFlash(__('Error: That course does not exist.', true));
+                    $this->redirect('/courses');
                 }
-                $usernames[] = $user[User::IMPORT_USERNAME];
+                $this->breadcrumb->push(array('course' => $course['Course']));
             }
 
-            if ($this->data['User']['update_class']) {
-                $this->User->removeOldStudents($usernames, $courseId);
-            }
+            $courses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
+            $this->set('courses', $courses);
 
-            // add the users to the database
-            $result = $this->User->addUserByArray($data, true);
-
-            if (!$result) {
-                $this->Session->setFlash("Error: Unable to import users.");
-                return;
+            // make sure we know the course we're importing users into
+            if ($courseId == null && !empty($this->data)) {
+                $courseId = $this->data['Course']['Course'];
             }
+            $this->set('courseId', $courseId);
 
-            $insertedIds = array();
-            foreach ($this->User->insertedIds as $new) {
-                $insertedIds[] = $new;
-            }
-            foreach ($result['updated_students'] as $old) {
-                $insertedIds[] = $old['User']['id'];
-            }
+            $this->set('breadcrumb', $this->breadcrumb->push(__('Import Students From Text (.txt) or CSV File (.csv)', true)));
 
-            // enrol the users in the selectec course
-            $this->Course->enrolStudents($insertedIds,
-                $this->data['Course']['Course']);
-            $this->FileUpload->removeFile($uploadFile);
-            $this->set('data', $result);
-            $this->render('userSummary');
+
+            if (!empty($this->data)) {
+                // check that file upload worked
+                if ($this->FileUpload->success) {
+                    $uploadFile = $this->FileUpload->uploadDir.DS.$this->FileUpload->finalFile;
+                } else {
+                    $this->Session->setFlash($this->FileUpload->showErrors());
+                    return;
+                }
+
+                $data = Toolkit::parseCSV($uploadFile);
+                $usernames = array();
+                // generation password for users who weren't given one
+                foreach ($data as &$user) {
+                    if (empty($user[User::IMPORT_PASSWORD])) {
+                        $user[User::GENERATED_PASSWORD] = $this->PasswordGenerator->generate();
+                    } else {
+                        $user[User::GENERATED_PASSWORD] = '';
+                    }
+                    $usernames[] = $user[User::IMPORT_USERNAME];
+                }
+
+                if ($this->data['User']['update_class']) {
+                    $this->User->removeOldStudents($usernames, $courseId);
+                }
+
+                // add the users to the database
+                $result = $this->User->addUserByArray($data, true);
+
+                if (!$result) {
+                    $this->Session->setFlash("Error: Unable to import users.");
+                    return;
+                }
+
+                $insertedIds = array();
+                foreach ($this->User->insertedIds as $new) {
+                    $insertedIds[] = $new;
+                }
+                foreach ($result['updated_students'] as $old) {
+                    $insertedIds[] = $old['User']['id'];
+                }
+
+                // enrol the users in the selectec course
+                $this->Course->enrolStudents($insertedIds,
+                    $this->data['Course']['Course']);
+                $this->FileUpload->removeFile($uploadFile);
+                $this->set('data', $result);
+                $this->render('userSummary');
+            }
         }
     }
 

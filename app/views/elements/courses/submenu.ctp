@@ -17,7 +17,8 @@ switch($submenu) {
     if ($status == 'A') {
         array_push(
             $items,
-            array('name' => 'Email to All Students',  'link' => "/emailer/write/C/$course_id")
+            array('name' => 'Email to All Students',  'link' => "/emailer/write/C/$course_id"),
+            array('name' => 'Import Students from Canvas',  'link' => "/users/import/$course_id/canvas")
         );
     }
     break;

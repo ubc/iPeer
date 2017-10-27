@@ -1,4 +1,6 @@
 <?php
+App::import('Component', 'Security');
+
 /**
  * SysParameter
  *
@@ -63,6 +65,10 @@ class SysParameter extends AppModel
         if (null == $result) {
             $param = $this->findParameter($paramCode);
             if ($param) {
+                // decrypt the parameter if it's encrypted
+                if ($param['SysParameter']['parameter_type'] == 'E'){
+                    $param['SysParameter']['parameter_value'] = Security::cipher($param['SysParameter']['parameter_value'], Configure::read('Security.cipherSeed'));
+                }
                 $result = $param['SysParameter']['parameter_value'];
                 Cache::write($paramCode, $result, 'configuration');
             } else {
@@ -103,6 +109,10 @@ class SysParameter extends AppModel
     function beforeSave()
     {
         $this->data[$this->name]['modified'] = date('Y-m-d H:i:s');
+
+        if ($this->data[$this->name]['parameter_type'] == 'E'){
+            $this->data[$this->name]['parameter_value'] = Security::cipher($this->data[$this->name]['parameter_value'], Configure::read('Security.cipherSeed'));
+        }
 
         return true;
     }

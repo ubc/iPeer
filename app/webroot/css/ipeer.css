@@ -347,6 +347,11 @@ a#home, a#home:hover, a#home:active {
     border: 2px solid #990044;
 }
 
+#flashMessage.success, #authMessage.success, .success-message {
+    color: #159900;
+    border: 2px solid #159900;
+}
+
 .red {
     color: red;
 }
@@ -1054,7 +1059,9 @@ i {
 }
 
 /* SysParameters */
-#sysParam .text label, #sysParam .select label {
+#sysParam .text label, 
+#sysParam .password label, 
+#sysParam .select label {
     width: 18em;
 }
 
