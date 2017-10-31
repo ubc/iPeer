@@ -9,6 +9,7 @@ App::import('Vendor', 'Httpful', array('file' => 'nategood'.DS.'httpful'.DS.'boo
  * @uses Object
  * @package   CTLT.iPeer
  * @author    Clarence Ho <clarence.ho@ubc.ca>
+ * @author    Aidin Niavarani <aidin.niavarani@ubc.ca>
  * @copyright 2017 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
@@ -68,8 +69,12 @@ class CanvasApiComponent extends Object
         return false;
     }
 
-    public function getApiTokenUsingRefreshToken($refreshToken)
+    public function getApiTokenUsingRefreshToken($refreshToken = null)
     {
+        if (!$refreshToken) {
+            $oauth = $this->UserOauth->getAll($this->userId, $this->provider);
+            $refreshToken = $oauth['UserOauth']['refresh_token'];
+        }
         return $this->_getAccessTokensFromCanvas('refresh_token', $refreshToken);
     }
             
@@ -78,14 +83,14 @@ class CanvasApiComponent extends Object
         return $this->_getAccessTokensFromCanvas('authorization_code', $code);
     }
 
-    public function getCanvasData($_controller, $current_url, $force_auth, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=True)
+    public function getCanvasData($_controller, $redirect_uri, $force_auth, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=True)
     {   
         // first check to see if we have a valid access token
         $accessToken = $this->getAccessToken();
 
         // if auth token exists, attempt to call api
         if ($accessToken) {
-            return $this->_getCanvasData($accessToken, $uri, $params, $additionalHeader, $refreshTokenAndRetry);
+            return $this->_getCanvasData($_controller, $redirect_uri, $accessToken, $uri, $params, $additionalHeader, $refreshTokenAndRetry);
         }
 
         // returning from canvas with auth code
@@ -93,6 +98,7 @@ class CanvasApiComponent extends Object
             $apiToken = $this->getApiTokenUsingCode($_controller->params['url']['code']);
             if (isset($apiToken['accessToken'])) {
                 $_controller->Session->setFlash('You have successfully connected to Canvas.', 'flash_success');
+                $_controller->redirect($redirect_uri);
             }
             elseif (isset($apiToken['err'])) {
                 $_controller->Session->setFlash($apiToken['err']);
@@ -103,13 +109,18 @@ class CanvasApiComponent extends Object
         }
         // if no access token, get a new access token by forwarding the user to the canvas auth page
         elseif ($force_auth) {
-            $canvasOauthUrl = 'http://localhost:8900' . '/login/oauth2/auth' . 
-                                '?client_id=' . $this->SysParameter->get('system.canvas_client_id') .
-                                '&response_type=code' . 
-                                '&state=new' . 
-                                '&redirect_uri=' . array_shift(explode('?', $current_url));
-            $_controller->redirect($canvasOauthUrl);
+            $this->_getNewOauth($_controller, $redirect_uri);
         }        
+    }
+
+    private function _getNewOauth($_controller, $redirect_uri)
+    {
+        $canvasOauthUrl = 'http://localhost:8900' . '/login/oauth2/auth' . 
+                            '?client_id=' . $this->SysParameter->get('system.canvas_client_id') .
+                            '&response_type=code' . 
+                            '&state=new' . 
+                            '&redirect_uri=' . array_shift(explode('?', $redirect_uri));
+        $_controller->redirect($canvasOauthUrl);
     }
 
     private function _getAccessTokensFromCanvas($grantType, $codeOrToken)
@@ -127,6 +138,8 @@ class CanvasApiComponent extends Object
         
         $request = \Httpful\Request::post($this->getBaseUrl() . "/login/oauth2/token", http_build_query($params))->expectsJson();
 
+        $error = array();
+        
         try {
             $response = $request->sendIt()->body;
             
@@ -139,9 +152,10 @@ class CanvasApiComponent extends Object
                     default:
                         $auth_error = ucfirst($response->error_description);
                 }
-                $err = sprintf(__('Error: Authentication failed. %s', true), $auth_error);
+                $error_description = sprintf(__('Error: Authentication failed. %s', true), $auth_error);
+                $error = $response->error;
             } elseif (!isset($response->access_token)) {
-                $err = __('Error: Authentication failed. Canvas did not send back an access token, and additionally did not provide an error message, either.', true);
+                $error_description = __('Error: Authentication failed. Canvas did not send back an access token, and additionally did not provide an error message, either.', true);
             } else {
                 $saveData = array(
                     'access_token' => $response->access_token,
@@ -159,13 +173,13 @@ class CanvasApiComponent extends Object
         }
         catch (Exception $e) {
             error_log($e->getMessage());
-            $err = sprintf(__('Error: Authentication failed. Connection error: %s', true), $e->getMessage());
+            $error_description = sprintf(__('Error: Authentication failed. Connection error: %s', true), $e->getMessage());
         }
         
-        return array('err' => $err);
+        return array('err' => $error_description, 'err_code' => $error);
     }
 
-    private function _getCanvasData($accessToken, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=True)
+    private function _getCanvasData($_controller, $redirect_uri, $accessToken, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=True)
     {
         try {
             // For Canvas API, multiple parameters can have the same key.
@@ -189,7 +203,18 @@ class CanvasApiComponent extends Object
                     ->addHeaders($additionalHeader? $additionalHeader : array())
                     ->send();
 
-            // TODO: check $response->code. if necessary handle token refresh and try again ($refreshTokenAndRetry).
+            if (isset($response->body->errors) && $refreshTokenAndRetry) {
+                // most likely, the access token is no longer valid (deleted or expired), so use refresh token to get it
+                $apiToken = $this->getApiTokenUsingRefreshToken();
+                if (isset($apiToken['accessToken'])) {
+                    return $this->_getCanvasData($_controller, $redirect_uri, $apiToken['accessToken'], $uri, $params, $additionalHeader, false);
+                }
+                // if not able to get new access token, we need to re-authenticate with canvas
+                else {
+                    $this->UserOauth->deleteToken($this->userId, $this->provider);
+                    $this->_getNewOauth($_controller, $redirect_uri);
+                }
+            }
             return $response->body;
         } catch (Exception $e) {
             // TODO: better error handling

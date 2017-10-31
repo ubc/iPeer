@@ -94,6 +94,11 @@ class UserOauth extends AppModel
 
         return $oauth;
     }
+
+    function deleteToken($userId, $provider)
+    {
+        return $this->deleteAll(array('UserOauth.user_id =' => $userId, 'UserOauth.provider =' => $provider));
+    }
     
     /**
         * Returns a list of fields from the database, and sets the current model
