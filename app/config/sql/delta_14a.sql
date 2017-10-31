@@ -1,7 +1,7 @@
 --
 -- Canvas integration
 --
-INSERT INTO `sys_parameters` (
+INSERT INTO `ipeer`.`sys_parameters` (
     `parameter_code`, `parameter_value`,
     `parameter_type`, `description`, `record_status`, `creator_id`, `created`,
     `updater_id`, `modified`)
@@ -10,7 +10,7 @@ VALUES (
     'Base URL for Canvas API', 'A', 0, NOW(), NULL, NOW()
 );
 
-INSERT INTO `sys_parameters` (
+INSERT INTO `ipeer`.`sys_parameters` (
     `parameter_code`, `parameter_value`,
     `parameter_type`, `description`, `record_status`, `creator_id`, `created`,
     `updater_id`, `modified`)
@@ -19,7 +19,7 @@ VALUES (
     'Enable Canvas integration', 'A', 0, NOW(), NULL, NOW()
 );
 
-INSERT INTO `sys_parameters` (
+INSERT INTO `ipeer`.`sys_parameters` (
     `parameter_code`, `parameter_value`,
     `parameter_type`, `description`, `record_status`, `creator_id`, `created`,
     `updater_id`, `modified`)
@@ -28,5 +28,12 @@ VALUES (
     'Key used to map a Canvas user to iPeer username', 'A', 0, NOW(), NULL, NOW()
 );
 
+INSERT INTO `ipeer`.`acos`
+(`parent_id`, `model`, `foreign_key`, `alias`, `lft`, `rght`)
+	select id, NULL, NULL, 'syncCanvasEnrollment', NULL, NULL
+	from `ipeer`.`acos`
+	where BINARY `alias`='Courses' LIMIT 1;
+
+
 -- store canvas course id
-ALTER TABLE `courses` ADD COLUMN `canvas_id` VARCHAR(25) NULL DEFAULT NULL;
+ALTER TABLE `ipeer`.`courses` ADD COLUMN `canvas_id` VARCHAR(25) NULL DEFAULT NULL;

@@ -67,26 +67,29 @@ class CanvasCourseComponent extends Object
      * @param mixed $roles array of roles to retrieve. by default, retrieves teachers, TAs, and students
      *
      * @access public
-     * @return array Array of CanvasCourseUserComponent with integration id as key
+     * @return array Array of CanvasCourseUserComponent.  Key is the value used to map Canvas users to iPeer username
      */
-    public function getCanvasCourseUsers($user_id, $roles=array(
+    public function getCanvasCourseUsers($_controller, $user_id, $roles=array(
         CanvasCourseUserComponent::ENROLLMENT_QUERY_STUDENT,
         CanvasCourseUserComponent::ENROLLMENT_QUERY_TEACHER,
-        CanvasCourseUserComponent::ENROLLEMNT_QUERY_TA))
+        CanvasCourseUserComponent::ENROLLEMNT_QUERY_TA), $force_auth=false)
     {
         $api = new CanvasApiComponent($user_id);
         $uri = '/courses/' . $this->id . '/users';
         $params['enrollment_type[]'] = $roles;      // note the square brackets used in key
         $params['include[]'] = 'enrollments';
         
-        $courseUsers_json = $api->getCanvasData($uri, $params);
+        //$courseUsers_json = $api->getCanvasData($uri, $params);
+        $courseUsers_json = $api->getCanvasData($_controller, Router::url(null, true), $force_auth, $uri, $params);
+
 
         $courseUsers = array();
         if (!empty($courseUsers_json)) {
             foreach ($courseUsers_json as $courseuser) {
                 $courseuser_obj = new CanvasCourseUserComponent($courseuser);
-                if (!empty($courseuser_obj->integration_id)) {
-                    $courseUsers[$courseuser_obj->integration_id] = $courseuser_obj;
+                $key = $courseuser_obj->canvas_user_key;    // key used to map canvas user to iPeer username
+                if (!empty($courseuser_obj->$key)) {
+                    $courseUsers[$courseuser_obj->$key] = $courseuser_obj;
                 }
             }
         }

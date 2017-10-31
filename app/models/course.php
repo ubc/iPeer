@@ -420,6 +420,21 @@ class Course extends AppModel
 
         return $this->habtmAdd('Enrol', $courseId, $ids);
     }
+    
+    /**
+     * unenroll students from a course
+     *
+     * @param mixed $ids      id array of the students
+     * @param mixed $courseId the course the students to be unenrolled. If null,
+     * read the current id in the course object
+     *
+     * @access public
+     * @return boolean true for success, false for failed.
+     */
+    function unenrollStudents($ids, $courseId = null)
+    {
+        return $this->habtmDelete('Enrol', $courseId, $ids);
+    }
 
     /**
      * Get course data by departments

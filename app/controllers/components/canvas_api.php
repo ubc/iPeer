@@ -89,7 +89,7 @@ class CanvasApiComponent extends Object
         }
 
         // returning from canvas with auth code
-        if ($force_auth && isset($_controller->params['url']['code'])){
+        if (isset($_controller->params['url']['code'])){
             $apiToken = $this->getApiTokenUsingCode($_controller->params['url']['code']);
             if (isset($apiToken['accessToken'])) {
                 $_controller->Session->setFlash('You have successfully connected to Canvas.', 'flash_success');
@@ -126,7 +126,7 @@ class CanvasApiComponent extends Object
         }
         
         $request = \Httpful\Request::post($this->getBaseUrl() . "/login/oauth2/token", http_build_query($params))->expectsJson();
-        
+
         try {
             $response = $request->sendIt()->body;
             

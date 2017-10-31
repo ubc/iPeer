@@ -13,7 +13,7 @@ App::import('Component', 'CanvasApi');
  */
 class CanvasCourseUserComponent extends Object
 {
-    protected $canvas_user_key = 'integration_id';
+    public $canvas_user_key = 'integration_id';
     
     const ENROLLMENT_QUERY_STUDENT = 'student';
     const ENROLLMENT_QUERY_TEACHER = 'teacher';
