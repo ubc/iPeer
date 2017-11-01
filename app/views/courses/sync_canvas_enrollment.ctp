@@ -12,6 +12,8 @@ if ($canvasCourses) {
         )
     );
     echo $html->div('input text', $cCourse, array('id' => 'canvas_courses'));
+} else {
+    echo $html->div('help-text', __('No accessible Canvas course to compare', true));
 }
 ?>
 <h2><?php echo __('Students currently enrolled in this iPeer course', true)?></h2>
@@ -249,26 +251,6 @@ function doCompare()
 jQuery(document).ready(function() {
     jQuery('#CanvasCourses').prepend('<option value="" <?php echo !(empty($canvasCourseId))? '' : 'selected="selected"' ?>></option>');
     
-    jQuery('#btn_enroll').attr('disabled', true);
-    jQuery(document).on("click", "input:checkbox[id^='enroll_']", function(){
-        jQuery('#btn_enroll').attr('disabled', true);
-        jQuery("input:checkbox[id^='enroll_']").each(function(){
-            if (jQuery(this).prop('checked')) { 
-                jQuery('#btn_enroll').attr('disabled', false);
-            }
-        });
-    });
-
-    jQuery('#btn_unenroll').attr('disabled', true);
-    jQuery(document).on("click", "input:checkbox[id^='unenroll_']", function(){
-        jQuery('#btn_unenroll').attr('disabled', true);
-        jQuery("input:checkbox[id^='unenroll_']").each(function(){
-            if (jQuery(this).prop('checked')) { 
-                jQuery('#btn_unenroll').attr('disabled', false);
-            }
-        });
-    });
-
 	var elmnt = null;
     /*
      * Initialise DataTables, with no sorting on the 'details' column
@@ -302,6 +284,22 @@ jQuery(document).ready(function() {
       "aaSorting" : [[2, 'asc']],
     });
     
+    jQuery('#btn_unenroll').attr('disabled', true);
+    jQuery(document).on("click", "input:checkbox[id^='unenroll_']", function(){
+        jQuery('#btn_unenroll').attr('disabled', true);
+        if (jQuery(oTable1.fnGetNodes()).find("input:checkbox[id^='unenroll_']").filter(":checked").length > 0) {
+            jQuery('#btn_unenroll').attr('disabled', false);
+        }
+    });
+
+    jQuery('#btn_enroll').attr('disabled', true);
+    jQuery(document).on("click", "input:checkbox[id^='enroll_']", function(){
+        jQuery('#btn_enroll').attr('disabled', true);
+        if (jQuery(oTable2.fnGetNodes()).find("input:checkbox[id^='enroll_']").filter(":checked").length > 0) {
+            jQuery('#btn_enroll').attr('disabled', false);
+        }
+    });
+
     // jQuery Datatable hides invisible rows (e.g. search filtered, pagenation etc).
     // Add back the selected items for form submission
     jQuery('#unEnrollForm').submit(function(){

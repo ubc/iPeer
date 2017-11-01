@@ -358,7 +358,7 @@ class CoursesController extends AppController
         $this->set('instructorSelected', User::get('id'));
         
         $canvasApi = new CanvasApiComponent(User::get('id'));
-        $this->set('canvasTokenSet', !empty($canvasApi->getAccessToken()));
+        $this->set('canvasTokenSet', $canvasApi->getAccessToken() !== false);
         $this->set('canvasEnabled', ($this->SysParameter->get('system.canvas_enabled', 'false') == 'true'));
 
         $instructions = $this->SysParameter->find('first', array('conditions' => array('parameter_code' => 'course.creation.instructions')));
@@ -368,6 +368,8 @@ class CoursesController extends AppController
 
         if ($this->data['Course']['doCanvasAuthorize'] == "1") {
             $canvasCourses = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), true);
+            $this->render('edit');
+            return;
         }
         
         // populate data from Canvas
@@ -416,7 +418,7 @@ class CoursesController extends AppController
         $this->_initFormEnv($courseId);
 
         $canvasApi = new CanvasApiComponent(User::get('id'));
-        $this->set('canvasTokenSet', !empty($canvasApi->getAccessToken()));
+        $this->set('canvasTokenSet', $canvasApi->getAccessToken() !== false);
         $this->set('canvasEnabled', ($this->SysParameter->get('system.canvas_enabled', 'false') == 'true'));
 
         $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission(), array('Instructor', 'Department'));
@@ -815,7 +817,7 @@ class CoursesController extends AppController
         $this->set('courseId', $courseId);
         
         // Canvas courses that the user can access
-        $canvasCourses = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), false);
+        $canvasCourses = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), true);
         $selectedCanvasCourse = empty($canvasCourseId) ? '' : $canvasCourses[$canvasCourseId];
         // If a Canvas course is selected and user has access, get the student enrollment in Canvas
         $canvasStudents = array();
