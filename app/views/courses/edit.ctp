@@ -7,27 +7,29 @@ if (isset($instructions)) {
 echo $this->Form->create('Course');
 echo $this->Form->input('id');
 
-if ($canvasEnabled && !$canvasTokenSet) {
-    echo $html->link(__('Authorize Canvas access', true), '#', array('onclick' => 'javascript: jQuery("#CourseDoCanvasAuthorize").val(1); document.forms[0].submit(); return false;'));
-} else {
-    // canvas courses
-    $cCourse = $form->input(
-        'Course.canvas_course',
-        array(
-            'type' => 'select',
-            'id' => 'CanvasCourses',
-            'label' => __('Populate from Canvas course', true),
-            'options' => $canvasCourses,
-            'after' => $html->link(__('Populate', true), '#', array('onclick' => 'javascript: if (CanvasCourses.value == "") { return false; } document.forms[0].submit(); return false;'))
-        )
-    );
-        echo $html->div('input text', $cCourse, array('id' => 'canvas_courses'));
-    if (empty($canvasCourses)) {
-        echo $html->div('help-text', __('No accessible Canvas course', true));
+if (!empty($this->data['Course'] && empty($this->data['Course']['id']))) {
+    echo $form->hidden('Course.canvas_id');    
+}
+if ($canvasEnabled) {
+    if (!empty($this->data) && !empty($this->data['Course'] && !empty($this->data['Course']['id']))) {
+        // canvas courses
+        $cCourse = $form->input(
+            'Course.canvas_id',
+            array(
+                'type' => 'select',
+                'id' => 'canvas_id',
+                'label' => __('Linked with Canvas course', true),
+                'options' => $canvasCourses,
+                'default' => $this->data['Course']['canvas_id'],
+            )
+        );
+        echo $html->div('input text', $cCourse);
+        if (empty($canvasCourses)) {
+            echo $html->div('help-text', __('No accessible Canvas course', true));
+        }        
     }
 }
 
-echo $form->hidden('doCanvasAuthorize', array('value' => 0));
 echo $form->input('Course.course');
 echo $html->div('help-text', __('Course subjects and course numbers, e.g. APSC 201 001', true));
 echo $form->input('Course.title');
@@ -110,7 +112,7 @@ echo $form->end(); ?>
 
 <script type="text/javascript">
 
-jQuery('#CanvasCourses').prepend('<option value="" selected="selcted"></option>');
+jQuery('#canvas_id').prepend('<option value="" <?php echo empty($this->data['Course']['canvas_id'])? 'selected="selected"' : '' ?>></option>');
 
 // remove all already added instructors from the drop down
 var selected = <?php echo json_encode($selected); ?>;

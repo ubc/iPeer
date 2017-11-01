@@ -40,6 +40,7 @@ class CoursesController extends AppController
     {
         parent::beforeFilter();
         $this->set('title_for_layout', __('Courses',true));
+        $this->set('canvasEnabled', ($this->SysParameter->get('system.canvas_enabled', 'false') == 'true'));
 
         $allowTypes = array(
             'text/plain', 'text/csv', 'application/csv',
@@ -351,30 +352,27 @@ class CoursesController extends AppController
      * @access public
      * @return void
      */
-    public function add()
+    public function add($selCanvas=null)
     {
         $this->set('title_for_layout', 'Add Course');
         $this->_initFormEnv();
         $this->set('instructorSelected', User::get('id'));
         
-        $canvasApi = new CanvasApiComponent(User::get('id'));
-        $this->set('canvasTokenSet', $canvasApi->getAccessToken() !== false);
-        $this->set('canvasEnabled', ($this->SysParameter->get('system.canvas_enabled', 'false') == 'true'));
-
         $instructions = $this->SysParameter->find('first', array('conditions' => array('parameter_code' => 'course.creation.instructions')));
         if (!empty($instructions) && !empty($instructions['SysParameter']['parameter_value'])) {
             $this->set('instructions', $instructions['SysParameter']['parameter_value']);
         }
-
-        if ($this->data['Course']['doCanvasAuthorize'] == "1") {
+        
+        if ($selCanvas === 'selCanvas') {
             $canvasCourses = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), true);
-            $this->render('edit');
+            $this->render('select_canvas');
             return;
         }
-        
+
         // populate data from Canvas
         if (!empty($this->data) && !empty($this->data['Course']) && !empty($this->data['Course']['canvas_course'])) {
             $this->_populateWithCanvasCourseData($this->data['Course']['canvas_course']);
+            $this->data['Course']['canvas_id'] = $this->data['Course']['canvas_course'];
             $this->render('edit');
             return;
         }
@@ -417,28 +415,11 @@ class CoursesController extends AppController
     {
         $this->_initFormEnv($courseId);
 
-        $canvasApi = new CanvasApiComponent(User::get('id'));
-        $this->set('canvasTokenSet', $canvasApi->getAccessToken() !== false);
-        $this->set('canvasEnabled', ($this->SysParameter->get('system.canvas_enabled', 'false') == 'true'));
-
         $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission(), array('Instructor', 'Department'));
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
         }
-        
-        if ($this->data['Course']['doCanvasAuthorize'] == "1") {
-            $canvasCourses = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), true);
-            $this->render('edit');
-            return;
-        }
-
-        // populate data from Canvas
-        if (!empty($this->data) && !empty($this->data['Course']) && !empty($this->data['Course']['canvas_course'])) {
-            $this->_populateWithCanvasCourseData($this->data['Course']['canvas_course']);
-            $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Edit Course', true)));
-            return;
-        }
-        
+      
         if (!empty($this->data)) {
             $this->data['Course'] = array_map('trim', $this->data['Course']);
             $newInstructors = (!isset($this->data['Instructor'])) ? array() :

@@ -19,6 +19,7 @@ if ($canvasCourses) {
 <h2><?php echo __('Students currently enrolled in this iPeer course', true)?></h2>
 <?php 
 echo $this->Form->create('Course', array('id' => 'unEnrollForm', 'action' => 'syncCanvasEnrollment/' . $courseId . '/' . $canvasCourseId));
+echo $html->div('', '', array('id' => 'unEnrollHidden', 'style' => 'display:none;'));
 ?>
 
 <table id="table_id_1">
@@ -91,6 +92,7 @@ echo $form->end();
 
 <?php 
 echo $this->Form->create('Course', array('id' => 'enrollForm','action' => 'syncCanvasEnrollment/' . $courseId . '/' . $canvasCourseId));
+echo $html->div('', '', array('id' => 'enrollHidden', 'style' => 'display:none;'));
 ?>
 <table id="table_id_2">
     <thead>
@@ -300,13 +302,13 @@ jQuery(document).ready(function() {
         }
     });
 
-    // jQuery Datatable hides invisible rows (e.g. search filtered, pagenation etc).
+    // jQuery Datatable hides invisible rows (e.g. search filtered, pagination etc).
     // Add back the selected items for form submission
     jQuery('#unEnrollForm').submit(function(){
-        jQuery(oTable1.fnGetHiddenNodes()).find('input:checked').appendTo(this);
+        jQuery(oTable1.fnGetHiddenNodes()).find('input:checked').appendTo(jQuery('#unEnrollHidden'));
     });
     jQuery('#enrollForm').submit(function(){
-        jQuery(oTable2.fnGetHiddenNodes()).find('input:checked').appendTo(this);
+        jQuery(oTable2.fnGetHiddenNodes()).find('input:checked').appendTo(jQuery('#enrollHidden'));
     });    
 
 } );

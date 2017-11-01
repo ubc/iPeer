@@ -9,6 +9,15 @@
             }
             ?>
             </li>
+            <li>
+            <?php
+            if (User::hasPermission('controllers/Courses/add') &&
+                $canvasEnabled) {
+                echo $html->link( __('Add Course Based on Canvas', true),
+                    '/courses/add/selCanvas', array('class' => 'add-button'));
+            }
+            ?>
+            </li>
         </ul>
     </div>
 
