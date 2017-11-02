@@ -56,8 +56,6 @@ class UserOauth extends AppModel
         }
 
         $this->save($newOauth);
-
-        // $this->Session->write('oauth_'.$provider, $newOauth);
     }
     
     /**

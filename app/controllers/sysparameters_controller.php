@@ -95,6 +95,7 @@ class SysParametersController extends AppController
      * @return array
      */
     function postProcessAjaxList ($data){
+        // hide the encrypted parameters for security
         foreach ($data as $k => $v) {
             if ($v['SysParameter']['parameter_type'] == 'E'){
                 $data[$k]['SysParameter']['parameter_value'] = '(hidden)';

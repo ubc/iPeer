@@ -18,6 +18,7 @@ class CoursesController extends AppController
         'Js' => array('Prototype'), 'FileUpload.FileUpload');
     public $components = array('ExportBaseNew', 'AjaxList', 'ExportCsv', 'ExportExcel',
         'FileUpload.FileUpload', 'RequestHandler', 'CanvasCourse', 'CanvasCourseUser');
+    private $canvasEnabled;
 
     /**
      * __construct
@@ -40,7 +41,9 @@ class CoursesController extends AppController
     {
         parent::beforeFilter();
         $this->set('title_for_layout', __('Courses',true));
-        $this->set('canvasEnabled', ($this->SysParameter->get('system.canvas_enabled', 'false') == 'true'));
+
+        $this->canvasEnabled = in_array($this->SysParameter->get('system.canvas_enabled', 'false'), array('1', 'true', 'yes'));
+        $this->set('canvasEnabled', $this->canvasEnabled);
 
         $allowTypes = array(
             'text/plain', 'text/csv', 'application/csv',
@@ -266,7 +269,7 @@ class CoursesController extends AppController
         $this->set('tutors', $tutorList);
 
         // TODO: check if user has Canvas token setup
-        if ($this->SysParameter->get('system.canvas_enabled', 'false') == 'true') {
+        if ($this->canvasEnabled) {
             // map function to keep only the course name
             $map_func = function($value) {
                 return $value->name;
@@ -336,17 +339,29 @@ class CoursesController extends AppController
         }
         
         if ($selCanvas === 'selCanvas') {
-            $canvasCourses = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), true);
-            $this->render('select_canvas');
-            return;
+            if ($this->canvasEnabled){
+                $canvasCourses = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), true);
+                $this->render('select_canvas');
+                return;
+            }
+            else {
+                $this->Session->setFlash(__('Error: Canvas integration not enabled.', true));
+                $this->redirect('index');
+            }
         }
 
         // populate data from Canvas
         if (!empty($this->data) && !empty($this->data['Course']) && !empty($this->data['Course']['canvas_course'])) {
-            $this->_populateWithCanvasCourseData($this->data['Course']['canvas_course']);
-            $this->data['Course']['canvas_id'] = $this->data['Course']['canvas_course'];
-            $this->render('edit');
-            return;
+            if ($this->canvasEnabled){
+                $this->_populateWithCanvasCourseData($this->data['Course']['canvas_course']);
+                $this->data['Course']['canvas_id'] = $this->data['Course']['canvas_course'];
+                $this->render('edit');
+                return;
+            }
+            else {
+                $this->Session->setFlash(__('Error: Canvas integration not enabled.', true));
+                $this->redirect('index');
+            }
         }
         
         if (!empty($this->data)) {
@@ -743,8 +758,7 @@ class CoursesController extends AppController
      */
     function syncCanvasEnrollment($courseId)
     {
-        // check if Canvas is enabled
-        if ($this->SysParameter->get('system.canvas_enabled', 'false') == 'false') {
+        if (!$this->canvasEnabled){
             $this->Session->setFlash(__('Error: Canvas integration not enabled.', true));
             $this->redirect('index');
         }

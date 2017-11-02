@@ -2,6 +2,7 @@
 App::import('Model', 'SysParameter');
 App::import('Model', 'User');
 App::import('Component', 'CanvasApi');
+
 /**
  * CanvasCourseUserComponent
  *

@@ -2,6 +2,7 @@
 App::import('Model', 'User');
 App::import('Component', 'CanvasApi');
 App::import('Component', 'CanvasCourseUser');
+
 /**
  * CanvasCourseComponent
  *

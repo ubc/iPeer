@@ -25,6 +25,7 @@ class UsersController extends AppController
     );
     public $components = array('Session', 'AjaxList', 'RequestHandler',
         'Email', 'FileUpload.FileUpload', 'PasswordGenerator');
+    private $canvasEnabled;
 
     /**
      * __construct
@@ -61,6 +62,8 @@ class UsersController extends AppController
         $this->FileUpload->fileModel(null);
         $this->FileUpload->attr('required', true);
         $this->FileUpload->attr('forceWebroot', false);
+
+        $this->canvasEnabled = in_array($this->SysParameter->get('system.canvas_enabled', 'false'), array('1', 'true', 'yes'));
     }
 
     /**
@@ -264,8 +267,7 @@ class UsersController extends AppController
         $this->set('classList', $course['Enrol']);
         $this->set('courseId', $courseId);
 
-        if ($this->SysParameter->get('system.canvas_enabled', 'false') == 'true' &&
-            !empty($course['Course']['canvas_id'])) {
+        if ($this->canvasEnabled && !empty($course['Course']['canvas_id'])) {
             $this->set('linkedWithCanvas', true);
         } else {
             $this->set('linkedWithCanvas', false);
@@ -1125,6 +1127,11 @@ class UsersController extends AppController
         $usernames = array();
 
         if ($importFrom == 'canvas') {
+
+            if (!$this->canvasEnabled){
+                $this->Session->setFlash(__('Error: Canvas integration not enabled.', true));
+                $this->redirect('index');
+            }
 
             $this->set('breadcrumb', $this->breadcrumb->push(__('Import Students From Canvas', true)));
             $this->set('isFileImport', false);

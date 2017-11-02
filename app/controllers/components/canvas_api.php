@@ -18,31 +18,62 @@ class CanvasApiComponent extends Object
     protected $SysParameter;
     protected $userId;
     protected $provider;
+    protected $apiVersion;
 
+    /**
+     * overriden constructor to initialize private variables
+     *
+     * @param integer $userId required for most nonstatic functionalities
+     * 
+     * @access public
+     */
     public function __construct($userId)
     {
         parent::__construct();
         $this->userId = $userId;
         $this->provider = 'canvas';
+        $this->apiVersion = 'v1';
         $this->SysParameter = ClassRegistry::init('SysParameter');
         $this->UserOauth = ClassRegistry::init('UserOauth');
     }
 
-    public function getBaseUrl()
+    /**
+     * gets the base URL for canvas (without appending slash)
+     *
+     * @param boolean $ext pass true if making a frontend request to canvas
+     * 
+     * @access public
+     * @return void
+     * 
+     */
+    public function getBaseUrl($ext=false)
     {
+        if ($ext) {
+            $extBaseUrl = $this->SysParameter->get('system.canvas_baseurl_ext');
+            if ($extBaseUrl) {
+                return $extBaseUrl;
+            }
+        }
+        
         return $this->SysParameter->get('system.canvas_baseurl');
     }
 
-    public function getVersion()
+    /**
+     * get full URL to api (without appending slash). Append API URI to make a request
+     *
+     * @access public
+     * @return void
+     */
+    public function getApiUrl()
     {
-        return '/api/v1';
+        return $this->getBaseUrl() . '/api/v1';
     }
     
     /**
       * get user access token
       *
       * @access public
-      * @return mixed
+      * @return mixed return access token if successful, boolean false otherwise
       */
     public function getAccessToken()
     {
@@ -69,42 +100,92 @@ class CanvasApiComponent extends Object
         return false;
     }
 
+    /**
+     * get access token and other information using a refresh token. if successful, also saves this information to the database
+     *
+     * @param string $refreshToken if not provided, fetches it from the database
+     * 
+     * @access public
+     * @return array with key 'access_token' if successful, otherwise the array will have 'err' element with description of error
+     */
     public function getApiTokenUsingRefreshToken($refreshToken = null)
     {
         if (!$refreshToken) {
             $oauth = $this->UserOauth->getAll($this->userId, $this->provider);
-            $refreshToken = $oauth['UserOauth']['refresh_token'];
+            if (isset($oauth['UserOauth']['refresh_token'])){
+                $refreshToken = $oauth['UserOauth']['refresh_token'];
+            }
+            else {
+                err_log('Canvas API: Tried to fetch access tokens using a non-existent refresh token');
+                return array('err'=>'Could not retrieve refresh token. Please contact the administrator.');
+            }
         }
         return $this->_getAccessTokensFromCanvas('refresh_token', $refreshToken);
     }
-            
+
+    /**
+     * get access token and other information using an authorization code (this is the step after user authorizes iPeer in Canvas)
+     * if successful, also saves this information to the database
+     *
+     * @param string $code
+     * 
+     * @access public
+     * @return array with key 'access_token' if successful, otherwise the array will have 'err' element with description of error
+     */
     public function getApiTokenUsingCode($code)
     {
         return $this->_getAccessTokensFromCanvas('authorization_code', $code);
     }
 
-    public function getCanvasData($_controller, $redirect_uri, $force_auth, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=True)
+    /**
+     * retrieves requested data from canvas api
+     *
+     * @param object    $_controller the controller that initiated this request
+     * @param string    $redirect_uri the page to end up on after this request is done (only used if oauth needed)
+     * @param boolean   $force_auth redirects the user to give auhtorization through Canvas if not authorized yet
+     * @param string    $uri canvas api uri
+     * @param array     $params canvas api parameters
+     * @param string    $additionalHeader
+     * @param boolean   $refreshTokenAndRetry if set to true (default), uses the refresh token to retry if the access token is expired
+     * 
+     * @access public
+     * @return mixed return requested data, otherwise void
+     */
+    public function getCanvasData($_controller, $redirect_uri, $force_auth, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=true)
     {   
         // first check to see if we have a valid access token
         $accessToken = $this->getAccessToken();
 
         // if auth token exists, attempt to call api
         if ($accessToken) {
-            return $this->_getCanvasData($_controller, $redirect_uri, $accessToken, $uri, $params, $additionalHeader, $refreshTokenAndRetry);
+            $data = $this->_getCanvasData($_controller, $redirect_uri, $accessToken, $uri, $params, $additionalHeader, $refreshTokenAndRetry);
+            if ($data) {
+                return $data;
+            }
+            else {
+                $_controller->Session->setFlash('There was an error retrieving data from Canvas. Please try again.');
+            }
         }
 
         // returning from canvas with auth code
         if (isset($_controller->params['url']['code'])){
-            $apiToken = $this->getApiTokenUsingCode($_controller->params['url']['code']);
-            if (isset($apiToken['accessToken'])) {
-                $_controller->Session->setFlash('You have successfully connected to Canvas.', 'flash_success');
-                $_controller->redirect($redirect_uri);
-            }
-            elseif (isset($apiToken['err'])) {
-                $_controller->Session->setFlash($apiToken['err']);
+            // ensure state is the same for security, then get tokens
+            if ($_controller->params['url']['state'] == $_controller->Session->read('oauth_'.$this->provider.'_state')){
+                $_controller->Session->delete('oauth_'.$this->provider.'_state');
+                $apiToken = $this->getApiTokenUsingCode($_controller->params['url']['code']);
+                if (isset($apiToken['accessToken'])) {
+                    $_controller->Session->setFlash('You have successfully connected to Canvas.', 'flash_success');
+                    $_controller->redirect($redirect_uri);
+                }
+                elseif (isset($apiToken['err'])){
+                    $_controller->Session->setFlash($apiToken['err']);
+                }
+                else {
+                    $_controller->Session->setFlash('There was an error connecting to Canvas. Please try again.');
+                }
             }
             else {
-                $_controller->Session->setFlash('There was an error connecting to Canvas. Please try again.');
+                $_controller->Session->setFlash('There was an authentication error while trying to connect to Canvas. Please try again.');
             }
         }
         // if no access token, get a new access token by forwarding the user to the canvas auth page
@@ -113,27 +194,55 @@ class CanvasApiComponent extends Object
         }        
     }
 
+    /**
+     * forward the user to canvas to give authorization to ipeer
+     *
+     * @param object    $_controller the controller that initiated this request
+     * @param string    $redirect_uri the page to end up on after this request is done (only used if oauth needed)
+     * 
+     * @access private
+     * @return void
+     */
     private function _getNewOauth($_controller, $redirect_uri)
     {
-        $canvasOauthUrl = 'http://localhost:8900' . '/login/oauth2/auth' . 
+        // this will be passed back by Canvas along with the code, so we save it in session and check it at that point to ensure security
+        $state = uniqid('st');
+        $_controller->Session->write('oauth_'.$this->provider.'_state', $state);
+
+        // if true, it will force the user to enter their credentials, even if they're already logged into Canvas. By default, if 
+        // a user already has an active Canvas web session, they will not be asked to re-enter their credentials.
+        $forceLogin = in_array($this->SysParameter->get('system.canvas_force_login', 'false'), array('1', 'true', 'yes'));
+
+        $canvasOauthUrl = $this->getBaseUrl(true) . '/login/oauth2/auth' . 
                             '?client_id=' . $this->SysParameter->get('system.canvas_client_id') .
                             '&response_type=code' . 
-                            '&state=new' . 
+                            '&state=' . $state .
+                            ($forceLogin ? '&force_login=1' : '') .
                             '&redirect_uri=' . array_shift(explode('?', $redirect_uri));
+                            
         $_controller->redirect($canvasOauthUrl);
     }
 
-    private function _getAccessTokensFromCanvas($grantType, $codeOrToken)
+    /**
+     * get access token and other information. if successful, also saves this information to the database
+     *
+     * @param string $grantType either 'refresh_token' or 'authorization_code'
+     * @param string $tokenOrCode the actual refresh token or authorization code
+     * 
+     * @access private
+     * @return array with key 'access_token' if successful, otherwise the array will have 'err' element with description of error
+     */
+    private function _getAccessTokensFromCanvas($grantType, $tokenOrCode)
     {
         $params = array('grant_type' => $grantType,
                         'client_id' => $this->SysParameter->get('system.canvas_client_id'),
                         'client_secret' => $this->SysParameter->get('system.canvas_client_secret'));
                         
         if ($grantType == 'refresh_token') {
-            $params['refresh_token'] = $codeOrToken;
+            $params['refresh_token'] = $tokenOrCode;
         }
         elseif ($grantType == 'authorization_code') {
-            $params['code'] = $codeOrToken;
+            $params['code'] = $tokenOrCode;
         }
         
         $request = \Httpful\Request::post($this->getBaseUrl() . "/login/oauth2/token", http_build_query($params))->expectsJson();
@@ -180,6 +289,19 @@ class CanvasApiComponent extends Object
         return array('err' => $error_description, 'err_code' => $error);
     }
 
+    /**
+     * retrieves requested data from canvas api
+     *
+     * @param object    $_controller the controller that initiated this request
+     * @param string    $redirect_uri the page to end up on after this request is done (only used if oauth needed)
+     * @param string    $uri canvas api uri
+     * @param array     $params canvas api parameters
+     * @param string    $additionalHeader
+     * @param boolean   $refreshTokenAndRetry if set to true (default), uses the refresh token to retry if the access token is expired
+     * 
+     * @access private
+     * @return mixed either the response body from the api, or false if not successful
+     */
     private function _getCanvasData($_controller, $redirect_uri, $accessToken, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=True)
     {
         try {
@@ -198,8 +320,7 @@ class CanvasApiComponent extends Object
                 }
             }
             
-            $response = \Httpful\Request::get($this->getBaseUrl() .
-                $this->getVersion() . $uri .
+            $response = \Httpful\Request::get($this->getApiUrl() . $uri .
                 ($params? '?' . $params_expanded : ''))
                     ->expectsJson()
                     ->addHeaders(array('Authorization' => 'Bearer ' . $accessToken))
@@ -220,8 +341,8 @@ class CanvasApiComponent extends Object
             }
             return $response->body;
         } catch (Exception $e) {
-            // TODO: better error handling
             error_log($e->getMessage());
+            return false;
         }
     }
 }
