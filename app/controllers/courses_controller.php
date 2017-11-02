@@ -56,20 +56,6 @@ class CoursesController extends AppController
         $this->FileUpload->attr('forceWebroot', false);
     }
 
-    /*
-    public function postProcessCanvasIdForDisplay($data)
-    {
-        foreach ($data as $key => $theCourse) {
-            if (!empty($theCourse['Course']['canvas_id'])) {
-                $data[$key]['!Custom'] = array('canvas_linked' => __('Yes', true));
-            } else {
-                $data[$key]['!Custom'] = array('canvas_linked' => __('', true));
-            }
-        }
-        return $data;
-    }
-    */
-
     /**
      * _setUpAjaxList
      *
@@ -217,19 +203,6 @@ class CoursesController extends AppController
         $this->set('data', $course);
         $this->set('title_for_layout', $course['Course']['full_name']);
 
-        // TODO: check if user has Canvas token setup
-        if ($this->SysParameter->get('system.canvas_enabled', 'false') == 'true') {
-            // map function to keep only the course name
-            $map_func = function($value) {
-                return $value->name;
-            };
-            $this->set('canvasCourses',
-                array_map($map_func,
-                    CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), false)));
-        } else {
-            $this->set('canvasCourses', array());
-        }
-
         //Setup the courseId to session
         $this->Session->write('ipeerSession.courseId', $id);
 
@@ -336,7 +309,6 @@ class CoursesController extends AppController
            $this->data['Course']['title'] = $selectedCanvasCourse->name;
            
            $canvasusers = $selectedCanvasCourse->getCanvasCourseUsers($this, User::get('id'));
-           error_log(json_encode($canvasusers));
            $iInstructors = $this->_getCorrespondingUser($canvasusers, CanvasCourseUserComponent::ENROLLMENT_TYPE_TEACHER);
            $iTAs = $this->_getCorrespondingUser($canvasusers, CanvasCourseUserComponent::ENROLLMENT_TYPE_TA);
            $this->data['Instructor'] = $iInstructors;
@@ -769,7 +741,7 @@ class CoursesController extends AppController
      * @access public
      * @return void
      */
-    function syncCanvasEnrollment($courseId, $canvasCourseId='')
+    function syncCanvasEnrollment($courseId)
     {
         // check if Canvas is enabled
         if ($this->SysParameter->get('system.canvas_enabled', 'false') == 'false') {
@@ -790,16 +762,19 @@ class CoursesController extends AppController
         }
         // if selected stuents to unenroll
         if (!empty($this->data['Course']['unenroll'])) {
-            $this->Course->unenrollStudents($this->data['Course']['unenroll'],
+            $this->Course->unenrolStudents($this->data['Course']['unenroll'],
                 $courseId);
         }
         
         $course = $this->Course->getCourseWithEnrolmentById($courseId);
         $this->set('courseId', $courseId);
+        $canvasCourseId = $course['Course']['canvas_id'];
         
         // Canvas courses that the user can access
         $canvasCourses = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), true);
-        $selectedCanvasCourse = empty($canvasCourseId) ? '' : $canvasCourses[$canvasCourseId];
+        $selectedCanvasCourse =
+            empty($canvasCourseId) || !array_key_exists($canvasCourseId, $canvasCourses)?
+                '' : $canvasCourses[$canvasCourseId];
         // If a Canvas course is selected and user has access, get the student enrollment in Canvas
         $canvasStudents = array();
         if (empty($selectedCanvasCourse)) {
@@ -836,6 +811,7 @@ class CoursesController extends AppController
         $this->set('canvasStudents', $canvasStudents);
         $this->set('iPeerUserByCanvasEnrollment', $iPeerUserByCanvasEnrollment);
         $this->Set('canvasStudentWithoutiPeer', $canvasStudentWithoutiPeer);
+        $this->Set('selectedCanvasCourse', $selectedCanvasCourse);
 
         // Add values into classList to indicate if enrolled in Canvas
         foreach ($course['Enrol'] as $key => $enrol) {

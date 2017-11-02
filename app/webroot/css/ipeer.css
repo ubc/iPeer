@@ -1760,6 +1760,7 @@ table.content-table {
 .edit-button,
 .merge-button,
 .export-excel-button,
+.compare-button,
 .instruction-icon,
 .button {
     background-color: #eee;
@@ -1778,6 +1779,7 @@ table.content-table {
 .edit-button:hover,
 .merge-button:hover,
 .export-excel-button:hover,
+.compare-button:hover,
 .instruction-icon:hover,
 .button:hover {
     background-color: #fbf9ea;
@@ -1803,6 +1805,10 @@ table.content-table {
 
 .export-excel-button {
     background-image: url('../img/icons/export_excel.gif');
+}
+
+.compare-button {
+    background-image: url('../img/icons/merge.png');
 }
 
 .instruction-icon {

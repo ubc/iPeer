@@ -1,22 +1,15 @@
+<h3>
 <?php
-if ($canvasCourses) {
-    $cCourse = $this->Form->input(
-        'Course.canvas_course',
-        array(
-            'type' => 'select',
-            'id' => 'CanvasCourses',
-            'label' => __('Compare with Canvas course', true),
-            'options' => array_map(function($value) { return $value->name; }, $canvasCourses),
-            'default' => $canvasCourseId,
-            'after' => $html->link(__('Compare', true), '#', array('onclick' => 'return doCompare()', 'id' => 'btn_compare'))
-        )
-    );
-    echo $html->div('input text', $cCourse, array('id' => 'canvas_courses'));
+if (!empty($selectedCanvasCourse)) {
+    echo __('Comparing with Canvas course:', true);
+    echo "&nbsp;";
+    echo $selectedCanvasCourse->name;
 } else {
-    echo $html->div('help-text', __('No accessible Canvas course to compare', true));
+    echo __('No accessible Canvas course to compare', true);
 }
 ?>
-<h2><?php echo __('Students currently enrolled in this iPeer course', true)?></h2>
+</h3>
+<h2><?php echo __('Students currently enrolled in this iPeer course', true) ?></h2>
 <?php 
 echo $this->Form->create('Course', array('id' => 'unEnrollForm', 'action' => 'syncCanvasEnrollment/' . $courseId . '/' . $canvasCourseId));
 echo $html->div('', '', array('id' => 'unEnrollHidden', 'style' => 'display:none;'));
@@ -229,16 +222,16 @@ echo $form->end();
 <script type="text/javascript">
 function enrollConfirmed()
 {
-    var confirmed = confirm("Are you sure you want to enroll selected students to this iPeer course?");
+    var confirmed = confirm("<?php echo __("Are you sure you want to enroll selected students to this iPeer course?", true); ?>");
     return confirmed;
 }
 
 function unenrollConfirmed()
 {
-    var confirmed = confirm("Are you sure you want to unenroll selected students from this iPeer course?");
+    var confirmed = confirm("<?php echo __("Are you sure you want to unenroll selected students from this iPeer course?", true); ?>");
     return confirmed;
 }
-
+/*
 function doCompare()
 {
     if (jQuery('#CanvasCourses').val() == '') {
@@ -249,9 +242,9 @@ function doCompare()
         return true;
     }
 }
-
+*/
 jQuery(document).ready(function() {
-    jQuery('#CanvasCourses').prepend('<option value="" <?php echo !(empty($canvasCourseId))? '' : 'selected="selected"' ?>></option>');
+    //jQuery('#CanvasCourses').prepend('<option value="" <?php echo !(empty($canvasCourseId))? '' : 'selected="selected"' ?>></option>');
     
 	var elmnt = null;
     /*

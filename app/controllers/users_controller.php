@@ -264,6 +264,13 @@ class UsersController extends AppController
         $this->set('classList', $course['Enrol']);
         $this->set('courseId', $courseId);
 
+        if ($this->SysParameter->get('system.canvas_enabled', 'false') == 'true' &&
+            !empty($course['Course']['canvas_id'])) {
+            $this->set('linkedWithCanvas', true);
+        } else {
+            $this->set('linkedWithCanvas', false);
+        }
+
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Students', true)));
     }
 

@@ -6,12 +6,12 @@ if (isset($instructions)) {
 
 echo $this->Form->create('Course');
 echo $this->Form->input('id');
-
-if (!empty($this->data['Course'] && empty($this->data['Course']['id']))) {
-    echo $form->hidden('Course.canvas_id');    
-}
 if ($canvasEnabled) {
-    if (!empty($this->data) && !empty($this->data['Course'] && !empty($this->data['Course']['id']))) {
+    if (!empty($this->data['Course']) && empty($this->data['Course']['id'])) {
+        // new course creation based on canvas
+        echo $form->hidden('Course.canvas_id');
+    } else if (!empty($this->data['Course']) && !empty($this->data['Course']['id'])) {
+        // edit existing course
         // canvas courses
         $cCourse = $form->input(
             'Course.canvas_id',
@@ -23,10 +23,13 @@ if ($canvasEnabled) {
                 'default' => $this->data['Course']['canvas_id'],
             )
         );
-        echo $html->div('input text', $cCourse);
+        
         if (empty($canvasCourses)) {
             echo $html->div('help-text', __('No accessible Canvas course', true));
-        }        
+            echo $form->hidden('Course.canvas_id');
+        } else {
+            echo $html->div('input text', $cCourse);
+        }
     }
 }
 
@@ -113,7 +116,9 @@ echo $form->end(); ?>
 <script type="text/javascript">
 
 jQuery('#canvas_id').prepend('<option value="" <?php echo empty($this->data['Course']['canvas_id'])? 'selected="selected"' : '' ?>></option>');
-
+if (jQuery('#canvas_id option[value="<?php echo $this->data['Course']['canvas_id'] ?>"]').length == 0) {
+    jQuery('#canvas_id option[value=""]').attr('selected', 'selected');
+}
 // remove all already added instructors from the drop down
 var selected = <?php echo json_encode($selected); ?>;
 jQuery.each(selected, function(key, value) {

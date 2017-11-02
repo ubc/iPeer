@@ -1,3 +1,19 @@
+<?php if ($linkedWithCanvas && User::hasPermission('controllers/Courses/add')): ?>
+    <div class="button-row">
+        <ul>
+            <li>
+                <?php echo __('This course is linked with a Canvas course. You may compare the enrollment.', true); ?>
+            </li>
+            <li>
+            <?php
+                echo $html->link( __('Compare', true),
+                    '/courses/syncCanvasEnrollment/'.$courseId, array('class' => 'compare-button'));
+            ?>
+            </li>
+        </ul>
+    </div>
+<?php endif ?>
+
 <table id="table_id">
     <thead>
         <tr>

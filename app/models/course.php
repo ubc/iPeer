@@ -431,8 +431,16 @@ class Course extends AppModel
      * @access public
      * @return boolean true for success, false for failed.
      */
-    function unenrollStudents($ids, $courseId = null)
+    function unenrolStudents($ids, $courseId = null)
     {
+        if (null == $courseId) {
+            $courseId = $this->id;
+        }
+
+        if (null == $courseId) {
+            return false;
+        }
+
         return $this->habtmDelete('Enrol', $courseId, $ids);
     }
 

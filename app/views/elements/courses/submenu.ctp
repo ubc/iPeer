@@ -21,12 +21,6 @@ switch($submenu) {
             array('name' => 'Import Students from Canvas',  'link' => "/users/import/$course_id/canvas")
         );
     }
-    if ($status == 'A') {
-        array_push(
-            $items,
-            array('name' => __('Compare enrollment with Canvas', True),  'link' => "/courses/syncCanvasEnrollment/$course_id")
-        );
-    }
     break;
   case "Group":
     if ($status == 'A') {
