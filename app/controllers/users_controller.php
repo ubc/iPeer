@@ -1093,37 +1093,82 @@ class UsersController extends AppController
      *
      * @return void
      */
-    public function import($courseId = null, $importFrom = 'csv')
+    public function import($courseId = null, $importFrom = 'file')
     {
+        if (!is_null($courseId)) {
+            $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
+            if (empty($course)) {
+                $this->Session->setFlash(__('Error: That course does not exist.', true));
+                $this->redirect('/courses');
+            }
+            $this->breadcrumb->push(array('course' => $course['Course']));
+        }
+
+        $courses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
+        $this->set('courses', $courses);
+
+        // make sure we know the course we're importing users into
+        if ($courseId == null && !empty($this->data)) {
+            $courseId = $this->data['Course']['Course'];
+        }
+        $this->set('courseId', $courseId);
+        $this->set('formUrl', Router::url(null, true));
+
+        $users = array();
+        $usernames = array();
+
         if ($importFrom == 'canvas') {
+
+            $this->set('breadcrumb', $this->breadcrumb->push(__('Import Students From Canvas', true)));
+            $this->set('isFileImport', false);
+
             $userId = $this->Auth->user('id');
 
-            App::import('Component', 'CanvasApi');
-            $canvasApi = new CanvasApiComponent($userId);
+            App::import('Component', 'CanvasCourse');
+            $canvasCoursesRaw = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, $userId, true);
+
+            $canvasCourses = array();
+            foreach ($canvasCoursesRaw as $course) {
+                $canvasCourses[$course->id] = $course->name;
+            }
+            $this->set('canvasCourses', $canvasCourses);
+
+            if (!empty($this->data)) {
+
+                // TODO: do some validation
             
-            // TODO: do the import
+                App::import('Component', 'CanvasCourse');
+                App::import('Component', 'CanvasCourseUser');
+
+                $canvasCourses = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), true);
+                $selectedCanvasCourse = $canvasCourses[$this->data['User']['canvasCourse']];
+
+                $canvasUsers = $selectedCanvasCourse->getCanvasCourseUsers(
+                    $this,
+                    User::get('id'),
+                    array(CanvasCourseUserComponent::ENROLLMENT_QUERY_STUDENT),
+                    true,
+                    true
+                );
+
+                $canvas_user_key = $this->SysParameter->get('system.canvas_user_key'); 
+
+                foreach ($canvasUsers as $k => $canvasUser) {
+                    $users[] = array(
+                        User::IMPORT_USERNAME => $canvasUser->$canvas_user_key,
+                        User::IMPORT_PASSWORD => $this->PasswordGenerator->generate(),
+                        User::IMPORT_FIRSTNAME => $canvasUser->first_name,
+                        User::IMPORT_LASTNAME => $canvasUser->last_name,
+                        User::IMPORT_EMAIL => isset($canvasUser->email) ? $canvasUser->email : '',
+                    );
+                    $usernames[] = $canvasUser->$canvas_user_key;
+                }
+            }
         }
         else {
-            if (!is_null($courseId)) {
-                $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
-                if (empty($course)) {
-                    $this->Session->setFlash(__('Error: That course does not exist.', true));
-                    $this->redirect('/courses');
-                }
-                $this->breadcrumb->push(array('course' => $course['Course']));
-            }
-
-            $courses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
-            $this->set('courses', $courses);
-
-            // make sure we know the course we're importing users into
-            if ($courseId == null && !empty($this->data)) {
-                $courseId = $this->data['Course']['Course'];
-            }
-            $this->set('courseId', $courseId);
 
             $this->set('breadcrumb', $this->breadcrumb->push(__('Import Students From Text (.txt) or CSV File (.csv)', true)));
-
+            $this->set('isFileImport', true);
 
             if (!empty($this->data)) {
                 // check that file upload worked
@@ -1135,7 +1180,7 @@ class UsersController extends AppController
                 }
 
                 $data = Toolkit::parseCSV($uploadFile);
-                $usernames = array();
+                
                 // generation password for users who weren't given one
                 foreach ($data as &$user) {
                     if (empty($user[User::IMPORT_PASSWORD])) {
@@ -1146,33 +1191,38 @@ class UsersController extends AppController
                     $usernames[] = $user[User::IMPORT_USERNAME];
                 }
 
-                if ($this->data['User']['update_class']) {
-                    $this->User->removeOldStudents($usernames, $courseId);
-                }
+                $users = $data;
 
-                // add the users to the database
-                $result = $this->User->addUserByArray($data, true);
-
-                if (!$result) {
-                    $this->Session->setFlash("Error: Unable to import users.");
-                    return;
-                }
-
-                $insertedIds = array();
-                foreach ($this->User->insertedIds as $new) {
-                    $insertedIds[] = $new;
-                }
-                foreach ($result['updated_students'] as $old) {
-                    $insertedIds[] = $old['User']['id'];
-                }
-
-                // enrol the users in the selectec course
-                $this->Course->enrolStudents($insertedIds,
-                    $this->data['Course']['Course']);
                 $this->FileUpload->removeFile($uploadFile);
-                $this->set('data', $result);
-                $this->render('userSummary');
             }
+        }
+
+        if (!empty($this->data)) {
+
+            if ($this->data['User']['update_class']) {
+                $this->User->removeOldStudents($usernames, $courseId);
+            }
+
+            // add the users to the database
+            $result = $this->User->addUserByArray($users, true, $this);
+
+            if (!$result) {
+                $this->Session->setFlash("Error: Unable to import users.");
+                return;
+            }
+
+            $insertedIds = array();
+            foreach ($this->User->insertedIds as $new) {
+                $insertedIds[] = $new;
+            }
+            foreach ($result['updated_students'] as $old) {
+                $insertedIds[] = $old['User']['id'];
+            }
+
+            // enrol the users in the selectec course
+            $this->Course->enrolStudents($insertedIds, $this->data['Course']['Course']);
+            $this->set('data', $result);
+            $this->render('userSummary');
         }
     }
 

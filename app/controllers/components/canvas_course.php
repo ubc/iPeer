@@ -72,16 +72,16 @@ class CanvasCourseComponent extends Object
     public function getCanvasCourseUsers($_controller, $user_id, $roles=array(
         CanvasCourseUserComponent::ENROLLMENT_QUERY_STUDENT,
         CanvasCourseUserComponent::ENROLLMENT_QUERY_TEACHER,
-        CanvasCourseUserComponent::ENROLLEMNT_QUERY_TA), $force_auth=false)
+        CanvasCourseUserComponent::ENROLLEMNT_QUERY_TA), 
+        $active_only=false, $force_auth=false)
     {
         $api = new CanvasApiComponent($user_id);
         $uri = '/courses/' . $this->id . '/users';
         $params['enrollment_type[]'] = $roles;      // note the square brackets used in key
-        $params['include[]'] = 'enrollments';
+        $params['include[]'] = array('enrollments', 'email');
         
         //$courseUsers_json = $api->getCanvasData($uri, $params);
         $courseUsers_json = $api->getCanvasData($_controller, Router::url(null, true), $force_auth, $uri, $params);
-
 
         $courseUsers = array();
         if (!empty($courseUsers_json)) {

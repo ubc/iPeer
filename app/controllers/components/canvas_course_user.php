@@ -50,8 +50,12 @@ class CanvasCourseUserComponent extends Object
         $this->$user_key = null;
         
         foreach ($args as $key => $val) {
-            if ($key == 'id' || $key == 'name' || $key == $this->canvas_user_key || $key == 'login_id') {
+            if ($key == 'id' || $key == 'name' || $key == $this->canvas_user_key || $key == 'login_id' || $key == 'email') {
                 $this->$key = $val;
+            } else if ($key == 'sortable_name') {
+                $nameParts = explode(', ', $val);
+                $this->first_name = count($nameParts)>1 ? $nameParts[1] : $nameParts[0];
+                $this->last_name = count($nameParts)>1 ? $nameParts[0] : '';
             } else if ($key == 'enrollments') {
                 foreach ($val as $enrollment) {
                     array_push($this->enrollment_roles, $enrollment->role);

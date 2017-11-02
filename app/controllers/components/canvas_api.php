@@ -157,10 +157,11 @@ class CanvasApiComponent extends Object
             } elseif (!isset($response->access_token)) {
                 $error_description = __('Error: Authentication failed. Canvas did not send back an access token, and additionally did not provide an error message, either.', true);
             } else {
-                $saveData = array(
-                    'access_token' => $response->access_token,
-                    'expires' => $response->expires_in
-                );
+                $saveData = array('access_token' => $response->access_token);
+
+                if (isset($response->expires_in)) {
+                    $saveData['expires'] = $response->expires_in;
+                }
 
                 if (isset($response->refresh_token)) {
                     $saveData['refresh_token'] = $response->refresh_token;
@@ -185,13 +186,15 @@ class CanvasApiComponent extends Object
             // For Canvas API, multiple parameters can have the same key.
             // In this case, the value of the passed in $params will be an array
             $params_expanded = '';
-            foreach ($params as $key => $value) {
-                if (is_array($value)) {
-                    foreach ($value as $val) {
-                        $params_expanded = $params_expanded . '&' . http_build_query(array($key => $val));
+            if ($params) {
+                foreach ($params as $key => $value) {
+                    if (is_array($value)) {
+                        foreach ($value as $val) {
+                            $params_expanded = $params_expanded . '&' . http_build_query(array($key => $val));
+                        }
+                    } else {
+                        $params_expanded = $params_expanded . '&' . http_build_query(array($key => $value));
                     }
-                } else {
-                    $params_expanded = $params_expanded . '&' . http_build_query(array($key => $value));
                 }
             }
             
@@ -204,7 +207,7 @@ class CanvasApiComponent extends Object
                     ->send();
 
             if (isset($response->body->errors) && $refreshTokenAndRetry) {
-                // most likely, the access token is no longer valid (deleted or expired), so use refresh token to get it
+                // most likely, the access token is no longer valid (expired), so use refresh token to get it
                 $apiToken = $this->getApiTokenUsingRefreshToken();
                 if (isset($apiToken['accessToken'])) {
                     return $this->_getCanvasData($_controller, $redirect_uri, $apiToken['accessToken'], $uri, $params, $additionalHeader, false);
