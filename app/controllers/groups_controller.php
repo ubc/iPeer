@@ -18,6 +18,7 @@ class GroupsController extends AppController
         'UserEnrol', 'UserTutor');
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'FileUpload.FileUpload');
     public $components = array('AjaxList', 'ExportBaseNew', 'ExportCsv', 'FileUpload.FileUpload');
+    private $canvasEnabled;
 
     /**
      * _postProcess
@@ -65,6 +66,9 @@ class GroupsController extends AppController
         $this->FileUpload->fileModel(null);
         $this->FileUpload->attr('required', true);
         $this->FileUpload->attr('forceWebroot', false);
+
+        $this->canvasEnabled = in_array($this->SysParameter->get('system.canvas_enabled', 'false'), array('1', 'true', 'yes'));
+        $this->set('canvasEnabled', $this->canvasEnabled);
     }
 
     // =-=-=-=-=-== New list routines =-=-=-=-=-===-=-
@@ -351,55 +355,120 @@ class GroupsController extends AppController
      * import
      *
      * @param int $courseId
+     * @param mixed $importFrom either 'file' or 'canvas'
      *
      * @access public
      * @return void
      */
-    function import($courseId = null)
+    function import($courseId = null, $importFrom = 'file')
     {
-        if (empty($courseId) || !$course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission())) {
-            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
-            $this->redirect('/courses');
-            return;
+        if (!is_null($courseId)) {
+            $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
+            if (empty($course)) {
+                $this->Session->setFlash(__('Error: That course does not exist.', true));
+                $this->redirect('/courses');
+            }
+            $this->breadcrumb->push(array('course' => $course['Course']));
         }
-        $this->breadcrumb->push(array('course' => $course['Course']));
+        
+        $courses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
+        $this->set('courses', $courses);
 
-        // Just render :-)
-        if (!empty($this->params['form'])) {
-            $courseId = $this->params['data']['Group']['Course'];
-            $this->params['data']['Group']['course_id'] = $courseId;
-            $filename = $this->params['form']['file']['name'];
-            $update = ($this->params['data']['Group']['update_groups']) ?
-                true : false;
-            $identifier = $this->params['data']['Group']['identifiers'];
+        // make sure we know the course we're importing groups for
+        if ($courseId == null && !empty($this->data)) {
+            $courseId = $this->data['Group']['Course'];
+        }
+        $this->set('courseId', $courseId);
+        $this->set('formUrl', Router::url(null, true));
 
-            //check that a file is attached
-            if (trim($filename) == "") {
-                $this->Session->setFlash(__('Please select a file to upload.', true));
-                $this->redirect('import/'.$courseId);
-                return;
+
+        if ($importFrom == 'canvas') {
+            
+            if (!$this->canvasEnabled){
+                $this->Session->setFlash(__('Error: Canvas integration not enabled.', true));
+                $this->redirect('index');
             }
 
-            if ($this->FileUpload->success) {
-                $uploadFile = $this->FileUpload->uploadDir.DS.$this->FileUpload->finalFile;
-                // Get file into an array.
-                $lines = Toolkit::parseCSV($uploadFile);
-                //Mass create groups
-                $this->_addGroupByImport($lines, $courseId, $update, $identifier);
-                // Delete the uploaded file
-                $this->FileUpload->removeFile($uploadFile);
-            } else {
-                $this->Session->setFlash($this->FileUpload->showErrors());
-                return;
+            $this->set('breadcrumb', $this->breadcrumb->push(__('Import Groups From Canvas', true)));
+            $this->set('isFileImport', false);
+            
+            $userId = $this->Auth->user('id');
+
+            App::import('Component', 'CanvasCourse');
+            $canvasCoursesRaw = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, $userId, true);
+
+            $canvasCourses = array();
+            foreach ($canvasCoursesRaw as $course) {
+                $canvasCourses[$course->id] = $course->name;
+            }
+            $this->set('canvasCourses', $canvasCourses);
+
+            if (!empty($this->data)) {
+                
+                // TODO: do some validation
+                $courseId = $this->params['data']['Group']['Course'];
+                $this->params['data']['Group']['course_id'] = $courseId;
+            
+                App::import('Component', 'CanvasCourseGroup');
+
+                $canvasCourses = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), true);
+                $selectedCanvasCourse = $canvasCourses[$this->data['Group']['canvasCourse']];
+
+                $canvasGroups = $selectedCanvasCourse->getCanvasCourseGroups($this, $userId, true);
+
+                $lines = array();
+                $canvas_user_key = $this->SysParameter->get('system.canvas_user_key'); 
+
+                foreach ($canvasGroups as $k => $canvasGroup) {
+                    $groupUsers = $canvasGroup->getGroupUsers($this, $userId);
+                    foreach ($groupUsers as $user){
+                        $lines[] = array($user->$canvas_user_key, $canvasGroup->name);
+
+                    }
+                }
+                
+                $update = ($this->params['data']['Group']['update_groups']) ? true : false;
+                $identifier = 'username';
+
+                if (count($lines)) {
+                    $this->_addGroupByImport($lines, $courseId, $update, $identifier);
+                }
             }
         }
+        else {
+            
+            $this->set('breadcrumb', $this->breadcrumb->push(__('Import Groups From CSV File (.csv or .txt)', true)));
+            $this->set('isFileImport', true);
 
+            if (!empty($this->params['form'])) {
+                $courseId = $this->params['data']['Group']['Course'];
+                $this->params['data']['Group']['course_id'] = $courseId;
+                $filename = $this->params['form']['file']['name'];
+                $update = ($this->params['data']['Group']['update_groups']) ? true : false;
+                $identifier = $this->params['data']['Group']['identifiers'];
 
-        $coursesList = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
+                //check that a file is attached
+                if (trim($filename) == "") {
+                    $this->Session->setFlash(__('Please select a file to upload.', true));
+                    $this->redirect('import/'.$courseId);
+                    return;
+                }
 
-        $this->set('breadcrumb', $this->breadcrumb->push(__('Import Groups From Text (.txt) or CSV File (.csv)', true)));
-        $this->set("courses", $coursesList);
-        $this->set("courseId", $courseId);
+                if ($this->FileUpload->success) {
+                    $uploadFile = $this->FileUpload->uploadDir.DS.$this->FileUpload->finalFile;
+                    // Get file into an array.
+                    $lines = Toolkit::parseCSV($uploadFile);
+                    //Mass create groups
+                    $this->_addGroupByImport($lines, $courseId, $update, $identifier);
+                    // Delete the uploaded file
+                    $this->FileUpload->removeFile($uploadFile);
+                } else {
+                    $this->Session->setFlash($this->FileUpload->showErrors());
+                    return;
+                }
+            }
+
+        }
     }
 
 

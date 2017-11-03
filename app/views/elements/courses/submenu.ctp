@@ -6,8 +6,7 @@ switch($submenu) {
     if ($status == 'A') {
         array_push(
             $items,
-            array('name' => 'Add Student', 'link' => "/users/add/$course_id"),
-            array('name' => 'Import Students', 'link' => "/users/import/$course_id")
+            array('name' => 'Add Student', 'link' => "/users/add/$course_id")
         );
     }
     array_push(
@@ -18,21 +17,36 @@ switch($submenu) {
         array_push(
             $items,
             array('name' => 'Email to All Students',  'link' => "/emailer/write/C/$course_id"),
-            array('name' => 'Import Students from Canvas',  'link' => "/users/import/$course_id/canvas")
+            array('name' => 'Import Students from CSV', 'link' => "/users/import/$course_id")
         );
+        if ($canvasEnabled){
+            array_push(
+                $items,
+                array('name' => 'Import Students from Canvas',  'link' => "/users/import/$course_id/canvas")
+            );
+        }
     }
     break;
   case "Group":
+    array_push(
+        $items,
+        array('name' => 'Add Group', 'link' => "/groups/add/$course_id"),
+        array('name' => 'List Groups', 'link' => "/groups/index/$course_id")
+    );
     if ($status == 'A') {
         array_push(
             $items,
-            array('name' => 'Create Groups (Manual)', 'link' => "/groups/add/$course_id"),
-            array('name' => 'Create Groups (Import)', 'link' => "/groups/import/$course_id")
+            array('name' => 'Import Groups from CSV', 'link' => "/groups/import/$course_id")
         );
+        if ($canvasEnabled){
+            array_push(
+                $items,
+                array('name' => 'Import Groups from Canvas', 'link' => "/groups/import/$course_id/canvas")
+            );
+        }
     }
     array_push(
         $items,
-        array('name' => 'List Groups', 'link' => "/groups/index/$course_id"),
         array('name' => 'Export Groups', 'link' => "/groups/export/$course_id")
     );
     break;

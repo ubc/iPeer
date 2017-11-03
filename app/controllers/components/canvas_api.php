@@ -18,7 +18,7 @@ class CanvasApiComponent extends Object
     protected $SysParameter;
     protected $userId;
     protected $provider;
-    protected $apiVersion;
+    protected $apiPath;
 
     /**
      * overriden constructor to initialize private variables
@@ -32,7 +32,7 @@ class CanvasApiComponent extends Object
         parent::__construct();
         $this->userId = $userId;
         $this->provider = 'canvas';
-        $this->apiVersion = 'v1';
+        $this->apiPath = '/api/v1';
         $this->SysParameter = ClassRegistry::init('SysParameter');
         $this->UserOauth = ClassRegistry::init('UserOauth');
     }
@@ -59,14 +59,14 @@ class CanvasApiComponent extends Object
     }
 
     /**
-     * get full URL to api (without appending slash). Append API URI to make a request
+     * get full URL to api (without appending slash). Append API endpoint URI to make a request
      *
      * @access public
      * @return void
      */
     public function getApiUrl()
     {
-        return $this->getBaseUrl() . '/api/v1';
+        return $this->getBaseUrl() . $this->apiPath;
     }
     
     /**
@@ -159,11 +159,11 @@ class CanvasApiComponent extends Object
         // if auth token exists, attempt to call api
         if ($accessToken) {
             $data = $this->_getCanvasData($_controller, $redirect_uri, $accessToken, $uri, $params, $additionalHeader, $refreshTokenAndRetry);
-            if ($data) {
-                return $data;
+            if ($data === false) {
+                $_controller->Session->setFlash('There was an error retrieving data from Canvas. Please try again.');
             }
             else {
-                $_controller->Session->setFlash('There was an error retrieving data from Canvas. Please try again.');
+                return $data;
             }
         }
 
@@ -205,6 +205,13 @@ class CanvasApiComponent extends Object
      */
     private function _getNewOauth($_controller, $redirect_uri)
     {
+        // handle the case of the user having cancelled the authorization
+        if (isset($_controller->params['url']['error']) && $_controller->params['url']['error']=='access_denied'){
+            $_controller->Session->setFlash(__('Canvas authorization was cancelled. You need to authorize iPeer '
+                                              .'in order to use Canvas functionalities.', true));
+            $_controller->redirect('/');
+        }
+
         // this will be passed back by Canvas along with the code, so we save it in session and check it at that point to ensure security
         $state = uniqid('st');
         $_controller->Session->write('oauth_'.$this->provider.'_state', $state);

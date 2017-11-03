@@ -1151,7 +1151,6 @@ class UsersController extends AppController
 
                 // TODO: do some validation
             
-                App::import('Component', 'CanvasCourse');
                 App::import('Component', 'CanvasCourseUser');
 
                 $canvasCourses = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), true);
@@ -1159,7 +1158,7 @@ class UsersController extends AppController
 
                 $canvasUsers = $selectedCanvasCourse->getCanvasCourseUsers(
                     $this,
-                    User::get('id'),
+                    $userId,
                     array(CanvasCourseUserComponent::ENROLLMENT_QUERY_STUDENT),
                     true,
                     true
@@ -1181,7 +1180,7 @@ class UsersController extends AppController
         }
         else {
 
-            $this->set('breadcrumb', $this->breadcrumb->push(__('Import Students From Text (.txt) or CSV File (.csv)', true)));
+            $this->set('breadcrumb', $this->breadcrumb->push(__('Import Students From CSV File (.csv or .txt)', true)));
             $this->set('isFileImport', true);
 
             if (!empty($this->data)) {

@@ -2,6 +2,7 @@
 App::import('Model', 'User');
 App::import('Component', 'CanvasApi');
 App::import('Component', 'CanvasCourseUser');
+App::import('Component', 'CanvasCourseGroup');
 
 /**
  * CanvasCourseComponent
@@ -91,6 +92,34 @@ class CanvasCourseComponent extends Object
                 $key = $courseuser_obj->canvas_user_key;    // key used to map canvas user to iPeer username
                 if (!empty($courseuser_obj->$key)) {
                     $courseUsers[$courseuser_obj->$key] = $courseuser_obj;
+                }
+            }
+        }
+
+        return $courseUsers;
+    }
+    
+    /**
+     * Retrieves a course's groups
+     *
+     * @param mixed $user_id
+     *
+     * @access public
+     * @return array Array of CanvasCourseGroupComponent
+     */
+    public function getCanvasCourseGroups($_controller, $user_id, $force_auth=false)
+    {
+        $api = new CanvasApiComponent($user_id);
+        $uri = '/courses/' . $this->id . '/groups';
+        
+        $courseGroups_array = $api->getCanvasData($_controller, Router::url(null, true), $force_auth, $uri);
+
+        $courseUsers = array();
+        if (!empty($courseGroups_array)) {
+            foreach ($courseGroups_array as $courseGroup_details) {
+                $courseGroup = new CanvasCourseGroupComponent($courseGroup_details);
+                if (!empty($courseGroup->id)) {
+                    $courseUsers[$courseGroup->id] = $courseGroup;
                 }
             }
         }

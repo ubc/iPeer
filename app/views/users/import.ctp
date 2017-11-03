@@ -34,11 +34,8 @@ if ($isFileImport) {
 else {
     echo $this->Form->input('canvasCourse', array('label'=>'From Canvas Course', 'multiple' => false));
 }
-echo $this->Form->input('Course', 
-    array('label'=>'Into iPeer Course', 'multiple' => false, 'default' => $courseId));
-echo $this->Form->input('update_class',
-    array('label'=>'Remove old students', 'type'=>'checkbox'));
-?><?php
+echo $this->Form->input('Course', array('label'=>'Into iPeer Course', 'multiple' => false, 'default' => $courseId));
+echo $this->Form->input('update_class', array('label'=>'Remove old students', 'type'=>'checkbox'));
 echo $this->Form->submit(__('Import', true));
 echo $this->Form->end();
 ?>

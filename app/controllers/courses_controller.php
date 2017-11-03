@@ -42,9 +42,6 @@ class CoursesController extends AppController
         parent::beforeFilter();
         $this->set('title_for_layout', __('Courses',true));
 
-        $this->canvasEnabled = in_array($this->SysParameter->get('system.canvas_enabled', 'false'), array('1', 'true', 'yes'));
-        $this->set('canvasEnabled', $this->canvasEnabled);
-
         $allowTypes = array(
             'text/plain', 'text/csv', 'application/csv',
             'application/csv.ms-excel', 'application/octet-stream',
@@ -57,6 +54,9 @@ class CoursesController extends AppController
         $this->FileUpload->fileModel(null);
         $this->FileUpload->attr('required', true);
         $this->FileUpload->attr('forceWebroot', false);
+        
+        $this->canvasEnabled = in_array($this->SysParameter->get('system.canvas_enabled', 'false'), array('1', 'true', 'yes'));
+        $this->set('canvasEnabled', $this->canvasEnabled);
     }
 
     /**
