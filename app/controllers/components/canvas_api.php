@@ -15,6 +15,8 @@ App::import('Vendor', 'Httpful', array('file' => 'nategood'.DS.'httpful'.DS.'boo
  */
 class CanvasApiComponent extends Object
 {
+    const API_CALL_TIMEOUT = 10;   // RESTful call timeout in seconds
+    
     protected $SysParameter;
     protected $userId;
     protected $provider;
@@ -253,7 +255,7 @@ class CanvasApiComponent extends Object
         }
         
         $request = \Httpful\Request::post($this->getBaseUrl() . "/login/oauth2/token", http_build_query($params))->expectsJson();
-
+        $request->timeoutIn(CanvasApiComponent::API_CALL_TIMEOUT);
         $error = array();
         
         try {
@@ -332,6 +334,7 @@ class CanvasApiComponent extends Object
                     ->expectsJson()
                     ->addHeaders(array('Authorization' => 'Bearer ' . $accessToken))
                     ->addHeaders($additionalHeader? $additionalHeader : array())
+                    ->timeoutIn(CanvasApiComponent::API_CALL_TIMEOUT)
                     ->send();
 
             if (isset($response->body->errors) && $refreshTokenAndRetry) {

@@ -267,19 +267,6 @@ class CoursesController extends AppController
         // set the list of instructors/tutors
         $this->set('instructors', $instructorList);
         $this->set('tutors', $tutorList);
-
-        // TODO: check if user has Canvas token setup
-        if ($this->canvasEnabled) {
-            // map function to keep only the course name
-            $map_func = function($value) {
-                return $value->name;
-            };
-            $this->set('canvasCourses',
-                array_map($map_func,
-                    CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), false)));
-        } else {
-            $this->set('canvasCourses', array());
-        }
     }
     
     /**
@@ -306,7 +293,7 @@ class CoursesController extends AppController
    protected function _populateWithCanvasCourseData($canvas_course_id)
    {
        $cCourses = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), false);
-       $selectedCanvasCourse = $cCourses[$canvas_course_id];
+       $selectedCanvasCourse = array_key_exists($canvas_course_id, $cCourses) ? $cCourses[$canvas_course_id] : '';
        if (!empty($selectedCanvasCourse)) {
            $this->data['Course']['course'] = $selectedCanvasCourse->course_code;
            $this->data['Course']['title'] = $selectedCanvasCourse->name;
@@ -332,6 +319,7 @@ class CoursesController extends AppController
         $this->set('title_for_layout', 'Add Course');
         $this->_initFormEnv();
         $this->set('instructorSelected', User::get('id'));
+        $this->set('canvasCourses', array());
         
         $instructions = $this->SysParameter->find('first', array('conditions' => array('parameter_code' => 'course.creation.instructions')));
         if (!empty($instructions) && !empty($instructions['SysParameter']['parameter_value'])) {
@@ -340,7 +328,13 @@ class CoursesController extends AppController
         
         if ($selCanvas === 'selCanvas') {
             if ($this->canvasEnabled){
-                $canvasCourses = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), true);
+                // map function to keep only the course name
+                $map_func = function($value) {
+                    return $value->name;
+                };
+                $this->set('canvasCourses',
+                    array_map($map_func,
+                        CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), false)));
                 $this->render('select_canvas');
                 return;
             }
@@ -401,12 +395,24 @@ class CoursesController extends AppController
     public function edit($courseId)
     {
         $this->_initFormEnv($courseId);
-
+        
         $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission(), array('Instructor', 'Department'));
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
         }
       
+        if ($this->canvasEnabled) {
+            // map function to keep only the course name
+            $map_func = function($value) {
+                return $value->name;
+            };
+            $this->set('canvasCourses',
+                array_map($map_func,
+                    CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), false)));
+        } else {
+            $this->set('canvasCourses', array());
+        }
+
         if (!empty($this->data)) {
             $this->data['Course'] = array_map('trim', $this->data['Course']);
             $newInstructors = (!isset($this->data['Instructor'])) ? array() :

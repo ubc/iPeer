@@ -109,7 +109,7 @@ echo $html->div('help-text', __('Selecting correct assoication will allow admin 
 echo $this->Form->input('homepage');
 echo $html->div('help-text', __('e.g. http://mycoursehome.com', true));
 
-echo $html->div('center', $form->submit(__('Save', true), array('div' => false, 'onclick' => 'javascript: CanvasCourses.value=""; return true;')));
+echo $html->div('center', $form->submit(__('Save', true), array('div' => false)));
 echo $form->end(); ?>
 </div>
 
