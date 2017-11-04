@@ -399,6 +399,8 @@ class CoursesController extends AppController
         $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission(), array('Instructor', 'Department'));
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
+            $this->redirect('index');
+            return;
         }
       
         if ($this->canvasEnabled) {
