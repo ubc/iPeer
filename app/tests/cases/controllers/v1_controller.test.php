@@ -106,7 +106,7 @@ class V1ControllerTest extends CakeTestCase {
             // read the server from environment var first
             // so that this can be configured from outside
             if (!($server = getenv('SERVER_TEST'))) {
-                $server = 'http://localhost:2000';
+                $server = 'http://web-unittest:80';
             }
             // since the Router isn't handling relative URLs for us, make sure
             // to convert the path to an absolute URL

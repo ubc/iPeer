@@ -21,6 +21,13 @@ Note: if you are planning to develop iPeer and did not run docker pull with abov
 docker-compose up -d
 ```
 
+#### Running iPeer unit tests
+
+- To run the unit tests on containers:
+    - On host, run an interactive shell in the unit test app container: `docker exec -it ipeer_app_unittest bash`
+    - In the interactive shell, while at `/var/www/html`, run the command `vendor/bin/phing test`
+
+
 Running Virtual Development Server
 ---------------------------
 Virtual Environment Setup:

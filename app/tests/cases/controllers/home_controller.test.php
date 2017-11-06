@@ -76,9 +76,13 @@ class HomeControllerTest extends ExtendedAuthTestCase
     function testIndex()
     {
         $result = $this->testAction('/home/index', array('return' => 'vars'));
-        // test that courses are in alphabetical order
+        // courses are sorted by creation date in reverse order
+        $this->assertTrue(
+            strtotime($result['course_list']['A'][0]['Course']['created']) >
+            strtotime($result['course_list']['A'][1]['Course']['created']));
+        
         $this->assertEqual(
-            $result['course_list']['A'][0]['Course']['course'], 'APSC 201');
+            $result['course_list']['A'][1]['Course']['course'], 'APSC 201');
         $this->assertEqual(
             $result['course_list']['A'][2]['Course']['course'], 'MECH 328');
         // test that there are no duplicate courses listed
@@ -87,8 +91,8 @@ class HomeControllerTest extends ExtendedAuthTestCase
         // test that course information is correct
         $activeCourses = $result['course_list']['A'];
         $inactiveCourses = $result['course_list']['I'];
-        $this->assertEqual(count($activeCourses[0]['Instructor']), 3);
-        $this->assertEqual(count($activeCourses[0]['Event']), 0);
+        $this->assertEqual(count($activeCourses[1]['Instructor']), 3);
+        $this->assertEqual(count($activeCourses[1]['Event']), 0);
         $this->assertEqual(count($activeCourses[2]['Instructor']), 1);
         $this->assertEqual(count($activeCourses[2]['Event']), 17);
         $this->assertEqual(count($inactiveCourses[0]['Instructor']), 1);
