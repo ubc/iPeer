@@ -68,6 +68,8 @@ services:
       - IPEER_DB_NAME=ipeer_test
       - IPEER_DEBUG=2
       - IPEER_SESSION_SAVE=database
+      - SELENIUM_HOST=selenium-ff
+      - SERVER_TEST=http://ipeer_web_unittest:80/
       #- IPEER_AUTH=Ldap
       #- IPEER_AUTH_LDAP_host=ldap.example.com
       #- IPEER_AUTH_LDAP_port=636

@@ -26,7 +26,40 @@ docker-compose up -d
 - To run the unit tests on containers:
     - On host, run an interactive shell in the unit test app container: `docker exec -it ipeer_app_unittest bash`
     - In the interactive shell, while at `/var/www/html`, run the command `vendor/bin/phing test`
+    
+### Running integration tests
 
+- Install PHP Webdriver (https://github.com/Element-34/php-webdriver) and Sausage (https://github.com/jlipps/sausage) under `vendors` directory.  These are defined as submodules and can be updated by:
+```
+   git submodule init
+   git submodule update
+```
+- Setup ubc/docker-canvas container (https://github.com/ubc/docker-canvas).  Also create a network bridge to connect the Canvas app and iPeer app containers together
+```
+    docker network create canvas_ipeer_network
+    docker network connect canvas_ipeer_network ipeer_app
+    docker network connect canvas_ipeer_network ipeer_app_unittest
+    docker network connect canvas_ipeer_network dockercanvas_app_1
+```
+- Run the Selenium + Firefox container (need to disable the passthrough feature):
+    `docker run -d -p 4444:4444 -e SE_OPTS="-enablePassThrough false" --name selenium-ff --shm-size 2g selenium/standalone-firefox:3.7.1-argon`
+  Or, if needed to see the browser actions, run the debug image instead and expose the VNC server port 5900 to host:
+    `docker run -d -p 4444:4444 -p 5900:5900 -e SE_OPTS="-enablePassThrough false" --name selenium-ff --shm-size 2g selenium/standalone-firefox-debug:3.7.1-argon`
+  To view the browser, run VNC viewer on host (the default password is `secret`), e.g.:
+    `vncviewer localhost::5900`
+- Create a network bridge to connect iPeer, Canvas, and Selenium together
+```
+    docker network create canvas_ipeer_network_it
+    docker network connect canvas_ipeer_network_it ipeer_app_unittest
+    docker network connect canvas_ipeer_network_it ipeer_web_unittest
+    docker network connect canvas_ipeer_network_it selenium-ff
+```
+- To start the test, run an interactive shell in the test app container and run the command:
+```
+    docker exec -it ipeer_app_unittest bash
+    vendor/bin/phing init-test-db   # preload iPeer db with sample data
+    cake/console/cake -app app testsuite app group system
+```
 
 Running Virtual Development Server
 ---------------------------
