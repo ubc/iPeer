@@ -22,6 +22,7 @@ class CourseTestCase extends CakeTestCase {
     {
         echo "Start Course model test.\n";
         $this->Course = ClassRegistry::init('Course');
+        $this->User = ClassRegistry::init('User');
     }
 
     function endCase()
@@ -322,5 +323,33 @@ class CourseTestCase extends CakeTestCase {
 
     function testGetCourseList()
     {
+    }
+    
+    function testUnenrolStudents()
+    {
+        // test courses taught by instructor1
+        $course = $this->Course->getCourseByInstructor(2);
+
+        $this->assertEqual($course[0]['Course']['course'], "MECH 328");
+        $enrollment = $this->User->getEnrolledStudents($course[0]['Course']['id']);
+        
+        // there should be 13 students
+        $this->assertEqual(count($enrollment), 13);
+        
+        // extract the user id and split the array with size of 10
+        $enrolled_userid = array_map(function($u) { return $u['User']['id']; }, $enrollment);
+        $enrolled_user_id_split = array_chunk($enrolled_userid, 10);
+        
+        // unenroll the first 10 students
+        $this->assertTrue($this->Course->unenrolStudents($enrolled_user_id_split[0], $course[0]['Course']['id']));
+        // there should be 3 students left
+        $enrollment = $this->User->getEnrolledStudents($course[0]['Course']['id']);
+        $this->assertEqual(count($enrollment), 3);
+        
+        // unenroll the remaining students
+        $this->assertTrue($this->Course->unenrolStudents($enrolled_user_id_split[1], $course[0]['Course']['id']));
+        // there should be no enrollment left
+        $enrollment = $this->User->getEnrolledStudents($course[0]['Course']['id']);
+        $this->assertEqual(count($enrollment), 0);
     }
 }
