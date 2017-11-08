@@ -112,6 +112,7 @@ p {
     padding: 0 1em 0 0;
     width: auto;
     margin-top: 0.4em;
+    min-width: 10em;
 }
 
 input[type="text"], input[type="file"], input[type="password"], textarea, select, button
@@ -221,18 +222,16 @@ strong {
     text-align: left;
 }
 
-.standardtable tr:first-child th:first-child,
-.standardtable tr:first-child td:first-child {
+.standardtable tr:first-child th:first-child {
     border-top-left-radius: 4px;
 }
-.standardtable tr:first-child th:last-child,
-.standardtable tr:first-child td:last-child {
+.standardtable tr:first-child th:last-child {
     border-top-right-radius: 4px;
 }
-.standardtable tr:last-child td:first-child, .standardtable tr:last-child th:first-child {
+.standardtable tr:last-child td:first-child, .standardtable thead:only-child tr:last-child th:first-child {
     border-bottom-left-radius: 4px;
 }
-.standardtable tr:last-child td:last-child, .standardtable tr:last-child th:last-child {
+.standardtable tr:last-child td:last-child, .standardtable thead:only-child tr:last-child th:last-child {
     border-bottom-right-radius: 4px;
 }
 
@@ -437,6 +436,7 @@ h4 {
 
 i {
     font-style: italic;
+    /* display: none; */
 }
 
 /* FOOTER */
@@ -751,7 +751,7 @@ i {
 }
 
 .course_submenu {
-    margin: 1em 0;
+    margin: 0.6em 0;
     width: 48.5%;
     vertical-align: top;
     display: inline-block;
@@ -762,7 +762,7 @@ i {
 }
 
 .course_actions .course_submenu:nth-child(even) {
-    float: right;
+    margin-left: 2.1%;
 }
 
 .course_submenu h3 {
@@ -1412,6 +1412,25 @@ i {
 
 #groupsimport #title, #groupsimport #button_text {
     text-align: center;
+}
+
+#syncCanvasTable .check-before:before {
+    width: 14px;
+    height: 14px;
+    display: block;
+    float: left;
+    margin: 0 -27px 0 13px;
+    font-style: normal;
+    content: "✔";
+}
+
+.highlight-green {
+    background: #a0ffa0 !important;
+    color: green !important;
+}
+th.highlight-green {
+    background: #3ca13c !important;
+    color: rgb(0, 66, 0) !important;
 }
 
 /* MIXEVALS */

@@ -67,8 +67,8 @@ class CanvasCourseGroupComponent extends Object
      * @param object $_controller
      * @param integer $user_id  this is the user id of the person performing this change (i.e. current user)
      * @param boolean $force_auth
-     * @param integer $user_id_to_add this is the user id of the user to be added to this group
-     * @return boolean true if successful, false otherwise
+     * @param integer $user_id_to_add this is the Canvas user id of the user to be added to this group
+     * @return object returned object
      */
     public function addUser($_controller, $user_id, $force_auth=false, $user_id_to_add)
     {
@@ -81,11 +81,6 @@ class CanvasCourseGroupComponent extends Object
 
         $retObj = $api->postCanvasData($_controller, Router::url(null, true), $force_auth, $uri, $params);
 
-        if (isset($retObj->errors)) {
-            return false;
-        }
-        else {
-            return true;
-        }
+        return $retObj;
     }
 }

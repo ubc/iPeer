@@ -38,18 +38,17 @@ switch($submenu) {
             $items,
             array('name' => 'Import Groups from CSV', 'link' => "/groups/import/$course_id")
         );
-        if ($canvasEnabled){
-            array_push(
-                $items,
-                array('name' => 'Import Groups from Canvas', 'link' => "/groups/import/$course_id/canvas")
-            );
-        }
     }
     array_push(
         $items,
-        array('name' => 'Export Groups to CSV', 'link' => "/groups/export/$course_id"),
-        array('name' => 'Sync Groups with Canvas', 'link' => "/groups/syncCanvas/$course_id")
+        array('name' => 'Export Groups to CSV', 'link' => "/groups/export/$course_id")
     );
+    if ($canvasEnabled){
+        array_push(
+            $items,
+            array('name' => 'Import/Export Canvas Groups', 'link' => "/groups/syncCanvas/$course_id")
+        );
+    }
     break;
   case "EvalEvents":
     if ($status == 'A') {

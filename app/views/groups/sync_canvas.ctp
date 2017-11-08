@@ -8,10 +8,6 @@ if (empty($courseId) || empty($canvasCourseId)) :
     ?><label class="defLabel"></label><?php
     echo $this->Form->submit(__("Next", true));
     echo $this->Form->end();
-    
-elseif ($showSuccessMessage): 
-
-    echo 'Click <a href="' . $formUrl . '">here</a> to go back to the sync wizad.';
 
 elseif ($showImportInterface): 
 
@@ -54,9 +50,8 @@ elseif ($showImportInterface):
                     foreach ($row['Member'] as $user) {
                         ?>
                             <tr>
-                                <td>
+                                <td <?php if(isset($user['justAdded']) && $user['justAdded']){ echo ' class="highlight-green"'; } ?>>
                                     <?php if ($user['isInCanvasCourse']) : ?>
-                                        <input type="checkbox" readonly="readonly" onclick="return false;"/>
                                         <span title="<?php echo $user['username']; ?>">
                                             <?php echo $user['full_name']; ?>
                                         </span>
@@ -88,7 +83,7 @@ elseif ($showImportInterface):
                     <table class="standardtable">
                         <thead>
                             <tr>
-                                <th>
+                                <th <?php if(isset($row['CanvasGroup']['justAdded']) && $row['CanvasGroup']['justAdded']){ echo ' class="highlight-green"'; } ?>>
                                     <?php echo $this->Form->checkbox('canvasGroup.' . $row['CanvasGroup']['group_name'], array('hiddenField' => false)); ?>
                                     <?php echo $row['CanvasGroup']['group_name']; ?>
                                 </th>
@@ -98,9 +93,8 @@ elseif ($showImportInterface):
                     foreach ($row['CanvasMember'] as $user) {
                         ?>
                             <tr>
-                                <td>
+                                <td <?php if(isset($user['justAdded']) && $user['justAdded']){ echo ' class="highlight-green"'; } ?>>
                                     <?php if ($user['isIniPeer']) : ?>
-                                        <input type="checkbox" readonly="readonly" onclick="return false;"/>
                                         <span title="<?php echo $user[$canvasUserKey]; ?>">
                                             <?php echo $user['full_name']; ?>
                                         </span>
@@ -212,7 +206,12 @@ elseif ($showImportInterface):
 
     <script type="text/javascript">
         jQuery('#syncCanvasTable table th input[type="checkbox"]').change(function(){
-            jQuery(this).parents('table.standardtable').find('tr input[type="checkbox"]').prop('checked', (jQuery(this).is(':checked')));
+            if (jQuery(this).is(':checked')) {
+                jQuery(this).parents('table.standardtable').find('tr td span:not(.disabled)').addClass('check-before');
+            }
+            else {
+                jQuery(this).parents('table.standardtable').find('tr td span:not(.disabled)').removeClass('check-before');
+            }
         });
     </script>
     

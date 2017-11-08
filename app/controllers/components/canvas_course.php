@@ -189,4 +189,23 @@ class CanvasCourseComponent extends Object
 
         return new CanvasCourseGroupComponent($courseGroup_obj);
     }
+    
+    /**
+     * Deletes a group in this course
+     *
+     * @param object $_controller
+     * @param integer $user_id
+     * @param boolean $force_auth
+     * @param string $group_id
+     */
+    public function deleteGroup($_controller, $user_id, $force_auth, $group_id)
+    {
+        $api = new CanvasApiComponent($user_id);
+        $uri = '/groups' . $group_id;
+
+        $courseGroup_obj = $api->deleteCanvasData($_controller, Router::url(null, true), $force_auth, $uri);
+
+        // TODO: add error handling
+        return true;
+    }
 }

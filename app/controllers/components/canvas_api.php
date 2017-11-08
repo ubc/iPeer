@@ -220,6 +220,25 @@ class CanvasApiComponent extends Object
     {
         return $this->getCanvasData($_controller, $redirect_uri, $force_auth, $uri, $params, $additionalHeader, $refreshTokenAndRetry, 'post');
     }
+    
+    /**
+     * delete requested data from canvas api
+     *
+     * @param object    $_controller the controller that initiated this request
+     * @param string    $redirect_uri the page to end up on after this request is done (only used if oauth needed)
+     * @param boolean   $force_auth redirects the user to give auhtorization through Canvas if not authorized yet
+     * @param string    $uri canvas api uri
+     * @param array     $params canvas api parameters
+     * @param string    $additionalHeader
+     * @param boolean   $refreshTokenAndRetry if set to true (default), uses the refresh token to retry if the access token is expired
+     * 
+     * @access public
+     * @return mixed return response, otherwise void
+     */
+    public function deleteCanvasData($_controller, $redirect_uri, $force_auth, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=true)
+    {
+        return $this->getCanvasData($_controller, $redirect_uri, $force_auth, $uri, $params, $additionalHeader, $refreshTokenAndRetry, 'delete');
+    }
 
     /**
      * forward the user to canvas to give authorization to ipeer
@@ -338,7 +357,7 @@ class CanvasApiComponent extends Object
      */
     private function _getPostCanvasData($_controller, $redirect_uri, $accessToken, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=true, $method='get')
     {
-        if ($method != 'get' && $method != 'post') {
+        if ($method != 'get' && $method != 'post' && $method != 'delete') {
             return false;
         }
 
