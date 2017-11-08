@@ -113,7 +113,8 @@ class V1ControllerTest extends CakeTestCase {
             if (substr($path,0,1) != '/') {
                 $path = "/$path";
             }
-            return $server.$path;
+            # remove extra slashes before returning
+            return preg_replace('/([^:])(\/{2,})/', '$1/', $server.$path);
         }
         return $url;
     }
