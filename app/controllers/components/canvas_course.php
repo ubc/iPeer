@@ -40,13 +40,13 @@ class CanvasCourseComponent extends Object
     /**
      * Retreives user's Canvas courses
      *
-     * @param mixed $user_id
+     * @param integer $user_id
      * @param string $enrollment_type Get courses the user enrolled as. Default as 'teacher'.
      *
      * @access public
      * @return array Array of CanvasCourseComponent with id as key
      */
-    static public function getCanvasCoursesByIPeerUser($_controller, $user_id, $force_auth=true, $enrollment_type=CanvasCourseUserComponent::ENROLLMENT_QUERY_TEACHER)
+    static public function getAllByIPeerUser($_controller, $user_id, $force_auth=true, $enrollment_type=CanvasCourseUserComponent::ENROLLMENT_QUERY_TEACHER)
     {
         $api = new CanvasApiComponent($user_id);
         $courses_json = $api->getCanvasData($_controller, Router::url(null, true), $force_auth, '/courses', array('enrollment_type' => $enrollment_type));
@@ -65,13 +65,13 @@ class CanvasCourseComponent extends Object
     /**
      * Retrieves a course's users
      *
-     * @param mixed $user_id
+     * @param integer $user_id
      * @param mixed $roles array of roles to retrieve. by default, retrieves teachers, TAs, and students
      *
      * @access public
      * @return array Array of CanvasCourseUserComponent.  Key is the value used to map Canvas users to iPeer username
      */
-    public function getCanvasCourseUsers($_controller, $user_id, $roles=array(
+    public function getUsers($_controller, $user_id, $roles=array(
         CanvasCourseUserComponent::ENROLLMENT_QUERY_STUDENT,
         CanvasCourseUserComponent::ENROLLMENT_QUERY_TEACHER,
         CanvasCourseUserComponent::ENROLLEMNT_QUERY_TA), 
@@ -102,15 +102,20 @@ class CanvasCourseComponent extends Object
     /**
      * Retrieves a course's groups
      *
-     * @param mixed $user_id
+     * @param object $_controller 
+     * @param integer $user_id
+     * @param boolean $force_auth
      *
      * @access public
      * @return array Array of CanvasCourseGroupComponent
      */
-    public function getCanvasCourseGroups($_controller, $user_id, $force_auth=false)
+    public function getGroups($_controller, $user_id, $force_auth=false, $per_page=100)
     {
         $api = new CanvasApiComponent($user_id);
         $uri = '/courses/' . $this->id . '/groups';
+        $params = array(
+            'per_page' => $per_page
+        );
         
         $courseGroups_array = $api->getCanvasData($_controller, Router::url(null, true), $force_auth, $uri);
 
@@ -125,5 +130,63 @@ class CanvasCourseComponent extends Object
         }
 
         return $courseUsers;
+    }
+    
+    /**
+     * Retrieves a course's group categories (also called Groupsets)
+     *
+     * @param object $_controller 
+     * @param integer $user_id
+     * @param boolean $force_auth
+     *
+     * @access public
+     * @return array Array of stdClass Objects (each representing one group category)
+     */
+    public function getGroupCategories($_controller, $user_id, $force_auth=false, $ret_type='keypair')
+    {
+        $api = new CanvasApiComponent($user_id);
+        $uri = '/courses/' . $this->id . '/group_categories';
+        
+        $courseGroupCategories_array = $api->getCanvasData($_controller, Router::url(null, true), $force_auth, $uri);
+
+        $courseGroupCategories = array();
+
+        if (!empty($courseGroupCategories_array)) {
+            foreach ($courseGroupCategories_array as $cat) {
+                $courseGroupCategories[$cat->id] = ($ret_type=='keypair') ? $cat->name : $cat;
+            }
+        }
+
+        return $courseGroupCategories;
+    }
+
+    /**
+     * Creates a new group in this course
+     *
+     * @param object $_controller
+     * @param integer $user_id
+     * @param boolean $force_auth
+     * @param string $group_name
+     * @param integer $group_category_id
+     * @return object of type CanvasCourseGroupComponent
+     */
+    public function createGroup($_controller, $user_id, $force_auth=false, $group_name='', $group_category_id=null)
+    {
+        $api = new CanvasApiComponent($user_id);
+        if ($group_category_id) {
+            $uri = '/group_categories/' . $group_category_id . '/groups';
+        }
+        else {
+            $uri = '/groups';
+        }
+        
+        $params = array(
+            'name' => $group_name,
+            'join_level' => 'parent_context_auto_join'
+        );
+
+        $courseGroup_obj = $api->postCanvasData($_controller, Router::url(null, true), $force_auth, $uri, $params);
+
+        return new CanvasCourseGroupComponent($courseGroup_obj);
     }
 }

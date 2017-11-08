@@ -65,12 +65,18 @@ VALUES (
     'Force the user to enter their Canvas credentials when connecting for the first time', 'A', 0, NOW(), NULL, NOW()
 );
 
--- add page permission --
+-- add page permissions --
 INSERT INTO `ipeer`.`acos`
 (`parent_id`, `model`, `foreign_key`, `alias`, `lft`, `rght`)
 	select id, NULL, NULL, 'syncCanvasEnrollment', NULL, NULL
 	from `ipeer`.`acos`
 	where BINARY `alias`='Courses' LIMIT 1;
+
+INSERT INTO `ipeer`.`acos`
+(`parent_id`, `model`, `foreign_key`, `alias`, `lft`, `rght`)
+	select id, NULL, NULL, 'syncCanvas', NULL, NULL
+	from `ipeer`.`acos`
+	where BINARY `alias`='Groups' LIMIT 1;
 
 -- store canvas course id
 ALTER TABLE `ipeer`.`courses` ADD COLUMN `canvas_id` VARCHAR(25) NULL DEFAULT NULL;

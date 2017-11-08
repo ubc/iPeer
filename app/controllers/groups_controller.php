@@ -352,6 +352,236 @@ class GroupsController extends AppController
 
 
     /**
+     * sync groups with canvas (import or export)
+     *
+     * @param mixed $task 'import' or 'export'
+     * @param int   $courseId
+     * @param mixed $canvasCourseId
+     *
+     * @access public
+     * @return void
+     */
+    function syncCanvas($courseId = null, $canvasCourseId = null)
+    {
+        if (!$this->canvasEnabled){
+            $this->Session->setFlash(__('Error: Canvas integration not enabled.', true));
+            $this->redirect('index');
+        }
+        
+        $userId = $this->Auth->user('id');
+        
+        $this->set('showImportInterface', false);
+        $this->set('showSuccessMessage', false);
+
+        // get all accessible courses (for dropdown) and also validate selected course (if any)
+
+        $courses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
+        $this->set('courses', $courses);
+
+        if ($courseId == null || isset($this->data['Group']['Course'])) {
+            $courseId = $this->data['Group']['Course'];
+        }
+
+        if (!is_null($courseId)) {
+            $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
+            if (empty($course)) {
+                $this->Session->setFlash(__('Error: Invalid course. Please select a valid course.', true));
+                $courseId = null;
+            }
+            else {
+                $this->breadcrumb->push(array('course' => $course['Course']));
+            }
+        }
+
+        // get all accessible canvas courses (for dropdown) and also validate selected canvas course (if any)
+
+        App::import('Component', 'CanvasCourse');
+        App::import('Component', 'CanvasCourseUser');
+        $canvasCoursesRaw = CanvasCourseComponent::getAllByIPeerUser($this, $userId, true);
+
+        $canvasCourses = array();
+        foreach ($canvasCoursesRaw as $course) {
+            $canvasCourses[$course->id] = $course->name;
+        }
+        $this->set('canvasCourses', $canvasCourses);
+
+        if ($canvasCourseId == null || isset($this->data['Group']['canvasCourse'])) {
+            $canvasCourseId = $this->data['Group']['canvasCourse'];
+        }
+
+        if (!is_null($canvasCourseId)) {
+            if (!isset($canvasCourses[$canvasCourseId])){
+                $this->Session->setFlash(__('Error: Invalid canvas course. Please select a valid canvas course.', true));
+                $canvasCourseId = null;
+            }
+        }
+
+        if (!empty($courseId) && !empty($canvasCourseId)) {
+
+            $this->set('breadcrumb', $this->breadcrumb->push(__('Import/Export Canvas Groups', true)));
+            
+            if (!empty($courseId) && !empty($courseId)) {
+
+                $canvasUserKey = $this->SysParameter->get('system.canvas_user_key');
+
+                $canvasStudents = $canvasCoursesRaw[$canvasCourseId]->getUsers(
+                    $this,
+                    User::get('id'),
+                    array(CanvasCourseUserComponent::ENROLLMENT_QUERY_STUDENT)
+                );
+
+                $groups = $this->Group->getGroupsByCourseId($courseId);
+                $groupsAndUsers = array();
+
+                foreach ($groups as $k => $group) {
+                    $groupsAndUsers[$group] = array('users'=>array());
+                    $groupsAndUsers[$group]['group'] = $group;
+
+                    $groupsAndUsers[$group] = $this->Group->getGroupWithMembersById($k);
+                    foreach ($groupsAndUsers[$group]['Member'] as $k2 => $user) {
+                        $groupsAndUsers[$group]['Member'][$k2]['isInCanvasCourse'] = isset($canvasStudents[$user['username']]);
+                    }
+                }
+
+                // Get list of iPeer users that are enrolled in the course in Canvas (may or may not be in this iPeer course)
+                $iPeerUsernameBasedOnCanvas = array_values(array_map(
+                    function ($student) {
+                        $key = $student->canvas_user_key;
+                        return $student->$key;
+                    },
+                    $canvasStudents));
+                $iPeerUsernamesInCanvasCourse = array_map(
+                    function ($p) { return $p['User']['username']; },
+                    $this->User->getByUsernames($iPeerUsernameBasedOnCanvas));
+
+                $canvasGroups = $canvasCoursesRaw[$canvasCourseId]->getGroups($this, $userId, true);
+                $canvasGroupsAndUsers = array();
+
+                foreach ($canvasGroups as $k => $canvasGroup) {
+                    $canvasGroupsAndUsers[$canvasGroup->name] = array('CanvasMember'=>array());
+                    $canvasGroupsAndUsers[$canvasGroup->name]['CanvasGroup'] = array( 
+                        'id' => $canvasGroup->id,
+                        'group_name' => $canvasGroup->name
+                    );
+
+                    // use id as $key so we get all users, not just the importable ones
+                    $groupUsers = $canvasGroup->getUsers($this, $userId, false, 'id');
+                    foreach ($groupUsers as $k2 => $user){
+                        $canvasGroupsAndUsers[$canvasGroup->name]['CanvasMember'][$k2] = array(
+                            'id' => $user->id,
+                            'full_name' => $user->name,
+                            'first_name' => $user->first_name,
+                            'last_name' => $user->last_name,
+                            $canvasUserKey => $user->$canvasUserKey,
+                            'isIniPeer' => (!empty($user->$canvasUserKey) && in_array($user->$canvasUserKey, $iPeerUsernamesInCanvasCourse))
+                        );
+                    }
+                }
+
+                $groupsAndUsers = array_merge_recursive($groupsAndUsers, $canvasGroupsAndUsers);
+
+                $this->set('groupsAndUsers', $groupsAndUsers);
+
+                $canvasGroupCategories = $canvasCoursesRaw[$canvasCourseId]->getGroupCategories(
+                    $this,
+                    User::get('id')
+                );
+
+                $this->set('canvasGroupCategories', $canvasGroupCategories);
+
+                // process import of requested groups from canvas
+                if (isset($this->data['Group']['syncType'])) {
+
+                    if ($this->data['Group']['syncType'] == 'import') {
+
+                        $lines = array();
+
+                        // todo: validate groups
+
+                        // print 'Going to import these groups:';
+                        // print '<pre>'; 
+                        foreach( $this->data['canvasGroup'] as $groupName => $groupChecked ) {
+                            if ($groupChecked && isset($groupsAndUsers[$groupName]) && isset($groupsAndUsers[$groupName]['CanvasMember'])) {
+                                foreach ($groupsAndUsers[$groupName]['CanvasMember'] as $user){
+                                    if (isset($user[$canvasUserKey]) && in_array($user[$canvasUserKey], $iPeerUsernamesInCanvasCourse)) {
+                                        $lines[] = array($user[$canvasUserKey], $groupName);
+                                    }
+                                }
+                            }
+                        }
+                        // print_r($lines);
+                        // die;
+
+                        $update = ($this->data['Group']['updateGroups']) ? true : false;
+                        $identifier = 'username';
+
+                        if (count($lines)) {
+                            $this->_addGroupByImport($lines, $courseId, $update, $identifier);
+                        }
+                    }
+                    elseif ($this->data['Group']['syncType'] == 'export') {
+
+                        if ( !isset($this->data['iPeerGroup']) ) {
+                            $this->Session->setFlash(__('Please select one or more groups to export.', true));
+                            $this->set('showImportInterface', true);
+                        }
+                        else {
+                            $this->set('showSuccessMessage', true);
+                            $successMsgs = '';
+                            foreach( $this->data['iPeerGroup'] as $groupName => $groupChecked ) {
+                                if ($groupChecked && isset($groupsAndUsers[$groupName]) && isset($groupsAndUsers[$groupName]['Member'])) {
+                                    // create group in canvas if necessary
+                                    if (!isset($groupsAndUsers[$groupName]['CanvasGroup'])) {
+                                        $canvasGroup = $canvasCoursesRaw[$canvasCourseId]->createGroup($this, $userId, false, $groupName, $this->data['Group']['canvasGroupCategories']);
+                                        if ($canvasGroup) {
+                                            $successMsgs .= '<li>Group "' . $groupName . '" created in Canvas.</li>';
+                                        }
+                                    }
+                                    else {
+                                        $canvasGroup = $canvasGroups[$groupsAndUsers[$groupName]['CanvasGroup']['id']];
+                                    }
+
+                                    // add members
+                                    if ($canvasGroup) {
+                                        foreach ($groupsAndUsers[$groupName]['Member'] as $user){
+                                            if (isset($user['username']) && in_array($user['username'], $iPeerUsernamesInCanvasCourse)) {
+                                                $userAdded = $canvasGroup->addUser($this, $userId, false, $user['id']);
+                                                if ($canvasGroup) {
+                                                    $successMsgs .= '<li>"'. $user['full_name'] . '" was added to the group in Canvas.</li>';
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            $this->Session->setFlash('<ul>'. $successMsgs .'</ul>', 'good');
+                        }
+                    }
+                }
+                // show the groups to import
+                else {
+                    $this->set('showImportInterface', true);
+                }
+
+                $this->set('canvasUserKey', $canvasUserKey);
+            }
+        }
+
+        $formUrl = $this->params['action'];
+        if (!empty($courseId)) {
+            $formUrl .= DS . $courseId;
+            if (!empty($canvasCourseId)) {
+                $formUrl .= DS . $canvasCourseId;
+            }
+        }
+
+        $this->set('formUrl', Router::url($formUrl, true));
+
+        $this->set('courseId', $courseId);
+        $this->set('canvasCourseId', $canvasCourseId);
+    }
+
+    /**
      * import
      *
      * @param int $courseId
@@ -381,7 +611,6 @@ class GroupsController extends AppController
         $this->set('courseId', $courseId);
         $this->set('formUrl', Router::url(null, true));
 
-
         if ($importFrom == 'canvas') {
             
             if (!$this->canvasEnabled){
@@ -395,7 +624,7 @@ class GroupsController extends AppController
             $userId = $this->Auth->user('id');
 
             App::import('Component', 'CanvasCourse');
-            $canvasCoursesRaw = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, $userId, true);
+            $canvasCoursesRaw = CanvasCourseComponent::getAllByIPeerUser($this, $userId, true);
 
             $canvasCourses = array();
             foreach ($canvasCoursesRaw as $course) {
@@ -411,16 +640,16 @@ class GroupsController extends AppController
             
                 App::import('Component', 'CanvasCourseGroup');
 
-                $canvasCourses = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), true);
+                $canvasCourses = CanvasCourseComponent::getAllByIPeerUser($this, User::get('id'), true);
                 $selectedCanvasCourse = $canvasCourses[$this->data['Group']['canvasCourse']];
 
-                $canvasGroups = $selectedCanvasCourse->getCanvasCourseGroups($this, $userId, true);
+                $canvasGroups = $selectedCanvasCourse->getGroups($this, $userId, true);
 
                 $lines = array();
                 $canvas_user_key = $this->SysParameter->get('system.canvas_user_key'); 
 
                 foreach ($canvasGroups as $k => $canvasGroup) {
-                    $groupUsers = $canvasGroup->getGroupUsers($this, $userId);
+                    $groupUsers = $canvasGroup->getUsers($this, $userId);
                     foreach ($groupUsers as $user){
                         $lines[] = array($user->$canvas_user_key, $canvasGroup->name);
 
@@ -470,7 +699,6 @@ class GroupsController extends AppController
 
         }
     }
-
 
     /**
      * _addGroupByImport

@@ -16,6 +16,7 @@ time, mark, audio, video {
     border: 0;
     font-size: 100%;
     font: inherit;
+    color: #333;
 }
 /* html5 display-role reset for older browsers */
 article, aside, details, figcaption, figure, 
@@ -109,11 +110,11 @@ p {
     text-align: right;
     clear: left;
     padding: 0 1em 0 0;
-    width: 13em;
+    width: auto;
     margin-top: 0.4em;
 }
 
-input[type="text"], input[type="file"], input[type="password"], textarea, select
+input[type="text"], input[type="file"], input[type="password"], textarea, select, button
 {   
     margin: 0.35em 0.35em; 
     border-radius: 3px; 
@@ -147,11 +148,12 @@ button {
     padding: 0.3em 0.5em;
 }
 
-a:link, a:visited, a:hover {
+a:link, a:visited, a:hover, input[type="submit"], button {
+    color: #1049b1;
     text-decoration: none;
 }
 
-a:hover, a:hover * {
+a:hover, a:hover *, input[type="submit"]:hover, button:hover {
     color: green !important;
 }
 
@@ -174,27 +176,40 @@ strong {
 
 .standardtable {
     width: 100%;
+    border: solid 1px #ccc;
+    border-radius: 5px;
+    border-collapse: separate;
+    box-shadow: 0 0 25px rgba(85, 85, 85, 0.10);
+    margin: 0.5em 0 0.7em;
 }
 
 .standardtable th {
     padding: 0.4em 0.1em;
-    background-color: #ddd;
+    background-color: #ececec;
     font-weight: 600;
     font-size: 0.95em;
-    border-left: 2px solid white;
-    border-bottom: 2px solid white;
+    border-left: solid 1px #ddd;
+    border-bottom: solid 1px #ddd;
 }
 
 .standardtable td {
-    border-left: 2px solid white;
-    border-bottom: 2px solid white;
+    border-left: solid 1px #e9e9e9;
+    border-bottom: solid 1px #e9e9e9;
     padding: 0.4em 0.1em;
-    background-color: #f6f6f6;
+    background-color: #f9f9f9;
     text-align: center;
 }
 
+.standardtable tr th:first-child, 
+.standardtable tr td:first-child {
+    border-left: none;
+}
+.standardtable tr:last-child td {
+    border-bottom: none;
+}
+
 .standardtable #details td {
-    background-color: #F1F1F1;
+    background-color: #f1f1f1;
 }
 
 .standardtable table td {
@@ -204,6 +219,21 @@ strong {
 .leftalignedtable th, .leftalignedtable td {
     padding: 0.4em;
     text-align: left;
+}
+
+.standardtable tr:first-child th:first-child,
+.standardtable tr:first-child td:first-child {
+    border-top-left-radius: 4px;
+}
+.standardtable tr:first-child th:last-child,
+.standardtable tr:first-child td:last-child {
+    border-top-right-radius: 4px;
+}
+.standardtable tr:last-child td:first-child, .standardtable tr:last-child th:first-child {
+    border-bottom-left-radius: 4px;
+}
+.standardtable tr:last-child td:last-child, .standardtable tr:last-child th:last-child {
+    border-bottom-right-radius: 4px;
 }
 
 /* css for timepicker */
@@ -368,11 +398,24 @@ a#home, a#home:hover, a#home:active {
     color: blue;
 }
 
+.breadcrumb {
+    margin: 0 0 2em;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: #000;
+    float: left;
+    opacity: 0.5;
+    width: 100%;
+}
+.breadcrumb a {
+    color: #000;
+}
+
 h1.title {
     margin: 0.5em 0 1em;
     font-size: 1.5em;
     font-weight: 600;
-    color: #be9ad3;
+    color: #9971ad;
     padding: 0;
 }
 
@@ -709,16 +752,25 @@ i {
 
 .course_submenu {
     margin: 1em 0;
-    width: 49.6%;
+    width: 48.5%;
     vertical-align: top;
     display: inline-block;
+    border: solid 1px #ccc;
+    border-radius: 5px;
+    padding-bottom: 1em;
+    box-shadow: 0 0 25px rgba(85, 85, 85, 0.10);
+}
+
+.course_actions .course_submenu:nth-child(even) {
+    float: right;
 }
 
 .course_submenu h3 {
-    background-color: #EAEAEA;
+    background-color: #ececec;
     color: #0A2C64;
     font-weight: 600;
-    padding: 0.5em;
+    padding: 0.5em 0.8em;
+    margin: 0;
 }
 
 .course_submenu ul {
@@ -726,11 +778,11 @@ i {
 }
 
 .course_submenu li {
-    padding-left: 2em;
+    padding-left: 2.5em;
     margin-top: 1em;
     background-image: url("../img/layout/yellow_arrow.gif");
     background-repeat: no-repeat;
-    background-position: 0.5em;
+    background-position: 0.9em;
 }
 
 #CourseHome .invalid {
@@ -1755,14 +1807,8 @@ table.content-table {
     margin: 0 auto 0 auto;
 }
 
-.add-button,
-.delete-button,
-.edit-button,
-.merge-button,
-.export-excel-button,
-.compare-button,
-.instruction-icon,
-.button {
+.add-button, .delete-button, .edit-button, .merge-button, .export-excel-button, .compare-button, .instruction-icon, .button, 
+input[type="submit"], button {
     background-color: #eee;
     padding: 5px 5px 5px 25px;
     background-position: 5px 6px;
@@ -1772,6 +1818,16 @@ table.content-table {
     font-size: 0.9em;
     background-repeat: no-repeat;
     box-shadow: 0 0 5px rgba(85, 85, 85, 0.28);
+    cursor: pointer;
+}
+
+input[type="submit"], button {
+    padding: 5px 10px;
+    background: #eee; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(left top, #eee, #ccc); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(bottom right, #eee, #ccc); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(bottom right, #eee, #ccc); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(to bottom right, #eee, #ccc); /* Standard syntax */
 }
 
 .add-button:hover,
@@ -1781,8 +1837,10 @@ table.content-table {
 .export-excel-button:hover,
 .compare-button:hover,
 .instruction-icon:hover,
-.button:hover {
-    background-color: #fbf9ea;
+.button:hover,
+input[type="submit"]:hover, 
+button:hover {
+    background-color: #fbf9ea !important;
     border-color: gold;
     box-shadow: 0 0 5px rgb(222, 204, 124);
 }

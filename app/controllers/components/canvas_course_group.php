@@ -34,11 +34,14 @@ class CanvasCourseGroupComponent extends Object
             } 
         }
     }
-
-    public function getGroupUsers($_controller, $user_id, $force_auth=false){
-
+    
+    public function getUsers($_controller, $user_id, $force_auth=false, $key='canvas_user_key', $per_page=100)
+    {
         $api = new CanvasApiComponent($user_id);
         $uri = '/groups/' . $this->id . '/users';
+        $params = array(
+            'per_page' => $per_page
+        );
         
         $usersArray = $api->getCanvasData($_controller, Router::url(null, true), $force_auth, $uri);
 
@@ -46,7 +49,9 @@ class CanvasCourseGroupComponent extends Object
         if (!empty($usersArray)) {
             foreach ($usersArray as $user) {
                 $user_obj = new CanvasCourseUserComponent($user);
-                $key = $user_obj->canvas_user_key;    // key used to map canvas user to iPeer username
+                if ($key == 'canvas_user_key') {
+                    $key = $user_obj->canvas_user_key;    // key used to map canvas user to iPeer username
+                }
                 if (!empty($user_obj->$key)) {
                     $groupUsers[$user_obj->$key] = $user_obj;
                 }
@@ -54,5 +59,33 @@ class CanvasCourseGroupComponent extends Object
         }
 
         return $groupUsers;
+    }
+
+    /**
+     * Adds a user to this group in Canvas
+     *
+     * @param object $_controller
+     * @param integer $user_id  this is the user id of the person performing this change (i.e. current user)
+     * @param boolean $force_auth
+     * @param integer $user_id_to_add this is the user id of the user to be added to this group
+     * @return boolean true if successful, false otherwise
+     */
+    public function addUser($_controller, $user_id, $force_auth=false, $user_id_to_add)
+    {
+        $api = new CanvasApiComponent($user_id);
+        $uri = '/groups/' . $this->id . '/memberships';
+        
+        $params = array(
+            'user_id' => $user_id_to_add
+        );
+
+        $retObj = $api->postCanvasData($_controller, Router::url(null, true), $force_auth, $uri, $params);
+
+        if (isset($retObj->errors)) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 }

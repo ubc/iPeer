@@ -88,7 +88,12 @@ class CanvasApiComponent extends Object
                 if ($expiresInSeconds < 300) {
                     // Refresh access token
                     $apiToken = $this->getApiTokenUsingRefreshToken($oauth['UserOauth']['refresh_token']);
-                    $accessToken = $apiToken['accessToken'];
+                    if (isset($apiToken['accessToken'])){
+                        $accessToken = $apiToken['accessToken'];
+                    }
+                    else {
+                        return false;
+                    }
                 }
                 else {
                     $accessToken = $oauth['UserOauth']['access_token'];
@@ -140,7 +145,7 @@ class CanvasApiComponent extends Object
     }
 
     /**
-     * retrieves requested data from canvas api
+     * get requested data from canvas api
      *
      * @param object    $_controller the controller that initiated this request
      * @param string    $redirect_uri the page to end up on after this request is done (only used if oauth needed)
@@ -149,18 +154,19 @@ class CanvasApiComponent extends Object
      * @param array     $params canvas api parameters
      * @param string    $additionalHeader
      * @param boolean   $refreshTokenAndRetry if set to true (default), uses the refresh token to retry if the access token is expired
+     * @param string    $method 'get' (default) or 'post' to do a post request instead
      * 
      * @access public
      * @return mixed return requested data, otherwise void
      */
-    public function getCanvasData($_controller, $redirect_uri, $force_auth, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=true)
+    public function getCanvasData($_controller, $redirect_uri, $force_auth, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=true, $method='get')
     {   
         // first check to see if we have a valid access token
         $accessToken = $this->getAccessToken();
 
         // if auth token exists, attempt to call api
         if ($accessToken) {
-            $data = $this->_getCanvasData($_controller, $redirect_uri, $accessToken, $uri, $params, $additionalHeader, $refreshTokenAndRetry);
+            $data = $this->_getPostCanvasData($_controller, $redirect_uri, $accessToken, $uri, $params, $additionalHeader, $refreshTokenAndRetry, $method);
             if ($data === false) {
                 $_controller->Session->setFlash('There was an error retrieving data from Canvas. Please try again.');
             }
@@ -194,6 +200,25 @@ class CanvasApiComponent extends Object
         elseif ($force_auth) {
             $this->_getNewOauth($_controller, $redirect_uri);
         }        
+    }
+    
+    /**
+     * post requested data to canvas api
+     *
+     * @param object    $_controller the controller that initiated this request
+     * @param string    $redirect_uri the page to end up on after this request is done (only used if oauth needed)
+     * @param boolean   $force_auth redirects the user to give auhtorization through Canvas if not authorized yet
+     * @param string    $uri canvas api uri
+     * @param array     $params canvas api parameters
+     * @param string    $additionalHeader
+     * @param boolean   $refreshTokenAndRetry if set to true (default), uses the refresh token to retry if the access token is expired
+     * 
+     * @access public
+     * @return mixed return response, otherwise void
+     */
+    public function postCanvasData($_controller, $redirect_uri, $force_auth, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=true)
+    {
+        return $this->getCanvasData($_controller, $redirect_uri, $force_auth, $uri, $params, $additionalHeader, $refreshTokenAndRetry, 'post');
     }
 
     /**
@@ -311,8 +336,12 @@ class CanvasApiComponent extends Object
      * @access private
      * @return mixed either the response body from the api, or false if not successful
      */
-    private function _getCanvasData($_controller, $redirect_uri, $accessToken, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=True)
+    private function _getPostCanvasData($_controller, $redirect_uri, $accessToken, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=true, $method='get')
     {
+        if ($method != 'get' && $method != 'post') {
+            return false;
+        }
+
         try {
             // For Canvas API, multiple parameters can have the same key.
             // In this case, the value of the passed in $params will be an array
@@ -328,8 +357,8 @@ class CanvasApiComponent extends Object
                     }
                 }
             }
-            
-            $response = \Httpful\Request::get($this->getApiUrl() . $uri .
+
+            $response = \Httpful\Request::$method($this->getApiUrl() . $uri .
                 ($params? '?' . $params_expanded : ''))
                     ->expectsJson()
                     ->addHeaders(array('Authorization' => 'Bearer ' . $accessToken))
@@ -341,7 +370,7 @@ class CanvasApiComponent extends Object
                 // most likely, the access token is no longer valid (expired), so use refresh token to get it
                 $apiToken = $this->getApiTokenUsingRefreshToken();
                 if (isset($apiToken['accessToken'])) {
-                    return $this->_getCanvasData($_controller, $redirect_uri, $apiToken['accessToken'], $uri, $params, $additionalHeader, false);
+                    return $this->_getPostCanvasData($_controller, $redirect_uri, $apiToken['accessToken'], $uri, $params, $additionalHeader, false, $method);
                 }
                 // if not able to get new access token, we need to re-authenticate with canvas
                 else {

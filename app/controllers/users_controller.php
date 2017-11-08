@@ -1139,7 +1139,7 @@ class UsersController extends AppController
             $userId = $this->Auth->user('id');
 
             App::import('Component', 'CanvasCourse');
-            $canvasCoursesRaw = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, $userId, true);
+            $canvasCoursesRaw = CanvasCourseComponent::getAllByIPeerUser($this, $userId, true);
 
             $canvasCourses = array();
             foreach ($canvasCoursesRaw as $course) {
@@ -1153,10 +1153,10 @@ class UsersController extends AppController
             
                 App::import('Component', 'CanvasCourseUser');
 
-                $canvasCourses = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), true);
+                $canvasCourses = CanvasCourseComponent::getAllByIPeerUser($this, User::get('id'), true);
                 $selectedCanvasCourse = $canvasCourses[$this->data['User']['canvasCourse']];
 
-                $canvasUsers = $selectedCanvasCourse->getCanvasCourseUsers(
+                $canvasUsers = $selectedCanvasCourse->getUsers(
                     $this,
                     $userId,
                     array(CanvasCourseUserComponent::ENROLLMENT_QUERY_STUDENT),
@@ -1219,8 +1219,20 @@ class UsersController extends AppController
             // add the users to the database
             $result = $this->User->addUserByArray($users, true, $this);
 
-            if (!$result) {
-                $this->Session->setFlash("Error: Unable to import users.");
+            if (isset($result['errors'])) {
+                $error_message = '<ul>';
+                foreach ($result['errors'] as $error){
+                    if (is_array($error)) {
+                        foreach ($error as $error_detail) {
+                            $error_message .= '<li>' . $error_detail . '</li>';
+                        }
+                    }
+                    else {
+                        $error_message .= '<li>' . $error . '</li>';
+                    }
+                }
+
+                $this->Session->setFlash("Error: Unable to import users " . $error_message . "</ul>");
                 return;
             }
 

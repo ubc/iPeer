@@ -573,6 +573,7 @@ AjaxList.prototype.renderPageSizes = function (div) {
 
     div.style.textAlign = "right";
     div.style.whiteSpace = "nowrap";
+    div.style.padding = "12px 0";
     div.appendChild(new Element("b").update("Page Size: "));
 
     // Create a radio button for each page size

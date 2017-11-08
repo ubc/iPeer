@@ -292,13 +292,13 @@ class CoursesController extends AppController
      */
    protected function _populateWithCanvasCourseData($canvas_course_id)
    {
-       $cCourses = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), false);
+       $cCourses = CanvasCourseComponent::getAllByIPeerUser($this, User::get('id'), false);
        $selectedCanvasCourse = array_key_exists($canvas_course_id, $cCourses) ? $cCourses[$canvas_course_id] : '';
        if (!empty($selectedCanvasCourse)) {
            $this->data['Course']['course'] = $selectedCanvasCourse->course_code;
            $this->data['Course']['title'] = $selectedCanvasCourse->name;
            
-           $canvasusers = $selectedCanvasCourse->getCanvasCourseUsers($this, User::get('id'));
+           $canvasusers = $selectedCanvasCourse->getUsers($this, User::get('id'));
            $iInstructors = $this->_getCorrespondingUser($canvasusers, CanvasCourseUserComponent::ENROLLMENT_TYPE_TEACHER);
            $iTAs = $this->_getCorrespondingUser($canvasusers, CanvasCourseUserComponent::ENROLLMENT_TYPE_TA);
            $this->data['Instructor'] = $iInstructors;
@@ -334,7 +334,7 @@ class CoursesController extends AppController
                 };
                 $this->set('canvasCourses',
                     array_map($map_func,
-                        CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), false)));
+                        CanvasCourseComponent::getAllByIPeerUser($this, User::get('id'), false)));
                 $this->render('select_canvas');
                 return;
             }
@@ -410,7 +410,7 @@ class CoursesController extends AppController
             };
             $this->set('canvasCourses',
                 array_map($map_func,
-                    CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), false)));
+                    CanvasCourseComponent::getAllByIPeerUser($this, User::get('id'), false)));
         } else {
             $this->set('canvasCourses', array());
         }
@@ -782,7 +782,7 @@ class CoursesController extends AppController
             $this->Course->enrolStudents($this->data['Course']['enroll_by_canvas'],
                 $courseId);
         }
-        // if selected stuents to unenroll
+        // if selected students to unenroll
         if (!empty($this->data['Course']['unenroll'])) {
             $this->Course->unenrolStudents($this->data['Course']['unenroll'],
                 $courseId);
@@ -793,7 +793,7 @@ class CoursesController extends AppController
         $canvasCourseId = $course['Course']['canvas_id'];
         
         // Canvas courses that the user can access
-        $canvasCourses = CanvasCourseComponent::getCanvasCoursesByIPeerUser($this, User::get('id'), true);
+        $canvasCourses = CanvasCourseComponent::getAllByIPeerUser($this, User::get('id'), true);
         $selectedCanvasCourse =
             empty($canvasCourseId) || !array_key_exists($canvasCourseId, $canvasCourses)?
                 '' : $canvasCourses[$canvasCourseId];
@@ -802,13 +802,13 @@ class CoursesController extends AppController
         if (empty($selectedCanvasCourse)) {
             $canvasCourseId = '';
         } else {
-            $canvasStudents = $selectedCanvasCourse->getCanvasCourseUsers(
+            $canvasStudents = $selectedCanvasCourse->getUsers(
                 $this,
                 User::get('id'),
                 array(CanvasCourseUserComponent::ENROLLMENT_QUERY_STUDENT)
             );
         }
-        // Get list of iPeer users based on Canvas id that are not enrolled in iPeer
+        // Get list of iPeer users that are enrolled in the course in Canvas
         $iPeerUsernameBasedOnCanvas = array_values(array_map(
             function ($student) {
                 $key = $student->canvas_user_key;

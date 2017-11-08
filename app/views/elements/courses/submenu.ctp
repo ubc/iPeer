@@ -47,7 +47,8 @@ switch($submenu) {
     }
     array_push(
         $items,
-        array('name' => 'Export Groups', 'link' => "/groups/export/$course_id")
+        array('name' => 'Export Groups to CSV', 'link' => "/groups/export/$course_id"),
+        array('name' => 'Sync Groups with Canvas', 'link' => "/groups/syncCanvas/$course_id")
     );
     break;
   case "EvalEvents":
