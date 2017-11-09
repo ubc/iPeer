@@ -1,4 +1,4 @@
-<?php 
+<div id="syncCanvasWrapper"><?php 
 
 if (empty($courseId) || empty($canvasCourseId)) : 
     
@@ -9,7 +9,7 @@ if (empty($courseId) || empty($canvasCourseId)) :
     echo $this->Form->submit(__("Next", true));
     echo $this->Form->end();
 
-elseif ($showImportInterface): 
+else: 
 
     echo $this->Form->create(null, array("id" => "syncCanvasForm", "url" => $formUrl));
 
@@ -19,14 +19,14 @@ elseif ($showImportInterface):
             <tr>
                 <th>
                     <h3>iPeer</h3>
-                    <a id="selectAlliPeerGroups" href="#">select all</a>
-                    <a id="selectNoneiPeerGroups"  href="#">select none</a>
+                    <a id="selectAlliPeer" href="#">select all</a>
+                    <a id="selectNoneiPeer"  href="#">select none</a>
                 </th>
                 <th>&nbsp;</th>
                 <th>
                     <h3>Canvas</h3>
-                    <a id="selectAllCanvasGroups" href="#">select all</a>
-                    <a id="selectNoneCanvasGroups"  href="#">select none</a>
+                    <a id="selectAllCanvas" href="#">select all</a>
+                    <a id="selectNoneCanvas"  href="#">select none</a>
                 </th>
             </tr>
         </thead>
@@ -37,18 +37,18 @@ elseif ($showImportInterface):
             <tr>
                 <td>
                     <?php if (isset($row['Group'])): ?>
-                    <table class="standardtable">
+                    <table class="standardtable iPeerGroup">
                         <thead>
                             <tr>
-                                <th>
+                                <th <?php if(isset($row['Group']['justAdded']) && $row['Group']['justAdded']){ echo ' class="highlight-green"'; } ?>>
                                     <?php echo $this->Form->checkbox('iPeerGroup.' . $row['Group']['group_name'], array('hiddenField' => false)); ?>
                                     <?php echo $row['Group']['group_name']; ?>
                                 </th>
                             </tr>
                         </thead>
-                        <tbody><?php
-                    foreach ($row['Member'] as $user) {
-                        ?>
+                        <?php if (isset($row['Member'])): ?>
+                        <tbody>
+                            <?php foreach ($row['Member'] as $user) { ?>
                             <tr>
                                 <td <?php if(isset($user['justAdded']) && $user['justAdded']){ echo ' class="highlight-green"'; } ?>>
                                     <?php if ($user['isInCanvasCourse']) : ?>
@@ -62,10 +62,9 @@ elseif ($showImportInterface):
                                     <?php endif; ?>
                                 </td>
                             </tr>
-                        <?php
-                    }
-                    ?>
+                            <?php } ?>
                         </tbody>
+                        <?php endif; ?>
                     </table>
                     <?php endif; ?>
                 </td>
@@ -80,7 +79,7 @@ elseif ($showImportInterface):
                 </td>
                 <td>
                     <?php if (isset($row['CanvasGroup'])): ?>
-                    <table class="standardtable">
+                    <table class="standardtable canvasGroup">
                         <thead>
                             <tr>
                                 <th <?php if(isset($row['CanvasGroup']['justAdded']) && $row['CanvasGroup']['justAdded']){ echo ' class="highlight-green"'; } ?>>
@@ -89,9 +88,9 @@ elseif ($showImportInterface):
                                 </th>
                             </tr>
                         </thead>
-                        <tbody><?php
-                    foreach ($row['CanvasMember'] as $user) {
-                        ?>
+                        <?php if (isset($row['CanvasMember'])): ?>
+                        <tbody>
+                            <?php foreach ($row['CanvasMember'] as $user) { ?>
                             <tr>
                                 <td <?php if(isset($user['justAdded']) && $user['justAdded']){ echo ' class="highlight-green"'; } ?>>
                                     <?php if ($user['isIniPeer']) : ?>
@@ -105,10 +104,9 @@ elseif ($showImportInterface):
                                     <?php endif; ?>
                                 </td>
                             </tr>
-                        <?php
-                    }
-                    ?>
+                            <?php } ?>
                         </tbody>
+                        <?php endif; ?>
                     </table>
                     <?php endif; ?>
                 </td>
@@ -135,11 +133,11 @@ elseif ($showImportInterface):
             </tr>
             <tr class="submit-buttons">
                 <td>
-                    <?php echo $this->Form->button(__("-&gt; Export selected groups to Canvas", true), array("onclick" => "jQuery('#GroupSyncType').val('export'); jQuery('#syncCanvasForm').submit();")); ?>
+                    <?php echo $this->Form->button(__("Export selected groups to Canvas <span class='syncIcon'>&rarr;</span>", true), array("onclick" => "jQuery('#GroupSyncType').val('export'); jQuery('#syncCanvasForm').submit();")); ?>
                 </td>
                 <td>&nbsp;</td>
                 <td>
-                    <?php echo $this->Form->button(__("&lt;- Import selected groups from Canvas", true), array("onclick" => "jQuery('#GroupSyncType').val('import'); jQuery('#syncCanvasForm').submit();")); ?>
+                    <?php echo $this->Form->button(__("<span class='syncIcon' style='float:left;'>&larr;</span> Import selected groups from Canvas", true), array("onclick" => "jQuery('#GroupSyncType').val('import'); jQuery('#syncCanvasForm').submit();")); ?>
                 </td>
             </tr>
         </tfoot>
@@ -149,62 +147,9 @@ elseif ($showImportInterface):
 
     <br>
 
-    <style type="text/css">
-        #syncCanvasTable {
-            width: 100%;
-        }
-
-        #syncCanvasTable > thead tr th:first-child,
-        #syncCanvasTable > thead tr th:last-child {
-            width: 48%;
-        }
-
-        #syncCanvasTable > thead th a {
-            font-size: 0.8em;
-        }
-        
-        #syncCanvasTable > * > tr td {
-            vertical-align: top;
-        }
-        
-        #syncCanvasTable > tbody tr td .disabled {
-            color: #999;
-        }
-
-        #syncCanvasTable > tbody tr td.syncIcon {
-            text-align: center;
-            font-size: 2em;
-            line-height: 1.2em;
-        }
-        
-        #syncCanvasTable input[type="checkbox"] {
-            float: left;
-            margin: 0 -1em 0 1em;
-        }
-        
-        #syncCanvasTable tfoot input[type="checkbox"] {
-            margin: 9px 8px 0 1em;
-        }
-        
-        #syncCanvasTable tfoot .checkbox {
-            margin: 1em auto;
-            float: none;
-            max-width: 18.5em;
-        }
-        #syncCanvasTable tfoot .checkbox label {
-            clear: none;
-            width: 15em;
-            text-align: left;
-        }
-        
-        #syncCanvasTable .submit-buttons td {
-            text-align: center;
-            padding-top: 1em;
-        }
-
-    </style>
-
     <script type="text/javascript">
+    jQuery(document).ready(function(){
+        jQuery('#syncCanvasForm input[type="checkbox"]').prop('checked',false);
         jQuery('#syncCanvasTable table th input[type="checkbox"]').change(function(){
             if (jQuery(this).is(':checked')) {
                 jQuery(this).parents('table.standardtable').find('tr td span:not(.disabled)').addClass('check-before');
@@ -213,6 +158,19 @@ elseif ($showImportInterface):
                 jQuery(this).parents('table.standardtable').find('tr td span:not(.disabled)').removeClass('check-before');
             }
         });
+        jQuery('#syncCanvasForm #selectAllCanvas').click(function(){
+            jQuery('table.canvasGroup input[type="checkbox"]').prop('checked', true);
+        });
+        jQuery('#syncCanvasForm #selectNoneCanvas').click(function(){
+            jQuery('table.canvasGroup input[type="checkbox"]').prop('checked', false);
+        });
+        jQuery('#syncCanvasForm #selectAlliPeer').click(function(){
+            jQuery('table.iPeerGroup input[type="checkbox"]').prop('checked', true);
+        });
+        jQuery('#syncCanvasForm #selectNoneiPeer').click(function(){
+            jQuery('table.iPeerGroup input[type="checkbox"]').prop('checked', false);
+        });
+    });
     </script>
     
 <?php  

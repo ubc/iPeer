@@ -371,14 +371,51 @@ a#home, a#home:hover, a#home:active {
 }
 
 /* authMessage is only used for cake generated login errors. */
-#flashMessage, #authMessage, .error-message {
+#flashMessage, 
+#authMessage, 
+.error-message {
     color: #990044;
-    border: 2px solid #990044;
+    border: 1px solid #ca4343;
+    background: #fff0f0;
+    box-shadow: 0 0 25px rgba(144, 73, 73, 0.28);
+    border-radius: 5px;
 }
 
-#flashMessage.success, #authMessage.success, .success-message {
+#flashMessage > *,
+#authMessage > *,
+.error-message > *,
+.success-message > *,
+.good-message > * {
+    text-align: left;
+}
+
+#flashMessage > ul,
+#authMessage > ul,
+.error-message > ul,
+.success-message > ul
+.good-message > ul {
+    list-style-type: disc;
+    padding-left: 2em;
+    padding-bottom: 1em;
+}
+
+#flashMessage > p,
+#authMessage > p,
+.error-message > p,
+.success-message > p,
+.good-message > p  {
+    padding-top: 0;
+}
+
+#flashMessage.success, 
+#authMessage.success, 
+.success-message,
+.good-message {
     color: #159900;
-    border: 2px solid #159900;
+    border: 1px solid #159900;
+    background: #f1fff0;
+    box-shadow: 0 0 25px rgba(73, 144, 74, 0.28);
+    border-radius: 5px;
 }
 
 .red {
@@ -1414,6 +1451,64 @@ i {
     text-align: center;
 }
 
+#syncCanvasTable {
+    width: 100%;
+}
+
+#syncCanvasTable > thead tr th:first-child,
+#syncCanvasTable > thead tr th:last-child {
+    width: 48%;
+}
+
+#syncCanvasTable > thead th a {
+    font-size: 0.8em;
+}
+
+#syncCanvasTable > * > tr td {
+    vertical-align: top;
+}
+
+#syncCanvasTable > tbody tr td .disabled {
+    color: #999;
+}
+
+#syncCanvasForm .syncIcon {
+    font-size: 2em;
+    line-height: 0.5em;
+    float: right;
+}
+
+#syncCanvasTable > tbody tr td.syncIcon {
+    text-align: center;
+    line-height: 1.2em;
+    float: none;
+}
+
+#syncCanvasTable input[type="checkbox"] {
+    float: left;
+    margin: 0 -1em 0 1em;
+}
+
+#syncCanvasTable tfoot input[type="checkbox"] {
+    margin: 9px 8px 0 1em;
+}
+
+#syncCanvasTable tfoot .checkbox {
+    margin: 1em auto;
+    float: none;
+    max-width: 18.5em;
+}
+#syncCanvasTable tfoot .checkbox label {
+    clear: none;
+    width: 15em;
+    text-align: left;
+}
+
+#syncCanvasTable .submit-buttons td {
+    text-align: center;
+    padding-top: 1em;
+}
+
 #syncCanvasTable .check-before:before {
     width: 14px;
     height: 14px;
@@ -1421,16 +1516,18 @@ i {
     float: left;
     margin: 0 -27px 0 13px;
     font-style: normal;
-    content: "✔";
+    content: ' \2714';
 }
 
 .highlight-green {
     background: #a0ffa0 !important;
     color: green !important;
+    border-bottom-color: #8bea8a !important;
 }
 th.highlight-green {
     background: #3ca13c !important;
     color: rgb(0, 66, 0) !important;
+    border-color: #1e7d1e;
 }
 
 /* MIXEVALS */
@@ -1828,7 +1925,7 @@ table.content-table {
 
 .add-button, .delete-button, .edit-button, .merge-button, .export-excel-button, .compare-button, .instruction-icon, .button, 
 input[type="submit"], button {
-    background-color: #eee;
+    background-color: #e6e6e6;
     padding: 5px 5px 5px 25px;
     background-position: 5px 6px;
     border: solid 1px #ccc;
@@ -1838,15 +1935,18 @@ input[type="submit"], button {
     background-repeat: no-repeat;
     box-shadow: 0 0 5px rgba(85, 85, 85, 0.28);
     cursor: pointer;
+    border-color: #adadad;
 }
 
 input[type="submit"], button {
     padding: 5px 10px;
-    background: #eee; /* For browsers that do not support gradients */
-    background: -webkit-linear-gradient(left top, #eee, #ccc); /* For Safari 5.1 to 6.0 */
-    background: -o-linear-gradient(bottom right, #eee, #ccc); /* For Opera 11.1 to 12.0 */
-    background: -moz-linear-gradient(bottom right, #eee, #ccc); /* For Firefox 3.6 to 15 */
-    background: linear-gradient(to bottom right, #eee, #ccc); /* Standard syntax */
+    background: #e7d3f1; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(left top, #e7d3f1, #c19bd4); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(bottom right, #e7d3f1, #c19bd4); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(bottom right, #e7d3f1, #c19bd4); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(to bottom right, #e7d3f1, #c19bd4); /* Standard syntax */
+    border-color: #632b7d;
+    color: #632b7d;
 }
 
 .add-button:hover,
@@ -1860,8 +1960,19 @@ input[type="submit"], button {
 input[type="submit"]:hover, 
 button:hover {
     background-color: #fbf9ea !important;
-    border-color: gold;
-    box-shadow: 0 0 5px rgb(222, 204, 124);
+    border-color: #f1cb00;
+    box-shadow: 0 0 5px #decc7c;
+    color: #5f5415 !important;
+}
+
+.button:hover,
+input[type="submit"]:hover, 
+button:hover {
+    background: #fbf9ea; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(left top, #fbf9ea, #f8e988); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(bottom right, #fbf9ea, #f8e988); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(bottom right, #fbf9ea, #f8e988); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(to bottom right, #fbf9ea, #f8e988); /* Standard syntax */
 }
 
 .add-button {
