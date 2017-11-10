@@ -141,7 +141,6 @@ input[type="text"], input[type="file"], input[type="password"], textarea, select
     height: 2em;
     font-weight: 600;
     display: block;
-    width: 8em;
 }
 
 /* Make buttons a bit easier to press */
@@ -453,6 +452,10 @@ h1.title {
     font-weight: 600;
     color: #9971ad;
     padding: 0;
+}
+
+#bannerLarge + h1.title {
+    margin-top: 2em;
 }
 
 h2 {
@@ -1273,22 +1276,20 @@ i {
 }
 
 .evaltoolsnav a {
-    color: white;
     font-weight: 600;
     font-size: 0.9em;
-    background-color: #0A2C64;
+    background-color: #eee;
     text-decoration: none;
-    padding: 0.5em;
+    padding: 0.5em 1em 0.3em;
+    border-bottom: solid 4px #eee;
 }
 
 .evaltoolsnav a:hover {
-    background-color: yellow;
-    color: #111;
+    border-color: gold;
 }
 
 .evaltoolsnav .current a {
-    background-color: gold;
-    color: #111;
+    border-color: gold;
 }
 
 .evaltool-section-header h2{
@@ -1460,8 +1461,21 @@ i {
     width: 48%;
 }
 
-#syncCanvasTable > thead th a {
+#syncCanvasTable > thead th a,
+#syncCanvasTable .standardtable td a {
     font-size: 0.8em;
+}
+
+#syncCanvasTable > thead th a.selectAll,
+#syncCanvasTable > thead th a.selectNone {
+    float: left;
+    margin-right: 1em;
+}
+
+#syncCanvasTable > thead th a.expandAll,
+#syncCanvasTable > thead th a.collapseAll {
+    float: right;
+    margin-left: 1em;
 }
 
 #syncCanvasTable > * > tr td {
@@ -1482,6 +1496,15 @@ i {
     text-align: center;
     line-height: 1.2em;
     float: none;
+}
+
+#syncCanvasTable .standardtable .showLessMembers,
+#syncCanvasTable .standardtable .showMoreMembers {
+    display: none !important;
+}
+#syncCanvasTable .standardtable tr.showMoreLessMembers td {
+    background: #ddd;
+    padding: 0.1em 0.1em 0.2em;
 }
 
 #syncCanvasTable input[type="checkbox"] {
@@ -1517,6 +1540,26 @@ i {
     margin: 0 -27px 0 13px;
     font-style: normal;
     content: ' \2714';
+}
+
+#syncCanvasTable .collapsed-after:after {
+    width: 14px;
+    height: 14px;
+    display: block;
+    float: right;
+    margin: 0 13px 0 -27px ;
+    font-style: normal;
+    content: ' \25B8';
+}
+
+#syncCanvasTable .expanded-after:after {
+    width: 14px;
+    height: 14px;
+    display: block;
+    float: right;
+    margin: 0 13px 0 -27px ;
+    font-style: normal;
+    content: ' \25BE';
 }
 
 .highlight-green {
@@ -1924,7 +1967,7 @@ table.content-table {
 }
 
 .add-button, .delete-button, .edit-button, .merge-button, .export-excel-button, .compare-button, .instruction-icon, .button, 
-input[type="submit"], button {
+input[type="submit"], input[type="button"], button {
     background-color: #e6e6e6;
     padding: 5px 5px 5px 25px;
     background-position: 5px 6px;
@@ -1938,7 +1981,18 @@ input[type="submit"], button {
     border-color: #adadad;
 }
 
-input[type="submit"], button {
+input[type="submit"], input[type="button"], button {
+    padding: 5px 10px;
+    background: #e7e7e7; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(left top, #e7e7e7, #c1c1c1); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(bottom right, #e7e7e7, #c1c1c1); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(bottom right, #e7e7e7, #c1c1c1); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(to bottom right, #e7e7e7, #c1c1c1); /* Standard syntax */
+    border-color: #636363;
+    color: #636363;
+}
+
+input[type="submit"], button.submit {
     padding: 5px 10px;
     background: #e7d3f1; /* For browsers that do not support gradients */
     background: -webkit-linear-gradient(left top, #e7d3f1, #c19bd4); /* For Safari 5.1 to 6.0 */
@@ -1947,6 +2001,7 @@ input[type="submit"], button {
     background: linear-gradient(to bottom right, #e7d3f1, #c19bd4); /* Standard syntax */
     border-color: #632b7d;
     color: #632b7d;
+    font-weight: normal;
 }
 
 .add-button:hover,
@@ -1957,7 +2012,8 @@ input[type="submit"], button {
 .compare-button:hover,
 .instruction-icon:hover,
 .button:hover,
-input[type="submit"]:hover, 
+input[type="submit"]:hover,
+input[type="button"]:hover,
 button:hover {
     background-color: #fbf9ea !important;
     border-color: #f1cb00;
@@ -1966,7 +2022,8 @@ button:hover {
 }
 
 .button:hover,
-input[type="submit"]:hover, 
+input[type="submit"]:hover,
+input[type="button"]:hover,
 button:hover {
     background: #fbf9ea; /* For browsers that do not support gradients */
     background: -webkit-linear-gradient(left top, #fbf9ea, #f8e988); /* For Safari 5.1 to 6.0 */
