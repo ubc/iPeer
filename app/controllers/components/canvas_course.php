@@ -109,13 +109,10 @@ class CanvasCourseComponent extends Object
      * @access public
      * @return array Array of CanvasCourseGroupComponent
      */
-    public function getGroups($_controller, $user_id, $force_auth=false, $per_page=100)
+    public function getGroups($_controller, $user_id, $force_auth=false)
     {
         $api = new CanvasApiComponent($user_id);
         $uri = '/courses/' . $this->id . '/groups';
-        $params = array(
-            'per_page' => $per_page
-        );
         
         $courseGroups_array = $api->getCanvasData($_controller, Router::url(null, true), $force_auth, $uri);
 
@@ -138,11 +135,12 @@ class CanvasCourseComponent extends Object
      * @param object $_controller 
      * @param integer $user_id
      * @param boolean $force_auth
+     * @param mixed $names_only set to false to return the full group category objects, rather than just the names
      *
      * @access public
      * @return array Array of stdClass Objects (each representing one group category)
      */
-    public function getGroupCategories($_controller, $user_id, $force_auth=false, $ret_type='keypair')
+    public function getGroupCategories($_controller, $user_id, $force_auth=false, $names_only=true)
     {
         $api = new CanvasApiComponent($user_id);
         $uri = '/courses/' . $this->id . '/group_categories';
@@ -153,7 +151,7 @@ class CanvasCourseComponent extends Object
 
         if (!empty($courseGroupCategories_array)) {
             foreach ($courseGroupCategories_array as $cat) {
-                $courseGroupCategories[$cat->id] = ($ret_type=='keypair') ? $cat->name : $cat;
+                $courseGroupCategories[$cat->id] = ($names_only) ? $cat->name : $cat;
             }
         }
 
@@ -168,6 +166,8 @@ class CanvasCourseComponent extends Object
      * @param boolean $force_auth
      * @param string $group_name
      * @param integer $group_category_id
+     * 
+     * @access public
      * @return object of type CanvasCourseGroupComponent
      */
     public function createGroup($_controller, $user_id, $force_auth=false, $group_name='', $group_category_id=null)
@@ -189,6 +189,48 @@ class CanvasCourseComponent extends Object
 
         return new CanvasCourseGroupComponent($courseGroup_obj);
     }
+
+    /**
+     * Creates a new group in this course
+     *
+     * @param object $_controller
+     * @param integer $user_id
+     * @param boolean $force_auth
+     * @param string $group_category_name
+     * 
+     * @access public
+     * @return object of type CanvasCourseGroupComponent
+     */
+    public function createGroupCategory($_controller, $user_id, $force_auth=false, $group_category_name=null)
+    {
+        $api = new CanvasApiComponent($user_id);
+        $uri = '/courses/' . $this->id . '/group_categories';
+
+        // if no groupset name is passed in, create a sequential groupset name e.g. "Groupset 4"
+        if (!$group_category_name) {
+            $groupCategories = $this->getGroupCategories($_controller, $user_id, $force_auth);
+            $groupCategoryNum = count($groupCategories) + 1;
+            while (in_array("Groupset " . $groupCategoryNum, $groupCategories)) {
+                $groupCategoryNum++;
+            }
+            $group_category_name = "Groupset " . $groupCategoryNum;
+        }
+        
+        $params = array(
+            'name' => $group_category_name
+        );
+
+        $courseGroupCategory_obj = $api->postCanvasData($_controller, Router::url(null, true), $force_auth, $uri, $params);
+
+        $courseGroupCategory = array();
+        foreach ($courseGroupCategory_obj as $key => $val) {
+            if ($key == 'id' || $key == 'name') {
+                $courseGroupCategory[$key] = $val;
+            } 
+        }
+
+        return $courseGroupCategory;
+    }
     
     /**
      * Deletes a group in this course
@@ -197,6 +239,8 @@ class CanvasCourseComponent extends Object
      * @param integer $user_id
      * @param boolean $force_auth
      * @param string $group_id
+     * 
+     * @access public
      * @return object returned object
      */
     public function deleteGroup($_controller, $user_id, $force_auth, $group_id)

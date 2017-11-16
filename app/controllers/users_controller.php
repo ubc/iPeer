@@ -1220,7 +1220,7 @@ class UsersController extends AppController
             $result = $this->User->addUserByArray($users, true, $this);
 
             if (isset($result['errors'])) {
-                $error_message = '<ul>';
+                $error_message = '';
                 foreach ($result['errors'] as $error){
                     if (is_array($error)) {
                         foreach ($error as $error_detail) {
@@ -1232,8 +1232,15 @@ class UsersController extends AppController
                     }
                 }
 
-                $this->Session->setFlash("Error: Unable to import users " . $error_message . "</ul>");
+                $supportEmail = $this->SysParameter->get('display.contact_info');
+                $this->Session->setFlash("Error: Unable to import users <ul>" . $error_message . "</ul>" .
+                                         "<p>If you continue having issues with the import, please " .
+                                         "<a href='mailto:" . $supportEmail . "?subject=Problem using "
+                                         "iPeer user import feature'>contact support</a>.");
                 return;
+            }
+            else {
+                $this->Session->setFlash("Import successful! See below for import details.", 'good');
             }
 
             $insertedIds = array();

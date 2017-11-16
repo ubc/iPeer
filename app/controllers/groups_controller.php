@@ -487,14 +487,6 @@ class GroupsController extends AppController
 
             $groupsAndUsers = array_merge_recursive($groupsAndUsers, $canvasGroupsAndUsers);
 
-            $canvasGroupCategories = $canvasCoursesRaw[$canvasCourseId]->getGroupCategories(
-                $this,
-                User::get('id')
-            );
-
-            $this->set('canvasGroupCategories', $canvasGroupCategories);
-
-            // process import of requested groups from canvas
             if (isset($this->data['Group']['syncType'])) {
 
                 if ($this->data['Group']['syncType'] == 'import') {
@@ -515,6 +507,14 @@ class GroupsController extends AppController
                     );
                 }
             }
+            
+            $canvasGroupCategories = $canvasCoursesRaw[$canvasCourseId]->getGroupCategories(
+                $this,
+                User::get('id')
+            );
+            $canvasGroupCategories[''] = '(Create new groupset)';
+
+            $this->set('canvasGroupCategories', $canvasGroupCategories);
 
             $this->set('numMembersToShow', 5); // determines how many members are displayed at minimum per group
             $this->set('groupsAndUsers', $groupsAndUsers);
@@ -936,12 +936,28 @@ class GroupsController extends AppController
                         unset($groupsAndUsers[$groupName]['CanvasMember']);
                     }
 
+                    // create groupset in canvas if necessary
+                    if (!isset($this->data['Group']['canvasGroupCategories']) || empty($this->data['Group']['canvasGroupCategories'])) {
+                        $canvasGroupCategory = $canvasCoursesRaw[$canvasCourseId]->createGroupCategory($this, $userId, false);
+                        if ($canvasGroupCategory) {
+                            $this->data['Group']['canvasGroupCategories'] = $canvasGroupCategory['id'];
+                        }
+                        else {
+                            $errorMsgs .= '<li>Error creating new group set for group ' . $groupName . '</li>';
+                            continue;                                            
+                        }
+                    }
+
                     // create group in canvas if necessary
                     if (!isset($groupsAndUsers[$groupName]['CanvasGroup'])) {
                         $canvasGroup = $canvasCoursesRaw[$canvasCourseId]->createGroup($this, $userId, false, $groupName, $this->data['Group']['canvasGroupCategories']);
                         if ($canvasGroup) {
                             $someSuccess = true;
                             $groupsAndUsers[$groupName]['CanvasGroup'] = array('group_name'=>$groupName, 'id'=>$canvasGroup->id, 'justAdded'=>true);
+                        }
+                        else {
+                            $errorMsgs .= '<li>Error creating group ' . $groupName . '</li>';
+                            continue;                                            
                         }
                     }
                     else {

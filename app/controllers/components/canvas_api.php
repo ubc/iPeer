@@ -427,10 +427,16 @@ class CanvasApiComponent extends Object
 
                 $callCount += 1;
                 // only merge result if there is no error
-                if (is_array($response->body) && !isset($response->body->errors)) {
-                    $result = array_merge($result, $response->body);
-                } else {
+                if (is_object($response->body) && isset($response->body->errors)) {
+                    $_controller->Session->setFlash('There was an error sending / receiving Canvas data:' . 
+                                                    $this->_getErrorsAsString($response->body->errors));
                     break;
+                }
+                elseif (is_array($response->body)) {
+                    $result = array_merge($result, $response->body);
+                }
+                else {
+                    $result = $response->body;
                 }
                 $nextPageUrl = $this->_hasMore($response);
             } while (
@@ -456,6 +462,39 @@ class CanvasApiComponent extends Object
         } catch (Exception $e) {
             error_log($e->getMessage());
             return false;
+        }
+    }
+
+    /**
+     * Turns the Canvas API error object into a string for display
+     *
+     * @param object $errors
+     * @param string $separator if not set or null, it will return an unordered list
+     * @param integer $num if set, it will limit the errors to a certain number
+     * 
+     * @access private
+     * @return string
+     */
+    private function _getErrorsAsString($errors, $separator=null, $num=null) {
+        $ret = array();
+        if (is_object($errors)) {
+            foreach ($errors as $param => $errs) {
+                foreach ($errs as $err) {
+                    $ret[] = $err->message;
+                }
+            }
+        }
+
+        if ($num !== null) {
+            $num += 0;
+            array_splice($ret, 0, $num);
+        }
+
+        if ($separator === null) {
+            return '<ul><li>' . implode('</li><li>', $ret) . '</li></ul>';
+        }
+        else {
+            return implode($separator, $ret);
         }
     }
 
