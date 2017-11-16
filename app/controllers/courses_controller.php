@@ -298,7 +298,9 @@ class CoursesController extends AppController
            $this->data['Course']['course'] = $selectedCanvasCourse->course_code;
            $this->data['Course']['title'] = $selectedCanvasCourse->name;
            
-           $canvasusers = $selectedCanvasCourse->getUsers($this, User::get('id'));
+           $canvasusers = $selectedCanvasCourse->getUsers(
+               $this, User::get('id'),
+               array(CanvasCourseUserComponent::ENROLLEMNT_QUERY_TA, CanvasCourseUserComponent::ENROLLMENT_QUERY_TEACHER));
            $iInstructors = $this->_getCorrespondingUser($canvasusers, CanvasCourseUserComponent::ENROLLMENT_TYPE_TEACHER);
            $iTAs = $this->_getCorrespondingUser($canvasusers, CanvasCourseUserComponent::ENROLLMENT_TYPE_TA);
            $this->data['Instructor'] = $iInstructors;

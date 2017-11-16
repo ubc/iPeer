@@ -50,7 +50,7 @@ class UserOauth extends AppModel
         $newOauth['UserOauth']['user_id'] = $userId;
         $newOauth['UserOauth']['provider'] = $provider;
 
-        if ($saveData['expires']){
+        if (isset($saveData['expires'])) {
             $expiryDateTime = new DateTime('+'.$saveData['expires'].' seconds');
             $newOauth['UserOauth']['expires'] = $expiryDateTime->format("Y-m-d H:i:s");
         }

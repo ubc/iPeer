@@ -16,6 +16,9 @@ App::import('Vendor', 'Httpful', array('file' => 'nategood'.DS.'httpful'.DS.'boo
 class CanvasApiComponent extends Object
 {
     const API_CALL_TIMEOUT = 10;   // RESTful call timeout in seconds
+    const API_PAGINATION_DEFAULT_PER_PAGE = 50;  // default items to retrieve per each call to Canvas API
+    const API_PAGINATION_MAX_ITEM = 10000;  // max how many items to retrieve when auto-looping pagination
+    const API_PAGINATION_MAX_NUM_CALL = 50;   // limit the number of Canvas API call when auto-looping pagination
     
     protected $SysParameter;
     protected $userId;
@@ -155,18 +158,20 @@ class CanvasApiComponent extends Object
      * @param string    $additionalHeader
      * @param boolean   $refreshTokenAndRetry if set to true (default), uses the refresh token to retry if the access token is expired
      * @param string    $method 'get' (default) or 'post' to do a post request instead
+     * @param boolean   $retrieveAll Canvas API uses pagination to limit items returned per call.  Set to true (default) to retrieve all (max up to the constant API_PAGINATION_MAX_ITEM)
+     * @param integer   $perPage Limit how many items to retrieve on each Canvas API call. Default to API_PAGINATION_DEFAULT_PER_PAGE
      * 
      * @access public
      * @return mixed return requested data, otherwise void
      */
-    public function getCanvasData($_controller, $redirect_uri, $force_auth, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=true, $method='get')
+    public function getCanvasData($_controller, $redirect_uri, $force_auth, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=true, $method='get', $retrieveAll=true, $perPage=CanvasApiComponent::API_PAGINATION_DEFAULT_PER_PAGE)
     {   
         // first check to see if we have a valid access token
         $accessToken = $this->getAccessToken();
 
         // if auth token exists, attempt to call api
         if ($accessToken) {
-            $data = $this->_getPostCanvasData($_controller, $redirect_uri, $accessToken, $uri, $params, $additionalHeader, $refreshTokenAndRetry, $method);
+            $data = $this->_getPostCanvasData($_controller, $redirect_uri, $accessToken, $uri, $params, $additionalHeader, $refreshTokenAndRetry, $method, $retrieveAll, $perPage);
             if ($data === false) {
                 $_controller->Session->setFlash('There was an error retrieving data from Canvas. Please try again.');
             }
@@ -355,7 +360,7 @@ class CanvasApiComponent extends Object
      * @access private
      * @return mixed either the response body from the api, or false if not successful
      */
-    private function _getPostCanvasData($_controller, $redirect_uri, $accessToken, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=true, $method='get')
+    private function _getPostCanvasData($_controller, $redirect_uri, $accessToken, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=true, $method='get', $retrieveAll=true, $perPage=CanvasApiComponent::API_PAGINATION_DEFAULT_PER_PAGE)
     {
         if ($method != 'get' && $method != 'post' && $method != 'delete') {
             return false;
@@ -377,19 +382,53 @@ class CanvasApiComponent extends Object
                 }
             }
 
-            $response = \Httpful\Request::$method($this->getApiUrl() . $uri .
-                ($params? '?' . $params_expanded : ''))
-                    ->expectsJson()
-                    ->addHeaders(array('Authorization' => 'Bearer ' . $accessToken))
-                    ->addHeaders($additionalHeader? $additionalHeader : array())
-                    ->timeoutIn(CanvasApiComponent::API_CALL_TIMEOUT)
-                    ->send();
+            if ($method == 'get' && !isset($params['per_page'])) {
+                $params_expanded = $params_expanded . '&'. http_build_query(array('per_page' => $perPage));
+            }
+
+            $result = array();
+            $nextPageUrl = false;
+            $callCount = 0;
+            do {
+                if ($method == 'get' && $nextPageUrl) {
+                    $response = \Httpful\Request::get($nextPageUrl)
+                        // no need to append parameters here.
+                        // the Canvas pagination url is absolute and contains all necessary params
+                        ->expectsJson()
+                        ->addHeaders(array('Authorization' => 'Bearer ' . $accessToken))
+                        ->addHeaders($additionalHeader? $additionalHeader : array())
+                        ->timeoutIn(CanvasApiComponent::API_CALL_TIMEOUT)
+                        ->send();
+                } else {
+                    $response = \Httpful\Request::$method($this->getApiUrl() . $uri .
+                        ($params? '?' . $params_expanded : ''))
+                            ->expectsJson()
+                            ->addHeaders(array('Authorization' => 'Bearer ' . $accessToken))
+                            ->addHeaders($additionalHeader? $additionalHeader : array())
+                            ->timeoutIn(CanvasApiComponent::API_CALL_TIMEOUT)
+                            ->send();
+                }
+
+                $callCount += 1;
+                // only merge result if there is no error
+                if (is_array($response->body) && !isset($response->body->errors)) {
+                    $result = array_merge($result, $response->body);
+                } else {
+                    break;
+                }
+                $nextPageUrl = $this->_hasMore($response);
+            } while (
+                $method == 'get' &&     // only do pagniation loop for GET
+                $retrieveAll &&
+                $callCount < CanvasApiComponent::API_PAGINATION_MAX_NUM_CALL &&
+                $nextPageUrl !== false &&
+                sizeof($result) < CanvasApiComponent::API_PAGINATION_MAX_ITEM);
 
             if (isset($response->body->errors) && $refreshTokenAndRetry) {
                 // most likely, the access token is no longer valid (expired), so use refresh token to get it
                 $apiToken = $this->getApiTokenUsingRefreshToken();
                 if (isset($apiToken['accessToken'])) {
-                    return $this->_getPostCanvasData($_controller, $redirect_uri, $apiToken['accessToken'], $uri, $params, $additionalHeader, false, $method);
+                    return $this->_getPostCanvasData($_controller, $redirect_uri, $apiToken['accessToken'], $uri, $params, $additionalHeader, false, $method, $retrieveAll, $perPage);
                 }
                 // if not able to get new access token, we need to re-authenticate with canvas
                 else {
@@ -397,10 +436,41 @@ class CanvasApiComponent extends Object
                     $this->_getNewOauth($_controller, $redirect_uri);
                 }
             }
-            return $response->body;
+            return $result;
         } catch (Exception $e) {
             error_log($e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * checks if there are more items to retrieve from Canvas API pagination
+     *
+     * @param Httpful\Response    $response the response from Canvas API
+     *
+     * @access private
+     * @return mixed false if no more items to retrieve.  Otherwise, the URL to retrieve the next page
+     */
+    private function _hasMore($response) {
+        if (!$response->headers->offsetExists('link')) {
+            return false;
+        }
+        $links = explode(',', trim($response->headers->offsetGet('link')));
+        foreach ($links as $link) {
+            $elements = explode(';', $link);
+            $url = trim($elements[0], '<> ');
+            $relArray = array();
+            foreach ($elements as $elm) {
+                if (strncmp(trim($elm), 'rel=', 4) == 0) {
+                    $relArray = explode(' ', trim(substr(trim($elm), 4), '"\''));
+                    break;
+                }
+            }
+
+            if (in_array('next', $relArray)) {
+                return $url;
+            }
+        }
+        return false;
     }
 }
