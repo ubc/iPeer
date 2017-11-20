@@ -1,3 +1,13 @@
+var updateFormType = function() {
+    console.log(jQuery('input[name="data[Group][formType]"]').val());
+    if (jQuery('input[name="data[Group][formType]"]:checked').val()=="simplified") {
+        jQuery('#syncCanvasTable').addClass('simplified');
+    }
+    else {
+        jQuery('#syncCanvasTable').removeClass('simplified');
+    }
+}
+
 jQuery(document).ready(function(){
     
     jQuery('#syncCanvasForm input[type="checkbox"]').prop('checked',false);
@@ -5,6 +15,7 @@ jQuery(document).ready(function(){
     var numMembersToShow = jQuery('#syncCanvasTable').data('nummembers');
 
     // Select All / Select None
+
     jQuery('#syncCanvasForm #canvasHeading .selectAll').click(function(){
         jQuery('table.canvasGroup input[type="checkbox"]:not(:checked)').click();
         return false;
@@ -23,6 +34,7 @@ jQuery(document).ready(function(){
     });
     
     // Expand / Collapse All
+
     jQuery('#syncCanvasForm #iPeerHeading .expandAll').click(function(){
         jQuery('table.iPeerGroup tbody tr').slideDown();
         jQuery('table.iPeerGroup tbody').slideDown();
@@ -57,6 +69,7 @@ jQuery(document).ready(function(){
     });
     
     // Click group name (table header) to show / hide members (tbody)
+
     jQuery('.standardtable th').click(function(e){
         if(e.target == this){
             jQuery(this).closest('table').find('tbody').toggle();
@@ -71,6 +84,7 @@ jQuery(document).ready(function(){
     });
 
     // When (un)checking a group, (un)check all its eligible members
+
     jQuery('#syncCanvasTable table th input[type="checkbox"]').change(function(){
         console.log('tttt');
         if (jQuery(this).is(':checked')) {
@@ -82,6 +96,7 @@ jQuery(document).ready(function(){
     });
 
     // Show all / more / less / min members
+
     jQuery('#syncCanvasTable .standardtable').each(function(){
         if (jQuery(this).find('tbody tr:not(".showMoreLessMembers")').length > numMembersToShow) {
             jQuery(this).find('tbody tr:not(".showMoreLessMembers"):gt(' + (numMembersToShow - 1) + ')').hide();
@@ -134,5 +149,10 @@ jQuery(document).ready(function(){
         jQuery(this).hide();
         return false;
     });
+
+    jQuery('#syncCanvasForm .collapseAll.collapseOnLoad').click();
+
+    jQuery('input[name="data[Group][formType]"]').change(updateFormType);
+    updateFormType();    
 
 });

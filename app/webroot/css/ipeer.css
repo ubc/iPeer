@@ -1452,8 +1452,26 @@ i {
     text-align: center;
 }
 
+#syncCanvasWrapper #syncFormType {
+    margin: 0 auto;
+    float: none;
+    width: 14em;
+}
+
 #syncCanvasTable {
     width: 100%;
+}
+
+#syncCanvasTable.simplified > thead a,
+#syncCanvasTable.simplified > tbody table > thead input[type="checkbox"],
+/*
+#syncCanvasTable.simplified > tbody table > thead .expanded-after:after,
+#syncCanvasTable.simplified > tbody table > tbody,
+*/
+#syncCanvasTable.simplified table > tbody input[type="checkbox"],
+#syncCanvasTable.simplified > tfoot > tr:not(.sync-button-row),
+#syncCanvasTable:not(.simplified) > tfoot > tr.sync-button-row {
+    display: none !important;
 }
 
 #syncCanvasTable > thead tr th:first-child,
@@ -1480,10 +1498,24 @@ i {
 
 #syncCanvasTable > * > tr td {
     vertical-align: top;
+    text-align: center;
 }
 
 #syncCanvasTable > tbody tr td .disabled {
     color: #999;
+}
+
+#syncCanvasTable .non-existent-group {
+    border: dashed 2px #ccc;
+    min-height: 20px;
+    margin-top: 8px;
+    border-radius: 5px;
+    color: #999;
+    margin: 0.55em 0 0.7em;
+    text-align: center;
+    padding-top: 5px;
+    font-size: 0.8em;
+    background: #f6f6f6;
 }
 
 #syncCanvasForm .syncIcon {
@@ -1527,8 +1559,8 @@ i {
     text-align: left;
 }
 
-#syncCanvasTable .submit-buttons td {
-    text-align: center;
+#syncCanvasTable .submit-buttons-row td,
+#syncCanvasTable .sync-button-row td {
     padding-top: 1em;
 }
 
@@ -1981,7 +2013,7 @@ input[type="submit"], input[type="button"], button {
     border-color: #adadad;
 }
 
-input[type="submit"], input[type="button"], button {
+input[type="submit"], input[type="button"], button, .button {
     padding: 5px 10px;
     background: #e7e7e7; /* For browsers that do not support gradients */
     background: -webkit-linear-gradient(left top, #e7e7e7, #c1c1c1); /* For Safari 5.1 to 6.0 */

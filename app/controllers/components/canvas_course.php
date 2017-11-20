@@ -109,10 +109,15 @@ class CanvasCourseComponent extends Object
      * @access public
      * @return array Array of CanvasCourseGroupComponent
      */
-    public function getGroups($_controller, $user_id, $force_auth=false)
+    public function getGroups($_controller, $user_id, $force_auth=false, $group_category_id=null)
     {
         $api = new CanvasApiComponent($user_id);
-        $uri = '/courses/' . $this->id . '/groups';
+        if (empty($group_category_id)) {
+            $uri = '/courses/' . $this->id . '/groups';
+        }
+        else {
+            $uri = '/group_categories/' . $group_category_id . '/groups';
+        }
         
         $courseGroups_array = $api->getCanvasData($_controller, Router::url(null, true), $force_auth, $uri);
 
@@ -199,7 +204,7 @@ class CanvasCourseComponent extends Object
      * @param string $group_category_name
      * 
      * @access public
-     * @return object of type CanvasCourseGroupComponent
+     * @return array containing the id and name of this group category
      */
     public function createGroupCategory($_controller, $user_id, $force_auth=false, $group_category_name=null)
     {

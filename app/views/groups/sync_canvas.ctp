@@ -3,35 +3,60 @@
 if (empty($courseId) || empty($canvasCourseId)) : 
     
     echo $this->Form->create(null, array("id" => "syncCanvasForm", "url" => $formUrl ));
-    echo $this->Form->input("canvasCourse", array("label"=>"From Canvas Course", "multiple" => false));
-    echo $this->Form->input("Course", array("label"=>"Into iPeer Course", "multiple"=>false, "default" => $courseId));
+    echo $this->Form->input("Course", array("label"=>"iPeer Course", "multiple"=>false, "default" => $courseId, "onchange" => "jQuery('#syncCanvasForm').submit(); jQuery('#syncCanvasForm select').attr('disabled','disabled');"));
+    echo $this->Form->input("canvasCourse", array("label"=>"Canvas Course", "multiple" => false, "onchange" => "jQuery('#syncCanvasForm').submit(); jQuery('#syncCanvasForm select').attr('disabled','disabled');"));
     ?><label class="defLabel"></label><?php
     echo $this->Form->submit(__("Next", true));
     echo $this->Form->end();
 
+elseif (is_null($canvasGroupCategoryId)) : 
+    
+    echo $this->Form->create(null, array("id" => "syncCanvasForm", "url" => $formUrl ));
+    echo $this->Form->input("Course", array("label"=>"iPeer Course", "multiple"=>false, "default" => $courseId, "onchange" => "jQuery('#GroupCanvasGroupCategory').attr('disabled','disabled'); jQuery('#syncCanvasForm').submit(); jQuery('#syncCanvasForm select').attr('disabled','disabled');"));
+    echo $this->Form->input("canvasCourse", array("label"=>"Canvas Course", "multiple" => false, "onchange" => "jQuery('#GroupCanvasGroupCategory').attr('disabled','disabled'); jQuery('#syncCanvasForm').submit(); jQuery('#syncCanvasForm select').attr('disabled','disabled');"));
+    echo $this->Form->input("canvasGroupCategory", array("label"=>"Canvas Group set", "multiple" => false));
+    ?><label class="defLabel"></label><?php
+    echo $this->Form->submit(__("Next", true));
+    echo $this->Form->end();
+    
 else: 
 
     echo $this->Form->create(null, array("id" => "syncCanvasForm", "url" => $formUrl));
 
     $javascript->link(Router::url('/js/synccanvas.js', true), false);
 
+    echo $this->Form->input('formType', array(
+        'legend' => false,
+        'div' => array('id' => 'syncFormType'),
+        'options' => array(
+            'simplified' => 'Simplified', 
+            'advanced'   => 'Advanced'
+        ),
+        'disabled' => (!$enableSimplifiedSync ? 'disabled' : false),
+        'value' => (!$enableSimplifiedSync ? 'advanced' : 'simplified'),
+        'type' => 'radio'
+    ));
+
     ?>
-    <table id="syncCanvasTable" data-nummembers="<?php echo $numMembersToShow; ?>">
+
+    <table id="syncCanvasTable" class="simplified" data-nummembers="<?php echo $numMembersToShow; ?>">
         <thead>
             <tr>
                 <th id="iPeerHeading">
                     <h3>iPeer</h3>
                     <a class="selectAll" href="#">select all</a>
                     <a class="selectNone" href="#">select none</a>
-                    <a class="collapseAll" href="#">collapse all</a>
+                    <a class="collapseAll <?php echo $importSuccess ? "" : "collapseOnLoad"; ?>" href="#">collapse all</a>
                     <a class="expandAll" href="#">expand all</a>
                 </th>
                 <th>&nbsp;</th>
                 <th id="canvasHeading">
-                    <h3>Canvas (<?php echo $canvasCourseName; ?>)</h3>
+                    <h3>Canvas Course: <?php echo $canvasCourseName; ?></h3>
+                    <h4>Group set: <?php echo $canvasGroupCategoryName; ?></h4>
+                    <br>
                     <a class="selectAll" href="#">select all</a>
                     <a class="selectNone" href="#">select none</a>
-                    <a class="collapseAll" href="#">collapse all</a>
+                    <a class="collapseAll <?php echo $exportSuccess ? "" : "collapseOnLoad"; ?>" href="#">collapse all</a>
                     <a class="expandAll" href="#">expand all</a>
                 </th>
             </tr>
@@ -48,6 +73,7 @@ else:
                             <tr>
                                 <th class="expanded-after <?php if(isset($row['Group']['justAdded']) && $row['Group']['justAdded']){ echo ' highlight-green'; } ?>">
                                     <?php echo $this->Form->checkbox('iPeerGroup.' . $row['Group']['group_name'], array('hiddenField' => false)); ?>
+                                    <?php echo $this->Form->hidden('iPeerGroupAll.' . $row['Group']['group_name'], array('value' => 1)); ?>
                                     <?php echo $row['Group']['group_name']; ?>
                                 </th>
                             </tr>
@@ -90,6 +116,8 @@ else:
                             <?php endif; ?>
                         </tbody>
                     </table>
+                    <?php else: ?>
+                        <div class="non-existent-group">This group does not currently exist in iPeer</div>
                     <?php endif; ?>
                 </td>
                 <td class="syncIcon">
@@ -108,6 +136,7 @@ else:
                             <tr>
                                 <th class="expanded-after <?php if(isset($row['CanvasGroup']['justAdded']) && $row['CanvasGroup']['justAdded']){ echo ' highlight-green'; } ?>">
                                     <?php echo $this->Form->checkbox('canvasGroup.' . $row['CanvasGroup']['group_name'], array('hiddenField' => false)); ?>
+                                    <?php echo $this->Form->hidden('canvasGroupAll.' . $row['CanvasGroup']['group_name'], array('value' => 1)); ?>
                                     <?php echo $row['CanvasGroup']['group_name']; ?>
                                 </th>
                             </tr>
@@ -150,6 +179,8 @@ else:
                         <?php endif; ?>
                         </tbody>
                     </table>
+                    <?php else: ?>
+                        <div class="non-existent-group">This group does not currently exist in Canvas</div>
                     <?php endif; ?>
                 </td>
             </tr>
@@ -163,8 +194,6 @@ else:
                     <span style="warning">* Students marked with an asterisk do not have a corresponding account in Canvas and therefore will not be exported into the group.</span>
                     <br>
                     <?php echo $this->Form->input('updateCanvasGroups', array('label'=>'Replace group, rather than merge.', 'type'=>'checkbox')); ?>
-                    <br>&nbsp;<br>
-                    <?php echo $this->Form->input("canvasGroupCategories", array("label"=>"Group set to export to", "multiple" => false)); ?>
                 </td>
                 <td>&nbsp;</td>
                 <td>
@@ -173,7 +202,7 @@ else:
                     <?php echo $this->Form->input('updateGroups', array('label'=>'Replace group, rather than merge.', 'type'=>'checkbox')); ?>
                 </td>
             </tr>
-            <tr class="submit-buttons">
+            <tr class="submit-buttons-row">
                 <td>
                     <?php echo $this->Form->button(__("Export selected groups to Canvas <span class='syncIcon'>&rarr;</span>", true), array("class" => "submit", "onclick" => "jQuery('#GroupSyncType').val('export'); jQuery('#syncCanvasForm').submit();")); ?>
                 </td>
@@ -182,19 +211,20 @@ else:
                     <?php echo $this->Form->button(__("<span class='syncIcon' style='float:left;'>&larr;</span> Import selected groups from Canvas", true), array("class" => "submit", "onclick" => "jQuery('#GroupSyncType').val('import'); jQuery('#syncCanvasForm').submit();")); ?>
                 </td>
             </tr>
+            <tr class="sync-button-row">
+                <td colspan="3">
+                    <?php echo $this->Form->button(__("Sync All Groups", true), array("class" => "submit", "onclick" => "jQuery('#GroupSyncType').val('sync'); jQuery('#syncCanvasForm').submit();")); ?>
+                </td>
+            </tr>
         </tfoot>
     </table>
 
     <?php echo $this->Form->hidden('syncType'); ?>
 
     <br>
-
-    <script type="text/javascript">
-    </script>
     
-<?php  
+<?php  echo $this->Form->end();
 
-    echo $this->Form->end();
 endif; ?>
 
 </div>

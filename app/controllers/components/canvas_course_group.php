@@ -15,6 +15,7 @@ class CanvasCourseGroupComponent extends Object
 {
     public $id = null;
     public $name = null;
+    public $group_category_id = null;
 
     /**
      * __construct
@@ -29,7 +30,7 @@ class CanvasCourseGroupComponent extends Object
         parent::__construct();
         
         foreach ($args as $key => $val) {
-            if ($key == 'id' || $key == 'name') {
+            if ($key == 'id' || $key == 'name' || $key == 'group_category_id') {
                 $this->$key = $val;
             } 
         }

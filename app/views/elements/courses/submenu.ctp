@@ -46,7 +46,7 @@ switch($submenu) {
     if ($canvasEnabled){
         array_push(
             $items,
-            array('name' => 'Import/Export Canvas Groups', 'link' => "/groups/syncCanvas/$course_id")
+            array('name' => 'Sync Canvas Groups', 'link' => "/groups/syncCanvas/$course_id")
         );
     }
     break;
