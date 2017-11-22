@@ -215,7 +215,7 @@ class CanvasCourseComponent extends Object
         if (!$group_category_name) {
             $groupCategories = $this->getGroupCategories($_controller, $user_id, $force_auth);
             $groupCategoryNum = count($groupCategories) + 1;
-            while (in_array("Groupset " . $groupCategoryNum, $groupCategories)) {
+            while (in_array("Group set " . $groupCategoryNum, $groupCategories)) {
                 $groupCategoryNum++;
             }
             $group_category_name = "Groupset " . $groupCategoryNum;

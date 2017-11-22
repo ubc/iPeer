@@ -1235,8 +1235,8 @@ class UsersController extends AppController
                 $supportEmail = $this->SysParameter->get('display.contact_info');
                 $this->Session->setFlash("Error: Unable to import users <ul>" . $error_message . "</ul>" .
                                          "<p>If you continue having issues with the import, please " .
-                                         "<a href='mailto:" . $supportEmail . "?subject=Problem using "
-                                         "iPeer user import feature'>contact support</a>.");
+                                         "<a href='mailto:" . $supportEmail . "?subject=Problem using " .
+                                         "iPeer user import feature'>contact support</a>.</p>");
                 return;
             }
             else {
