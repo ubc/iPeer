@@ -19,6 +19,7 @@ class GroupsController extends AppController
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'FileUpload.FileUpload');
     public $components = array('AjaxList', 'ExportBaseNew', 'ExportCsv', 'FileUpload.FileUpload');
     private $canvasEnabled;
+    private $errorMessages = array();
 
     /**
      * _postProcess
@@ -377,11 +378,13 @@ class GroupsController extends AppController
         $courses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
         $this->set('courses', $courses);
 
-        if (isset($this->data['Group']['Course'])) {
+        // get course id from form submission if it's not in url
+        if (empty($courseId) && isset($this->data['Group']['Course'])) {
             $courseId = $this->data['Group']['Course'];
         }
 
-        if (!is_null($courseId)) {
+        // validate course
+        if (!empty($courseId)) {
             $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
             if (empty($course)) {
                 $this->Session->setFlash(__('Error: Invalid course. Please select a valid course.', true));
@@ -401,55 +404,69 @@ class GroupsController extends AppController
         }
         $this->set('canvasCourses', $canvasCourses);
 
-        if (isset($this->data['Group']['canvasCourse'])) {
-            $canvasCourseId = $this->data['Group']['canvasCourse'];
-        }
+        if (!empty($courseId)) {
 
-        if (!is_null($canvasCourseId)) {
-            if (!isset($canvasCourses[$canvasCourseId])){
-                $this->Session->setFlash(__('Error: Invalid canvas course. Please select a valid canvas course.', true));
-                $canvasCourseId = null;
-            }
-        }
-        elseif (!empty($course) && isset($course['Course']['canvas_id'])) {
-            if (!isset($canvasCourses[$course['Course']['canvas_id']])){
-                $this->Session->setFlash(__('Error: Canvas course associated with this course has been deleted. Please select a new canvas course.', true));
-            }
-        }
-
-        if (empty($canvasCourseId) && !empty($canvasCoursesRaw)) {
-            reset($canvasCoursesRaw);
-            $canvasCourseId = current($canvasCoursesRaw)->id;
-        }
-
-        $canvasGroupCategories = array();
-
-        if (!empty($canvasCourseId)) {
-
-            // get all accessible canvas course categories (for dropdown) and also validate selected canvas group category (if any)
-            $canvasGroupCategories = $canvasCoursesRaw[$canvasCourseId]->getGroupCategories($this, User::get('id'));
-            $canvasGroupCategories[''] = '(Create new groupset)';
-
-            if (isset($this->data['Group']['canvasGroupCategory'])) {
-                $canvasGroupCategoryId = $this->data['Group']['canvasGroupCategory'];
-            }
-    
-            if (!is_null($canvasGroupCategoryId)) {
-                if ($canvasGroupCategoryId == 'new') {
-                    $canvasGroupCategoryId = '';
+            // first, look to see if this course has a canvas course associated with it
+            if (!empty($course['Course']['canvas_id'])) {
+                if (!isset($canvasCourses[$course['Course']['canvas_id']])){
+                    $this->Session->setFlash(__('Error: Canvas course associated with this course has been deleted or not accessible. Please select a new canvas course.', true));
                 }
-                elseif (!isset($canvasGroupCategories[$canvasGroupCategoryId])){
-                    $this->Session->setFlash(__('Error: Invalid canvas group set. Please select a valid canvas group set.', true));
-                    $canvasGroupCategoryId = null;
+                else {
+                    $canvasCourseId = $course['Course']['canvas_id'];
                 }
             }
+
+            // if no valid canvas course association, try looking at the url
+            if (!empty($canvasCourseId)) {
+                if (!isset($canvasCourses[$canvasCourseId])){
+                    $this->Session->setFlash(__('Error: Invalid canvas course. Please select a valid canvas course.', true));
+                    $canvasCourseId = null;
+                }
+            }
+
+            // if all else fails, look at the form submit
+            if (isset($this->data['Group']['canvasCourse'])) {
+                $canvasCourseId = $this->data['Group']['canvasCourse'];
+            }
+
+            // save the canvas course association with this course if there's no association (or an invalid association) and there's a course
+            if (!empty($canvasCourseId) && (empty($course['Course']['canvas_id']) || !isset($canvasCourses[$course['Course']['canvas_id']]))) {
+                $save_data = array('Course' => array('canvas_id' => $canvasCourseId));
+                $this->Course->id = $courseId;
+                $this->Course->save($save_data);
+            }
+
+            $canvasGroupCategories = array();
+
+            if (!empty($canvasCourseId)) {
+
+                // get all accessible canvas course categories (for dropdown) and also validate selected canvas group category (if any)
+                $canvasGroupCategories = $canvasCoursesRaw[$canvasCourseId]->getGroupCategories($this, User::get('id'));
+                $canvasGroupCategories[''] = '(Create new groupset)';
+
+                if (isset($this->data['Group']['canvasGroupCategory'])) {
+                    $canvasGroupCategoryId = $this->data['Group']['canvasGroupCategory'];
+                }
+        
+                if (!is_null($canvasGroupCategoryId)) {
+                    if ($canvasGroupCategoryId == 'new') {
+                        $canvasGroupCategoryId = '';
+                    }
+                    elseif (!isset($canvasGroupCategories[$canvasGroupCategoryId])){
+                        $this->Session->setFlash(__('Error: Invalid canvas group set. Please select a valid canvas group set.', true));
+                        $canvasGroupCategoryId = null;
+                    }
+                }
+            }
+            
         }
+        
+        $this->breadcrumb->push(__('Sync Canvas Groups', true));
+        $this->set('breadcrumb', $this->breadcrumb);
 
         $formUrl = $this->params['action'];
 
         if (!empty($courseId) && !empty($canvasCourseId) && !is_null($canvasGroupCategoryId)) {
-
-            $this->set('breadcrumb', $this->breadcrumb->push(__('Sync Canvas Groups', true)));
 
             $canvasUserKey = $this->SysParameter->get('system.canvas_user_key');
             $this->set('canvasBaseUrl', $this->SysParameter->get('system.canvas_baseurl_ext'));
@@ -529,7 +546,7 @@ class GroupsController extends AppController
                 $canvasGroupCategory = array();
 
                 if ($this->data['Group']['syncType'] == 'import') {
-                    $groupsAndUsers = $this->_importCanvasGroups(
+                    list($groupsAndUsers, $importSuccess) = $this->_importCanvasGroups(
                         $groupsAndUsers,
                         $courseId,
                         $iPeerUsernamesInCanvasCourse
@@ -537,7 +554,7 @@ class GroupsController extends AppController
                     $importSuccess = true;
                 }
                 elseif ($this->data['Group']['syncType'] == 'export') {
-                    list($groupsAndUsers, $canvasGroupCategory) = $this->_exportGroupsToCanvas(
+                    list($groupsAndUsers, $canvasGroupCategory, $exportSuccess) = $this->_exportGroupsToCanvas(
                         $groupsAndUsers, 
                         $canvasCourseId, 
                         $canvasGroupCategoryId,
@@ -547,7 +564,6 @@ class GroupsController extends AppController
                         $iPeerUsernamesInCanvasCourse,
                         $eligibleCanvasUsersIniPeerCourse
                     );
-                    $exportSuccess = true;
                 }
                 elseif ($this->data['Group']['syncType'] == 'sync') {
                     if ($enableSimplifiedSync) {
@@ -560,16 +576,15 @@ class GroupsController extends AppController
                         }
 
                         if (!empty($this->data['canvasGroup'])){
-                            $groupsAndUsers = $this->_importCanvasGroups(
+                            list($groupsAndUsers, $importSuccess) = $this->_importCanvasGroups(
                                 $groupsAndUsers,
                                 $courseId,
                                 $iPeerUsernamesInCanvasCourse
                             );
-                            $importSuccess = true;
                         }
 
                         if (!empty($this->data['iPeerGroup'])){
-                            list($groupsAndUsers, $canvasGroupCategory) = $this->_exportGroupsToCanvas(
+                            list($groupsAndUsers, $canvasGroupCategory, $exportSuccess) = $this->_exportGroupsToCanvas(
                                 $groupsAndUsers, 
                                 $canvasCourseId, 
                                 $canvasGroupCategoryId,
@@ -579,12 +594,38 @@ class GroupsController extends AppController
                                 $iPeerUsernamesInCanvasCourse,
                                 $eligibleCanvasUsersIniPeerCourse
                             );
-                            $exportSuccess = true;
                         }
                     }
                     else {
-                        $this->Session->setFlash(__('Sorry, we are not able to do simplified sync due to inconsistencies between Canvas and iPeer groups. Please use advanced mode.', true));
+                        $this->Session->setFlash(__('Sorry, we are not able to do simplified sync either because you have some members in more than one group or otherwise because you have diffent members in the same Canvas and iPeer groups. Please use advanced mode.', true));
                     }
+                }
+
+                // display any error or success messages relating to import / export
+                $errorMsgs = '';
+
+                $actionPhrase = 'synchronized with';
+                if (!$importSuccess) {
+                    $actionPhrase = 'exported to';
+                }
+                elseif (!$exportSuccess) {
+                    $actionPhrase = 'imported from';
+                }
+
+                if (empty($this->errorMessages) && ($exportSuccess || $importSuccess)) {
+                    $this->Session->setFlash('Success! Groups and users ' . $actionPhrase . ' Canvas are <span class="highlight-green">highlighted</span> below.', 'good');
+                }
+                elseif (!empty($this->errorMessages)) {
+                    if ($exportSuccess || $importSuccess) {
+                        $errorTitle = '<p>Only some of the requested groups and users were ' . $actionPhrase .
+                                ' Canvas. Those are <span class="highlight-green">highlighted</span> below.</p>';
+                    }
+                    else {
+                        $errorTitle = '<h2>Export failed!</h2>';
+                    }
+                    $errorTitle .= '<p>The following errors happened: </p>';
+                    $this->addErrorMsg('titles', 'general', $errorTitle);
+                    $this->Session->setFlash($this->getFullErrorMessage());
                 }
 
                 if (!empty($canvasGroupCategory)) {
@@ -595,7 +636,7 @@ class GroupsController extends AppController
                 $enableSimplifiedSync = $this->_shouldEnableSimplifiedSync($groupsAndUsers, $canvasUserKey);
             }
             elseif (!$enableSimplifiedSync) {
-                $this->Session->setFlash(__('Simplified sync is disabled because there are inconsistencies between Canvas and iPeer groups. Please use advanced mode instead.', true));
+                $this->Session->setFlash(__('Simplified sync is disabled either because you have some members in more than one group or otherwise because you have diffent members in the same Canvas and iPeer groups. Please use advanced mode.', true));
             }
 
             if (!empty($courseId)) {
@@ -659,7 +700,6 @@ class GroupsController extends AppController
         $this->set('formUrl', Router::url(null, true));
         
         $this->set('breadcrumb', $this->breadcrumb->push(__('Import Groups From CSV File (.csv or .txt)', true)));
-        $this->set('isFileImport', true);
 
         if (!empty($this->params['form'])) {
             $courseId = $this->params['data']['Group']['Course'];
@@ -1003,38 +1043,26 @@ class GroupsController extends AppController
             }
 
             if (!empty($importResults['groupFailure']) || !empty($importResults['memFailure'])) {
-                $errorMsgs = '';
-                if (!empty($importResults['groupSuccess']) || !empty($importResults['memSuccess'])){
-                    $errorMsgs .= '<p>Only some of the requested groups and users were imported. Those are <span class="highlight-green">highlighted</span> below.</p>';
-                }
-                $errorMsgs .= '<p>The following errors happened:</p><ul>';
                 if (!empty($importResults['groupFailure'])) {
-                    $errorMsgs .= '<li>There was a problem importing these groups: ' . implode(', ', $importResults['groupFailure']) . '</li>';
+                    $this->addErrorMsg('groupImport', 'groupAdd', 'There was a problem importing these groups: ' . implode(', ', $importResults['groupFailure']) . '.');
                 }
                 if (!empty($importResults['memFailure'])) {
                     foreach ($importResults['memFailure'] as $groupName => $members) {
-                        $errorMsgs .= '<li>There was a problem adding the following members to the ' . $groupName . ' group: ' . implode(', ', $members) . '</li>';
+                        $this->addErrorMsg('groupImport', 'groupMemberAdd', 'There was a problem adding the following members to the ' . $groupName . ' group: ' . implode(', ', $members) . '.');
                     }
-
-                    $errorMsgs .= '</ul><p>Possible reasons: </p><ul>';
-                    $errorMsgs .= '<li>The student identifier does not exist in the system. Please add them first.</li>';
-                    $errorMsgs .= '<li>The student is not enrolled in the course. Please enrol them first.</li>';
-                    $errorMsgs .= '<li>The group was unable to be created or does not exist.</li>';
-                }
-                $this->Session->setFlash($errorMsgs . '</ul>');                       
+                }                 
             }
-            elseif ((!empty($importResults['groupSuccess']) || !empty($importResults['memSuccess'])) || $update) {
-                $this->Session->setFlash('Success! Imported groups and members are <span class="highlight-green">highlighted</span> below.', 'good');                                
-            }
-            else {
-                $this->Session->setFlash('There were no eligible groups or members to import that are not already in iPeer.');
+            
+            if (!$someSuccess && empty($importResults['groupFailure']) && empty($importResults['memFailure'])) {
+                $this->addErrorMsg('groupImport', 'nothingToDo', __('There were no eligible groups or members to import that are not already in iPeer.', true));
             }
         }
         else {
-            $this->Session->setFlash(__('Please select one or more non-empty groups to import.', true));
+            $this->addErrorMsg('groupImport', 'noCourseSelected', __('Please select one or more non-empty groups to import.', true));
         }
 
-        return $groupsAndUsers;
+        $someSuccess = (!empty($importResults['groupSuccess']) || !empty($importResults['memSuccess']));
+        return array($groupsAndUsers, $someSuccess);
     }
 
     /**
@@ -1058,10 +1086,9 @@ class GroupsController extends AppController
         $canvasGroupCategory = array();
 
         if ( !isset($this->data['iPeerGroup']) ) {
-            $this->Session->setFlash(__('Please select one or more groups to export.', true));
+            $this->addErrorMsg('groupExport', 'noCourseSelected', __('Please select one or more groups to export.', true));
         }
         else {
-            $errorMsgs = '';
             $someSuccess = false;
 
             // reset this since all groups are deleted
@@ -1076,7 +1103,7 @@ class GroupsController extends AppController
                     if ($this->data['Group']['updateCanvasGroups'] && isset($groupsAndUsers[$groupName]['CanvasGroup'])) {
                         $groupDeleted = $canvasCoursesRaw[$canvasCourseId]->deleteGroup($this, $userId, false, $groupsAndUsers[$groupName]['CanvasGroup']['id']);  
                         if (isset($groupDeleted->errors)){
-                            $errorMsgs .= '<li>Error exporting group ' . $groupName . '</li>';
+                            $this->addErrorMsg('groupExport', 'groupExport', 'Error exporting group ' . $groupName . '. Please try again.');
                             continue;                                            
                         }
                         unset($groupsAndUsers[$groupName]['CanvasGroup']);
@@ -1090,7 +1117,7 @@ class GroupsController extends AppController
                             $canvasGroupCategoryId = $canvasGroupCategory['id'];
                         }
                         else {
-                            $errorMsgs .= '<li>Error creating new group set for group ' . $groupName . '</li>';
+                            $this->addErrorMsg('groupExport', 'groupSetCreate', 'Error creating new group set for group ' . $groupName . '. Please try again.');
                             continue;                                            
                         }
                     }
@@ -1103,7 +1130,7 @@ class GroupsController extends AppController
                             $groupsAndUsers[$groupName]['CanvasGroup'] = array('group_name'=>$groupName, 'id'=>$canvasGroup->id, 'justAdded'=>true);
                         }
                         else {
-                            $errorMsgs .= '<li>Error creating group ' . $groupName . '</li>';
+                            $this->addErrorMsg('groupExport', 'groupCreate', 'Error creating group ' . $groupName . '. Please try again.');
                             continue;                                            
                         }
                     }
@@ -1116,20 +1143,21 @@ class GroupsController extends AppController
                         foreach ($groupsAndUsers[$groupName]['Member'] as $user){
                             if (isset($user['username']) && in_array($user['username'], $eligibleiPeerUsers)) {
                                 if (in_array($user['username'], $eligibleCanvasUsers)) {
-                                    $errorMsgs .= '<li>' . $user['full_name'] . ' could not be added to group "' . $groupName . '" because (s)he is already in a group.</li>';
+                                    $this->addErrorMsg('groupExport', 'userTwoGroups', $user['full_name'] . ' could not be added to group "' . 
+                                                       $groupName . '" because (s)he is already in a group.');
                                     continue;
                                 }
                                 $canvasUserAddedId = $canvasStudents[$user['username']]->id;
                                 $userAdded = $canvasGroup->addUser($this, $userId, false, $canvasUserAddedId);
                                 if (isset($userAdded->errors)) {
-                                    $errorMsgs .= '<li>Error adding ' . $user['full_name'] . ' to group';
+                                    $errorMsgs = 'Error adding ' . $user['full_name'] . ' to group';
                                     if (is_array($userAdded->errors) && isset($userAdded->errors[0]->message)) {
                                         $errorMsgs .= ': ' . $userAdded->errors[0]->message;
                                     }
                                     elseif (isset($userAdded->errors->group_id[0]->message)) {
                                         $errorMsgs .= ': ' . $userAdded->errors->group_id[0]->message;
                                     }
-                                    $errorMsgs .= '</li>';
+                                    $this->addErrorMsg('groupExport', 'userAdd', $errorMsgs);
                                 }
                                 else {
                                     $someSuccess = true;
@@ -1152,23 +1180,84 @@ class GroupsController extends AppController
                     }
                 }
             }
-            if (!empty($errorMsgs)) {
-                if ($someSuccess){
-                    $errorMsgs = '<p>Only some of the requested groups and users were exported to Canvas. ' .
-                                 'Those are <span class="highlight-green">highlighted</span> below.</p>' .
-                                 '<p>The following errors happened: </p><ul>' . $errorMsgs .'</ul>';
-                }
-                else {
-                    $errorMsgs = '<p>Export failed. The following errors happened:</p><ul>' . $errorMsgs .'</ul>';
-                }
-                $this->Session->setFlash($errorMsgs);
-            }
-            elseif ($someSuccess) {
-                $this->Session->setFlash('Success! Groups and users exported to Canvas are <span class="highlight-green">highlighted</span> below.', 'good');                                
+        }
+
+        return array($groupsAndUsers, $canvasGroupCategory, $someSuccess);
+    }
+
+    private function addErrorMsg($group, $type, $error) {
+        if (!isset($this->errorMessages[$group])) {
+            $this->errorMessages[$group] = array();
+        }
+        if (!isset($this->errorMessages[$group][$type])) {
+            $this->errorMessages[$group][$type] = array();
+        }
+        $this->errorMessages[$group][$type][] = $error;
+    }
+
+    private function getFullErrorMessage() {
+        $errorOutput = '';
+        $errorCount = 0;
+
+        if (isset($this->errorMessages['titles']['general']) && !empty($this->errorMessages['titles']['general'])) {
+            foreach ($this->errorMessages['titles']['general'] as $errorMessage) {
+                $errorOutput .= $errorMessage;
             }
         }
 
-        return array($groupsAndUsers, $canvasGroupCategory);
+        if (!empty($this->errorMessages)) {
+            $errorOutput .= '<ul>';
+            foreach ($this->errorMessages as $groupKey => $errorMessageGroup) {
+                if ($groupKey == 'titles') {
+                    continue;
+                }
+                if (isset($this->errorMessages['titles'][$groupKey]) && !empty($this->errorMessages['titles'][$groupKey])) {
+                    $errorOutput .= '</ul>';
+                    foreach ($this->errorMessages['titles'][$groupKey] as $errorMessage) {
+                        $errorOutput .= $errorMessage;
+                    }
+                    $errorOutput .= '<ul>';
+                }
+                if (!empty($errorMessageGroup)) {
+                    foreach ($errorMessageGroup as $errorMessageType) {
+                        foreach ($errorMessageType as $errorMessage) {
+                            $errorOutput .= '<li>' . $errorMessage . '</li>';
+                        }
+                        $errorCount++;
+                    }    
+                }
+            }
+            $errorOutput .= '</ul>';
+
+            if (isset($this->errorMessages['groupImport']['groupMemberAdd'])) {
+                // add additional help
+                $errorOutput .= '<p>Possible reasons why some members could not be added: </p><ul>';
+                $errorOutput .= '<li>The student identifier does not exist in the system. Please add them first.</li>';
+                $errorOutput .= '<li>The student is not enrolled in the course. Please enrol them first.</li>';
+                $errorOutput .= '<li>The group was unable to be created or does not exist.</li>';
+                $errorOutput .= '</ul>';
+                $errorCount--;
+            }
+
+            if (isset($this->errorMessages['groupExport']['userTwoGroups'])) {
+                // add additional help
+                $errorOutput .= '<p>Please note that Canvas allows each member to be in a <u>maximum of 1 group</u> per ' .
+                                'group set. Your options are as follows: </p><ul>' .
+                                '<li>Change your iPeer groups so that you have each person in a maximum of 1 group.</li>' .
+                                '<li>If you really want to add the student to more than one group, consider using different '.
+                                'group sets and add each of the groups with the same student into different group sets.</li>';
+                $errorOutput .= '</ul>';
+                $errorCount--;
+            }
+
+            if ($errorCount > 0) {
+                $supportEmail = $this->SysParameter->get('display.contact_info');
+                $errorOutput .= '<p>If you continue having issues, please <a href="mailto:' . $supportEmail . 
+                                '?subject=Problem using iPeer Canvas sync feature">contact support</a>.</p>';
+            }
+        }
+        
+        return $errorOutput;
     }
 
     /**

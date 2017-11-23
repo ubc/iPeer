@@ -2,21 +2,26 @@
 
 $javascript->link(Router::url('/js/synccanvas.js', true), false);
 
-if (empty($courseId) || empty($canvasCourseId)) : 
+if (is_null($canvasGroupCategoryId)) : 
     
     echo $this->Form->create(null, array("id" => "syncCanvasForm", "class"=>"prepare", "url" => $formUrl ));
-    echo $this->Form->input("Course", array("label"=>"iPeer Course", "multiple"=>false, "default" => $courseId));
-    echo $this->Form->input("canvasCourse", array("label"=>"Canvas Course", "multiple" => false));
-    ?><label class="defLabel"></label><?php
-    echo $this->Form->submit(__("Next", true), array("class" => "button-next"));
-    echo $this->Form->end();
 
-elseif (is_null($canvasGroupCategoryId)) : 
-    
-    echo $this->Form->create(null, array("id" => "syncCanvasForm", "class"=>"prepare", "url" => $formUrl ));
-    echo $this->Form->input("Course", array("label"=>"iPeer Course", "multiple"=>false, "default" => $courseId));
-    echo $this->Form->input("canvasCourse", array("label"=>"Canvas Course", "multiple" => false));
-    echo $this->Form->input("canvasGroupCategory", array("label"=>"Canvas Group set", "multiple" => false));
+    if (!empty($courseId)) {
+        echo $this->Form->hidden('Course', array('value' => $courseId));
+    }
+    echo $this->Form->input("Course", array("label"=>"iPeer Course", "multiple"=>false, "default" => $courseId, "disabled"=>!empty($courseId)));
+
+    if (!empty($canvasCourseId)) {
+        echo $this->Form->hidden('canvasCourse', array('value' => $canvasCourseId));
+    }    
+    echo $this->Form->input("canvasCourse", array("label"=>"Canvas Course", "multiple" => false, "default" => $canvasCourseId, "disabled"=>!empty($canvasCourseId)));
+
+    if (!empty($courseId) && !empty($canvasCourseId)) : 
+
+        echo $this->Form->input("canvasGroupCategory", array("label"=>"Canvas Group set", "multiple" => false));
+
+    endif;
+
     ?><label class="defLabel"></label><?php
     echo $this->Form->submit(__("Next", true), array("class" => "button-next"));
     echo $this->Form->end();
