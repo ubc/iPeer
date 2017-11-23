@@ -78,6 +78,19 @@ class CanvasApiComponent extends Object
     {
         return $this->getBaseUrl() . $this->apiPath;
     }
+
+    // use the url set in the settings first. The deploy behind load
+    // balancer with SSL off loading may cause problem if using the URL
+    // directly with Router::url (missing https)
+    private function _getCurrentUrl() {
+        $appUrl = $this->SysParameter->get('system.absolute_url');
+        if (empty($appUrl)) {
+            $appUrl = Router::url(null, true);
+        } else {
+            $appUrl .= Router::url(null, false);
+        }
+        return $appUrl;
+    }
     
     /**
       * get user access token
@@ -156,7 +169,6 @@ class CanvasApiComponent extends Object
      * get requested data from canvas api
      *
      * @param object    $_controller the controller that initiated this request
-     * @param string    $redirect_uri the page to end up on after this request is done (only used if oauth needed)
      * @param boolean   $force_auth redirects the user to give auhtorization through Canvas if not authorized yet
      * @param string    $uri canvas api uri
      * @param array     $params canvas api parameters
@@ -169,7 +181,7 @@ class CanvasApiComponent extends Object
      * @access public
      * @return mixed return requested data, otherwise void
      */
-    public function getCanvasData($_controller, $redirect_uri, $force_auth, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=true, $method='get', $retrieveAll=true, $perPage=null)
+    public function getCanvasData($_controller, $force_auth, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=true, $method='get', $retrieveAll=true, $perPage=null)
     {   
         if (is_null($perPage)) {
             $perPage = $this->paginationDefaultPerPage;
@@ -180,7 +192,7 @@ class CanvasApiComponent extends Object
 
         // if auth token exists, attempt to call api
         if ($accessToken) {
-            $data = $this->_getPostCanvasData($_controller, $redirect_uri, $accessToken, $uri, $params, $additionalHeader, $refreshTokenAndRetry, $method, $retrieveAll, $perPage);
+            $data = $this->_getPostCanvasData($_controller, $accessToken, $uri, $params, $additionalHeader, $refreshTokenAndRetry, $method, $retrieveAll, $perPage);
             if ($data === false) {
                 $_controller->Session->setFlash('There was an error retrieving data from Canvas. Please try again.');
             }
@@ -197,7 +209,7 @@ class CanvasApiComponent extends Object
                 $apiToken = $this->getApiTokenUsingCode($_controller->params['url']['code']);
                 if (isset($apiToken['accessToken'])) {
                     $_controller->Session->setFlash('You have successfully connected to Canvas.', 'flash_success');
-                    $_controller->redirect($redirect_uri);
+                    $_controller->redirect($this->_getCurrentUrl());
                 }
                 elseif (isset($apiToken['err'])){
                     $_controller->Session->setFlash($apiToken['err']);
@@ -212,7 +224,7 @@ class CanvasApiComponent extends Object
         }
         // if no access token, get a new access token by forwarding the user to the canvas auth page
         elseif ($force_auth) {
-            $this->_getNewOauth($_controller, $redirect_uri);
+            $this->_getNewOauth($_controller);
         }        
     }
     
@@ -220,7 +232,6 @@ class CanvasApiComponent extends Object
      * post requested data to canvas api
      *
      * @param object    $_controller the controller that initiated this request
-     * @param string    $redirect_uri the page to end up on after this request is done (only used if oauth needed)
      * @param boolean   $force_auth redirects the user to give auhtorization through Canvas if not authorized yet
      * @param string    $uri canvas api uri
      * @param array     $params canvas api parameters
@@ -230,16 +241,15 @@ class CanvasApiComponent extends Object
      * @access public
      * @return mixed return response, otherwise void
      */
-    public function postCanvasData($_controller, $redirect_uri, $force_auth, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=true)
+    public function postCanvasData($_controller, $force_auth, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=true)
     {
-        return $this->getCanvasData($_controller, $redirect_uri, $force_auth, $uri, $params, $additionalHeader, $refreshTokenAndRetry, 'post');
+        return $this->getCanvasData($_controller, $force_auth, $uri, $params, $additionalHeader, $refreshTokenAndRetry, 'post');
     }
     
     /**
      * delete requested data from canvas api
      *
      * @param object    $_controller the controller that initiated this request
-     * @param string    $redirect_uri the page to end up on after this request is done (only used if oauth needed)
      * @param boolean   $force_auth redirects the user to give auhtorization through Canvas if not authorized yet
      * @param string    $uri canvas api uri
      * @param array     $params canvas api parameters
@@ -249,21 +259,20 @@ class CanvasApiComponent extends Object
      * @access public
      * @return mixed return response, otherwise void
      */
-    public function deleteCanvasData($_controller, $redirect_uri, $force_auth, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=true)
+    public function deleteCanvasData($_controller, $force_auth, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=true)
     {
-        return $this->getCanvasData($_controller, $redirect_uri, $force_auth, $uri, $params, $additionalHeader, $refreshTokenAndRetry, 'delete');
+        return $this->getCanvasData($_controller, $force_auth, $uri, $params, $additionalHeader, $refreshTokenAndRetry, 'delete');
     }
 
     /**
      * forward the user to canvas to give authorization to ipeer
      *
      * @param object    $_controller the controller that initiated this request
-     * @param string    $redirect_uri the page to end up on after this request is done (only used if oauth needed)
      * 
      * @access private
      * @return void
      */
-    private function _getNewOauth($_controller, $redirect_uri)
+    private function _getNewOauth($_controller)
     {
         // handle the case of the user having cancelled the authorization
         if (isset($_controller->params['url']['error']) && $_controller->params['url']['error']=='access_denied'){
@@ -285,7 +294,7 @@ class CanvasApiComponent extends Object
                             '&response_type=code' . 
                             '&state=' . $state .
                             ($forceLogin ? '&force_login=1' : '') .
-                            '&redirect_uri=' . array_shift(explode('?', $redirect_uri));
+                            '&redirect_uri=' . array_shift(explode('?', $this->_getCurrentUrl()));
                             
         $_controller->redirect($canvasOauthUrl);
     }
@@ -360,7 +369,6 @@ class CanvasApiComponent extends Object
      * retrieves requested data from canvas api
      *
      * @param object    $_controller the controller that initiated this request
-     * @param string    $redirect_uri the page to end up on after this request is done (only used if oauth needed)
      * @param mixed     $accessToken access token for Canvas API calls
      * @param string    $uri canvas api uri
      * @param array     $params canvas api parameters
@@ -373,7 +381,7 @@ class CanvasApiComponent extends Object
      * @access private
      * @return mixed either the response body from the api, or false if not successful
      */
-    private function _getPostCanvasData($_controller, $redirect_uri, $accessToken, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=true, $method='get', $retrieveAll=true, $perPage=null)
+    private function _getPostCanvasData($_controller, $accessToken, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=true, $method='get', $retrieveAll=true, $perPage=null)
     {
         if (is_null($perPage)) {
             $perPage = $this->paginationDefaultPerPage;
@@ -450,12 +458,12 @@ class CanvasApiComponent extends Object
                 // most likely, the access token is no longer valid (expired), so use refresh token to get it
                 $apiToken = $this->getApiTokenUsingRefreshToken();
                 if (isset($apiToken['accessToken'])) {
-                    return $this->_getPostCanvasData($_controller, $redirect_uri, $apiToken['accessToken'], $uri, $params, $additionalHeader, false, $method, $retrieveAll, $perPage);
+                    return $this->_getPostCanvasData($_controller, $apiToken['accessToken'], $uri, $params, $additionalHeader, false, $method, $retrieveAll, $perPage);
                 }
                 // if not able to get new access token, we need to re-authenticate with canvas
                 else {
                     $this->UserOauth->deleteToken($this->userId, $this->provider);
-                    $this->_getNewOauth($_controller, $redirect_uri);
+                    $this->_getNewOauth($_controller);
                 }
             }
             return $result;

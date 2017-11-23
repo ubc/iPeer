@@ -52,8 +52,8 @@ INSERT INTO `sys_parameters` (
     `description`, `record_status`, `creator_id`, `created`,
     `updater_id`, `modified`)
 VALUES (
-    'system.canvas_client_secret', '', 'S',
-    'Canvas Oauth Client Secret', 'E', 0, NOW(), NULL, NOW()
+    'system.canvas_client_secret', '', 'E',
+    'Canvas Oauth Client Secret', 'A', 0, NOW(), NULL, NOW()
 );
 
 INSERT INTO `ipeer`.`sys_parameters` (

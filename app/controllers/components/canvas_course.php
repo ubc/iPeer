@@ -49,7 +49,7 @@ class CanvasCourseComponent extends Object
     static public function getAllByIPeerUser($_controller, $user_id, $force_auth=true, $enrollment_type=CanvasCourseUserComponent::ENROLLMENT_QUERY_TEACHER)
     {
         $api = new CanvasApiComponent($user_id);
-        $courses_json = $api->getCanvasData($_controller, Router::url(null, true), $force_auth, '/courses', array('enrollment_type' => $enrollment_type));
+        $courses_json = $api->getCanvasData($_controller, $force_auth, '/courses', array('enrollment_type' => $enrollment_type));
 
         $courses = array();
         if (!empty($courses_json)) {
@@ -83,7 +83,7 @@ class CanvasCourseComponent extends Object
         $params['include[]'] = array('enrollments', 'email');
         
         //$courseUsers_json = $api->getCanvasData($uri, $params);
-        $courseUsers_json = $api->getCanvasData($_controller, Router::url(null, true), $force_auth, $uri, $params);
+        $courseUsers_json = $api->getCanvasData($_controller, $force_auth, $uri, $params);
 
         $courseUsers = array();
         if (!empty($courseUsers_json)) {
@@ -119,7 +119,7 @@ class CanvasCourseComponent extends Object
             $uri = '/group_categories/' . $group_category_id . '/groups';
         }
         
-        $courseGroups_array = $api->getCanvasData($_controller, Router::url(null, true), $force_auth, $uri);
+        $courseGroups_array = $api->getCanvasData($_controller, $force_auth, $uri);
 
         $courseUsers = array();
         if (!empty($courseGroups_array)) {
@@ -150,7 +150,7 @@ class CanvasCourseComponent extends Object
         $api = new CanvasApiComponent($user_id);
         $uri = '/courses/' . $this->id . '/group_categories';
         
-        $courseGroupCategories_array = $api->getCanvasData($_controller, Router::url(null, true), $force_auth, $uri);
+        $courseGroupCategories_array = $api->getCanvasData($_controller, $force_auth, $uri);
 
         $courseGroupCategories = array();
 
@@ -190,7 +190,7 @@ class CanvasCourseComponent extends Object
             'join_level' => 'parent_context_auto_join'
         );
 
-        $courseGroup_obj = $api->postCanvasData($_controller, Router::url(null, true), $force_auth, $uri, $params);
+        $courseGroup_obj = $api->postCanvasData($_controller, $force_auth, $uri, $params);
 
         return new CanvasCourseGroupComponent($courseGroup_obj);
     }
@@ -225,7 +225,7 @@ class CanvasCourseComponent extends Object
             'name' => $group_category_name
         );
 
-        $courseGroupCategory_obj = $api->postCanvasData($_controller, Router::url(null, true), $force_auth, $uri, $params);
+        $courseGroupCategory_obj = $api->postCanvasData($_controller, $force_auth, $uri, $params);
 
         $courseGroupCategory = array();
         foreach ($courseGroupCategory_obj as $key => $val) {
@@ -253,7 +253,7 @@ class CanvasCourseComponent extends Object
         $api = new CanvasApiComponent($user_id);
         $uri = '/groups/' . $group_id;
 
-        $retObj = $api->deleteCanvasData($_controller, Router::url(null, true), $force_auth, $uri);
+        $retObj = $api->deleteCanvasData($_controller, $force_auth, $uri);
 
         return $retObj;
     }

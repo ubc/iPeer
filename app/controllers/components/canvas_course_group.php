@@ -44,7 +44,7 @@ class CanvasCourseGroupComponent extends Object
             'per_page' => $per_page
         );
         
-        $usersArray = $api->getCanvasData($_controller, Router::url(null, true), $force_auth, $uri);
+        $usersArray = $api->getCanvasData($_controller, $force_auth, $uri);
 
         $groupUsers = array();
         if (!empty($usersArray)) {
@@ -80,7 +80,7 @@ class CanvasCourseGroupComponent extends Object
             'user_id' => $user_id_to_add
         );
 
-        $retObj = $api->postCanvasData($_controller, Router::url(null, true), $force_auth, $uri, $params);
+        $retObj = $api->postCanvasData($_controller, $force_auth, $uri, $params);
 
         return $retObj;
     }
