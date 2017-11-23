@@ -1104,8 +1104,10 @@ class UsersController extends AppController
      */
     public function import($courseId = null, $importFrom = 'file')
     {
+        $iPeerCourse = null;
         if (!is_null($courseId)) {
             $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
+            $iPeerCourse = $course;
             if (empty($course)) {
                 $this->Session->setFlash(__('Error: That course does not exist.', true));
                 $this->redirect('/courses');
@@ -1147,6 +1149,14 @@ class UsersController extends AppController
             }
             $this->set('canvasCourses', $canvasCourses);
 
+            // check if the course is already linked with a valid canvas course
+            if (isset($iPeerCourse['Course']) and
+                isset($iPeerCourse['Course']['canvas_id']) and
+                array_key_exists($iPeerCourse['Course']['canvas_id'], $canvasCourses)) {
+
+                $this->set('defaultCanvasId', $iPeerCourse['Course']['canvas_id']);
+            }
+
             if (!empty($this->data)) {
 
                 // TODO: do some validation
@@ -1175,6 +1185,13 @@ class UsersController extends AppController
                         User::IMPORT_EMAIL => isset($canvasUser->email) ? $canvasUser->email : '',
                     );
                     $usernames[] = $canvasUser->$canvas_user_key;
+                }
+
+                // save the canvas course association with this course if there's no association currently and there's a course
+                if (!empty($this->data['User']['canvasCourse']) && empty($iPeerCourse['Course']['canvas_id'])){
+                    $save_data = array('Course' => array('canvas_id' => $this->data['User']['canvasCourse']));
+                    $this->Course->id = $courseId;
+                    $this->Course->save($save_data);
                 }
             }
         }
@@ -1247,11 +1264,13 @@ class UsersController extends AppController
             foreach ($this->User->insertedIds as $new) {
                 $insertedIds[] = $new;
             }
-            foreach ($result['updated_students'] as $old) {
-                $insertedIds[] = $old['User']['id'];
+            if (isset($result['updated_students'])) {
+                foreach ($result['updated_students'] as $old) {
+                    $insertedIds[] = $old['User']['id'];
+                }
             }
 
-            // enrol the users in the selectec course
+            // enrol the users in the selected course
             $this->Course->enrolStudents($insertedIds, $this->data['Course']['Course']);
             $this->set('data', $result);
             $this->render('userSummary');

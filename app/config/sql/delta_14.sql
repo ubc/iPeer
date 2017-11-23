@@ -2,7 +2,7 @@
 -- Canvas integration
 --
 
-INSERT INTO `ipeer`.`sys_parameters` (
+INSERT INTO `sys_parameters` (
     `parameter_code`, `parameter_value`,
     `parameter_type`, `description`, `record_status`, `creator_id`, `created`,
     `updater_id`, `modified`)
@@ -11,7 +11,7 @@ VALUES (
     'Enable Canvas integration', 'A', 0, NOW(), NULL, NOW()
 );
 
-INSERT INTO `ipeer`.`sys_parameters` (
+INSERT INTO `sys_parameters` (
     `parameter_code`, `parameter_value`,
     `parameter_type`, `description`, `record_status`, `creator_id`, `created`,
     `updater_id`, `modified`)
@@ -20,7 +20,7 @@ VALUES (
     'Base URL for Canvas API', 'A', 0, NOW(), NULL, NOW()
 );
 
-INSERT INTO `ipeer`.`sys_parameters` (
+INSERT INTO `sys_parameters` (
     `parameter_code`, `parameter_value`,
     `parameter_type`, `description`, `record_status`, `creator_id`, `created`,
     `updater_id`, `modified`)
@@ -29,7 +29,7 @@ VALUES (
     'External Base URL for Canvas API (if not set, will default to canvas_baseurl)', 'A', 0, NOW(), NULL, NOW()
 );
 
-INSERT INTO `ipeer`.`sys_parameters` (
+INSERT INTO `sys_parameters` (
     `parameter_code`, `parameter_value`,
     `parameter_type`, `description`, `record_status`, `creator_id`, `created`,
     `updater_id`, `modified`)
@@ -56,7 +56,7 @@ VALUES (
     'Canvas Oauth Client Secret', 'A', 0, NOW(), NULL, NOW()
 );
 
-INSERT INTO `ipeer`.`sys_parameters` (
+INSERT INTO `sys_parameters` (
     `parameter_code`, `parameter_value`,
     `parameter_type`, `description`, `record_status`, `creator_id`, `created`,
     `updater_id`, `modified`)
@@ -66,20 +66,20 @@ VALUES (
 );
 
 -- add page permissions --
-INSERT INTO `ipeer`.`acos`
+INSERT INTO `acos`
 (`parent_id`, `model`, `foreign_key`, `alias`, `lft`, `rght`)
 	select id, NULL, NULL, 'syncCanvasEnrollment', NULL, NULL
-	from `ipeer`.`acos`
+	from `acos`
 	where BINARY `alias`='Courses' LIMIT 1;
 
-INSERT INTO `ipeer`.`acos`
+INSERT INTO `acos`
 (`parent_id`, `model`, `foreign_key`, `alias`, `lft`, `rght`)
 	select id, NULL, NULL, 'syncCanvas', NULL, NULL
-	from `ipeer`.`acos`
+	from `acos`
 	where BINARY `alias`='Groups' LIMIT 1;
 
 -- store canvas course id
-ALTER TABLE `ipeer`.`courses` ADD COLUMN `canvas_id` VARCHAR(25) NULL DEFAULT NULL;
+ALTER TABLE `courses` ADD COLUMN `canvas_id` VARCHAR(25) NULL DEFAULT NULL;
 
 -- add table to store oauth access/refresh tokens and expiry timestamp of the access token
 CREATE TABLE IF NOT EXISTS `user_oauths` (
@@ -99,7 +99,7 @@ AUTO_INCREMENT=1
 COLLATE = utf8_general_ci;
 
 -- new parameters to define the behaviour of Canvas API calls
-INSERT INTO `ipeer`.`sys_parameters` (
+INSERT INTO `sys_parameters` (
     `parameter_code`, `parameter_value`,
     `parameter_type`, `description`, `record_status`, `creator_id`, `created`,
     `updater_id`, `modified`)
@@ -107,7 +107,7 @@ VALUES (
     'system.canvas_api_timeout', '10', 'I',
     'Canvas API call timeout in seconds', 'A', 0, NOW(), NULL, NOW()
 );
-INSERT INTO `ipeer`.`sys_parameters` (
+INSERT INTO `sys_parameters` (
     `parameter_code`, `parameter_value`,
     `parameter_type`, `description`, `record_status`, `creator_id`, `created`,
     `updater_id`, `modified`)
@@ -115,7 +115,7 @@ VALUES (
     'system.canvas_api_default_per_page', '500', 'I',
     'Default number of items to retrieve per Canvas API call', 'A', 0, NOW(), NULL, NOW()
 );
-INSERT INTO `ipeer`.`sys_parameters` (
+INSERT INTO `sys_parameters` (
     `parameter_code`, `parameter_value`,
     `parameter_type`, `description`, `record_status`, `creator_id`, `created`,
     `updater_id`, `modified`)
@@ -123,7 +123,7 @@ VALUES (
     'system.canvas_api_max_retrieve_all', '10000', 'I',
     'Max number of item to retrieve when auto-looping Canvas API pagination to retrieve all records', 'A', 0, NOW(), NULL, NOW()
 );
-INSERT INTO `ipeer`.`sys_parameters` (
+INSERT INTO `sys_parameters` (
     `parameter_code`, `parameter_value`,
     `parameter_type`, `description`, `record_status`, `creator_id`, `created`,
     `updater_id`, `modified`)
