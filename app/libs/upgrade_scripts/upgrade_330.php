@@ -10,7 +10,7 @@ require_once('upgrade_base.php');
  * @license   PHP Version 3.0 {@link http://www.php.net/license/3_0.txt}
  * @version   Release: 3.1
  */
- class Upgrade321 extends UpgradeBase
+ class Upgrade330 extends UpgradeBase
 {
 	/**
 	 * __construct
@@ -21,7 +21,7 @@ require_once('upgrade_base.php');
 	public function __construct()
 	{
 		$this->fromVersions = array(null, '3.2.0');
-		$this->toVersion = '3.2.1';
+		$this->toVersion = '3.3.0';
 		$this->dbVersion = Configure::read('DATABASE_VERSION');
 	}
 
