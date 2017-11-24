@@ -336,7 +336,7 @@ class CoursesController extends AppController
                 };
                 $this->set('canvasCourses',
                     array_map($map_func,
-                        CanvasCourseComponent::getAllByIPeerUser($this, User::get('id'), false)));
+                        CanvasCourseComponent::getAllByIPeerUser($this, User::get('id'), true)));
                 $this->render('select_canvas');
                 return;
             }
