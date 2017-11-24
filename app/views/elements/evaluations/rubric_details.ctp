@@ -12,7 +12,6 @@ foreach ($result AS $evaluator => $row) {
     echo "<tr><td".$class."width='15%'>".$memberList[$evaluator]."</td>";
     $comment = array_pop($row);
     foreach ($row as $num => $grade) {
-        $empty = $rubric['lom_max'];
         echo '<td valign="middle"><br />';
         //Points Detail
         echo "<strong>".__('Points', true).": </strong>";
