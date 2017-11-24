@@ -409,7 +409,7 @@ class GroupsController extends AppController
             // first, look to see if this course has a canvas course associated with it
             if (!empty($course['Course']['canvas_id'])) {
                 if (!isset($canvasCourses[$course['Course']['canvas_id']])){
-                    $this->Session->setFlash(__('Error: Canvas course associated with this course has been deleted or not accessible. Please select a new canvas course.', true));
+                    $this->Session->setFlash(__('Error: Canvas course associated with this course has been deleted or not accessible. Please select a new Canvas course or otherwise ask someone who has access to the Canvas course.', true));
                 }
                 else {
                     $canvasCourseId = $course['Course']['canvas_id'];

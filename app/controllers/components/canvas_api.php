@@ -208,7 +208,7 @@ class CanvasApiComponent extends Object
                 $_controller->Session->delete('oauth_'.$this->provider.'_state');
                 $apiToken = $this->getApiTokenUsingCode($_controller->params['url']['code']);
                 if (isset($apiToken['accessToken'])) {
-                    $_controller->Session->setFlash('You have successfully connected to Canvas.', 'flash_success');
+                    $_controller->Session->setFlash('You have successfully connected to Canvas.', 'good');
                     $_controller->redirect($this->_getCurrentUrl());
                 }
                 elseif (isset($apiToken['err'])){

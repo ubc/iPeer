@@ -406,7 +406,6 @@ a#home, a#home:hover, a#home:active {
     padding-top: 0;
 }
 
-#flashMessage.success, 
 #authMessage.success, 
 .success-message,
 .good-message {

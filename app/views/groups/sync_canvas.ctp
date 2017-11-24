@@ -13,8 +13,15 @@ if (is_null($canvasGroupCategoryId)) :
 
     if (!empty($canvasCourseId)) {
         echo $this->Form->hidden('canvasCourse', array('value' => $canvasCourseId));
-    }    
-    echo $this->Form->input("canvasCourse", array("label"=>"Canvas Course", "multiple" => false, "default" => $canvasCourseId, "disabled"=>!empty($canvasCourseId)));
+    }
+    if (!empty($canvasCourses)) {
+        echo $this->Form->input("canvasCourse", array("label"=>"Canvas Course", "multiple" => false, "default" => $canvasCourseId, "disabled"=>!empty($canvasCourseId)));        
+    }
+    else {
+        echo '<div class="input select">' . $this->Form->label("Canvas Course") . '</div>';
+        echo $this->Form->select("canvasCourseInaccessible", array('0'=>'No accessible Canvas courses'), null, array("default" => '0', "disabled"=>true));
+        echo $this->Form->hidden('canvasCourse', array('value' => $canvasCourseId));
+    }
 
     if (!empty($courseId) && !empty($canvasCourseId)) : 
 
