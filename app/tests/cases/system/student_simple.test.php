@@ -1,4 +1,5 @@
 <?php
+require_once(VENDORS.'webdriver/PHPWebDriver/WebDriverActionChains.php');
 App::import('Lib', 'system_base');
 
 class studentSimple extends SystemBaseTestCase
@@ -76,7 +77,7 @@ class studentSimple extends SystemBaseTestCase
         // check penalty note
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '( Show/Hide late penalty policy )')->click();
         $penalty = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'penalty')->text();
-        $this->assertEqual($penalty, "1 day(s) late: 10% deduction.\n10% is deducted afterwards.");
+        $this->assertEqual($penalty, "From the due date to 1 days(s) late, 10% will be deducted.\n10% is deducted afterwards.");
 
         // move the sliders
         $this->handleOffset('handle6', 24);
@@ -192,8 +193,8 @@ class studentSimple extends SystemBaseTestCase
         $this->assertEqual($title, 'MECH 328 - Mechanical Engineering Design Project > Simple Evaluation > Results');
 
         //auto-release results message
-        $msg = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::ID, 'autoRelease_msg');
-        $this->assertTrue(!empty($msg));
+        // $msg = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::ID, 'autoRelease_msg');
+        // $this->assertTrue(!empty($msg));
 
         // check lates
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '3 Late')->click();
@@ -219,10 +220,10 @@ class studentSimple extends SystemBaseTestCase
         $this->assertEqual($left, 'Tutor 1 (TA)');
 
         // auto-release results messages
-        $msg = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::ID, 'autoRelease_msg');
-        $this->assertTrue(!empty($msg));
-        $msg = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'li[class="green"]');
-        $this->assertTrue(!empty($msg));
+        // $msg = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::ID, 'autoRelease_msg');
+        // $this->assertTrue(!empty($msg));
+        // $msg = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'li[class="green"]');
+        // $this->assertTrue(!empty($msg));
 
         // check summary table
         // colour coding names
@@ -507,23 +508,15 @@ class studentSimple extends SystemBaseTestCase
         // when a submission is made after grades and comments have been released
         // grades will become not released / only released comments will show up
         $this->waitForLogoutLogin('root');
-        $this->session->open($this->url.'events/edit/'.$this->eventId);
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->clear();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->sendKeys(date('Y-m-d H:i:s', strtotime('+1 day')));
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $w->until(
-            function($session) {
-                return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
-            }
-        );
+
         // release all comments
         $this->session->open($this->url.'evaluations/view/'.$this->eventId);
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Release All Comments')->click();
         $w->until(
             function($session) {
                 $comments = $session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[2]/td[8]/div')->text();
-                return $comments == 'Some Released';
+                return $comments == 'Released';
             }
         );
         // release all grades
@@ -532,7 +525,17 @@ class studentSimple extends SystemBaseTestCase
         $w->until(
             function($session) {
                 $grades = $session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[2]/td[7]/div')->text();
-                return $grades == 'Some Released';
+                return $grades == 'Released';
+            }
+        );
+
+        $this->session->open($this->url.'events/edit/'.$this->eventId);
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->clear();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->sendKeys(date('Y-m-d H:i:s', strtotime('+1 day')));
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $w->until(
+            function($session) {
+                return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
             }
         );
 
@@ -600,10 +603,12 @@ class studentSimple extends SystemBaseTestCase
     public function handleOffset($id, $offset)
     {
         $handle = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, $id);
-        $this->session->moveto(array('element' => $handle->getID()));
-        $this->session->buttondown();
-        $this->session->moveto(array('xoffset' => $offset, 'yoffset' => 0));
-        $this->session->buttonup();
+        $action = new PHPWebDriver_WebDriverActionChains($this->session);
+        $action->clickAndHold($handle)->moveByOffset($offset, 0)->release()->perform();
+        //$this->session->moveto(array('element' => $handle->getID()));
+        //$this->session->buttondown();
+        //$this->session->moveto(array('element' => $handle->getID(), 'xoffset' => $offset, 'yoffset' => 0));
+        //$this->session->buttonup();
     }
 
     public function secondStudent()

@@ -237,21 +237,28 @@ class AddMixEvalTestCase extends SystemBaseTestCase
 
     public function testEditTemplate()
     {
+        // the UI animation for adding / removing / re-arranging questions may confure Chrome if the commands executed too fast
+        // added some sleeps here
+        
         $this->session->open(str_replace('view', 'edit', $this->mixeval));
         // delete the score dropdown question
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="removeQ(3, 0); return false;"]')->click();
-
+        sleep(1);
+        
         // moving questions
         // move up the first question
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="upQ(0, 0); return false;"]')->click();
+        sleep(1);
         $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex0')->text();
         $this->assertEqual($quesNum, '1.'); // didn't move
         // move down the last question
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="downQ(2, 0); return false;"]')->click();
         $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex2')->text();
         $this->assertEqual($quesNum, '3.'); // didn't move
+        
         // move down the first question
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="downQ(0, 0); return false;"]')->click();
+        sleep(1);
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $w->until(
             function($session) {
@@ -261,8 +268,10 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         );
         $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex1')->text();
         $this->assertEqual($quesNum, '1.');
+        
         // move up the last question
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="upQ(2, 0); return false;"]')->click();
+        sleep(1);
         $w->until(
             function($session) {
                 $quesNum = $session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex2')->text();
@@ -271,8 +280,10 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         );
         $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex0')->text();
         $this->assertEqual($quesNum, '3.');
+        
         // delete the middle question
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="removeQ(2, 0); return false;"]')->click();
+        sleep(1);
         $w->until(
             function($session) {
                 $quesNum = $session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex0')->text();
@@ -285,13 +296,17 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         // adding question
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="MixevalMixevalQuestionTypePeer"] option[value="3"]')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[onclick="insertQ(false);"]')->click();
+        sleep(1);
         $quesNum = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'questionIndex4')->text();
         $this->assertEqual($quesNum, '3.');
 
         // delete all questions
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="removeQ(1, 0); return false;"]')->click();
+        sleep(1);
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="removeQ(0, 0); return false;"]')->click();
+        sleep(1);
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[onclick="removeQ(4, 0); return false;"]')->click();
+        sleep(1);
         $w->until(
             function($session) {
                 $ques = $session->elements(PHPWebDriver_WebDriverBy::CLASS_NAME, 'MixevalMakeQuestion');

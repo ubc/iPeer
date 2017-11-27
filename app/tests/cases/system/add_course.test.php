@@ -166,7 +166,7 @@ class AddCourseTestCase extends SystemBaseTestCase
         $this->assertTrue(empty($link));
         $link = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'List Groups');
         $this->assertTrue(!empty($link));
-        $link = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Export Groups');
+        $link = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Export Groups to CSV');
         $this->assertTrue(!empty($link));
 
         // Evaluation Events
@@ -238,10 +238,6 @@ class AddCourseTestCase extends SystemBaseTestCase
         $this->assertEqual($this->url.'users/add/1', $this->session->url());
         $this->session->open($this->url.'courses/home/1');
 
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Import Students')->click();
-        $this->assertEqual($this->url.'users/import/1', $this->session->url());
-        $this->session->open($this->url.'courses/home/1');
-
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'List Students')->click();
         $this->assertEqual($this->url.'users/goToClassList/1', $this->session->url());
         $this->session->open($this->url.'courses/home/1');
@@ -249,23 +245,27 @@ class AddCourseTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Email to All Students')->click();
         $this->assertEqual($this->url.'emailer/write/C/1', $this->session->url());
         $this->session->open($this->url.'courses/home/1');
+
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Import Students from CSV')->click();
+        $this->assertEqual($this->url.'users/import/1', $this->session->url());
+        $this->session->open($this->url.'courses/home/1');
     }
 
     public function testGroupLinks()
     {
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Create Groups (Manual)')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Add Group')->click();
         $this->assertEqual($this->url.'groups/add/1', $this->session->url());
-        $this->session->open($this->url.'courses/home/1');
-
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Create Groups (Import)')->click();
-        $this->assertEqual($this->url.'groups/import/1', $this->session->url());
         $this->session->open($this->url.'courses/home/1');
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'List Groups')->click();
         $this->assertEqual($this->url.'groups/index/1', $this->session->url());
         $this->session->open($this->url.'courses/home/1');
 
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Export Groups')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Import Groups from CSV')->click();
+        $this->assertEqual($this->url.'groups/import/1', $this->session->url());
+        $this->session->open($this->url.'courses/home/1');
+
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Export Groups to CSV')->click();
         $this->assertEqual($this->url.'groups/export/1', $this->session->url());
         $this->session->open($this->url.'courses/home/1');
     }

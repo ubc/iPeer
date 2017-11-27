@@ -118,12 +118,20 @@ abstract class SystemBaseTestCase extends CakeTestCase
         $home = $login->login($username, 'ipeeripeer');
     }
 
-    public function selectDayOnCalender($name, $day)
+    public function selectDayOnCalendar($name, $day, $nextMonth=true)
     {
+        // some browsers (e.g. chrome) will have problem if we click through the calendar too fast
+        // add some sleeps here
+        usleep(500000);
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, $name)->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
+        if ($nextMonth) {
+            $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
+            usleep(500000);
+        }
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, $day)->click();
+        usleep(500000);
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button.ui-priority-primary')->click();
+        usleep(500000);
     }
 
     public function startTest($method) {

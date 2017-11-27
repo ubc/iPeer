@@ -38,6 +38,7 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
         // allow access
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Allow All')->click();
         $this->updatePermissions();
+        sleep(2);
     }
 
     public function testAccess()
@@ -63,6 +64,7 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
         // deny access
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny All')->click();
         $this->updatePermissions();
+        sleep(2);
     }
 
     public function testDenyIndividualActions()
@@ -73,6 +75,7 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
         $this->findPermissions('controllers/mixevals/index');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Create')->click();
         $this->updatePermissions();
+        sleep(2);
         // deny read
         $this->findPermissions('controllers/mixevals/index');
         $deny = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Create');
@@ -81,6 +84,7 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
         $this->assertTrue(!empty($allow));
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Read')->click();
         $this->updatePermissions();
+        sleep(2);
         // deny update
         $this->findPermissions('controllers/mixevals/index');
         $deny = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Read');
@@ -89,6 +93,7 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
         $this->assertTrue(!empty($allow));
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Update')->click();
         $this->updatePermissions();
+        sleep(2);
         // deny delete
         $this->findPermissions('controllers/mixevals/index');
         $deny = $this->session->elements(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Update');
@@ -97,7 +102,8 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
         $this->assertTrue(!empty($allow));
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Delete')->click();
         $this->updatePermissions();
-
+        sleep(2);
+        
         $this->waitForLogoutLogin('instructor1');
         $this->session->open($this->url.'evaltools');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Mixed Evaluations')->click();
@@ -120,6 +126,7 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
         $this->findPermissions('controllers/mixevals/index');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Allow Create')->click();
         $this->updatePermissions();
+        sleep(2);
         // allow read
         $this->findPermissions('controllers/mixevals/index');
         $deny = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Create');
@@ -128,6 +135,7 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
         $this->assertTrue(empty($allow));
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Allow Read')->click();
         $this->updatePermissions();
+        sleep(2);
         // allow update
         $this->findPermissions('controllers/mixevals/index');
         $deny = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Read');
@@ -136,6 +144,7 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
         $this->assertTrue(empty($allow));
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Allow Update')->click();
         $this->updatePermissions();
+        sleep(2);
         // allow delete
         $this->findPermissions('controllers/mixevals/index');
         $deny = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Deny Update');
@@ -144,6 +153,7 @@ class PermissionsEditorTestCase extends SystemBaseTestCase
         $this->assertTrue(empty($allow));
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Allow Delete')->click();
         $this->updatePermissions();
+        sleep(2);
 
         $this->waitForLogoutLogin('instructor1');
         $this->session->open($this->url.'evaltools');
