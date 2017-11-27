@@ -103,3 +103,11 @@ Synchronize the groups and membership between iPeer and Canvas
 * In **Simplified** mode, users can click on the **Sync All Groups** button to synchronize.  Groups that only found in iPeer will be created in Canvas (and vice versa).  Memberships of the groups will also be synchronized between iPeer and Canvas
 * If there is a conflict or users want to control which group to synchronize, select the **Advanced** mode.  Here, users can review and select specific groups to synchronize from one system to another.  Users can also check the option **Replace group, rather than merge** when synchronizing
 
+> **Prerequisites for a proper group sync** 
+> 
+> Please note that group sync will not create new users in Canvas. Any users must already be in that Canvas course and linked properly (using the **system.canvas_user_key**) to be synchronized. 
+>
+> Please also note that Canvas (unlike iPeer) does not allow the same student to exist in more than one group in a single "group set" for a course. 
+>
+> **What are group sets?**
+> Canvas uses "Group Sets" to group groups. For example, you can have different group sets for different projects in a course. iPeer does not currently support this concept, but it is a requirement for Canvas.
