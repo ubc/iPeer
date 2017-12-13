@@ -6,6 +6,36 @@ if (isset($instructions)) {
 
 echo $this->Form->create('Course');
 echo $this->Form->input('id');
+if ($canvasEnabled) {
+    if (!empty($this->data['Course']) && empty($this->data['Course']['id'])) {
+        // new course creation based on canvas
+        echo $form->hidden('Course.canvas_id');
+    } else if (!empty($this->data['Course']) && !empty($this->data['Course']['id'])) {
+        // edit existing course
+        // canvas courses
+        $cCourse = $form->input(
+            'Course.canvas_id',
+            array(
+                'type' => 'select',
+                'id' => 'canvas_id',
+                'label' => __('Linked with <br/>Canvas course', true),
+                'options' => $canvasCourses,
+                'default' => $this->data['Course']['canvas_id'],
+                'div' => array( 'style' => 'padding-bottom: 10px;' )
+            )
+        );
+        
+        if (empty($canvasCourses)) {
+            echo '<div class="input select" style="padding-bottom: 10px;">' . $this->Form->label('Linked with <br/>Canvas course');
+            echo $this->Form->select("canvasCourseInaccessible", array('0'=>'No accessible Canvas courses'), null, array("default" => '0', "disabled"=>true));
+            echo '</div>';
+            echo $form->hidden('Course.canvas_id');
+        } else {
+            echo $html->div('input text', $cCourse);
+        }
+    }
+}
+
 echo $form->input('Course.course');
 echo $html->div('help-text', __('Course subjects and course numbers, e.g. APSC 201 001', true));
 echo $form->input('Course.title');
@@ -87,8 +117,29 @@ echo $form->end(); ?>
 </div>
 
 <script type="text/javascript">
-
-
+<?php if ($canvasEnabled) { ?>
+// add the empty option
+jQuery('#canvas_id').prepend('<option value="" <?php echo empty($this->data['Course']['canvas_id'])? 'selected="selected"' : '' ?>></option>');
+// select the empty option if no linked canvas course
+if (jQuery('#canvas_id option[value="<?php echo $this->data['Course']['canvas_id'] ?>"]').length == 0) {
+    jQuery('#canvas_id').val('');
+}
+// warn user if there is already a linked canvas course and they are changing it
+else if (jQuery('#canvas_id').val() != '') {
+    var prevCanvasId = '<?php echo $this->data['Course']['canvas_id'] ?>';
+    jQuery('#canvas_id').focus(function() {
+        prevCanvasId = jQuery(this).val();
+    }).change(function(){
+        jQuery(this).blur();
+        if (jQuery(this).val() != '<?php echo $this->data['Course']['canvas_id'] ?>' &&
+            prevCanvasId == '<?php echo $this->data['Course']['canvas_id'] ?>' &&
+            !confirm('If you change the associated Canvas course, all the data about this association might be erased. Are you sure you want to continue?')) {
+            jQuery(this).val(prevCanvasId);
+            return false;
+        }
+    })
+}
+<?php } ?>
 // remove all already added instructors from the drop down
 var selected = <?php echo json_encode($selected); ?>;
 jQuery.each(selected, function(key, value) {

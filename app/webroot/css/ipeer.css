@@ -16,6 +16,7 @@ time, mark, audio, video {
     border: 0;
     font-size: 100%;
     font: inherit;
+    color: #333;
 }
 /* html5 display-role reset for older browsers */
 article, aside, details, figcaption, figure, 
@@ -109,11 +110,12 @@ p {
     text-align: right;
     clear: left;
     padding: 0 1em 0 0;
-    width: 13em;
+    width: auto;
     margin-top: 0.4em;
+    min-width: 10em;
 }
 
-input[type="text"], input[type="file"], input[type="password"], textarea, select
+input[type="text"], input[type="file"], input[type="password"], textarea, select, button
 {   
     margin: 0.35em 0.35em; 
     border-radius: 3px; 
@@ -139,7 +141,6 @@ input[type="text"], input[type="file"], input[type="password"], textarea, select
     height: 2em;
     font-weight: 600;
     display: block;
-    width: 8em;
 }
 
 /* Make buttons a bit easier to press */
@@ -147,11 +148,12 @@ button {
     padding: 0.3em 0.5em;
 }
 
-a:link, a:visited, a:hover {
+a:link, a:visited, a:hover, input[type="submit"], button {
+    color: #1049b1;
     text-decoration: none;
 }
 
-a:hover, a:hover * {
+a:hover, a:hover *, input[type="submit"]:hover, button:hover {
     color: green !important;
 }
 
@@ -174,27 +176,40 @@ strong {
 
 .standardtable {
     width: 100%;
+    border: solid 1px #ccc;
+    border-radius: 5px;
+    border-collapse: separate;
+    box-shadow: 0 0 25px rgba(85, 85, 85, 0.10);
+    margin: 0.5em 0 0.7em;
 }
 
 .standardtable th {
     padding: 0.4em 0.1em;
-    background-color: #ddd;
+    background-color: #ececec;
     font-weight: 600;
     font-size: 0.95em;
-    border-left: 2px solid white;
-    border-bottom: 2px solid white;
+    border-left: solid 1px #ddd;
+    border-bottom: solid 1px #ddd;
 }
 
 .standardtable td {
-    border-left: 2px solid white;
-    border-bottom: 2px solid white;
+    border-left: solid 1px #e9e9e9;
+    border-bottom: solid 1px #e9e9e9;
     padding: 0.4em 0.1em;
-    background-color: #f6f6f6;
+    background-color: #f9f9f9;
     text-align: center;
 }
 
+.standardtable tr th:first-child, 
+.standardtable tr td:first-child {
+    border-left: none;
+}
+.standardtable tr:last-child td {
+    border-bottom: none;
+}
+
 .standardtable #details td {
-    background-color: #F1F1F1;
+    background-color: #f1f1f1;
 }
 
 .standardtable table td {
@@ -204,6 +219,19 @@ strong {
 .leftalignedtable th, .leftalignedtable td {
     padding: 0.4em;
     text-align: left;
+}
+
+.standardtable tr:first-child th:first-child {
+    border-top-left-radius: 4px;
+}
+.standardtable tr:first-child th:last-child {
+    border-top-right-radius: 4px;
+}
+.standardtable tr:last-child td:first-child, .standardtable thead:only-child tr:last-child th:first-child {
+    border-bottom-left-radius: 4px;
+}
+.standardtable tr:last-child td:last-child, .standardtable thead:only-child tr:last-child th:last-child {
+    border-bottom-right-radius: 4px;
 }
 
 /* css for timepicker */
@@ -342,9 +370,50 @@ a#home, a#home:hover, a#home:active {
 }
 
 /* authMessage is only used for cake generated login errors. */
-#flashMessage, #authMessage, .error-message {
+#flashMessage, 
+#authMessage, 
+.error-message {
     color: #990044;
-    border: 2px solid #990044;
+    border: 1px solid #ca4343;
+    background: #fff0f0;
+    box-shadow: 0 0 25px rgba(144, 73, 73, 0.28);
+    border-radius: 5px;
+}
+
+#flashMessage > *,
+#authMessage > *,
+.error-message > *,
+.success-message > *,
+.good-message > * {
+    text-align: left;
+}
+
+#flashMessage > ul,
+#authMessage > ul,
+.error-message > ul,
+.success-message > ul
+.good-message > ul {
+    list-style-type: disc;
+    padding-left: 2em;
+    padding-bottom: 1em;
+}
+
+#flashMessage > p,
+#authMessage > p,
+.error-message > p,
+.success-message > p,
+.good-message > p  {
+    padding-top: 0;
+}
+
+#authMessage.success, 
+.success-message,
+.good-message {
+    color: #159900;
+    border: 1px solid #159900;
+    background: #f1fff0;
+    box-shadow: 0 0 25px rgba(73, 144, 74, 0.28);
+    border-radius: 5px;
 }
 
 .red {
@@ -363,12 +432,29 @@ a#home, a#home:hover, a#home:active {
     color: blue;
 }
 
+.breadcrumb {
+    margin: 0 0 2em;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: #000;
+    float: left;
+    opacity: 0.5;
+    width: 100%;
+}
+.breadcrumb a {
+    color: #000;
+}
+
 h1.title {
     margin: 0.5em 0 1em;
     font-size: 1.5em;
     font-weight: 600;
-    color: #be9ad3;
+    color: #9971ad;
     padding: 0;
+}
+
+#bannerLarge + h1.title {
+    margin-top: 2em;
 }
 
 h2 {
@@ -389,6 +475,7 @@ h4 {
 
 i {
     font-style: italic;
+    /* display: none; */
 }
 
 /* FOOTER */
@@ -703,17 +790,26 @@ i {
 }
 
 .course_submenu {
-    margin: 1em 0;
-    width: 49.6%;
+    margin: 0.6em 0;
+    width: 48.5%;
     vertical-align: top;
     display: inline-block;
+    border: solid 1px #ccc;
+    border-radius: 5px;
+    padding-bottom: 1em;
+    box-shadow: 0 0 25px rgba(85, 85, 85, 0.10);
+}
+
+.course_actions .course_submenu:nth-child(even) {
+    margin-left: 2.1%;
 }
 
 .course_submenu h3 {
-    background-color: #EAEAEA;
+    background-color: #ececec;
     color: #0A2C64;
     font-weight: 600;
-    padding: 0.5em;
+    padding: 0.5em 0.8em;
+    margin: 0;
 }
 
 .course_submenu ul {
@@ -721,11 +817,11 @@ i {
 }
 
 .course_submenu li {
-    padding-left: 2em;
+    padding-left: 2.5em;
     margin-top: 1em;
     background-image: url("../img/layout/yellow_arrow.gif");
     background-repeat: no-repeat;
-    background-position: 0.5em;
+    background-position: 0.9em;
 }
 
 #CourseHome .invalid {
@@ -916,7 +1012,7 @@ i {
 
 /* courses/add, courses/edit */
 
-#CourseEditForm .select #CourseInstructors, #CourseEditForm .select #CourseTutors {
+#CourseEditForm .select #CourseInstructors, #CourseEditForm .select #CourseTutors, #CourseEditForm .select #CanvasCourses {
     width: 20em;
 }
 
@@ -936,7 +1032,7 @@ i {
     margin-right: 1em;
 }
 
-#CourseEditForm #instructors a, #CourseEditForm #tutors a {
+#CourseEditForm #instructors a, #CourseEditForm #tutors a, #CourseEditForm #canvas_courses a  {
     padding: 0.5em;
 }
 
@@ -1054,7 +1150,9 @@ i {
 }
 
 /* SysParameters */
-#sysParam .text label, #sysParam .select label {
+#sysParam .text label, 
+#sysParam .password label, 
+#sysParam .select label {
     width: 18em;
 }
 
@@ -1177,22 +1275,20 @@ i {
 }
 
 .evaltoolsnav a {
-    color: white;
     font-weight: 600;
     font-size: 0.9em;
-    background-color: #0A2C64;
+    background-color: #eee;
     text-decoration: none;
-    padding: 0.5em;
+    padding: 0.5em 1em 0.3em;
+    border-bottom: solid 4px #eee;
 }
 
 .evaltoolsnav a:hover {
-    background-color: yellow;
-    color: #111;
+    border-color: gold;
 }
 
 .evaltoolsnav .current a {
-    background-color: gold;
-    color: #111;
+    border-color: gold;
 }
 
 .evaltool-section-header h2{
@@ -1353,6 +1449,159 @@ i {
 
 #groupsimport #title, #groupsimport #button_text {
     text-align: center;
+}
+
+#syncCanvasWrapper #syncFormType {
+    margin: 0 auto;
+    float: none;
+    width: 14em;
+}
+
+#syncCanvasTable {
+    width: 100%;
+}
+
+#syncCanvasTable.simplified > thead a,
+#syncCanvasTable.simplified > tbody table > thead input[type="checkbox"],
+/*
+#syncCanvasTable.simplified > tbody table > thead .expanded-after:after,
+#syncCanvasTable.simplified > tbody table > tbody,
+*/
+#syncCanvasTable.simplified table > tbody input[type="checkbox"],
+#syncCanvasTable.simplified > tfoot > tr:not(.sync-button-row),
+#syncCanvasTable:not(.simplified) > tfoot > tr.sync-button-row {
+    display: none !important;
+}
+
+#syncCanvasTable > thead tr th:first-child,
+#syncCanvasTable > thead tr th:last-child {
+    width: 48%;
+}
+
+#syncCanvasTable > thead th a,
+#syncCanvasTable .standardtable td a {
+    font-size: 0.8em;
+}
+
+#syncCanvasTable > thead th a.selectAll,
+#syncCanvasTable > thead th a.selectNone {
+    float: left;
+    margin-right: 1em;
+}
+
+#syncCanvasTable > thead th a.expandAll,
+#syncCanvasTable > thead th a.collapseAll {
+    float: right;
+    margin-left: 1em;
+}
+
+#syncCanvasTable > * > tr td {
+    vertical-align: top;
+    text-align: center;
+}
+
+#syncCanvasTable > tbody tr td .disabled {
+    color: #999;
+}
+
+#syncCanvasTable .non-existent-group {
+    border: dashed 2px #ccc;
+    min-height: 20px;
+    margin-top: 8px;
+    border-radius: 5px;
+    color: #999;
+    margin: 0.55em 0 0.7em;
+    text-align: center;
+    padding-top: 5px;
+    font-size: 0.8em;
+    background: #f6f6f6;
+}
+
+#syncCanvasForm .syncIcon {
+    font-size: 2em;
+    line-height: 0.5em;
+    float: right;
+}
+
+#syncCanvasTable > tbody tr td.syncIcon {
+    text-align: center;
+    line-height: 1.2em;
+    float: none;
+}
+
+#syncCanvasTable .standardtable .showLessMembers,
+#syncCanvasTable .standardtable .showMoreMembers {
+    display: none !important;
+}
+#syncCanvasTable .standardtable tr.showMoreLessMembers td {
+    background: #ddd;
+    padding: 0.1em 0.1em 0.2em;
+}
+
+#syncCanvasTable input[type="checkbox"] {
+    float: left;
+    margin: 0 -1em 0 1em;
+}
+
+#syncCanvasTable tfoot input[type="checkbox"] {
+    margin: 9px 8px 0 1em;
+}
+
+#syncCanvasTable tfoot .checkbox {
+    margin: 1em auto;
+    float: none;
+    max-width: 18.5em;
+}
+#syncCanvasTable tfoot .checkbox label {
+    clear: none;
+    width: 15em;
+    text-align: left;
+}
+
+#syncCanvasTable .submit-buttons-row td,
+#syncCanvasTable .sync-button-row td {
+    padding-top: 1em;
+}
+
+#syncCanvasTable .check-before:before {
+    width: 14px;
+    height: 14px;
+    display: block;
+    float: left;
+    margin: 0 -27px 0 13px;
+    font-style: normal;
+    content: ' \2714';
+}
+
+#syncCanvasTable .collapsed-after:after {
+    width: 14px;
+    height: 14px;
+    display: block;
+    float: right;
+    margin: 0 13px 0 -27px ;
+    font-style: normal;
+    content: ' \25B8';
+}
+
+#syncCanvasTable .expanded-after:after {
+    width: 14px;
+    height: 14px;
+    display: block;
+    float: right;
+    margin: 0 13px 0 -27px ;
+    font-style: normal;
+    content: ' \25BE';
+}
+
+.highlight-green {
+    background: #a0ffa0 !important;
+    color: green !important;
+    border-bottom-color: #8bea8a !important;
+}
+th.highlight-green {
+    background: #3ca13c !important;
+    color: rgb(0, 66, 0) !important;
+    border-color: #1e7d1e;
 }
 
 /* MIXEVALS */
@@ -1748,14 +1997,9 @@ table.content-table {
     margin: 0 auto 0 auto;
 }
 
-.add-button,
-.delete-button,
-.edit-button,
-.merge-button,
-.export-excel-button,
-.instruction-icon,
-.button {
-    background-color: #eee;
+.add-button, .delete-button, .edit-button, .merge-button, .export-excel-button, .compare-button, .instruction-icon, .button, 
+input[type="submit"], input[type="button"], button {
+    background-color: #e6e6e6;
     padding: 5px 5px 5px 25px;
     background-position: 5px 6px;
     border: solid 1px #ccc;
@@ -1764,6 +2008,31 @@ table.content-table {
     font-size: 0.9em;
     background-repeat: no-repeat;
     box-shadow: 0 0 5px rgba(85, 85, 85, 0.28);
+    cursor: pointer;
+    border-color: #adadad;
+}
+
+input[type="submit"], input[type="button"], button, .button {
+    padding: 5px 10px;
+    background: #e7e7e7; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(left top, #e7e7e7, #c1c1c1); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(bottom right, #e7e7e7, #c1c1c1); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(bottom right, #e7e7e7, #c1c1c1); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(to bottom right, #e7e7e7, #c1c1c1); /* Standard syntax */
+    border-color: #636363;
+    color: #636363;
+}
+
+input[type="submit"], button.submit {
+    padding: 5px 10px;
+    background: #e7d3f1; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(left top, #e7d3f1, #c19bd4); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(bottom right, #e7d3f1, #c19bd4); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(bottom right, #e7d3f1, #c19bd4); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(to bottom right, #e7d3f1, #c19bd4); /* Standard syntax */
+    border-color: #632b7d;
+    color: #632b7d;
+    font-weight: normal;
 }
 
 .add-button:hover,
@@ -1771,11 +2040,27 @@ table.content-table {
 .edit-button:hover,
 .merge-button:hover,
 .export-excel-button:hover,
+.compare-button:hover,
 .instruction-icon:hover,
-.button:hover {
-    background-color: #fbf9ea;
-    border-color: gold;
-    box-shadow: 0 0 5px rgb(222, 204, 124);
+.button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+button:hover {
+    background-color: #fbf9ea !important;
+    border-color: #f1cb00;
+    box-shadow: 0 0 5px #decc7c;
+    color: #5f5415 !important;
+}
+
+.button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+button:hover {
+    background: #fbf9ea; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(left top, #fbf9ea, #f8e988); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(bottom right, #fbf9ea, #f8e988); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(bottom right, #fbf9ea, #f8e988); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(to bottom right, #fbf9ea, #f8e988); /* Standard syntax */
 }
 
 .add-button {
@@ -1796,6 +2081,10 @@ table.content-table {
 
 .export-excel-button {
     background-image: url('../img/icons/export_excel.gif');
+}
+
+.compare-button {
+    background-image: url('../img/icons/merge.png');
 }
 
 .instruction-icon {

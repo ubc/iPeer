@@ -717,7 +717,7 @@ class User extends AppModel
 
         if (!empty($data) && !($this->saveAll(array_values($data)))) {
             $this->errorMessage = array_merge($this->errorMessage, $this->validationErrors);
-            return false;
+            return array('errors'=>$this->errorMessage);
         }
 
         if ($updateExisting && !empty($existings)) {

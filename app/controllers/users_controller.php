@@ -25,6 +25,7 @@ class UsersController extends AppController
     );
     public $components = array('Session', 'AjaxList', 'RequestHandler',
         'Email', 'FileUpload.FileUpload', 'PasswordGenerator');
+    private $canvasEnabled;
 
     /**
      * __construct
@@ -61,6 +62,8 @@ class UsersController extends AppController
         $this->FileUpload->fileModel(null);
         $this->FileUpload->attr('required', true);
         $this->FileUpload->attr('forceWebroot', false);
+
+        $this->canvasEnabled = in_array($this->SysParameter->get('system.canvas_enabled', 'false'), array('1', 'true', 'yes'));
     }
 
     /**
@@ -263,6 +266,12 @@ class UsersController extends AppController
 
         $this->set('classList', $course['Enrol']);
         $this->set('courseId', $courseId);
+
+        if ($this->canvasEnabled && !empty($course['Course']['canvas_id'])) {
+            $this->set('linkedWithCanvas', true);
+        } else {
+            $this->set('linkedWithCanvas', false);
+        }
 
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Students', true)));
     }
@@ -1093,10 +1102,12 @@ class UsersController extends AppController
      *
      * @return void
      */
-    public function import($courseId = null)
+    public function import($courseId = null, $importFrom = 'file')
     {
+        $iPeerCourse = null;
         if (!is_null($courseId)) {
             $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
+            $iPeerCourse = $course;
             if (empty($course)) {
                 $this->Session->setFlash(__('Error: That course does not exist.', true));
                 $this->redirect('/courses');
@@ -1112,55 +1123,155 @@ class UsersController extends AppController
             $courseId = $this->data['Course']['Course'];
         }
         $this->set('courseId', $courseId);
+        $this->set('formUrl', Router::url(null, true));
 
-        $this->set('breadcrumb', $this->breadcrumb->push(__('Import Students From Text (.txt) or CSV File (.csv)', true)));
+        $users = array();
+        $usernames = array();
 
+        if ($importFrom == 'canvas') {
+
+            if (!$this->canvasEnabled){
+                $this->Session->setFlash(__('Error: Canvas integration not enabled.', true));
+                $this->redirect('index');
+            }
+
+            $this->set('breadcrumb', $this->breadcrumb->push(__('Import Students From Canvas', true)));
+            $this->set('isFileImport', false);
+
+            $userId = $this->Auth->user('id');
+
+            App::import('Component', 'CanvasCourse');
+            $canvasCoursesRaw = CanvasCourseComponent::getAllByIPeerUser($this, $userId, true);
+
+            $canvasCourses = array();
+            foreach ($canvasCoursesRaw as $course) {
+                $canvasCourses[$course->id] = $course->name;
+            }
+            $this->set('canvasCourses', $canvasCourses);
+
+            // check if the course is already linked with a valid canvas course
+            if (isset($iPeerCourse['Course']) and
+                isset($iPeerCourse['Course']['canvas_id']) and
+                array_key_exists($iPeerCourse['Course']['canvas_id'], $canvasCourses)) {
+
+                $this->set('defaultCanvasId', $iPeerCourse['Course']['canvas_id']);
+            }
+
+            if (!empty($this->data)) {
+
+                // TODO: do some validation
+            
+                App::import('Component', 'CanvasCourseUser');
+
+                $canvasCourses = CanvasCourseComponent::getAllByIPeerUser($this, User::get('id'), true);
+                $selectedCanvasCourse = $canvasCourses[$this->data['User']['canvasCourse']];
+
+                $canvasUsers = $selectedCanvasCourse->getUsers(
+                    $this,
+                    $userId,
+                    array(CanvasCourseUserComponent::ENROLLMENT_QUERY_STUDENT),
+                    true,
+                    true
+                );
+
+                $canvas_user_key = $this->SysParameter->get('system.canvas_user_key'); 
+
+                foreach ($canvasUsers as $k => $canvasUser) {
+                    $users[] = array(
+                        User::IMPORT_USERNAME => $canvasUser->$canvas_user_key,
+                        User::IMPORT_PASSWORD => $this->PasswordGenerator->generate(),
+                        User::IMPORT_FIRSTNAME => $canvasUser->first_name,
+                        User::IMPORT_LASTNAME => $canvasUser->last_name,
+                        User::IMPORT_EMAIL => isset($canvasUser->email) ? $canvasUser->email : '',
+                    );
+                    $usernames[] = $canvasUser->$canvas_user_key;
+                }
+
+                // save the canvas course association with this course if there's no association currently and there's a course
+                if (!empty($this->data['User']['canvasCourse']) && empty($iPeerCourse['Course']['canvas_id'])){
+                    $save_data = array('Course' => array('canvas_id' => $this->data['User']['canvasCourse']));
+                    $this->Course->id = $courseId;
+                    $this->Course->save($save_data);
+                }
+            }
+        }
+        else {
+
+            $this->set('breadcrumb', $this->breadcrumb->push(__('Import Students From CSV File (.csv or .txt)', true)));
+            $this->set('isFileImport', true);
+
+            if (!empty($this->data)) {
+                // check that file upload worked
+                if ($this->FileUpload->success) {
+                    $uploadFile = $this->FileUpload->uploadDir.DS.$this->FileUpload->finalFile;
+                } else {
+                    $this->Session->setFlash($this->FileUpload->showErrors());
+                    return;
+                }
+
+                $data = Toolkit::parseCSV($uploadFile);
+                
+                // generation password for users who weren't given one
+                foreach ($data as &$user) {
+                    if (empty($user[User::IMPORT_PASSWORD])) {
+                        $user[User::GENERATED_PASSWORD] = $this->PasswordGenerator->generate();
+                    } else {
+                        $user[User::GENERATED_PASSWORD] = '';
+                    }
+                    $usernames[] = $user[User::IMPORT_USERNAME];
+                }
+
+                $users = $data;
+
+                $this->FileUpload->removeFile($uploadFile);
+            }
+        }
 
         if (!empty($this->data)) {
-            // check that file upload worked
-            if ($this->FileUpload->success) {
-                $uploadFile = $this->FileUpload->uploadDir.DS.$this->FileUpload->finalFile;
-            } else {
-                $this->Session->setFlash($this->FileUpload->showErrors());
-                return;
-            }
-
-            $data = Toolkit::parseCSV($uploadFile);
-            $usernames = array();
-            // generation password for users who weren't given one
-            foreach ($data as &$user) {
-                if (empty($user[User::IMPORT_PASSWORD])) {
-                    $user[User::GENERATED_PASSWORD] = $this->PasswordGenerator->generate();
-                } else {
-                    $user[User::GENERATED_PASSWORD] = '';
-                }
-                $usernames[] = $user[User::IMPORT_USERNAME];
-            }
 
             if ($this->data['User']['update_class']) {
                 $this->User->removeOldStudents($usernames, $courseId);
             }
 
             // add the users to the database
-            $result = $this->User->addUserByArray($data, true);
+            $result = $this->User->addUserByArray($users, true, $this);
 
-            if (!$result) {
-                $this->Session->setFlash("Error: Unable to import users.");
+            if (isset($result['errors'])) {
+                $error_message = '';
+                foreach ($result['errors'] as $error){
+                    if (is_array($error)) {
+                        foreach ($error as $error_detail) {
+                            $error_message .= '<li>' . $error_detail . '</li>';
+                        }
+                    }
+                    else {
+                        $error_message .= '<li>' . $error . '</li>';
+                    }
+                }
+
+                $supportEmail = $this->SysParameter->get('display.contact_info');
+                $this->Session->setFlash("Error: Unable to import users <ul>" . $error_message . "</ul>" .
+                                         "<p>If you continue having issues with the import, please " .
+                                         "<a href='mailto:" . $supportEmail . "?subject=Problem using " .
+                                         "iPeer user import feature'>contact support</a>.</p>");
                 return;
+            }
+            else {
+                $this->Session->setFlash("Import successful! See below for import details.", 'good');
             }
 
             $insertedIds = array();
             foreach ($this->User->insertedIds as $new) {
                 $insertedIds[] = $new;
             }
-            foreach ($result['updated_students'] as $old) {
-                $insertedIds[] = $old['User']['id'];
+            if (isset($result['updated_students'])) {
+                foreach ($result['updated_students'] as $old) {
+                    $insertedIds[] = $old['User']['id'];
+                }
             }
 
-            // enrol the users in the selectec course
-            $this->Course->enrolStudents($insertedIds,
-                $this->data['Course']['Course']);
-            $this->FileUpload->removeFile($uploadFile);
+            // enrol the users in the selected course
+            $this->Course->enrolStudents($insertedIds, $this->data['Course']['Course']);
             $this->set('data', $result);
             $this->render('userSummary');
         }

@@ -6,8 +6,7 @@ switch($submenu) {
     if ($status == 'A') {
         array_push(
             $items,
-            array('name' => 'Add Student', 'link' => "/users/add/$course_id"),
-            array('name' => 'Import Students', 'link' => "/users/import/$course_id")
+            array('name' => 'Add Student', 'link' => "/users/add/$course_id")
         );
     }
     array_push(
@@ -17,23 +16,39 @@ switch($submenu) {
     if ($status == 'A') {
         array_push(
             $items,
-            array('name' => 'Email to All Students',  'link' => "/emailer/write/C/$course_id")
+            array('name' => 'Email to All Students',  'link' => "/emailer/write/C/$course_id"),
+            array('name' => 'Import Students from CSV', 'link' => "/users/import/$course_id")
         );
+        if ($canvasEnabled){
+            array_push(
+                $items,
+                array('name' => 'Import Students from Canvas',  'link' => "/users/import/$course_id/canvas")
+            );
+        }
     }
     break;
   case "Group":
+    array_push(
+        $items,
+        array('name' => 'Add Group', 'link' => "/groups/add/$course_id"),
+        array('name' => 'List Groups', 'link' => "/groups/index/$course_id")
+    );
     if ($status == 'A') {
         array_push(
             $items,
-            array('name' => 'Create Groups (Manual)', 'link' => "/groups/add/$course_id"),
-            array('name' => 'Create Groups (Import)', 'link' => "/groups/import/$course_id")
+            array('name' => 'Import Groups from CSV', 'link' => "/groups/import/$course_id")
         );
     }
     array_push(
         $items,
-        array('name' => 'List Groups', 'link' => "/groups/index/$course_id"),
-        array('name' => 'Export Groups', 'link' => "/groups/export/$course_id")
+        array('name' => 'Export Groups to CSV', 'link' => "/groups/export/$course_id")
     );
+    if ($canvasEnabled){
+        array_push(
+            $items,
+            array('name' => 'Sync Canvas Groups', 'link' => "/groups/syncCanvas/$course_id")
+        );
+    }
     break;
   case "EvalEvents":
     if ($status == 'A') {

@@ -76,6 +76,13 @@ Runing the tests:
 
 It is better not to touch the mouse or keyboard during the tests.
 
+iPeer 3.3.0
+-----------
+* Updated UI/UX to make iPeer more modern
+* Added Canvas integration
+* Fixed grades api for mixed eval 
+* Fixed edit event template issue
+
 iPeer 3.2.0
 -----------
 * Fixed wrong score calculation when using rubric with zero mark enabled
