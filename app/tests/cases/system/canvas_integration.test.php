@@ -75,11 +75,11 @@ const IPEER_STUDENT3_STUDENTNO = '98985481';
 
 class CanvasIntegrationTestCase extends SystemBaseTestCase
 {
-    public function setUp()
+    public function skip()
     {
         $this->skipUnless(ENABLE_CANVAS_TEST, 'Canvas integration test disabled');
     }
-    
+
     public function startCase()
     {
         parent::startCase();
