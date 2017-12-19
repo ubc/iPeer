@@ -24,7 +24,7 @@ if ($canvasEnabled) {
                 'div' => array( 'style' => 'padding-bottom: 10px;' )
             )
         );
-        
+
         if (empty($canvasCourses)) {
             echo '<div class="input select" style="padding-bottom: 10px;">' . $this->Form->label('Linked with <br/>Canvas course');
             echo $this->Form->select("canvasCourseInaccessible", array('0'=>'No accessible Canvas courses'), null, array("default" => '0', "disabled"=>true));
@@ -108,7 +108,7 @@ echo $form->input(
 echo $form->input('Department', array(
     'label' => $this->Vocabulary->translate('Department'),
 ));
-echo $html->div('help-text', __('Selecting correct assoication will allow admin to help troubleshooting.', true));
+echo $html->div('help-text', __('Selecting correct associations will allow admin to help troubleshooting.', true));
 echo $this->Form->input('homepage');
 echo $html->div('help-text', __('e.g. http://mycoursehome.com', true));
 
