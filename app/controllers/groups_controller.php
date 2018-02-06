@@ -368,10 +368,10 @@ class GroupsController extends AppController
             $this->Session->setFlash(__('Error: Canvas integration not enabled.', true));
             $this->redirect('index');
         }
-        
+
         App::import('Component', 'CanvasCourse');
         App::import('Component', 'CanvasCourseUser');
-        
+
         $userId = $this->Auth->user('id');
 
         // get all accessible courses (for dropdown) and also validate selected course (if any)
@@ -394,7 +394,7 @@ class GroupsController extends AppController
                 $this->breadcrumb->push(array('course' => $course['Course']));
             }
         }
-        
+
         // get all accessible canvas courses (for dropdown) and also validate selected canvas course (if any)
         $canvasCoursesRaw = CanvasCourseComponent::getAllByIPeerUser($this, $userId, true);
 
@@ -447,7 +447,7 @@ class GroupsController extends AppController
                 if (isset($this->data['Group']['canvasGroupCategory'])) {
                     $canvasGroupCategoryId = $this->data['Group']['canvasGroupCategory'];
                 }
-        
+
                 if (!is_null($canvasGroupCategoryId)) {
                     if ($canvasGroupCategoryId == 'new') {
                         $canvasGroupCategoryId = '';
@@ -458,9 +458,9 @@ class GroupsController extends AppController
                     }
                 }
             }
-            
+
         }
-        
+
         $this->breadcrumb->push(__('Sync Canvas Groups', true));
         $this->set('breadcrumb', $this->breadcrumb);
 
@@ -476,7 +476,7 @@ class GroupsController extends AppController
                 User::get('id'),
                 array(CanvasCourseUserComponent::ENROLLMENT_QUERY_STUDENT)
             );
-            
+
             // Get the list of groups in this iPeer course and the students in each group
             $groupsAndUsers = array();
             $groups = $this->Group->getGroupsByCourseId($courseId);
@@ -504,18 +504,26 @@ class GroupsController extends AppController
             $enableSimplifiedSync = true;
             $eligibleCanvasUsersIniPeerCourse = array();
 
+            // We need to show the user a warning if there are duplicate group names
+            $canvasDuplicateGroupNames = array();
+
             // Get the list of groups in this Canvas course and the students in each group
             $canvasGroupsAndUsers = array();
             $canvasGroups = array();
             if (!empty($canvasGroupCategoryId)) {
                 $canvasGroups = $canvasCoursesRaw[$canvasCourseId]->getGroups($this, $userId, true, $canvasGroupCategoryId);
                 foreach ($canvasGroups as $k => $canvasGroup) {
+                    foreach ($canvasGroups as $canvasGroupToCheck) {
+                        if ($canvasGroup->id != $canvasGroupToCheck->id && $canvasGroup->name == $canvasGroupToCheck->name) {
+                            $canvasDuplicateGroupNames[$canvasGroup->name] = isset($canvasDuplicateGroupNames[$canvasGroup->name]) ? count($canvasDuplicateGroupNames[$canvasGroup->name])+1 : 1;
+                        }
+                    }
                     $canvasGroupsAndUsers[$canvasGroup->name] = array('CanvasMember'=>array());
-                    $canvasGroupsAndUsers[$canvasGroup->name]['CanvasGroup'] = array( 
+                    $canvasGroupsAndUsers[$canvasGroup->name]['CanvasGroup'] = array(
                         'id' => $canvasGroup->id,
                         'group_name' => $canvasGroup->name
                     );
-    
+
                     // use id as $key so we get all users, not just the importable ones
                     $groupUsers = $canvasGroup->getUsers($this, $userId, false, 'id');
                     foreach ($groupUsers as $k2 => $user){
@@ -529,9 +537,9 @@ class GroupsController extends AppController
                         );
                     }
                 }
-    
+
                 // Merge into a single array of groups, indexed by group name
-                $groupsAndUsers = array_merge_recursive($groupsAndUsers, $canvasGroupsAndUsers);
+                $groupsAndUsers = array_replace_recursive($groupsAndUsers, $canvasGroupsAndUsers);
 
                 list($enableSimplifiedSync, $eligibleCanvasUsersIniPeerCourse) = $this->_shouldEnableSimplifiedSync($groupsAndUsers, $canvasUserKey, $eligibleCanvasUsersIniPeerCourse);
             }
@@ -541,7 +549,16 @@ class GroupsController extends AppController
             $exportSuccess = false;
             $importSuccess = false;
 
-            if (isset($this->data['Group']['syncType'])) {
+            if (!empty($canvasDuplicateGroupNames)) {
+                $errorMessages = '<p>' . __('We cannot perform a sync because there is a problem with the way your Canvas groups are structured. In order to continue, please go to this Groupset in Canvas and rename / remove some of your groups so that all your groups have <u>unique names</u>. For your reference:.', true) . '</p><ul>';
+                foreach ($canvasDuplicateGroupNames as $duplicateGroupName => $count) {
+                    $errorMessages .= '<li>You have ' . $count . ' groups in Canvas with the name "' . $duplicateGroupName . '".</li>';
+                }
+                $errorMessages .= '</ul>';
+                $this->Session->setFlash($errorMessages);
+                $this->set('disableSync', true);
+            }
+            elseif (isset($this->data['Group']['syncType'])) {
 
                 $canvasGroupCategory = array();
 
@@ -551,18 +568,16 @@ class GroupsController extends AppController
                         $courseId,
                         $iPeerUsernamesInCanvasCourse
                     );
-                    $importSuccess = true;
                 }
                 elseif ($this->data['Group']['syncType'] == 'export') {
                     list($groupsAndUsers, $canvasGroupCategory, $exportSuccess) = $this->_exportGroupsToCanvas(
-                        $groupsAndUsers, 
-                        $canvasCourseId, 
+                        $groupsAndUsers,
+                        $canvasCourseId,
                         $canvasGroupCategoryId,
-                        $canvasCoursesRaw, 
-                        $canvasStudents, 
-                        $canvasGroups, 
-                        $iPeerUsernamesInCanvasCourse,
-                        $eligibleCanvasUsersIniPeerCourse
+                        $canvasCoursesRaw,
+                        $canvasStudents,
+                        $canvasGroups,
+                        $iPeerUsernamesInCanvasCourse
                     );
                 }
                 elseif ($this->data['Group']['syncType'] == 'sync') {
@@ -585,14 +600,13 @@ class GroupsController extends AppController
 
                         if (!empty($this->data['iPeerGroup'])){
                             list($groupsAndUsers, $canvasGroupCategory, $exportSuccess) = $this->_exportGroupsToCanvas(
-                                $groupsAndUsers, 
-                                $canvasCourseId, 
+                                $groupsAndUsers,
+                                $canvasCourseId,
                                 $canvasGroupCategoryId,
-                                $canvasCoursesRaw, 
-                                $canvasStudents, 
-                                $canvasGroups, 
-                                $iPeerUsernamesInCanvasCourse,
-                                $eligibleCanvasUsersIniPeerCourse
+                                $canvasCoursesRaw,
+                                $canvasStudents,
+                                $canvasGroups,
+                                $iPeerUsernamesInCanvasCourse
                             );
                         }
                     }
@@ -621,7 +635,7 @@ class GroupsController extends AppController
                                 ' Canvas. Those are <span class="highlight-green">highlighted</span> below.</p>';
                     }
                     else {
-                        $errorTitle = '<h2>Export failed!</h2>';
+                        $errorTitle = '<h2>' . ucwords($this->data['Group']['syncType']) . ' failed!</h2>';
                     }
                     $errorTitle .= '<p>The following errors happened: </p>';
                     $this->addErrorMsg('titles', 'general', $errorTitle);
@@ -688,7 +702,7 @@ class GroupsController extends AppController
             }
             $this->breadcrumb->push(array('course' => $course['Course']));
         }
-        
+
         $courses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
         $this->set('courses', $courses);
 
@@ -698,7 +712,7 @@ class GroupsController extends AppController
         }
         $this->set('courseId', $courseId);
         $this->set('formUrl', Router::url(null, true));
-        
+
         $this->set('breadcrumb', $this->breadcrumb->push(__('Import Groups From CSV File (.csv or .txt)', true)));
 
         if (!empty($this->params['form'])) {
@@ -956,7 +970,7 @@ class GroupsController extends AppController
         $lines = array();
 
         $usersToImport = array();
-        
+
         $update = ($this->data['Group']['updateGroups']) ? true : false;
 
         $importResults = array('groupSuccess'=>array(), 'groupFailure'=>array());
@@ -965,37 +979,44 @@ class GroupsController extends AppController
             foreach( $this->data['canvasGroup'] as $groupName => $groupChecked ) {
                 if ($groupChecked && isset($groupsAndUsers[$groupName])) {
 
-                    // if there are no members in this canvas group and the update flag is on or the iPeer group doesn't exist, 
-                    // we need to import manually since _addGroupByImport wouldn't import groups without members in them
-                    if (empty($groupsAndUsers[$groupName]['CanvasMember']) && ($update || !isset($groupsAndUsers[$groupName]['Group']))) {
-                        // just empty the group if the group already exists
-                        if (isset($groupsAndUsers[$groupName]['Group'])) {
-                            $this->GroupsMembers->deleteAll(array('group_id' => $groupsAndUsers[$groupName]['Group']['id']));
-                            $groupsAndUsers[$groupName]['Group']['justAdded'] = true;
-                            unset($groupsAndUsers[$groupName]['Member']);
-                        }
-                        // otherwise, add this empty group
-                        else {
-                            $groupNum = $this->Group->getFirstAvailGroupNum($courseId);
-                            $tmp = array('Group' => array('group_num' => $groupNum, 'group_name' => $groupName,
-                                'course_id' => $courseId, 'creator_id' => $this->Auth->user('id')));
-                            $this->Group->id = null;
-                            if ($this->Group->save($tmp)) {
-                                $importResults['groupSuccess'][$groupName] = $this->Group->id;
-                                $groupsAndUsers[$groupName]['Group'] = array(
-                                    'id' => $this->Group->id,
-                                    'group_name' => $groupName,
-                                    'group_num' => $groupNum,
-                                    'course_id' => $courseId,
-                                    'record_status' => 'A',
-                                    'justAdded' => true
-                                );
-                            } else {
-                                $importResults['groupFailure'][] = $groupName;
-                            }
+                    $canvasGroupEmpty = true;
+
+                    foreach ($groupsAndUsers[$groupName]['CanvasMember'] as $groupMember) {
+                        if ($groupMember['isIniPeer']) {
+                            $canvasGroupEmpty = false;
+                            break;
                         }
                     }
-                    elseif (isset($groupsAndUsers[$groupName]['CanvasMember'])) {
+
+                    // if update flag is on, empty the iPeer group first (if it exists and not already empty)
+                    if ($update && isset($groupsAndUsers[$groupName]['Member']) && count($groupsAndUsers[$groupName]['Member'])) {
+                        $this->GroupsMembers->deleteAll(array('group_id' => $groupsAndUsers[$groupName]['Group']['id']));
+                        $groupsAndUsers[$groupName]['Group']['justAdded'] = true;
+                        unset($groupsAndUsers[$groupName]['Member']);
+                    }
+
+                    // if there are no members in this canvas group and the iPeer group doesn't exist,
+                    // we need to manually create this group since _addGroupByImport wouldn't import groups without members in them
+                    if ($canvasGroupEmpty && !isset($groupsAndUsers[$groupName]['Group'])) {
+                        $groupNum = $this->Group->getFirstAvailGroupNum($courseId);
+                        $tmp = array('Group' => array('group_num' => $groupNum, 'group_name' => $groupName,
+                            'course_id' => $courseId, 'creator_id' => $this->Auth->user('id')));
+                        $this->Group->id = null;
+                        if ($this->Group->save($tmp)) {
+                            $importResults['groupSuccess'][] = $groupName;
+                            $groupsAndUsers[$groupName]['Group'] = array(
+                                'id' => $this->Group->id,
+                                'group_name' => $groupName,
+                                'group_num' => $groupNum,
+                                'course_id' => $courseId,
+                                'record_status' => 'A',
+                                'justAdded' => true
+                            );
+                        } else {
+                            $importResults['groupFailure'][] = $groupName;
+                        }
+                    }
+                    elseif (!$canvasGroupEmpty) {
                         foreach ($groupsAndUsers[$groupName]['CanvasMember'] as $canvasUser){
                             if (isset($canvasUser[$canvasUserKey]) && in_array($canvasUser[$canvasUserKey], $iPeerUsernamesInCanvasCourse)) {
                                 // ensure this user is not already in this group
@@ -1019,7 +1040,8 @@ class GroupsController extends AppController
             }
 
             if (count($lines)) {
-                $importResults = array_merge_recursive($importResults, $this->_addGroupByImport($lines, $courseId, $update, 'username', false));
+                $addedGroups = $this->_addGroupByImport($lines, $courseId, $update, 'username', false);
+                $importResults = array_merge_recursive($importResults, $addedGroups);
                 foreach ($importResults['groupSuccess'] as $groupName) {
                     $groupsAndUsers[$groupName]['Group'] = $groupsAndUsers[$groupName]['CanvasGroup'];
                     $groupsAndUsers[$groupName]['Group']['justAdded'] = true;
@@ -1050,10 +1072,13 @@ class GroupsController extends AppController
                     foreach ($importResults['memFailure'] as $groupName => $members) {
                         $this->addErrorMsg('groupImport', 'groupMemberAdd', 'There was a problem adding the following members to the ' . $groupName . ' group: ' . implode(', ', $members) . '.');
                     }
-                }                 
+                }
             }
-            
-            if (!$someSuccess && empty($importResults['groupFailure']) && empty($importResults['memFailure'])) {
+
+            if (empty($importResults['groupSuccess']) &&
+                empty($importResults['memSuccess']) &&
+                empty($importResults['groupFailure']) &&
+                empty($importResults['memFailure']) ) {
                 $this->addErrorMsg('groupImport', 'nothingToDo', __('There were no eligible groups or members to import that are not already in iPeer.', true));
             }
         }
@@ -1075,40 +1100,40 @@ class GroupsController extends AppController
      * @param array     $canvasStudents list of Canvas students in this course
      * @param array     $canvasGroups list of Canvas groups (component objects) in this course with details
      * @param array     $eligibleiPeerUsers array of usernames of users that are enrolled in this canvas course
-     * @param array     $eligibleCanvasUsers array of strings representing integration_id (e.g. username) in Canvas 
-     *                    that are enrolled in this iPeer course
      * @return array    updated array of $groupsAndUsers including the results of the import
      */
-    private function _exportGroupsToCanvas($groupsAndUsers, $canvasCourseId, $canvasGroupCategoryId, $canvasCoursesRaw, $canvasStudents, $canvasGroups, $eligibleiPeerUsers, $eligibleCanvasUsers)
+    private function _exportGroupsToCanvas($groupsAndUsers, $canvasCourseId, $canvasGroupCategoryId, $canvasCoursesRaw, $canvasStudents, $canvasGroups, $eligibleiPeerUsers)
     {
         $userId = $this->Auth->user('id');
         $canvasUserKey = $this->SysParameter->get('system.canvas_user_key');
         $canvasGroupCategory = array();
+        $someSuccess = false;
 
         if ( !isset($this->data['iPeerGroup']) ) {
             $this->addErrorMsg('groupExport', 'noCourseSelected', __('Please select one or more groups to export.', true));
         }
         else {
-            $someSuccess = false;
 
-            // reset this since all groups are deleted
+            // if the update flag is on, let's start by deleting groups in canvas
             if ($this->data['Group']['updateCanvasGroups']) {
-                $eligibleCanvasUsers = array();
-            }
-
-            foreach( $this->data['iPeerGroup'] as $groupName => $groupChecked ) {
-                if ($groupChecked && isset($groupsAndUsers[$groupName]) && isset($groupsAndUsers[$groupName]['Member'])) {
-
-                    // delete group in canvas if we need to create a new group
-                    if ($this->data['Group']['updateCanvasGroups'] && isset($groupsAndUsers[$groupName]['CanvasGroup'])) {
-                        $groupDeleted = $canvasCoursesRaw[$canvasCourseId]->deleteGroup($this, $userId, false, $groupsAndUsers[$groupName]['CanvasGroup']['id']);  
+                foreach( $this->data['iPeerGroup'] as $groupName => $groupChecked ) {
+                    if ($groupChecked &&
+                        isset($groupsAndUsers[$groupName]) &&
+                        isset($groupsAndUsers[$groupName]['CanvasGroup'])
+                        ) {
+                        $groupDeleted = $canvasCoursesRaw[$canvasCourseId]->deleteGroup($this, $userId, false, $groupsAndUsers[$groupName]['CanvasGroup']['id']);
                         if (isset($groupDeleted->errors)){
                             $this->addErrorMsg('groupExport', 'groupExport', 'Error exporting group ' . $groupName . '. Please try again.');
-                            continue;                                            
+                            continue;
                         }
                         unset($groupsAndUsers[$groupName]['CanvasGroup']);
                         unset($groupsAndUsers[$groupName]['CanvasMember']);
                     }
+                }
+            }
+
+            foreach( $this->data['iPeerGroup'] as $groupName => $groupChecked ) {
+                if ($groupChecked && isset($groupsAndUsers[$groupName]) && isset($groupsAndUsers[$groupName]['Member'])) {
 
                     // create groupset in canvas if necessary
                     if (empty($canvasGroupCategoryId)) {
@@ -1118,7 +1143,7 @@ class GroupsController extends AppController
                         }
                         else {
                             $this->addErrorMsg('groupExport', 'groupSetCreate', 'Error creating new group set for group ' . $groupName . '. Please try again.');
-                            continue;                                            
+                            continue;
                         }
                     }
 
@@ -1131,7 +1156,7 @@ class GroupsController extends AppController
                         }
                         else {
                             $this->addErrorMsg('groupExport', 'groupCreate', 'Error creating group ' . $groupName . '. Please try again.');
-                            continue;                                            
+                            continue;
                         }
                     }
                     else {
@@ -1142,11 +1167,33 @@ class GroupsController extends AppController
                     if ($canvasGroup) {
                         foreach ($groupsAndUsers[$groupName]['Member'] as $user){
                             if (isset($user['username']) && in_array($user['username'], $eligibleiPeerUsers)) {
-                                if (in_array($user['username'], $eligibleCanvasUsers)) {
-                                    $this->addErrorMsg('groupExport', 'userTwoGroups', $user['full_name'] . ' could not be added to group "' . 
-                                                       $groupName . '" because (s)he is already in a group.');
+
+                                // collect usernames of canvas members in this canvas group ...
+                                $canvasUsernamesInThisGroup = array();
+                                if (isset($groupsAndUsers[$groupName]['CanvasMember'])) {
+                                    foreach ($groupsAndUsers[$groupName]['CanvasMember'] as $canvasMember) {
+                                        $canvasUsernamesInThisGroup[] = $canvasMember[$canvasUserKey];
+                                    }
+                                }
+                                // .. and those in other groups (we need all this for merging purposes)
+                                $canvasUsernamesInOtherGroups = array();
+                                foreach ($groupsAndUsers as $otherGroupName => $otherGroup) {
+                                    if ($otherGroupName != $groupName && isset($groupsAndUsers[$otherGroupName]['CanvasMember'])) {
+                                        foreach ($groupsAndUsers[$otherGroupName]['CanvasMember'] as $canvasMember) {
+                                            $canvasUsernamesInOtherGroups[] = $canvasMember[$canvasUserKey];
+                                        }
+                                    }
+                                }
+                                if (in_array($user['username'], $canvasUsernamesInOtherGroups) || in_array($user['username'], $canvasUsernamesInThisGroup)) {
+
+                                    // don't show error if the user is just in this group
+                                    if (!in_array($user['username'], $canvasUsernamesInThisGroup)) {
+                                        $this->addErrorMsg('groupExport', 'userTwoGroups', $user['full_name'] . ' could not be added to group "' .
+                                        $groupName . '" because (s)he is already in another group.');
+                                    }
                                     continue;
                                 }
+
                                 $canvasUserAddedId = $canvasStudents[$user['username']]->id;
                                 $userAdded = $canvasGroup->addUser($this, $userId, false, $canvasUserAddedId);
                                 if (isset($userAdded->errors)) {
@@ -1173,7 +1220,6 @@ class GroupsController extends AppController
                                         'isIniPeer' => true,
                                         'justAdded'=>true
                                     );
-                                    $eligibleCanvasUsers[] = $user['username'];
                                 }
                             }
                         }
@@ -1224,7 +1270,7 @@ class GroupsController extends AppController
                             $errorOutput .= '<li>' . $errorMessage . '</li>';
                         }
                         $errorCount++;
-                    }    
+                    }
                 }
             }
             $errorOutput .= '</ul>';
@@ -1252,28 +1298,28 @@ class GroupsController extends AppController
 
             if ($errorCount > 0) {
                 $supportEmail = $this->SysParameter->get('display.contact_info');
-                $errorOutput .= '<p>If you continue having issues, please <a href="mailto:' . $supportEmail . 
+                $errorOutput .= '<p>If you continue having issues, please <a href="mailto:' . $supportEmail .
                                 '?subject=Problem using iPeer Canvas sync feature">contact support</a>.</p>';
             }
         }
-        
+
         return $errorOutput;
     }
 
     /**
      * Determine whether to enable simplified sync for canvas
-     * We can do a simplified sync if: 
+     * We can do a simplified sync if:
      * - iPeer does not have the same eligible member in more than 1 group
      * - Groups either exist only on one side, or have the same eligible members on both sides
      *
      * @param array $groupsAndUsers
      * @param string $canvasUserKey
      * @param array $eligibleCanvasUsers
-     * 
+     *
      * @access private
      * @return mixed if 3rd arg is not provided or null, will return either true or false, otherwise an array
      */
-    private function _shouldEnableSimplifiedSync($groupsAndUsers, $canvasUserKey, $eligibleCanvasUsers=null) 
+    private function _shouldEnableSimplifiedSync($groupsAndUsers, $canvasUserKey, $eligibleCanvasUsers=null)
     {
 
         $eligibleiPeerUsers = array();
@@ -1310,7 +1356,7 @@ class GroupsController extends AppController
                     }
                 }
                 if (  count($eligibleCanvasGroupUsers) != count($eligibleiPeerGroupUsers) ||
-                        count(array_intersect($eligibleiPeerGroupUsers, $eligibleCanvasGroupUsers)) != count($eligibleiPeerGroupUsers) ) 
+                        count(array_intersect($eligibleiPeerGroupUsers, $eligibleCanvasGroupUsers)) != count($eligibleiPeerGroupUsers) )
                 {
                     $enableSimplifiedSync = false;
                     break;
