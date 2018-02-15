@@ -24,46 +24,46 @@ jQuery( document ).ready(function() {
         e.preventDefault();
         var thisForm = this;
         var usersToSubmit = [];
-        
+
         for (var count = 0; count < groupMembers.length; count++) {
             var userId = groupMembers[count];
             var wasUpdated = jQuery("input[name='member_"+userId+"_updated']").val() == "1";
             if (!wasUpdated) {
                 continue;
             }
-            
+
             // check if form complete for user
             var complete = saveButtonVal(userId);
-            
+
             if (complete) {
                 usersToSubmit.push(userId); // if complete, submit form for this user
             } else {
                 // else we need to warn user that they will lose data for incompelte forms
-                
+
                 var fullname = jQuery("#panel"+userId).data("fullname");
                 var message = "<?php __('You have not completed all the questions for %fullname%. Would you like to discard changes?'); ?>";
                 message = message.replace("%fullname%", fullname);
-                if (!confirm(message)) { 
-                    return; 
+                if (!confirm(message)) {
+                    return;
                 }
             }
         }
-        
+
         // update button text indicating user should wait
         jQuery(thisForm).find("input[type='submit']").attr("disabled", true).val("<?php echo __('Saving... Please wait.', true); ?>");
-        
+
         if (usersToSubmit.length == 0) {
             thisForm.submit();
         } else {
             var ajaxCalls = [];
             var userEvalForm = jQuery('#evalForm');
-            
+
             for (count = 0; count < usersToSubmit.length; count++) {
                 var formData = userEvalForm.serialize();
                 formData += "&" + usersToSubmit[count] + "=Submit";
                 ajaxCalls.push(jQuery.post(userEvalForm.attr('action'), formData));
             }
-            
+
             // when all the ajax calls are finished
             jQuery.when.apply(jQuery, ajaxCalls).then(function() {
                 thisForm.submit();
@@ -111,7 +111,7 @@ jQuery( document ).ready(function() {
         <td colspan="4" style="text-align: left;">
             <span class="instruction-icon"><?php __(' Instructions')?>:</span>
             <ul class="instructions">
-            <li><?php __('Click <font color ="#FF6666"><i>EACH</i></font> of your peer\'s name to rate his/her performance.')?></li>
+            <li><?php __('Click <font color ="#FF6666"><i>EACH</i></font> of your peer\'s name to rate their performance.')?></li>
             <li><?php __('Enter Comments')?> (<?php echo $event['Event']['com_req']? '<font color="red">'.__('Required', true).'</font>' : __('Optional', true) ;?>).</li>
             <li><?php __('Press "Save This Section" to save the evaluation for each group member.')?></li>
             <li><?php __('Press "Submit to Complete the Evaluation" to submit your evaluation to all peers.')?> </li>
@@ -216,7 +216,7 @@ new Rico.Accordion( 'accordion',
     clickedClass: 'mdClicked',
     unselectedClass: 'panelheader',
     initHideAll: true});
-    
+
 var userIds = [<?php echo $userIds ?>];
 jQuery.each(userIds, function(index, userId) {
     jQuery('#'+userId+'likert').hide();
