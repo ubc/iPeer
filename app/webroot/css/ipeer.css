@@ -300,7 +300,7 @@ a#home, a#home:hover, a#home:active {
 #navigationOuter {
     float: left;
     width: 100%;
-    padding: 3px 0 0;
+    padding: 4px 0 0 1px;
     margin: 1em 0 1.5em;
     border: solid 1px #ccc;
     background: #fff;
@@ -325,6 +325,7 @@ a#home, a#home:hover, a#home:active {
     padding: 9px 0.5em;
     text-decoration: none;
     background-color: #fff;
+    margin-top: 1px;
 }
 
 .navigation ul li:first-child a {
