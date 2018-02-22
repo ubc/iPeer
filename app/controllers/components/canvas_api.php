@@ -29,7 +29,7 @@ class CanvasApiComponent extends Object
      * overriden constructor to initialize private variables
      *
      * @param integer $userId required for most nonstatic functionalities
-     * 
+     *
      * @access public
      */
     public function __construct($userId)
@@ -40,7 +40,7 @@ class CanvasApiComponent extends Object
         $this->apiPath = '/api/v1';
         $this->SysParameter = ClassRegistry::init('SysParameter');
         $this->UserOauth = ClassRegistry::init('UserOauth');
-        
+
         $this->apiTimeout = (int)$this->SysParameter->get('system.canvas_api_timeout', '10');
         $this->paginationDefaultPerPage = (int)$this->SysParameter->get('system.canvas_api_default_per_page', '500');
         $this->paginationMaxRetrieveAll = (int)$this->SysParameter->get('system.canvas_api_max_retrieve_all', '10000');
@@ -51,10 +51,10 @@ class CanvasApiComponent extends Object
      * gets the base URL for canvas (without appending slash)
      *
      * @param boolean $ext pass true if making a frontend request to canvas
-     * 
+     *
      * @access public
      * @return void
-     * 
+     *
      */
     public function getBaseUrl($ext=false)
     {
@@ -64,7 +64,7 @@ class CanvasApiComponent extends Object
                 return $extBaseUrl;
             }
         }
-        
+
         return $this->SysParameter->get('system.canvas_baseurl');
     }
 
@@ -91,7 +91,7 @@ class CanvasApiComponent extends Object
         }
         return $appUrl;
     }
-    
+
     /**
       * get user access token
       *
@@ -132,7 +132,7 @@ class CanvasApiComponent extends Object
      * get access token and other information using a refresh token. if successful, also saves this information to the database
      *
      * @param string $refreshToken if not provided, fetches it from the database
-     * 
+     *
      * @access public
      * @return array with key 'access_token' if successful, otherwise the array will have 'err' element with description of error
      */
@@ -156,7 +156,7 @@ class CanvasApiComponent extends Object
      * if successful, also saves this information to the database
      *
      * @param string $code
-     * 
+     *
      * @access public
      * @return array with key 'access_token' if successful, otherwise the array will have 'err' element with description of error
      */
@@ -177,16 +177,16 @@ class CanvasApiComponent extends Object
      * @param string    $method 'get' (default) or 'post' to do a post request instead
      * @param boolean   $retrieveAll Canvas API uses pagination to limit items returned per call.  Set to true (default) to retrieve all (max limited by system parameter "system.canvas_api_max_retrieve_all")
      * @param integer   $perPage Limit how many items to retrieve on each Canvas API call. Default to system parameter "system.canvas_api_default_per_page" or 500
-     * 
+     *
      * @access public
      * @return mixed return requested data, otherwise void
      */
     public function getCanvasData($_controller, $force_auth, $uri, $params=null, $additionalHeader=null, $refreshTokenAndRetry=true, $method='get', $retrieveAll=true, $perPage=null)
-    {   
+    {
         if (is_null($perPage)) {
             $perPage = $this->paginationDefaultPerPage;
         }
-        
+
         // first check to see if we have a valid access token
         $accessToken = $this->getAccessToken();
 
@@ -225,9 +225,9 @@ class CanvasApiComponent extends Object
         // if no access token, get a new access token by forwarding the user to the canvas auth page
         elseif ($force_auth) {
             $this->_getNewOauth($_controller);
-        }        
+        }
     }
-    
+
     /**
      * post requested data to canvas api
      *
@@ -237,7 +237,7 @@ class CanvasApiComponent extends Object
      * @param array     $params canvas api parameters
      * @param string    $additionalHeader
      * @param boolean   $refreshTokenAndRetry if set to true (default), uses the refresh token to retry if the access token is expired
-     * 
+     *
      * @access public
      * @return mixed return response, otherwise void
      */
@@ -245,7 +245,7 @@ class CanvasApiComponent extends Object
     {
         return $this->getCanvasData($_controller, $force_auth, $uri, $params, $additionalHeader, $refreshTokenAndRetry, 'post');
     }
-    
+
     /**
      * delete requested data from canvas api
      *
@@ -255,7 +255,7 @@ class CanvasApiComponent extends Object
      * @param array     $params canvas api parameters
      * @param string    $additionalHeader
      * @param boolean   $refreshTokenAndRetry if set to true (default), uses the refresh token to retry if the access token is expired
-     * 
+     *
      * @access public
      * @return mixed return response, otherwise void
      */
@@ -268,7 +268,7 @@ class CanvasApiComponent extends Object
      * forward the user to canvas to give authorization to ipeer
      *
      * @param object    $_controller the controller that initiated this request
-     * 
+     *
      * @access private
      * @return void
      */
@@ -285,17 +285,17 @@ class CanvasApiComponent extends Object
         $state = uniqid('st');
         $_controller->Session->write('oauth_'.$this->provider.'_state', $state);
 
-        // if true, it will force the user to enter their credentials, even if they're already logged into Canvas. By default, if 
+        // if true, it will force the user to enter their credentials, even if they're already logged into Canvas. By default, if
         // a user already has an active Canvas web session, they will not be asked to re-enter their credentials.
         $forceLogin = in_array($this->SysParameter->get('system.canvas_force_login', 'false'), array('1', 'true', 'yes'));
 
-        $canvasOauthUrl = $this->getBaseUrl(true) . '/login/oauth2/auth' . 
+        $canvasOauthUrl = $this->getBaseUrl(true) . '/login/oauth2/auth' .
                             '?client_id=' . $this->SysParameter->get('system.canvas_client_id') .
-                            '&response_type=code' . 
+                            '&response_type=code' .
                             '&state=' . $state .
                             ($forceLogin ? '&force_login=1' : '') .
                             '&redirect_uri=' . array_shift(explode('?', $this->_getCurrentUrl()));
-                            
+
         $_controller->redirect($canvasOauthUrl);
     }
 
@@ -304,7 +304,7 @@ class CanvasApiComponent extends Object
      *
      * @param string $grantType either 'refresh_token' or 'authorization_code'
      * @param string $tokenOrCode the actual refresh token or authorization code
-     * 
+     *
      * @access private
      * @return array with key 'access_token' if successful, otherwise the array will have 'err' element with description of error
      */
@@ -313,21 +313,21 @@ class CanvasApiComponent extends Object
         $params = array('grant_type' => $grantType,
                         'client_id' => $this->SysParameter->get('system.canvas_client_id'),
                         'client_secret' => $this->SysParameter->get('system.canvas_client_secret'));
-                        
+
         if ($grantType == 'refresh_token') {
             $params['refresh_token'] = $tokenOrCode;
         }
         elseif ($grantType == 'authorization_code') {
             $params['code'] = $tokenOrCode;
         }
-        
+
         $request = \Httpful\Request::post($this->getBaseUrl() . "/login/oauth2/token", http_build_query($params))->expectsJson();
         $request->timeoutIn($this->apiTimeout);
         $error = array();
-        
+
         try {
             $response = $request->sendIt()->body;
-            
+
             if (isset($response->error)) {
                 switch ($response->error) {
                     case 'invalid_client':
@@ -351,7 +351,7 @@ class CanvasApiComponent extends Object
                 if (isset($response->refresh_token)) {
                     $saveData['refresh_token'] = $response->refresh_token;
                 }
-                
+
                 $this->UserOauth->saveTokens($this->userId, $this->provider, $saveData);
 
                 return array('accessToken' => $response->access_token);
@@ -361,7 +361,7 @@ class CanvasApiComponent extends Object
             error_log($e->getMessage());
             $error_description = sprintf(__('Error: Authentication failed. Connection error: %s', true), $e->getMessage());
         }
-        
+
         return array('err' => $error_description, 'err_code' => $error);
     }
 
@@ -377,7 +377,7 @@ class CanvasApiComponent extends Object
      * @param string    $method 'get' (default) or 'post' to do a post request instead
      * @param boolean   $retrieveAll Canvas API uses pagination to limit items returned per call.  Set to true (default) to retrieve all (max limited by system parameter "system.canvas_api_max_retrieve_all")
      * @param integer   $perPage Limit how many items to retrieve on each Canvas API call. Default to system parameter "system.canvas_api_default_per_page" or 500
-     * 
+     *
      * @access private
      * @return mixed either the response body from the api, or false if not successful
      */
@@ -434,9 +434,13 @@ class CanvasApiComponent extends Object
                 }
 
                 $callCount += 1;
+                // ignore "not found" errors
+                if (is_object($response->body) && isset($response->code) && $response->code == 404) {
+                    continue;
+                }
                 // only merge result if there is no error
-                if (is_object($response->body) && isset($response->body->errors)) {
-                    $_controller->Session->setFlash('There was an error sending / receiving Canvas data:' . 
+                elseif (is_object($response->body) && isset($response->body->errors)) {
+                    $_controller->Session->setFlash('There was an error sending / receiving Canvas data:' .
                                                     $this->_getErrorsAsString($response->body->errors));
                     break;
                 }
@@ -479,17 +483,24 @@ class CanvasApiComponent extends Object
      * @param object $errors
      * @param string $separator if not set or null, it will return an unordered list
      * @param integer $num if set, it will limit the errors to a certain number
-     * 
+     *
      * @access private
      * @return string
      */
     private function _getErrorsAsString($errors, $separator=null, $num=null) {
         $ret = array();
+
         if (is_object($errors)) {
             foreach ($errors as $param => $errs) {
                 foreach ($errs as $err) {
                     $ret[] = $err->message;
                 }
+            }
+        }
+
+        if (is_array($errors) && isset($errors[0]) && is_object($errors[0]) && isset($errors[0]->message)) {
+            foreach ($errors as $err) {
+                $ret[] = $err->message;
             }
         }
 
