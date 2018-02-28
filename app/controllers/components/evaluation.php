@@ -1095,6 +1095,8 @@ class EvaluationComponent extends Object
                 if ($ques['required'] && !$ques['self_eval']) {
                     $totalGrade += $evalMixevalDetail['EvaluationMixevalDetail']['grade'];
                 }
+                // empty the comment for type 1 and 4 questions
+                $evalMixevalDetail['EvaluationMixevalDetail']['question_comment'] = NULL;
             } else {
                 if (empty($data[$num]['question_comment']) && !empty($evalMixevalDetail)) {
                     $this->EvaluationMixevalDetail->delete($this->EvaluationMixevalDetail->id);
