@@ -7,8 +7,8 @@ b, u, i, center,
 dl, dt, dd, ol, ul, li,
 fieldset, form, label, legend,
 table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed, 
-figure, figcaption, footer, header, hgroup, 
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
 menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
     margin: 0;
@@ -19,7 +19,7 @@ time, mark, audio, video {
     color: #333;
 }
 /* html5 display-role reset for older browsers */
-article, aside, details, figcaption, figure, 
+article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
     display: block;
 }
@@ -75,13 +75,13 @@ p {
 }
 
 .pagewidth {
-    /* 780px is Wide enough for someone with a 800px device to 
+    /* 780px is Wide enough for someone with a 800px device to
      * view the whole app without horizontal scrolling. I assume
      * most people's computers are at least 1024x768. However
      * many smartphones have at least a 800x480 display now,
      * so we shouldn't use a higher min width.
      * */
-    min-width: 780px; 
+    min-width: 780px;
     max-width: 1000px;
     margin-left: auto;
     margin-right: auto;
@@ -116,9 +116,9 @@ p {
 }
 
 input[type="text"], input[type="file"], input[type="password"], textarea, select, button
-{   
-    margin: 0.35em 0.35em; 
-    border-radius: 3px; 
+{
+    margin: 0.35em 0.35em;
+    border-radius: 3px;
     border: 1px solid #999;
     clear: right;
     padding: 0.3em 0.5em;
@@ -200,7 +200,7 @@ strong {
     text-align: center;
 }
 
-.standardtable tr th:first-child, 
+.standardtable tr th:first-child,
 .standardtable tr td:first-child {
     border-left: none;
 }
@@ -245,8 +245,8 @@ div.ui-datepicker { font-size: 0.85em; }
 
 /* BANNER */
 .banner {
-    border-top-left-radius: 8px; 
-    border-top-right-radius: 8px; 
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
     border-bottom: none;
     background-color: #fff;
 }
@@ -277,7 +277,7 @@ div.ui-datepicker { font-size: 0.85em; }
 }
 
 #bannerLogoText {
-    font-size: 1em; 
+    font-size: 1em;
     font-weight: 200;
     font-style: italic;
 }
@@ -333,7 +333,7 @@ a#home, a#home:hover, a#home:active {
 }
 
 .navigation #current a,
-.navigation a:hover, 
+.navigation a:hover,
 .navigation a:active {
     background: none;
     border-bottom: solid 3px gold;
@@ -349,7 +349,7 @@ a#home, a#home:hover, a#home:active {
 
 /* CONTENT CONTAINER */
 .containerOuter {
-    border-radius: 10px; 
+    border-radius: 10px;
     border: 1px solid #ccc;
     padding: 2em;
     background: white;
@@ -361,9 +361,10 @@ a#home, a#home:hover, a#home:active {
     margin-top: 0.5em;
     margin-bottom: 1em;
     clear: left;
-    padding: 0.7em;
+    padding: 0.7em 1.2em;
     font-weight: 600;
     text-align: center;
+    line-height: 1.5em;
 }
 
 .good-message {
@@ -371,8 +372,8 @@ a#home, a#home:hover, a#home:active {
 }
 
 /* authMessage is only used for cake generated login errors. */
-#flashMessage, 
-#authMessage, 
+#flashMessage,
+#authMessage,
 .error-message {
     color: #990044;
     border: 1px solid #ca4343;
@@ -387,16 +388,25 @@ a#home, a#home:hover, a#home:active {
 .success-message > *,
 .good-message > * {
     text-align: left;
+    font-weight: 400;
 }
 
 #flashMessage > ul,
 #authMessage > ul,
 .error-message > ul,
-.success-message > ul
+.success-message > ul,
 .good-message > ul {
     list-style-type: disc;
     padding-left: 2em;
     padding-bottom: 1em;
+}
+
+#flashMessage > h2:first-child,
+#authMessage > h2:first-child,
+.error-message > h2:first-child,
+.success-message > h2:first-child,
+.good-message > h2:first-child {
+    margin-top: 0.5em;
 }
 
 #flashMessage > p,
@@ -407,7 +417,7 @@ a#home, a#home:hover, a#home:active {
     padding-top: 0;
 }
 
-#authMessage.success, 
+#authMessage.success,
 .success-message,
 .good-message {
     color: #159900;
@@ -516,7 +526,7 @@ i {
 }
 
 .login h4 {
-    background-color: crimson; 
+    background-color: crimson;
     color: white;
     margin: 0;
     padding: 0.5em;
@@ -648,15 +658,15 @@ i {
 
 /* view */
 
-#EmailtemplateViewForm .text input { 
+#EmailtemplateViewForm .text input {
     width: 21em;
 }
 
-#EmailtemplateViewForm .textarea textarea { 
+#EmailtemplateViewForm .textarea textarea {
     width: 21.5em;
 }
 
-#EmailtemplateViewForm .radio input { 
+#EmailtemplateViewForm .radio input {
     margin: 0.65em;
 }
 
@@ -678,12 +688,12 @@ i {
 }
 
 /* makes the text boxes bigger */
-#EmailtemplateAddForm .text input { 
+#EmailtemplateAddForm .text input {
     width: 21em;
 }
 
 
-#EmailtemplateAddForm .textarea textarea { 
+#EmailtemplateAddForm .textarea textarea {
     width: 21.5em;
 }
 
@@ -1091,9 +1101,9 @@ i {
     margin-bottom: 0.5em;
 }
 
-#Events .text label, #Events .password label, 
-#Events .textarea label, #Events .select label, 
-#Events .datetime label, #Events .radio legend, 
+#Events .text label, #Events .password label,
+#Events .textarea label, #Events .select label,
+#Events .datetime label, #Events .radio legend,
 #Events .penaltyLabel{
     width: 18em;
 }
@@ -1151,8 +1161,8 @@ i {
 }
 
 /* SysParameters */
-#sysParam .text label, 
-#sysParam .password label, 
+#sysParam .text label,
+#sysParam .password label,
 #sysParam .select label {
     width: 18em;
 }
@@ -1248,14 +1258,14 @@ i {
 
 #ajaxListDiv .timestamp {
     font-size: 0.8em;
-    text-align: left; 
+    text-align: left;
     width: 33%;
 }
 
 #ajaxListDiv .total-result {
-    text-align: center;  
-    width: 33%; 
-    font-weight: 600; 
+    text-align: center;
+    width: 33%;
+    font-weight: 600;
     font-size: 100%
 }
 
@@ -1998,7 +2008,7 @@ table.content-table {
     margin: 0 auto 0 auto;
 }
 
-.add-button, .delete-button, .edit-button, .merge-button, .export-excel-button, .compare-button, .instruction-icon, .button, 
+.add-button, .delete-button, .edit-button, .merge-button, .export-excel-button, .compare-button, .instruction-icon, .button,
 input[type="submit"], input[type="button"], button {
     background-color: #e6e6e6;
     padding: 5px 5px 5px 25px;
@@ -2137,7 +2147,7 @@ button:hover {
 
 textarea.question-title-textarea, textarea.question-descriptor {
     width: 90%;
-    height: 4em; 
+    height: 4em;
 }
 
 .question-title {
@@ -2211,7 +2221,7 @@ ul.instructions {
 }
 
 ul.instructions li {
-    list-style-type: square; 
+    list-style-type: square;
     padding: 0.2em;
 }
 

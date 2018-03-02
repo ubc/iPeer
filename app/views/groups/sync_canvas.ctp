@@ -1,9 +1,9 @@
-<div id="syncCanvasWrapper"><?php 
+<div id="syncCanvasWrapper"><?php
 
 $javascript->link(Router::url('/js/synccanvas.js', true), false);
 
-if (is_null($canvasGroupCategoryId)) : 
-    
+if (is_null($canvasGroupCategoryId)) :
+
     echo $this->Form->create(null, array("id" => "syncCanvasForm", "class"=>"prepare", "url" => $formUrl ));
 
     if (!empty($courseId)) {
@@ -15,7 +15,7 @@ if (is_null($canvasGroupCategoryId)) :
         echo $this->Form->hidden('canvasCourse', array('value' => $canvasCourseId));
     }
     if (!empty($canvasCourses)) {
-        echo $this->Form->input("canvasCourse", array("label"=>"Canvas Course", "multiple" => false, "default" => $canvasCourseId, "disabled"=>!empty($canvasCourseId)));        
+        echo $this->Form->input("canvasCourse", array("label"=>"Canvas Course", "multiple" => false, "default" => $canvasCourseId, "disabled"=>!empty($canvasCourseId)));
     }
     else {
         echo '<div class="input select">' . $this->Form->label("Canvas Course") . '</div>';
@@ -23,7 +23,7 @@ if (is_null($canvasGroupCategoryId)) :
         echo $this->Form->hidden('canvasCourse', array('value' => $canvasCourseId));
     }
 
-    if (!empty($courseId) && !empty($canvasCourseId)) : 
+    if (!empty($courseId) && !empty($canvasCourseId)) :
 
         echo $this->Form->input("canvasGroupCategory", array("label"=>"Canvas Group set", "multiple" => false));
 
@@ -32,17 +32,17 @@ if (is_null($canvasGroupCategoryId)) :
     ?><label class="defLabel"></label><?php
     echo $this->Form->submit(__("Next", true), array("class" => "button-next"));
     echo $this->Form->end();
-    
-else: 
+
+elseif (empty($disableSync)):
 
     echo $this->Form->create(null, array("id" => "syncCanvasForm", "class"=>"sync-screen", "url" => $formUrl));
 
-    if (!empty($groupsAndUsers)) { 
+    if (!empty($groupsAndUsers)) {
         echo $this->Form->input('formType', array(
             'legend' => false,
             'div' => array('id' => 'syncFormType'),
             'options' => array(
-                'simplified' => 'Simplified', 
+                'simplified' => 'Simplified',
                 'advanced'   => 'Advanced'
             ),
             'disabled' => (!$enableSimplifiedSync ? 'disabled' : false),
@@ -84,13 +84,13 @@ else:
             <tr>
                 <td colspan="3" class="non-existent-group">
                     <p>You do not have any groups in the selected iPeer course or Canvas course group set.</p>
-                    <p>You can create some groups <a href="/groups/index/<?php echo $courseId; ?>">in this iPeer course</a> or 
-                        <a href="<?php echo $canvasBaseUrl; ?>/courses/<?php echo $canvasCourseId; ?>/groups/#tab-<?php echo $canvasGroupCategoryId; ?>">in this Canvas course group set</a> 
+                    <p>You can create some groups <a href="/groups/index/<?php echo $courseId; ?>">in this iPeer course</a> or
+                        <a href="<?php echo $canvasBaseUrl; ?>/courses/<?php echo $canvasCourseId; ?>/groups/#tab-<?php echo $canvasGroupCategoryId; ?>">in this Canvas course group set</a>
                         and come back here to sync.</p>
                 </td>
             </tr>
 
-        <?php } else { 
+        <?php } else {
 
             foreach ($groupsAndUsers as $row) { ?>
 
@@ -127,9 +127,9 @@ else:
                                     <?php if (count($row['Member']) > $numMembersToShow): ?>
                                         <tr class="showMoreLessMembers">
                                             <td>
-                                                <a href="#" class="showMinMembers" style="display:none;">show <?php echo $numMembersToShow; ?></a> &nbsp; 
-                                                <a href="#" class="showLessMembers" style="display:none;">show less</a> &nbsp; 
-                                                <a href="#" class="showMoreMembers">show more</a> &nbsp; 
+                                                <a href="#" class="showMinMembers" style="display:none;">show <?php echo $numMembersToShow; ?></a> &nbsp;
+                                                <a href="#" class="showLessMembers" style="display:none;">show less</a> &nbsp;
+                                                <a href="#" class="showMoreMembers">show more</a> &nbsp;
                                                 <a href="#" class="showAllMembers">show all</a>
                                             </td>
                                         </tr>
@@ -156,7 +156,7 @@ else:
                             &rarr;
                         <?php else: ?>
                             &larr;
-                        <?php endif; ?>    
+                        <?php endif; ?>
                     </td>
                     <td>
                         <?php if (isset($row['CanvasGroup'])): ?>
@@ -190,9 +190,9 @@ else:
                                 <?php if (count($row['CanvasMember']) > $numMembersToShow): ?>
                                     <tr class="showMoreLessMembers">
                                         <td>
-                                            <a href="#" class="showMinMembers" style="display:none;">show <?php echo $numMembersToShow; ?></a> &nbsp; 
-                                            <a href="#" class="showLessMembers" style="display:none;">show less</a> &nbsp; 
-                                            <a href="#" class="showMoreMembers">show more</a> &nbsp; 
+                                            <a href="#" class="showMinMembers" style="display:none;">show <?php echo $numMembersToShow; ?></a> &nbsp;
+                                            <a href="#" class="showLessMembers" style="display:none;">show less</a> &nbsp;
+                                            <a href="#" class="showMoreMembers">show more</a> &nbsp;
                                             <a href="#" class="showAllMembers">show all</a>
                                         </td>
                                     </tr>
@@ -254,7 +254,7 @@ else:
     <?php echo $this->Form->hidden('syncType'); ?>
 
     <br>
-    
+
 <?php  echo $this->Form->end();
 
 endif; ?>
