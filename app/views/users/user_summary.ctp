@@ -7,7 +7,7 @@
 
   <?php if (isset($data['created_students'])) : ?>
     <h3><?php echo $msg?></h3>
-    <?php echo $this->element('users/user_summary_list', array('data'=>$data['created_students'], 'showPasswords' => true));?>
+    <?php echo $this->element('users/user_summary_list', array('data'=>$data['created_students'], 'showPasswords' => (isset($showPasswords) ? $showPasswords : true) ));?>
   <?php endif; ?>
 
   <?php $msg = ('resetPassword' == $this->action || 'edit' == $this->action) ? __('User(s) modified successfully:', true) : __('User(s) updated successfully:', true);?>
@@ -18,7 +18,7 @@
   <?php endif; ?>
 
 <p>
-<?php 
+<?php
 echo $html->link(__('Back to Course', true), "/courses/home/$courseId");
 ?>
 </p>
