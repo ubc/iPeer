@@ -1,6 +1,6 @@
 # LANGUAGE translation of CakePHP Application
 # Copyright YEAR NAME <EMAIL@ADDRESS>
-# 
+#
 # Translators:
 # Eric Bergeron  <Eric_Bergeron@uqac.ca>, 2017
 msgid ""
@@ -2788,7 +2788,7 @@ msgstr ""
 #: /Users/compass/projects/ipeer/src//elements/evaluations/rubric_eval_form.ctp:114
 msgid ""
 "Click <font color =\"#FF6666\"><i>EACH</i></font> of your peer's name to "
-"rate his/her performance."
+"rate their performance."
 msgstr ""
 
 #: /Users/compass/projects/ipeer/src//elements/evaluations/rubric_eval_form.ctp:115
