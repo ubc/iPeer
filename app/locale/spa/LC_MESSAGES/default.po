@@ -2820,7 +2820,7 @@ msgstr "Instrucciones"
 #: /views/elements/evaluations/rubric_eval_form.ctp:61
 msgid ""
 "Click <font color =\"#FF6666\"><i>EACH</i></font> of your peer's name to "
-"rate his/her performance."
+"rate their performance."
 msgstr ""
 "Haga clic en <font color=\"#FF6666\"><i>cada</i></font> nombre de sus "
 "compañeros para calificar su desempeño."

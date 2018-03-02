@@ -2864,7 +2864,7 @@ msgid " Instructions"
 msgstr ""
 
 #: /Users/compass/projects/ipeer/src//elements/evaluations/rubric_eval_form.ctp:114
-msgid "Click <font color =\"#FF6666\"><i>EACH</i></font> of your peer's name to rate his/her performance."
+msgid "Click <font color =\"#FF6666\"><i>EACH</i></font> of your peer's name to rate their performance."
 msgstr ""
 
 #: /Users/compass/projects/ipeer/src//elements/evaluations/rubric_eval_form.ctp:115

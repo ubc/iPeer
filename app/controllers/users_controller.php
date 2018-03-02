@@ -461,7 +461,7 @@ class UsersController extends AppController
         $this->set('coursesOptions', $coursesOptions);
 
         $this->set('courseLevelRoles', array( 0 => 'none', 3 => 'instructor', 4 => 'tutor', 5 => 'student'));
-        
+
         $this->set('roleOptions', $this->AccessControl->getEditableRoles());
         $this->set('faculties', $this->User->Faculty->find('list',
             array('order' => 'Faculty.name ASC')));
@@ -709,12 +709,12 @@ class UsersController extends AppController
             $this->Session->setFlash(__('Error: This user does not exist.', true));
             $this->redirect($this->referer());
         }
-        
+
         if (!User::hasPermission('functions/user')) {
             $this->Session->setFlash(__('Error: You do not have permission to edit users.', true));
             $this->redirect('/home');
         }
-        
+
         if (!User::hasPermission('functions/user/'.$role, 'update')) {
             $this->Session->setFlash(__('Error: You do not have permission to edit this user.', true));
             if (is_null($courseId)) {
@@ -723,7 +723,7 @@ class UsersController extends AppController
                 $this->redirect('goToClassList/'.$courseId);
             }
         }
-        
+
         // save the data which involves:
         if ($this->data) {
             $this->data['User'] = array_map('trim', $this->data['User']);
@@ -732,7 +732,7 @@ class UsersController extends AppController
             // in user does not have access to so that the user would not
             // be unenrolled from the course when their profile is edited.
             $hiddenCourses = $this->_notUnenrolCourses($this->Auth->user('id'), $userId);
-            
+
             // REMOVE OLD STUDENT STATUSES
             // unenrol student from course, group, surveygroup
             // only students will go in because only they have records in Enrolment
@@ -741,7 +741,7 @@ class UsersController extends AppController
                     $this->User->removeStudent($userId, $course);
                 }
             }
-            
+
             // REMOVE OLD TUTOR STATUSES
             // unenrol tutor from course, group
             foreach ($tutorCourses as $course) {
@@ -749,7 +749,7 @@ class UsersController extends AppController
                     $this->User->removeTutor($userId, $course);
                 }
             }
-            
+
             // REMOVE OLD INSTRUCTOR STATUSES
             // unenrol instructor from course
             foreach ($instructors as $course) {
@@ -757,11 +757,11 @@ class UsersController extends AppController
                     $this->User->removeInstructor($userId, $course);
                 }
             }
-            
+
             $newTutorCourses = array();
             $newInstructorCourses = array();
             $newStudentCourses = array();
-            
+
             // ADD NEW (possibly existing) STATUSES
             foreach($this->data['CourseEnroll'] as $currCourseId => $currRoleId) {
                 if(!is_numeric($currCourseId)) {
@@ -781,21 +781,21 @@ class UsersController extends AppController
                         // nothing
                 }
             }
-            
+
             unset($this->data['CourseEnroll']); //unset to avoid confusing CakePHP model insertion
 
             // combine the query data
-            $this->data = array_merge($this->data, 
+            $this->data = array_merge($this->data,
                                       $this->_convertCourseEnrolment($newInstructorCourses,3),
                                       $this->_convertCourseEnrolment($newTutorCourses,4),
                                       $this->_convertCourseEnrolment($newStudentCourses,5)
                                      );
-            
-            // upgrade to instructor, but don't downgrade 
+
+            // upgrade to instructor, but don't downgrade
             if(!empty($newInstructorCourses) && $this->data['Role']['RolesUser']['role_id'] > 3) {
                 $this->data['Role']['RolesUser']['role_id'] = 3;
             }
-            
+
             // Now we actually attempt to save the data
             if ($this->User->save($this->data)) {
                 // Success!
@@ -1137,6 +1137,8 @@ class UsersController extends AppController
 
             $this->set('breadcrumb', $this->breadcrumb->push(__('Import Students From Canvas', true)));
             $this->set('isFileImport', false);
+            $this->set('showFullEmails', false);
+            $this->set('showPasswords', false);
 
             $userId = $this->Auth->user('id');
 
@@ -1160,7 +1162,7 @@ class UsersController extends AppController
             if (!empty($this->data)) {
 
                 // TODO: do some validation
-            
+
                 App::import('Component', 'CanvasCourseUser');
 
                 $canvasCourses = CanvasCourseComponent::getAllByIPeerUser($this, User::get('id'), true);
@@ -1174,7 +1176,7 @@ class UsersController extends AppController
                     true
                 );
 
-                $canvas_user_key = $this->SysParameter->get('system.canvas_user_key'); 
+                $canvas_user_key = $this->SysParameter->get('system.canvas_user_key');
 
                 foreach ($canvasUsers as $k => $canvasUser) {
                     $users[] = array(
@@ -1210,7 +1212,7 @@ class UsersController extends AppController
                 }
 
                 $data = Toolkit::parseCSV($uploadFile);
-                
+
                 // generation password for users who weren't given one
                 foreach ($data as &$user) {
                     if (empty($user[User::IMPORT_PASSWORD])) {
@@ -1792,7 +1794,7 @@ class UsersController extends AppController
         // get editor's list of courses
         $editorCourses = $this->Course->getAccessibleCourses(User::get('id'),
             User::getCourseFilterPermission(), 'list');
-        
+
         return array_diff($userCourses, array_keys($editorCourses));
     }
 

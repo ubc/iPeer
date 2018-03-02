@@ -380,9 +380,10 @@ a#home, a#home:hover, a#home:active {
     margin-top: 0.5em;
     margin-bottom: 1em;
     clear: left;
-    padding: 0.7em;
+    padding: 0.7em 1.2em;
     font-weight: 600;
     text-align: center;
+    line-height: 1.5em;
 }
 
 .good-message {
@@ -406,16 +407,25 @@ a#home, a#home:hover, a#home:active {
 .success-message > *,
 .good-message > * {
     text-align: left;
+    font-weight: 400;
 }
 
 #flashMessage > ul,
 #authMessage > ul,
 .error-message > ul,
-.success-message > ul
+.success-message > ul,
 .good-message > ul {
     list-style-type: disc;
     padding-left: 2em;
     padding-bottom: 1em;
+}
+
+#flashMessage > h2:first-child,
+#authMessage > h2:first-child,
+.error-message > h2:first-child,
+.success-message > h2:first-child,
+.good-message > h2:first-child {
+    margin-top: 0.5em;
 }
 
 #flashMessage > p,
