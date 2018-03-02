@@ -20,10 +20,11 @@ class homeTestCase extends SystemBaseTestCase
         $this->assertEqual($headers[1]->text(), 'Inactive Courses');
 
         $courses = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::TAG_NAME, 'h3');
-        $this->assertEqual(count($courses), 3);
-        $this->assertEqual($courses[0]->text(), 'APSC 201');
-        $this->assertEqual($courses[1]->text(), 'MECH 328');
-        $this->assertEqual($courses[2]->text(), 'CPSC 101');
+        $this->assertEqual(count($courses), 4);
+        $this->assertEqual($courses[0]->text(), 'CPSC 404');
+        $this->assertEqual($courses[1]->text(), 'APSC 201');
+        $this->assertEqual($courses[2]->text(), 'MECH 328');
+        $this->assertEqual($courses[3]->text(), 'CPSC 101');
 
         // navigation
         $home = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Home');
@@ -42,11 +43,13 @@ class homeTestCase extends SystemBaseTestCase
     {
         $this->waitForLogoutLogin('admin2');
         $headers = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::TAG_NAME, 'h2');
-        $this->assertEqual(count($headers), 1);
-        $this->assertEqual($headers[0]->text(), 'Inactive Courses');
+        $this->assertEqual(count($headers), 2);
+        $this->assertEqual($headers[0]->text(), 'My Courses');
+        $this->assertEqual($headers[1]->text(), 'Inactive Courses');
         $courses = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::TAG_NAME, 'h3');
-        $this->assertEqual(count($courses), 1);
-        $this->assertEqual($courses[0]->text(), 'CPSC 101');
+        $this->assertEqual(count($courses), 2);
+        $this->assertEqual($courses[0]->text(), 'CPSC 404');
+        $this->assertEqual($courses[1]->text(), 'CPSC 101');
 
         // navigation
         $home = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Home');

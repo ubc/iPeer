@@ -18,7 +18,7 @@ class AddGroupTestCase extends SystemBaseTestCase
     public function testAddGroup()
     {
         $this->session->open($this->url.'courses/home/2');
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Create Groups (Manual)')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Add Group')->click();
         $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
         $this->assertEqual($title, 'APSC 201 - Technical Communication > Add Group');
 

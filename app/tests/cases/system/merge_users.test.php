@@ -80,11 +80,13 @@ class MergeUsersTestCase extends SystemBaseTestCase
         $primary = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'UserPrimarySearchValue');
         $primary->sendKeys('Bob B');
         $primary->sendKeys($return->key);
+        sleep(1);
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserSecondarySearch"] option[value="username"]')->click();
         $secondary = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'UserSecondarySearchValue');
         $secondary->sendKeys('bby567');
         $secondary->sendKeys($return->key);
+        sleep(1);
 
         // wait for primary account search results
         $w = new PHPWebDriver_WebDriverWait($this->session);
@@ -141,11 +143,13 @@ class MergeUsersTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserPrimarySearch"] option[value="username"]')->click();
         $primary->sendKeys('root');
         $primary->sendKeys($return->key);
+        sleep(1);
 
         $secondary = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'UserSecondarySearchValue');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserSecondarySearch"] option[value="student_no"]')->click();
         $secondary->sendKeys('65498451');
         $secondary->sendKeys($return->key);
+        sleep(1);
 
         // wait for primary account search results
         $w = new PHPWebDriver_WebDriverWait($this->session);
@@ -191,6 +195,7 @@ class MergeUsersTestCase extends SystemBaseTestCase
         $primary->sendKeys('redshirt9999');
         $return = new PHPWebDriver_WebDriverKeys('ReturnKey');
         $primary->sendKeys($return->key);
+        sleep(1);
 
         // wait for primary account search results
         $w = new PHPWebDriver_WebDriverWait($this->session);
@@ -215,10 +220,12 @@ class MergeUsersTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserPrimarySearch"] option[value="username"]')->click();
         $primary->sendKeys('admin');
         $primary->sendkeys($return->key);
+        sleep(1);
 
         $secondary = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'UserSecondarySearchValue');
         $secondary->sendKeys('admin');
         $secondary->sendKeys($return->key);
+        sleep(1);
 
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $w->until(
@@ -261,7 +268,9 @@ class MergeUsersTestCase extends SystemBaseTestCase
     {
         $return = new PHPWebDriver_WebDriverKeys('ReturnKey');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'UserPrimarySearchValue')->sendKeys($return->key);
+        sleep(1);
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'UserSecondarySearchValue')->sendKeys($return->key);
+        sleep(1);
 
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $w->until(
@@ -277,7 +286,6 @@ class MergeUsersTestCase extends SystemBaseTestCase
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserPrimaryAccount"] option[value="38"]')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="UserSecondaryAccount"] option[value="38"]')->click();
-
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $this->session->accept_alert();
 
@@ -286,6 +294,11 @@ class MergeUsersTestCase extends SystemBaseTestCase
                 return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::ID, 'flashMessage'));
             }
         );
+        // unfortunately this test method is riding on previous method "testMergeLoggedInUser",
+        // which already has a flash message displayed. to avoid picking up the prev
+        // flash message, sleep for 2s
+        // TODO: rewrite this method so it can run independently and cleanly
+        sleep(2);
         $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'flashMessage');
         $this->assertEqual($msg->text(), 'Error: No merger needed. The primary and secondary accounts are the same.');
     }
@@ -297,7 +310,8 @@ class MergeUsersTestCase extends SystemBaseTestCase
         $primary->sendKeys('root');
         $return = new PHPWebDriver_WebDriverKeys('ReturnKey');
         $primary->sendKeys($return->key);
-
+        sleep(1);
+        
         // wait for primary account search results
         // will not find root (super admin) because it is not an accessible role for admins
         $w = new PHPWebDriver_WebDriverWait($this->session);

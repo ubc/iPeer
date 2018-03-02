@@ -49,3 +49,46 @@ services:
       - "8080:80"
     depends_on:
       - app
+      
+  # for running unit tests
+  app-unittest:
+    image: ubcctlt/ipeer-app
+    build:
+      context: .
+      dockerfile: Dockerfile-app-unittest
+    container_name: ipeer_app_unittest
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "9001:9000"
+    environment:
+      - IPEER_DB_HOST=db
+      - IPEER_DB_USER=ipeer
+      - IPEER_DB_PASSWORD=ipeer
+      - IPEER_DB_NAME=ipeer_test
+      - IPEER_DEBUG=2
+      - IPEER_SESSION_SAVE=database
+      - SELENIUM_HOST=selenium-local
+      - SELENIUM_BROWSER=chrome
+      #- SELENIUM_BROWSER=firefox
+      - SERVER_TEST=http://ipeer_web_unittest/
+      #- IPEER_AUTH=Ldap
+      #- IPEER_AUTH_LDAP_host=ldap.example.com
+      #- IPEER_AUTH_LDAP_port=636
+    depends_on:
+      - db
+  # for running unit tests
+  web-unittest:
+    image: ubcctlt/ipeer-web
+    build:
+      context: .
+      dockerfile: Dockerfile-web
+    container_name: ipeer_web_unittest
+    volumes:
+      - ./app/webroot:/var/www/html
+    environment:
+      - NGINX_FASTCGI_PASS=ipeer_app_unittest:9000
+    ports:
+      - "8081:80"
+    depends_on:
+      - app-unittest
