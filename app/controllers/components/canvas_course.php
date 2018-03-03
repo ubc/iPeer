@@ -3,6 +3,7 @@ App::import('Model', 'User');
 App::import('Component', 'CanvasApi');
 App::import('Component', 'CanvasCourseUser');
 App::import('Component', 'CanvasCourseGroup');
+App::import('Component', 'CanvasCourseGradeColumn');
 
 /**
  * CanvasCourseComponent
@@ -37,11 +38,42 @@ class CanvasCourseComponent extends Object
         }
     }
 
+    /*********************************************************************************************/
+    /* Static Functions
+    /*********************************************************************************************/
+
+    /**
+     * Retreives a single Canvas course
+     *
+     * @param object  $_controller
+     * @param integer $user_id
+     * @param boolean $force_auth
+     * @param string  $course_id
+     *
+     * @access public
+     * @return object CanvasCourseComponent
+     */
+    static public function getById($_controller, $user_id, $course_id, $force_auth=true)
+    {
+        $api = new CanvasApiComponent($user_id);
+        $uri = '/courses/' . $course_id;
+
+        $params = array(
+            'include[]' => 'permissions'
+        );
+
+        $course_obj = $api->getCanvasData($_controller, $force_auth, $uri, $params);
+
+        return new CanvasCourseComponent($course_obj);
+    }
+
     /**
      * Retreives user's Canvas courses
      *
+     * @param object  $_controller
      * @param integer $user_id
-     * @param string $enrollment_type Get courses the user enrolled as. Default as 'teacher'.
+     * @param boolean $force_auth
+     * @param string  $enrollment_type Get courses the user enrolled as. Default as 'teacher'.
      *
      * @access public
      * @return array Array of CanvasCourseComponent with id as key
@@ -63,8 +95,39 @@ class CanvasCourseComponent extends Object
     }
 
     /**
+     * Get the progress of an asynchronous Canvas API operation
+     * Returns a progress object containing:
+     * - completion (an integer out of 100)
+     * - workflow_state (queued, running, completed, or failed)
+     * - message (e.g. "17 courses processed"))
+     * See https://canvas.instructure.com/doc/api/progress.html#Progress for full list
+     *
+     * @param object $_controller
+     * @param integer $user_id
+     * @param integer $progress_id
+     * @param boolean $force_auth
+     *
+     * @access public
+     * @return object progress object
+     */
+    static public function getProgress($_controller, $user_id, $progress_id, $force_auth=true) {
+
+        $api = new CanvasApiComponent($user_id);
+        $uri = '/progress/' . $progress_id;
+
+        $progressObj = $api->getCanvasData($_controller, $force_auth, $uri);
+
+        return $progressObj;
+    }
+
+    /*********************************************************************************************/
+    /* Users
+    /*********************************************************************************************/
+
+    /**
      * Retrieves a course's users
      *
+     * @param object $_controller
      * @param integer $user_id
      * @param mixed $roles array of roles to retrieve. by default, retrieves teachers, TAs, and students
      *
@@ -74,14 +137,14 @@ class CanvasCourseComponent extends Object
     public function getUsers($_controller, $user_id, $roles=array(
         CanvasCourseUserComponent::ENROLLMENT_QUERY_STUDENT,
         CanvasCourseUserComponent::ENROLLMENT_QUERY_TEACHER,
-        CanvasCourseUserComponent::ENROLLEMNT_QUERY_TA), 
+        CanvasCourseUserComponent::ENROLLEMNT_QUERY_TA),
         $active_only=false, $force_auth=false)
     {
         $api = new CanvasApiComponent($user_id);
         $uri = '/courses/' . $this->id . '/users';
         $params['enrollment_type[]'] = $roles;      // note the square brackets used in key
         $params['include[]'] = array('enrollments', 'email');
-        
+
         //$courseUsers_json = $api->getCanvasData($uri, $params);
         $courseUsers_json = $api->getCanvasData($_controller, $force_auth, $uri, $params);
 
@@ -98,11 +161,15 @@ class CanvasCourseComponent extends Object
 
         return $courseUsers;
     }
-    
+
+    /*********************************************************************************************/
+    /* Groups
+    /*********************************************************************************************/
+
     /**
      * Retrieves a course's groups
      *
-     * @param object $_controller 
+     * @param object $_controller
      * @param integer $user_id
      * @param boolean $force_auth
      *
@@ -118,7 +185,7 @@ class CanvasCourseComponent extends Object
         else {
             $uri = '/group_categories/' . $group_category_id . '/groups';
         }
-        
+
         $courseGroups_array = $api->getCanvasData($_controller, $force_auth, $uri);
 
         $courseUsers = array();
@@ -133,11 +200,68 @@ class CanvasCourseComponent extends Object
 
         return $courseUsers;
     }
-    
+
     /**
-     * Retrieves a course's group categories (also called Groupsets)
+     * Creates a new group in this course
      *
-     * @param object $_controller 
+     * @param object $_controller
+     * @param integer $user_id
+     * @param boolean $force_auth
+     * @param string $group_name
+     * @param integer $group_category_id
+     *
+     * @access public
+     * @return object of type CanvasCourseGroupComponent
+     */
+    public function createGroup($_controller, $user_id, $force_auth=false, $group_name='', $group_category_id=null)
+    {
+        $api = new CanvasApiComponent($user_id);
+        if ($group_category_id) {
+            $uri = '/group_categories/' . $group_category_id . '/groups';
+        }
+        else {
+            $uri = '/groups';
+        }
+
+        $params = array(
+            'name' => $group_name,
+            'join_level' => 'parent_context_auto_join'
+        );
+
+        $courseGroup_obj = $api->postCanvasData($_controller, $force_auth, $uri, $params);
+
+        return new CanvasCourseGroupComponent($courseGroup_obj);
+    }
+
+    /**
+     * Deletes a group in this course
+     *
+     * @param object $_controller
+     * @param integer $user_id
+     * @param boolean $force_auth
+     * @param string $group_id
+     *
+     * @access public
+     * @return object returned object
+     */
+    public function deleteGroup($_controller, $user_id, $force_auth, $group_id)
+    {
+        $api = new CanvasApiComponent($user_id);
+        $uri = '/groups/' . $group_id;
+
+        $retObj = $api->deleteCanvasData($_controller, $force_auth, $uri);
+
+        return $retObj;
+    }
+
+    /*********************************************************************************************/
+    /* Group Categories ("Group sets")
+    /*********************************************************************************************/
+
+    /**
+     * Retrieves a course's group categories (also called Group sets)
+     *
+     * @param object $_controller
      * @param integer $user_id
      * @param boolean $force_auth
      * @param mixed $names_only set to false to return the full group category objects, rather than just the names
@@ -149,7 +273,7 @@ class CanvasCourseComponent extends Object
     {
         $api = new CanvasApiComponent($user_id);
         $uri = '/courses/' . $this->id . '/group_categories';
-        
+
         $courseGroupCategories_array = $api->getCanvasData($_controller, $force_auth, $uri);
 
         $courseGroupCategories = array();
@@ -164,45 +288,13 @@ class CanvasCourseComponent extends Object
     }
 
     /**
-     * Creates a new group in this course
-     *
-     * @param object $_controller
-     * @param integer $user_id
-     * @param boolean $force_auth
-     * @param string $group_name
-     * @param integer $group_category_id
-     * 
-     * @access public
-     * @return object of type CanvasCourseGroupComponent
-     */
-    public function createGroup($_controller, $user_id, $force_auth=false, $group_name='', $group_category_id=null)
-    {
-        $api = new CanvasApiComponent($user_id);
-        if ($group_category_id) {
-            $uri = '/group_categories/' . $group_category_id . '/groups';
-        }
-        else {
-            $uri = '/groups';
-        }
-        
-        $params = array(
-            'name' => $group_name,
-            'join_level' => 'parent_context_auto_join'
-        );
-
-        $courseGroup_obj = $api->postCanvasData($_controller, $force_auth, $uri, $params);
-
-        return new CanvasCourseGroupComponent($courseGroup_obj);
-    }
-
-    /**
-     * Creates a new group in this course
+     * Creates a new group category in this course
      *
      * @param object $_controller
      * @param integer $user_id
      * @param boolean $force_auth
      * @param string $group_category_name
-     * 
+     *
      * @access public
      * @return array containing the id and name of this group category
      */
@@ -220,7 +312,7 @@ class CanvasCourseComponent extends Object
             }
             $group_category_name = "Groupset " . $groupCategoryNum;
         }
-        
+
         $params = array(
             'name' => $group_category_name
         );
@@ -231,30 +323,217 @@ class CanvasCourseComponent extends Object
         foreach ($courseGroupCategory_obj as $key => $val) {
             if ($key == 'id' || $key == 'name') {
                 $courseGroupCategory[$key] = $val;
-            } 
+            }
         }
 
         return $courseGroupCategory;
     }
-    
+
+    /*********************************************************************************************/
+    /* Custom Grade Columns
+    /*********************************************************************************************/
+
     /**
-     * Deletes a group in this course
+     * Retrieves a course's custom gradebook columns
+     *
+     * @param object $_controller
+     * @param integer $user_id
+     * @param boolean $include_hidden
+     * @param boolean $force_auth
+     *
+     * @access public
+     * @return array Array of CanvasCourseGradeColumnComponent
+     */
+    public function getGradeColumns($_controller, $user_id, $include_hidden=false, $force_auth=false)
+    {
+        $api = new CanvasApiComponent($user_id);
+        $uri = '/courses/' . $this->id . '/custom_gradebook_columns';
+        $params['include_hidden'] = $include_hidden;
+
+        $courseGradeColumns_json = $api->getCanvasData($_controller, $force_auth, $uri, $params);
+
+        $courseGradeColumns = array();
+        if (!empty($courseGradeColumns_json)) {
+            foreach ($courseGradeColumns_json as $courseGradeColumn) {
+                $courseGradeColumn_obj = new CanvasCourseGradeColumnComponent($this->id, $courseGradeColumn);
+                if (!empty($courseGradeColumn_obj->id)) {
+                    $courseGradeColumns[$courseGradeColumn_obj->id] = $courseGradeColumn_obj;
+                }
+            }
+        }
+
+        return $courseGradeColumns;
+    }
+
+    /**
+     * Creates a new custom grade column in this course
+     *
+     * @param object  $_controller
+     * @param integer $user_id
+     * @param string  $title the name of this column
+     * @param integer $position position of this column in the gradebook
+     * @param boolean $hidden defaults to false
+     * @param boolean $force_auth
+     *
+     * @access public
+     * @return object of type CanvasCourseGradeColumnComponent
+     */
+    public function createGradeColumn($_controller, $user_id, $title, $position, $hidden=false, $force_auth=false)
+    {
+        $api = new CanvasApiComponent($user_id);
+        $uri = '/courses/' . $this->id . '/custom_gradebook_columns';
+
+        $params = array(
+            'column[title]' => $title,
+            'column[position]' => ($position + 0),
+            'column[hidden]' => $hidden
+        );
+
+        $courseGradeColumn_obj = $api->postCanvasData($_controller, $force_auth, $uri, $params);
+
+        return new CanvasCourseGradeColumnComponent($this->id, $courseGradeColumn_obj);
+    }
+
+    /**
+     * Deletes a custom grade column in this course
      *
      * @param object $_controller
      * @param integer $user_id
      * @param boolean $force_auth
-     * @param string $group_id
-     * 
+     * @param string $grade_column_id
+     *
      * @access public
      * @return object returned object
      */
-    public function deleteGroup($_controller, $user_id, $force_auth, $group_id)
+    public function deleteGradeColumn($_controller, $user_id, $force_auth, $grade_column_id)
     {
         $api = new CanvasApiComponent($user_id);
-        $uri = '/groups/' . $group_id;
+        $uri = '/courses/' . $this->id . '/custom_gradebook_columns/' . $grade_column_id;
 
         $retObj = $api->deleteCanvasData($_controller, $force_auth, $uri);
 
         return $retObj;
+    }
+
+    /*********************************************************************************************/
+    /* Assignments
+    /*********************************************************************************************/
+
+    /**
+     * Retrieves a single assignment for this course
+     *
+     * @param object  $_controller
+     * @param integer $user_id
+     * @param boolean $force_auth
+     * @param integer $assignment_id
+     *
+     * @access public
+     * @return object of type CanvasCourseAssignmentComponent
+     */
+    public function getAssignment($_controller, $user_id, $assignment_id, $force_auth=false)
+    {
+        $api = new CanvasApiComponent($user_id);
+        $uri = '/courses/' . $this->id . '/assignments/' . $assignment_id;
+
+        $courseAssignment_obj = $api->getCanvasData($_controller, $force_auth, $uri);
+
+        if (!empty($courseAssignment_obj)) {
+            return new CanvasCourseAssignmentComponent($this->id, $courseAssignment_obj);
+        }
+        else {
+            return false;
+        }
+    }
+
+    /**
+     * Creates a new assignment in this course
+     *
+     * @param object  $_controller
+     * @param integer $user_id
+     * @param boolean $force_auth
+     * @param array   $args
+     *
+     * @access public
+     * @return object of type CanvasCourseAssignmentComponent
+     */
+    public function createAssignment($_controller, $user_id, $args, $assignment_group_name, $force_auth=false)
+    {
+        $api = new CanvasApiComponent($user_id);
+        $uri = '/courses/' . $this->id . '/assignments';
+
+        $defaults = array(
+            'submission_types' => array('none'),
+            'published' => true,
+            'grading_type' => 'points'
+        );
+
+        // place into assignment group named $assignment_group_name
+        $assignmentGroups = $this->getAssignmentGroups($_controller, $user_id, $force_auth);
+        foreach ($assignmentGroups as $assignmentGroup) {
+            if ($assignmentGroup->name == $assignment_group_name) {
+                $defaults['assignment_group_id'] = $assignmentGroup->id;
+                break;
+            }
+        }
+        if (empty($defaults['assignment_group_id'])) {
+            $defaults['assignment_group_id'] = $this->createAssignmentGroup($_controller, $user_id, $assignment_group_name, $force_auth);
+        }
+
+        foreach ($defaults as $key => $val) {
+            $params['assignment[' . $key . ']'] = $val;
+        }
+
+        foreach ($args as $key => $val) {
+            $params['assignment[' . $key . ']'] = $val;
+        }
+
+        $assignment_obj = $api->postCanvasData($_controller, $force_auth, $uri, $params);
+
+        return new CanvasCourseAssignmentComponent($this->id, $assignment_obj);
+    }
+
+    /*********************************************************************************************/
+    /* Assignment Groups
+    /*********************************************************************************************/
+
+    /**
+     * Retrieves assignment groups for this course
+     *
+     * @param object  $_controller
+     * @param integer $user_id
+     * @param boolean $force_auth
+     *
+     * @access public
+     * @return array  Array of stdClass Objects (each representing one assignment group)
+     */
+    public function getAssignmentGroups($_controller, $user_id, $force_auth=false)
+    {
+        $api = new CanvasApiComponent($user_id);
+        $uri = '/courses/' . $this->id . '/assignment_groups';
+
+        return $api->getCanvasData($_controller, $force_auth, $uri);
+    }
+
+    /**
+     * Create a new assignment group in this course
+     *
+     * @param object  $_controller
+     * @param integer $user_id
+     * @param string  $name
+     * @param boolean $force_auth
+     *
+     * @access public
+     * @return integer assignment group id
+     */
+    public function createAssignmentGroup($_controller, $user_id, $name, $force_auth=false)
+    {
+        $api = new CanvasApiComponent($user_id);
+        $uri = '/courses/' . $this->id . '/assignment_groups';
+
+        $params['name'] = $name;
+
+        $assignmentGroup_obj = $api->postCanvasData($_controller, $force_auth, $uri, $params);
+
+        return $assignmentGroup_obj->id;
     }
 }

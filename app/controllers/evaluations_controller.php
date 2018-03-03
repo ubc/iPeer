@@ -135,10 +135,10 @@ class EvaluationsController extends AppController
             array("not reviewed" => __("Not Reviewed", true), "to review" => "To Review",
             "reviewed" => __("Reviewed", true))),
             array("GroupEvent.grade_release_status",__("Grade", true), "7em",   "map",
-            array("None" => __("Not Released", true), "Some" => __("Some Released", true), 
+            array("None" => __("Not Released", true), "Some" => __("Some Released", true),
                 "Auto" => __("Auto-Release", true), "All" => __("Released", true))),
             array("GroupEvent.comment_release_status", __("Comment", true), "7em",   "map",
-            array("None" => __("Not Released", true), "Some" => __("Some Released", true), 
+            array("None" => __("Not Released", true), "Some" => __("Some Released", true),
                 "Auto" => __("Auto-Release", true), "All" => __("Released", true))),
 
             // Extra info about course and Event
@@ -225,6 +225,7 @@ class EvaluationsController extends AppController
 
         $this->set('data', $event);
         $this->set('viewReleaseBtns', $viewReleaseBtns);
+        $this->set('canvasEnabled', in_array($this->SysParameter->get('system.canvas_enabled', 'false'), array('1', 'true', 'yes')));
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $event['Course']))
             ->push(array('event' => $event['Event']))
             ->push(__('Results', true)));
@@ -327,24 +328,236 @@ class EvaluationsController extends AppController
             $fileName = isset($this->params['form']['file_name']) && !empty($this->params['form']['file_name']) ? $this->params['form']['file_name']:date('m.d.y');
 
             switch($this->params['form']['export_type']) {
-            case "csv" :
-                header('Content-Type: application/csv');
-                header('Content-Disposition: attachment; filename=' . $fileName . '.csv');
-                $this->ExportCsv->createCsv($this->params['form'], $event);
-                break;
-            case "pdf":
-                $this->ExportPdf->createPdf($this->params['form'], $event);
-                break;
-            case "excel" :
-                $this->ExportExcel->createExcel($this->params['form'], $event);
-                break;
-            default :
-                throw new Exception("Invalid evaluation selection.");
+                case "csv" :
+                    header('Content-Type: application/csv');
+                    header('Content-Disposition: attachment; filename=' . $fileName . '.csv');
+                    $this->ExportCsv->createCsv($this->params['form'], $event);
+                    break;
+                case "pdf":
+                    $this->ExportPdf->createPdf($this->params['form'], $event);
+                    break;
+                case "excel" :
+                    $this->ExportExcel->createExcel($this->params['form'], $event);
+                    break;
+                default :
+                    throw new Exception("Invalid evaluation selection.");
             }
             $this->log('Memory Usage for exporting event '.$event['Event']['title'].': '.memory_get_peak_usage(), 'debug');
         } else {
             // Set up data
             $this->set('file_name', date('m.d.y'));
+        }
+    }
+
+    function exportCanvas($eventId, $progressId=false) {
+        $canvasEnabled = in_array($this->SysParameter->get('system.canvas_enabled', 'false'), array('1', 'true', 'yes'));
+
+        if (!$canvasEnabled){
+            $this->Session->setFlash(__('Error: Canvas integration not enabled.', true));
+            $this->redirect('index');
+        }
+
+        App::import('Component', 'CanvasCourse');
+        App::import('Component', 'CanvasCourseAssignment');
+
+        // if progress id is passed in, we return a json object with the progress of this export
+        if ($progressId) {
+
+            $result = array();
+            $statusCode = 'HTTP/1.1 400 Bad Request'; // unrecognized request type
+
+            if ($this->RequestHandler->isGet()) {
+                $result = CanvasCourseComponent::getProgress($this, User::get('id'), $progressId);
+                $statusCode = 'HTTP/1.1 200 OK';
+            }
+
+            header('Content-Type: application/json');
+            header($statusCode);
+            if ($result == null) {
+                $result = array();
+            }
+            $json = json_encode($result);
+            header("Content-length: ".strlen($json));
+            echo $json;
+            die;
+        }
+
+        // Get event
+        $event = $this->Event->getAccessibleEventById($eventId, User::get('id'), User::getCourseFilterPermission());
+        if (!$event) {
+            $this->Session->setFlash(__('Error: Event does not exist or you do not have permission to view this event.', true));
+            $this->redirect('index');
+            return;
+        }
+        $event = $event['Event'];
+
+        $this->set('eventName', $event['title']);
+
+        // Get course
+        $courseId = $this->Event->getCourseByEventId($eventId);
+        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
+        if (!$course) {
+            $this->Session->setFlash(__('Error: The associated course does not exist or you do not have permission to view this course.', true));
+            $this->redirect('index');
+            return;
+        }
+        $course = $course['Course'];
+
+        $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course))
+             ->push(array('event' => $event))
+             ->push(__('Push Grades to Canvas', true)));
+
+        // if form is submitted, process it
+        if (isset($this->params['form']['submit'])) {
+
+            $exportReport = array();
+            $errorCount = 0;
+
+            $gradeExportProgress = false;
+            $this->set('canvasProgressId', false);
+
+            // Get Canvas course
+            if (!$course['canvas_id']) {
+                $this->Session->setFlash(__('Error: You need to first associate this course with a Canvas course in order to push grades. You can do so from the course Edit screen.', true));
+                $this->redirect('index');
+                return;
+            }
+            $canvasCourse = CanvasCourseComponent::getById($this, User::get('id'), $course['canvas_id']);
+            if (!$canvasCourse) {
+                $this->Session->setFlash(__('Error: Canvas course not found or you do not have access to it.', true));
+                $this->redirect('index');
+                return;
+            }
+
+            $eventTemplateType = $this->Event->getEventTemplateTypeId($eventId);
+
+            $points_possible = 0;
+            if ($eventTemplateType == 1) {
+                $simpleEvaluation = $this->SimpleEvaluation->find('first', array(
+                    'conditions' => array('id' => $event['template_id']),
+                    'contain' => false,
+                ));
+                $points_possible = $simpleEvaluation['SimpleEvaluation']['point_per_member'];
+            } else if ($eventTemplateType == 2) {
+                $rubric = $this->Rubric->getRubricById($event['template_id']);
+                $points_possible = $rubric['Rubric']['total_marks'];
+            } else if ($eventTemplateType == 4) {
+                $mixeval = $this->Mixeval->getEvaluation($event['template_id']);
+                $points_possible = $mixeval['Mixeval']['total_marks'];
+            }
+
+            $scores = array();
+            $key = "";
+
+            $fields = array('id', 'evaluatee', 'evaluator', 'score');
+            $conditions = array('event_id' => $eventId);
+            if ($eventTemplateType == 1) {
+                $scores = $this->EvaluationSimple->simpleEvalScore($eventId, $fields, $conditions);
+                $key = "EvaluationSimple";
+            } else if ($eventTemplateType == 2) {
+                $scores = $this->EvaluationRubric->rubricEvalScore($eventId, $conditions);
+                $key = "EvaluationRubric";
+            } else if ($eventTemplateType == 4) {
+                $scores = $this->EvaluationMixeval->mixedEvalScore($eventId, $fields, $conditions);
+                $key = "EvaluationMixeval";
+            }
+
+            $grades = array();
+            if (count($scores)) {
+
+                $user_ids = Set::classicExtract($scores, "{n}.$key.evaluatee", $scores);
+                $usernames = $this->User->find('list', array('conditions' => array('User.id' => $user_ids), 'fields' => array('User.username')));
+                $canvasUsers = $canvasCourse->getUsers($this, User::get('id'), array(CanvasCourseUserComponent::ENROLLMENT_QUERY_STUDENT));
+
+                foreach ($scores as &$score) {
+                    if(isset($usernames[$score[$key]['evaluatee']]) ) {
+                        $username = $usernames[$score[$key]['evaluatee']];
+                        if (isset($canvasUsers[$username])) {
+                            $canvasUserId = $canvasUsers[$username]->id;
+                            $grades[$canvasUserId] = $score[$key]['score'];
+                        }
+                        else {
+                            $exportReport[] = 'User with username "' . $username . '" does not have an associated account in Canvas, so their grade was not exported.';
+                            $errorCount++;
+                        }
+                    } else {
+                        $exportReport[] = 'User with iPeer id ' . $score[$key]['evaluatee'] . ' was not found, so their grade was not exported.';
+                        $errorCount++;
+                    }
+                }
+            }
+
+            if ($points_possible && count($grades)) {
+
+                // Get Canvas assignment
+                $canvasAssignment = null;
+                if ($event['canvas_assignment_id']) {
+                    $canvasAssignment = $canvasCourse->getAssignment($this, User::get('id'), $event['canvas_assignment_id']);
+                }
+
+                // Create assignment in Canvas if no assignment already associated or if assignment does not exist in Canvas
+                if (!$canvasAssignment) {
+                    $assignmentArgs = array(
+                        'integration_id' => $eventId,
+                        'name' => $event['title'],
+                        'description' => $event['description'],
+                        'published' => true,
+                        'muted' => true,
+                        'grading_type' => 'points',
+                        'points_possible' => $points_possible
+                    );
+                    $canvasAssignment = $canvasCourse->createAssignment($this, User::get('id'), $assignmentArgs, "iPeer Evaluations");
+
+                    if (!$canvasAssignment) {
+                        $exportReport[] = 'There was a problem creating the assignment in Canvas. Please try again later.';
+                        $errorCount++;
+                    }
+                    else {
+                        // save the canvas assignment association with this event
+                        $event['canvas_assignment_id'] = $canvasAssignment->id;
+                        $this->Event->id = $eventId;
+                        $this->Event->save(array('Event' => $event));
+
+                        if ($event['canvas_assignment_id']) {
+                            $exportReport[] = 'The previously associated assignment for the event "' . $event['title'] . '" could not be found in Canvas, so a new one was created.';
+                        }
+                        else {
+                            $exportReport[] = 'A new assignment was created in Canvas for the event "' . $event['title'] . '".';
+                        }
+                    }
+                }
+
+                // Export grades
+                if ($canvasAssignment) {
+
+                    $gradeExportProgress = $canvasAssignment->grade($this, User::get('id'), $grades);
+
+                    if (!$gradeExportProgress) {
+                        $exportReport[] = 'Grades could not be exported.';
+                        $errorCount++;
+                    }
+                    else {
+                        $this->set('canvasProgressId', $gradeExportProgress->id);
+                    }
+                }
+            }
+            elseif (count($grades)) {
+                $exportReport[] = 'This evaluation type cannot be exported.';
+                $errorCount++;
+            }
+            else {
+                $exportReport[] = 'There are no grades that can be exported.';
+                $errorCount++;
+            }
+
+            if ($errorCount > 0) {
+                $supportEmail = $this->SysParameter->get('display.contact_info');
+                $exportReport[] = 'If you are having issues with the export and require assistance, please <a href="mailto:' . $supportEmail .
+                                  '?subject=Problem using iPeer Canvas grade sync feature">contact support</a>.';
+            }
+
+            $this->set('exportReportDetails', $exportReport);
+            $this->set('exportDetails', $gradeExportProgress);
         }
     }
 
@@ -1294,7 +1507,7 @@ class EvaluationsController extends AppController
             $fullNames = $this->User->getFullNames($memberList);
             $members = $this->User->findAllById($memberList);
             $sub = Set::extract('/EvaluationSubmission/submitter_id', $sub);
-            
+
             $mixeval = $this->Mixeval->find('first', array(
                 'conditions' => array('Mixeval.id' => $event['Event']['template_id']),
                 'recursive' => 2
@@ -1303,7 +1516,7 @@ class EvaluationsController extends AppController
             $peerQues = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}.self_eval');
             // only required peer evaluation questions are counted toward the averages
             $required = array_flip(array_intersect(array_keys($required, 1), array_keys($peerQues, 0)));
-            
+
             $member_ids = Set::extract($groupMembers, '/GroupsMembers/user_id');
             $details = $this->Evaluation->getMixevalResultDetail($groupEventId, $members, $member_ids, array_keys($required));
             $inCompleteMembers = $this->User->getUsers($inCompleteMembers, array('Role'), array('User.full_name'));
