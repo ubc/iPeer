@@ -157,11 +157,11 @@ class addEventTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[id="selectAll"]')->click();
 
         // fill in the dates
-        $this->selectDayOnCalender('EventDueDate', '12');
-        $this->selectDayOnCalender('EventReleaseDateBegin', '4');
-        $this->selectDayOnCalender('EventReleaseDateEnd', '13');
-        $this->selectDayOnCalender('EventResultReleaseDateBegin', '14');
-        $this->selectDayOnCalender('EventResultReleaseDateEnd', '28');
+        $this->selectDayOnCalendar('EventDueDate', '12');
+        $this->selectDayOnCalendar('EventReleaseDateBegin', '4');
+        $this->selectDayOnCalendar('EventReleaseDateEnd', '13');
+        $this->selectDayOnCalendar('EventResultReleaseDateBegin', '14');
+        $this->selectDayOnCalendar('EventResultReleaseDateEnd', '28');
 
         // submit form
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
@@ -217,17 +217,19 @@ class addEventTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDescription')->sendKeys('w/ reminders');
 
         // fill in the dates
-        $this->selectDayOnCalender('EventDueDate', '12');
-        $this->selectDayOnCalender('EventReleaseDateBegin', '4');
-        $this->selectDayOnCalender('EventReleaseDateEnd', '13');
-        $this->selectDayOnCalender('EventResultReleaseDateBegin', '14');
-        $this->selectDayOnCalender('EventResultReleaseDateEnd', '28');
+        $this->selectDayOnCalendar('EventDueDate', '12');
+        $this->selectDayOnCalendar('EventReleaseDateBegin', '1', false);  // relaese at the beginning of current month so student can see it
+        $this->selectDayOnCalendar('EventReleaseDateEnd', '28');
+        $this->selectDayOnCalendar('EventResultReleaseDateBegin', '14');
+        $this->selectDayOnCalendar('EventResultReleaseDateEnd', '28');
 
         $dueDate = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->attribute('value');
         $releaseEnd = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->attribute('value');
 
         // set email reminder frequency to 5 days
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[value="5"]')->click();
+        // select email template
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailTemplate"] option[value="6"]')->click();
         // select all groups
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[id="selectAll"]')->click();
 
@@ -270,13 +272,19 @@ class addEventTestCase extends SystemBaseTestCase
         $this->assertTrue(empty($alex)); // Alex is not listed because he has submitted already
         // email content
         $content = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'emailContent')->text();
-        $expected = "Hello Name,\nA peer evaluation for MECH 328 is made available to you in iPeer, which".
-            " has yet to be completed.\nName: Simple Evaluation with Reminders\nDue Date: ".date('l, F j, Y g:i a', strtotime($dueDate)).
-            "\nClose Date: ".date('l, F j, Y g:i a', strtotime($releaseEnd))."\nYou can login here to complete ".
-            "the peer evaluation before it closes.\nThank you";
+        // $expected = "Hello Name,\nA peer evaluation for MECH 328 is made available to you in iPeer, which".
+        //     " has yet to be completed.\nName: Simple Evaluation with Reminders\nDue Date: ".date('l, F j, Y g:i a', strtotime($dueDate)).
+        //     "\nClose Date: ".date('l, F j, Y g:i a', strtotime($releaseEnd))."\nYou can login here to complete ".
+        //     "the peer evaluation before it closes.\nThank you";
+        $expected = "Hello {{{FIRSTNAME}}},\n\n".
+                    "A evaluation for {{{COURSENAME}}} is made available to you in iPeer, which has yet to be completed.\n\n".
+                    "Name: {{{EVENTTITLE}}}\n".
+                    "Due Date: {{{DUEDATE}}}\n".
+                    "Close Date: {{{CLOSEDATE}}}\n\n".
+                    "Thank You";
         $this->assertEqual($content, $expected);
-        $link = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'here')->attribute('href');
-        $this->assertEqual($link, $this->url);
+        // $link = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'here')->attribute('href');
+        // $this->assertEqual($link, $this->url);
 
         // frequency calculations
         $this->session->open($this->url.'events/edit/'.$eventId);
@@ -346,12 +354,14 @@ class addEventTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventSurvey"] option[value="1"]')->click();
 
         // fill in the dates
-        $this->selectDayOnCalender('EventDueDate', '12');
-        $this->selectDayOnCalender('EventReleaseDateBegin', '4');
-        $this->selectDayOnCalender('EventReleaseDateEnd', '13');
+        $this->selectDayOnCalendar('EventDueDate', '12');
+        $this->selectDayOnCalendar('EventReleaseDateBegin', '1', false); # release at the begining of current month
+        $this->selectDayOnCalendar('EventReleaseDateEnd', '13');
 
         // set email reminder frequency to 5 days
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[value="5"]')->click();
+        // select email template
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailTemplate"] option[value="7"]')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $w->until(
@@ -450,12 +460,10 @@ class addEventTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventTitle')->sendKeys('Survey with Email Reminders');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDescription')->sendKeys('Email Reminders are included');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEventTemplateTypeId"] option[value="3"]')->click();
-
         // fill in the dates - interval is 2 days
-        $this->selectDayOnCalender('EventDueDate', '12');
-        $this->selectDayOnCalender('EventReleaseDateBegin', '10');
-        $this->selectDayOnCalender('EventReleaseDateEnd', '13');
-        $this->selectDayOnCalender('EventResultReleaseDateEnd', '12');
+        $this->selectDayOnCalendar('EventDueDate', '12');
+        $this->selectDayOnCalendar('EventReleaseDateBegin', '10');
+        $this->selectDayOnCalendar('EventReleaseDateEnd', '13');
         // set email reminder frequency to 3 days
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[value="3"]')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();

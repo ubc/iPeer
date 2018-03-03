@@ -27,16 +27,10 @@ class studentRubric extends SystemBaseTestCase
         // set due date and release date end to next month so that the event is opened.
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->clear();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventDueDate')->sendKeys(date('Y-m-d H:i:s'));
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateBegin')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '4')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventResultReleaseDateBegin')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '5')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventResultReleaseDateEnd')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'a[title="Next"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '28')->click();
+        $this->selectDayOnCalendar('EventReleaseDateBegin', date('j'), false);
+        $this->selectDayOnCalendar('EventReleaseDateEnd', '4');
+        $this->selectDayOnCalendar('EventResultReleaseDateBegin', '5');
+        $this->selectDayOnCalendar('EventResultReleaseDateEnd', '28');
 
         // add penalty
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Add Penalty')->click();;
@@ -74,7 +68,7 @@ class studentRubric extends SystemBaseTestCase
         // check penalty note
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '( Show/Hide late penalty policy )')->click();
         $penalty = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'penalty')->text();
-        $this->assertEqual($penalty, "1 day late: 10% deduction.\n10% is deducted afterwards.");
+        $this->assertEqual($penalty, "From the due date to 1 days(s) late, 10% will be deducted.\n10% is deducted afterwards.");
         // check disabled submit button
         $submit = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Submit to Complete the Evaluation"]');
         $this->assertTrue($submit->attribute('disabled'));
@@ -90,8 +84,10 @@ class studentRubric extends SystemBaseTestCase
         // Alex Student
         $header = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'panel6Header');
         $this->assertEqual($header->text(), 'Alex Student - (click to expand)');
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_1.value=4;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_3.value=5;"]')->click();
+        $header->click();
+        sleep(1);   // don't click too fast otherwise browser may choke and can't find the expanded view
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="4" and @name="6criteria_points_1"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="5" and @name="6criteria_points_3"]')->click();
         $comments = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::NAME, '6comments[]');
         $comments[1]->sendKeys('very co-operative');
         $comments[2]->sendKeys('very punctual');
@@ -110,7 +106,7 @@ class studentRubric extends SystemBaseTestCase
         $this->assertEqual($msg->text(), 'Please complete all the questions marked red before saving.');
 
         // answer question 2 + save
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_2.value=5;"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="5" and @name="6criteria_points_2"]')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::NAME, '6')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $w->until(
@@ -125,6 +121,9 @@ class studentRubric extends SystemBaseTestCase
         $this->session->open($this->session->url()); // clear message by refreshing the page
 
         // fill in first comment
+        $header = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'panel6Header');
+        $header->click();
+        sleep(1);
         $comment = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::NAME, '6comments[]');
         $comment->sendKeys('participated lots');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::NAME, '6')->click();
@@ -140,9 +139,11 @@ class studentRubric extends SystemBaseTestCase
         // check the evaluation for Alex is saved
         $header = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'panel6Header');
         $this->assertEqual($header->text(), 'Alex Student ( Saved )');
-        $radio1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_1.value=4;"]');
-        $radio2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_2.value=5;"]');
-        $radio3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_3.value=5;"]');
+        $header->click();
+        sleep(1);
+        $radio1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="4" and @name="6criteria_points_1"]');
+        $radio2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="5" and @name="6criteria_points_2"]');
+        $radio3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="5" and @name="6criteria_points_3"]');
         $this->assertTrue($radio1->attribute('checked'));
         $this->assertTrue($radio2->attribute('checked'));
         $this->assertTrue($radio3->attribute('checked'));
@@ -155,9 +156,10 @@ class studentRubric extends SystemBaseTestCase
 
         // Matt Student
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'panel7Header')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_7_1.value=3;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_7_2.value=4;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_7_3.value=5;"]')->click();
+        sleep(1);
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="3" and @name="7criteria_points_1"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="4" and @name="7criteria_points_2"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="5" and @name="7criteria_points_3"]')->click();
         $comments = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::NAME, '7comments[]');
         $comments[0]->sendKeys('average participation');
         $comments[1]->sendKeys('pretty co-operative');
@@ -177,10 +179,16 @@ class studentRubric extends SystemBaseTestCase
 
     public function testReSubmit()
     {
+        $this->waitForLogoutLogin('redshirt0001');
+
+        // Alex student
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_1.value=5;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_2.value=4;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_3.value=4;"]')->click();
+        $header = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'panel6Header');
+        $header->click();
+        sleep(1);
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="5" and @name="6criteria_points_1"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="4" and @name="6criteria_points_2"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="4" and @name="6criteria_points_3"]')->click();
         $comments = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::NAME, '6comments[]');
         $comments[0]->clear();
         $comments[0]->sendKeys('very active in the group');
@@ -201,6 +209,9 @@ class studentRubric extends SystemBaseTestCase
         $this->assertEqual($msg, 'Your evaluation has been saved, but some comments are missing.');
         $this->session->open($this->session->url());
 
+        $header = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'panel6Header');
+        $header->click();
+        sleep(1);
         $comments = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::NAME, '6comments[]');
         $comments[1]->sendKeys('easy to work with');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::NAME, '6')->click();
@@ -247,8 +258,8 @@ class studentRubric extends SystemBaseTestCase
         $this->assertEqual($title, 'MECH 328 - Mechanical Engineering Design Project > Rubric Evaluation > Results');
 
         //auto-release results message
-        $msg = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::ID, 'autoRelease_msg');
-        $this->assertTrue(!empty($msg));
+        // $msg = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::ID, 'autoRelease_msg');
+        // $this->assertTrue(!empty($msg));
 
         // check lates
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, '3 Late')->click();
@@ -355,9 +366,9 @@ class studentRubric extends SystemBaseTestCase
         $alex = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'panel1Content');
         $this->assertEqual(substr($alex->text(), 0, 116),
             "(Number of Evaluator(s): 2)\nFinal Total: 11.00 - 1.10 = 9.90 (66%)  << Below Group Average >>\nNOTE: 10% Late Penalty");
-        $ques1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/table/tbody/tr[1]/th[2]');
-        $ques2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/table/tbody/tr[1]/th[3]');
-        $ques3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/table/tbody/tr[1]/th[4]');
+        $ques1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/form/table/tbody/tr[1]/th[2]');
+        $ques2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/form/table/tbody/tr[1]/th[3]');
+        $ques3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/form/table/tbody/tr[1]/th[4]');
         $this->assertEqual($ques1->text(), '(1) Participated in Team Meetings');
         $this->assertEqual($ques2->text(), '(2) Was Helpful and Co-operative');
         $this->assertEqual($ques3->text(), '(3) Submitted Work on Time');
@@ -366,27 +377,27 @@ class studentRubric extends SystemBaseTestCase
         $this->assertEqual(count($points), 84);
         $empty = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'img[alt="circle_empty"]');
         $this->assertEqual(count($empty), 21);
-        $ed1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/table/tbody/tr[2]/td[2]')->text();
+        $ed1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/form/table/tbody/tr[2]/td[2]')->text();
         $this->assertEqual(substr($ed1, 0, 59), "Points:\nGrade: 5.00 / 5\n\nComment: very active in the group");
-        $ed2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/table/tbody/tr[2]/td[3]')->text();
+        $ed2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/form/table/tbody/tr[2]/td[3]')->text();
         $this->assertEqual(substr($ed2, 0, 51), "Points:\nGrade: 4.00 / 5\n\nComment: easy to work with");
-        $ed3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/table/tbody/tr[2]/td[4]')->text();
+        $ed3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/form/table/tbody/tr[2]/td[4]')->text();
         $this->assertEqual(substr($ed3, 0, 61), "Points:\nGrade: 4.00 / 5\n\nComment: hands in their work on time");
-        $edGen = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/table/tbody/tr[3]/td[2]')->text();
+        $edGen = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/form/table/tbody/tr[3]/td[2]')->text();
         $this->assertEqual(substr($edGen, 0, 25), "General Comment:\ngood job");
-        $tutor1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/table/tbody/tr[4]/td[2]')->text();
+        $tutor1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/form/table/tbody/tr[4]/td[2]')->text();
         $this->assertEqual(substr($tutor1, 0, 41), "Points:\nGrade: 3.00 / 5\n\nComment: giraffe");
-        $tutor2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/table/tbody/tr[4]/td[3]')->text();
+        $tutor2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/form/table/tbody/tr[4]/td[3]')->text();
         $this->assertEqual(substr($tutor2, 0, 38), "Points:\nGrade: 3.00 / 5\n\nComment: lion");
-        $tutor3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/table/tbody/tr[4]/td[4]')->text();
+        $tutor3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/form/table/tbody/tr[4]/td[4]')->text();
         $this->assertEqual(substr($tutor3, 0, 40), "Points:\nGrade: 3.00 / 5\n\nComment: monkey");
-        $edGen = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/table/tbody/tr[5]/td[2]')->text();
+        $edGen = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/form/table/tbody/tr[5]/td[2]')->text();
         $this->assertEqual(substr($edGen, 0, 37), "General Comment:\nacceptable");
-        $auto = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'autoRelease_msg')->text();
-        $this->assertEqual($auto, "Auto Release is ON, you do not need to manually release the grades and comments");
+        // $auto = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'autoRelease_msg')->text();
+        // $this->assertEqual($auto, "Auto Release is ON, you do not need to manually release the grades and comments");
 
         // blue class for removed members - Tutor 1
-        $tutor = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/table/tbody/tr[4]/td[1]');
+        $tutor = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/form/table/tbody/tr[4]/td[1]');
         $this->assertEqual($tutor->attribute('class'), 'blue');
 
         // matt's panel
@@ -450,7 +461,7 @@ class studentRubric extends SystemBaseTestCase
         $tutor = $this->session->elements(PHPWebDriver_WebDriverBy::ID, 'panel35');
         $this->assertTrue(empty($tutor));
         // no class for Tutor - since they are reassigned to the group
-        $tutor = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/table/tbody/tr[4]/td[1]');
+        $tutor = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/form/table/tbody/tr[4]/td[1]');
         $this->assertFalse($tutor->attribute('class'));
     }
 
@@ -480,10 +491,11 @@ class studentRubric extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Detail')->click();
 
         // release Alex's grades
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/input[1]')->click();
+        //$this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/form/input[1]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/table[4]/tbody/tr[2]/td[2]/input')->click();
         $w->until(
             function($session) {
-                $button = $session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/input[1]');
+                $button = $session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/table[4]/tbody/tr[2]/td[2]/input');
                 return ($button->attribute('value') == 'Unrelease Grades');
             }
         );
@@ -500,7 +512,7 @@ class studentRubric extends SystemBaseTestCase
         $this->assertEqual($red[3]->text(), 'Comments Not Released Yet.');
 
         $grade = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[2]');
-        $testGrades = $this->shuffled(substr($grade->text(), 15, 4));
+        $testGrades = $this->shuffled($grade->text());
         // if fails - invalid grade was passed - should only be 3.00 or 5.00
         $this->assertTrue($testGrades);
     }
@@ -511,19 +523,21 @@ class studentRubric extends SystemBaseTestCase
         $this->waitForLogoutLogin('root');
         $this->session->open($this->url.'evaluations/viewEvaluationResults/'.$this->eventId.'/1/Detail');
         // unrelease Alex's grades
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/input[1]')->click();
+        // $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/form/input[1]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/table[4]/tbody/tr[2]/td[2]/input')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $w->until(
             function($session) {
-                $button = $session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/input[1]');
+                $button = $session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/table[4]/tbody/tr[2]/td[2]/input');
                 return ($button->attribute('value') == 'Release Grades');
             }
         );
         // release Alex's comments
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/input[2]')->click();
+        // $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/form/input[2]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/table[4]/tbody/tr[2]/td[3]/form/input[3]')->click();
         $w->until(
             function($session) {
-                $button = $session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/input[2]');
+                $button = $session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/table[4]/tbody/tr[2]/td[3]/form/input[3]');
                 return ($button->attribute('value') == 'Unrelease Comments');
             }
         );
@@ -536,7 +550,7 @@ class studentRubric extends SystemBaseTestCase
         $this->assertEqual($red->text(), 'Grades Not Released Yet.');
 
         $comment = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[2]');
-        $testComments = $this->shuffled(substr($comment->text(), 32));
+        $testComments = $this->shuffled($comment->text());
         // if fails - invalid comment was passed - should only be giraffe or very active in the group
         $this->assertTrue($testComments);
     }
@@ -559,11 +573,11 @@ class studentRubric extends SystemBaseTestCase
         $this->waitForLogoutLogin('root');
         $this->session->open($this->url.'evaluations/viewEvaluationResults/'.$this->eventId.'/1/Detail');
         // unrelease Alex's comments
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/input[2]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/table[4]/tbody/tr[2]/td[3]/form/input[3]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $w->until(
             function($session) {
-                $button = $session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panel1Content"]/input[2]');
+                $button = $session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/div[3]/table[4]/tbody/tr[2]/td[3]/form/input[3]');
                 return ($button->attribute('value') == 'Release Comments');
             }
         );
@@ -573,7 +587,7 @@ class studentRubric extends SystemBaseTestCase
         $w->until(
             function($session) {
                 $cell = $session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[2]/td[7]/div');
-                return ($cell->text() == 'Some Released');
+                return ($cell->text() == 'Released');
             }
         );
 
@@ -585,7 +599,7 @@ class studentRubric extends SystemBaseTestCase
         $this->assertEqual($red[3]->text(), 'Comments Not Released Yet.');
 
         $grade = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[2]');
-        $testGrades = $this->shuffled(substr($grade->text(), 15, 4));
+        $testGrades = $this->shuffled($grade->text());
         // if fails - invalid grade was passed - should only be 3.00 or 5.00
         $this->assertTrue($testGrades);
 
@@ -617,7 +631,7 @@ class studentRubric extends SystemBaseTestCase
         $w->until(
             function($session) {
                 $cell = $session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[2]/td[8]/div');
-                return ($cell->text() == 'Some Released');
+                return ($cell->text() == 'Released');
             }
         );
 
@@ -629,7 +643,7 @@ class studentRubric extends SystemBaseTestCase
         $this->assertEqual($red->text(), 'Grades Not Released Yet.');
 
         $comment = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[2]');
-        $testComments = $this->shuffled(substr($comment->text(), 32));
+        $testComments = $this->shuffled($comment->text());
         // if fails - invalid comment was passed - should only be giraffe or very active in the group
         $this->assertTrue($testComments);
 
@@ -658,23 +672,15 @@ class studentRubric extends SystemBaseTestCase
     {
         // unsubmitted answers should not show up in student / instructor's results views
         $this->waitForLogoutLogin('root');
-        $this->session->open($this->url.'events/edit/'.$this->eventId);
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->clear();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->sendKeys(date('Y-m-d H:i:s', strtotime('+1 day')));
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
-        $w->until(
-            function($session) {
-                return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
-            }
-        );
+
         // release all comments
         $this->session->open($this->url.'evaluations/view/'.$this->eventId);
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Release All Comments')->click();
         $w->until(
             function($session) {
                 $comments = $session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[2]/td[8]/div')->text();
-                return $comments == 'Some Released';
+                return $comments == 'Released';
             }
         );
         // release all grades
@@ -683,7 +689,17 @@ class studentRubric extends SystemBaseTestCase
         $w->until(
             function($session) {
                 $grades = $session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[2]/td[7]/div')->text();
-                return $grades == 'Some Released';
+                return $grades == 'Released';
+            }
+        );
+
+        $this->session->open($this->url.'events/edit/'.$this->eventId);
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->clear();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'EventReleaseDateEnd')->sendKeys(date('Y-m-d H:i:s', strtotime('+1 day')));
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $w->until(
+            function($session) {
+                return count($session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']"));
             }
         );
 
@@ -692,9 +708,11 @@ class studentRubric extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
         $header = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'panel5Header');
         $this->assertEqual($header->text(), 'Ed Student - (click to expand)');
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_5_1.value=4;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_5_2.value=5;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_5_3.value=5;"]')->click();
+        $header->click();
+        sleep(1);
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="4" and @name="5criteria_points_1"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="5" and @name="5criteria_points_2"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="5" and @name="5criteria_points_3"]')->click();
         $comments = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::NAME, '5comments[]');
         $comments[0]->sendKeys('circle');
         $comments[1]->sendKeys('triangle');
@@ -720,18 +738,32 @@ class studentRubric extends SystemBaseTestCase
     {
         $this->waitForLogoutLogin('redshirt0003');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
+
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'panel5Header')->click();
+        sleep(1);
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="3" and @name="5criteria_points_1"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="4" and @name="5criteria_points_2"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="5" and @name="5criteria_points_3"]')->click();
+        $comments = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::NAME, '5comments[]');
+        $comments[0]->sendKeys('math');
+        $comments[1]->sendKeys('English');
+        $comments[2]->sendKeys('history');
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::NAME, '5gen_comment')->sendKeys('subjects');
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::NAME, '5')->click();
+        
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'panel6Header')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_1.value=3;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_2.value=4;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_3.value=5;"]')->click();
+        sleep(1);
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="3" and @name="6criteria_points_1"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="4" and @name="6criteria_points_2"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="5" and @name="6criteria_points_3"]')->click();
         $comments = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::NAME, '6comments[]');
         $comments[0]->sendKeys('math');
         $comments[1]->sendKeys('English');
         $comments[2]->sendKeys('history');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::NAME, '6gen_comment')->sendKeys('subjects');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::NAME, '6')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Submit to Complete the Evaluation"]')->click();
 
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[value="Submit to Complete the Evaluation"]')->click();
         $w = new PHPWebDriver_WebDriverWait($this->session);
         $w->until(
             function($session) {
@@ -741,13 +773,13 @@ class studentRubric extends SystemBaseTestCase
         $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'Your Evaluation was submitted successfully.');
 
-        // comments and grades become unreleased for Ed Student
+        // grades become unreleased for Ed Student
         $this->waitForLogoutLogin('redshirt0001');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
         $rating = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '/html/body/div[1]/table[2]/tbody/tr[2]/td');
         $this->assertEqual($rating->text(), 'Not Released');
         $header = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'font[color="red"]');
-        $this->assertEqual($header->text(), 'Comments/Grades Not Released Yet.');
+        $this->assertEqual($header->text(), 'Grades Not Released Yet.');
 
         // comments and grades are still released for Matt Student - no evaluations for him
         $this->waitForLogoutLogin('redshirt0003');
@@ -777,9 +809,14 @@ class studentRubric extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
 
         // Ed Student
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_5_1.value=5;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_5_2.value=5;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_5_3.value=5;"]')->click();
+        $header = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'panel5Header')->click();
+        sleep(1);
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="5" and @name="5criteria_points_1"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="5" and @name="5criteria_points_2"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="5" and @name="5criteria_points_3"]')->click();
+        // $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_5_1.value=5;"]')->click();
+        // $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_5_2.value=5;"]')->click();
+        // $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_5_3.value=5;"]')->click();
         $comments = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::NAME, '5comments[]');
         $comments[0]->sendKeys('abc');
         $comments[1]->sendKeys('def');
@@ -789,9 +826,13 @@ class studentRubric extends SystemBaseTestCase
 
         // Matt Student
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'panel7Header')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_7_1.value=5;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_7_2.value=4;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_7_3.value=3;"]')->click();
+        sleep(1);
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="5" and @name="7criteria_points_1"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="4" and @name="7criteria_points_2"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="3" and @name="7criteria_points_3"]')->click();
+        // $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_7_1.value=5;"]')->click();
+        // $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_7_2.value=4;"]')->click();
+        // $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_7_3.value=3;"]')->click();
         $comments = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::NAME, '7comments[]');
         $comments[0]->sendKeys('participated');
         $comments[1]->sendKeys('co-operated');
@@ -816,9 +857,11 @@ class studentRubric extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Rubric Evaluation')->click();
 
         // Ed Student
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_5_1.value=4;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_5_2.value=3;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_5_3.value=4;"]')->click();
+        $header = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'panel5Header')->click();
+        sleep(1);
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="4" and @name="5criteria_points_1"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="3" and @name="5criteria_points_2"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="4" and @name="5criteria_points_3"]')->click();
         $comments = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::NAME, '5comments[]');
         $comments[0]->sendKeys('bop');
         $comments[1]->sendKeys('pop');
@@ -828,9 +871,10 @@ class studentRubric extends SystemBaseTestCase
 
         // Alex Student
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'panel6Header')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_1.value=3;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_2.value=3;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_6_3.value=3;"]')->click();
+        sleep(1);
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="3" and @name="6criteria_points_1"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="3" and @name="6criteria_points_2"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="3" and @name="6criteria_points_3"]')->click();
         $comments = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::NAME, '6comments[]');
         $comments[0]->sendKeys('giraffe');
         $comments[1]->sendKeys('lion');
@@ -839,9 +883,10 @@ class studentRubric extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::NAME, '6')->click();
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'panel7Header')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_7_1.value=4;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_7_2.value=3;"]')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[onclick="document.evalForm.selected_lom_7_3.value=5;"]')->click();
+        sleep(1);
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="4" and @name="7criteria_points_1"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="3" and @name="7criteria_points_2"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//input[@value="5" and @name="7criteria_points_3"]')->click();
         $comments = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::NAME, '7comments[]');
         $comments[0]->sendKeys('gerbil');
         $comments[1]->sendKeys('dog');
@@ -892,77 +937,77 @@ class studentRubric extends SystemBaseTestCase
 
     public function shuffled($text)
     {
-        if ($text == '3.00') {
+        if (strpos($text, '3.00')) {
             $ed1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[2]')->text();
-            $this->assertEqual(substr($ed1, 0, 33), "Points:\nGrade: 3.00\nComment: n/a");
+            $this->assertTrue(strpos($ed1, "Points:\nGrade: 3.00\nComment: n/a") !== false);
             $ed2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[3]')->text();
-            $this->assertEqual(substr($ed2, 0, 37), "Points:\nGrade: 3.00\nComment: n/a");
+            $this->assertTrue(strpos($ed2, "Points:\nGrade: 3.00\nComment: n/a") !== false);
             $ed3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[4]')->text();
-            $this->assertEqual(substr($ed3, 0, 37), "Points:\nGrade: 3.00\nComment: n/a");
+            $this->assertTrue(strpos($ed3, "Points:\nGrade: 3.00\nComment: n/a") !== false);
             $edGen = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[3]/td[2]')->text();
-            $this->assertEqual(substr($edGen, 0, 20), "General Comment:\nn/a");
+            $this->assertTrue(strpos($edGen, "General Comment:\nn/a") !== false);
             $tutor1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[2]')->text();
-            $this->assertEqual(substr($tutor1, 0, 37), "Points:\nGrade: 5.00\nComment: n/a");
+            $this->assertTrue(strpos($tutor1, "Points:\nGrade: 5.00\nComment: n/a") !== false);
             $tutor2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[3]')->text();
-            $this->assertEqual(substr($tutor2, 0, 37), "Points:\nGrade: 4.00\nComment: n/a");
+            $this->assertTrue(strpos($tutor2, "Points:\nGrade: 4.00\nComment: n/a") !== false);
             $tutor3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[4]')->text();
-            $this->assertEqual(substr($tutor3, 0, 37), "Points:\nGrade: 4.00\nComment: n/a");
+            $this->assertTrue(strpos($tutor3, "Points:\nGrade: 4.00\nComment: n/a") !== false);
             $edGen = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[5]/td[2]')->text();
-            $this->assertEqual(substr($edGen, 0, 20), "General Comment:\nn/a");
+            $this->assertTrue(strpos($edGen, "General Comment:\nn/a") !== false);
             return true;
-        } else if ($text == '5.00') {
+        } else if (strpos($text, '5.00')) {
             $tutor1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[2]')->text();
-            $this->assertEqual(substr($tutor1, 0, 37), "Points:\nGrade: 5.00\nComment: n/a");
+            $this->assertTrue(strpos($tutor1, "Points:\nGrade: 5.00\nComment: n/a") !== false);
             $tutor2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[3]')->text();
-            $this->assertEqual(substr($tutor2, 0, 37), "Points:\nGrade: 4.00\nComment: n/a");
+            $this->assertTrue(strpos($tutor2, "Points:\nGrade: 4.00\nComment: n/a") !== false);
             $tutor3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[4]')->text();
-            $this->assertEqual(substr($tutor3, 0, 37), "Points:\nGrade: 4.00\nComment: n/a");
+            $this->assertTrue(strpos($tutor3, "Points:\nGrade: 4.00\nComment: n/a") !== false);
             $tutorGen = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[3]/td[2]')->text();
-            $this->assertEqual(substr($tutorGen, 0, 20), "General Comment:\nn/a");
+            $this->assertTrue(strpos($tutorGen, "General Comment:\nn/a") !== false);
             $ed1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[2]')->text();
-            $this->assertEqual(substr($ed1, 0, 37), "Points:\nGrade: 3.00\nComment: n/a");
+            $this->assertTrue(strpos($ed1, "Points:\nGrade: 3.00\nComment: n/a") !== false);
             $ed2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[3]')->text();
-            $this->assertEqual(substr($ed2, 0, 37), "Points:\nGrade: 3.00\nComment: n/a");
+            $this->assertTrue(strpos($ed2, "Points:\nGrade: 3.00\nComment: n/a") !== false);
             $ed3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[4]')->text();
-            $this->assertEqual(substr($ed3, 0, 37), "Points:\nGrade: 3.00\nComment: n/a");
+            $this->assertTrue(strpos($ed3, "Points:\nGrade: 3.00\nComment: n/a") !== false);
             $edGen = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[5]/td[2]')->text();
-            $this->assertEqual(substr($edGen, 0, 20), "General Comment:\nn/a");
+            $this->assertTrue(strpos($edGen, "General Comment:\nn/a") !== false);
             return true;
-        } else if ($text == 'giraffe') {
+        } else if (strpos($text, 'giraffe')) {
             $ed1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[2]')->text();
-            $this->assertEqual(substr($ed1, 32), "giraffe");
+            $this->assertTrue(strpos($ed1, "giraffe") !== false);
             $ed2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[3]')->text();
-            $this->assertEqual(substr($ed2, 32), "lion");
+            $this->assertTrue(strpos($ed2, "lion") !== false);
             $ed3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[4]')->text();
-            $this->assertEqual(substr($ed3, 32), "monkey");
+            $this->assertTrue(strpos($ed3, "monkey") !== false);
             $edGen = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[3]/td[2]')->text();
-            $this->assertEqual(substr($edGen, 0, 27), "General Comment:\nacceptable");
+            $this->assertTrue(strpos($edGen, "General Comment:\nacceptable") !== false);
             $tutor1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[2]')->text();
-            $this->assertEqual(substr($tutor1, 32), "very active in the group");
+            $this->assertTrue(strpos($tutor1, "very active in the group") !== false);
             $tutor2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[3]')->text();
-            $this->assertEqual(substr($tutor2, 32), "easy to work with");
+            $this->assertTrue(strpos($tutor2, "easy to work with") !== false);
             $tutor3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[4]')->text();
-            $this->assertEqual(substr($tutor3, 32), "hands in their work on time");
+            $this->assertTrue(strpos($tutor3, "hands in their work on time") !== false);
             $tutorGen = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[5]/td[2]')->text();
-            $this->assertEqual(substr($tutorGen, 0, 25), "General Comment:\ngood job");
+            $this->assertTrue(strpos($tutorGen, "General Comment:\ngood job") !== false);
             return true;
-        } else if ($text == 'very active in the group') {
+        } else if (strpos($text, 'very active in the group')) {
             $tutor1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[2]')->text();
-            $this->assertEqual(substr($tutor1, 32), "very active in the group");
+            $this->assertTrue(strpos($tutor1, "very active in the group") !== false);
             $tutor2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[3]')->text();
-            $this->assertEqual(substr($tutor2, 32), "easy to work with");
+            $this->assertTrue(strpos($tutor2, "easy to work with") !== false);
             $tutor3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[2]/td[4]')->text();
-            $this->assertEqual(substr($tutor3, 32), "hands in their work on time");
+            $this->assertTrue(strpos($tutor3, "hands in their work on time") !== false);
             $tutorGen = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[3]/td[2]')->text();
-            $this->assertEqual(substr($tutorGen, 0, 27), "General Comment:\ngood job");
+            $this->assertTrue(strpos($tutorGen, "General Comment:\ngood job") !== false);
             $ed1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[2]')->text();
-            $this->assertEqual(substr($ed1, 32), "giraffe");
+            $this->assertTrue(strpos($ed1, "giraffe") !== false);
             $ed2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[3]')->text();
-            $this->assertEqual(substr($ed2, 32), "lion");
+            $this->assertTrue(strpos($ed2, "lion") !== false);
             $ed3 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[4]/td[4]')->text();
-            $this->assertEqual(substr($ed3, 32), "monkey");
+            $this->assertTrue(strpos($ed3, "monkey") !== false);
             $edGen = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="panelResultsContent"]/table/tbody/tr[5]/td[2]')->text();
-            $this->assertEqual(substr($edGen, 0, 27), "General Comment:\nacceptable");
+            $this->assertTrue(strpos($edGen, "General Comment:\nacceptable") !== false);
             return true;
         } else {
             return false;

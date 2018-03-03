@@ -33,7 +33,7 @@ class ImportUsersTestCase extends SystemBaseTestCase
     {
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Courses')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'APSC 201')->click();
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Import Students')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Import Students from CSV')->click();
 
         $file = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'UserFile');
         $file->sendKeys(dirname(__FILE__).'/files/newClass_APSC201.csv');
