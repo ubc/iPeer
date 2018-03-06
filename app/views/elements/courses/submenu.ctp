@@ -75,7 +75,7 @@ switch($submenu) {
     if ($canvasEnabled){
         array_push(
             $items,
-            array('name' => 'Import Students from Canvas',  'link' => "/users/import/$course_id/canvas")
+            array('name' => 'Import Users from Canvas',  'link' => "/users/import/$course_id/canvas")
         );
         array_push(
             $items,

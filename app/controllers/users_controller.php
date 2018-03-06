@@ -1127,15 +1127,22 @@ class UsersController extends AppController
 
         $users = array();
         $usernames = array();
+        $instructorUsers = array();
+        $instructorUsernames = array();
 
         if ($importFrom == 'canvas') {
+ 
+            // if importing from Canvas, always remove old students
+            if (!empty($this->data)) {
+                $this->data['User']['update_class'] = true;
+            }
 
             if (!$this->canvasEnabled){
                 $this->Session->setFlash(__('Error: Canvas integration not enabled.', true));
                 $this->redirect('index');
             }
 
-            $this->set('breadcrumb', $this->breadcrumb->push(__('Import Students From Canvas', true)));
+            $this->set('breadcrumb', $this->breadcrumb->push(__('Import Users from Canvas', true)));
             $this->set('isFileImport', false);
             $this->set('showFullEmails', false);
             $this->set('showPasswords', false);
@@ -1195,6 +1202,35 @@ class UsersController extends AppController
                     $this->Course->id = $courseId;
                     $this->Course->save($save_data);
                 }
+
+                // also synchronize Canvas instructors and TAs as iPeer instructors
+                $canvasInstructors = $selectedCanvasCourse->getUsers(
+                    $this,
+                    $userId,
+                    array(CanvasCourseUserComponent::ENROLLMENT_QUERY_TEACHER,
+                        CanvasCourseUserComponent::ENROLLEMNT_QUERY_TA),
+                    true,
+                    true
+                );
+                // compose a student dictionary so we can exlucde them as Instructors/TAs
+                $mergedStudentUsernames = array_merge(
+                    array_flip($usernames),     // students being imported
+                    $this->data['User']['update_class']? array() :  // removing existing students?
+                        array_flip(Set::extract($this->Course->getCourseWithEnrolmentById($courseId),
+                            '/Enrol/username')));
+                foreach ($canvasInstructors as $k => $canvasInstructor) {
+                    if (!array_key_exists($canvasInstructor->$canvas_user_key, $mergedStudentUsernames)) {
+                        $instructorUsers[] = array(
+                            User::IMPORT_USERNAME => $canvasInstructor->$canvas_user_key,
+                            User::IMPORT_FIRSTNAME => $canvasInstructor->first_name,
+                            User::IMPORT_LASTNAME => $canvasInstructor->last_name,
+                            User::IMPORT_EMAIL => isset($canvasInstructor->email) ? $canvasInstructor->email : '',
+                            User::IMPORT_PASSWORD => '',
+                            User::GENERATED_PASSWORD => $this->PasswordGenerator->generate(),
+                        );
+                        $instructorUsernames[] = $canvasInstructor->$canvas_user_key;
+                    }
+                }
             }
         }
         else {
@@ -1235,12 +1271,28 @@ class UsersController extends AppController
                 $this->User->removeOldStudents($usernames, $courseId);
             }
 
-            // add the users to the database
-            $result = $this->User->addUserByArray($users, true, $this);
+            // add the users to the database and save new user IDs
+            $result = $this->User->addUserByArray($users, true);
+            $insertedIds = $this->User->insertedIds;
+            $this->User->insertedIds = [];  // reset the list of inserted records
 
+            // add the instructors/TAs and save new user IDs
+            $resultInstructors = NULL;
+            if (!empty($instructorUsers)) {
+                $resultInstructors = $this->User->addUserByArray($instructorUsers, true, $this->User->USER_TYPE_INSTRUCTOR);
+            }
+            $insertedInstructorIds = $this->User->insertedIds;
+
+            $errors = array();
             if (isset($result['errors'])) {
+                $errors[] = $result['errors'];
+            }
+            if (!empty($resultInstructors) && isset($resultInstructors['errors'])) {
+                $errors[] = $resultInstructors['errors'];
+            }
+            if (!empty($errors)) {
                 $error_message = '';
-                foreach ($result['errors'] as $error){
+                foreach ($errors as $error){
                     if (is_array($error)) {
                         foreach ($error as $error_detail) {
                             $error_message .= '<li>' . $error_detail . '</li>';
@@ -1262,19 +1314,35 @@ class UsersController extends AppController
                 $this->Session->setFlash("Import successful! See below for import details.", 'good');
             }
 
-            $insertedIds = array();
-            foreach ($this->User->insertedIds as $new) {
-                $insertedIds[] = $new;
+            // enrol the users in the selected course
+            $insertedIds = array_merge(
+                $insertedIds,
+                Set::extract('/User/id', $result['updated_users']));
+            $this->Course->enrolStudents($insertedIds, $this->data['Course']['Course']);
+
+            if (!isset($resultInstructors['failed_users'])) {
+                $resultInstructors['failed_users'] = [];
             }
-            if (isset($result['updated_students'])) {
-                foreach ($result['updated_students'] as $old) {
-                    $insertedIds[] = $old['User']['id'];
+            // add instructors to the course
+            if (!empty($resultInstructors['updated_users']) || !empty($insertedInstructorIds)) {
+                $combinedInstructorIds = array_merge(
+                    $insertedInstructorIds,
+                    Set::extract('/User/id', $resultInstructors['updated_users']));
+                foreach ($combinedInstructorIds as $user_id_instructor) {
+                    if ($this->User->getRoleName($user_id_instructor) === 'instructor') {
+                        // only add as instructor if system role is instructor
+                        $this->Course->addInstructor($this->data['Course']['Course'], $user_id_instructor);
+                    } else {
+                        // newly created instructors should be fine. so here we are dealing with updated users only
+                        $resultInstructors['failed_users'] = array_merge(
+                            $resultInstructors['failed_users'],
+                            Set::extract('/User[id='.$user_id_instructor.']', $resultInstructors['updated_users']));
+                    }
                 }
             }
 
-            // enrol the users in the selected course
-            $this->Course->enrolStudents($insertedIds, $this->data['Course']['Course']);
             $this->set('data', $result);
+            $this->set('dataInstructors', $resultInstructors);
             $this->render('userSummary');
         }
     }

@@ -45,7 +45,7 @@ echo $html->div('help-text', __('Course title, e.g. Technical Communication', tr
 function makeInstructor($i, $userId, $fullName, $html, $form) {
     // make instructor text box
     $name = "'$fullName'";
-    $input = $form->label(' ') . $form->text("Instructor.$i.full_name", array('default' => $fullName, 'disabled' => true)) .
+    $input = $form->label(' ') . $form->text("Instructor.$i.full_name", array('value' => $fullName, 'disabled' => true)) .
         $html->link('X', '#', array('onclick' => "rmInstructor($i, $name, $userId); return false;"));
     $input .= $form->hidden("Instructor.Instructor.$i", array('value' => $userId));
     $ret = $html->div('input text', $input, array('id' => "instructorsList$i"));
@@ -63,7 +63,10 @@ if (isset($this->data) && isset($this->data['Instructor'])) {
     // eg. admin adds an instructor from a different department to the course.
     $profs = Set::combine($this->data['Instructor'], '{n}.id', '{n}.full_name');
     foreach($this->data['Instructor']['Instructor'] as $key => $id) {
-        $prof .= makeInstructor($key, $id, $profs[$id], $html, $form);
+        // Lookup the fullname in $profs or $instructors
+        // In some cases (e.g. add a new course and encounterd error, need to show the add screen again),
+        // $profs is not propulated with names
+        $prof .= makeInstructor($key, $id, array_key_exists($id, $profs)? $profs[$id] : $instructors[$id], $html, $form);
         $numInstructors = $key + 1;
         $selected[] = $id;
     }

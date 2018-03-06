@@ -22,6 +22,14 @@
         user3,first3,last3,student3,3@example.com,password3
         user4,first4,last4,student4,4@example.com,password4
         </pre>
+    <?php else: ?>
+        <ul>
+            <li><?php __("This function will import instructors, TAs, and students from corresponding Canvas course")?></li>
+            <li><?php __("TAs in Canvas will be imported as instructors for the course")?></li>
+            <li><?php __("Instructors / TAs with existing iPeer accounts but not with Primary Role as Instructor will NOT be imported")?></li>
+            <li><?php __("Existing students in the iPeer course will be removed and a fresh roster is imported from Canvas")?></li>
+            <li><?php __("Existing instructors / TAs in the iPeer course will be kept and merged with those imported from Canvas")?></li>
+        </ul>
     <?php endif; ?>
 
 <h2><?php __('Import')?></h2>
@@ -39,7 +47,9 @@ else {
 }
 echo $this->Form->input('Course', array('label'=>'Into iPeer Course', 'multiple' => false, 'default' => $courseId, 'disabled' => 'disabled'));
 echo $this->Form->hidden('Course', array('value' => $courseId));
-echo $this->Form->input('update_class', array('label'=>'Remove old students', 'type'=>'checkbox'));
+if ($isFileImport) {
+    echo $this->Form->input('update_class', array('label'=>'Remove old students', 'type'=>'checkbox'));
+}
 echo $this->Form->submit(__('Import', true));
 echo $this->Form->end();
 ?>

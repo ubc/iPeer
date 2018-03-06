@@ -30,6 +30,24 @@ class CanvasCourseUserComponent extends Object
     public $enrollment_roles = array();
 
     /**
+     * Finds the corresponding iPeer user with specific role
+     */
+    public static function getCorrespondingUser($currentUser, $canvas_course_users, $role)
+    {
+        $result = array();
+        foreach ($canvas_course_users as $ccuser) {
+            if (in_array($role, $ccuser->enrollment_roles)) {
+                $iuser = $ccuser->getMatchingiPeerUser($currentUser);
+
+                if ($iuser) {
+                    $result[$iuser['id']] = $iuser;
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
      * __construct
      *
      * @param mixed $args key -> value mappings to initialize the instance
@@ -64,7 +82,7 @@ class CanvasCourseUserComponent extends Object
             }
         }
     }
-    
+
     /**
      * Retrieves the corresponding iPeer User based on Canva user. null if not found.
      *
