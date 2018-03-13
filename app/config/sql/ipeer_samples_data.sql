@@ -2049,8 +2049,8 @@ INSERT INTO `sys_parameters` (`parameter_code`, `parameter_value`, `parameter_ty
 ('system.super_admin', 'root', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 ('system.admin_email', 'Please enter the iPeer administrator\\''s email address.', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 ('display.date_format', 'D, M j, Y g:i a', 'S', 'date format preference', 'A', 0, NOW(), NULL, NOW()),
-('system.version', '3.3.0', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
-('database.version', '14', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
+('system.version', '3.3.1', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
+('database.version', '15', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
 ('email.port', '25', 'S', 'port number for email smtp option', 'A', '0', NOW(), NULL , NOW()),
 ('email.host', 'localhost', 'S', 'host address for email smtp option', 'A', '0', NOW(), NULL , NOW()),
 ('email.username', '', 'S', 'username for email smtp option', 'A', '0', NOW(), NULL , NOW()),
@@ -2359,3 +2359,15 @@ VALUES (
     'system.canvas_api_max_call', '20', 'I',
     'Max number of API calls when auto-looping Canvas API pagination to retrieve all records', 'A', 0, NOW(), NULL, NOW()
 );
+
+--- START: Added by DB upgrade to version 15
+-- add page permissions --
+INSERT INTO `acos`
+(`parent_id`, `model`, `foreign_key`, `alias`, `lft`, `rght`)
+select id, NULL, NULL, 'exportCanvas', NULL, NULL
+	from `acos`
+	where BINARY `alias`='Evaluations' LIMIT 1;
+
+-- store canvas course id
+ALTER TABLE `events` ADD COLUMN `canvas_assignment_id` VARCHAR(25) NULL DEFAULT NULL;
+--- END: Added by DB upgrade to version 15

@@ -5,13 +5,13 @@
 <table class="standardtable">
 <?php
 echo $html->tableHeaders($headers);
-$empty = $rubric['lom_max'];
 $col = $rubric['criteria'] + 1;
 foreach ($result AS $evaluator => $row) {
     $class = in_array($evaluator, $notInGroup) ? ' class="blue" ' : ' ';
     echo "<tr><td".$class."width='15%'>".$memberList[$evaluator]."</td>";
     $comment = array_pop($row);
     foreach ($row as $num => $grade) {
+        $empty = $rubric['lom_max'];
         echo '<td valign="middle"><br />';
         //Points Detail
         echo "<strong>".__('Points', true).": </strong>";
