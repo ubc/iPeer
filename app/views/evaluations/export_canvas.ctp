@@ -53,7 +53,7 @@ else if ($canvasProgressId) { ?>
     });
 
     function updateProgressbar() {
-        jQuery.get('<?php echo '/'.$this->params['url']['url'] . '/' . $canvasProgressId; ?>', function( data ) {
+        jQuery.get('<?php echo Router::url(null, false) . '/' . $canvasProgressId; ?>', function( data ) {
             jQuery('#export-progressbar').css('width', data.completion + '%');
             if (data.workflow_state == 'queued' || data.workflow_state == 'running') {
                 setTimeout(updateProgressbar, 500);
