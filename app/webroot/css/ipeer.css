@@ -68,6 +68,32 @@ ul.bulleted-list li {
     margin: 0.5em;
 }
 
+ul.bulleted-indent-list li {
+    list-style-type: circle;
+    list-style-position: inside;
+    margin: 0.5em;
+}
+ul.bulleted-indent-list span.pre-wrap {
+    white-space: pre-wrap;
+}
+ul.bulleted-indent-list span.highlight {
+    font-weight: bold;
+}
+ul.bulleted-indent-list span.red-highlight {
+    color: red;
+    font-weight: bold;
+}
+ul.bulleted-indent-list > ol.dec-indent-list li {
+    margin-left: 50px;
+    list-style-type: decimal;
+    list-style-position: inside;
+}
+
+a.external-link:after {
+    content: url('../img/icons/external-link.png');
+    margin: 0 0 0 5px;
+}
+
 .floatleft {
     float: left;
 }

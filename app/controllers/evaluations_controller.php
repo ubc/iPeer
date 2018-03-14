@@ -357,6 +357,7 @@ class EvaluationsController extends AppController
             $this->redirect('index');
         }
 
+        App::import('Component', 'CanvasApiComponent');
         App::import('Component', 'CanvasCourse');
         App::import('Component', 'CanvasCourseAssignment');
 
@@ -392,6 +393,7 @@ class EvaluationsController extends AppController
         $event = $event['Event'];
 
         $this->set('eventName', $event['title']);
+        $this->set('eventId', $eventId);
 
         // Get course
         $courseId = $this->Event->getCourseByEventId($eventId);
@@ -407,6 +409,15 @@ class EvaluationsController extends AppController
              ->push(array('event' => $event))
              ->push(__('Push Grades to Canvas', true)));
 
+        // trigger the Canvas api here so that if we are returning from Canvas authorization with a GET method,
+        // the token got saved in both iPeer and Canvas
+        if (!$course['canvas_id']) {
+            $this->Session->setFlash(__('Error: You need to first associate this course with a Canvas course in order to push grades. You can do so from the course Edit screen.', true));
+            $this->redirect('index');
+            return;
+        }
+        $canvasCourse = CanvasCourseComponent::getById($this, User::get('id'), $course['canvas_id']);
+
         // if form is submitted, process it
         if (isset($this->params['form']['submit'])) {
 
@@ -416,18 +427,13 @@ class EvaluationsController extends AppController
             $gradeExportProgress = false;
             $this->set('canvasProgressId', false);
 
-            // Get Canvas course
-            if (!$course['canvas_id']) {
-                $this->Session->setFlash(__('Error: You need to first associate this course with a Canvas course in order to push grades. You can do so from the course Edit screen.', true));
-                $this->redirect('index');
-                return;
-            }
-            $canvasCourse = CanvasCourseComponent::getById($this, User::get('id'), $course['canvas_id']);
+            // Check Canvas course
             if (!$canvasCourse) {
                 $this->Session->setFlash(__('Error: Canvas course not found or you do not have access to it.', true));
                 $this->redirect('index');
                 return;
             }
+            $this->set('canvasCourseUrl', CanvasApiComponent::getBaseUrl(true) . '/courses/' . $course['canvas_id']);
 
             $eventTemplateType = $this->Event->getEventTemplateTypeId($eventId);
 

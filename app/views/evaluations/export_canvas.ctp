@@ -1,10 +1,15 @@
 <?php if (!isset($this->params['form']['submit'])) { ?>
     <div id='exportEvalCanvas'>
     <h2><?php echo 'Push Grades for ' . $eventName . ' to Canvas'; ?></h2>
-    <ul class="bulleted-list">
-        <li><?php echo __("Press the \"Export\" button below to push grades for this evaluation to Canvas.", true)?></li>
-        <li><?php echo __("If you have not yet pushed the grades, an assignment will be created in the associated Canvas course for this Evaluation.", true)?></li>
-        <li><?php echo __("The assignment will be muted, so students will NOT see the grades until you manually unmute the assignment in Canvas.", true)?></li>
+    <ul class="bulleted-indent-list">
+        <li><?php echo __("Press the \"Export\" button below to push the results for this evaluation to Canvas.", true)?></li>
+        <span class="pre-wrap">
+            <?php echo __("When you do this, ", true) ?><span class="red-highlight"><?php echo __("two things will happen", true)?></span>:
+        </span>
+        <ol class="dec-indent-list">
+            <li><?php echo __("An assignment will be created on the <span class=\"highlight\">Assignments page</span> in the associated Canvas course for this Evaluation.", true)?></li>
+            <li><?php echo __("In the Canvas gradebook, the assignment column will be muted (hidden) upon creation.", true)?></li>
+        </ol>
     </ul>
     <br><br><?php
     echo $this->Form->create('ExportEvalCanvas', array('url' => '/'.$this->params['url']['url']));
@@ -87,3 +92,12 @@ else if ($canvasProgressId) { ?>
 <?php } ?>
 
 <br><br>
+<div>
+   <?php echo $html->link(__('Back to Evaluation Result', true), '/evaluations/view/'.$eventId); ?>
+   <?php
+    if (isset($canvasCourseUrl)) {
+        echo '&nbsp;|&nbsp;';
+        echo $html->link(__('Jump to Canvas course', true), $canvasCourseUrl, array('target'=>'_blank', 'escape'=>false, 'class'=>'external-link'));
+    }
+   ?>
+</div>
