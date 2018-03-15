@@ -93,7 +93,7 @@ else if ($canvasProgressId) { ?>
 
 <br><br>
 <div>
-   <?php echo $html->link(__('Back to Evaluation Result', true), '/evaluations/view/'.$eventId); ?>
+   <?php echo $html->link(__('Back to Evaluation Result', true), '/evaluations/view/'.$eventIdBack); ?>
    <?php
     if (isset($canvasCourseUrl)) {
         echo '&nbsp;|&nbsp;';
