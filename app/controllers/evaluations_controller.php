@@ -357,7 +357,6 @@ class EvaluationsController extends AppController
             $this->redirect('index');
         }
 
-        App::import('Component', 'CanvasApiComponent');
         App::import('Component', 'CanvasCourse');
         App::import('Component', 'CanvasCourseAssignment');
 
@@ -393,7 +392,7 @@ class EvaluationsController extends AppController
         $event = $event['Event'];
 
         $this->set('eventName', $event['title']);
-        $this->set('eventId', $eventId);
+        $this->set('eventIdBack', $eventId);
 
         // Get course
         $courseId = $this->Event->getCourseByEventId($eventId);
@@ -433,7 +432,7 @@ class EvaluationsController extends AppController
                 $this->redirect('index');
                 return;
             }
-            $this->set('canvasCourseUrl', CanvasApiComponent::getBaseUrl(true) . '/courses/' . $course['canvas_id']);
+            $this->set('canvasCourseUrl', CanvasCourseComponent::getCourseUrl(User::get('id'), $course['canvas_id']));
 
             $eventTemplateType = $this->Event->getEventTemplateTypeId($eventId);
 

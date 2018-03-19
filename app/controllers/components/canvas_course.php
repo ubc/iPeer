@@ -120,6 +120,12 @@ class CanvasCourseComponent extends Object
         return $progressObj;
     }
 
+    static public function getCourseUrl($user_id, $canvas_course_id)
+    {
+        $api = new CanvasApiComponent($user_id);
+        return $api->getBaseUrl(true) . '/courses/' . $canvas_course_id;
+    }
+
     /*********************************************************************************************/
     /* Users
     /*********************************************************************************************/
