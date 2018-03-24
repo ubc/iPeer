@@ -86,6 +86,10 @@ class UpgraderComponent extends Object
             }
         }
 
+        foreach(array('css', 'js', 'views', 'models', 'persistent') as $dir) {
+            clearCache(null, $dir, null);
+        }
+
         return true;
     }
 }

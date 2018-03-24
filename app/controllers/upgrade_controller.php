@@ -23,6 +23,7 @@ class UpgradeController extends Controller
      */
     function beforeFilter()
     {
+        Cache::clear(false, 'default');
         Cache::clear(false, 'configuration');
         $this->set('title_for_layout', __('Upgrade', true));
         if (!class_exists('DATABASE_CONFIG')) {
