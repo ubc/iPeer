@@ -1,3 +1,5 @@
+<?php if ($exportTo == 'file'): ?>
+
 <?php echo $html->script('groups');?>
 <div class="content-container">
     <form name="frm" id="frm" method="POST" action="<?php echo $html->url('export/'.$courseId) ?>">
@@ -58,3 +60,53 @@ echo $this->element("groups/group_list_chooser",
       </table>
     </form>
 </div>
+
+<?php elseif (!empty($exportSuccess)): ?>
+
+    <br><br>
+    <p><a href="/courses/home/<?php echo $courseId; ?>">&laquo; Back to course homepage</a></p>
+
+<?php else: ?>
+
+<div class="instructions">
+
+When you press the Export button below:
+    <ul class="bulleted-list">
+        <li><?php __('All the groups in the selected Canvas group set will be deleted.')?></li>
+        <li><?php __('The groups in this iPeer course will be exported to the selected group set in Canvas, along with their members.')?></li>
+        <li><?php __('Any students in iPeer that are not in Canvas will not be exported.')?></li>
+    </ul>
+
+</div>
+
+    <br><br>
+
+Export groups to: <br><br>
+    <?php
+    echo $this->Form->create(null, array("id" => "syncCanvasForm", "class"=>"prepare", "url" => $formUrl ));
+
+    echo $this->Form->hidden('Course', array('value' => $courseId));
+
+    if (!empty($canvasCourseId)) {
+        echo $this->Form->hidden('canvasCourse', array('value' => $canvasCourseId));
+    }
+    if (!empty($canvasCourses)) {
+        echo $this->Form->input("canvasCourse", array("label"=>"Canvas Course", "multiple" => false, "default" => $canvasCourseId, "disabled"=>!empty($canvasCourseId)));
+    }
+    else {
+        echo '<div class="input select">' . $this->Form->label("Canvas Course") . '</div>';
+        echo $this->Form->select("canvasCourseInaccessible", array('0'=>'No accessible Canvas courses'), null, array("default" => '0', "disabled"=>true));
+        echo $this->Form->hidden('canvasCourse', array('value' => $canvasCourseId));
+    }
+
+    if (!empty($courseId) && !empty($canvasCourseId)) :
+
+        echo $this->Form->input("canvasGroupCategory", array("label"=>"Canvas Group set", "multiple" => false));
+
+    endif;
+
+    ?><label class="defLabel"></label><?php
+    echo $this->Form->submit(__("Export", true), array("class" => "button"));
+    echo $this->Form->end(); ?>
+
+<?php endif; ?>

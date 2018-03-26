@@ -68,6 +68,13 @@ if (User::hasPermission('controllers/Surveys')) {
   echo $this->element('courses/submenu', $params);
 }
 
+if ($canvasEnabled) {
+  $submenu = 'Canvas';
+  $submenuTitle = __('Canvas', true);
+  $params = array('controller'=>'courses', 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'course_id'=>$data['Course']['id']);
+  echo $this->element('courses/submenu', $params);
+}
+
 ?>
 </div>
 </div>

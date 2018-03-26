@@ -392,6 +392,14 @@ a#home, a#home:hover, a#home:active {
     border-bottom: solid 3px #fff;
 }
 
+.instructions {
+    border: solid 1px #ccc;
+    padding: 1em 1em 0.5em;
+    background: #fafafa;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(85, 85, 85, 0.28) inset;
+}
+
 /* CONTENT CONTAINER */
 .containerOuter {
     border-radius: 10px;
@@ -861,6 +869,21 @@ i {
 
 .course_actions .course_submenu:nth-child(even) {
     margin-left: 2.1%;
+}
+
+@media screen and (max-width: 865px) {
+    .course_actions .course_submenu {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+}
+@media screen and (min-width: 865px) {
+    .course_submenu-TeamMaker + .course_submenu-Canvas {
+        float: right;
+        margin-top: -118px;
+        margin-right: 2px;
+        background: #fff;
+    }
 }
 
 .course_submenu h3 {
