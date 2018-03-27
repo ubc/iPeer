@@ -41,10 +41,36 @@
 
   // Custom View Include Files
   echo $scripts_for_layout;
+  
+  // check that a google tag manager container id is given
+  $gtmHead = null;
+  $gtmBody = null;
+  if (!empty($gtmContainerId) && !empty($gtmContainerId['SysParameter']['parameter_value'])) {
+      $gtmContainerId = $gtmContainerId['SysParameter']['parameter_value'];
+      
+      $gtmHead = "
+        <!-- Google Tag Manager -->
+          <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','$gtmContainerId');</script>
+        <!-- End Google Tag Manager -->
+        ";
+      $gtmBody = '
+          <!-- Google Tag Manager (noscript) -->
+            <noscript><iframe src="https://www.googletagmanager.com/ns.html?id='.$gtmContainerId.'"
+            height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
+        ';
+  }
+  
+  echo $gtmHead;
   ?>
 </head>
+  
 <body>
-
+  <?php echo $gtmBody; ?>
 <div class='containerOuter pagewidth'>
 <!-- BANNER -->
 <?php echo $this->element('global/banner', array('customLogo' => $customLogo)); ?>

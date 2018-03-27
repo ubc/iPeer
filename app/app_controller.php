@@ -126,7 +126,11 @@ class AppController extends Controller
         $this->set('trackingId', $trackingId);
         $this->set('domain', $domain);
         $this->set('customLogo', $customLogo);
-
+        
+        // for setting up google tag manager
+        $gtmContainerId = $this->SysParameter->findByParameterCode('google_tag_manager.container_id');
+        $this->set('gtmContainerId', $gtmContainerId);
+        
         parent::beforeFilter();
     }
 
