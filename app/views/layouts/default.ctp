@@ -78,7 +78,7 @@
 <?php echo $this->Js->writeBuffer(); // Write cached scripts?>
 <?php
 // check that a google analytics tracking id is given
-if (!empty($trackingId)) {
+if (!empty($trackingId) && !empty($trackingId['SysParameter']['parameter_value'])) {
     $trackingId = $trackingId['SysParameter']['parameter_value'];
     // check whether a domain is given
     if (empty($domain) || empty($domain['SysParameter']['parameter_value'])) {
