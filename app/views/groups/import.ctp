@@ -1,4 +1,7 @@
 <div id='groupsimport'>
+
+    <?php if ($importFrom == 'file'): ?>
+
     <h2><?php __('Instructions') ?></h2>
     <ul>
         <li><?php __('Please make sure to remove the header in CSV file.')?></li>
@@ -41,4 +44,52 @@
     echo $this->Form->submit(__('Import', true));
     echo $this->Form->end();
     ?>
+
+    <?php elseif (!empty($importSuccess)): ?>
+
+    <br><br>
+    <p><a href="/courses/home/<?php echo $courseId; ?>">&laquo; Back to course homepage</a></p>
+
+    <?php else: ?>
+
+    When you press the Import button below:
+    <ul>
+        <li><?php __('The roster for this course will be imported from Canvas.')?></li>
+        <li><?php __('All the groups from the selected group set will be imported.')?></li>
+    </ul>
+
+    <br><br>
+
+    <?php
+    echo $this->Form->create(null, array("id" => "syncCanvasForm", "class"=>"prepare", "url" => $formUrl ));
+
+    if (!empty($courseId)) {
+        echo $this->Form->hidden('Course', array('value' => $courseId));
+    }
+    echo $this->Form->input("Course", array("label"=>"iPeer Course", "multiple"=>false, "default" => $courseId, "disabled"=>!empty($courseId)));
+
+    if (!empty($canvasCourseId)) {
+        echo $this->Form->hidden('canvasCourse', array('value' => $canvasCourseId));
+    }
+    if (!empty($canvasCourses)) {
+        echo $this->Form->input("canvasCourse", array("label"=>"Canvas Course", "multiple" => false, "default" => $canvasCourseId, "disabled"=>!empty($canvasCourseId)));
+    }
+    else {
+        echo '<div class="input select">' . $this->Form->label("Canvas Course") . '</div>';
+        echo $this->Form->select("canvasCourseInaccessible", array('0'=>'No accessible Canvas courses'), null, array("default" => '0', "disabled"=>true));
+        echo $this->Form->hidden('canvasCourse', array('value' => $canvasCourseId));
+    }
+
+    if (!empty($courseId) && !empty($canvasCourseId)) :
+
+        echo $this->Form->input("canvasGroupCategory", array("label"=>"Canvas Group set", "multiple" => false));
+
+    endif;
+
+    ?><label class="defLabel"></label><?php
+    echo $this->Form->submit(__("Import", true), array("class" => "button"));
+    echo $this->Form->end();
+
+    endif; ?>
+
 </div>

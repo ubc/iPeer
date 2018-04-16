@@ -19,12 +19,6 @@ switch($submenu) {
             array('name' => 'Email to All Students',  'link' => "/emailer/write/C/$course_id"),
             array('name' => 'Import Students from CSV', 'link' => "/users/import/$course_id")
         );
-        if ($canvasEnabled){
-            array_push(
-                $items,
-                array('name' => 'Import Students from Canvas',  'link' => "/users/import/$course_id/canvas")
-            );
-        }
     }
     break;
   case "Group":
@@ -43,12 +37,6 @@ switch($submenu) {
         $items,
         array('name' => 'Export Groups to CSV', 'link' => "/groups/export/$course_id")
     );
-    if ($canvasEnabled){
-        array_push(
-            $items,
-            array('name' => 'Sync Canvas Groups', 'link' => "/groups/syncCanvas/$course_id")
-        );
-    }
     break;
   case "EvalEvents":
     if ($status == 'A') {
@@ -83,9 +71,29 @@ switch($submenu) {
         array('name' => 'Export Survey Group Sets', 'link' => "/surveygroups/export/$course_id")
     );
     break;
+  case "Canvas":
+    if ($canvasEnabled){
+        array_push(
+            $items,
+            array('name' => 'Import Students from Canvas',  'link' => "/users/import/$course_id/canvas")
+        );
+        array_push(
+            $items,
+            array('name' => 'Import Groups from Canvas', 'link' => "/groups/import/$course_id/canvas")
+        );
+        array_push(
+            $items,
+            array('name' => 'Export iPeer Groups to Canvas', 'link' => "/groups/export/$course_id/canvas")
+        );
+        // array_push(
+        //     $items,
+        //     array('name' => 'Sync Canvas Groups', 'link' => "/groups/syncCanvas/$course_id")
+        // );
+    }
+    break;
 }
 ?>
-<div class="course_submenu">
+<div class="course_submenu course_submenu-<?php echo $submenu; ?>">
 <h3>
   <?php echo $submenuTitle?>
 </h3>
