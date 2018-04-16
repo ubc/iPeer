@@ -304,7 +304,7 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
     private function _ipeerImportStudentFromCanvas($canvasUser, $canvasPassword, $courseCode, $courseTitle, $canvasCourseTitle, $createdStudent, $updatedStudent)
     {
         $this->_ipeerCourseHome($courseTitle);
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//a[text()="Import Students from Canvas"]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//a[text()="Import Users from Canvas"]')->click();
         $this->_handleOAuth($canvasUser, $canvasPassword);
         
         // the iPeer course should be selecte by default
