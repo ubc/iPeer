@@ -141,6 +141,16 @@ Runing the tests:
 
 It is better not to touch the mouse or keyboard during the tests.
 
+iPeer 3.3.2
+-----------
+* Simplify Canvas group import and export
+* Import instructors and TAs (as instructors) from Canvas when importing users
+* For Mixed evaluation, clear the comment field if the question type is graded Likert or ScoreDropdown (#565)
+
+iPeer 3.3.1
+-----------
+* Push Evaluation Grades to Canvas
+
 iPeer 3.3.0
 -----------
 * Updated UI/UX to make iPeer more modern
