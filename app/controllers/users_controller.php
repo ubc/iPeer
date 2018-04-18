@@ -1131,7 +1131,7 @@ class UsersController extends AppController
         $instructorUsernames = array();
 
         if ($importFrom == 'canvas') {
- 
+
             // if importing from Canvas, always remove old students
             if (!empty($this->data)) {
                 $this->data['User']['update_class'] = true;
@@ -1274,7 +1274,7 @@ class UsersController extends AppController
             // add the users to the database and save new user IDs
             $result = $this->User->addUserByArray($users, true);
             $insertedIds = $this->User->insertedIds;
-            $this->User->insertedIds = [];  // reset the list of inserted records
+            $this->User->insertedIds = array();  // reset the list of inserted records
 
             // add the instructors/TAs and save new user IDs
             $resultInstructors = NULL;
@@ -1321,7 +1321,7 @@ class UsersController extends AppController
             $this->Course->enrolStudents($insertedIds, $this->data['Course']['Course']);
 
             if (!isset($resultInstructors['failed_users'])) {
-                $resultInstructors['failed_users'] = [];
+                $resultInstructors['failed_users'] = array();
             }
             // add instructors to the course
             if (!empty($resultInstructors['updated_users']) || !empty($insertedInstructorIds)) {
