@@ -414,7 +414,24 @@ class CanvasApiComponent extends Object
             $nextPageUrl = false;
             $callCount = 0;
             do {
-                if ($method == 'get' && $nextPageUrl) {
+                if ($method == 'post') {
+                    if ($params) {
+                        $paramsFixed = array();
+                        foreach ($params as $key => $value) {
+                            $paramsFixed[str_replace('[]','',$key)] = $value;
+                        }
+                        $params = $paramsFixed;
+                    }
+                    $response = \Httpful\Request::post($this->getApiUrl() . $uri)
+                        ->sendsJson()
+                        ->body(json_encode($params))
+                        ->expectsJson()
+                        ->addHeaders(array('Authorization' => 'Bearer ' . $accessToken))
+                        ->addHeaders($additionalHeader? $additionalHeader : array())
+                        ->timeoutIn($this->apiTimeout)
+                        ->send();
+                }
+                elseif ($method == 'get' && $nextPageUrl) {
                     $response = \Httpful\Request::get($nextPageUrl)
                         // no need to append parameters here.
                         // the Canvas pagination url is absolute and contains all necessary params
@@ -424,14 +441,13 @@ class CanvasApiComponent extends Object
                         ->timeoutIn($this->apiTimeout)
                         ->send();
                 } else {
-                    $response = \Httpful\Request::$method($this->getApiUrl() . $uri)
-                        ->sendsJson()
-                        ->body(json_encode($params))
-                        ->expectsJson()
-                        ->addHeaders(array('Authorization' => 'Bearer ' . $accessToken))
-                        ->addHeaders($additionalHeader? $additionalHeader : array())
-                        ->timeoutIn($this->apiTimeout)
-                        ->send();
+                    $response = \Httpful\Request::$method($this->getApiUrl() . $uri .
+                        ($params? '?' . $params_expanded : ''))
+                            ->expectsJson()
+                            ->addHeaders(array('Authorization' => 'Bearer ' . $accessToken))
+                            ->addHeaders($additionalHeader? $additionalHeader : array())
+                            ->timeoutIn($this->apiTimeout)
+                            ->send();
                 }
 
                 $callCount += 1;
