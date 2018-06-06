@@ -424,13 +424,14 @@ class CanvasApiComponent extends Object
                         ->timeoutIn($this->apiTimeout)
                         ->send();
                 } else {
-                    $response = \Httpful\Request::$method($this->getApiUrl() . $uri .
-                        ($params? '?' . $params_expanded : ''))
-                            ->expectsJson()
-                            ->addHeaders(array('Authorization' => 'Bearer ' . $accessToken))
-                            ->addHeaders($additionalHeader? $additionalHeader : array())
-                            ->timeoutIn($this->apiTimeout)
-                            ->send();
+                    $response = \Httpful\Request::$method($this->getApiUrl() . $uri)
+                        ->sendsJson()
+                        ->body(json_encode($params))
+                        ->expectsJson()
+                        ->addHeaders(array('Authorization' => 'Bearer ' . $accessToken))
+                        ->addHeaders($additionalHeader? $additionalHeader : array())
+                        ->timeoutIn($this->apiTimeout)
+                        ->send();
                 }
 
                 $callCount += 1;
