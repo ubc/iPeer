@@ -1131,7 +1131,7 @@ class GroupsController extends AppController
                     $insertedIds[] = $new;
                 }
 
-                foreach ($result['updated_students'] as $updated_user) {
+                foreach ($result['updated_users'] as $updated_user) {
                     $insertedIds[] = $updated_user['User']['id'];
                 }
 
