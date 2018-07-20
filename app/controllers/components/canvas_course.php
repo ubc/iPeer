@@ -460,7 +460,7 @@ class CanvasCourseComponent extends Object
      * @param array   $args
      *
      * @access public
-     * @return object of type CanvasCourseAssignmentComponent
+     * @return mixed object of type CanvasCourseAssignmentComponent if successful. false otherwise
      */
     public function createAssignment($_controller, $user_id, $args, $assignment_group_name, $force_auth=false)
     {
@@ -485,16 +485,19 @@ class CanvasCourseComponent extends Object
             $defaults['assignment_group_id'] = $this->createAssignmentGroup($_controller, $user_id, $assignment_group_name, $force_auth);
         }
 
+        $the_assignment = array();
         foreach ($defaults as $key => $val) {
-            $params['assignment[' . $key . ']'] = $val;
+            $the_assignment[$key] = $val;
         }
-
         foreach ($args as $key => $val) {
-            $params['assignment[' . $key . ']'] = $val;
+            $the_assignment[$key] = $val;
         }
+        $params['assignment'] = $the_assignment;
 
         $assignment_obj = $api->postCanvasData($_controller, $force_auth, $uri, $params);
-
+        if (empty($assignment_obj)) {
+            return false;
+        }
         return new CanvasCourseAssignmentComponent($this->id, $assignment_obj);
     }
 

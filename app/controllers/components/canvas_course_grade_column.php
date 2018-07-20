@@ -65,30 +65,4 @@ class CanvasCourseGradeColumnComponent extends Object
 
         return $grades;
     }
-
-    /**
-     * Adds a grade for the specified user in Canvas
-     *
-     * @param object  $_controller
-     * @param integer $user_id  this is the user id of the person performing this change (i.e. current user)
-     * @param integer $gradee_user_id this is the Canvas user id of the user whose grade we want updated
-     * @param string  $grade the grade for this user. Setting this to blank will delete the grade
-     * @param boolean $force_auth
-     *
-     * @access public
-     * @return object returned object
-     */
-    public function addGrade($_controller, $user_id, $gradee_user_id, $grade, $force_auth=false)
-    {
-        $api = new CanvasApiComponent($user_id);
-        $uri = '/courses/' . $this->course_id . '/custom_gradebook_columns/' . $this->id . '/data/' . $gradee_user_id;
-
-        $params = array(
-            'column_data[content]' => $grade
-        );
-
-        $retObj = $api->postCanvasData($_controller, $force_auth, $uri, $params);
-
-        return $retObj;
-    }
 }

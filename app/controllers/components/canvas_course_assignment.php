@@ -114,15 +114,16 @@ class CanvasCourseAssignmentComponent extends Object
         $uri = '/courses/' . $this->course_id . '/assignments/' . $this->id . '/submissions/update_grades';
 
         $params = array();
-
+        $grade_data = array();
         foreach ($grades as $student_id => $grade) {
             $student_id += 0;
             if ($student_id) {
-                $params['grade_data[' . $student_id . '][posted_grade]'] = $grade;
+                $grade_data[$student_id]['posted_grade'] = $grade;
             }
         }
 
-        if (count($params)) {
+        if (count($grade_data)) {
+            $params['grade_data'] = $grade_data;
             return $api->postCanvasData($_controller, $force_auth, $uri, $params);
         }
 
