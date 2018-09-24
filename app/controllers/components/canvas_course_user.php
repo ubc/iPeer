@@ -25,6 +25,7 @@ class CanvasCourseUserComponent extends Object
     const ENROLLMENT_TYPE_TA = 'TaEnrollment';
     
     public $id = null;
+    public $sis_user_id = null;
     public $name = null;
     public $login_id = null;
     public $enrollment_roles = array();
@@ -69,7 +70,7 @@ class CanvasCourseUserComponent extends Object
         $this->$user_key = null;
         
         foreach ($args as $key => $val) {
-            if ($key == 'id' || $key == 'name' || $key == $this->canvas_user_key || $key == 'login_id' || $key == 'email') {
+            if ($key == 'id' || $key == 'name' || $key == $this->canvas_user_key || $key == 'login_id' || $key == 'email' || $key == 'sis_user_id') {
                 $this->$key = $val;
             } else if ($key == 'sortable_name') {
                 $nameParts = explode(', ', $val);

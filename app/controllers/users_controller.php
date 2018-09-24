@@ -1192,6 +1192,7 @@ class UsersController extends AppController
                         User::IMPORT_FIRSTNAME => $canvasUser->first_name,
                         User::IMPORT_LASTNAME => $canvasUser->last_name,
                         User::IMPORT_EMAIL => isset($canvasUser->email) ? $canvasUser->email : '',
+                        User::IMPORT_STUDENT_NO => $canvasUser->sis_user_id,
                     );
                     $usernames[] = $canvasUser->$canvas_user_key;
                 }

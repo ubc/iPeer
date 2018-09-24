@@ -1120,11 +1120,12 @@ class GroupsController extends AppController
                         User::IMPORT_FIRSTNAME => $canvasUser->first_name,
                         User::IMPORT_LASTNAME => $canvasUser->last_name,
                         User::IMPORT_EMAIL => isset($canvasUser->email) ? $canvasUser->email : '',
+                        User::IMPORT_STUDENT_NO => $canvasUser->sis_user_id,
                     );
                     $iPeerUsernamesInCanvasCourse[] = $canvasUser->$canvas_user_key;
                 }
 
-                $result = $this->User->addUserByArray($users, true, $this);
+                $result = $this->User->addUserByArray($users, true, $this->User->USER_TYPE_STUDENT);
 
                 $insertedIds = array();
                 foreach ($this->User->insertedIds as $new) {
