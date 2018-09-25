@@ -141,6 +141,11 @@ Runing the tests:
 
 It is better not to touch the mouse or keyboard during the tests.
 
+iPeer 3.3.3
+-----------
+* Fixed the problem of new users created with role=0 when importing groups with Canvas
+* Fixed #596 import student number from Canvas sis_user_id
+
 iPeer 3.3.2
 -----------
 * Simplify Canvas group import and export
