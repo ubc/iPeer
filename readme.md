@@ -144,6 +144,8 @@ It is better not to touch the mouse or keyboard during the tests.
 iPeer 3.3.4
 -----------
 * Fixed the problem of not importing group membership from Canvas when all group members are new iPeer users.
+* Display course term next to course name when selecting Canvas courses for import
+* Add purpose/description to the Canvas access token
 
 iPeer 3.3.3
 -----------

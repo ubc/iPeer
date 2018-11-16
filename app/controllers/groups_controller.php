@@ -400,7 +400,11 @@ class GroupsController extends AppController
 
         $canvasCourses = array();
         foreach ($canvasCoursesRaw as $canvasCourse) {
-            $canvasCourses[$canvasCourse->id] = $canvasCourse->name;
+            if ($canvasCourse->term && $canvasCourse->term->name) {
+                $canvasCourses[$canvasCourse->id] = $canvasCourse->name . ' (' . $canvasCourse->term->name . ')';
+            } else {
+                $canvasCourses[$canvasCourse->id] = $canvasCourse->name;
+            }
         }
         $this->set('canvasCourses', $canvasCourses);
 
