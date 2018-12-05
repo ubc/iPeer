@@ -294,6 +294,7 @@ class CanvasApiComponent extends Object
                             '&response_type=code' .
                             '&state=' . $state .
                             ($forceLogin ? '&force_login=1' : '') .
+                            '&purpose=iPeer' .
                             '&redirect_uri=' . array_shift(explode('?', $this->_getCurrentUrl()));
 
         $_controller->redirect($canvasOauthUrl);

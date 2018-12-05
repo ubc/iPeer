@@ -1154,7 +1154,11 @@ class UsersController extends AppController
 
             $canvasCourses = array();
             foreach ($canvasCoursesRaw as $course) {
-                $canvasCourses[$course->id] = $course->name;
+                if ($course->term && $course->term->name) {
+                    $canvasCourses[$course->id] = $course->name . ' (' . $course->term->name . ')';
+                } else {
+                    $canvasCourses[$course->id] = $course->name;
+                }
             }
             $this->set('canvasCourses', $canvasCourses);
 

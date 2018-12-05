@@ -19,6 +19,7 @@ class CanvasCourseComponent extends Object
     public $id = null;
     public $name = null;
     public $course_code = null;
+    public $term = null;
 
     /**
      * __construct
@@ -32,7 +33,7 @@ class CanvasCourseComponent extends Object
     {
         parent::__construct();
         foreach($args as $key => $val) {
-            if ($key == 'id' || $key == 'name' || $key == 'course_code') {
+            if ($key == 'id' || $key == 'name' || $key == 'course_code' || $key == 'term') {
                 $this->$key = $val;
             }
         }
@@ -81,7 +82,12 @@ class CanvasCourseComponent extends Object
     static public function getAllByIPeerUser($_controller, $user_id, $force_auth=true, $enrollment_type=CanvasCourseUserComponent::ENROLLMENT_QUERY_TEACHER)
     {
         $api = new CanvasApiComponent($user_id);
-        $courses_json = $api->getCanvasData($_controller, $force_auth, '/courses', array('enrollment_type' => $enrollment_type));
+        $params = array(
+            'include[]' => 'term',
+            'enrollment_type' => $enrollment_type,
+        );
+
+        $courses_json = $api->getCanvasData($_controller, $force_auth, '/courses', $params);
 
         $courses = array();
         if (!empty($courses_json)) {

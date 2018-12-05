@@ -321,6 +321,10 @@ class CoursesController extends AppController
             if ($this->canvasEnabled){
                 // map function to keep only the course name
                 $map_func = function($value) {
+                    // append term name if available
+                    if ($value->term && $value->term->name) {
+                        return $value->name . ' (' . $value->term->name . ')';
+                    }
                     return $value->name;
                 };
                 $this->set('canvasCourses',

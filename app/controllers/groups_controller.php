@@ -400,7 +400,11 @@ class GroupsController extends AppController
 
         $canvasCourses = array();
         foreach ($canvasCoursesRaw as $canvasCourse) {
-            $canvasCourses[$canvasCourse->id] = $canvasCourse->name;
+            if ($canvasCourse->term && $canvasCourse->term->name) {
+                $canvasCourses[$canvasCourse->id] = $canvasCourse->name . ' (' . $canvasCourse->term->name . ')';
+            } else {
+                $canvasCourses[$canvasCourse->id] = $canvasCourse->name;
+            }
         }
         $this->set('canvasCourses', $canvasCourses);
 
@@ -1193,26 +1197,27 @@ class GroupsController extends AppController
                             $importResults['groupFailure'][] = $groupName;
                         }
                     }
-                    elseif (!$canvasGroupEmpty) {
-                        foreach ($groupsAndUsers[$groupName]['CanvasMember'] as $canvasUser){
-                            if (isset($canvasUser[$canvasUserKey]) && in_array($canvasUser[$canvasUserKey], $iPeerUsernamesInCanvasCourse)) {
-                                // ensure this user is not already in this group
-                                $userNotInGroup = true;
-                                if (!empty($groupsAndUsers[$groupName]['Member'])){
-                                    foreach ($groupsAndUsers[$groupName]['Member'] as $user) {
-                                        if ($user['username'] == $canvasUser[$canvasUserKey]) {
-                                            $userNotInGroup = false;
-                                            break;
-                                        }
+
+                    // Generate lines to import users into groups
+                    foreach ($groupsAndUsers[$groupName]['CanvasMember'] as $canvasUser){
+                        if (isset($canvasUser[$canvasUserKey]) && in_array($canvasUser[$canvasUserKey], $iPeerUsernamesInCanvasCourse)) {
+                            // ensure this user is not already in this group
+                            $userNotInGroup = true;
+                            if (!empty($groupsAndUsers[$groupName]['Member'])){
+                                foreach ($groupsAndUsers[$groupName]['Member'] as $user) {
+                                    if ($user['username'] == $canvasUser[$canvasUserKey]) {
+                                        $userNotInGroup = false;
+                                        break;
                                     }
                                 }
-                                if ($userNotInGroup) {
-                                    $lines[] = array($canvasUser[$canvasUserKey], $groupName);
-                                    $usersToImport[$canvasUser[$canvasUserKey]] = $canvasUser;
-                                }
+                            }
+                            if ($userNotInGroup) {
+                                $lines[] = array($canvasUser[$canvasUserKey], $groupName);
+                                $usersToImport[$canvasUser[$canvasUserKey]] = $canvasUser;
                             }
                         }
                     }
+
                 }
             }
 
