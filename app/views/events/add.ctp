@@ -68,12 +68,18 @@ echo $this->Form->input(
     array(
         'label' => 'Email Reminder Frequency ',
         'options' => $emailSchedules,
-        'div' => array('id' => 'emailSchedule')
+        'div' => array('id' => 'emailSchedule'),
+        'disabled' => !$reminder_enabled
     )
 );
 ?>
+<?php if (!$reminder_enabled): ?>
+    <?php echo $this->Form->input('email_schedule', array('hidden' => true, 'type' => 'text', 'value' => 0, 'label' => false)); ?>
+    <div class='email-help-text'><?php __('Email reminder feature is disabled in the system.') ?></div>
+<?php else: ?>
 <div class='email-help-text'><?php __('Select the number of days in between each email reminder for submitting
     evaluations. The first email is sent when the event is released.') ?></div>
+<?php endif; ?>
 <?php
 echo $this->Form->input('EmailTemplate',
     array('div' => array('id' => 'EmailTemplateDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevE', 'target' => '_blank'))));

@@ -138,6 +138,7 @@ class EmailerController extends AppController
     {
         // Set up the basic static ajax list variables
         $this->setUpAjaxList();
+        $this->set('reminder_enabled', $this->SysParameter->get('email.reminder_enabled', true));
         // Set the display list
         $this->set('paramsForList', $this->AjaxList->getParamsForList());
     }

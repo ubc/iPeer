@@ -371,6 +371,7 @@ class EventsController extends AppController
         $this->set('emailTemplates', $this->EmailTemplate->getPermittedEmailTemplate(User::get('id'), 'list'));
         $this->set('emailSchedules', $emailReminders);
         $this->set('course_id', $courseId);
+        $this->set('reminder_enabled', $this->SysParameter->get('email.reminder_enabled', true));
 
         // Try to save the data
         if (!empty($this->data)) {
@@ -433,7 +434,6 @@ class EventsController extends AppController
         $subject = $template['EmailTemplate']['subject'];
         $courseId = $this->Event->getCourseByEventId($eventId);
         //Get the startdate, duedate and frequency of emails
-        $startDate = $eventData['Event']['release_date_begin'];
         $startDate = strtotime($eventData['Event']['release_date_begin']) > time() ?
             $eventData['Event']['release_date_begin'] : date('Y-m-j H:i:s');
         $dueDate = $eventData['Event']['due_date'];
@@ -457,8 +457,6 @@ class EventsController extends AppController
             $data = $this->_multiMap($data);
             $this->EmailSchedule->saveAll($data);
         }
-
-        return;
      }
 
     /**
@@ -511,6 +509,7 @@ class EventsController extends AppController
         ));
         $this->set('emailId', $emailTemp['EmailSchedule']['content']);
         $event = $this->Event->getEventById($eventId);
+        $this->set('reminder_enabled', $this->SysParameter->get('email.reminder_enabled', true));
 
         if (!empty($this->data) && array_key_exists('formLoaded', $this->data)) {
             if (!array_key_exists('formLoaded', $this->data)) {

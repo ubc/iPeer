@@ -66,8 +66,14 @@ class SysParameter extends AppModel
             $param = $this->findParameter($paramCode);
             if ($param) {
                 // decrypt the parameter if it's encrypted
-                if ($param['SysParameter']['parameter_type'] == 'E'){
+                if ($param['SysParameter']['parameter_type'] === 'E'){
                     $param['SysParameter']['parameter_value'] = Security::cipher($param['SysParameter']['parameter_value'], Configure::read('Security.cipherSeed'));
+                } elseif ($param['SysParameter']['parameter_type'] === 'B') {
+                    $param['SysParameter']['parameter_value'] =
+                        !($param['SysParameter']['parameter_value'] === 'false' ||
+                        $param['SysParameter']['parameter_value'] === 'False' ||
+                        $param['SysParameter']['parameter_value'] === 'FALSE' ||
+                        $param['SysParameter']['parameter_value'] === 0);
                 }
                 $result = $param['SysParameter']['parameter_value'];
                 Cache::write($paramCode, $result, 'configuration');

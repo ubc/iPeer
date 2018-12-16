@@ -28,7 +28,7 @@ class UpgradeBase
      * isUpgradable
      *
      * @access public
-     * @return void
+     * @return bool
      */
     public function isUpgradable()
     {
@@ -92,7 +92,7 @@ class UpgradeBase
      *              the major patches.
      *
      * @access public
-     * @return void
+     * @return mixed
      */
     public function patchDb($fromVersion, $toVersion = null,
         $additionalDeltas = array())
