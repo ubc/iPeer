@@ -1001,6 +1001,10 @@ class EvaluationComponent extends Object
             if ($ques['MixevalQuestion']['mixeval_question_type_id'] == '1') {
                 $scale = count($ques['MixevalQuestionDesc']);
                 if (empty($data[$num]['selected_lom'])) {
+                    if (!empty($params['EvaluationMixeval'][$num]['grade'])) {
+                        // something is wrong if there is grade selected but no lom
+                        return false;
+                    }
                     continue;
                 }
                 $valid_loms = array();
