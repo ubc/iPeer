@@ -171,8 +171,12 @@
 /**
  * Session time out time (in seconds).
  * Actual value depends on 'Security.level' setting.
+ * When using CakePHP 1.3.x:
+ *   - cookie expiration (in seconds) = "this value" * Security::inactiveMins() * 60
+ *   - session timeout (in seconds) = "this value" * Security::inactiveMins()
+ * NOTE: With CakePHP 2.x, this value is in minutes.  And security level won't affect timeout
  */
-	Configure::write('Session.timeout', '1200');
+	Configure::write('Session.timeout', '36');
 
 /**
  * If set to false, sessions are not automatically started.
