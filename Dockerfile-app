@@ -1,4 +1,4 @@
-FROM php:5.6-fpm
+FROM php:7.2-fpm
 
 RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests  -y \
         libpng-dev \
@@ -9,10 +9,10 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
     && rm -rf /var/lib/apt/lists/* \
     && ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so \
     && ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so \
-    && docker-php-ext-install -j$(nproc) xml gd ldap mysql \
+    && docker-php-ext-install -j$(nproc) xml gd ldap mysqli \
     && pecl install timezonedb \
     && docker-php-ext-enable timezonedb \
-    && curl https://getcomposer.org/download/1.2.0/composer.phar -o /usr/local/bin/composer \
+    && curl https://getcomposer.org/download/1.8.4/composer.phar -o /usr/local/bin/composer \
     && chmod +x /usr/local/bin/composer
 
 COPY docker/php.ini /usr/local/etc/php/
