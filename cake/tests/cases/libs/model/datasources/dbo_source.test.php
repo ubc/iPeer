@@ -4,14 +4,14 @@
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) Tests <http://book.cakephp.org/view/1196/Testing>
+ * CakePHP(tm) Tests <http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html>
  * Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  *	Licensed under The Open Group Test Suite License
  *	Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
- * @link          http://book.cakephp.org/view/1196/Testing CakePHP(tm) Tests
+ * @link          http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html CakePHP(tm) Tests
  * @package       cake
  * @subpackage    cake.tests.cases.libs.model.datasources
  * @since         CakePHP(tm) v 1.2.0.4206
@@ -1321,13 +1321,13 @@ class DboSourceTest extends CakeTestCase {
 			}");
 		}
 
-		$this->testDb =& new DboTest($this->__config);
+		$this->testDb = new DboTest($this->__config);
 		$this->testDb->cacheSources = false;
 		$this->testDb->startQuote = '`';
 		$this->testDb->endQuote = '`';
 		Configure::write('debug', 1);
 		$this->debug = Configure::read('debug');
-		$this->Model =& new TestModel();
+		$this->Model = new TestModel();
 	}
 
 /**
@@ -1354,7 +1354,7 @@ class DboSourceTest extends CakeTestCase {
 		$test =& ConnectionManager::create('quoteTest', $config);
 		$test->simulated = array();
 
-		$this->Model =& new Article2(array('alias' => 'Article', 'ds' => 'quoteTest'));
+		$this->Model = new Article2(array('alias' => 'Article', 'ds' => 'quoteTest'));
 		$this->Model->setDataSource('quoteTest');
 
 		$this->assertEqual($this->Model->escapeField(), '`Article`.`id`');
@@ -1393,11 +1393,11 @@ class DboSourceTest extends CakeTestCase {
  */
 	function testGenerateAssociationQuerySelfJoin() {
 		$this->startTime = microtime(true);
-		$this->Model =& new Article2();
+		$this->Model = new Article2();
 		$this->_buildRelatedModels($this->Model);
 		$this->_buildRelatedModels($this->Model->Category2);
-		$this->Model->Category2->ChildCat =& new Category2();
-		$this->Model->Category2->ParentCat =& new Category2();
+		$this->Model->Category2->ChildCat = new Category2();
+		$this->Model->Category2->ParentCat = new Category2();
 
 		$queryData = array();
 
@@ -1421,7 +1421,7 @@ class DboSourceTest extends CakeTestCase {
 		$query = $this->testDb->generateAssociationQuery($this->Model->Category2, $null, null, null, null, $queryData, false, $null);
 		$this->assertPattern('/^SELECT\s+(.+)FROM(.+)`Category2`\.`group_id`\s+=\s+`Group`\.`id`\)\s+LEFT JOIN(.+)WHERE\s+1 = 1\s*$/', $query);
 
-		$this->Model =& new TestModel4();
+		$this->Model = new TestModel4();
 		$this->Model->schema();
 		$this->_buildRelatedModels($this->Model);
 
@@ -1485,10 +1485,10 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testGenerateInnerJoinAssociationQuery() {
-		$this->Model =& new TestModel9();
+		$this->Model = new TestModel9();
 		$test =& ConnectionManager::create('test2', $this->__config);
 		$this->Model->setDataSource('test2');
-		$this->Model->TestModel8 =& new TestModel8();
+		$this->Model->TestModel8 = new TestModel8();
 		$this->Model->TestModel8->setDataSource('test2');
 
 		$this->testDb->read($this->Model, array('recursive' => 1));
@@ -1509,7 +1509,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testGenerateAssociationQuerySelfJoinWithConditionsInHasOneBinding() {
-		$this->Model =& new TestModel8();
+		$this->Model = new TestModel8();
 		$this->Model->schema();
 		$this->_buildRelatedModels($this->Model);
 
@@ -1537,7 +1537,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testGenerateAssociationQuerySelfJoinWithConditionsInBelongsToBinding() {
-		$this->Model =& new TestModel9();
+		$this->Model = new TestModel9();
 		$this->Model->schema();
 		$this->_buildRelatedModels($this->Model);
 
@@ -1564,7 +1564,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testGenerateAssociationQuerySelfJoinWithConditions() {
-		$this->Model =& new TestModel4();
+		$this->Model = new TestModel4();
 		$this->Model->schema();
 		$this->_buildRelatedModels($this->Model);
 
@@ -1584,7 +1584,7 @@ class DboSourceTest extends CakeTestCase {
 		$this->assertPattern('/\s+ON\s+\(`TestModel4`.`parent_id` = `TestModel4Parent`.`id`\)\s+WHERE/', $result);
 		$this->assertPattern('/\s+WHERE\s+(?:\()?`TestModel4Parent`.`name`\s+!=\s+\'mariano\'(?:\))?\s*$/', $result);
 
-		$this->Featured2 =& new Featured2();
+		$this->Featured2 = new Featured2();
 		$this->Featured2->schema();
 
 		$this->Featured2->bindModel(array(
@@ -1626,7 +1626,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testGenerateAssociationQueryHasOne() {
-		$this->Model =& new TestModel4();
+		$this->Model = new TestModel4();
 		$this->Model->schema();
 		$this->_buildRelatedModels($this->Model);
 
@@ -1659,7 +1659,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testGenerateAssociationQueryHasOneWithConditions() {
-		$this->Model =& new TestModel4();
+		$this->Model = new TestModel4();
 		$this->Model->schema();
 		$this->_buildRelatedModels($this->Model);
 
@@ -1689,7 +1689,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testGenerateAssociationQueryBelongsTo() {
-		$this->Model =& new TestModel5();
+		$this->Model = new TestModel5();
 		$this->Model->schema();
 		$this->_buildRelatedModels($this->Model);
 
@@ -1721,7 +1721,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testGenerateAssociationQueryBelongsToWithConditions() {
-		$this->Model =& new TestModel5();
+		$this->Model = new TestModel5();
 		$this->Model->schema();
 		$this->_buildRelatedModels($this->Model);
 
@@ -1753,7 +1753,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testGenerateAssociationQueryHasMany() {
-		$this->Model =& new TestModel5();
+		$this->Model = new TestModel5();
 		$this->Model->schema();
 		$this->_buildRelatedModels($this->Model);
 
@@ -1783,7 +1783,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testGenerateAssociationQueryHasManyWithLimit() {
-		$this->Model =& new TestModel5();
+		$this->Model = new TestModel5();
 		$this->Model->schema();
 		$this->_buildRelatedModels($this->Model);
 
@@ -1823,7 +1823,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testGenerateAssociationQueryHasManyWithConditions() {
-		$this->Model =& new TestModel5();
+		$this->Model = new TestModel5();
 		$this->Model->schema();
 		$this->_buildRelatedModels($this->Model);
 
@@ -1852,7 +1852,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testGenerateAssociationQueryHasManyWithOffsetAndLimit() {
-		$this->Model =& new TestModel5();
+		$this->Model = new TestModel5();
 		$this->Model->schema();
 		$this->_buildRelatedModels($this->Model);
 
@@ -1890,7 +1890,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testGenerateAssociationQueryHasManyWithPageAndLimit() {
-		$this->Model =& new TestModel5();
+		$this->Model = new TestModel5();
 		$this->Model->schema();
 		$this->_buildRelatedModels($this->Model);
 
@@ -1927,7 +1927,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testGenerateAssociationQueryHasManyWithFields() {
-		$this->Model =& new TestModel5();
+		$this->Model = new TestModel5();
 		$this->Model->schema();
 		$this->_buildRelatedModels($this->Model);
 
@@ -2052,7 +2052,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testGenerateAssociationQueryHasManyAndAggregateFunction() {
-		$this->Model =& new TestModel5();
+		$this->Model = new TestModel5();
 		$this->Model->schema();
 		$this->_buildRelatedModels($this->Model);
 
@@ -2075,7 +2075,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testGenerateAssociationQueryHasAndBelongsToMany() {
-		$this->Model =& new TestModel4();
+		$this->Model = new TestModel4();
 		$this->Model->schema();
 		$this->_buildRelatedModels($this->Model);
 
@@ -2106,7 +2106,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testGenerateAssociationQueryHasAndBelongsToManyWithConditions() {
-		$this->Model =& new TestModel4();
+		$this->Model = new TestModel4();
 		$this->Model->schema();
 		$this->_buildRelatedModels($this->Model);
 
@@ -2135,7 +2135,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testGenerateAssociationQueryHasAndBelongsToManyWithOffsetAndLimit() {
-		$this->Model =& new TestModel4();
+		$this->Model = new TestModel4();
 		$this->Model->schema();
 		$this->_buildRelatedModels($this->Model);
 
@@ -2172,7 +2172,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testGenerateAssociationQueryHasAndBelongsToManyWithPageAndLimit() {
-		$this->Model =& new TestModel4();
+		$this->Model = new TestModel4();
 		$this->Model->schema();
 		$this->_buildRelatedModels($this->Model);
 
@@ -2217,7 +2217,7 @@ class DboSourceTest extends CakeTestCase {
 				} elseif (isset($assocData['className'])) {
 					$className = $assocData['className'];
 				}
-				$model->$className =& new $className();
+				$model->$className = new $className();
 				$model->$className->schema();
 			}
 		}
@@ -2764,6 +2764,38 @@ class DboSourceTest extends CakeTestCase {
 		)));
 		$expected = " WHERE '2009-03-04' BETWEEN Model.field1 AND Model.field2";
 		$this->assertEqual($result, $expected);
+		
+		$result = $this->testDb->conditions(array('Model.field::integer' => 5));
+		$expected = " WHERE `Model`.`field::integer` = 5";
+		$this->assertEqual($result, $expected);
+		
+		$result = $this->testDb->conditions(array('"Model"."field"::integer' => 5));
+		$expected = " WHERE \"Model\".\"field\"::integer = 5";
+		$this->assertEqual($result, $expected);
+		
+		$result = $this->testDb->conditions(array('Model.field::integer' => array(5, 50, 500)));
+		$expected = " WHERE `Model`.`field`::integer IN (5, 50, 500)";
+		$this->assertEqual($result, $expected);
+		
+		$result = $this->testDb->conditions(array('"Model"."field"::integer' => array(5, 50, 500)));
+		$expected = " WHERE \"Model\".\"field\"::integer IN (5, 50, 500)";
+		$this->assertEqual($result, $expected);
+		
+		$result = $this->testDb->conditions(array('Model.field::integer' => array(5, 50)));
+		$expected = " WHERE `Model`.`field`::integer IN (5, 50)";
+		$this->assertEqual($result, $expected);
+		
+		$result = $this->testDb->conditions(array('"Model"."field"::integer' => array(5, 50)));
+		$expected = " WHERE \"Model\".\"field\"::integer IN (5, 50)";
+		$this->assertEqual($result, $expected);
+		
+		$result = $this->testDb->conditions(array('Model.field::integer BETWEEN ? AND ?' => array(5, 50)));
+		$expected = " WHERE `Model`.`field::integer` BETWEEN 5 AND 50";
+		$this->assertEqual($result, $expected);
+		
+		$result = $this->testDb->conditions(array('"Model"."field"::integer BETWEEN ? AND ?' => array(5, 50)));
+		$expected = " WHERE \"Model\".\"field\"::integer BETWEEN 5 AND 50";
+		$this->assertEqual($result, $expected);
 	}
 
 /**
@@ -2835,7 +2867,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testConditionsWithModel() {
-		$this->Model =& new Article2();
+		$this->Model = new Article2();
 
 		$result = $this->testDb->conditions(array('Article2.viewed >=' => 0), true, true, $this->Model);
 		$expected = " WHERE `Article2`.`viewed` >= 0";
@@ -3364,7 +3396,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testSchema() {
-		$Schema =& new CakeSchema();
+		$Schema = new CakeSchema();
 		$Schema->tables = array('table' => array(), 'anotherTable' => array());
 
 		$this->expectError();
@@ -4530,7 +4562,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testFieldsWithComplexVirtualFields() {
-		$Article =& new Article();
+		$Article = new Article();
 		$Article->virtualFields = array(
 			'distance' => 'ACOS(SIN(20 * PI() / 180)
 					* SIN(Article.latitude * PI() / 180)
@@ -4557,7 +4589,7 @@ class DboSourceTest extends CakeTestCase {
  * @return void
  */
 	function testReadVirtualFieldsWithNewLines() {
-		$Article =& new Article();
+		$Article = new Article();
 		$Article->recursive = 1;
 		$Article->virtualFields = array(
 			'test' => '
@@ -4643,4 +4675,46 @@ class DboSourceTest extends CakeTestCase {
 		$this->testDb->fields($Article, null, array('title', 'body', 'published'));
 		$this->assertTrue(empty($this->testDb->methodCache['fields']), 'Cache not empty');
 	}
+
+/**
+ * Test defaultConditions()
+ *
+ * @return void
+ */
+	public function testDefaultConditions() {
+		$this->loadFixtures('Article');
+		$Article = ClassRegistry::init('Article');
+		$db = $Article->getDataSource();
+
+		// Creates a default set of conditions from the model if $conditions is null/empty.
+		$Article->id = 1;
+		$result = $db->defaultConditions($Article, null);
+		$this->assertEqual(array('Article.id' => 1), $result);
+
+		// $useAlias == false
+		$Article->id = 1;
+		$result = $db->defaultConditions($Article, null, false);
+		$this->assertEqual(array($db->fullTableName($Article, false) . '.id' => 1), $result);
+
+		// If conditions are supplied then they will be returned.
+		$Article->id = 1;
+		$result = $db->defaultConditions($Article, array('Article.title' => 'First article'));
+		$this->assertEqual(array('Article.title' => 'First article'), $result);
+
+		// If a model doesn't exist and no conditions were provided either null or false will be returned based on what was input.
+		$Article->id = 1000000;
+		$result = $db->defaultConditions($Article, null);
+		$this->assertNull($result);
+
+		$Article->id = 1000000;
+		$result = $db->defaultConditions($Article, false);
+		$this->assertFalse($result);
+
+		// Safe update mode
+		$Article->id = 1000000;
+		$Article->__safeUpdateMode = true;
+		$result = $db->defaultConditions($Article, null);
+		$this->assertFalse($result);
+	}
+
 }

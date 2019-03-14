@@ -6,14 +6,14 @@
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) Tests <http://book.cakephp.org/view/1196/Testing>
+ * CakePHP(tm) Tests <http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html>
  * Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  *  Licensed under The Open Group Test Suite License
  *  Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
- * @link          http://book.cakephp.org/view/1196/Testing CakePHP(tm) Tests
+ * @link          http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html CakePHP(tm) Tests
  * @package       cake
  * @subpackage    cake.cake.tests.lib
  * @since         CakePHP(tm) v 1.2.0.4433
@@ -81,7 +81,7 @@ class CodeCoverageManager {
 	function &getInstance() {
 		static $instance = array();
 		if (!$instance) {
-			$instance[0] =& new CodeCoverageManager();
+			$instance[0] = new CodeCoverageManager();
 		}
 		return $instance[0];
 	}
@@ -498,10 +498,10 @@ class CodeCoverageManager {
 				break;
 			}
 		}
-		$testManager =& new TestManager();
+		$testManager = new TestManager();
 		$testFile = str_replace(array('/', $testManager->_testExtension), array(DS, '.php'), $file);
 
-		$folder =& new Folder();
+		$folder = new Folder();
 		$folder->cd(ROOT . DS . CAKE_TESTS_LIB);
 		$contents = $folder->read();
 
@@ -528,7 +528,7 @@ class CodeCoverageManager {
  */
 	function __testObjectFilesFromGroupFile($groupFile, $isApp = true) {
 		$manager = CodeCoverageManager::getInstance();
-		$testManager =& new TestManager();
+		$testManager = new TestManager();
 
 		$path = TESTS;
 		if (!$isApp) {

@@ -23,14 +23,14 @@
  *
  * @package       cake
  * @subpackage    cake.cake.libs
- * @link          http://book.cakephp.org/view/924/The-Configuration-Class
+ * @link          http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Configuration.html#the-configuration-class
  */
-class Configure extends Object {
+class Configure extends CakeObject {
 
 /**
  * Current debug level.
  *
- * @link          http://book.cakephp.org/view/931/CakePHP-Core-Configuration-Variables
+ * @link          http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Configuration.html#cakephp-core-configuration-variables
  * @var integer
  * @access public
  */
@@ -48,7 +48,7 @@ class Configure extends Object {
 			if (!class_exists('Set')) {
 				require LIBS . 'set.php';
 			}
-			$instance[0] =& new Configure();
+			$instance[0] = new Configure();
 			$instance[0]->__loadBootstrap($boot);
 		}
 		return $instance[0];
@@ -72,6 +72,7 @@ class Configure extends Object {
  * ));
  * }}}
  *
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Configuration.html#write
  * @link http://book.cakephp.org/view/926/write
  * @param array $config Name of var to write
  * @param mixed $value Value to set for var
@@ -154,7 +155,7 @@ class Configure extends Object {
  * Configure::read('Name.key'); will return only the value of Configure::Name[key]
  * }}}
  *
- * @link http://book.cakephp.org/view/927/read
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Configuration.html#read
  * @param string $var Variable to obtain.  Use '.' to access array elements.
  * @return string value of Configure::$var
  * @access public
@@ -204,7 +205,7 @@ class Configure extends Object {
  * Configure::delete('Name.key'); will delete only the Configure::Name[key]
  * }}}
  *
- * @link http://book.cakephp.org/view/928/delete
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Configuration.html#delete
  * @param string $var the var to be deleted
  * @return void
  * @access public
@@ -231,7 +232,7 @@ class Configure extends Object {
  * - To load config files from app/config use `Configure::load('configure_file');`.
  * - To load config files from a plugin `Configure::load('plugin.configure_file');`.
  *
- * @link http://book.cakephp.org/view/929/load
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Configuration.html#load
  * @param string $fileName name of file to load, extension must be .php and only the name
  *     should be used, not the extenstion
  * @return mixed false if file not found, void if load successful
@@ -282,7 +283,7 @@ class Configure extends Object {
  *
  * Usage `Configure::version();`
  *
- * @link http://book.cakephp.org/view/930/version
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Configuration.html#version
  * @return string Current version of CakePHP
  * @access public
  */
@@ -448,12 +449,12 @@ class Configure extends Object {
 /**
  * Class/file loader and path management.
  *
- * @link          http://book.cakephp.org/view/933/The-App-Class
+ * @link          http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Configuration.html#the-app-class
  * @since         CakePHP(tm) v 1.2.0.6001
  * @package       cake
  * @subpackage    cake.cake.libs
  */
-class App extends Object {
+class App extends CakeObject {
 
 /**
  * List of object types and their properties
@@ -848,7 +849,7 @@ class App extends Object {
  * Finds classes based on $name or specific file(s) to search.  Calling App::import() will
  * not construct any classes contained in the files. It will only find and require() the file.
  *
- * @link          http://book.cakephp.org/view/934/Using-App-import
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Configuration.html#using-app-import
  * @param mixed $type The type of Class if passed as a string, or all params can be passed as
  *                    an single array to $type,
  * @param string $name Name of the Class or a unique name for the file
@@ -986,7 +987,7 @@ class App extends Object {
 	function &getInstance() {
 		static $instance = array();
 		if (!$instance) {
-			$instance[0] =& new App();
+			$instance[0] = new App();
 			$instance[0]->__map = (array)Cache::read('file_map', '_cake_core_');
 		}
 		return $instance[0];
@@ -1033,8 +1034,9 @@ class App extends Object {
 				if (!class_exists('Folder')) {
 					require LIBS . 'folder.php';
 				}
-				$Folder =& new Folder();
-				$directories = $Folder->tree($path, array('.svn', '.git', 'CVS', 'tests', 'templates'), 'dir');
+				$Folder = new Folder();
+				$ignorePaths = array('.svn', '.git', 'CVS', 'tests', 'templates', 'node_modules');
+				$directories = $Folder->tree($path, $ignorePaths, 'dir');
 				sort($directories);
 				$this->__paths[$path] = $directories;
 			}
@@ -1272,7 +1274,7 @@ class App extends Object {
 			require LIBS . 'folder.php';
 		}
 		$items = array();
-		$Folder =& new Folder($path);
+		$Folder = new Folder($path);
 		$contents = $Folder->read(false, true);
 
 		if (is_array($contents)) {

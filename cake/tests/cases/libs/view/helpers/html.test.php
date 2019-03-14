@@ -4,14 +4,14 @@
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) Tests <http://book.cakephp.org/view/1196/Testing>
+ * CakePHP(tm) Tests <http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html>
  * Copyright 2005-2012, Cake Software Foundation, Inc.
  *
  *  Licensed under The Open Group Test Suite License
  *  Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2005-2012, Cake Software Foundation, Inc.
- * @link          http://book.cakephp.org/view/1196/Testing CakePHP(tm) Tests
+ * @link          http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html CakePHP(tm) Tests
  * @package       cake
  * @subpackage    cake.tests.cases.libs.view.helpers
  * @since         CakePHP(tm) v 1.2.0.4206
@@ -110,8 +110,8 @@ class HtmlHelperTest extends CakeTestCase {
  * @return void
  */
 	function startTest() {
-		$this->Html =& new HtmlHelper();
-		$view =& new View(new TheHtmlTestController());
+		$this->Html = new HtmlHelper();
+		$view = new View(new TheHtmlTestController());
 		ClassRegistry::addObject('view', $view);
 		$this->_appEncoding = Configure::read('App.encoding');
 		$this->_asset = Configure::read('Asset');
@@ -346,7 +346,7 @@ class HtmlHelperTest extends CakeTestCase {
 		App::import('Core', 'File');
 
 		$testfile = WWW_ROOT . 'theme' . DS . 'test_theme' . DS . 'img' . DS . '__cake_test_image.gif';
-		$file =& new File($testfile, true);
+		$file = new File($testfile, true);
 
 		App::build(array(
 			'views' => array(TEST_CAKE_CORE_INCLUDE_PATH . 'tests' . DS . 'test_app' . DS . 'views'. DS)
@@ -374,7 +374,7 @@ class HtmlHelperTest extends CakeTestCase {
 		)));
 		$this->Html->webroot = $webroot;
 
-		$dir =& new Folder(WWW_ROOT . 'theme' . DS . 'test_theme');
+		$dir = new Folder(WWW_ROOT . 'theme' . DS . 'test_theme');
 		$dir->delete();
 	}
 
@@ -478,7 +478,7 @@ class HtmlHelperTest extends CakeTestCase {
 		$this->assertEqual(count($result), 2);
 
 		ClassRegistry::removeObject('view');
-		$view =& new HtmlHelperMockView();
+		$view = new HtmlHelperMockView();
 		ClassRegistry::addObject('view', $view);
 		$view->expectAt(0, 'addScript', array(new PatternExpectation('/css_in_head.css/')));
 		$result = $this->Html->css('css_in_head', null, array('inline' => false));
@@ -630,7 +630,7 @@ class HtmlHelperTest extends CakeTestCase {
 		$this->assertTags($result, $expected);
 
 		$view =& ClassRegistry::getObject('view');
-		$view =& new HtmlHelperMockView();
+		$view = new HtmlHelperMockView();
 		$view->expectAt(0, 'addScript', array(new PatternExpectation('/script_in_head.js/')));
 		$result = $this->Html->script('script_in_head', array('inline' => false));
 		$this->assertNull($result);
@@ -669,7 +669,7 @@ class HtmlHelperTest extends CakeTestCase {
 		App::import('Core', 'File');
 
 		$testfile = WWW_ROOT . 'theme' . DS . 'test_theme' . DS . 'js' . DS . '__test_js.js';
-		$file =& new File($testfile, true);
+		$file = new File($testfile, true);
 
 		App::build(array(
 			'views' => array(TEST_CAKE_CORE_INCLUDE_PATH . 'tests' . DS . 'test_app' . DS . 'views'. DS)
@@ -720,7 +720,7 @@ class HtmlHelperTest extends CakeTestCase {
 		$this->assertTags($result, $expected);
 
 		$view =& ClassRegistry::getObject('view');
-		$view =& new HtmlHelperMockView();
+		$view = new HtmlHelperMockView();
 		$view->expectAt(0, 'addScript', array(new PatternExpectation('/window\.foo\s\=\s2;/')));
 
 		$result = $this->Html->scriptBlock('window.foo = 2;', array('inline' => false));
@@ -769,7 +769,7 @@ class HtmlHelperTest extends CakeTestCase {
 		$this->assertTags($result, $expected);
 
 		ClassRegistry::removeObject('view');
-		$View =& new HtmlHelperMockView();
+		$View = new HtmlHelperMockView();
 
 		$View->expectOnce('addScript');
 		ClassRegistry::addObject('view', $View);

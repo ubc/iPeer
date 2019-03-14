@@ -4,14 +4,14 @@
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) Tests <http://book.cakephp.org/view/1196/Testing>
+ * CakePHP(tm) Tests <http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html>
  * Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  *  Licensed under The Open Group Test Suite License
  *  Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
- * @link          http://book.cakephp.org/view/1196/Testing CakePHP(tm) Tests
+ * @link          http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html CakePHP(tm) Tests
  * @package       cake
  * @subpackage    cake.tests.cases.libs
  * @since         CakePHP(tm) v 1.2.0.4206
@@ -126,7 +126,7 @@ class TestThemeView extends ThemeView {
  * @return void
  */
 	function cakeError($method, $messages) {
-		$error =& new ThemeViewTestErrorHandler($method, $messages);
+		$error = new ThemeViewTestErrorHandler($method, $messages);
 		return $error;
 	}
 }
@@ -147,11 +147,11 @@ class ThemeViewTest extends CakeTestCase {
  */
 	function setUp() {
 		Router::reload();
-		$this->Controller =& new Controller();
-		$this->PostsController =& new ThemePostsController();
+		$this->Controller = new Controller();
+		$this->PostsController = new ThemePostsController();
 		$this->PostsController->viewPath = 'posts';
 		$this->PostsController->index();
-		$this->ThemeView =& new ThemeView($this->PostsController);
+		$this->ThemeView = new ThemeView($this->PostsController);
 	}
 
 /**
@@ -174,7 +174,7 @@ class ThemeViewTest extends CakeTestCase {
 	function testConstructionNoRegister() {
 		ClassRegistry::flush();
 		$controller = null;
-		$Theme =& new ThemeView($controller, false);
+		$Theme = new ThemeView($controller, false);
 		$ThemeTwo =& ClassRegistry::getObject('view');
 		$this->assertFalse($ThemeTwo);
 	}
@@ -215,7 +215,7 @@ class ThemeViewTest extends CakeTestCase {
 		$this->Controller->action = 'index';
 		$this->Controller->theme = 'test_theme';
 
-		$ThemeView =& new TestThemeView($this->Controller);
+		$ThemeView = new TestThemeView($this->Controller);
 		$expected = TEST_CAKE_CORE_INCLUDE_PATH . 'tests' . DS . 'test_app' . DS . 'views' . DS . 'themed' . DS . 'test_theme' . DS . 'plugins' . DS . 'test_plugin' . DS . 'tests' . DS .'index.ctp';
 		$result = $ThemeView->getViewFileName('index');
 		$this->assertEqual($result, $expected);
@@ -242,7 +242,7 @@ class ThemeViewTest extends CakeTestCase {
 		$this->Controller->action = 'display';
 		$this->Controller->params['pass'] = array('home');
 
-		$ThemeView =& new TestThemeView($this->Controller);
+		$ThemeView = new TestThemeView($this->Controller);
 		$ThemeView->theme = 'test_theme';
 		$expected = TEST_CAKE_CORE_INCLUDE_PATH . 'tests' . DS . 'test_app' . DS . 'views' . DS .'pages' . DS .'home.ctp';
 		$result = $ThemeView->getViewFileName('home');
@@ -283,7 +283,7 @@ class ThemeViewTest extends CakeTestCase {
 		$this->Controller->params['pass'] = array('home');
 
 		restore_error_handler();
-		$View =& new TestThemeView($this->Controller);
+		$View = new TestThemeView($this->Controller);
 		ob_start();
 		$result = $View->getViewFileName('does_not_exist');
 		$expected = str_replace(array("\t", "\r\n", "\n"), "", ob_get_clean());
@@ -306,7 +306,7 @@ class ThemeViewTest extends CakeTestCase {
 		$this->Controller->theme = 'my_theme';
 
 		restore_error_handler();
-		$View =& new TestThemeView($this->Controller);
+		$View = new TestThemeView($this->Controller);
 		ob_start();
 		$result = $View->getLayoutFileName();
 		$expected = str_replace(array("\t", "\r\n", "\n"), "", ob_get_clean());
@@ -330,7 +330,7 @@ class ThemeViewTest extends CakeTestCase {
 		$this->Controller->layout = 'whatever';
 		$this->Controller->theme = 'test_theme';
 
-		$View =& new ThemeView($this->Controller);
+		$View = new ThemeView($this->Controller);
 		$View->element('test_element');
 
 		$start = memory_get_usage();

@@ -4,14 +4,14 @@
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) Tests <http://book.cakephp.org/view/1196/Testing>
+ * CakePHP(tm) Tests <http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html>
  * Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  *  Licensed under The Open Group Test Suite License
  *  Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
- * @link          http://book.cakephp.org/view/1196/Testing CakePHP(tm) Tests
+ * @link          http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html CakePHP(tm) Tests
  * @package       cake
  * @subpackage    cake.cake.tests.libs
  * @since         CakePHP(tm) v 1.2.0.4667
@@ -188,7 +188,7 @@ class CakeTestCase extends UnitTestCase {
  * @return boolean|null
  * @access public
  */
-	function assert(&$expectation, $compare, $message = '%s') {
+	function assert($expectation, $compare, $message = '%s') {
 		if ($this->_should_skip) {
 			return;
 		}
@@ -254,7 +254,7 @@ class CakeTestCase extends UnitTestCase {
 				$this->_actionFixtures = array();
 
 				foreach ($models as $model) {
-					$fixture =& new CakeTestFixture($this->db);
+					$fixture = new CakeTestFixture($this->db);
 
 					$fixture->name = $model['model'] . 'Test';
 					$fixture->table = $model['table'];
@@ -352,7 +352,7 @@ class CakeTestCase extends UnitTestCase {
 		$return = $params['return'];
 		$params = array_diff_key($params, array('data' => null, 'method' => null, 'return' => null));
 
-		$dispatcher =& new CakeTestDispatcher();
+		$dispatcher = new CakeTestDispatcher();
 		$dispatcher->testCase($this);
 
 		if ($return != 'result') {
@@ -795,7 +795,7 @@ class CakeTestCase extends UnitTestCase {
 			if (isset($fixtureFile)) {
 				require_once($fixtureFile);
 				$fixtureClass = Inflector::camelize($fixture) . 'Fixture';
-				$this->_fixtures[$this->fixtures[$index]] =& new $fixtureClass($this->db);
+				$this->_fixtures[$this->fixtures[$index]] = new $fixtureClass($this->db);
 				$this->_fixtureClassMap[Inflector::camelize($fixture)] = $this->fixtures[$index];
 			}
 		}

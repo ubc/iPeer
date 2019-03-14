@@ -4,14 +4,14 @@
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) Tests <http://book.cakephp.org/view/1196/Testing>
+ * CakePHP(tm) Tests <http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html>
  * Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  *  Licensed under The Open Group Test Suite License
  *  Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
- * @link          http://book.cakephp.org/view/1196/Testing CakePHP(tm) Tests
+ * @link          http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html CakePHP(tm) Tests
  * @package       cake
  * @subpackage    cake.tests.cases.libs.view.helpers
  * @since         CakePHP(tm) v 1.2.0.4206
@@ -150,12 +150,12 @@ class AjaxHelperTest extends CakeTestCase {
  */
 	function setUp() {
 		Router::reload();
-		$this->Ajax =& new TestAjaxHelper();
-		$this->Ajax->Html =& new HtmlHelper();
-		$this->Ajax->Form =& new FormHelper();
-		$this->Ajax->Javascript =& new JavascriptHelper();
+		$this->Ajax = new TestAjaxHelper();
+		$this->Ajax->Html = new HtmlHelper();
+		$this->Ajax->Form = new FormHelper();
+		$this->Ajax->Javascript = new JavascriptHelper();
 		$this->Ajax->Form->Html =& $this->Ajax->Html;
-		$view =& new View(new AjaxTestController());
+		$view = new View(new AjaxTestController());
 		ClassRegistry::addObject('view', $view);
 		ClassRegistry::addObject('PostAjaxTest', new PostAjaxTest());
 
@@ -831,7 +831,7 @@ class AjaxHelperTest extends CakeTestCase {
 	function testAfterRender() {
 		ob_start();
 		$oldXUpdate = env('HTTP_X_UPDATE');
-		$this->Ajax->Javascript =& new TestJavascriptHelper();
+		$this->Ajax->Javascript = new TestJavascriptHelper();
 
 		$_SERVER['HTTP_X_UPDATE'] = 'secondDiv myDiv anotherDiv';
 		$result = $this->Ajax->div('myDiv');

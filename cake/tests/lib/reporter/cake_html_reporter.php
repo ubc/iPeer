@@ -4,7 +4,7 @@
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) Tests <http://book.cakephp.org/view/1196/Testing>
+ * CakePHP(tm) Tests <http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html>
  * Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  *  Licensed under The Open Group Test Suite License
@@ -34,9 +34,9 @@ class CakeHtmlReporter extends CakeBaseReporter {
  * @param string $params 
  * @return void
  */
-	function CakeHtmlReporter($charset = 'utf-8', $params = array()) {
+	function __construct($charset = 'utf-8', $params = array()) {
 		$params = array_map(array($this, '_htmlEntities'), $params);
-		$this->CakeBaseReporter($charset, $params);
+		CakeBaseReporter::__construct($charset, $params);
 	}
 /**
  * Paints the top of the web page setting the

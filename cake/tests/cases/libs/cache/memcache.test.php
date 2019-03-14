@@ -4,14 +4,14 @@
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) Tests <http://book.cakephp.org/view/1196/Testing>
+ * CakePHP(tm) Tests <http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html>
  * Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  *  Licensed under The Open Group Test Suite License
  *  Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
- * @link          http://book.cakephp.org/view/1196/Testing CakePHP(tm) Tests
+ * @link          http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html CakePHP(tm) Tests
  * @package       cake
  * @subpackage    cake.tests.cases.libs.cache
  * @since         CakePHP(tm) v 1.2.0.5434
@@ -121,7 +121,7 @@ class MemcacheEngineTest extends CakeTestCase {
 	function testMultipleServers() {
 		$servers = array('127.0.0.1:11211', '127.0.0.1:11222');
 		$available = true;
-		$Memcache =& new Memcache();
+		$Memcache = new Memcache();
 
 		foreach($servers as $server) {
 			list($host, $port) = explode(':', $server);
@@ -133,7 +133,7 @@ class MemcacheEngineTest extends CakeTestCase {
 		if ($this->skipIf(!$available, '%s Need memcache servers at ' . implode(', ', $servers) . ' to run this test')) {
 			return;
 		}
-		$Memcache =& new MemcacheEngine();
+		$Memcache = new MemcacheEngine();
 		$Memcache->init(array('engine' => 'Memcache', 'servers' => $servers));
 
 		$servers = array_keys($Memcache->__Memcache->getExtendedStats());
@@ -149,7 +149,7 @@ class MemcacheEngineTest extends CakeTestCase {
  * @return void
  */
 	function testConnect() {
-		$Memcache =& new MemcacheEngine();
+		$Memcache = new MemcacheEngine();
 		$Memcache->init(Cache::settings('memcache'));
 		$result = $Memcache->connect('127.0.0.1');
 		$this->assertTrue($result);
@@ -161,7 +161,7 @@ class MemcacheEngineTest extends CakeTestCase {
  * @return void
  */
 	function testConnectIpv6() {
-		$Memcache =& new MemcacheEngine();
+		$Memcache = new MemcacheEngine();
 		$result = $Memcache->init(array(
 			'prefix' => 'cake_',
 			'duration' => 200,
@@ -179,7 +179,7 @@ class MemcacheEngineTest extends CakeTestCase {
  * @return void
  */
 	function testParseServerStringNonLatin() {
-		$Memcache =& new TestMemcacheEngine();
+		$Memcache = new TestMemcacheEngine();
 		$result = $Memcache->parseServerString('schülervz.net:13211');
 		$this->assertEqual($result, array('schülervz.net', '13211'));
 
@@ -193,7 +193,7 @@ class MemcacheEngineTest extends CakeTestCase {
  * @return void
  */
     function testParseServerStringUnix() {
-        $Memcache =& new TestMemcacheEngine();
+        $Memcache = new TestMemcacheEngine();
         $result = $Memcache->parseServerString('unix:///path/to/memcached.sock');
         $this->assertEqual($result, array('unix:///path/to/memcached.sock', 0));
     }
@@ -387,7 +387,7 @@ class MemcacheEngineTest extends CakeTestCase {
  * @return void
  */
 	function testLongDurationEqualToZero() {
-		$memcache =& new TestMemcacheEngine();
+		$memcache = new TestMemcacheEngine();
 		$memcache->settings['compress'] = false;
 
 		$mock = new MemcacheMockMemcache();
