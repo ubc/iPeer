@@ -74,7 +74,7 @@ class DATABASE_CONFIG {
     private static $instance = null;
 
 	public $default = array(
-		'driver' => 'mysql',
+		'driver' => 'mysqli',
 		'persistent' => false,
 		'host' => 'localhost',
 		'login' => 'ipeer',

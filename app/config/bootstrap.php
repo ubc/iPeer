@@ -49,7 +49,7 @@
  *
  */
 
-include_once('fix_mysql.inc.php')
+#include_once('fix_mysql.inc.php')
 
 ;if (file_exists(dirname(__FILE__).'/bootstrap.local.php')) {
   include('bootstrap.local.php');
@@ -88,29 +88,28 @@ if (!defined('DB_PREDEFINED')) {
     define('DB_PREDEFINED', false);
 }
 
-function table_exists($table) {
-    $val = mysql_query("SELECT 1 FROM $table LIMIT 1");
+function table_exists($conn, $table) {
+    $val = mysqli_query($conn, "SELECT 1 FROM $table LIMIT 1");
     return $val !== false;
 }
 
 // test if the system has been installed
 $db_config = new DATABASE_CONFIG();
-if ($db_config->default['driver'] === 'mysql') {
-    $conn = mysql_connect($db_config->default['host'], $db_config->default['login'], $db_config->default['password']);
-    if (mysql_errno()) {
+if ($db_config->default['driver'] === 'mysqli') {
+    $conn = mysqli_connect($db_config->default['host'], $db_config->default['login'], $db_config->default['password'], $db_config->default['database']);
+    if (mysqli_errno($conn)) {
         throw new RuntimeException('Please setup database config first in app/config/database.php.');
     }
-    mysql_select_db($db_config->default['database']);
     $table_name = $db_config->default['prefix'] . 'users';
-    if (table_exists($table_name)) {
+    if (table_exists($conn, $table_name)) {
         define('IS_INSTALLED', 1);
     } else {
         define('IS_INSTALLED', 0);
     }
 
     // create session table if needed
-    if (Configure::read('Session.save') === 'database' && !table_exists('cake_session')) {
-        mysql_query('
+    if (Configure::read('Session.save') === 'database' && !table_exists($conn, 'cake_session')) {
+        mysqli_query($conn, '
             CREATE TABLE `cake_sessions` (
             `id` varchar(255) NOT NULL,
             `data` text DEFAULT NULL,
@@ -118,7 +117,7 @@ if ($db_config->default['driver'] === 'mysql') {
             );
         ');
     }
-    mysql_close($conn);
+    mysqli_close($conn);
 } else {
-    throw new RuntimeException('Database driver is not supported!');
+    throw new RuntimeException('Database driver '.$db_config->default['driver'].' is not supported!');
 }
