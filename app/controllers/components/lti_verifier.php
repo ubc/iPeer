@@ -18,7 +18,7 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class LtiVerifierComponent extends Object
+class LtiVerifierComponent extends CakeObject
 {
     public $components = array('Auth');
 

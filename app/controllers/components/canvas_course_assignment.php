@@ -10,7 +10,7 @@ App::import('Component', 'CanvasApi');
  * @copyright 2018 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class CanvasCourseAssignmentComponent extends Object
+class CanvasCourseAssignmentComponent extends CakeObject
 {
     private $attributes = array('id', 'integration_id', 'course_id', 'published', 'name', 'description', 'due_at',
                                 'lock_at', 'unlock_at', 'grade_group_students_individually', 'group_category_id',

@@ -80,7 +80,7 @@ class TemplateEmailComponent extends EmailComponent
      * @access public
      * @return void
      */
-    public function send($emails, $templateName, $from = null)
+    public function sendByTemplate($emails, $templateName, $from = null)
     {
         $templateObj = ClassRegistry::init('EmailTemplate');
         $template = $templateObj->findByName($templateName);

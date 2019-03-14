@@ -12,7 +12,7 @@ App::import('Component', 'CanvasApi');
  * @copyright 2017 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class CanvasCourseUserComponent extends Object
+class CanvasCourseUserComponent extends CakeObject
 {
     public $canvas_user_key = 'integration_id';
     

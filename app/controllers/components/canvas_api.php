@@ -13,7 +13,7 @@ App::import('Vendor', 'Httpful', array('file' => 'nategood'.DS.'httpful'.DS.'boo
  * @copyright 2017 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class CanvasApiComponent extends Object
+class CanvasApiComponent extends CakeObject
 {
     protected $apiTimeout;                  // RESTful call timeout in seconds
     protected $paginationDefaultPerPage;    // default items to retrieve per each call to Canvas API

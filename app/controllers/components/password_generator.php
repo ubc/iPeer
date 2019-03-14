@@ -8,7 +8,7 @@
  * random number generator is in discussion, but for now, we have to make do
  * with a few work arounds to get quality random numbers.
  * */
-class PasswordGeneratorComponent extends Object {
+class PasswordGeneratorComponent extends CakeObject {
 
   public $name = 'PasswordGenerator';
 

@@ -239,7 +239,7 @@ class Event extends AppModel
      * @access public
      * @return mixed
      */
-    function afterFind(array $results, $primary)
+    function afterFind($results, $primary = false)
     {
         $currentDate = time();
         foreach ($results as $key => $event) {
@@ -272,7 +272,7 @@ class Event extends AppModel
      * @access public
      * @return void
      */
-    function beforeValidate()
+    function beforeValidate($options = array())
     {
         if ($this->data['Event']['event_template_type_id'] == 3) {
             // remove the result release validation
@@ -294,7 +294,7 @@ class Event extends AppModel
      * @access public
      * @return void
      */
-    function beforeSave(array $options) {
+    function beforeSave($options = array()) {
         if (isset($this->data['Group']['Group']) && isset($this->data[$this->alias]['id'])) {
             $this->GroupEvent->updateGroups($this->data[$this->alias]['id'], $this->data['Group']['Group']);
             unset($this->data['Group']);

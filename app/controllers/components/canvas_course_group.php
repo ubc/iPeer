@@ -11,7 +11,7 @@ App::import('Component', 'CanvasApi');
  * @copyright 2017 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class CanvasCourseGroupComponent extends Object
+class CanvasCourseGroupComponent extends CakeObject
 {
     public $id = null;
     public $name = null;

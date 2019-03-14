@@ -114,7 +114,7 @@ class TraceableBehavior extends ModelBehavior
      * @version 1.0
      * @since 1.0
      */
-    function setup($model, $config = array())
+    function setup(&$model, $config = array())
     {
 
         if (!$model->useTable) {
@@ -164,7 +164,7 @@ class TraceableBehavior extends ModelBehavior
      * @version 1.0
      * @since 1.0
      */
-    function beforeSave($model)
+    function beforeSave(&$model)
     {
         if (!empty($this->settings[$model->alias]['map'])) {
             $this->_trace($model);

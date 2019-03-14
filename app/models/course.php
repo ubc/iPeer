@@ -260,7 +260,7 @@ class Course extends AppModel
      * @access public
      * @return void
      */
-    function deleteAll($id = null)
+    function deleteWithRelated($id = null)
     {
         //delete self
         if ($this->delete($id)) {

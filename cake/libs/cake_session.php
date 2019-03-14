@@ -470,6 +470,11 @@ class CakeSession extends CakeObject {
  * @access private
  */
 	function __initSession() {
+	    // PHP 7.2+ has more strict session management. It generates 'Headers already sent'
+        // warnings when use ini_set()
+	    if (PHP_SAPI === 'cli') {
+	        return;
+        }
 		$iniSet = function_exists('ini_set');
 		if ($iniSet && env('HTTPS')) {
 			ini_set('session.cookie_secure', 1);
@@ -509,7 +514,8 @@ class CakeSession extends CakeObject {
 					if ($iniSet) {
 						ini_set('session.use_trans_sid', 0);
 						ini_set('url_rewriter.tags', '');
-						ini_set('session.save_handler', 'user');
+						// user value is forbidden since 7.2.0
+						//ini_set('session.save_handler', 'user');
 						ini_set('session.serialize_handler', 'php');
 						ini_set('session.use_cookies', 1);
 						ini_set('session.name', Configure::read('Session.cookie'));
@@ -545,7 +551,7 @@ class CakeSession extends CakeObject {
 					if ($iniSet) {
 						ini_set('session.use_trans_sid', 0);
 						ini_set('url_rewriter.tags', '');
-						ini_set('session.save_handler', 'user');
+						//ini_set('session.save_handler', 'user');
 						ini_set('session.use_cookies', 1);
 						ini_set('session.name', Configure::read('Session.cookie'));
 						ini_set('session.cookie_lifetime', $this->cookieLifeTime);
@@ -736,7 +742,7 @@ class CakeSession extends CakeObject {
 		));
 
 		if (empty($row[$model->alias]['data'])) {
-			return false;
+			return '';
 		}
 
 		return $row[$model->alias]['data'];
@@ -757,7 +763,7 @@ class CakeSession extends CakeObject {
 		$expires = time() + Configure::read('Session.timeout') * Security::inactiveMins();
 		$model =& ClassRegistry::getObject('Session');
 		$return = $model->save(array($model->primaryKey => $id) + compact('data', 'expires'));
-		return $return;
+		return !empty($return);
 	}
 
 /**

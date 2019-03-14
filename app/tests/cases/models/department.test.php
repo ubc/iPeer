@@ -19,12 +19,12 @@ class DepartmentTestCase extends CakeTestCase {
         'app.evaluation_mixeval', 'app.evaluation_mixeval_detail'
     );
 
-    function startTest() {
+    function startTest($method) {
         echo "Start Department model test.";
         $this->Department =& ClassRegistry::init('Department');
     }
 
-    function endTest() {
+    function endTest($method) {
         unset($this->Department);
         ClassRegistry::flush();
     }

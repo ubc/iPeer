@@ -53,7 +53,7 @@
     </target>
 
     <target name="init-test-db" depends="load-db-config">
-        <pdosqlexec url="${db.driver}:host=${db.host};dbname=${db.name}" userid="${db.username}" password="${db.password}">
+        <pdosqlexec url="mysql:host=${db.host};dbname=${db.name}" userid="${db.username}" password="${db.password}">
             <transaction src="app/config/sql/ipeer_samples_data.sql"/>
         </pdosqlexec>
         <!--<exec command="cake/console/cake schema_ci create DbAcl" passthru="true"/>-->

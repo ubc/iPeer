@@ -51,7 +51,7 @@ class EvaltoolsControllerTest extends CakeTestCase {
     function endCase() {
     }
 
-    function startTest() {
+    function startTest($method) {
         $controller = new FakeController();
         $controller->constructClasses();
         $controller->startupProcess();
@@ -62,7 +62,7 @@ class EvaltoolsControllerTest extends CakeTestCase {
         $controller->Auth->login($admin);
     }
 
-    function endTest() {
+    function endTest($method) {
     }
 
     function testIndex() {

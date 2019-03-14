@@ -4,6 +4,7 @@
       "nategood/httpful": "^0.2.20"
   },
   "require-dev": {
+    "roave/security-advisories": "dev-master",
     "phing/phing": "2.*",
     "pdepend/pdepend" : "2.*",
     "phpmd/phpmd" : "@stable",
@@ -21,7 +22,7 @@
   },
   "config": {
       "platform": {
-          "php": "5.3.3"
+          "php": "7.2"
       }
   }
 }

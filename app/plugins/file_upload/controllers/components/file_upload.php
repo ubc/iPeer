@@ -12,7 +12,7 @@
 */
 App::import('Vendor', 'FileUpload.uploader');
 App::import('Config', 'FileUpload.file_upload_settings');
-class FileUploadComponent extends Object{
+class FileUploadComponent extends CakeObject{
   /**
     * options are the default options that will be used
     *
@@ -111,9 +111,9 @@ class FileUploadComponent extends Object{
     * @return mixed
     */
   function __call($method, $params){
-    if(key_exists($method, $this->options)){
+    if(array_key_exists($method, $this->options)){
       array_unshift($params, $method);
-			return $this->dispatchMethod('attr', $params);
+			return $this->dispatchMethod($this, 'attr', $params);
     }
   }
 
@@ -126,7 +126,7 @@ class FileUploadComponent extends Object{
     * @return mixed option on key name, or void if setting
     */
   function attr($name, $values = null){
-    if(key_exists($name, $this->options)){
+    if(array_key_exists($name, $this->options)){
       if(func_num_args() > 1){
         $this->options[$name] = $values;
       }

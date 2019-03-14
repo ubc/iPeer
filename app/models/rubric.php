@@ -208,7 +208,7 @@ class Rubric extends EvaluationBase
      * @access public
      * @return void
      */
-    function afterFind(array $results)
+    function afterFind($results, $primary = false)
     {
         $return = array();
 

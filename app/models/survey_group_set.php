@@ -196,7 +196,7 @@ class SurveyGroupSet extends AppModel
      * @access public
      * @return void
      */
-    function beforeDelete($cascade)
+    function beforeDelete($cascade = true)
     {
         $time = $this->field('date', array('id' => $this->id));
 

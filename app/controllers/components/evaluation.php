@@ -12,7 +12,7 @@ App::import('Model', 'SurveyQuestion');
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class EvaluationComponent extends Object
+class EvaluationComponent extends CakeObject
 {
     public $uses =  array('Mixeval');
     public $components = array('Session', 'Auth');

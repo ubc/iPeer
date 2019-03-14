@@ -176,7 +176,7 @@ class User extends AppModel
      * if user is a faculty admin, or instructor,
      * faculty field must not be empty
      */
-    public function beforeValidate() {
+    public function beforeValidate($options = array()) {
         /* array structure is different between add & edit and reset password &
         adding superadmin during installation */
         if (array_key_exists('Faculty', $this->data) && array_key_exists('Role', $this->data)) {
@@ -234,7 +234,7 @@ class User extends AppModel
      * @access public
      * @return void
      */
-    public function beforeSave()
+    public function beforeSave($options = array())
     {
         return parent::beforeSave();
     }
@@ -1185,7 +1185,7 @@ class User extends AppModel
      * */
     function get($path)
     {
-        $_user =& User::getInstance();
+        $_user = User::getInstance();
         $path = str_replace('.', '/', $path);
         if (strpos($path, 'User') !== 0) {
             $path = sprintf('User/%s', $path);
@@ -1337,7 +1337,7 @@ class User extends AppModel
     {
         App::import('Component', 'Session');
         $Session = new SessionComponent();
-        return $Session->read('ipeerSession.Roles');
+        return $Session->read('ipeerSession.Roles') === null ? array() : $Session->read('ipeerSession.Roles');
     }
 
 
@@ -1347,13 +1347,14 @@ class User extends AppModel
      *
      * @static
      * @access public
-     * @return void
+     * @return array the permission array or array()
      */
     static function getPermissions()
     {
         App::import('Component', 'Session');
         $Session = new SessionComponent();
-        return $Session->read('ipeerSession.Permissions');
+        return $Session->read('ipeerSession.Permissions') === null ?
+            array() : $Session->read('ipeerSession.Permissions');
     }
 
 

@@ -5,10 +5,10 @@ App::import('Model', 'UserFaculty');
 class UserFacultyTestCase extends CakeTestCase {
 	public $fixtures = array();
 
-	public function startTest() {
+	public function startTest($method) {
         echo "Start UserFaculty model test.\n";
 	}
 
-	public function endTest() {
+	public function endTest($method) {
 	}
 }

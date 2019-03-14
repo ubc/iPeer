@@ -112,7 +112,7 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
         $this->controller = new MockMixevalsController();
     }
 
-    public function endTest() {
+    public function endTest($method) {
     }
 
     public function getController()

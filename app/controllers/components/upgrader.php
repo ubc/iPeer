@@ -8,7 +8,7 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class UpgraderComponent extends Object
+class UpgraderComponent extends CakeObject
 {
     public $scripts = array();
     public $errors = array();

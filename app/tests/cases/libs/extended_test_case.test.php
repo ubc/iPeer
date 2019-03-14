@@ -32,7 +32,7 @@ class Dummy extends AppModel {
  * @package			extended_test_case
  * @subpackage    extended_test_case.tests.cases.libs
  */
-class DumbComponent extends Object {
+class DumbComponent extends CakeObject {
 	var $enabled = false;
 
 	function initialize() {
@@ -111,8 +111,8 @@ Mock::generatePartial('RequestHandlerComponent', 'MockRequestHandlerComponent', 
  */
 class ExtendedTestCaseTestCase extends CakeTestCase {
 
-	function startTest() {
-		$this->ExtendedTestCase =& new ExtendedTestCase();
+	function startTest($method) {
+		$this->ExtendedTestCase = new ExtendedTestCase();
 		$this->Dummies = new DummiesController();
 		$this->Dummies->constructClasses();
 		$this->Dummies->RequestHandler = new MockRequestHandlerComponent();
@@ -120,7 +120,7 @@ class ExtendedTestCaseTestCase extends CakeTestCase {
 		$this->ExtendedTestCase->testController = $this->Dummies;
 	}
 
-	function endTest() {
+	function endTest($method) {
 		unset($this->ExtendedTestCase);
 		unset($this->Dummies);
 		ClassRegistry::flush();

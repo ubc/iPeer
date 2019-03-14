@@ -5,11 +5,11 @@ App::import('Model', 'OauthNonce');
 class OauthNonceTestCase extends CakeTestCase {
 	var $fixtures = array('app.oauth_nonce');
 
-	function startTest() {
+	function startTest($method) {
 		$this->OauthNonce =& ClassRegistry::init('OauthNonce');
 	}
 
-	function endTest() {
+	function endTest($method) {
 		unset($this->OauthNonce);
 		ClassRegistry::flush();
 	}

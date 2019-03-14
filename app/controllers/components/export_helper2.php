@@ -8,7 +8,7 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class ExportHelper2Component extends Object
+class ExportHelper2Component extends CakeObject
 {
     public $name = 'ExportHelper2';
 
