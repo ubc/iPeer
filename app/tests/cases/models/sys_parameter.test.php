@@ -64,7 +64,7 @@ class SysParameterTestCase extends CakeTestCase
     function testNumberSysParam()
     {
         $result = $this->SysParameter->find('count');
-        $this->assertEqual($result, 19);
+        $this->assertEqual($result, 30);
         
         $result = $this->SysParameter->find('list', array('fields' => array('SysParameter.parameter_code')));
         $expected = array(
@@ -72,7 +72,11 @@ class SysParameterTestCase extends CakeTestCase
             'database.version', 'email.port', 'email.host', 'email.username', 'email.password',
             'display.contact_info', 'display.login.header', 'display.login.footer', 'system.absolute_url',
             'google_analytics.tracking_id', 'google_analytics.domain', 'banner.custom_logo', 'system.timezone', 
-            'system.student_number', 'course.creation.instructions');
+            'system.student_number', 'course.creation.instructions', 'system.canvas_enabled',
+            'system.canvas_baseurl', 'system.canvas_baseurl_ext', 'system.canvas_user_key',
+            'system.canvas_client_id', 'system.canvas_client_secret', 'system.canvas_force_login',
+            'system.canvas_api_timeout', 'system.canvas_api_default_per_page',
+            'system.canvas_api_max_retrieve_all', 'system.canvas_api_max_call');
         $this->assertEqual(array_values($result), $expected);
     }
 }

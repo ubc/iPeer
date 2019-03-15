@@ -1254,13 +1254,13 @@ class User extends AppModel
      */
     function getMyDepartmentsCourseList($findType = 'list')
     {
-        $this->UserFaculty = Classregistry::init('UserFaculty');
-        $this->Department = Classregistry::init('Department');
-        $this->Course = Classregistry::init('Course');
+        $userFaculty = Classregistry::init('UserFaculty');
+        $department = Classregistry::init('Department');
+        $course = Classregistry::init('Course');
 
-        $uf = $this->UserFaculty->findAllByUserId($this->Auth->user('id'));
-        $d = $this->Department->getByUserFaculties($uf);
-        $ret = $this->Course->getByDepartments($d, $findType);
+        $uf = $userFaculty->findAllByUserId(User::getCurrentLoggedInUser()['id']);
+        $d = $department->getByUserFaculties($uf);
+        $ret = $course->getByDepartments($d, $findType);
 
         return $ret;
     }

@@ -40,7 +40,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         'app.evaluation_rubric', 'app.evaluation_rubric_detail',
         'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
         'app.user_faculty', 'app.department', 'app.sys_parameter',
-        'app.oauth_token', 'app.survey_input',
+        'app.oauth_token', 'app.survey_input', 'app.user_oauths'
     );
 
     //public $testMethods = array('testIndexNoPermission');

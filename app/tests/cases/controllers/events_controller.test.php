@@ -85,7 +85,8 @@ class EventsControllerTest extends ExtendedAuthTestCase {
 
         $this->assertEqual(count($result["paramsForList"]['data']['entries']),
             17);
-        $this->assertEqual(sort(Set::extract($result["paramsForList"]['data']['entries'], '/Event/id')), array(1,2,3,6));
+        $_event_ids = Set::extract($result["paramsForList"]['data']['entries'], '/Event/id');
+        $this->assertEqual(sort($_event_ids), array(1,2,3,6));
         $events = Set::sort($result["paramsForList"]['data']['entries'], '{n}.Event.id', 'asc');
 
         $this->assertEqual($events[0]['Event']['Title'], 'Term 1 Evaluation');
