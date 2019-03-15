@@ -10,7 +10,8 @@
     "phpmd/phpmd" : "@stable",
     "squizlabs/php_codesniffer": "2.*",
     "sebastian/phpcpd": "*",
-    "phpdocumentor/phpdocumentor": "2.*"
+    "jms/serializer": "1.7.*",
+    "phpdocumentor/phpdocumentor": "^2.9"
   },
   "scripts": {
       "post-install-cmd": [

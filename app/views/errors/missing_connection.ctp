@@ -4,7 +4,7 @@
 <pre style="background-color:#FFFFDD;">
 &lt;?php
 class DATABASE_CONFIG {
-var $default = array('driver'   => 'mysql',
+var $default = array('driver'   => 'mysqli',
                      'connect'  => 'mysql_pconnect',
                      'host'     => 'your_ipeer_host',
                      'login'    => 'your_mysql_login',

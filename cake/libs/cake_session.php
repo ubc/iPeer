@@ -647,7 +647,7 @@ class CakeSession extends CakeObject {
 			if (session_id() != ''|| isset($_COOKIE[session_name()])) {
 				setcookie(Configure::read('Session.cookie'), '', time() - 42000, $this->path);
 			}
-			session_regenerate_id(true);
+			@session_regenerate_id(true);
 			if (PHP_VERSION < 5.1) {
 				$sessionPath = session_save_path();
 				if (empty($sessionPath)) {

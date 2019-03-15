@@ -8,7 +8,7 @@ define("DB_PREDEFINED", true);
 class DATABASE_CONFIG
 {
 public $default = array(
-    'driver' => 'mysql',
+    'driver' => 'mysqli',
     'connect' => 'mysql_pconnect',
     'host'   => DB_HOST,
     'login'   => DB_USER,
