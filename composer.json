@@ -1,6 +1,6 @@
 {
   "require": {
-      "compass/cake-guard": "1.0.4",
+      "compass/cake-guard": "1.0.5",
       "nategood/httpful": "^0.2.20"
   },
   "require-dev": {

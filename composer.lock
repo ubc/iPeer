@@ -4,24 +4,24 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "45a710690a6f0996ae68e60fe1adf9dd",
+    "content-hash": "95efaca42d1f5745b120f6b1a476a7f3",
     "packages": [
         {
             "name": "compass/cake-guard",
-            "version": "1.0.4",
+            "version": "1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/xcompass/CakePHP-Guard-Plugin.git",
-                "reference": "6572df44d5dbfd87ca01da42a524cb9f63108189"
+                "reference": "96d815561a6c3fb77982f080c6e6b7fea1b5042a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/xcompass/CakePHP-Guard-Plugin/zipball/6572df44d5dbfd87ca01da42a524cb9f63108189",
-                "reference": "6572df44d5dbfd87ca01da42a524cb9f63108189",
+                "url": "https://api.github.com/repos/xcompass/CakePHP-Guard-Plugin/zipball/96d815561a6c3fb77982f080c6e6b7fea1b5042a",
+                "reference": "96d815561a6c3fb77982f080c6e6b7fea1b5042a",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0"
+                "php": ">=7.0.0"
             },
             "type": "library",
             "notification-url": "https://packagist.org/downloads/",
@@ -35,7 +35,7 @@
                 }
             ],
             "description": "Authentication Plugin for CakePHP 1.3",
-            "time": "2018-05-09T22:21:22+00:00"
+            "time": "2019-03-15T23:22:30+00:00"
         },
         {
             "name": "nategood/httpful",
