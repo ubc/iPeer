@@ -62,7 +62,8 @@ class ImportUsersTestCase extends SystemBaseTestCase
         );
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'td[class="  sorting_1"]')->click();
         $newStudent = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'View')->attribute('href');
-        $userId = end(explode('/', $newStudent));
+        $_temp_url = explode('/', $newStudent);
+        $userId = end($_temp_url);
 
         $this->updateClassList();
         $this->session->open($this->url.'users/delete/'.$userId);

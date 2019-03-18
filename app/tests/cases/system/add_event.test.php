@@ -20,7 +20,8 @@ class addEventTestCase extends SystemBaseTestCase
         $this->session->open($this->url.'events/add/1');
         $this->fillInEventAddForm();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Peer Evaluation')->click();
-        $eventId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $eventId = end($_temp_url);
 
         // search that all the email schedules have been created
         $this->session->open($this->url.'emailer');
@@ -184,7 +185,8 @@ class addEventTestCase extends SystemBaseTestCase
         $email = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[selected="selected"]');
         $this->assertEqual($email->attribute('value'), 2);
 
-        $eventId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $eventId = end($_temp_url);
         $groups = count($this->session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="GroupGroup"] option[selected="selected"]'));
         $this->assertEqual($groups, 2);
 
@@ -245,7 +247,8 @@ class addEventTestCase extends SystemBaseTestCase
         $this->assertEqual($msg, 'Add event successful!');
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Simple Evaluation with Reminders')->click();
-        $eventId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $eventId = end($_temp_url);
 
         // Alex Student completes the evaluations
         $this->waitForLogoutLogin('redshirt0002');
@@ -372,7 +375,8 @@ class addEventTestCase extends SystemBaseTestCase
         $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'Add event successful!');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Survey with Email Reminders')->click();
-        $eventId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $eventId = end($_temp_url);
 
         // Alex Student completes the survey
         $this->waitForLogoutLogin('redshirt0002');
@@ -475,7 +479,8 @@ class addEventTestCase extends SystemBaseTestCase
         );
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Survey with Email Reminders')->click();
-        $eventId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $eventId = end($_temp_url);
         $this->session->open($this->url.'events/edit/'.$eventId);
         $selected = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="EventEmailSchedule"] option[selected="selected"]');
         $this->assertEqual($selected->attribute('value'), 7);

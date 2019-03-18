@@ -88,7 +88,8 @@ class AddCourseTestCase extends SystemBaseTestCase
         $this->assertEqual($msg, 'Course created!');
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'CPSC 101 101')->click();
-        $courseId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $courseId = end($_temp_url);
         $this->session->open($this->url.'courses/edit/'.$courseId);
 
         // instructor1 is defaulted to be an instructor
@@ -113,7 +114,8 @@ class AddCourseTestCase extends SystemBaseTestCase
     public function testInactiveCourse()
     {
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'EECE 474 101')->click();
-        $courseId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $courseId = end($_temp_url);
         $this->session->open($this->url.'courses/edit/'.$courseId);
 
         $remove = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'X');
@@ -194,7 +196,8 @@ class AddCourseTestCase extends SystemBaseTestCase
     {
         $this->session->open($this->url.'courses');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'EECE 474 101')->click();
-        $courseId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $courseId = end($_temp_url);
 
         $this->session->open($this->url.'courses/delete/'.$courseId);
 

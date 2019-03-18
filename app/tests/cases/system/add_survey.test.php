@@ -28,7 +28,8 @@ class addSurveyTestCase extends SystemBaseTestCase
         $this->assertEqual($msg, 'Survey is saved!');
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'grp making')->click();
-        $surveyId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $surveyId = end($_temp_url);
         $this->session->open($this->url.'surveys/questionsSummary/'.$surveyId);
         $this->addMC($surveyId);
         $this->addMultipleAnswers($surveyId);

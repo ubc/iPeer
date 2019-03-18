@@ -71,7 +71,8 @@ class addSimpleTestCase extends SystemBaseTestCase
     {
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Project Eval Part One')->click();
         $url = $this->session->url();
-        $this->simpleId = end(explode('/', $url));
+        $_temp_url = explode('/', $url);
+        $this->simpleId = end($_temp_url);
         $this->session->open(str_replace('view', 'edit', $url));
         $points = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'SimpleEvaluationPointPerMember');
         $this->assertEqual($points->attribute('value'), 50);

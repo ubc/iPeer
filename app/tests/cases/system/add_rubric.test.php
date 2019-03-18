@@ -103,7 +103,8 @@ class addRubricTestCase extends SystemBaseTestCase
     {
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Midterm Evaluation')->click();
         $url = $this->session->url();
-        $this->rubricId = end(explode('/', $url));
+        $_temp_url = explode('/', $url);
+        $this->rubricId = end($_temp_url);
         $this->session->open(str_replace('view', 'edit', $url));
 
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'name')->clear();

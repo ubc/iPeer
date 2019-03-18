@@ -172,16 +172,20 @@ class OutputComponent extends CakeObject
             '@&(quot|#34);@i', // Replace HTML entities
             '@&(amp|#38);@i', '@&(lt|#60);@i', '@&(gt|#62);@i', '@&(nbsp|#160);@i',
             '@&(iexcl|#161);@i', '@&(cent|#162);@i', '@&(pound|#163);@i',
-            '@&(copy|#169);@i', '@&#(\d+);@e'); // evaluate as php
+            '@&(copy|#169);@i');
 
         $replace = array('', '', '', '', '', '', '<br/>', '"', '&', '<', '>', ' ',
-            chr(161), chr(162), chr(163), chr(169), 'chr(\1)');
+            chr(161), chr(162), chr(163), chr(169));
         if (is_array($data)) {
             foreach ($data as $key => $value) {
                 $data[$key] = $this->filter($value);
             }
         } else {
             $data = preg_replace($search, $replace, $data);
+            // Decode the &#[0-9]+; pattern
+            $data = preg_replace_callback('/&#(\d+);/m', function($matches) {
+                return chr($matches[1]);
+            }, $data);
         }
         return $data;
     }

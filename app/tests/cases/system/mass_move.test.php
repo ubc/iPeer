@@ -71,7 +71,8 @@ class massMoveTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Team Creation Survey')->click();
         $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
         $this->assertEqual($title, 'TEST 101 101 - Demo Course > Team Creation Survey > View');
-        $this->eventId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $this->eventId = end($_temp_url);
 
         // check that the two submissions have been copied over
         $this->session->open($this->url.'evaluations/viewSurveySummary/'.$this->eventId);
@@ -413,7 +414,8 @@ class massMoveTestCase extends SystemBaseTestCase
         );
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, $name)->click();
 
-        return end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        return end($_temp_url);
     }
 
     public function enrolStudent($cId, $username)
