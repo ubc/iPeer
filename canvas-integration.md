@@ -8,9 +8,9 @@ If you are running Docker-Canvas locally, you will need to run the following com
 ```
 docker network create canvas_ipeer_network
 docker network connect canvas_ipeer_network ipeer_app
-docker network connect canvas_ipeer_network dockercanvas_app_1
+docker network connect canvas_ipeer_network docker-canvas_app_1
 ```
-> This assumes that your Docker-Canvas container is called `dockercanvas_app_1` and your iPeer container `ipeer_app`
+> This assumes that your Docker-Canvas container is called `docker-canvas_app_1` and your iPeer container `ipeer_app`
 
 ### Developer key setup
 The integration depends on OAuth2 authorization and requires a client ID / secret pair shared between Canvas and iPeer.

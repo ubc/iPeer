@@ -171,7 +171,8 @@ class studentSimple extends SystemBaseTestCase
 
         $this->session->open($this->url.'events/index/1');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Simple Evaluation')->click();
-        $this->eventId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $this->eventId = end($_temp_url);
 
         // edit event's release date end to test final penalty
         // edit event's result release date begin to test student view of the results

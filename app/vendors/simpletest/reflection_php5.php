@@ -294,6 +294,9 @@ class SimpleReflection {
         if ($name == '__toString') {
             return "function $name()";
         }
+        if (version_compare(phpversion(), '7') >= 0) {
+            return $this->_getFullSignature($name);
+        }
         if ($this->_isInterfaceMethod($name) ||
                 $this->_isAbstractMethod($name) ||
                 $this->_isAbstractMethodInParents($name) ||

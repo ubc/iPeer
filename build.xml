@@ -29,8 +29,9 @@
     <target name="build"
         depends="prepare,lint,phploc,pdepend,phpmd,phpcs,phpcpd,phpdoc,test,phpcb"/>
 
+    <!-- remove phpdoc dependency for now.  phpdoc 2.9 is not working with php7 -->
     <target name="build-ci"
-        depends="prepare,lint,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,phpdoc,test-ci,phpcb"/>
+        depends="prepare,lint,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,test-ci,phpcb"/>
 
     <target name="clean" description="Cleanup build artifacts">
         <delete dir="${project.basedir}/build/api"/>

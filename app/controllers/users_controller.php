@@ -1685,7 +1685,8 @@ class UsersController extends AppController
             $secondaryTutor = Set::extract('/'.$model.'/course_id', $this->$model->findAllByUserId($secondary));
             $conflict = array_intersect($primaryTutor, $secondaryTutor);
             if ($conflict) {
-                $updated = $updated && $this->User->$functionNames[$model]($secondary, $conflict);
+                $_function_name = $functionNames[$model];
+                $updated = $updated && $this->User->$_function_name($secondary, $conflict);
             }
             $conflict = implode(',', $conflict);
             $name = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $model)).'s';
@@ -1753,19 +1754,20 @@ class UsersController extends AppController
         );
 
         foreach ($models as $model) {
-            $primaryUser = $this->$model[User::MERGE_MODEL]->findAllByUserId($primary);
+            $_merge_model = $model[User::MERGE_MODEL];
+            $primaryUser = $this->$_merge_model->findAllByUserId($primary);
             $primaryUser = Set::extract('/'.$model[User::MERGE_MODEL].'/'.$model[User::MERGE_FIELD], $primaryUser);
-            $secondaryUser = $this->$model[User::MERGE_MODEL]->findAllByUserId($secondary);
+            $secondaryUser = $this->$_merge_model->findAllByUserId($secondary);
             $secondaryUser = Set::extract('/'.$model[User::MERGE_MODEL].'/'.$model[User::MERGE_FIELD], $secondaryUser);
             $conflict = array_intersect($primaryUser, $secondaryUser);
             if ($conflict) {
-                $updated = $updated && $this->$model[User::MERGE_MODEL]->deleteAll(
+                $updated = $updated && $this->$_merge_model->deleteAll(
                     array('user_id' => $secondaryUser, $model[User::MERGE_FIELD] => $conflict));
             }
             $conflict = implode(',', $conflict);
             $change = 'UPDATE '.$model[User::MERGE_TABLE].' SET user_id='.$primary.' WHERE user_id='.$secondary;
             $change .= ($conflict) ? ' AND '.$model[User::MERGE_FIELD].' NOT IN ('.$conflict.');' : ';';
-            $updated = $updated && $this->$model[User::MERGE_MODEL]->query($change);
+            $updated = $updated && $this->$_merge_model->query($change);
         }
 
         //oauth_clients

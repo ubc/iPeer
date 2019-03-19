@@ -93,7 +93,8 @@ class studentSurvey extends SystemBaseTestCase
         $this->waitForLogoutLogin('root');
         $this->session->open($this->url.'events/index/1');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Survey')->click();
-        $this->eventId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $this->eventId = end($_temp_url);
         $this->session->open($this->url.'evaluations/viewSurveySummary/'.$this->eventId);
 
         // multiple choice

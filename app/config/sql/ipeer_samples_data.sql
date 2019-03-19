@@ -2058,13 +2058,14 @@ INSERT INTO `sys_parameters` (`parameter_code`, `parameter_value`, `parameter_ty
 ('display.contact_info', 'noreply@ipeer.ctlt.ubc.ca', 'S', 'Contact Info', 'A', 0, NOW(), 0, NOW()),
 ('display.login.header', '', 'S', 'Login Info Header', 'A', 0, NOW(), 0, NOW()),
 ('display.login.footer', '', 'S', 'Login Info Footer', 'A', 0, NOW(), 0, NOW()),
-('system.absolute_url', 'http://ipeer_web_unittest', 'S', 'base url to iPeer', 'A', 0, NOW(), 0, NOW()),
+('system.absolute_url', '', 'S', 'base url to iPeer', 'A', 0, NOW(), 0, NOW()),
 ('google_analytics.tracking_id', '', 'S', 'tracking id for Google Analytics', 'A', 0, NOW(), 0, NOW()),
 ('google_analytics.domain', '', 'S', 'domain name for Google Analytics', 'A', 0, NOW(), 0, NOW()),
 ('banner.custom_logo', '', 'S', 'custom logo that appears on the left side of the banner', 'A', 0, NOW(), 0, NOW()),
 ('system.timezone', '', 'S', 'timezone', 'A', 0, NOW(), 0, NOW()),
 ('system.student_number', 'true', 'B', 'allow students to change their student number', 'A', 0, NOW(), 0, NOW()),
-('course.creation.instructions', '', 'S', 'Display course creation instructions', 'A', 0, NOW(), 0, NOW());
+('course.creation.instructions', '', 'S', 'Display course creation instructions', 'A', 0, NOW(), 0, NOW()),
+('email.reminder_enabled', 'true', 'B', 'Enable email reminder feature', 'A', 0, NOW(), NULL, NOW());
 
 -- --------------------------------------------------------
 
@@ -2244,7 +2245,7 @@ INSERT INTO `sys_parameters` (
     `parameter_type`, `description`, `record_status`, `creator_id`, `created`,
     `updater_id`, `modified`)
 VALUES (
-    'system.canvas_baseurl', 'http://dockercanvas_app_1:80', 'S',
+    'system.canvas_baseurl', 'http://docker-canvas_app_1:80', 'S',
     'Base URL for Canvas API', 'A', 0, NOW(), NULL, NOW()
 );
 
@@ -2253,7 +2254,7 @@ INSERT INTO `sys_parameters` (
     `parameter_type`, `description`, `record_status`, `creator_id`, `created`,
     `updater_id`, `modified`)
 VALUES (
-    'system.canvas_baseurl_ext', 'http://dockercanvas_app_1', 'S',
+    'system.canvas_baseurl_ext', 'http://docker-canvas_app_1', 'S',
     'External Base URL for Canvas API (if not set, will default to canvas_baseurl)', 'A', 0, NOW(), NULL, NOW()
 );
 

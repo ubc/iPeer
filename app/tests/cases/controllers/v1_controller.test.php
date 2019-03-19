@@ -169,7 +169,9 @@ class V1ControllerTest extends CakeTestCase {
         $url = $this->_getURL('/v1/oauth');
 
         // No errors thrown
-        $this->assertEqual('', $this->_oauthReq($url));
+        $result = $this->_oauthReq($url);
+        print_r($result);
+        $this->assertEqual('', $result);
         // The client key couldn't be found in the db
         $original = $this->clientKey;
         $this->clientKey = "a";

@@ -2,7 +2,8 @@ language: php
 php:
 - '7.2'
 env:
-  - SERVER_TEST=http://localhost IPEER_DB_NAME=ipeer_test IPEER_DB_USER=root IPEER_DB_PASSWORD=""
+  # need to turn off IPEER_DEBUG for the /v1 endpoints to work properly
+  - SERVER_TEST=http://localhost IPEER_DB_NAME=ipeer_test IPEER_DB_USER=root IPEER_DB_PASSWORD="" IPEER_DEBUG=0
 
 services:
 - mysql
@@ -10,22 +11,45 @@ install:
 - composer install
 before_script:
   - sudo apt-get update
-  - sudo apt-get install apache2 libapache2-mod-fastcgi
+  - sudo apt-get install -y --force-yes apache2 libapache2-mod-fastcgi
   # install oauth extension
   - pecl install -f oauth-2.0.2
-  # enable php-fpm
+  # copy php-fpm configure files
   - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
+  - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf
+  # setting user and group directives are not necessary unless we are using sudo to start php-fpm. but anyway...
+  - sudo sed -i '/^user =/cuser = travis' ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf
+  - sudo sed -i '/^group =/cgroup = travis' ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf
+  - sudo sed -i "/^;chdir =/cchdir = $(pwd)/app/webroot" ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf
+  # dont clear env. make sure environment variables are passed to the workers
+  - sudo sed -i '/^;clear_env =/cclear_env = no' ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf
+  # turn of display_errors unless we are debugging. otherwise it may affect /v1 endpoints
+  - sudo sed -i '/^;php_flag\[display_errors\]/cphp_flag[display_errors] = off' ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf
+  # for debugging php-fpm
+  - sudo touch /var/log/fpm-access.log
+  - sudo chmod a+wr /var/log/fpm-access.log
+  - sudo touch /var/log/fpm-error.log
+  - sudo chmod a+wr /var/log/fpm-error.log
+  - sudo sed -i '/^;access.log/caccess.log = /var/log/fpm-access.log' ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf
+  - sudo sed -i '/^;php_admin_value\[error_log\]/cphp_admin_value[error_log] = /var/log/fpm-error.log' ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf
+  - sudo sed -i '/^;catch_workers_output/ccatch_workers_output = yes' ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf
+  - sudo sed -i '/^;php_admin_flag\[log_errors\]/cphp_admin_flag[log_errors] = on' ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/www.conf
+  # end of debugging php-fpm
   - sudo a2enmod rewrite actions fastcgi alias
   - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
+  - sudo sed -i -e "s,www-data,travis,g" /etc/apache2/envvars
+  - sudo chown -R travis:travis /var/lib/apache2/fastcgi
   # configure apache virtual hosts
-  - sudo cp -f build/travis-ci-apache /etc/apache2/sites-available/default
-  - sudo sed -e "s?%TRAVIS_BUILD_DIR%?$(pwd)/app/webroot?g" --in-place /etc/apache2/sites-available/default
+  - sudo cp -f build/travis-ci-apache /etc/apache2/sites-available/000-default.conf
+  - sudo sed -e "s?%TRAVIS_BUILD_DIR%?$(pwd)/app/webroot?g" --in-place /etc/apache2/sites-available/000-default.conf
+  # restart php fpm and apache
+  - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
   - sudo service apache2 restart
   # setup mysql
   - mysql -e "create database IF NOT EXISTS ipeer_test;" -uroot
 
 script: vendor/bin/phing build-ci
+
 #deploy:
 #  provider: releases
 #  skip_cleanup: true
