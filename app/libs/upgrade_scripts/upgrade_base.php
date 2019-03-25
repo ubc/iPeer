@@ -9,14 +9,6 @@
  * @version   Release: 3.0
  */
 
-// mysql_set_charset is only available PHP 5 >= 5.2.3
-if (!function_exists('mysql_set_charset')) {
-    function mysql_set_charset($charset,$dbh)
-    {
-        return mysql_query("set names $charset",$dbh);
-    }
-}
-
 class UpgradeBase
 {
     public $errors = array();
@@ -24,6 +16,8 @@ class UpgradeBase
     public $fromVersions;
     public $toVersion;
     public $dbVersion;
+
+    public $_mysql;
     /**
      * isUpgradable
      *
@@ -115,16 +109,16 @@ class UpgradeBase
         foreach ($deltaFiles as $file) {
             // Check that we can read the delta file
             if (!is_readable($file)) {
-                mysql_close();
+                mysqli_close($this->_mysql);
                 return "Cannot read delta file $file";
             }
             $ret = $this->applyDelta($file);
             if ($ret) {
-                mysql_close();
+                mysqli_close($this->_mysql);
                 return 'Failed to apply delta file: '.$file.'. Message = '.$ret;
             }
         }
-        mysql_close();
+        mysqli_close($this->_mysql);
 
         return false;
     }
@@ -142,15 +136,15 @@ class UpgradeBase
         $dbConfig = new DATABASE_CONFIG();
         $dbConfig = $dbConfig->default;
 
-        $mysql = mysql_connect($dbConfig['host'], $dbConfig['login'], $dbConfig['password']);
-        if (!$mysql) {
+        $this->_mysql = mysqli_connect($dbConfig['host'], $dbConfig['login'], $dbConfig['password']);
+        if (!$this->_mysql) {
             return 'Could not connect to database!';
         }
 
-        mysql_set_charset('utf8', $mysql);
+        mysqli_set_charset($this->_mysql, 'utf8');
 
         //Open the database
-        $mysqldb = mysql_select_db($dbConfig['database']);
+        $mysqldb = mysqli_select_db($this->_mysql, $dbConfig['database']);
         if (!$mysqldb) {
             return 'Could not find database '.$dbConfig['database'].'!';
         }
@@ -173,7 +167,7 @@ class UpgradeBase
         if (false === $fp) {
             return "Could not open ".$file;
         }
-        mysql_query('BEGIN');
+        mysqli_query($this->_mysql, 'BEGIN');
 
         $cmd = "";
         $done = false;
@@ -200,10 +194,10 @@ class UpgradeBase
             $cmd .= $line;
 
             if ($done) {
-                $result = mysql_query($cmd);
+                $result = mysqli_query($this->_mysql, $cmd);
                 if (!$result) {
-                    $err = mysql_error();
-                    mysql_query("ROLLBACK");
+                    $err = mysqli_error($this->_mysql);
+                    mysqli_query($this->_mysql, "ROLLBACK");
                     return "Cannot run query from $file - $cmd - $err";
                 }
                 $cmd = "";
@@ -212,8 +206,8 @@ class UpgradeBase
         }
         fclose($fp);
         // update database version
-        mysql_query('UPDATE `sys_parameters` SET `parameter_value` = '.$this->dbVersion.' Where `parameter_code` = "database.version";');
-        mysql_query("COMMIT");
+        mysqli_query($this->_mysql, 'UPDATE `sys_parameters` SET `parameter_value` = '.$this->dbVersion.' Where `parameter_code` = "database.version";');
+        mysqli_query($this->_mysql, "COMMIT");
         return false;
     }
 

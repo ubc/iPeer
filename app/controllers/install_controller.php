@@ -347,7 +347,7 @@ class InstallController extends Controller
     private function createSuperAdmin($username, $password, $email)
     {
         // modify the superadmin to user specs
-        $ret = $this->loadModel('User');
+        $this->loadModel('User');
         $root = $this->User->findById(1);
         $root['User']['username'] = $username;
         $root['User']['password'] = $password;
