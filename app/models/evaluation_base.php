@@ -43,7 +43,7 @@ class EvaluationBase extends AppModel
      * @access public
      * @return void
      */
-    function beforeSave()
+    function beforeSave($options = array())
     {
         // Ensure the name is not empty
         if (empty($this->data[$this->name]['name'])) {

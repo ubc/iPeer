@@ -12,7 +12,7 @@ Mock::generate('SimpleSocket');
 class TestOfEclipse extends UnitTestCase {
 
 	function testPass() {
-		$listener = &new MockSimpleSocket();
+		$listener = new MockSimpleSocket();
 
 		$fullpath = realpath(dirname(__FILE__).'/support/test1.php');
 		$testpath = EclipseReporter::escapeVal($fullpath);

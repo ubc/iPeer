@@ -9,7 +9,7 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class TreeBuilderComponent extends Object
+class TreeBuilderComponent extends CakeObject
 {
 
     public $tree;

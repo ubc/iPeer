@@ -4,14 +4,14 @@
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) Tests <http://book.cakephp.org/view/1196/Testing>
+ * CakePHP(tm) Tests <http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html>
  * Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  *  Licensed under The Open Group Test Suite License
  *  Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
- * @link          http://book.cakephp.org/view/1196/Testing CakePHP(tm) Tests
+ * @link          http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html CakePHP(tm) Tests
  * @package       cake
  * @subpackage    cake.tests.cases.libs.controller.components.dbacl.models
  * @since         CakePHP(tm) v 1.2.0.4206
@@ -243,10 +243,10 @@ class DbAclTest extends DbAcl {
  * @return void
  */
 	function __construct() {
-		$this->Aro =& new DbAroTest();
-		$this->Aro->Permission =& new DbPermissionTest();
-		$this->Aco =& new DbAcoTest();
-		$this->Aro->Permission =& new DbPermissionTest();
+		$this->Aro = new DbAroTest();
+		$this->Aro->Permission = new DbPermissionTest();
+		$this->Aco = new DbAcoTest();
+		$this->Aro->Permission = new DbPermissionTest();
 	}
 }
 
@@ -284,7 +284,7 @@ class AclNodeTest extends CakeTestCase {
  * @return void
  */
 	function testNode() {
-		$Aco =& new DbAcoTest();
+		$Aco = new DbAcoTest();
 		$result = Set::extract($Aco->node('Controller1'), '{n}.DbAcoTest.id');
 		$expected = array(2, 1);
 		$this->assertEqual($result, $expected);
@@ -325,7 +325,7 @@ class AclNodeTest extends CakeTestCase {
  * @return void
  */
 	function testNodeWithDuplicatePathSegments() {
-		$Aco =& new DbAcoTest();
+		$Aco = new DbAcoTest();
 		$nodes = $Aco->node('ROOT/Users');
 		$this->assertEqual($nodes[0]['DbAcoTest']['parent_id'], 1, 'Parent id does not point at ROOT. %s');
 	}

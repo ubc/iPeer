@@ -1,7 +1,7 @@
 <?php
 
 class CoursesViewTestCase extends CakeTestCase {
-  function startTest() {
+  function startTest($method) {
     $controller = new Controller();
     $this->view = new View($controller);
     $this->view->layout = null;

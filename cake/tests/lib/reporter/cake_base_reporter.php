@@ -4,7 +4,7 @@
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) Tests <http://book.cakephp.org/view/1196/Testing>
+ * CakePHP(tm) Tests <http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html>
  * Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  *  Licensed under The Open Group Test Suite License
@@ -81,8 +81,8 @@ class CakeBaseReporter extends SimpleReporter {
  * @param array $params Array of request parameters the reporter should use. See above.
  * @access public
  */
-	function CakeBaseReporter($charset = 'utf-8', $params = array()) {
-		$this->SimpleReporter();
+	function __construct($charset = 'utf-8', $params = array()) {
+		SimpleReporter::__construct();
 		if (!$charset) {
 			$charset = 'utf-8';
 		}

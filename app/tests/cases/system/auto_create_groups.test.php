@@ -65,7 +65,8 @@ class autoCreateGroupsTestCase extends SystemBaseTestCase
     public function testEditGroups()
     {
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Team Creation Survey')->click();
-        $this->surveyGroupId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $this->surveyGroupId = end($_temp_url);
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="question"] option[value="1"]')->click();
         $ques1Ans = count($this->session->elementsWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[checked]'));
         $this->assertEqual($ques1Ans, 2);

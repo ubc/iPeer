@@ -251,7 +251,7 @@ class EventsController extends AppController
         // Clear the state first, we don't want any previous searches/selections
         $this->AjaxList->clearState();
         // Set and update session state Variable
-        $joinFilterSelections = new Object();
+        $joinFilterSelections = new CakeObject();
         $joinFilterSelections->course_id = $courseId;
         $this->AjaxList->setStateVariable("joinFilterSelections", $joinFilterSelections);
 

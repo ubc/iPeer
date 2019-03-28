@@ -15,7 +15,7 @@ $yes = '<b class="green">'.__('Yes', true).'</b>';
 
 // Mandatory requirements init
 $phpver = $no;
-$REQPHPVER = '5.3';
+$REQPHPVER = '7.2';
 $mysql = $no;
 $configwritable = $no;
 $dbconfig = $no;
@@ -30,7 +30,7 @@ $emailperm = $no;
 if (version_compare(phpversion(), $REQPHPVER) >= 0) {
   $phpver = $yes;
 }
-if (function_exists('mysql_connect')) {
+if (function_exists('mysqli_connect')) {
   $mysql = $yes;
 }
 if (get_magic_quotes_gpc()) {
@@ -58,9 +58,9 @@ $limit = ini_get('memory_limit');
 $unit = substr($limit, -1);
 // convert to bytes
 if ($limit == -1) $limit = 9999999999999; # no memory limit
-else if (strcasecmp($unit, 'k') == 0) $limit *= 1024;
-else if (strcasecmp($unit, 'm')) $limit *= 1024 * 1024;
-else if (strcasecmp($unit, 'g')) $limit *= 1024 * 1024 * 1024;
+else if (strcasecmp($unit, 'k') == 0) $limit = (int)$limit * 1024;
+else if (strcasecmp($unit, 'm') == 0) $limit = (int)$limit * 1024 * 1024;
+else if (strcasecmp($unit, 'g') == 0) $limit = (int)$limit * 1024 * 1024 * 1024;
 $memlimit = $no;
 if ($limit >= 64 * 1024 * 1024) $memlimit = $yes;
 

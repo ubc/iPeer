@@ -10,7 +10,7 @@ App::import('Model', 'UserCourse');
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class SearchComponent extends Object
+class SearchComponent extends CakeObject
 {
 
     /**

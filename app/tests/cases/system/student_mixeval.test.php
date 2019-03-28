@@ -153,7 +153,8 @@ class studentMixeval extends SystemBaseTestCase
 
         $this->session->open($this->url.'events/index/1');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Mixed Evaluation')->click();
-        $this->eventId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $this->eventId = end($_temp_url);
 
         // edit event's release date end to test final penalty
         // edit event's result release date begin to test student view of the results
@@ -818,7 +819,8 @@ class studentMixeval extends SystemBaseTestCase
             }
         );
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Final Project Evaluation')->click();
-        $templateId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $templateId = end($_temp_url);
 
         // add event
         $this->session->open($this->url.'events/add/1');
@@ -942,7 +944,8 @@ class studentMixeval extends SystemBaseTestCase
         $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'The mixed evaluation was saved successfully.');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'With Self-Evaluation')->click();
-        $this->templateId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $this->templateId = end($_temp_url);
     }
 
     public function testSelfEvaluationEvent()
@@ -980,7 +983,8 @@ class studentMixeval extends SystemBaseTestCase
         $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'Add event successful!');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Eval with Self-Eval')->click();
-        $this->eventId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $this->eventId = end($_temp_url);
     }
 
     public function testAnswerSelfEval()

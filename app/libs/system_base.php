@@ -62,6 +62,9 @@ abstract class SystemBaseTestCase extends CakeTestCase
         $apikey = getenv('SAUCE_API_KEY') ? ':'.getenv('SAUCE_API_KEY').'@' : '';
         $this->seleniumUrl = "http://".$username.$apikey.$host.':'.$port.'/wd/hub';
         $this->url = getenv('SERVER_TEST') ? getenv('SERVER_TEST') : 'http://localhost:2000/';
+        if (substr($this->url, -1) != '/') {
+            $this->url = $this->url . '/';
+        }
 
         /*echo "SELENIUM_BROWSER = ".$this->browser."\n";
         echo "SELENIUM_VERSION = ".$this->capabilities['version']."\n";

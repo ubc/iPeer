@@ -29,8 +29,9 @@
     <target name="build"
         depends="prepare,lint,phploc,pdepend,phpmd,phpcs,phpcpd,phpdoc,test,phpcb"/>
 
+    <!-- remove phpdoc dependency for now.  phpdoc 2.9 is not working with php7 -->
     <target name="build-ci"
-        depends="prepare,lint,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,phpdoc,test-ci,phpcb"/>
+        depends="prepare,lint,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,test-ci,phpcb"/>
 
     <target name="clean" description="Cleanup build artifacts">
         <delete dir="${project.basedir}/build/api"/>
@@ -53,7 +54,7 @@
     </target>
 
     <target name="init-test-db" depends="load-db-config">
-        <pdosqlexec url="${db.driver}:host=${db.host};dbname=${db.name}" userid="${db.username}" password="${db.password}">
+        <pdosqlexec url="mysql:host=${db.host};dbname=${db.name}" userid="${db.username}" password="${db.password}">
             <transaction src="app/config/sql/ipeer_samples_data.sql"/>
         </pdosqlexec>
         <!--<exec command="cake/console/cake schema_ci create DbAcl" passthru="true"/>-->

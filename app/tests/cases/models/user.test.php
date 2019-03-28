@@ -192,8 +192,8 @@ class UserTestCase extends CakeTestCase {
     function testGetInstructor() {
         $actual = $this->User->GetInstructors('all', array());
         $actual = Set::extract('/User/id', $actual);
-        $expected = array('0' => 4, '1' => 2, '2' => 3);
-        $this->assertTrue(count(array_diff_assoc($actual, $expected) == 0));
+        $expected = array('0' => 2, '1' => 3, '2' => 4);
+        $this->assertEqual(count(array_diff_assoc($actual, $expected)), 0);
     }
 
     function testLoadRole() {
@@ -467,7 +467,6 @@ class UserTestCase extends CakeTestCase {
             'fields' => array('User.id', 'username', 'last_name', 'first_name'),
             'contain' => false,
         ));
-
         $this->assertEqual(count($sbody), 3);
     }
 

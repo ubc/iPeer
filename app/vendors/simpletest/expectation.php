@@ -75,7 +75,7 @@ class SimpleExpectation {
      */
     function &_getDumper() {
         if (! $this->_dumper) {
-            $dumper = &new SimpleDumper();
+            $dumper = new SimpleDumper();
             return $dumper;
         }
         return $this->_dumper;
@@ -467,7 +467,7 @@ class ReferenceExpectation extends SimpleExpectation {
      *    @return boolean              True if correct.
      *    @access public
      */
-    function test(&$compare) {
+    function test($compare) {
         return SimpleTestCompatibility::isReference($this->_value, $compare);
     }
 

@@ -84,7 +84,8 @@ class AddGroupTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Amazing Group (4 members)')->click();
         $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
         $this->assertEqual($title, 'APSC 201 - Technical Communication > Groups > View');
-        $this->groupId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $this->groupId = end($_temp_url);
 
         $this->checkViewLinks();
 

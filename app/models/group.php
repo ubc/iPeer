@@ -112,7 +112,7 @@ class Group extends AppModel
      * @access public
      * @return void
      */
-    function beforeSave()
+    function beforeSave($options = array())
     { //serverside validation
         // Ensure the name is not empty
         if (empty($this->data[$this->name]['group_name'])) {

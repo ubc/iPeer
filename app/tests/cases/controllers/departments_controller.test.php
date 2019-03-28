@@ -104,6 +104,7 @@ class DepartmentsControllerTestCase extends ExtendedAuthTestCase {
                 'created' => '2006-06-20 14:14:45',
                 'updater_id' => null,
                 'modified' => '2006-06-20 14:14:45',
+                'canvas_id' => null,
                 'creator' => 'Super Admin',
                 'updater' => null,
                 'student_count' => 13,

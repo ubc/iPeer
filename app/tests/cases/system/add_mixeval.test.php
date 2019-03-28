@@ -352,7 +352,8 @@ class AddMixEvalTestCase extends SystemBaseTestCase
         $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
         $this->assertEqual($title, 'Mixed Evaluations > View > Final Project Evaluation');
 
-        $templateId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $templateId = end($_temp_url);
         $this->session->open($this->url.'mixevals/delete/'.$templateId);
 
         $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();

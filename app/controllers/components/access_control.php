@@ -8,7 +8,7 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class AccessControlComponent extends Object
+class AccessControlComponent extends CakeObject
 {
     public $name = 'AccessControl';
     public $components = array('Session', 'Acl');

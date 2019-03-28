@@ -55,7 +55,7 @@ if (!function_exists('json_encode') ) {
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class AjaxListComponent extends Object
+class AjaxListComponent extends CakeObject
 {
 
     // Will hold a reference to the controller
@@ -117,7 +117,7 @@ class AjaxListComponent extends Object
         // Got it okay?
         if (!$state) {
             // No state is session? Well, set it up then!
-            $state = new Object();
+            $state = new CakeObject();
             $state->sortBy = $this->sortBy;
             $state->sortAsc = true;
             $state->pageSize = 20;
@@ -544,7 +544,7 @@ class AjaxListComponent extends Object
     {
         // Set up the basics
         $this->model = $model;
-        $this->columns = $columns;
+        $this->columns = empty($columns) ? array() : $columns;
         $this->actions = $actions;
         $this->joinFilters = $joinFilters;
         $this->extraFilters = $extraFilters;

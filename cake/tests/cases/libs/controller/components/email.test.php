@@ -6,14 +6,14 @@
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) Tests <http://book.cakephp.org/view/1196/Testing>
+ * CakePHP(tm) Tests <http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html>
  * Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
  *
  *  Licensed under The Open Group Test Suite License
  *  Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
- * @link          http://book.cakephp.org/view/1196/Testing CakePHP(tm) Tests
+ * @link          http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html CakePHP(tm) Tests
  * @package       cake
  * @subpackage    cake.cake.tests.cases.libs.controller.components
  * @since         CakePHP(tm) v 1.2.0.5347
@@ -243,7 +243,7 @@ class EmailComponentTest extends CakeTestCase {
 		$this->_appEncoding = Configure::read('App.encoding');
 		Configure::write('App.encoding', 'UTF-8');
 
-		$this->Controller =& new EmailTestController();
+		$this->Controller = new EmailTestController();
 
 		restore_error_handler();
 		@$this->Controller->Component->init($this->Controller);
@@ -384,7 +384,7 @@ TEMPDOC;
 			return;
 		}
 
-		$connection =& new CakeSocket(array('protocol'=>'smtp', 'host' => 'localhost', 'port' => 25));
+		$connection = new CakeSocket(array('protocol'=>'smtp', 'host' => 'localhost', 'port' => 25));
 		$this->Controller->EmailTest->setConnectionSocket($connection);
 		$this->Controller->EmailTest->smtpOptions['timeout'] = 10;
 		$this->assertTrue($connection->connect());
@@ -551,6 +551,7 @@ Reply-To: noreply@example.com
 Date: $date
 X-Mailer: CakePHP Email Component
 Content-Type: {CONTENTTYPE}
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bitParameters:
 
 Message:
@@ -608,6 +609,7 @@ Reply-To: noreply@example.com
 Date: $date
 X-Mailer: CakePHP Email Component
 Content-Type: {CONTENTTYPE}
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bitParameters:
 
 Message:
@@ -655,8 +657,14 @@ HTMLBLOC;
 		$boundary = $this->Controller->EmailTest->getBoundary();
 
 		$expect = str_replace('{CONTENTTYPE}', 'multipart/alternative; boundary="alt-' . $boundary . '"', $header);
-		$expect .= '--alt-' . $boundary . "\n" . 'Content-Type: text/plain; charset=UTF-8' . "\n" . 'Content-Transfer-Encoding: 7bit' . "\n\n" . $text . "\n\n";
-		$expect .= '--alt-' . $boundary . "\n" . 'Content-Type: text/html; charset=UTF-8' . "\n" . 'Content-Transfer-Encoding: 7bit' . "\n\n" . $html . "\n\n";
+		$expect .= '--alt-' . $boundary . "\n" .
+			'Content-Type: text/plain; charset=UTF-8' . "\n" .
+			'Content-Transfer-Encoding: 7bit' .
+			"\n\n" . $text . "\n\n";
+		$expect .= '--alt-' . $boundary . "\n" .
+			'Content-Type: text/html; charset=UTF-8' . "\n" .
+			'Content-Transfer-Encoding: 7bit' .
+			"\n\n" . $html . "\n\n";
 		$expect = '<pre>' . $expect . "--alt-$boundary--" . "\n\n" . '</pre>';
 		$this->assertEqual($this->Controller->Session->read('Message.email.message'), $this->__osFix($expect));
 
@@ -692,7 +700,7 @@ HTMLBLOC;
 		$expect = str_replace('{CONTENTTYPE}', 'text/html; charset=UTF-8', $header) . $html;
 		$expect = '<pre>' . $expect . '</pre>';
 		$this->assertEqual($this->Controller->Session->read('Message.email.message'), $this->__osFix($expect));
-		
+
 		$result = ClassRegistry::getObject('view');
 		$this->assertFalse($result);
 	}
@@ -733,7 +741,7 @@ HTMLBLOC;
 		}
 
 		$this->Controller->EmailTest->smtpOptions['timeout'] = 10;
-		$socket =& new CakeSocket(array_merge(array('protocol'=>'smtp'), $this->Controller->EmailTest->smtpOptions));
+		$socket = new CakeSocket(array_merge(array('protocol'=>'smtp'), $this->Controller->EmailTest->smtpOptions));
 		$this->Controller->EmailTest->setConnectionSocket($socket);
 
 		$this->assertTrue($this->Controller->EmailTest->getConnectionSocket());

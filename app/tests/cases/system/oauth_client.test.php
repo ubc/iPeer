@@ -46,7 +46,8 @@ class oauthClientTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'td[class="  sorting_1"]')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Edit')->click();
 
-        $this->clientId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $this->clientId = end($_temp_url);
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'OauthClientComment')->sendKeys('Has been edited');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
 

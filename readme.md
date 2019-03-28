@@ -47,7 +47,7 @@ docker-compose up -d
     docker network create canvas_ipeer_network
     docker network connect canvas_ipeer_network ipeer_app
     docker network connect canvas_ipeer_network ipeer_app_unittest
-    docker network connect canvas_ipeer_network dockercanvas_app_1
+    docker network connect canvas_ipeer_network docker-canvas_app_1
 ```
 - Run the Selenium + Firefox (or Chrome) container (need to disable the passthrough feature):
 ```
@@ -75,7 +75,7 @@ docker-compose up -d
     docker network create canvas_ipeer_network_it
     docker network connect canvas_ipeer_network_it ipeer_app_unittest
     docker network connect canvas_ipeer_network_it ipeer_web_unittest
-    docker network connect canvas_ipeer_network_it dockercanvas_app_1
+    docker network connect canvas_ipeer_network_it docker-canvas_app_1
     docker network connect canvas_ipeer_network_it selenium-local
 ```
 - To start the integration test, run an interactive shell in the test app container and run the commands in container, e.g.:
@@ -140,6 +140,10 @@ Runing the tests:
     cake/console/cake -app app testsuite app group system
 
 It is better not to touch the mouse or keyboard during the tests.
+
+iPeer 3.3.5
+-----------
+* Update iPeer to run under PHP 7.2.
 
 iPeer 3.3.4
 -----------

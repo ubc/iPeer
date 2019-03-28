@@ -173,9 +173,9 @@ class DboOracle extends DboSource {
 		$config['charset'] = !empty($config['charset']) ? $config['charset'] : null;
 
 		if (!$config['persistent']) {
-			$this->connection = @ocilogon($config['login'], $config['password'], $config['database'], $config['charset']);
+			$this->connection = ocilogon($config['login'], $config['password'], $config['database'], $config['charset']);
 		} else {
-			$this->connection = @ociplogon($config['login'], $config['password'], $config['database'], $config['charset']);
+			$this->connection = ociplogon($config['login'], $config['password'], $config['database'], $config['charset']);
 		}
 
 		if ($this->connection) {
@@ -240,6 +240,15 @@ class DboOracle extends DboSource {
 			return false;
 		}
 		return $row[0]['VALUE'];
+	}
+
+/**
+ * Check whether the OCI8 extension is installed/loaded
+ *
+ * @return boolean
+ */
+	function enabled() {
+		return extension_loaded('oci8');
 	}
 
 /**

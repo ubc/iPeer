@@ -13,7 +13,7 @@ App::import('Vendor', 'Httpful', array('file' => 'nategood'.DS.'httpful'.DS.'boo
  * @copyright 2017 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class CanvasApiComponent extends Object
+class CanvasApiComponent extends CakeObject
 {
     protected $apiTimeout;                  // RESTful call timeout in seconds
     protected $paginationDefaultPerPage;    // default items to retrieve per each call to Canvas API
@@ -288,6 +288,7 @@ class CanvasApiComponent extends Object
         // if true, it will force the user to enter their credentials, even if they're already logged into Canvas. By default, if
         // a user already has an active Canvas web session, they will not be asked to re-enter their credentials.
         $forceLogin = in_array($this->SysParameter->get('system.canvas_force_login', 'false'), array('1', 'true', 'yes'));
+        $_split_current_url = explode('?', $this->_getCurrentUrl());
 
         $canvasOauthUrl = $this->getBaseUrl(true) . '/login/oauth2/auth' .
                             '?client_id=' . $this->SysParameter->get('system.canvas_client_id') .
@@ -295,7 +296,7 @@ class CanvasApiComponent extends Object
                             '&state=' . $state .
                             ($forceLogin ? '&force_login=1' : '') .
                             '&purpose=iPeer' .
-                            '&redirect_uri=' . array_shift(explode('?', $this->_getCurrentUrl()));
+                            '&redirect_uri=' . array_shift($_split_current_url);
 
         $_controller->redirect($canvasOauthUrl);
     }

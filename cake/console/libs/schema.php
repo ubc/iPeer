@@ -28,7 +28,7 @@ App::import('Model', 'CakeSchema', false);
  *
  * @package       cake
  * @subpackage    cake.cake.console.libs
- * @link          http://book.cakephp.org/view/1523/Schema-management-and-migrations
+ * @link          http://book.cakephp.org/1.3/en/The-Manual/Core-Console-Applications/Schema-management-and-migrations.html
  */
 class SchemaShell extends Shell {
 
@@ -94,7 +94,7 @@ class SchemaShell extends Shell {
 				$name = $plugin;
 			}
 		}
-		$this->Schema =& new CakeSchema(compact('name', 'path', 'file', 'connection', 'plugin'));
+		$this->Schema = new CakeSchema(compact('name', 'path', 'file', 'connection', 'plugin'));
 	}
 
 /**
@@ -158,11 +158,11 @@ class SchemaShell extends Shell {
 
 		$content = $this->Schema->read($options);
 		$content['file'] = $this->params['file'];
-
+		
 		Configure::write('Cache.disable', $cacheDisable);
 
 		if ($snapshot === true) {
-			$Folder =& new Folder($this->Schema->path);
+			$Folder = new Folder($this->Schema->path);
 			$result = $Folder->read();
 
 			$numToUse = false;
@@ -230,9 +230,9 @@ class SchemaShell extends Shell {
 				$write .= '.sql';
 			}
 			if (strpos($write, DS) !== false) {
-				$File =& new File($write, true);
+				$File = new File($write, true);
 			} else {
-				$File =& new File($this->Schema->path . DS . $write, true);
+				$File = new File($this->Schema->path . DS . $write, true);
 			}
 
 			if ($File->write($contents)) {
@@ -280,7 +280,7 @@ class SchemaShell extends Shell {
 		if (isset($this->params['plugin'])) {
 			$plugin = $this->params['plugin'];
 		}
-
+		
 		if (isset($this->params['dry'])) {
 			$this->__dry = true;
 			$this->out(__('Performing a dry run.', true));
@@ -495,13 +495,13 @@ Commands:
 
 	schema create <name> <table>
 		Drop and create tables based on schema file
-		optional <table> argument can be used to create only a single
+		optional <table> argument can be used to create only a single 
 		table in the schema. Pass the -s param with a number to use a snapshot.
 		Use the `-dry` param to preview the changes.
 
 	schema update <name> <table>
 		Alter the tables based on schema file. Optional <table>
-		parameter will only update one table.
+		parameter will only update one table. 
 		To use a snapshot pass the `-s` param with the snapshot number.
 		To preview the changes that will be done use `-dry`.
 		To force update of all tables into the schema, use the -f param.

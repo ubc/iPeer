@@ -13,7 +13,7 @@
  * @copyright     Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
  * @link          http://cakephp.org CakePHP(tm) Project
  * @package       cake
- * @subpackage    cake.console.libs.tasks
+ * @subpackage    cake.cake.console.libs.tasks
  * @since         CakePHP(tm) v 1.3
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
@@ -57,7 +57,7 @@ class TemplateTask extends Shell {
 		$separator = DS === '/' ? '/' : '\\\\';
 		$core = preg_replace('#libs' . $separator . '$#', '', $core);
 
-		$Folder =& new Folder($core . 'templates' . DS . 'default');
+		$Folder = new Folder($core . 'templates' . DS . 'default');
 		$contents = $Folder->read();
 		$themeFolders = $contents[0];
 
@@ -74,14 +74,14 @@ class TemplateTask extends Shell {
 
 		$themes = array();
 		foreach ($paths as $path) {
-			$Folder =& new Folder($path . 'templates', false);
+			$Folder = new Folder($path . 'templates', false);
 			$contents = $Folder->read();
 			$subDirs = $contents[0];
 			foreach ($subDirs as $dir) {
 				if (empty($dir) || preg_match('@^skel$|_skel$@', $dir)) {
 					continue;
 				}
-				$Folder =& new Folder($path . 'templates' . DS . $dir);
+				$Folder = new Folder($path . 'templates' . DS . $dir);
 				$contents = $Folder->read();
 				$subDirs = $contents[0];
 				if (array_intersect($contents[0], $themeFolders)) {

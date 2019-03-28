@@ -129,7 +129,7 @@ class ShellDispatcher {
  * @return void
  * @access public
  */
-	function ShellDispatcher($args = array()) {
+	function __construct($args = array()) {
 		set_time_limit(0);
 
 		$this->__initConstants();
@@ -250,18 +250,18 @@ class ShellDispatcher {
 
 		$includes = array(
 			CORE_PATH . 'cake' . DS . 'config' . DS . 'paths.php',
-			CORE_PATH . 'cake' . DS . 'libs' . DS . 'object.php',
+			CORE_PATH . 'cake' . DS . 'libs' . DS . 'cake_object.php',
 			CORE_PATH . 'cake' . DS . 'libs' . DS . 'inflector.php',
 			CORE_PATH . 'cake' . DS . 'libs' . DS . 'configure.php',
 			CORE_PATH . 'cake' . DS . 'libs' . DS . 'file.php',
 			CORE_PATH . 'cake' . DS . 'libs' . DS . 'cache.php',
-			CORE_PATH . 'cake' . DS . 'libs' . DS . 'string.php',
+			CORE_PATH . 'cake' . DS . 'libs' . DS . 'cake_string.php',
 			CORE_PATH . 'cake' . DS . 'libs' . DS . 'class_registry.php',
 			CORE_PATH . 'cake' . DS . 'console' . DS . 'error.php'
 		);
 
 		foreach ($includes as $inc) {
-			if (!require_once($inc)) {
+			if (!require($inc)) {
 				$this->stderr("Failed to load Cake core file {$inc}");
 				return false;
 			}
@@ -622,7 +622,7 @@ class ShellDispatcher {
 		if ($shellList) {
 			ksort($shellList);
 			if (DS === '/') {
-				$width = exec('tput cols') - 2;
+				$width = ((int) exec('tput cols')) - 2;
 			}
 			if (empty($width)) {
 				$width = 80;

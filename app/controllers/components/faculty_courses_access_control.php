@@ -8,7 +8,7 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class FacultyCoursesAccessControlComponent extends Object
+class FacultyCoursesAccessControlComponent extends CakeObject
 {
 
     public $FacultyAcoUser;

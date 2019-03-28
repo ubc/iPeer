@@ -10,7 +10,7 @@ App::import('Component', 'CanvasApi');
  * @copyright 2018 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class CanvasCourseGradeColumnComponent extends Object
+class CanvasCourseGradeColumnComponent extends CakeObject
 {
     public $course_id = null;
     public $id = null;

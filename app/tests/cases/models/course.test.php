@@ -261,14 +261,14 @@ class CourseTestCase extends CakeTestCase {
          * Name is misleading, the function actually deletes a single course defined by id and all event related to it.
          *
          * */
-        $this->Course->deleteAll(1);
+        $this->Course->deleteWithRelated(1);
         //Query the course table, should return count==0 for course
         //$sql = "SELECT count(*) FROM courses";
         $course = $this->Course->getCourseName(1);
         $this->assertEqual($course, $empty);
 
 /*		//Test calling deleteAll on an empty course list; should retrun zero
-        $this->Course->deleteAll(1);
+        $this->Course->deleteWithRelated(1);
         $course = $this->Course->getCourseName(1);
         $this->assertEqual($course, $empty);
  */

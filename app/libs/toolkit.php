@@ -60,7 +60,7 @@ class Toolkit
 
   /*static function getUserGroupId()
 {
-    $_this =& Toolkit::getInstance();
+    $_this = Toolkit::getInstance();
     $user = $_this->user();
     return Set::extract($user, 'User.user_group_id');
   }*/

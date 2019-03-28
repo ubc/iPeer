@@ -47,7 +47,8 @@ class ImportGroupsTestCase extends SystemBaseTestCase
         $this->session->open($this->url.'courses/home/2');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'List Groups')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Team (3 members)')->click();
-        $groupId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $groupId = end($_temp_url);
 
         $this->session->open($this->url.'groups/edit/'.$groupId);
         $groupName = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'GroupGroupName')->attribute('value');

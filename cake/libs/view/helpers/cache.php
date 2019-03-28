@@ -26,7 +26,7 @@
  *
  * @package       cake
  * @subpackage    cake.cake.libs.view.helpers
- * @link http://book.cakephp.org/view/1376/Cache
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Core-Helpers/Cache.html#Cache
  */
 class CacheHelper extends AppHelper {
 
@@ -258,7 +258,7 @@ class CacheHelper extends AppHelper {
 			';
 		}
 
-		$file .= '$controller =& new ' . $this->controllerName . 'Controller();
+		$file .= '$controller = new ' . $this->controllerName . 'Controller();
 				$controller->plugin = $this->plugin = \''.$this->plugin.'\';
 				$controller->helpers = $this->helpers = unserialize(\'' . serialize($this->helpers) . '\');
 				$controller->base = $this->base = \'' . $this->base . '\';

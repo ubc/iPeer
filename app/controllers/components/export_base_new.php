@@ -8,7 +8,7 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class ExportBaseNewComponent extends Object
+class ExportBaseNewComponent extends CakeObject
 {
     public $eventType = array('1' => 'Simple Evaluation', '2' => 'Rubrics Evaluation', '4' => 'Mixed Evaluation');
     public $detailModel = array(1 => false, 2 => 'EvaluationRubricDetail', 4 => 'EvaluationMixevalDetail');

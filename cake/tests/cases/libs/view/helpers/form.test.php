@@ -4,14 +4,14 @@
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) Tests <http://book.cakephp.org/view/1196/Testing>
+ * CakePHP(tm) Tests <http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html>
  * Copyright 2005-2012, Cake Software Foundation, Inc.
  *
  *  Licensed under The Open Group Test Suite License
  *  Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2005-2012, Cake Software Foundation, Inc.
- * @link          http://book.cakephp.org/view/1196/Testing CakePHP(tm) Tests
+ * @link          http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html CakePHP(tm) Tests
  * @package       cake
  * @subpackage    cake.tests.cases.libs.view.helpers
  * @since         CakePHP(tm) v 1.2.0.4206
@@ -672,10 +672,10 @@ class FormHelperTest extends CakeTestCase {
 		parent::setUp();
 		Router::reload();
 
-		$this->Form =& new FormHelper();
-		$this->Form->Html =& new HtmlHelper();
-		$this->Controller =& new ContactTestController();
-		$this->View =& new View($this->Controller);
+		$this->Form = new FormHelper();
+		$this->Form->Html = new HtmlHelper();
+		$this->Controller = new ContactTestController();
+		$this->View = new View($this->Controller);
 		$this->Form->params['action'] = 'add';
 
 		ClassRegistry::addObject('view', $view);
@@ -984,7 +984,7 @@ class FormHelperTest extends CakeTestCase {
 
 		$result = $this->Form->secure($this->Form->fields);
 
-		$hash = 'c9118120e680a7201b543f562e5301006ccfcbe2%3AAddresses.0.id%7CAddresses.1.id';
+		$hash = 'f88bdc351fa388569210cf55ba6b8879763fca13%3AAddresses.0.id%7CAddresses.1.id';
 
 		$expected = array(
 			'div' => array('style' => 'display:none;'),
@@ -1009,6 +1009,27 @@ class FormHelperTest extends CakeTestCase {
 		$this->Form->create('Address');
 		$this->Form->input('Address.primary.1');
 		$this->assertEqual('Address.primary', $this->Form->fields[0]);
+	}
+
+/**
+ * Test form security hash generation with relative urls.
+ *
+ * @return void
+ */
+	function testFormSecurityRelativeUrl() {
+		$key = 'testKey';
+		$this->Form->params['_Token']['key'] = $key;
+
+		$expected = Security::hash(
+			'/posts/edit/type:5' .
+			serialize(array()) .
+			Configure::read('Security.salt')
+		);
+		$this->Form->create('Post', array(
+			'url' => array('controller' => 'posts', 'action' => 'edit', 'type' => 5)
+		));
+		$result = $this->Form->secure($this->Form->fields);
+		$this->assertTrue(strpos($result, $expected) !== false);
 	}
 
 /**
@@ -1041,7 +1062,7 @@ class FormHelperTest extends CakeTestCase {
 		$this->Form->input('Addresses.1.phone');
 
 		$result = $this->Form->secure($this->Form->fields);
-		$hash = '774df31936dc850b7d8a5277dc0b890123788b09%3AAddresses.0.id%7CAddresses.1.id';
+		$hash = 'cdf15a1cf5192aaa25a2ce85957e9f27c0a1a006%3AAddresses.0.id%7CAddresses.1.id';
 
 		$expected = array(
 			'div' => array('style' => 'display:none;'),
@@ -1085,7 +1106,7 @@ class FormHelperTest extends CakeTestCase {
 
 		$result = $this->Form->secure($expected);
 
-		$hash = '449b7e889128e8e52c5e81d19df68f5346571492%3AAddresses.id';
+		$hash = 'baf05f9b1087725d8adf49a847c3a9174b2df7bf%3AAddresses.id';
 		$expected = array(
 			'div' => array('style' => 'display:none;'),
 			'input' => array(
@@ -1204,8 +1225,7 @@ class FormHelperTest extends CakeTestCase {
 		);
 		$this->assertEqual($result, $expected);
 
-		$hash = 'bd7c4a654e5361f9a433a43f488ff9a1065d0aaf%3AUserForm.hidden%7CUserForm.stuff';
-
+		$hash = '6014b4e1c4f39eb62389712111dbe6435bec66cb%3AUserForm.hidden%7CUserForm.stuff';
 		$result = $this->Form->secure($this->Form->fields);
 		$expected = array(
 			'div' => array('style' => 'display:none;'),
@@ -5459,11 +5479,11 @@ class FormHelperTest extends CakeTestCase {
  */
 	function testFileUploadOnOtherModel() {
 		ClassRegistry::removeObject('view');
-		$controller =& new Controller();
+		$controller = new Controller();
 		$controller->name = 'ValidateUsers';
 		$controller->uses = array('ValidateUser');
 		$controller->constructClasses();
-		$view =& new View($controller, true);
+		$view = new View($controller, true);
 
 		$this->Form->create('ValidateUser', array('type' => 'file'));
 		$result = $this->Form->file('ValidateProfile.city');

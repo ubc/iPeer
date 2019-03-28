@@ -93,8 +93,8 @@ class SimpleInvokerDecorator {
      *    Stores the invoker to wrap.
      *    @param SimpleInvoker $invoker  Test method runner.
      */
-    function SimpleInvokerDecorator(&$invoker) {
-        $this->_invoker = &$invoker;
+    function SimpleInvokerDecorator($invoker) {
+        $this->_invoker = $invoker;
     }
 
     /**

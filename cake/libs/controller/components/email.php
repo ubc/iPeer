@@ -18,7 +18,7 @@
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 App::import('Core', 'Multibyte');
-App::import('Core', 'String');
+App::import('Core', 'CakeString');
 
 /**
  * EmailComponent
@@ -28,10 +28,10 @@ App::import('Core', 'String');
  *
  * @package       cake
  * @subpackage    cake.cake.libs.controller.components
- * @link http://book.cakephp.org/view/1283/Email
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Core-Components/Email.html
  *
  */
-class EmailComponent extends Object{
+class EmailComponent extends CakeObject{
 
 /**
  * Recipient of the email
@@ -248,7 +248,7 @@ class EmailComponent extends Object{
  *
  * @var array
  * @access public
- * @link http://book.cakephp.org/view/1290/Sending-A-Message-Using-SMTP
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Core-Components/Email.html#sending-a-message-using-smtp
  */
 	var $smtpOptions = array();
 
@@ -419,7 +419,7 @@ class EmailComponent extends Object{
  * Reset all EmailComponent internal variables to be able to send out a new email.
  *
  * @access public
- * @link http://book.cakephp.org/view/1285/Sending-Multiple-Emails-in-a-loop
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Core-Components/Email.html#sending-multiple-emails-in-a-loop
  */
 	function reset() {
 		$this->template = null;
@@ -592,7 +592,7 @@ class EmailComponent extends Object{
 
 		if ($this->messageId !== false) {
 			if ($this->messageId === true) {
-				$headers['Message-ID'] = '<' . str_replace('-', '', String::uuid()) . '@' . env('HTTP_HOST') . '>';
+				$headers['Message-ID'] = '<' . str_replace('-', '', CakeString::uuid()) . '@' . env('HTTP_HOST') . '>';
 			} else {
 				$headers['Message-ID'] = $this->messageId;
 			}
@@ -617,7 +617,6 @@ class EmailComponent extends Object{
 		}
 
 		if (!empty($this->attachments)) {
-			$headers['MIME-Version'] = '1.0';
 			$headers['Content-Type'] = 'multipart/mixed; boundary="' . $this->__boundary . '"';
 		} elseif ($this->sendAs === 'text') {
 			$headers['Content-Type'] = 'text/plain; charset=' . $this->charset;
@@ -626,7 +625,8 @@ class EmailComponent extends Object{
 		} elseif ($this->sendAs === 'both') {
 			$headers['Content-Type'] = 'multipart/alternative; boundary="alt-' . $this->__boundary . '"';
 		}
-
+		
+		$headers['MIME-Version'] = '1.0';
 		$headers['Content-Transfer-Encoding'] = '7bit';
 
         $this->header($headers);
@@ -841,7 +841,7 @@ class EmailComponent extends Object{
  * @access protected
  */
 	function _getSocket($config) {
-		$this->__smtpConnection =& new CakeSocket($config);
+		$this->__smtpConnection = new CakeSocket($config);
 	}
 
 /**
@@ -960,7 +960,9 @@ class EmailComponent extends Object{
 				$this->smtpError = 'timeout';
 				return false;
 			}
-			$response = end(explode("\r\n", rtrim($response, "\r\n")));
+			$response = rtrim($response, "\r\n");
+			$response = explode("\r\n", $response);
+			$response = end($response);
 
 			if (preg_match('/^(' . $checkCode . ')(.)/', $response, $code)) {
 				if ($code[2] === '-') {

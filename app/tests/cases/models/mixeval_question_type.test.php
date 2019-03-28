@@ -5,11 +5,11 @@ App::import('Model', 'MixevalQuestionType');
 class MixevalQuestionTypeTestCase extends CakeTestCase {
 	var $fixtures = array('app.mixeval_question_type', 'app.mixeval_question', 'app.mixeval_question_desc');
 
-	function startTest() {
+	function startTest($method) {
 		$this->MixevalQuestionType =& ClassRegistry::init('MixevalQuestionType');
 	}
 
-	function endTest() {
+	function endTest($method) {
 		unset($this->MixevalQuestionType);
 		ClassRegistry::flush();
 	}

@@ -4,7 +4,7 @@
  *
  * PHP versions 4 and 5
  *
- * CakePHP(tm) Tests <http://book.cakephp.org/view/1196/Testing>
+ * CakePHP(tm) Tests <http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html>
  * Copyright 2005-2012, Cake Software Foundation, Inc.
  *								1785 E. Sahara Avenue, Suite 490-204
  *								Las Vegas, Nevada 89104
@@ -13,7 +13,7 @@
  *  Redistributions of files must retain the above copyright notice.
  *
  * @copyright     Copyright 2005-2012, Cake Software Foundation, Inc. (http://cakefoundation.org)
- * @link          http://book.cakephp.org/view/1196/Testing CakePHP(tm) Tests
+ * @link          http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html CakePHP(tm) Tests
  * @package       cake
  * @subpackage    cake.tests.cases.libs
  * @since         CakePHP(tm) v 1.2.0.4206
@@ -35,8 +35,8 @@ class TestManagerTest extends CakeTestCase {
  * @access public
  */
 	function setUp() {
-		$this->TestManager =& new TestManager();
-		$this->Reporter =& new CakeHtmlReporter();
+		$this->TestManager = new TestManager();
+		$this->Reporter = new CakeHtmlReporter();
 	}
 
 /**
@@ -46,11 +46,11 @@ class TestManagerTest extends CakeTestCase {
  * @access public
  */
 	function testRunAllTests() {
-		$folder =& new Folder($this->TestManager->_getTestsPath());
+		$folder = new Folder($this->TestManager->_getTestsPath());
 		$extension = str_replace('.', '\.', $this->TestManager->getExtension('test'));
 		$out = $folder->findRecursive('.*' . $extension);
 
-		$reporter =& new CakeHtmlReporter();
+		$reporter = new CakeHtmlReporter();
 		$list = $this->TestManager->runAllTests($reporter, true);
 
 		$this->assertEqual(count($out), count($list));

@@ -28,7 +28,7 @@ class SearchsControllerTest extends CakeTestCase {
     function endCase() {
     }
 
-    function startTest() {
+    function startTest($method) {
     /*    $this->defaultLogin = array(
             'User' => array(
                 'username' => 'root',
@@ -45,7 +45,7 @@ class SearchsControllerTest extends CakeTestCase {
         $controller->Auth->login($admin);*/
     }
 
-    function endTest() {
+    function endTest($method) {
     }
 
     function testIndex() {

@@ -32,16 +32,16 @@ App::import('View', 'View', false);
  *
  * @package       cake
  * @subpackage    cake.cake.libs.controller
- * @link          http://book.cakephp.org/view/956/Introduction
+ * @link          http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#Introduction
  */
-class Controller extends Object {
+class Controller extends CakeObject {
 
 /**
  * The name of this controller. Controller names are plural, named after the model they manipulate.
  *
  * @var string
  * @access public
- * @link http://book.cakephp.org/view/959/Controller-Attributes
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#Controller-Attributes
  */
 	var $name = null;
 
@@ -79,7 +79,7 @@ class Controller extends Object {
  *
  * @var mixed A single name as a string or a list of names as an array.
  * @access protected
- * @link http://book.cakephp.org/view/961/components-helpers-and-uses
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#components-helpers-and-uses
  */
 	var $uses = false;
 
@@ -91,7 +91,7 @@ class Controller extends Object {
  *
  * @var mixed A single name as a string or a list of names as an array.
  * @access protected
- * @link http://book.cakephp.org/view/961/components-helpers-and-uses
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#components-helpers-and-uses
  */
 	var $helpers = array('Session', 'Html', 'Form');
 
@@ -101,7 +101,7 @@ class Controller extends Object {
  *
  * @var array
  * @access public
- * @link http://book.cakephp.org/view/963/The-Parameters-Attribute-params
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#The-Parameters-Attribute-params
  */
 	var $params = array();
 
@@ -131,7 +131,7 @@ class Controller extends Object {
  *
  * @var array
  * @access public
- * @link http://book.cakephp.org/view/1231/Pagination
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#Pagination
  */
 	var $paginate = array('limit' => 20, 'page' => 1);
 
@@ -182,7 +182,7 @@ class Controller extends Object {
  *
  * @var string
  * @access public
- * @link http://book.cakephp.org/view/962/Page-related-Attributes-layout-and-pageTitle
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#Page-related-Attributes-layout-and-pageTitle
  */
 	var $layout = 'default';
 
@@ -219,7 +219,7 @@ class Controller extends Object {
  *
  * @var array
  * @access public
- * @link http://book.cakephp.org/view/961/components-helpers-and-uses
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#components-helpers-and-uses
  */
 	var $components = array('Session');
 
@@ -276,7 +276,7 @@ class Controller extends Object {
  *
  * @var mixed
  * @access public
- * @link http://book.cakephp.org/view/1380/Caching-in-the-Controller
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#Caching-in-the-Controller
  */
 	var $cacheAction = false;
 
@@ -303,7 +303,7 @@ class Controller extends Object {
  *
  * @var mixed
  * @access public
- * @link http://book.cakephp.org/view/1103/Scaffolding
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#Scaffolding
  */
 	var $scaffold = false;
 
@@ -374,7 +374,7 @@ class Controller extends Object {
 		}
 		$this->modelClass = Inflector::classify($this->name);
 		$this->modelKey = Inflector::underscore($this->modelClass);
-		$this->Component =& new Component();
+		$this->Component = new Component();
 
 		$childMethods = get_class_methods($this);
 		$parentMethods = get_class_methods('Controller');
@@ -476,7 +476,7 @@ class Controller extends Object {
  * @return mixed true if models found and instance created, or cakeError if models not found.
  * @access public
  * @see Controller::loadModel()
- * @link http://book.cakephp.org/view/977/Controller-Methods#constructClasses-986
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#Controller-Methods#constructClasses-986
  */
 	function constructClasses() {
 		$this->__mergeVars();
@@ -667,7 +667,7 @@ class Controller extends Object {
  * @param boolean $exit If true, exit() will be called after the redirect
  * @return mixed void if $exit = false. Terminates script if $exit = true
  * @access public
- * @link http://book.cakephp.org/view/982/redirect
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#redirect
  */
 	function redirect($url, $status = null, $exit = true) {
 		$this->autoRender = false;
@@ -750,7 +750,7 @@ class Controller extends Object {
  *   Unused if $one is an associative array, otherwise serves as the values to $one's keys.
  * @return void
  * @access public
- * @link http://book.cakephp.org/view/979/set
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#set
  */
 	function set($one, $two = null) {
 		$data = array();
@@ -796,7 +796,7 @@ class Controller extends Object {
  *
  * @return bool true if authorized, false otherwise
  * @access public
- * @link http://book.cakephp.org/view/1275/authorize
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#authorize
  */
 	function isAuthorized() {
 		trigger_error(sprintf(
@@ -857,7 +857,7 @@ class Controller extends Object {
  * @param string $file File to use for rendering
  * @return string Full output string of view contents
  * @access public
- * @link http://book.cakephp.org/view/980/render
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#render
  */
 	function render($action = null, $layout = null, $file = null) {
 		$this->beforeRender();
@@ -876,7 +876,7 @@ class Controller extends Object {
 			$this->set('cakeDebug', $this);
 		}
 
-		$View =& new $viewClass($this);
+		$View = new $viewClass($this);
 
 		if (!empty($this->modelNames)) {
 			$models = array();
@@ -918,7 +918,7 @@ class Controller extends Object {
  * @param boolean $local If true, restrict referring URLs to local server
  * @return string Referring URL
  * @access public
- * @link http://book.cakephp.org/view/987/referer
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#referer
  */
 	function referer($default = null, $local = false) {
 		$ref = env('HTTP_REFERER');
@@ -926,7 +926,7 @@ class Controller extends Object {
 			$base = FULL_BASE_URL . $this->webroot;
 			if (strpos($ref, $base) === 0) {
 				$return =  substr($ref, strlen($base));
-				if ($return[0] != '/') {
+				if (isset($return[0]) && $return[0] != '/') {
 					$return = '/'.$return;
 				}
 				return $return;
@@ -947,7 +947,7 @@ class Controller extends Object {
  *
  * @return void
  * @access public
- * @link http://book.cakephp.org/view/988/disableCache
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#disableCache
  */
 	function disableCache() {
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
@@ -968,7 +968,7 @@ class Controller extends Object {
  * @param string $layout Layout you want to use, defaults to 'flash'
  * @return void Renders flash layout
  * @access public
- * @link http://book.cakephp.org/view/983/flash
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#flash
  */
 	function flash($message, $url, $pause = 1, $layout = 'flash') {
 		$this->autoRender = false;
@@ -990,7 +990,7 @@ class Controller extends Object {
  *        included in the returned conditions
  * @return array An array of model conditions
  * @access public
- * @link http://book.cakephp.org/view/989/postConditions
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#postConditions
  */
 	function postConditions($data = array(), $op = null, $bool = 'AND', $exclusive = false) {
 		if (!is_array($data) || empty($data)) {
@@ -1047,7 +1047,7 @@ class Controller extends Object {
  * @param array $whitelist List of allowed options for paging
  * @return array Model query results
  * @access public
- * @link http://book.cakephp.org/view/1232/Controller-Setup
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#Controller-Setup
  */
 	function paginate($object = null, $scope = array(), $whitelist = array()) {
 		if (is_array($object)) {
@@ -1114,6 +1114,11 @@ class Controller extends Object {
 			$options['limit'] = $options['show'];
 		}
 
+		if (isset($options['order']) && empty($options['sort'])) {
+			$options['sort'] = $options['order'];
+			unset($options['order']);
+		}
+
 		if (isset($options['sort'])) {
 			$direction = null;
 			if (isset($options['direction'])) {
@@ -1134,10 +1139,11 @@ class Controller extends Object {
 			}
 			$value = $options['order'][$key];
 			unset($options['order'][$key]);
+			$correctAlias = ($alias == $object->alias);
 
-			if ($object->hasField($field)) {
-				$options['order'][$alias . '.' . $field] = $value;
-			} elseif ($object->hasField($key, true)) {
+			if ($correctAlias && $object->hasField($field)) {
+				$options['order'][$object->alias . '.' . $field] = $value;
+			} elseif ($correctAlias && $object->hasField($key, true)) {
 				$options['order'][$field] = $value;
 			} elseif (isset($object->{$alias}) && $object->{$alias}->hasField($field)) {
 				$options['order'][$alias . '.' . $field] = $value;
@@ -1245,7 +1251,7 @@ class Controller extends Object {
  * Called before the controller action.
  *
  * @access public
- * @link http://book.cakephp.org/view/984/Callbacks
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#Callbacks
  */
 	function beforeFilter() {
 	}
@@ -1254,7 +1260,7 @@ class Controller extends Object {
  * Called after the controller action is run, but before the view is rendered.
  *
  * @access public
- * @link http://book.cakephp.org/view/984/Callbacks
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#Callbacks
  */
 	function beforeRender() {
 	}
@@ -1263,7 +1269,7 @@ class Controller extends Object {
  * Called after the controller action is run and rendered.
  *
  * @access public
- * @link http://book.cakephp.org/view/984/Callbacks
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#Callbacks
  */
 	function afterFilter() {
 	}
@@ -1274,7 +1280,7 @@ class Controller extends Object {
  * @param string $method name of method called example index, edit, etc.
  * @return boolean Success
  * @access protected
- * @link http://book.cakephp.org/view/984/Callbacks
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#Callbacks
  */
 	function _beforeScaffold($method) {
 		return true;
@@ -1286,7 +1292,7 @@ class Controller extends Object {
  * @param string $method name of method called either edit or update.
  * @return boolean Success
  * @access protected
- * @link http://book.cakephp.org/view/984/Callbacks
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#Callbacks
  */
 	function _afterScaffoldSave($method) {
 		return true;
@@ -1298,7 +1304,7 @@ class Controller extends Object {
  * @param string $method name of method called either edit or update.
  * @return boolean Success
  * @access protected
- * @link http://book.cakephp.org/view/984/Callbacks
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#Callbacks
  */
 	function _afterScaffoldSaveError($method) {
 		return true;
@@ -1312,7 +1318,7 @@ class Controller extends Object {
  * @param string $method name of method called example index, edit, etc.
  * @return boolean Success
  * @access protected
- * @link http://book.cakephp.org/view/984/Callbacks
+ * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#Callbacks
  */
 	function _scaffoldError($method) {
 		return false;

@@ -35,7 +35,7 @@ if (!class_exists('Security')) {
  * @package       cake
  * @subpackage    cake.cake.libs
  */
-class CakeSession extends Object {
+class CakeSession extends CakeObject {
 
 /**
  * True if the Session is still valid
@@ -470,12 +470,17 @@ class CakeSession extends Object {
  * @access private
  */
 	function __initSession() {
+	    // PHP 7.2+ has more strict session management. It generates 'Headers already sent'
+        // warnings when use ini_set()
+	    if (PHP_SAPI === 'cli') {
+	        return;
+        }
 		$iniSet = function_exists('ini_set');
 		if ($iniSet && env('HTTPS')) {
 			ini_set('session.cookie_secure', 1);
 		}
 		if ($iniSet && ($this->security === 'high' || $this->security === 'medium')) {
-			ini_set('session.referer_check', $this->host);
+		    ini_set('session.referer_check', $this->host);
 		}
 
 		if ($this->security == 'high') {
@@ -509,7 +514,8 @@ class CakeSession extends Object {
 					if ($iniSet) {
 						ini_set('session.use_trans_sid', 0);
 						ini_set('url_rewriter.tags', '');
-						ini_set('session.save_handler', 'user');
+						// user value is forbidden since 7.2.0
+						//ini_set('session.save_handler', 'user');
 						ini_set('session.serialize_handler', 'php');
 						ini_set('session.use_cookies', 1);
 						ini_set('session.name', Configure::read('Session.cookie'));
@@ -545,7 +551,7 @@ class CakeSession extends Object {
 					if ($iniSet) {
 						ini_set('session.use_trans_sid', 0);
 						ini_set('url_rewriter.tags', '');
-						ini_set('session.save_handler', 'user');
+						//ini_set('session.save_handler', 'user');
 						ini_set('session.use_cookies', 1);
 						ini_set('session.name', Configure::read('Session.cookie'));
 						ini_set('session.cookie_lifetime', $this->cookieLifeTime);
@@ -641,7 +647,7 @@ class CakeSession extends Object {
 			if (session_id() != ''|| isset($_COOKIE[session_name()])) {
 				setcookie(Configure::read('Session.cookie'), '', time() - 42000, $this->path);
 			}
-			session_regenerate_id(true);
+			@session_regenerate_id(true);
 			if (PHP_VERSION < 5.1) {
 				$sessionPath = session_save_path();
 				if (empty($sessionPath)) {
@@ -736,7 +742,7 @@ class CakeSession extends Object {
 		));
 
 		if (empty($row[$model->alias]['data'])) {
-			return false;
+			return '';
 		}
 
 		return $row[$model->alias]['data'];
@@ -757,7 +763,7 @@ class CakeSession extends Object {
 		$expires = time() + Configure::read('Session.timeout') * Security::inactiveMins();
 		$model =& ClassRegistry::getObject('Session');
 		$return = $model->save(array($model->primaryKey => $id) + compact('data', 'expires'));
-		return $return;
+		return !empty($return);
 	}
 
 /**

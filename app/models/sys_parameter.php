@@ -112,7 +112,7 @@ class SysParameter extends AppModel
      * @access public
      * @return void
      */
-    function beforeSave()
+    function beforeSave($options = array())
     {
         $this->data[$this->name]['modified'] = date('Y-m-d H:i:s');
 

@@ -74,7 +74,7 @@ class CopyableBehavior extends ModelBehavior
      * @access public
      * @return boolean
      */
-    public function setup($Model, $config = array())
+    public function setup(&$Model, $config = array())
     {
         $this->settings[$Model->alias] = array_merge($this->defaults, $config);
         return true;

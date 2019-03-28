@@ -52,24 +52,24 @@ class InstallHelperComponent
     function dbSource($dbConfig)
     {
         // Connect to the server
-        $mysql = mysql_connect($dbConfig['host'],
+        $mysql = mysqli_connect($dbConfig['host'],
             $dbConfig['login'],
             $dbConfig['password']);
         if (!$mysql) {
-            return('Could not connect: ' . mysql_error());
+            return('Could not connect to database');
         }
 
         // Create the database if not exists
-        $ret = mysql_query("CREATE DATABASE IF NOT EXISTS `".$dbConfig['database'].
-            "` CHARACTER SET `utf8` COLLATE `utf8_general_ci`;", $mysql);
+        $ret = mysqli_query($mysql, "CREATE DATABASE IF NOT EXISTS `".$dbConfig['database'].
+            "` CHARACTER SET `utf8` COLLATE `utf8_general_ci`;");
         if (!$ret) {
-            return 'Error creating database: ' . mysql_error();
+            return 'Error creating database: ' . mysqli_error($mysql);
         }
 
         // Open the database
-        $mysqldb = mysql_select_db($dbConfig['database']);
+        $mysqldb = mysqli_select_db($mysql, $dbConfig['database']);
         if (!$mysqldb) {
-            return 'Could not open the database: '. mysql_error();
+            return 'Could not open the database: '. mysqli_error($mysql);
         }
 
         // Read the SQL template file
@@ -79,7 +79,7 @@ class InstallHelperComponent
         }
 
         // Do the queries
-        mysql_query('START TRANSACTION');
+        mysqli_query($mysql, 'START TRANSACTION');
         $query = ''; // Query variable
         foreach ($template as $line) {
             // Skip comments
@@ -92,12 +92,12 @@ class InstallHelperComponent
             // Semicolon indicates end of query
             if (substr(trim($line), -1, 1) == ';') {
                 // Perform query to queue
-                $ret = mysql_query($query);
+                $ret = mysqli_query($mysql, $query);
                 if (!$ret) {
                     // Query failed, undo everything and cry
-                    $err = mysql_error();
-                    mysql_query('ROLLBACK');
-                    mysql_close($mysql);
+                    $err = mysqli_error($mysql);
+                    mysqli_query($mysql, 'ROLLBACK');
+                    mysqli_close($mysql);
                     return 'Query failed: ' . $err;
                 }
                 // Reset query variable to empty
@@ -106,11 +106,11 @@ class InstallHelperComponent
         }
 
         // Commit all queries
-        $ret = mysql_query("COMMIT");
+        $ret = mysqli_query($mysql, "COMMIT");
         if (!$ret) {
             return "Unable to commit queries: " . mysql_error();
         }
-        mysql_close($mysql);
+        mysqli_close($mysql);
         return false;
     }
 

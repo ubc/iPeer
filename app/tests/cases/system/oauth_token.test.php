@@ -47,7 +47,8 @@ class oauthTokenTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'td[class="  sorting_1"]')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Edit')->click();
 
-        $this->tokenId = end(explode('/', $this->session->url()));
+        $_temp_url = explode('/', $this->session->url());
+        $this->tokenId = end($_temp_url);
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="OauthTokenExpiresYear"] option[value="2023"]')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'OauthTokenComment')->sendKeys('Has been edited');
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
