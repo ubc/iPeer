@@ -141,7 +141,7 @@ Runing the tests:
 
 It is better not to touch the mouse or keyboard during the tests.
 
-iPeer 3.3.5
+iPeer 3.4.0
 -----------
 * Update iPeer to run under PHP 7.2.
 
