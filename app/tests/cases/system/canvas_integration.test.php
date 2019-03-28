@@ -18,34 +18,42 @@ const CANVAS_ADMIN_PASSWORD = 'password';
 //// testing data
 
 const CANVAS_INSTRUCTOR1_LOGIN = 'instructor1';
+const CANVAS_INSTRUCTOR1_FULLNAME = 'Instructor 1';
 const CANVAS_INSTRUCTOR1_PASSWORD = 'password';
 const CANVAS_INSTRUCTOR1_EMAIL = 'instructor1@test.ubc.ca';
 
 const CANVAS_TA1_LOGIN = 'tutor1';
+const CANVAS_TA1_FULLNAME = 'Tutor 1';
 const CANVAS_TA1_PASSWORD = 'password';
 const CANVAS_TA1_EMAIL = 'tutor1@test.ubc.ca';
 
 const CANVAS_TA2_LOGIN = 'tutor2';
+const CANVAS_TA2_FULLNAME = 'Tutor 2';
 const CANVAS_TA2_PASSWORD = 'password';
 const CANVAS_TA2_EMAIL = 'tutor2@test.ubc.ca';
 
 const CANVAS_STUDENT1_LOGIN = 'redshirt0001';
+const CANVAS_STUDENT1_FULLNAME = 'Ed Student';
 const CANVAS_STUDENT1_PASSWORD = 'password';
 const CANVAS_STUDENT1_EMAIL = 'redshirt0001@test.ubc.ca';
 
 const CANVAS_STUDENT2_LOGIN = 'redshirt0002';
+const CANVAS_STUDENT2_FULLNAME = 'Alex Student';
 const CANVAS_STUDENT2_PASSWORD = 'password';
 const CANVAS_STUDENT2_EMAIL = 'redshirt0002@test.ubc.ca';
 
 const CANVAS_STUDENT3_LOGIN = 'redshirt0003';
+const CANVAS_STUDENT3_FULLNAME = 'Matt Student';
 const CANVAS_STUDENT3_PASSWORD = 'password';
 const CANVAS_STUDENT3_EMAIL = 'redshirt0003@test.ubc.ca';
 
 const CANVAS_NEW_STUDENT1_LOGIN = 'blueshirt0001';
+const CANVAS_NEW_STUDENT1_FULLNAME = 'Blue1 Student';
 const CANVAS_NEW_STUDENT1_PASSWORD = 'password';
 const CANVAS_NEW_STUDENT1_EMAIL = 'blueshirt0001@test.ubc.ca';
 
 const CANVAS_NEW_STUDENT2_LOGIN = 'blueshirt0002';
+const CANVAS_NEW_STUDENT2_FULLNAME = 'Blue2 Student';
 const CANVAS_NEW_STUDENT2_PASSWORD = 'password';
 const CANVAS_NEW_STUDENT2_EMAIL = 'blueshirt0002@test.ubc.ca';
 
@@ -90,11 +98,12 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
         
         // create instructors, TAs, and students
         $this->_canvasUserCreate(
-            CANVAS_INSTRUCTOR1_LOGIN, CANVAS_INSTRUCTOR1_PASSWORD,
+            CANVAS_INSTRUCTOR1_LOGIN, CANVAS_INSTRUCTOR1_FULLNAME, CANVAS_INSTRUCTOR1_PASSWORD,
             CANVAS_INSTRUCTOR1_EMAIL, IPEER_INSTRUCTOR1_LOGIN, true);
         for ($i = 1; $i <= 2; $i++) {
             $this->_canvasUserCreate(
                 constant('CANVAS_TA'.$i.'_LOGIN'),
+                constant('CANVAS_TA'.$i.'_FULLNAME'),
                 constant('CANVAS_TA'.$i.'_PASSWORD'),
                 constant('CANVAS_TA'.$i.'_EMAIL'),
                 constant('IPEER_TA'.$i.'_LOGIN'), true);
@@ -102,6 +111,7 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
         for ($i = 1; $i <= 3; $i++) {
             $this->_canvasUserCreate(
                 constant('CANVAS_STUDENT'.$i.'_LOGIN'),
+                constant('CANVAS_STUDENT'.$i.'_FULLNAME'),
                 constant('CANVAS_STUDENT'.$i.'_PASSWORD'),
                 constant('CANVAS_STUDENT'.$i.'_EMAIL'),
                 constant('IPEER_STUDENT'.$i.'_LOGIN'), true);
@@ -109,6 +119,7 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
         for ($i = 1; $i <= 2; $i++) {
             $this->_canvasUserCreate(
                 constant('CANVAS_NEW_STUDENT'.$i.'_LOGIN'),
+                constant('CANVAS_NEW_STUDENT'.$i.'_FULLNAME'),
                 constant('CANVAS_NEW_STUDENT'.$i.'_PASSWORD'),
                 constant('CANVAS_NEW_STUDENT'.$i.'_EMAIL'),
                 constant('CANVAS_NEW_STUDENT'.$i.'_LOGIN'), true);  // students in Canvas only. no integration key (ipeer login) yet
@@ -172,6 +183,13 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
         $this->_canvasLogout();
         sleep(1);
         
+        // For TAs in Canvas to be mapped as instructors in iPeer, change the ipeer default role
+        $this->_ipeerLoginAdmin();
+        for ($i = 1; $i <= 2; $i++) {
+            $this->_ipeerChangeUserDefaultRole(constant('IPEER_TA'.$i.'_LOGIN'), 'instructor');
+        }
+        $this->_ipeerLogout();
+
         // create a new course in iPeer based on the Canvas course
         $this->_ipeerLogin(IPEER_INSTRUCTOR1_LOGIN, IPEER_INSTRUCTOR1_PASSWORD);
         $this->_ipeerCourseCreateBasedOnCanvas($courseCode, $courseTitle);
@@ -314,7 +332,7 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
 
         // select the canvas course
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH,
-            '//*[@id="UserCanvasCourse"]/option[normalize-space(text())="'.$canvasCourseTitle.'"]')->click();
+            '//*[@id="UserCanvasCourse"]/option[starts-with(normalize-space(text()), "'.$canvasCourseTitle.'")]')->click();
             
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//div[@class="submit"]/input[@type="submit"]')->click();
         $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
@@ -373,7 +391,7 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH,
             '//a[normalize-space(text())="Add Course Based on Canvas"]')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH,
-            '//select[@id="CanvasCourses"]/option[normalize-space(text())="'.$canvasCourseTitle.'"]')->click();
+            '//select[@id="CanvasCourses"]/option[starts-with(normalize-space(text()), "'.$canvasCourseTitle.'")]')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH,
             '//a[normalize-space(text())="Next"]')->click();
 
@@ -386,9 +404,9 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
         $addedInstructor = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'Instructor0FullName');
         $this->assertEqual($addedInstructor->attribute('value'), 'Instructor 1');
         // make sure the two tutors are added
-        $addedTutor1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'Tutor0FullName');
+        $addedTutor1 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'Instructor1FullName');
         $this->assertEqual($addedTutor1->attribute('value'), 'Tutor 1');
-        $addedTutor2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'Tutor1FullName');
+        $addedTutor2 = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'Instructor2FullName');
         $this->assertEqual($addedTutor2->attribute('value'), 'Tutor 2');
         
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="DepartmentDepartment"] option[value="1"]')->click();
@@ -460,7 +478,7 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
         // $this->assertEqual($courseCode . ' - ' . $courseTitle, $selected->text());
         // select the canvas course
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH,
-            '//*[@id="GroupCanvasCourse"]/option[normalize-space(text())="'.$canvasCourseTitle.'"]')->click();
+            '//*[@id="GroupCanvasCourse"]/option[starts-with(normalize-space(text()), "'.$canvasCourseTitle.'")]')->click();
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
         sleep(2);
         //$this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();  // create new group set
@@ -473,6 +491,24 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'button[type="submit"]')->click();
         $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, "div[class='message good-message green']")->text();
         $this->assertEqual($msg, 'Success! Groups and users exported to Canvas are highlighted below.');
+    }
+
+    private function _ipeerChangeUserDefaultRole($username, $role) {
+        $this->getSession()->open($this->url . 'users');
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'searchInputField')->clear();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::ID, 'searchInputField')->sendKeys($username);
+        sleep(2);
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//*[@id="ajaxListDiv"]/div/table/tbody/tr[2]/td[2]/div')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//div[text()="Edit User"]')->click();
+        sleep(1);
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="RoleRolesUserRoleId"] option[value="3"]')->click();
+        if ($role == 'instructor') {
+            sleep(1);
+            $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'select[id="FacultyFaculty"] option[value="1"]')->click();
+        }
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'input[type="submit"]')->click();
+        $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "div[class='message good-message green']")->text();
+        $this->assertEqual($msg, 'User successfully updated!');
     }
 
     //////////////////////////
@@ -583,7 +619,7 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
      * @access protected
      * @return void
      */
-    private function _canvasUserCreate($login, $password, $email, $integrationId, $forceCreateNew=true)
+    private function _canvasUserCreate($login, $fullname, $password, $email, $integrationId, $forceCreateNew=true)
     {
         if ($forceCreateNew) {
             // In Canvas, integration IDs are unique and can't be duplicated.
@@ -593,9 +629,11 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
             //$this->_clearIntegrationId($integrationId);
             $this->_clearIntegrationId($login);
             $this->_clearIntegrationId($email);
+            $this->_clearIntegrationId($this->_fullname_to_display_name($fullname));
 
             $this->_canvasDeleteUserByLogin($login);
             $this->_canvasDeleteUserByLogin($email);
+            $this->_canvasDeleteUserByLogin($this->_fullname_to_display_name($fullname));
         } else {
             
             $this->getSession()->open(CANVAS_TEST_BASE_URL . '/accounts/site_admin/users');
@@ -612,7 +650,7 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//a[contains(@class, "add_user_link")]/span')->click();
         sleep(1);  // allow ajax pop-up
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH,
-            '//table[@class="formtable"]//input[@id="user_name"]')->sendKeys($email);
+            '//table[@class="formtable"]//input[@id="user_name"]')->sendKeys($fullname);
         $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH,
             '//table[@class="formtable"]//input[@id="pseudonym_unique_id"]')->sendKeys($email);
         sleep(2); // allow auto-fillin to complete
@@ -634,7 +672,7 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
         $users = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH, '//ul[contains(@class, "users")]//a[starts-with(@href, "/accounts/")]');
         $foundUser = false;
         foreach ($users as $user) {
-            if ($user->text() == $email) {
+            if ($user->text() == $this->_fullname_to_display_name($fullname)) {
                 $foundUser = $user;
                 break;
             }
@@ -666,7 +704,7 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
         $users = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH, '//ul[contains(@class, "users")]//a[starts-with(@href, "/accounts/")]');
         $foundUser = false;
         foreach ($users as $user) {
-            if ($user->text() == $email) {
+            if ($user->text() == $this->_fullname_to_display_name($fullname)) {
                 $foundUser = $user;
                 break;
             }
@@ -699,7 +737,7 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
             $this->getSession()->open($link);
 
             $logins = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH, '//a[@class="edit_pseudonym_link"]');
-            foreach ($logins as $loginEdit) {
+            foreach ($logins as $loginEdit) {$login
                 if ($loginEdit->displayed()) {
                     $loginEdit->click();
                     $curentId = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH,
@@ -806,5 +844,13 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
         }
         $this->_canvasLogout();
         $this->_canvasLoginAdmin();
+    }
+
+    private function _fullname_to_display_name($fullname) {
+        $token = explode(' ', $fullname);
+        if (!$token or count($token) != 2) {
+            return $fullname;
+        }
+        return $token[1].', '.$token[0];
     }
 }
