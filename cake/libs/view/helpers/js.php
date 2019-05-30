@@ -138,7 +138,8 @@ class JsHelper extends AppHelper {
 					unset($params['buffer']);
 				}
 			}
-			$out = $this->{$this->__engineName}->dispatchMethod($this, $method, $params);
+			// dispatch the call to the engine with actual implementation
+			$out = $this->dispatchMethod($this->{$this->__engineName}, $method, $params);
 			if ($this->bufferScripts && $buffer && is_string($out)) {
 				$this->buffer($out);
 				return null;
