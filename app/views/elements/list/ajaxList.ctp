@@ -13,6 +13,18 @@
     function showProgrammerError ($message) {
         echo "<span style='color:red'>ajaxList: $message</span><br />";
     }
+
+    function utf8ize($d) {
+        if (is_array($d)) {
+            foreach ($d as $k => $v) {
+                $d[$k] = utf8ize($v);
+            }
+        } else if (is_string ($d)) {
+            return utf8_encode($d);
+        }
+        return $d;
+    }
+
     $divisionName = "ajaxListDiv";
     // The main div containing the controll
     echo "<div id='$divisionName'>";
@@ -33,10 +45,10 @@
     } else {
 
         // Start Up the element
-        $variables = json_encode($paramsForList);
+        $variables = json_encode(utf8ize($paramsForList));
 
         echo $html->script("ajaxList");
-        echo $html->scriptBlock("var ajaxList = new AjaxList($variables,'$divisionName')");
+        echo $html->scriptBlock("var ajaxList = new AjaxList({$variables},'$divisionName')");
 
     }
 

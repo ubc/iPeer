@@ -141,6 +141,10 @@ Runing the tests:
 
 It is better not to touch the mouse or keyboard during the tests.
 
+iPeer 3.4.2
+-----------
+* Fix problems with Simple Evaluations page not displayed properly
+
 iPeer 3.4.1
 -----------
 * Fix problems with the emailer
