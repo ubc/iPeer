@@ -1,4 +1,10 @@
 <?php
+App::import('Model', 'EvaluationBase');
+App::import('Model', 'MixevalQuestion');
+App::import('Model', 'MixevalQuestionDesc');
+App::import('Lib', 'caliper');
+use caliper\CaliperHooks;
+
 /**
  * Event
  *
@@ -312,6 +318,8 @@ class Event extends AppModel
      * @return void
      */
     function afterSave($created) {
+        parent::afterSave($created);
+
         // restore the validate if it is been changed
         if (null != $this->_backupValidate) {
             $this->validate = $this->_backupValidate;
@@ -320,6 +328,8 @@ class Event extends AppModel
         if($created && isset($this->data['Event']['auto_release']) && $this->data['Event']['auto_release']==1) {
             $this->insertedAutoRelease[] = $this->getInsertID();
         }
+
+        CaliperHooks::event_after_save($this, $created);
     }
     /**
      * prepData
@@ -1237,5 +1247,30 @@ class Event extends AppModel
         
         return count($validatedEvents);
     }
-    
+
+
+    /**
+     * Called after every deletion operation.
+     *
+     * @access public
+     * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Models.html#Callback-Methods#afterDelete-1055
+     */
+	function afterDelete() {
+        parent::afterDelete();
+        CaliperHooks::event_after_delete($this);
+	}
+
+
+    /**
+     * Called before every deletion operation.
+     *
+     * @param boolean $cascade If true records that depend on this record will also be deleted
+     * @return boolean True if the operation should continue, false if it should abort
+     * @access public
+     * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Models.html#Callback-Methods#beforeDelete-1054
+     */
+	function beforeDelete($cascade = true) {
+        CaliperHooks::event_before_delete($this);
+        return parent::beforeDelete($cascade);
+	}
 }

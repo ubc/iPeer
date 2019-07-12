@@ -1,4 +1,7 @@
 <?php
+App::import('Lib', 'caliper');
+use caliper\CaliperHooks;
+
 /**
  * EvaluationsController
  *
@@ -742,6 +745,8 @@ class EvaluationsController extends AppController
             $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
 
             if ($this->Evaluation->saveSimpleEvaluation($this->params, $groupEvent, $evaluationSubmission)) {
+                CaliperHooks::submit_simple_evaluation($eventId, $evaluator, $groupEvent['GroupEvent']['id'], $groupId);
+
                 $this->Session->setFlash(__('Your Evaluation was submitted successfully.', true), 'good');
                 $this->redirect('/home/index/', true);
             } else {
@@ -852,6 +857,7 @@ class EvaluationsController extends AppController
             if ($this->SurveyInput->saveAll($this->data['SurveyInput']) &&
                 $this->EvaluationSubmission->save($sub)
             ) {
+                CaliperHooks::submit_survey($eventId, $userId);
                 $this->Session->setFlash(
                     __('Your survey was submitted successfully!', true), 'good');
                 $this->redirect('/home/index/');
@@ -1161,6 +1167,7 @@ class EvaluationsController extends AppController
         }
 
         if ($status) {
+            CaliperHooks::submit_rubric($eventId, $evaluator, $groupEvent['GroupEvent']['id'], $groupId);
             $this->Session->setFlash(__('Your Evaluation was submitted successfully.', true), 'good');
             $this->redirect('/home/index/', true);
             return;
@@ -1334,6 +1341,7 @@ class EvaluationsController extends AppController
                             $this->Session->setFlash(__('Error: Unable to submit the evaluation. Please try again.', true));
                         }
                     }
+                    CaliperHooks::submit_mixeval($eventId, $evaluator, $groupEventId, $groupId);
 
                     //checks if all members in the group have submitted the number of
                     //submission equals the number of members means that this group is ready to review

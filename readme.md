@@ -141,6 +141,24 @@ Runing the tests:
 
 It is better not to touch the mouse or keyboard during the tests.
 
+Configuring Caliper
+---------------------------
+
+
+In order to enable Caliper, both `CALIPER_HOST` and `CALIPER_API_KEY` must be set.
+
+`CALIPER_HOST`: Set the Caliper LRS url.
+
+`CALIPER_API_KEY`: API key for sending Caliper events to the LRS.
+
+`CALIPER_BASE_URL`: Optionally set a base url to use for all events. This is useful to help keep statement urls consistent if the url of your instance changes over time or is accessible though different routes (ex http+https or multiple sub-domains). (Uses base url of request by default).
+
+You may optionally override the user default IRI (from `$base_url/users/view/$user_id`) to something more identifiable when setting both `CALIPER_ACTOR_BASE_URL` and `CALIPER_ACTOR_UNIQUE_IDENTIFIER_PARAM`.
+
+`CALIPER_ACTOR_BASE_URL`: Optionally set the actor's homepage to something else. This will be string formated to allow `CALIPER_ACTOR_UNIQUE_IDENTIFIER_PARAM` to be inserted into it (use `%s` where you want the unique identifier to appear). ex: `http://www.ubc.ca/%s`
+
+`CALIPER_ACTOR_UNIQUE_IDENTIFIER_PARAM`: Optionally set the actor's unique identifier using any column from the `user` table (ex: `username`, `id`, `email`). Will be inserted into the `CALIPER_ACTOR_BASE_URL` string.
+
 iPeer 3.4.2
 -----------
 * Fix problems with Simple Evaluations page not displayed properly

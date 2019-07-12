@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
         libldap2-dev \
         libldb-dev \
         unzip \
+        git \
     && rm -rf /var/lib/apt/lists/* \
     && ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so \
     && ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so \

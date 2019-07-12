@@ -1,4 +1,7 @@
 <?php
+App::import('Lib', 'caliper');
+use caliper\CaliperHooks;
+
 /**
  * MixevalsController
  *
@@ -310,8 +313,6 @@ class MixevalsController extends AppController
      * on the forms so that data can be saved correctly
      */
     public function _dataSavePrep() {
-        // Add a creation date
-        $this->data['Mixeval']['created'] = date('Y-m-d H:i:s');
         $selfEval = $this->data['Mixeval']['self_eval'];
 
         // Reorder the questions so that they're contiguous starting from 0.
@@ -420,6 +421,11 @@ class MixevalsController extends AppController
         $continue = true;
         $this->Mixeval->begin();
 
+        // events is used for caliper
+        $events = array();
+        $isNewMixeval = !isset($this->data['Mixeval']['id']);
+        $existingQIds = array();
+
         // Only try deleting stuff if we're editing
         if (isset($this->data['Mixeval']['id'])) {
             // Delete removed questions
@@ -474,6 +480,7 @@ class MixevalsController extends AppController
 
             $deletedQIds = array_diff($existingQIds, $submittedQIds);
 
+            $events = CaliperHooks::mixeval_save_deleted_question_partial($this->data['Mixeval']['id'], $deletedQIds);
             foreach ($deletedQIds as $id) {
                 $this->MixevalQuestion->delete($id);
             }
@@ -549,6 +556,8 @@ class MixevalsController extends AppController
         // commit the transaction if everything looks good
         if ($continue) {
             $this->Mixeval->commit();
+            CaliperHooks::mixeval_save_with_questions($events, $this->Mixeval->id, $existingQIds, $isNewMixeval);
+
             $this->Session->setFlash(
                 __('The mixed evaluation was saved successfully.', true), 'good');
             // TODO Maybe redirect to view evaluation instead?

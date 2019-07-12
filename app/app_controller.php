@@ -12,6 +12,8 @@ ini_set('auto_detect_line_endings', true);
 uses('sanitize');
 App::import('Lib', 'toolkit');
 App::import('Lib', 'breadcrumb');
+App::import('Lib', 'caliper');
+use caliper\CaliperHooks;
 
 /**
  * AppController the base controller
@@ -128,6 +130,18 @@ class AppController extends Controller
         $this->set('customLogo', $customLogo);
 
         parent::beforeFilter();
+    }
+
+    /**
+     * Called after the controller action is run, but before the view is rendered.
+     *
+     * @access public
+     * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-With-CakePHP/Controllers.html#Callbacks
+     */
+    function beforeRender() {
+        CaliperHooks::app_controller_before_render($this);
+
+        parent::beforeRender();
     }
 
     /**
@@ -248,6 +262,8 @@ class AppController extends Controller
             $this->AccessControl->loadPermissions();
             $this->SysParameter->reload();
             //TODO logging!
+
+            CaliperHooks::app_controller_after_login($this);
         }
 
         if (!$isRedirect) {
@@ -271,6 +287,7 @@ class AppController extends Controller
      */
     function _afterLogout()
     {
+        CaliperHooks::app_controller_after_logout($this);
         $this->Session->destroy();
     }
 
