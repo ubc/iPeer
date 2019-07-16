@@ -123,7 +123,7 @@ class SurveysController extends AppController
             $extraFilters .= "Survey.creator_id = $myID or availability = 'public')";
         }
 
-        $restrictions = "";
+        $restrictions = array();
 
         $basicRestrictions = array(
             $myID => true,

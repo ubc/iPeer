@@ -146,7 +146,7 @@ class RubricsController extends AppController
         }
 
         // Instructors can only edit their own rubric templates
-        $restrictions = "";
+        $restrictions = array();
         // instructors
         $basicRestrictions = array(
             $myID => true,
