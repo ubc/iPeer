@@ -149,7 +149,7 @@ class SimpleevaluationsController extends AppController
         }
 
         // Instructors can only edit their own simple evaluations
-        $restrictions = "";
+        $restrictions = array();
         // instructors
         $basicRestrictions = array(
             $myID => true,
