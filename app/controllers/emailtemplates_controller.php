@@ -112,7 +112,7 @@ class EmailtemplatesController extends AppController
         }
 
         // Instructors can only edit their own email templates
-        $restrictions = "";
+        $restrictions = array();
         // instructors
         $basicRestrictions = array(
             $myID => true,
