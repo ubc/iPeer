@@ -142,7 +142,7 @@ class MixevalsController extends AppController
         }
 
         // Instructors can only edit their own mixeval templates
-        $restrictions = "";
+        $restrictions = array();
         // instructors
         $basicRestrictions = array(
             User::get('id') => true,
