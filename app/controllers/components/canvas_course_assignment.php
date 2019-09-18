@@ -1,5 +1,6 @@
 <?php
 App::import('Component', 'CanvasApi');
+App::import('Component', 'CanvasGraphql');
 
 /**
  * CanvasCourseAssignmentComponent
@@ -128,5 +129,39 @@ class CanvasCourseAssignmentComponent extends CakeObject
         }
 
         return false;
+    }
+
+    /**
+     * With trasition to the new gradebook, try to use GraphQL to
+     * set the assignment post policy
+     */
+    public function setAssignmentPostPolicy($_controller, $user_id, $post_manually=true)
+    {
+        $graphQlApi = new CanvasGraphQlComponent($user_id);
+        $query_obj = array(
+            "operationName" => "SetAssignmentPostPolicy",
+            "variables" => array(
+                "assignmentId" => $this->id,
+                "postManually" => $post_manually
+            ),
+            "query" => 'mutation SetAssignmentPostPolicy($assignmentId: ID!, $postManually: Boolean!) { '.
+                'setAssignmentPostPolicy(input: {assignmentId: $assignmentId, postManually: $postManually}) ' .
+                '{ postPolicy { postManually __typename } errors { attribute message __typename } __typename } }'
+        );
+        $query = json_encode($query_obj);
+        $result = $graphQlApi->postGraphQl($_controller, $query);
+
+        if (!$result || (is_object($result) && property_exists($result, 'errors'))) {
+            return false;
+        }
+
+        if (is_object($result) && is_object($result->data) &&
+                is_object($result->data->setAssignmentPostPolicy)) {
+            if (isset($result->data->setAssignmentPostPolicy->errors)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

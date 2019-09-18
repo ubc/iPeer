@@ -141,6 +141,14 @@ Runing the tests:
 
 It is better not to touch the mouse or keyboard during the tests.
 
+iPeer 3.4.4
+-----------
+* Utilize Canvas's new gradebook Posting Policy
+
+iPeer 3.4.3
+-----------
+* Fix problems with instructors not able to copy evaluation templates
+
 iPeer 3.4.2
 -----------
 * Fix problems with Simple Evaluations page not displayed properly
