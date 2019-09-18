@@ -8,7 +8,7 @@
         </span>
         <ol class="dec-indent-list">
             <li><?php echo __("An assignment will be created on the <span class=\"highlight\">Assignments page</span> in the associated Canvas course for this Evaluation.", true)?></li>
-            <li><?php echo __("In the Canvas gradebook, the assignment column will be muted (hidden) upon creation.", true)?></li>
+            <li><?php echo __("In the Canvas gradebook, the assignment is set with <span class=\"highlight\">Manually Post Grades Policy</span>. Please use the 'Post grades' function in Canvas to <a href='https://faculty.canvas.ubc.ca/showing-and-hiding-grades-in-the-new-gradebook/#Canvas:NewGradebookCommunication(Draft)-Postinggradesforanassignment' target='_blank'>make grades visible to students</a>.", true)?></li>
         </ol>
     </ul>
     <br><br><?php

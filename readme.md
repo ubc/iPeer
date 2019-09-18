@@ -162,6 +162,11 @@ You may optionally override the user default IRI (from `$base_url/users/view/$us
 iPeer 3.4.4
 -----------
 * Added Caliper and delayed jobs support
+* Utilize Canvas's new gradebook Posting Policy
+
+iPeer 3.4.3
+-----------
+* Fix problems with instructors not able to copy evaluation templates
 
 iPeer 3.4.2
 -----------
