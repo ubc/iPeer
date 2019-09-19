@@ -2049,7 +2049,7 @@ INSERT INTO `sys_parameters` (`parameter_code`, `parameter_value`, `parameter_ty
 ('system.super_admin', 'root', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 ('system.admin_email', 'Please enter the iPeer administrator\\''s email address.', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 ('display.date_format', 'D, M j, Y g:i a', 'S', 'date format preference', 'A', 0, NOW(), NULL, NOW()),
-('system.version', '3.4.1', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
+('system.version', '3.4.4', 'S', NULL, 'A', 0, NOW(), NULL, NOW()),
 ('database.version', '16', 'I', 'database version', 'A', 0, NOW(), NULL, NOW()),
 ('email.port', '25', 'S', 'port number for email smtp option', 'A', '0', NOW(), NULL , NOW()),
 ('email.host', 'localhost', 'S', 'host address for email smtp option', 'A', '0', NOW(), NULL , NOW()),
@@ -2372,3 +2372,19 @@ select id, NULL, NULL, 'exportCanvas', NULL, NULL
 -- store canvas course id
 ALTER TABLE `events` ADD COLUMN `canvas_assignment_id` VARCHAR(25) NULL DEFAULT NULL;
 --- END: Added by DB upgrade to version 15
+
+--- START: Added by DB upgrade to version 17
+-- add table to store delayed jobs
+CREATE TABLE IF NOT EXISTS `jobs` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `handler` TEXT NOT NULL,
+    `queue` VARCHAR(255) NOT NULL DEFAULT 'default',
+    `attempts` INT UNSIGNED NOT NULL DEFAULT 0,
+    `run_at` DATETIME NULL,
+    `locked_at` DATETIME NULL,
+    `locked_by` VARCHAR(255) NULL,
+    `failed_at` DATETIME NULL,
+    `error` TEXT NULL,
+    `created_at` DATETIME NOT NULL
+) ENGINE = InnoDB DEFAULT CHARSET=utf8;
+--- END: Added by DB upgrade to version 17

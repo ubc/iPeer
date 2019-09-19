@@ -1,5 +1,5 @@
 <?php
-class ComponentGroupTest extends TestSuite
+class CaliperGroupTest extends TestSuite
 {
     public $label = 'Caliper';
     function __construct()

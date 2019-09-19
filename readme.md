@@ -159,6 +159,10 @@ You may optionally override the user default IRI (from `$base_url/users/view/$us
 
 `CALIPER_ACTOR_UNIQUE_IDENTIFIER_PARAM`: Optionally set the actor's unique identifier using any column from the `user` table (ex: `username`, `id`, `email`). Will be inserted into the `CALIPER_ACTOR_BASE_URL` string.
 
+iPeer 3.4.4
+-----------
+* Added Caliper and delayed jobs support
+
 iPeer 3.4.2
 -----------
 * Fix problems with Simple Evaluations page not displayed properly
