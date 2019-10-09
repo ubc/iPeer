@@ -11,3 +11,6 @@ CREATE TABLE IF NOT EXISTS `jobs` (
     `error` TEXT NULL,
     `created_at` DATETIME NOT NULL
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8;
+
+-- store course term
+ALTER TABLE `courses` ADD COLUMN `term` VARCHAR(50) NULL DEFAULT NULL;

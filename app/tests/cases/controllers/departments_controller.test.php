@@ -109,6 +109,9 @@ class DepartmentsControllerTestCase extends ExtendedAuthTestCase {
                 'updater' => null,
                 'student_count' => 13,
                 'full_name' => 'MECH 328 - Mechanical Engineering Design Project',
+                'term' => null,
+                'course_w_term' => 'MECH 328',
+                'title_w_term' => 'Mechanical Engineering Design Project',
             ),
             'CourseDepartment' => array(
                 'id' => 2,

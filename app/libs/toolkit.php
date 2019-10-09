@@ -425,7 +425,7 @@ class Toolkit
                 $tmp[] = $html->link($event['Event']['title'],
                     '/evaluations/makeEvaluation/'.$event['Event']['id']);
             }
-            $tmp[] = $event['Course']['course'];
+            $tmp[] = $event['Course']['course_w_term'];
             $tmp[] = Toolkit::formatDate($event['Event']['due_date']);
 
             $due = $event['Event']['due_in'];
@@ -486,7 +486,7 @@ class Toolkit
                 // NOTE: surveys don't have group names
                 $tmp[] = $event['Group']['group_name'];
             }
-            $tmp[] = $event['Course']['course'];
+            $tmp[] = $event['Course']['course_w_term'];
             $tmp[] = Toolkit::formatDate($event['Event']['due_date']);
             if (!empty($event['EvaluationSubmission'])) {
                 // expired events have no submissions

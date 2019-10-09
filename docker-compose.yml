@@ -83,7 +83,7 @@ services:
       - SELENIUM_HOST=selenium-local
       - SELENIUM_BROWSER=chrome
       #- SELENIUM_BROWSER=firefox
-      - SERVER_TEST=http://ipeer_web_unittest/
+      - SERVER_TEST=http://ipeer_web_unittest
       #- IPEER_AUTH=Ldap
       #- IPEER_AUTH_LDAP_host=ldap.example.com
       #- IPEER_AUTH_LDAP_port=636

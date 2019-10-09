@@ -21,10 +21,10 @@ class homeTestCase extends SystemBaseTestCase
 
         $courses = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::TAG_NAME, 'h3');
         $this->assertEqual(count($courses), 4);
-        $this->assertEqual($courses[0]->text(), 'CPSC 404');
-        $this->assertEqual($courses[1]->text(), 'APSC 201');
-        $this->assertEqual($courses[2]->text(), 'MECH 328');
-        $this->assertEqual($courses[3]->text(), 'CPSC 101');
+        $this->assertEqual($courses[0]->text(), 'CPSC 404 - Advanced Software Engineering');
+        $this->assertEqual($courses[1]->text(), 'APSC 201 - Technical Communication');
+        $this->assertEqual($courses[2]->text(), 'MECH 328 - Mechanical Engineering Design Project');
+        $this->assertEqual($courses[3]->text(), 'CPSC 101 - Connecting with Computer Science');
 
         // navigation
         $home = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Home');
@@ -48,8 +48,8 @@ class homeTestCase extends SystemBaseTestCase
         $this->assertEqual($headers[1]->text(), 'Inactive Courses');
         $courses = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::TAG_NAME, 'h3');
         $this->assertEqual(count($courses), 2);
-        $this->assertEqual($courses[0]->text(), 'CPSC 404');
-        $this->assertEqual($courses[1]->text(), 'CPSC 101');
+        $this->assertEqual($courses[0]->text(), 'CPSC 404 - Advanced Software Engineering');
+        $this->assertEqual($courses[1]->text(), 'CPSC 101 - Connecting with Computer Science');
 
         // navigation
         $home = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Home');
@@ -72,7 +72,7 @@ class homeTestCase extends SystemBaseTestCase
         $this->assertEqual($headers[0]->text(), 'My Courses');
         $courses = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::TAG_NAME, 'h3');
         $this->assertEqual(count($courses), 1);
-        $this->assertEqual($courses[0]->text(), 'APSC 201');
+        $this->assertEqual($courses[0]->text(), 'APSC 201 - Technical Communication');
 
         // navigation
         $home = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::LINK_TEXT, 'Home');

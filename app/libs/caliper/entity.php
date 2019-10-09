@@ -28,7 +28,7 @@ use IMSGlobal\Caliper\entities\lis\Group;
 use IMSGlobal\Caliper\entities\lis\Status;
 use IMSGlobal\Caliper\entities\feedback\Rating;
 use IMSGlobal\Caliper\entities\feedback\Comment;
-use IMSGlobal\Caliper\entities\Question\RatingScaleQuestion;
+use IMSGlobal\Caliper\entities\question\RatingScaleQuestion;
 use IMSGlobal\Caliper\util\UuidUtil;
 
 class CaliperEntity {

@@ -147,8 +147,8 @@ class SearchComponent extends CakeObject
         $markTo = isset($params['data']['Search']['mark_to']) ? $params['data']['Search']['mark_to']:'';
         !empty($markTo) ? $sticky['mark_to']=$markTo:$sticky['mark_to']='';
 
-        $nibble['maxPercent'] = $markTo/100.0;
-        $nibble['minPercent'] = $markFrom/100.0;
+        $nibble['maxPercent'] = floatval($markTo)/100.0;
+        $nibble['minPercent'] = floatval($markFrom)/100.0;
         $nibble['sticky'] = $sticky;
         $nibble['event_id'] = $eventId;
         $nibble['status'] = $status;

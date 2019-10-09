@@ -66,7 +66,7 @@ class MultiRoleTestCase extends SystemBaseTestCase
         $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[class="instructorView"] h1[class="title"]')->text();
         $this->assertEqual($title, 'Instructor View');
         $courseName = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[class="course"] h3')->text();
-        $this->assertEqual($courseName, 'APSC 201');
+        $this->assertEqual($courseName, 'APSC 201 - Technical Communication');
 
         // check Student View
         $msg = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, 'div[id="StudentHome"] div[class="eventSummary pending"]')->text();

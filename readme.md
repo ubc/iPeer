@@ -1,3 +1,5 @@
+*Please note that with MySQL 5.7 and later, [the default sql_mode](https://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sql-mode-changes) has been changed. Please make sure the following modes are disabled: ONLY_FULL_GROUP_BY, STRICT_TRANS_TABLES, NO_ZERO_IN_DATE, and NO_ZERO_DATE.*
+
 Running with Docker
 ---------------------------
 ### Prerequisites
@@ -163,6 +165,10 @@ iPeer 3.4.4
 -----------
 * Added Caliper and delayed jobs support
 * Utilize Canvas's new gradebook Posting Policy
+* Add `term` field to `courses`.
+
+After deployment, login to the url `/upgrade` as administrator to upgrade the DB.
+Otherwise users won't be able to load the homepage.
 
 iPeer 3.4.3
 -----------

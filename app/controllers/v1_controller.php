@@ -1179,7 +1179,8 @@ class V1Controller extends Controller {
     protected function getRequestInfo($request, $body)
     {
         $ret = '';
-        $ret .= $_SERVER['REQUEST_METHOD'] . ' ' . $request['url']. "\n";
+        $ret .= (isset($_SERVER['REQUEST_METHOD'])? $_SERVER['REQUEST_METHOD'] : '') .
+            ' ' . (isset($request['url'])? $request['url'] : '') . "\n";
         $ret .= "Params: \n";
         foreach ($request as $key => $value) {
             if ($key == 'url') {

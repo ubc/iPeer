@@ -184,30 +184,116 @@
     </target>
 
     <target name="test" description="Run unit tests" depends="init-test-db">
-        <exec command="IPEER_DB_NAME=${db.name} sh cake/console/cake -app app testsuite app group model" passthru="true"/>
-        <exec command="IPEER_DB_NAME=${db.name} sh cake/console/cake -app app testsuite app group caliper" passthru="true"/>
-        <exec command="IPEER_DB_NAME=${db.name} sh cake/console/cake -app app testsuite app group controller" passthru="true"/>
+        <exec command="IPEER_DB_NAME=${db.name} sh cake/console/cake -app app testsuite app group component" passthru="true" returnProperty="result.component"/>
+        <exec command="IPEER_DB_NAME=${db.name} sh cake/console/cake -app app testsuite app group model" passthru="true" returnProperty="result.model"/>
+        <exec command="IPEER_DB_NAME=${db.name} sh cake/console/cake -app app testsuite app group caliper" passthru="true" returnProperty="result.caliper"/>
+        <exec command="IPEER_DB_NAME=${db.name} sh cake/console/cake -app app testsuite app group controller" passthru="true" returnProperty="result.controller"/>
         <!-- v1_controller test must be last one as it will change the database -->
         <!--<exec command="sh cake/console/cake testsuite app case controllers/V1Controller" passthru="true"/>-->
         <phingcall target="post-test"/>
+        <fail message="Component test cases failed">
+            <condition>
+                <not>
+                    <equals arg1="${result.component}" arg2="0"/>
+                </not>
+            </condition>
+        </fail>
+        <fail message="Model test cases failed">
+            <condition>
+                <not>
+                    <equals arg1="${result.model}" arg2="0"/>
+                </not>
+            </condition>
+        </fail>
+        <fail message="Caliper test cases failed">
+            <condition>
+                <not>
+                    <equals arg1="${result.caliper}" arg2="0"/>
+                </not>
+            </condition>
+        </fail>
+        <fail message="Controller test cases failed">
+            <condition>
+                <not>
+                    <equals arg1="${result.controller}" arg2="0"/>
+                </not>
+            </condition>
+        </fail>
     </target>
 
     <target name="test-win" description="Run unit tests" depends="prepare,init-test-db">
-        <exec command="IPEER_DB_NAME=${db.name} cake\console\cake.bat -app app testsuite app group component" passthru="true"/>
-        <exec command="IPEER_DB_NAME=${db.name} cake\console\cake.bat -app app testsuite app group model" passthru="true"/>
-        <exec command="IPEER_DB_NAME=${db.name} cake\console\cake.bat -app app testsuite app group caliper" passthru="true"/>
-        <exec command="IPEER_DB_NAME=${db.name} cake\console\cake.bat -app app testsuite app group controller" passthru="true"/>
+        <exec command="IPEER_DB_NAME=${db.name} cake\console\cake.bat -app app testsuite app group component" passthru="true" returnProperty="result.component"/>
+        <exec command="IPEER_DB_NAME=${db.name} cake\console\cake.bat -app app testsuite app group model" passthru="true" returnProperty="result.model"/>
+        <exec command="IPEER_DB_NAME=${db.name} cake\console\cake.bat -app app testsuite app group caliper" passthru="true" returnProperty="result.caliper"/>
+        <exec command="IPEER_DB_NAME=${db.name} cake\console\cake.bat -app app testsuite app group controller" passthru="true" returnProperty="result.controller"/>
         <!-- v1_controller test must be last one as it will change the database -->
         <phingcall target="post-test"/>
+        <fail message="Component test cases failed">
+            <condition>
+                <not>
+                    <equals arg1="${result.component}" arg2="0"/>
+                </not>
+            </condition>
+        </fail>
+        <fail message="Model test cases failed">
+            <condition>
+                <not>
+                    <equals arg1="${result.model}" arg2="0"/>
+                </not>
+            </condition>
+        </fail>
+        <fail message="Caliper test cases failed">
+            <condition>
+                <not>
+                    <equals arg1="${result.caliper}" arg2="0"/>
+                </not>
+            </condition>
+        </fail>
+        <fail message="Controller test cases failed">
+            <condition>
+                <not>
+                    <equals arg1="${result.controller}" arg2="0"/>
+                </not>
+            </condition>
+        </fail>
     </target>
 
     <target name="test-ci" description="Run unit tests for continuous integration" depends="init-test-db">
-        <exec command="IPEER_DB_NAME=${db.name} cake/console/cake -app app testsuite app group model" passthru="true"/>
-        <exec command="IPEER_DB_NAME=${db.name} cake/console/cake -app app testsuite app group caliper" passthru="true"/>
-        <exec command="IPEER_DB_NAME=${db.name} cake/console/cake -app app testsuite app group controller" passthru="true"/>
+        <exec command="IPEER_DB_NAME=${db.name} cake/console/cake -app app testsuite app group component" passthru="true" returnProperty="result.component"/>
+        <exec command="IPEER_DB_NAME=${db.name} cake/console/cake -app app testsuite app group model" passthru="true" returnProperty="result.model"/>
+        <exec command="IPEER_DB_NAME=${db.name} cake/console/cake -app app testsuite app group caliper" passthru="true" returnProperty="result.caliper"/>
+        <exec command="IPEER_DB_NAME=${db.name} cake/console/cake -app app testsuite app group controller" passthru="true" returnProperty="result.controller"/>
         <!-- <exec command="cake/console/cake testreport app group system" passthru="true"/> -->
         <!-- v1_controller test must be last one as it will change the database -->
         <phingcall target="post-test"/>
+        <fail message="Component test cases failed">
+            <condition>
+                <not>
+                    <equals arg1="${result.component}" arg2="0"/>
+                </not>
+            </condition>
+        </fail>
+        <fail message="Model test cases failed">
+            <condition>
+                <not>
+                    <equals arg1="${result.model}" arg2="0"/>
+                </not>
+            </condition>
+        </fail>
+        <fail message="Caliper test cases failed">
+            <condition>
+                <not>
+                    <equals arg1="${result.caliper}" arg2="0"/>
+                </not>
+            </condition>
+        </fail>
+        <fail message="Controller test cases failed">
+            <condition>
+                <not>
+                    <equals arg1="${result.controller}" arg2="0"/>
+                </not>
+            </condition>
+        </fail>
     </target>
 
     <target name="test-ci-integration" description="Run integration tests for continuous integration(output as xml)" depends="prepare,init-test-db">
