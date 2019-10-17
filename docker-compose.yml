@@ -14,7 +14,7 @@ services:
       - ./.data:/var/lib/mysql
     ports:
       - "13306:3306"
-  app:
+  app: &app
     image: ubcctlt/ipeer-app
     build:
       context: .
@@ -30,11 +30,23 @@ services:
       - IPEER_DB_PASSWORD=ipeer
       - IPEER_DEBUG=2
       - IPEER_SESSION_SAVE=database
+      # uncomment to test Caliper
+      # - CALIPER_HOST=https://caliper.imsglobal.org/caliper/44c6173f-907f-40c5-8c93-a1acfaa6485c/message
+      # - CALIPER_API_KEY=44c6173f-907f-40c5-8c93-a1acfaa6485c
+      # - CALIPER_BASE_URL=http://localhost.test.com/
+      # - CALIPER_ACTOR_BASE_URL=http://www.ubc.ca/%s
+      # - CALIPER_ACTOR_UNIQUE_IDENTIFIER_PARAM=username
       #- IPEER_AUTH=Ldap
       #- IPEER_AUTH_LDAP_host=ldap.example.com
       #- IPEER_AUTH_LDAP_port=636
     depends_on:
       - db
+  worker: &worker
+    <<: *app
+    container_name: ipeer_worker
+    command: cake/console/cake worker run
+    ports:
+      - "9002:9000"
   web:
     image: ubcctlt/ipeer-web
     build:

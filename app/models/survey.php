@@ -1,5 +1,7 @@
 <?php
 App::import('Model', 'EvaluationBase');
+App::import('Lib', 'caliper');
+use caliper\CaliperHooks;
 
 /**
  * Survey
@@ -145,4 +147,29 @@ class Survey extends EvaluationBase
 
         return $questions;
     }
+
+    /**
+     * Called after every deletion operation.
+     *
+     * @access public
+     * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Models.html#Callback-Methods#afterDelete-1055
+     */
+	function afterDelete() {
+        parent::afterDelete();
+        CaliperHooks::survey_after_delete($this);
+	}
+
+
+    /**
+     * Called before every deletion operation.
+     *
+     * @param boolean $cascade If true records that depend on this record will also be deleted
+     * @return boolean True if the operation should continue, false if it should abort
+     * @access public
+     * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Models.html#Callback-Methods#beforeDelete-1054
+     */
+	function beforeDelete($cascade = true) {
+        CaliperHooks::survey_before_delete($this);
+        return parent::beforeDelete($cascade);
+	}
 }

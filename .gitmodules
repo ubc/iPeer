@@ -49,3 +49,6 @@
 [submodule "puppet/modules/initfile"]
 	path = puppet/modules/initfile
 	url = https://github.com/puppetlabs/puppetlabs-inifile.git
+[submodule "app/plugins/djjob/vendors"]
+	path = app/plugins/djjob/vendors
+	url = https://github.com/seatgeek/djjob.git

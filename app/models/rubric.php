@@ -1,5 +1,7 @@
 <?php
 App::import('Model', 'EvaluationBase');
+App::import('Lib', 'caliper');
+use caliper\CaliperHooks;
 
 /**
  * Rubric
@@ -113,6 +115,12 @@ class Rubric extends EvaluationBase
      */
     function saveAllWithCriteriaComment($data)
     {
+        $isNewRubric = !isset($data['Rubric']['id']) || empty($data['Rubric']['id']);
+
+        # events and modified_criteria_ids are needed for caliper
+        $events = array();
+        $modified_criteria_ids = array();
+
         // check if the we should remove some of the association records
         if (isset($data['Rubric']['id']) && !empty($data['Rubric']['id'])) {
             $rubric = $this->find('first', array('conditions' => array('id' => $data['Rubric']['id']),
@@ -120,8 +128,7 @@ class Rubric extends EvaluationBase
                 'RubricsLom')));
             // check level of mastery and criteria if they should be removed
             if (null != $rubric) {
-                $result = array('RubricsLom' => array(),
-                'RubricsCriteria' => array());
+                $result = array('RubricsCriteria' => array(), 'RubricsLom' => array());
                 foreach (array_keys($result) as $model) {
                     foreach ($rubric[$model] as $in_db) {
                         $found = false;
@@ -134,8 +141,21 @@ class Rubric extends EvaluationBase
                         if (!$found) {
                             $result[$model][] = $in_db['id'];
                         }
-                    }
 
+                        if ($model == 'RubricsCriteria') {
+                            if ($found) {
+                                $modified_criteria_ids[]=$in_db['id'];
+                            } else {
+                                $event = CaliperHooks::rubric_delete_criteria_partial($rubric, $in_db);
+                                if ($event) {
+                                    $events[] = $event;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                foreach (array_keys($result) as $model) {
                     if (!empty($result[$model])) {
                         // this should also remove related comments
                         $this->{$model}->deleteAll(array($model.'.id' => $result[$model]), true);
@@ -194,6 +214,9 @@ class Rubric extends EvaluationBase
                 return false;
             }
         }
+
+        // can't use after save hook due to the way the criteria are stored
+        CaliperHooks::rubric_save_with_criteria($this, $events, $modified_criteria_ids, $isNewRubric);
 
         return true;
     }
@@ -360,4 +383,30 @@ class Rubric extends EvaluationBase
 
         return $eval;
     }
+
+    /**
+     * Called after every deletion operation.
+     *
+     * @access public
+     * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Models.html#Callback-Methods#afterDelete-1055
+     */
+	function afterDelete() {
+        parent::afterDelete();
+
+        CaliperHooks::rubric_after_delete($this);
+	}
+
+
+    /**
+     * Called before every deletion operation.
+     *
+     * @param boolean $cascade If true records that depend on this record will also be deleted
+     * @return boolean True if the operation should continue, false if it should abort
+     * @access public
+     * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Models.html#Callback-Methods#beforeDelete-1054
+     */
+	function beforeDelete($cascade = true) {
+        CaliperHooks::rubric_before_delete($this);
+        return parent::beforeDelete($cascade);
+	}
 }

@@ -1,0 +1,280 @@
+h1. Cake DJJob Plugin
+
+Quick and easy job queues, based on delayed_job
+
+h2. Background
+
+"CakePackages":http://github.com/josegonzalez/cakepackages is the type of site that would do well with background processes. Rather than try to build - and fail - a job/worker system, I set out to wrap an existing system.
+
+I am aware of a few plugins for cakephp, notably the "queue":https://github.com/davidpersson/queue plugin by David Persson, and the "cron-mailer":https://github.com/kalt/cron-mailer plugin by Pierre-Emmanuel Fringant. However, I don't wish to run and maintain yet another service, and my cron tasks aren't email-based at all. The other thing was the lack of documentation for David's plugin, and I am hesitant to familiarize myself with so many tools at once.
+
+At "SeatGeek":http://seatgeek.com, we use a "PHP port":http://github.com/seatgeek/djjob of "delayed_job":https://github.com/collectiveidea/delayed_job, which works very well in production. It's a neat little set of classes that abstracts away most of the pain of creating new jobs and workers. Unfortunately, the only system I've ever used it in was Symfony (you'll notice we include a sample Symfony task with the package).
+
+So here this is, Cake DJJob. Use it and abuse it to create Jobs/workers whenever necessary :)
+
+h2. Requirements
+
+* CakePHP 1.3
+* Patience
+* PHP 5
+* PDO (Ships with PHP >= 5.1)
+* (Optional) PCNTL library
+
+h2. Installation
+
+You are required to install both @djjob@ and @cake_djjob@. Note that you'll need a @jobs@ table just like the one included with @djjob@. A @cake_schema@ file is forthcoming.
+
+h3. DJJob Installation
+
+_[Manual]_
+
+# Download this: http://github.com/seatgeek/djjob/zipball/master
+# Unzip that download.
+# Copy the resulting folder to app/plugins
+# Rename the folder you just copied to @djjob/vendors@
+
+_[GIT Submodule]_
+
+In your app directory type:
+<pre><code>git submodule add git://github.com/seatgeek/djjob.git plugins/djjob/vendors
+git submodule init
+git submodule update
+</code></pre>
+
+_[GIT Clone]_
+
+In your plugin directory type
+<pre><code>git clone git://github.com/seatgeek/djjob.git djjob/vendors</code></pre>
+
+h3. Cake DJJob Installation
+
+_[Manual]_
+
+# Download this: http://github.com/josegonzalez/cake_djjob/zipball/master
+# Unzip that download.
+# Copy the resulting folder to app/plugins
+# Rename the folder you just copied to @cake_djjob@
+
+_[GIT Submodule]_
+
+In your app directory type:
+<pre><code>git submodule add git://github.com/josegonzalez/cake_djjob.git plugins/cake_djjob
+git submodule init
+git submodule update
+</code></pre>
+
+_[GIT Clone]_
+
+In your plugin directory type
+<pre><code>git clone git://github.com/josegonzalez/cake_djjob.git cake_djjob</code></pre>
+
+h2. Usage
+
+h3. Creating New Jobs
+
+You can create new jobs in the @libs/jobs@ folder of your application or of any plugin. When creating plugin jobs, the plugin name must be in the job class name, but not the job class file. For example, the @cake_djjob@ plugin contains a @CakeDjjob_TestJob@ in @libs/jobs/test_job.php@. All plugins must be separated from the job classname using an underscore, and there can only be one underscore in a classname. This is so you can use jobs from plugins as well as from the application.
+
+Jobs respond to a @perform()@ method, as in "djjob":http://github.com/seatgeek/djjob. In @cake_djjob@, all jobs should extend the @CakeJob@ class. This is not required, but it allows for increased base functionality in your jobs. For example, an application's @ForgotPasswordJob@ might be composed as follows:
+
+<pre><code><?php
+class ForgotPasswordJob extends CakeJob {
+
+    var $email = null;
+    function __construct($email) {
+        $this->email = $email;
+    }
+
+    function perform() {
+        $this->out('Some debug output');
+
+        // Using models
+        $this->loadModel('User');
+        $user = $this->User->findByEmail($this->email);
+
+        if (empty($user)) {
+            return;
+        }
+
+        // Complex email stuff here...
+        $this->loadComponent('Email');
+        $this->Email->_set(array(
+            'to' => $this->email,
+            'from' => 'noreply@example.com',
+            'subject' => 'Forgot your password?',
+            'replyTo' => 'noreply@example.com',
+            'template' => null,
+            'sendAs' => 'both',
+        ));
+        $this->Email->send("Some text to indicate how to reset password...");
+    }
+
+}
+?>
+</code></pre>
+
+Extending the @CakeJob@ also allows the usage of the following methods:
+
+* @loadModel($modelClass, $id = null)@
+** Works exactly as Controller::loadModel() works
+* @loadComponent($componentClass)@
+** Loads, initializes, and attaches a Component
+* @out($message = null, $newlines = 1)@
+** Outputs messages to standard out
+* @err($message = null, $newlines = 1)@
+** Outputs error messages to standard error
+* @nl($multiplier = 1, $print = false)@
+** Outputs a new line to standard out
+* @hr($newlines = 0)@
+** Outputs a horizontal rule to standard out
+
+By extending @CakeJob@, you get an instant base off of which writing jobs will be quick and easy.
+
+
+h3. Enqueuing Jobs
+
+You can attach the @CakeDjjob@ Component to your controller like so:
+
+<pre><code><?php
+class UsersController extends AppController {
+    var $components = array('CakeDjjob.CakeDjjob');
+
+    function forgot_password() {
+        if (($email = $this->User->forgot($this->data)) != false) {
+            App::import('Lib', 'ForgotPasswordJob');
+            $this->CakeDjjob->enqueue(new ForgotPasswordJob($email));
+            $this->Session->setFlash('You will shortly be sent a password reset email :)');
+        } else {
+            $this->Session->setFlash('There is no such email in our system. Please try again.');
+        }
+    }
+
+}
+?></code></pre>
+
+It is also possible to queue jobs from a Model by attaching the included @CakeDjjob@ behavior:
+
+<pre><code><?php
+class User extends AppModel {
+    var $actsAs = array('CakeDjjob.CakeDjjob');
+
+    function forgot_password($email) {
+        App::import('Lib', 'ForgotPasswordJob');
+        return $this->enqueue(new ForgotPasswordJob($email));
+    }
+
+    function bulkAction($emails = array(), $config = array()) {
+        App::import('Lib', 'BulkPasswordResetJob');
+        $jobs = array();
+        foreach ($emails as $email) {
+            $jobs[] = new BulkPasswordResetJob($email, $config);
+        }
+
+        return $this->bulkEnqueue($jobs);
+    }
+}
+?></code></pre>
+
+h3. Optional way to load jobs into an object
+
+- Requires (PHP 5 >= 5.1.3) and ReflectionClass when loading jobs with arguments
+- This is an alternative to manually importing the Job using App::import().
+- The load function requires only that the first parameter be the name of the job to load.
+    - It assumes that the Job will be imported from /app/libs/jobs
+    - You can pass it as many parameters as needed as they are simply passed through to your Job
+
+<pre><code><?php
+class User extends AppModel {
+    var $actsAs = array('CakeDjjob.CakeDjjob');
+
+    function forgot_password($email) {
+        return $this->enqueue($this->CakeDjjob->load('ForgotPasswordJob', $email));
+    }
+
+    function bulkAction($emails = array(), $config = array()) {
+        $jobs = array();
+        foreach ($emails as $email)
+            $jobs[] = $this->CakeDjjob->load('BulkPasswordResetJob', $email, $config);
+        }
+
+        return $this->bulkEnqueue($jobs);
+    }
+}
+?></code></pre>
+
+h3. Running Jobs
+
+Included with this plugin is a task to run jobs.
+
+<pre><code>cake worker run</code></pre>
+
+The above statement will run a single worker on the default queue forever. It can be added to your cron or by some other process manager such as "God":http://god.rubyforge.org/. The following params are available for the worker:
+
+* -connection <config>
+** set db config <config>. default config: default
+* -type <name>
+** pdo name for connection <type>. default type: mysql
+* -queue <name>
+** queue <name> to pull jobs from. default queue: default
+* -count <number>
+** run <number> of jobs to run before exiting (0 for unlimited). default count: 0
+* -sleep <name>
+** sleep <number> seconds after finding no new jobs. default seconds: 5
+* -max <number>
+** max <number> of retries for a given job. default retries: 5
+* -debug <number>
+** debug <level> to set for worker. default level: 0
+
+h3. Cleaning job queues
+
+It's possible to clean a particular job queue, by either resetting locked jobs or deleting failed jobs:
+
+<pre><code>cake worker cleanup</code></pre>
+
+This task can take the @connection@, @type@, @queue@, and @debug@ arguments, as well as a few custom ones:
+
+* -action <string>
+** action to perform on cleanup task. default value: null
+* -date <string>
+** date <string> offset. default value: current evaluation of date('Y-m-d H:i:s')
+* -save <boolean>
+** allow cleanup to modify database. default value: 1
+
+h3. Retrieving the status of a job queue
+
+If you need to get the status of a particular job queue, you can call the status method on the task:
+
+<pre><code>cake worker status</code></pre>
+
+This task can take the @connection@, @type@, @queue@, and @debug@ arguments as well.
+
+h2. TODO
+
+* Allow alternative methods of plugin prefixing
+* Circumvent class-loading via a custom-serialization method
+* Configuring location of job classes
+* Screencast
+* Unit Tests
+* More documentation (DeferredEmail class)
+* -Task to allow creation of jobs from shells-
+
+h2. License
+
+Copyright (c) 2011 Jose Diaz-Gonzalez
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.

@@ -8,6 +8,9 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
+App::import('Lib', 'caliper');
+use caliper\CaliperHooks;
+
 class Course extends AppModel
 {
     const FILTER_PERMISSION_SUPERADMIN = 0;
@@ -420,7 +423,7 @@ class Course extends AppModel
 
         return $this->habtmAdd('Enrol', $courseId, $ids);
     }
-    
+
     /**
      * unenroll students from a course
      *
@@ -735,4 +738,41 @@ class Course extends AppModel
         return Set::extract($users, '/Enrol/id');
     }
 
+    /**
+     * Called after each successful save operation.
+     *
+     * @param boolean $created True if this save created a new record
+     * @access public
+     * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Models.html#Callback-Methods#afterSave-1053
+     */
+    function afterSave($created) {
+        parent::afterSave($created);
+        CaliperHooks::course_after_save($this, $created);
+    }
+
+
+    /**
+     * Called after every deletion operation.
+     *
+     * @access public
+     * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Models.html#Callback-Methods#afterDelete-1055
+     */
+	function afterDelete() {
+        parent::afterDelete();
+        CaliperHooks::course_after_delete($this);
+	}
+
+
+    /**
+     * Called before every deletion operation.
+     *
+     * @param boolean $cascade If true records that depend on this record will also be deleted
+     * @return boolean True if the operation should continue, false if it should abort
+     * @access public
+     * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Models.html#Callback-Methods#beforeDelete-1054
+     */
+	function beforeDelete($cascade = true) {
+        CaliperHooks::course_before_delete($this);
+        return parent::beforeDelete($cascade);
+	}
 }

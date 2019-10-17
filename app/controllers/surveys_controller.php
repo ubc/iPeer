@@ -1,4 +1,7 @@
 <?php
+App::import('Lib', 'caliper');
+use caliper\CaliperHooks;
+
 /**
  * SurveysController
  *
@@ -249,6 +252,7 @@ class SurveysController extends AppController
                     $quesNo = $this->Question->copyQuestions($questions, $this->Survey->id);
                     $this->SurveyQuestion->assignNumber($quesNo, $this->Survey->id);
                 }
+                CaliperHooks::survey_create($this->Survey->id);
                 $this->Session->setFlash(__('Survey is saved!', true), 'good');
                 $this->redirect('index');
                 return;
@@ -315,6 +319,7 @@ class SurveysController extends AppController
         if (!empty($this->data)) {
             $this->data['Survey']['name'] = trim($this->data['Survey']['name']);
             if ($this->Survey->save($this->data)) {
+                CaliperHooks::survey_edit($id);
                 $this->Session->setFlash(__('The Survey was edited successfully.', true), 'good');
                 $this->redirect('index');
                 return;
@@ -468,6 +473,8 @@ class SurveysController extends AppController
       if ($survey_id != null && $position != null && $question_id != null) {
           //$this->SurveyQuestion->moveQuestion($survey_id, $question_id, $move);
           $this->SurveyQuestion->moveQuestion($survey_id, $question_id, $position);
+
+          CaliperHooks::survey_edit($survey_id);
       }
       $this->redirect('questionsSummary/'.$survey_id);
   }
@@ -494,6 +501,9 @@ class SurveysController extends AppController
       $this->Survey->habtmDelete('Question', $survey_id, $question_id);
       // for some reason, habtmDelete does not remove the question's entry
       // in the Question model, so doing it here as a quick fix
+
+      CaliperHooks::survey_remove_question($survey_id, $question_id);
+
       $this->Question->delete($question_id);
 
       $this->Session->setFlash(__('The question was removed successfully.', true), 'good');
@@ -539,12 +549,14 @@ class SurveysController extends AppController
               }
           }
           if ($this->Question->saveAll($this->data)) {
-              $this->Session->setFlash(__('The question was added successfully.', true), 'good');
-              // Need to run reorderQuestions once in order to correctly set the question position numbers
-              $surveyQuestionId = $this->SurveyQuestion->find('first', array('conditions' => array('survey_id' => $survey_id), 'fields' => array('MIN(number) as minQuestionId')));
-              $this->SurveyQuestion->reorderQuestions($survey_id, $surveyQuestionId['0']['minQuestionId'], 'TOP');
-              $this->redirect('questionsSummary/'.$survey_id);
-              return;
+            $this->Session->setFlash(__('The question was added successfully.', true), 'good');
+            // Need to run reorderQuestions once in order to correctly set the question position numbers
+            $surveyQuestionId = $this->SurveyQuestion->find('first', array('conditions' => array('survey_id' => $survey_id), 'fields' => array('MIN(number) as minQuestionId')));
+            $this->SurveyQuestion->reorderQuestions($survey_id, $surveyQuestionId['0']['minQuestionId'], 'TOP');
+
+            CaliperHooks::survey_create_question($survey_id, $surveyQuestionId);
+            $this->redirect('questionsSummary/'.$survey_id);
+            return;
           } else {
               $this->Session->setFlash(__('Failed to save question.'));
           }
@@ -600,8 +612,9 @@ class SurveysController extends AppController
             }
           }
           if ($this->Question->saveAll($this->data)) {
-              $this->Session->setFlash(__('The question was updated successfully.', true), 'good');
-              $this->redirect('questionsSummary/'.$survey_id);
+            CaliperHooks::survey_edit_question($survey_id, $question_id);
+            $this->Session->setFlash(__('The question was updated successfully.', true), 'good');
+            $this->redirect('questionsSummary/'.$survey_id);
           } else {
               $this->Session->setFlash(__('Error in saving question.', true));
           }
