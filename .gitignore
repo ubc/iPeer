@@ -19,3 +19,5 @@ tags
 vendor/
 .idea
 .data
+composer.phar
+composer.lock
