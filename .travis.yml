@@ -2,8 +2,7 @@ language: php
 php:
 - '7.2'
 env:
-  # need to turn off IPEER_DEBUG for the /v1 endpoints to work properly
-  - SERVER_TEST=http://localhost IPEER_DB_NAME=ipeer_test IPEER_DB_USER=root IPEER_DB_PASSWORD="" IPEER_DEBUG=0
+  - SERVER_TEST=http://localhost IPEER_DB_NAME=ipeer_test IPEER_DB_USER=root IPEER_DB_PASSWORD="" IPEER_DEBUG=2
 
 services:
 - mysql
@@ -47,6 +46,14 @@ before_script:
   - sudo service apache2 restart
   # setup mysql
   - mysql -e "create database IF NOT EXISTS ipeer_test;" -uroot
+  # remove ONLY_FULL_GROUP_BY. otherwise some iPeer queries will fail
+  # also remove STRICT_TRANS_TABLES, NO_ZERO_IN_DATE and NO_ZERO_DATE for some test cases
+  - mysql -e "SELECT @@sql_mode;" -uroot
+  - mysql -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));" -uroot
+  - mysql -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'STRICT_TRANS_TABLES',''));" -uroot
+  - mysql -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'NO_ZERO_IN_DATE',''));" -uroot
+  - mysql -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'NO_ZERO_DATE',''));" -uroot
+  - mysql -e "SELECT @@sql_mode;" -uroot
 
 script: vendor/bin/phing build-ci
 

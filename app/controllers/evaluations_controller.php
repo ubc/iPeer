@@ -510,7 +510,6 @@ class EvaluationsController extends AppController
                         'name' => $event['title'],
                         'description' => $event['description'],
                         'published' => true,
-                        'muted' => true,
                         'grading_type' => 'points',
                         'points_possible' => $points_possible
                     );
@@ -531,6 +530,14 @@ class EvaluationsController extends AppController
                         }
                         else {
                             $exportReport[] = 'A new assignment was created in Canvas for the event "' . $event['title'] . '".';
+                        }
+
+                        // update the newly created Canvas assignment with manual posting policy
+                        try {
+                            $mute_result = $canvasAssignment->setAssignmentPostPolicy($this, User::get('id'), true);
+                        } catch (Exception $e) {
+                            err_log('Problem marking the assignment grade for manual release');
+                            error_log($e->getMessage());
                         }
                     }
                 }

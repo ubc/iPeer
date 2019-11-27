@@ -15,7 +15,7 @@ if (isset($course_list['A']))
   foreach ($course_list['A'] as $course)
   {
     $courseid = $course['Course']['id'];
-    $coursename = $course['Course']['course'];
+    $coursename = $course['Course']['full_name'];
     $image = $html->image("icons/home.gif", array('alt' => "$coursename home"));
     $link = "/courses/home/$courseid";
     echo "<div class='course'>";
@@ -58,7 +58,7 @@ if (isset($course_list['I']))
   foreach ($course_list['I'] as $course)
   {
     $courseid = $course['Course']['id'];
-    $coursename = $course['Course']['course'];
+    $coursename = $course['Course']['full_name'];
     echo "<div class='course'>";
     $image = $html->image("icons/home.gif", array('alt' => "$coursename home"));
     $link = "/courses/home/$courseid";

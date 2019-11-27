@@ -8,7 +8,7 @@ require_once('upgrade_base.php');
  * @author    Pan Luo
  * @copyright 2018 All rights reserved.
  * @license   PHP Version 3.0 {@link http://www.php.net/license/3_0.txt}
- * @version   Release: 3.4.0
+ * @version   Release: 3.4.4
  */
  class Upgrade344 extends UpgradeBase
 {

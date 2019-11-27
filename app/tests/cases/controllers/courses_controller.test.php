@@ -51,6 +51,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'id' => 1,
                 'course' => 'MECH 328',
                 'title' => 'Mechanical Engineering Design Project',
+                'term' => null,
                 'creator_id' => 1,
                 'record_status' => 'A',
                 'creator' => 'Super Admin'
@@ -61,6 +62,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'id' => 2,
                 'course' => 'APSC 201',
                 'title' => 'Technical Communication',
+                'term' => null,
                 'creator_id' => 1,
                 'record_status' => 'A',
                 'creator' => 'Super Admin'
@@ -71,6 +73,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'id' => 3,
                 'course' => 'CPSC 101',
                 'title' => 'Connecting with Computer Science',
+                'term' => null,
                 'creator_id' => 1,
                 'record_status' => 'I',
                 'creator' => 'Super Admin'
@@ -81,6 +84,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'id' => 4,
                 'course' => 'CPSC 404',
                 'title' => 'Advanced Software Engineering',
+                'term' => null,
                 'creator_id' => 1,
                 'record_status' => 'A',
                 'creator' => 'Super Admin'

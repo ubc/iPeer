@@ -289,7 +289,7 @@ class EvaluationComponent extends CakeObject
         $points = $params['form']['points'];
         $comments = $params['form']['comments'];
         $evaluator = $params['data']['Evaluation']['evaluator_id'];
-        isset($params['form']['group_id']) ? $evaluators = $this->GroupsMembers->findAllByGroupId($params['form']['group_id']) : $evaluators = "";
+        isset($params['form']['group_id']) ? $evaluators = $this->GroupsMembers->findAllByGroupId($params['form']['group_id']) : $evaluators = null;
         $evaluators = Set::extract('/GroupsMembers/user_id', $evaluators);
 
         // If value is not within range, then don't save.
@@ -1065,7 +1065,7 @@ class EvaluationComponent extends CakeObject
      */
     function saveNGetEvaluationMixevalDetail($evalMixevalId, $mixeval, $form, $auto_release)
     {
-        if ($evalMixevalId == null || $mixeval == null || $form == null || $auto_release == null) {
+        if ($evalMixevalId === null || $mixeval == null || $form == null || $auto_release === null) {
             return false;
         }
         $this->EvaluationMixevalDetail = ClassRegistry::init('EvaluationMixevalDetail');
