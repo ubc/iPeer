@@ -1,6 +1,6 @@
 <?php
 App::import('Lib', 'CakeDjjob.cake_job', array(
-    'file' => 'jobs' . DS . 'cake_job.php',
+    'file' => 'cake_djjob' . DS . 'libs' . DS . 'jobs' . DS . 'cake_job.php',
 ));
 App::import('Lib', 'caliper');
 use caliper\CaliperSensor;
