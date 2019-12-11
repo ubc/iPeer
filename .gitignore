@@ -21,3 +21,4 @@ vendor/
 .data
 composer.phar
 composer.lock
+app/config/**/*.key
