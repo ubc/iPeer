@@ -49,4 +49,5 @@ class Lti13 extends AppModel
 [launch.ctp](app/views/lti13/launch.ctp)
 
 ```html
-<h3>LTI 1.3 tool temporary launch page.</h3>```
+<h3>LTI 1.3 tool temporary launch page.</h3>
+```
