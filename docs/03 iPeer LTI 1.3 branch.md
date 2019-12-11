@@ -1,4 +1,4 @@
-# iPeer LTI 1.3 code
+# iPeer LTI 1.3 branch
 
 ## Create repository
 
