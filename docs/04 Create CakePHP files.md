@@ -20,7 +20,7 @@ git checkout lti-1.3
 touch app/controllers/lti13_controller.php
 touch app/models/lti13.php
 mkdir -p app/views/lti13
-touch app/views/lti13/index.ctp
+touch app/views/lti13/launch.ctp
 ```
 
 [lti13_controller.php](app/controllers/lti13_controller.php)
@@ -28,9 +28,6 @@ touch app/views/lti13/index.ctp
 ```php
 class Lti13Controller extends AppController
 {
-    public function index()
-    {}
-
     public function login()
     {}
 
@@ -49,8 +46,7 @@ class Lti13 extends AppModel
 }
 ```
 
-[index.ctp](app/views/lti13/index.ctp)
+[launch.ctp](app/views/lti13/launch.ctp)
 
 ```html
-<p>LTI 1.3 tool index page.</p>
-```
+<h3>LTI 1.3 tool temporary launch page.</h3>```

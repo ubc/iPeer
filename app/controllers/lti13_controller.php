@@ -11,9 +11,6 @@
  */
 class Lti13Controller extends AppController
 {
-    public function index()
-    {}
-
     public function login()
     {}
 
