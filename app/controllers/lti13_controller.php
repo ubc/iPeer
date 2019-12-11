@@ -16,4 +16,7 @@ class Lti13Controller extends AppController
 
     public function login()
     {}
+
+    public function launch()
+    {}
 }

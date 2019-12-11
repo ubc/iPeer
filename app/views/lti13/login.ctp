@@ -1,1 +1,0 @@
-<p>LTI 1.3 tool login page.</p>
