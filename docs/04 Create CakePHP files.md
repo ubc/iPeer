@@ -23,7 +23,7 @@ mkdir -p app/views/lti13
 touch app/views/lti13/index.ctp
 ```
 
-In `app/controllers/lti13_controller.php`:
+[lti13_controller.php](app/controllers/lti13_controller.php)
 
 ```php
 class Lti13Controller extends AppController
@@ -39,7 +39,7 @@ class Lti13Controller extends AppController
 }
 ```
 
-In `app/models/lti13.php`:
+[lti13.php](app/models/lti13.php)
 
 ```php
 class Lti13 extends AppModel
@@ -49,7 +49,7 @@ class Lti13 extends AppModel
 }
 ```
 
-In `app/views/lti13/index.ctp`:
+[index.ctp](app/views/lti13/index.ctp)
 
 ```html
 <p>LTI 1.3 tool index page.</p>
