@@ -25,7 +25,7 @@ class Lti13Controller extends AppController
 
     public function login()
     {
-        $url = Router::url('/lti13/launch');
+        $url = Router::url('/lti13/launch', true);
         return LTI_OIDC_Login::new(new Lti13Database())->do_oidc_login_redirect($url)->do_redirect();
     }
 
