@@ -2,8 +2,8 @@
 /**
  * Prevent notices, warnings and errors
  * by assigning $_SERVER['HTTP_X_FORWARDED_PROTO'] and
- * by loading IMSGlobal Composer package and
- * by loading it's dependent packages JWT & JWK
+ * by loading Firebase\JWT\JWT & Firebase\JWT\JWK first,
+ * then by loading IMSGlobal\LTI Composer package
  * at the top of every LTI13-related file.
  */
 $_SERVER['HTTP_X_FORWARDED_PROTO'] = env('HTTP_X_FORWARDED_PROTOCOL');
