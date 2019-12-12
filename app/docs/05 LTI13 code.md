@@ -37,11 +37,29 @@ echo 'app/config/**/*.key' | tee -a .gitignore
 }
 ```
 
+## lti13_bootstrap.php
+
+```php
+<?php
+/**
+ * Prevent notices, warnings and errors
+ * by assigning $_SERVER['HTTP_X_FORWARDED_PROTO'] and
+ * by loading IMSGlobal Composer package and
+ * by loading it's dependent package JWT
+ * at the top of every LTI13-related file.
+ */
+$_SERVER['HTTP_X_FORWARDED_PROTO'] = env('HTTP_X_FORWARDED_PROTOCOL');
+require_once ROOT.DS.'vendor'.DS.'fproject'.DS.'php-jwt'.DS.'src'.DS.'JWT.php';
+require_once ROOT.DS.'vendor'.DS.'imsglobal'.DS.'lti-1p3-tool'.DS.'src'.DS.'lti'.DS.'lti.php';
+```
+
+[lti13_bootstrap.php](app/libs/lti13_bootstrap.php)
+
 ## LTI13Database class
 
 <https://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Configuration.html#loading-vendor-files>
 
-[LTI13Database.php](app/libs/LTI13Database.php)
+[lti13_database.php](app/libs/lti13_database.php)
 
 ## Model
 
@@ -56,5 +74,6 @@ echo 'app/config/**/*.key' | tee -a .gitignore
 [routes.php](app/config/routes.php)
 
 ```diff
-
++ Router::connect('/lti13/login', array('controller' => 'Lti13', 'action' => 'login'));
++ Router::connect('/lti13/launch', array('controller' => 'Lti13', 'action' => 'launch'));
 ```

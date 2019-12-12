@@ -1,7 +1,7 @@
 <?php
-App::import('Vendor', 'IMSGlobal\\LTI', array('file'=>'imsglobal'.DS.'lti-1p3-tool'.DS.'src'.DS.'lti'.DS.'lti.php'));
+App::import('Lib', 'Lti13Bootstrap');
 
-use IMSGlobal\LTI\Database;
+use IMSGlobal\LTI\Database as LTI_Database;
 use IMSGlobal\LTI\LTI_Registration;
 use IMSGlobal\LTI\LTI_Deployment;
 
