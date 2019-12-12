@@ -24,7 +24,7 @@ class Lti13Database implements LTI_Database {
      */
     private function set_issuers()
     {
-        $filenames = glob(ROOT.DS.'config'.DS.'lti13'.DS.'*.json');
+        $filenames = glob(ROOT.DS.'app'.DS.'config'.DS.'lti13'.DS.'*.json');
         foreach ($filenames as $filename) {
             $json = json_decode(file_get_contents($filename), true);
             $this->issuers = array_merge($this->issuers, $json);
@@ -86,7 +86,7 @@ class Lti13Database implements LTI_Database {
      * @return string
      */
     private function tool_private_key($iss) {
-        $filename = base_path($this->issuers[$iss]['private_key_file']);
+        $filename = ROOT.DS.$this->issuers[$iss]['private_key_file'];
         return file_get_contents($filename);
     }
 }
