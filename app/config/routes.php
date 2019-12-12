@@ -32,6 +32,11 @@
  * */
 
 if (IS_INSTALLED) {
+
+  // LTI13 routes
+  Router::connect('/lti13/login', array('controller' => 'Lti13', 'action' => 'login'));
+  Router::connect('/lti13/launch', array('controller' => 'Lti13', 'action' => 'launch'));
+
   // Disable access to the installer by redirecting all attempts to access
   // the installer to the index page. Except for install5, which is needed
   // to tell the user that an install was successful.
