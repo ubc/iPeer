@@ -24,7 +24,7 @@ class Lti13Database implements LTI_Database {
      */
     private function set_issuers()
     {
-        $filenames = glob(APP_DIR.'/config/lti13/*.json');
+        $filenames = glob(ROOT.DS.'config'.DS.'lti13'.DS.'*.json');
         foreach ($filenames as $filename) {
             $json = json_decode(file_get_contents($filename), true);
             $this->issuers = array_merge($this->issuers, $json);
