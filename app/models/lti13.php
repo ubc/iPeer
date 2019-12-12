@@ -6,7 +6,7 @@ use Firebase\JWT\JWT;
 use IMSGlobal\LTI\LTI_Message_Launch;
 
 /**
- * LTI 1.3
+ * LTI 1.3 Model
  *
  * @uses AppModel
  * @package   CTLT.iPeer
@@ -16,7 +16,6 @@ use IMSGlobal\LTI\LTI_Message_Launch;
  */
 class Lti13 extends AppModel
 {
-    public $name = "Lti13";
     public $useTable = false;
 
     /**

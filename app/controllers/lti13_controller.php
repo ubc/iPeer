@@ -7,7 +7,7 @@ use IMSGlobal\LTI\LTI_OIDC_Login;
 use IMSGlobal\LTI\LTI_Message_Launch;
 
 /**
- * Lti13Controller
+ * LTI 1.3 Controller
  *
  * @uses AppController
  * @package   CTLT.iPeer
