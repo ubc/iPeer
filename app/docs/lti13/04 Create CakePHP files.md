@@ -7,9 +7,9 @@
 
 ### Existing LTI files
 
-- [lti_controller.php](app/controllers/lti_controller.php)
-- [lti_requester.php](app/controllers/components/lti_requester.php)
-- [lti_verifier.php](app/controllers/components/lti_verifier.php)
+- [app/controllers/lti_controller.php](app/controllers/lti_controller.php)
+- [app/controllers/components/lti_requester.php](app/controllers/components/lti_requester.php)
+- [app/controllers/components/lti_verifier.php](app/controllers/components/lti_verifier.php)
 
 ## Make new files
 
