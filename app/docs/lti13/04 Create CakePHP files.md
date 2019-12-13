@@ -23,7 +23,7 @@ mkdir -p app/views/lti13
 touch app/views/lti13/launch.ctp
 ```
 
-[lti13_controller.php](app/controllers/lti13_controller.php)
+[app/controllers/lti13_controller.php](app/controllers/lti13_controller.php)
 
 ```php
 class Lti13Controller extends AppController
@@ -36,7 +36,7 @@ class Lti13Controller extends AppController
 }
 ```
 
-[lti13.php](app/models/lti13.php)
+[app/models/lti13.php](app/models/lti13.php)
 
 ```php
 class Lti13 extends AppModel
@@ -45,7 +45,7 @@ class Lti13 extends AppModel
 }
 ```
 
-[launch.ctp](app/views/lti13/launch.ctp)
+[app/views/lti13/launch.ctp](app/views/lti13/launch.ctp)
 
 ```html
 <h3>LTI 1.3 tool temporary launch page.</h3>
