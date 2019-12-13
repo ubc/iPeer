@@ -56,7 +56,7 @@ class Lti13 extends AppModel
      */
     private function jwt_header()
     {
-        if ($jwt = $_REQUEST['id_token']) {
+        if ($jwt = @$_REQUEST['id_token']) {
             $jwt_header = explode('.', $jwt)[0];
             $jwt_header = json_decode(JWT::urlsafeB64Decode($jwt_header));
             return $this->to_json($jwt_header);
