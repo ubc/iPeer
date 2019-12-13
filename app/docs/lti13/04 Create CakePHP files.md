@@ -41,7 +41,6 @@ class Lti13Controller extends AppController
 ```php
 class Lti13 extends AppModel
 {
-    public $name = "Lti13";
     public $useTable = false;
 }
 ```

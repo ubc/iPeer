@@ -24,8 +24,6 @@ In Mac terminal:
 mkdir -p ~/Code/ctlt && cd $_
 git clone https://github.com/ubc/iPeer.git
 cd ~/Code/ctlt/iPeer
-# docker pull ubcctlt/ipeer-app
-# docker pull ubcctlt/ipeer-web
 curl -sS https://getcomposer.org/installer | php
 php composer.phar install
 ```
