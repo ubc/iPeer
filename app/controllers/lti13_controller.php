@@ -17,10 +17,16 @@ use IMSGlobal\LTI\LTI_Message_Launch;
  */
 class Lti13Controller extends AppController
 {
+    public $uses = array('Lti13');
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function beforeFilter()
     {
         $this->ltidb = new Lti13Database();
-        $this->model = new Lti13();
     }
 
     public function login()
@@ -32,9 +38,9 @@ class Lti13Controller extends AppController
     public function launch()
     {
         $launch = LTI_Message_Launch::new($this->ltidb)->validate();
-        $data = $this->model->get_launch_data($launch->get_launch_id(), $this->ltidb);
+        $data = $this->Lti13->get_launch_data($launch->get_launch_id(), $this->ltidb);
         $this->set('customLogo', null);
         $this->set('data', $data);
-        $this->render('launch');
+        $this->render();
     }
 }
