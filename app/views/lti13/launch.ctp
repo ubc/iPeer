@@ -1,4 +1,4 @@
-<h3>LTI 1.3 tool debug launch page.</h3>
+<h3>LTI 1.3 tool debug <u>launch</u> page.</h3>
 
 <p>Launch ID</p>
 <pre style="font-family:monospace;"><?php echo $launch_id; ?></pre>

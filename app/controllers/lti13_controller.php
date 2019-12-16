@@ -29,6 +29,14 @@ class Lti13Controller extends AppController
         $this->ltidb = new Lti13Database();
     }
 
+    public function index()
+    {
+        $json = $this->Lti13->get_registration_json($this->ltidb);
+        $this->set('customLogo', null);
+        $this->set('json', $json);
+        $this->render();
+    }
+
     public function login()
     {
         $url = Router::url('/lti13/launch', true);
