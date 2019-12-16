@@ -44,7 +44,7 @@ class Lti13 extends AppModel
             'launch_id'    => $launch_id,
             'message_type' => $jwt_payload['https://purl.imsglobal.org/spec/lti/claim/message_type'],
             'post_as_json' => json_encode($_POST, 448),
-            'jwt_header'   => $this->jwt_header(),
+            'jwt_header'   => json_encode($this->jwt_header(), 448),
             'jwt_payload'  => json_encode($jwt_payload, 448),
         ];
     }
@@ -58,8 +58,7 @@ class Lti13 extends AppModel
     {
         if ($jwt = @$_REQUEST['id_token']) {
             $jwt_header = explode('.', $jwt)[0];
-            $jwt_header = json_decode(JWT::urlsafeB64Decode($jwt_header));
-            return json_encode($jwt_header, 448);
+            return json_decode(JWT::urlsafeB64Decode($jwt_header));
         }
     }
 }
