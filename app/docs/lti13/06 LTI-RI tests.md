@@ -5,7 +5,12 @@
 ```bash
 cd ~/Code/ctlt/iPeer
 git checkout lti-1.3-debug
+docker-compose up -d
 ```
+
+## Browse to the LTI 1.3 index
+
+<http://localhost:8080/lti13>
 
 ## Perform manual test with LTI-RI
 
