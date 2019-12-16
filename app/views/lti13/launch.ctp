@@ -1,3 +1,16 @@
-<h3>LTI 1.3 tool temporary launch page.</h3>
+<h3>LTI 1.3 tool debug launch page.</h3>
 
-<pre style="font-family:monospace;">$data = <?php print_r($data); ?></pre>
+<p>Launch ID</p>
+<pre style="font-family:monospace;"><?php echo $launch_id; ?></pre>
+
+<p>Message type</p>
+<pre style="font-family:monospace;"><?php echo $message_type; ?></pre>
+
+<p>$_POST as JSON</p>
+<pre style="font-family:monospace;"><?php echo $post_as_json; ?></pre>
+
+<p>JWT header</p>
+<pre style="font-family:monospace;"><?php echo $jwt_header; ?></pre>
+
+<p>JWT payload</p>
+<pre style="font-family:monospace;"><?php echo $jwt_payload; ?></pre>

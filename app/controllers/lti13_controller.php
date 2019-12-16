@@ -40,7 +40,7 @@ class Lti13Controller extends AppController
         $launch = LTI_Message_Launch::new($this->ltidb)->validate();
         $data = $this->Lti13->get_launch_data($launch->get_launch_id(), $this->ltidb);
         $this->set('customLogo', null);
-        $this->set('data', $data);
+        $this->set($data);
         $this->render();
     }
 }

@@ -26,7 +26,7 @@ class Lti13 extends AppModel
      */
     public function get_registration_json(Lti13Database $ltidb)
     {
-        return $this->to_json($ltidb->get_issuers());
+        return json_encode($ltidb->get_issuers(), 448);
     }
 
     /**
@@ -43,9 +43,9 @@ class Lti13 extends AppModel
         return [
             'launch_id'    => $launch_id,
             'message_type' => $jwt_payload['https://purl.imsglobal.org/spec/lti/claim/message_type'],
-            'post_as_json' => $this->to_json($_POST),
+            'post_as_json' => json_encode($_POST, 448),
             'jwt_header'   => $this->jwt_header(),
-            'jwt_payload'  => $this->to_json($jwt_payload),
+            'jwt_payload'  => json_encode($jwt_payload, 448),
         ];
     }
 
@@ -59,18 +59,7 @@ class Lti13 extends AppModel
         if ($jwt = @$_REQUEST['id_token']) {
             $jwt_header = explode('.', $jwt)[0];
             $jwt_header = json_decode(JWT::urlsafeB64Decode($jwt_header));
-            return $this->to_json($jwt_header);
+            return json_encode($jwt_header, 448);
         }
-    }
-
-    /**
-     * Format value as pretty print JSON.
-     *
-     * @param mixed $value
-     * @return string
-     */
-    private function to_json($value)
-    {
-        return json_encode($value, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE);
     }
 }
