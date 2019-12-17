@@ -55,7 +55,7 @@ Log in and follow instructions at <https://lti-ri.imsglobal.org>
 - Title: `Test iPeer resource link title` (4)
 - Description: `Test iPeer resource link description`
 - Tool link url: `http://localhost:8080/lti13/launch` (2)
-    - URL for a local iPeer installation using the LtiController route
+    - URL for a local iPeer installation using the Lti13Controller route
 - Login initiation url: `http://localhost:8080/lti13/login`
 - Role: blank
 - User identifier only for launch, no PII such as first name, email etc.: OFF
