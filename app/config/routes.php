@@ -34,6 +34,7 @@
 if (IS_INSTALLED) {
 
   // LTI13 routes
+  Router::connect('/lti13', array('controller' => 'Lti13', 'action' => 'index'));
   Router::connect('/lti13/login', array('controller' => 'Lti13', 'action' => 'login'));
   Router::connect('/lti13/launch', array('controller' => 'Lti13', 'action' => 'launch'));
 

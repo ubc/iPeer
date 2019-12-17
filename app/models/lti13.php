@@ -17,29 +17,33 @@ use IMSGlobal\LTI\LTI_Message_Launch;
 class Lti13 extends AppModel
 {
     public $useTable = false;
+    public $ltidb;
+
+    public function __construct()
+    {
+        $this->ltidb = new Lti13Database();
+    }
 
     /**
      * Encode the Lti13Database::$issuers array into JSON.
      *
-     * @param Lti13Database $ltidb
      * @return string
      */
-    public function get_registration_json(Lti13Database $ltidb)
+    public function get_registration_json()
     {
-        return json_encode($ltidb->get_issuers(), 448);
+        return json_encode($this->ltidb->get_issuers(), 448);
     }
 
     /**
      * Encode the LTI_Message_Launch object into JSON.
      *
-     * @param string $launch_id
-     * @param Lti13Database $ltidb
      * @return string
      */
-    public function get_launch_data($launch_id, Lti13Database $ltidb)
+    public function get_launch_data()
     {
-        $cached_launch = LTI_Message_Launch::from_cache($launch_id, $ltidb);
-        $jwt_payload = $cached_launch->get_launch_data();
+        $launch = LTI_Message_Launch::new($this->ltidb)->validate();
+        $launch_id = $launch->get_launch_id();
+        $jwt_payload = LTI_Message_Launch::from_cache($launch_id, $this->ltidb)->get_launch_data();
         return [
             'launch_id'    => $launch_id,
             'message_type' => $jwt_payload['https://purl.imsglobal.org/spec/lti/claim/message_type'],

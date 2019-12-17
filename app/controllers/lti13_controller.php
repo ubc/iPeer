@@ -1,10 +1,7 @@
 <?php
-App::import('Lib', 'Lti13Bootstrap');
-App::import('Lib', 'Lti13Database');
 App::import('Model', 'Lti13');
 
 use IMSGlobal\LTI\LTI_OIDC_Login;
-use IMSGlobal\LTI\LTI_Message_Launch;
 
 /**
  * LTI 1.3 Controller
@@ -26,12 +23,12 @@ class Lti13Controller extends AppController
 
     public function beforeFilter()
     {
-        $this->ltidb = new Lti13Database();
+        $this->Auth->allow('index');
     }
 
     public function index()
     {
-        $json = $this->Lti13->get_registration_json($this->ltidb);
+        $json = $this->Lti13->get_registration_json();
         $this->set('customLogo', null);
         $this->set('json', $json);
         $this->render();
@@ -40,15 +37,14 @@ class Lti13Controller extends AppController
     public function login()
     {
         $url = Router::url('/lti13/launch', true);
-        return LTI_OIDC_Login::new($this->ltidb)->do_oidc_login_redirect($url)->do_redirect();
+        return LTI_OIDC_Login::new($this->Lti13->ltidb)->do_oidc_login_redirect($url)->do_redirect();
     }
 
     public function launch()
     {
-        $launch = LTI_Message_Launch::new($this->ltidb)->validate();
-        $data = $this->Lti13->get_launch_data($launch->get_launch_id(), $this->ltidb);
-        $this->set('customLogo', null);
+        $data = $this->Lti13->get_launch_data();
         $this->set($data);
+        $this->set('customLogo', null);
         $this->render();
     }
 }
