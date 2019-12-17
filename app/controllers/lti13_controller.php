@@ -29,8 +29,8 @@ class Lti13Controller extends AppController
     public function index()
     {
         $json = $this->Lti13->get_registration_json();
-        $this->set('customLogo', null);
         $this->set('json', $json);
+        $this->set('customLogo', null);
         $this->render();
     }
 
