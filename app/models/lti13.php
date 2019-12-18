@@ -41,7 +41,12 @@ class Lti13 extends AppModel
      */
     public function get_launch_data()
     {
-        $launch = LTI_Message_Launch::new($this->ltidb)->validate();
+        $launch = LTI_Message_Launch::new($this->ltidb);
+        try {
+            $launch->validate();
+        } catch (Exception $e) {
+            echo "Launch validation failed.";
+        }
         $launch_id = $launch->get_launch_id();
         $jwt_payload = LTI_Message_Launch::from_cache($launch_id, $this->ltidb)->get_launch_data();
         return [
