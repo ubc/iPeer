@@ -49,6 +49,7 @@ class Lti13Controller extends AppController
 
     public function launch()
     {
+        $this->Lti13->launch();
         $data = $this->Lti13->get_launch_data();
         $this->set($data);
         $this->set('customLogo', null);

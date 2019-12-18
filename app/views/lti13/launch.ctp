@@ -14,3 +14,10 @@
 
 <p>JWT payload</p>
 <pre style="font-family:monospace;"><?php echo $jwt_payload; ?></pre>
+
+<hr>
+
+<h3>Names Roles Provisioning Service</h3>
+
+<p>Members</p>
+<pre style="font-family:monospace;"><?php echo $members; ?></pre>
