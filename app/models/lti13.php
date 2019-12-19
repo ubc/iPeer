@@ -107,7 +107,7 @@ class Lti13 extends AppModel
      */
     public function get_members()
     {
-        if ($nrps = $this->get_nrps()) {
+        if ($nrps = @$this->get_nrps()) {
             $this->members = $nrps->get_members();
             return $this->members;
         }
