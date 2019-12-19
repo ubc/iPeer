@@ -4,6 +4,7 @@ App::import('Lib', 'Lti13Database');
 
 use Firebase\JWT\JWT;
 use IMSGlobal\LTI\LTI_Message_Launch;
+use Exception;
 
 /**
  * LTI 1.3 Model
@@ -92,7 +93,8 @@ class Lti13 extends AppModel
     {
         $launch = LTI_Message_Launch::from_cache($this->launch_id, $this->ltidb);
         if (!$launch->has_nrps()) {
-            throw new Exception("Don't have names and roles!");
+            // throw new Exception("Don't have names and roles!");
+            return;
         }
         $this->nrps = $launch->get_nrps();
         return $this->nrps;
@@ -105,7 +107,9 @@ class Lti13 extends AppModel
      */
     public function get_members()
     {
-        $this->members = $this->get_nrps()->get_members();
-        return $this->members;
+        if ($nrps = $this->get_nrps()) {
+            $this->members = $nrps->get_members();
+            return $this->members;
+        }
     }
 }
