@@ -1,5 +1,4 @@
 <?php
-
 namespace App\LTI13;
 
 use IMSGlobal\LTI\LTI_Assignments_Grades_Service;
