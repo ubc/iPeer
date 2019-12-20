@@ -1,14 +1,14 @@
 <?php
-App::import('Lib', 'Lti13Bootstrap');
+namespace App\LTI13;
 
 use IMSGlobal\LTI\Database as LTI_Database;
-use IMSGlobal\LTI\LTI_Registration;
 use IMSGlobal\LTI\LTI_Deployment;
+use IMSGlobal\LTI\LTI_Registration;
 
 /**
  * @link https://github.com/IMSGlobal/lti-1-3-php-example-tool/blob/master/src/db/example_database.php
  */
-class Lti13Database implements LTI_Database {
+class LTI13Database implements LTI_Database {
 
     private $issuers = [];
 
@@ -20,7 +20,7 @@ class Lti13Database implements LTI_Database {
     /**
      * Load all registration JSON files from app/config/lti13 folder.
      *
-     * @return LTI13Database
+     * @return App\LTI13\LTI13Database
      */
     private function set_issuers()
     {

@@ -1,8 +1,9 @@
 <?php
 App::import('Lib', 'Lti13Bootstrap');
-App::import('Lib', 'Lti13Database');
+App::import('Lib', 'LTI13Database', array('file'=>'lti13'.DS.'LTI13Database.php'));
 App::import('Lib', 'LTI_Assignments_Grades_Service_Override', array('file'=>'lti13'.DS.'LTI_Assignments_Grades_Service_Override.php'));
 
+use App\LTI13\LTI13Database;
 use App\LTI13\LTI_Assignments_Grades_Service_Override;
 use Firebase\JWT\JWT;
 use IMSGlobal\LTI\LTI_Deep_Link_Resource;
