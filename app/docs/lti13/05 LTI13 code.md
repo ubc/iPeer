@@ -61,7 +61,7 @@ require_once ROOT.DS.'vendor'.DS.'imsglobal'.DS.'lti-1p3-tool'.DS.'src'.DS.'lti'
 
 <https://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Configuration.html#loading-vendor-files>
 
-[app/libs/lti13_database.php](app/libs/lti13_database.php)
+[app/libs/LTI13Database.php](app/libs/LTI13Database.php)
 
 ## Model
 

@@ -20,3 +20,6 @@ docker-compose up -d
 > Success with both URLs 2019-12-12
 
 [app/views/lti13/launch.ctp](app/views/lti13/launch.ctp) is a debug view file that is displaying the `$_POST` and the JWT data.
+
+> Success with both URLs 2019-12-20
+> showing NRPS, AGS and Deep Link data.
