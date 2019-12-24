@@ -35,6 +35,12 @@ class Lti13Controller extends AppController
         $this->render();
     }
 
+    public function update()
+    {
+        $this->Lti13->update();
+        $this->redirect('/home');
+    }
+
     public function login()
     {
         $login = LTI_OIDC_Login::new($this->Lti13->ltidb);

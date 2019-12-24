@@ -7,6 +7,7 @@ use App\LTI13\LTI13Database;
 use App\LTI13\LTI_Assignments_Grades_Service_Override;
 use Firebase\JWT\JWT;
 use IMSGlobal\LTI\LTI_Deep_Link_Resource;
+use IMSGlobal\LTI\LTI_Exception;
 use IMSGlobal\LTI\LTI_Lineitem;
 use IMSGlobal\LTI\LTI_Message_Launch;
 use IMSGlobal\LTI\LTI_Service_Connector;
@@ -24,6 +25,7 @@ class Lti13 extends AppModel
 {
     public $useTable = false;
     public $ltidb, $launch_id, $nrps, $nrps_members, $ags, $ags_grades, $dl, $dl_response;
+    public $roster, $course;
 
     public function __construct()
     {
@@ -55,6 +57,78 @@ class Lti13 extends AppModel
         }
         $this->launch_id = $launch->get_launch_id();
         return $this->launch_id;
+    }
+
+    /**
+     * 
+     * 
+     * @return 
+     */
+    public function update()
+    {
+        $launch = LTI_Message_Launch::from_cache($this->launch_id, $this->ltidb);
+        $jwt_payload = json_decode($launch->get_launch_data(), true);
+
+        $this->roster = $this->get_course_roster();
+        $this->course = $this->get_course_info($jwt_payload);
+        $this->update_course_roster();
+        $this->log_in_as_user();
+    }
+
+    /**
+     * 
+     * 
+     * @return 
+     */
+    public function get_course_roster()
+    {
+
+    }
+
+    /**
+     * Check if course data is available and get `label` and `title` from it.
+     *
+     * @param array $jwt_payload
+     * @return array
+     */
+    public function get_course_info($jwt_payload)
+    {
+        if (! $context = @$jwt_payload['https://purl.imsglobal.org/spec/lti/claim/context']) {
+            throw new LTI_Exception("Missing 'https://purl.imsglobal.org/spec/lti/claim/context'");
+        }
+
+        if (!isset($context['label'])) {
+            throw new LTI_Exception("Missing 'context label'");
+        }
+
+        if (!isset($context['title'])) {
+            throw new LTI_Exception("Missing 'context title'");
+        }
+
+        return [
+            'course' => $context['label'],
+            'title'  => $context['title'],
+        ];
+    }
+
+    /**
+     * 
+     * 
+     * @return 
+     */
+    public function update_course_roster()
+    {
+
+    }
+
+    /**
+     * 
+     * 
+     * @return 
+     */
+    public function log_in_as_user()
+    {
+
     }
 
     /**
