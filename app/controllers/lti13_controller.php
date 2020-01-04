@@ -1,6 +1,7 @@
 <?php
 App::import('Model', 'Lti13');
 
+use IMSGlobal\LTI\LTI_Message_Launch;
 use IMSGlobal\LTI\LTI_OIDC_Login;
 use IMSGlobal\LTI\OIDC_Exception;
 
@@ -29,21 +30,15 @@ class Lti13Controller extends AppController
 
     public function index()
     {
-        $json = $this->Lti13->get_registration_json();
+        $json = $this->Lti13->getRegistrationJson();
         $this->set('json', $json);
         $this->set('customLogo', null);
         $this->render();
     }
 
-    public function update()
-    {
-        $this->Lti13->update();
-        $this->redirect('/home');
-    }
-
     public function login()
     {
-        $login = LTI_OIDC_Login::new($this->Lti13->ltidb);
+        $login = LTI_OIDC_Login::new($this->Lti13->db);
         try {
             $url = Router::url('/lti13/launch', true);
             $redirect = $login->do_oidc_login_redirect($url);
@@ -55,10 +50,28 @@ class Lti13Controller extends AppController
 
     public function launch()
     {
-        $this->Lti13->launch();
-        $data = $this->Lti13->get_launch_data();
-        $this->set($data);
-        $this->set('customLogo', null);
-        $this->render();
+        $launch = LTI_Message_Launch::new($this->Lti13->db);
+        try {
+            $launch->validate();
+        } catch (\Exception $e) {
+            echo "Launch validation failed.";
+        }
+        $this->Lti13->launchId = $launch->get_launch_id();
+
+        // $data = $this->Lti13->getLaunchData();
+        // $this->set($data);
+        // $this->set('customLogo', null);
+        // $this->render();
+    }
+
+    public function update()
+    {
+        $launch = LTI_Message_Launch::from_cache($this->Lti13->launchId, $this->Lti13->db);
+        $this->Lti13->jwtPayload = json_decode($launch->get_launch_data(), true);
+        $this->Lti13->ltiCourse = $this->Lti13->getLtiCourseData();
+        $this->Lti13->ltiRoster = $this->getLtiRoster();
+        $this->Lti13Component->saveCourseRoster();
+        // $this->log_in();                // TO BE DETERMINED (from legacy code)
+        $this->redirect('/home');
     }
 }

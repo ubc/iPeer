@@ -101,6 +101,6 @@ services:
     environment:
       - NGINX_FASTCGI_PASS=ipeer_app_unittest:9000
     ports:
-      - "8081:80"
+      - "8082:80"
     depends_on:
       - app-unittest

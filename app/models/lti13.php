@@ -1,21 +1,14 @@
 <?php
 App::import('Lib', 'Lti13Bootstrap');
 App::import('Lib', 'LTI13Database', array('file'=>'lti13'.DS.'LTI13Database.php'));
-App::import('Lib', 'LTI_Assignments_Grades_Service_Override', array('file'=>'lti13'.DS.'LTI_Assignments_Grades_Service_Override.php'));
 
 use App\LTI13\LTI13Database;
-use App\LTI13\LTI_Assignments_Grades_Service_Override;
-use Firebase\JWT\JWT;
-use IMSGlobal\LTI\LTI_Deep_Link_Resource;
 use IMSGlobal\LTI\LTI_Exception;
-use IMSGlobal\LTI\LTI_Lineitem;
-use IMSGlobal\LTI\LTI_Message_Launch;
-use IMSGlobal\LTI\LTI_Service_Connector;
 
 /**
  * LTI 1.3 Model
  *
- * @uses AppModel
+ * @uses      AppModel
  * @package   CTLT.iPeer
  * @author    Steven Marshall <steven.marshall@ubc.ca>
  * @copyright 2019 All rights reserved.
@@ -24,266 +17,279 @@ use IMSGlobal\LTI\LTI_Service_Connector;
 class Lti13 extends AppModel
 {
     public $useTable = false;
-    public $ltidb, $launch_id, $nrps, $nrps_members, $ags, $ags_grades, $dl, $dl_response;
-    public $roster, $course;
+    public $db, $User, $Course, $Role;
+    public $launchId, $jwtPayload, $ipeerRoster, $ltiRoster, $ltiCourse;
 
     public function __construct()
     {
-        $this->ltidb = new Lti13Database();
+        $this->db = new LTI13Database();
+        $this->User = ClassRegistry::init('User');
+        $this->Course = ClassRegistry::init('Course');
+        $this->Role = ClassRegistry::init('Role');
     }
 
     /**
-     * Encode the Lti13Database::$issuers array into JSON.
+     * Encode the LTI13Database::$issuers array into JSON.
      *
      * @return string
      */
-    public function get_registration_json()
+    public function getRegistrationJson()
     {
-        return json_encode($this->ltidb->get_issuers(), 448);
+        return json_encode($this->db->get_issuers(), 448);
     }
 
     /**
-     * Initialize LTI_Message_Launch object and validate its data.
-     *
-     * @return string
+     * Save course roster.
      */
-    public function launch()
+    public function saveCourseRoster()
     {
-        $launch = LTI_Message_Launch::new($this->ltidb);
-        try {
-            $launch->validate();
-        } catch (\Exception $e) {
-            echo "Launch validation failed.";
+        extract($this->ltiCourse); // => $label, $title
+
+        if ($data = $this->findCourseByLabel($label)) {
+            $this->updateCourseRoster($data);
+        } else {
+            $data = array(
+                'course' => $label,
+                'title' => $title,
+                'record_status' => Course::STATUS_ACTIVE,
+            );
+            $this->createCourseRoster($data);
         }
-        $this->launch_id = $launch->get_launch_id();
-        return $this->launch_id;
     }
 
     /**
-     * 
-     * 
-     * @return 
+     * Find course by label in database.
+     *
+     * @param string $label
+     * @return array
      */
-    public function update()
+    public function findCourseByLabel($label)
     {
-        $launch = LTI_Message_Launch::from_cache($this->launch_id, $this->ltidb);
-        $jwt_payload = json_decode($launch->get_launch_data(), true);
-
-        $this->roster = $this->get_course_roster();
-        $this->course = $this->get_course_info($jwt_payload);
-        $this->update_course_roster();
-        $this->log_in_as_user();
+        $conditions = array('Course.course' => $label);
+        return $this->Course->find('first', compact('conditions'));
     }
 
     /**
-     * 
-     * 
-     * @return 
+     * Update course roster in database.
+     *
+     * @param array $data
      */
-    public function get_course_roster()
+    public function updateCourseRoster($data)
     {
+        $courseId = $data['Course']['id'];
+        $this->ipeerRoster = $this->User->getEnrolledStudents($courseId);
+        $this->removeUsersFoundInBothRosters();
+        $this->removeRemainingUsersFromIpeerRoster($courseId);
+        $this->addRemainingUsersInIpeerRoster($courseId);
+    }
 
+    /**
+     * Create course roster in database.
+     *
+     * @param array $data
+     */
+    public function createCourseRoster($data)
+    {
+        if (!$this->Course->save($data)) {
+            throw new LTI_Exception("Unable to add course.");
+            return;
+        }
+        $this->addUsersInIpeerRoster($this->Course->id);
     }
 
     /**
      * Check if course data is available and get `label` and `title` from it.
      *
-     * @param array $jwt_payload
-     * @return array
+     * @return array|null
      */
-    public function get_course_info($jwt_payload)
+    public function getLtiCourseData()
     {
-        if (! $context = @$jwt_payload['https://purl.imsglobal.org/spec/lti/claim/context']) {
-            throw new LTI_Exception("Missing 'https://purl.imsglobal.org/spec/lti/claim/context'");
-        }
-
-        if (!isset($context['label'])) {
-            throw new LTI_Exception("Missing 'context label'");
-        }
-
-        if (!isset($context['title'])) {
-            throw new LTI_Exception("Missing 'context title'");
-        }
-
-        return [
-            'course' => $context['label'],
-            'title'  => $context['title'],
-        ];
-    }
-
-    /**
-     * 
-     * 
-     * @return 
-     */
-    public function update_course_roster()
-    {
-
-    }
-
-    /**
-     * 
-     * 
-     * @return 
-     */
-    public function log_in_as_user()
-    {
-
-    }
-
-    /**
-     * Encode the LTI_Message_Launch object into JSON.
-     *
-     * @return string
-     */
-    public function get_launch_data()
-    {
-        $launch = LTI_Message_Launch::from_cache($this->launch_id, $this->ltidb);
-        $jwt_payload = $launch->get_launch_data();
-        return [
-            'launch_id'    => $this->launch_id,
-            'message_type' => $jwt_payload['https://purl.imsglobal.org/spec/lti/claim/message_type'],
-            'post_as_json' => json_encode($_POST, 448),
-            'jwt_header'   => json_encode($this->jwt_header(), 448),
-            'jwt_payload'  => json_encode($jwt_payload, 448),
-            'nrps_members' => json_encode($this->get_members(), 448),
-            'ags_grades'   => json_encode($this->get_grades(), 448),
-            'dl_response'  => json_encode($this->get_response_jwt(), 448),
-        ];
-    }
-
-    /**
-     * Get JWT header.
-     *
-     * @return array
-     */
-    private function jwt_header()
-    {
-        if ($jwt = @$_REQUEST['id_token']) {
-            return $this->jwt_decode($jwt, 0);
-        }
-    }
-
-    /**
-     * Get LTI_Names_Roles_Provisioning_Service instance
-     *
-     * Obtained through Resource Link, not Deep Link
-     * @return LTI_Names_Roles_Provisioning_Service
-     */
-    public function get_nrps()
-    {
-        $launch = LTI_Message_Launch::from_cache($this->launch_id, $this->ltidb);
-        if (!$launch->has_nrps()) {
-            // throw new \Exception("Don't have names and roles!");
+        $key = 'https://purl.imsglobal.org/spec/lti/claim/context';
+        if (! $context = @$this->jwtPayload[$key]) {
+            throw new LTI_Exception(sprintf("Missing '%s'", $key));
             return;
         }
-        $this->nrps = $launch->get_nrps();
-        return $this->nrps;
+        $keys = array('label', 'title');
+        foreach ($keys as $key) {
+            if (!isset($context[$key])) {
+                throw new LTI_Exception(sprintf("Missing 'context %s'", $key));
+                return;
+            }
+        }
+        return array_intersect_key($context, array_flip($keys));
     }
 
     /**
-     * Get all members of the LTI_Names_Roles_Provisioning_Service instance.
+     * Get LTI course roster from API call.
      *
      * @return array
      */
-    public function get_members()
+    public function getLtiRoster()
     {
-        if ($nrps = @$this->get_nrps()) {
-            $this->members = $nrps->get_members();
-            return $this->members;
+
+    }
+
+    /**
+     * Remove users in both rosters.
+     */
+    public function removeUsersFoundInBothRosters()
+    {
+        foreach ($this->ltiRoster as $ltiKey => $ltiData) {
+            foreach ($this->ipeerRoster as $ipeerKey => $ipeerData) {
+                if ($ltiData['user_id'] == $ipeerData['User']['lti_id']) {
+                    unset($this->ltiRoster[$ltiKey], $this->ipeerRoster[$ipeerKey]);
+                    continue;
+                }
+            }
         }
     }
 
     /**
-     * Get LTI_Assignments_Grades_Service instance
+     * Remove remaining users from iPeer roster.
      *
-     * Obtained through Resource Link, not Deep Link
-     * @return LTI_Assignments_Grades_Service
+     * @param int $courseId
      */
-    public function get_ags()
+    public function removeRemainingUsersFromIpeerRoster($courseId)
     {
-        $launch = LTI_Message_Launch::from_cache($this->launch_id, $this->ltidb);
-        if (!$launch->has_ags()) {
-            // throw new \Exception("Don't have assignments and grades!");
-            return;
-        }
-        $this->ags = $this->get_ags_override();
-        return $this->ags;
-    }
-
-    /**
-     * Get all members of the LTI_Assignments_Grades_Service instance.
-     *
-     * @return array
-     */
-    public function get_grades()
-    {
-        if ($ags = @$this->get_ags()) {
-            $lineitem = LTI_Lineitem::new();
-            $this->grades = $ags->get_grades($lineitem);
-            return $this->grades;
+        foreach ($this->ipeerRoster as $data) {
+            $this->User->removeStudent($data['User']['id'], $courseId);
         }
     }
 
     /**
-     * Override LTI_Message_Launch::get_ags();
+     * Add remaining users in iPeer roster.
      *
-     * @see vendor/imsglobal/lti-1p3-tool/src/lti/LTI_Message_Launch.php::get_ags()
-     * @return LTI_Assignments_Grades_Service_Override
+     * @param $courseId
      */
-    public function get_ags_override() {
-        $launch = LTI_Message_Launch::from_cache($this->launch_id, $this->ltidb);
-        $jwt['body'] = $launch->get_launch_data();
-        $registration = $this->ltidb->find_registration_by_issuer($jwt['body']['iss']);
-        $service_connector = new LTI_Service_Connector($registration);
-        $service_data = $jwt['body']['https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'];
-        return new LTI_Assignments_Grades_Service_Override($service_connector, $service_data);
-    }
-
-    /**
-     * Get LTI_Deep_Link instance.
-     *
-     * @return LTI_Deep_Link
-     */
-    public function get_deep_link()
+    public function addRemainingUsersInIpeerRoster($courseId)
     {
-        $launch = LTI_Message_Launch::from_cache($this->launch_id, $this->ltidb);
-        if (!$launch->is_deep_link_launch()) {
-            return;
-        }
-        $this->dl = $launch->get_deep_link();
-        return $this->dl;
-    }
-
-    /**
-     * Get Deep Link response.
-     *
-     * @return array
-     */
-    public function get_response_jwt()
-    {
-        if ($dl = @$this->get_deep_link()) {
-            $resource = (new LTI_Deep_Link_Resource())
-                ->set_url("https://my.tool/launch")
-                ->set_custom_params(['my_param' => '\$my_param'])
-                ->set_title('My Resource');
-            $this->dl_response = $dl->get_response_jwt([$resource]);
-            return [
-                'JWT HEADER'  => $this->jwt_decode($this->dl_response, 0),
-                'JWT PAYLOAD' => $this->jwt_decode($this->dl_response, 1),
-            ];
+        foreach ($this->ltiRoster as $data) {
+            if (!$this->isInstructor($data['roles'])) {
+                $this->addUser($data, $courseId);
+            }
         }
     }
 
     /**
-     * Decode JWT header or payload.
+     * Add users in iPeer roster.
      *
-     * @param string $jwt
-     * @param int $i 0 = header, 1 = payload
-     * @return array
+     * @param int $courseId
      */
-    private function jwt_decode($jwt, $i)
+    public function addUsersInIpeerRoster($courseId)
     {
-        return json_decode(JWT::urlsafeB64Decode(explode('.', $jwt)[$i]));
+        foreach ($this->ltiRoster as $data) {
+            $this->addUser($data, $courseId);
+        }
+    }
+
+    /**
+     * Add user to database.
+     *
+     * @param array $data
+     * @param int $courseId
+     * @return bool
+     */
+    public function addUser($data, $courseId)
+    {
+        $isInstructor = $this->isInstructor($data['roles']);
+        $firstName = $data['person_name_given'];
+        $lastName = $data['person_name_family'];
+        $username = $firstName . $lastName;
+        $ltiId = $data['user_id'];
+
+        // If user exists, save existing user to course
+        if ($userData = $this->User->getByUsername($username)) {
+            return $this->saveExistingUserToCourse($userData, $ltiId, $courseId, $isInstructor);
+        }
+
+        // If user doesn't exist, save new user to course
+        $userData = array(
+            'User' => array(
+                'username' => $username,
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'email' => $data['person_contact_email_primary'],
+                'send_email_notification' => false,
+                'lti_id' => $ltiId,
+                'created' => date('Y-m-d H:i:s'),
+            ),
+            'Role' => array(
+                'RolesUser' => $isInstructor ? $this->User->USER_TYPE_INSTRUCTOR : $this->User->USER_TYPE_STUDENT,
+            ),
+        );
+        return $this->saveNewUserToCourse($userData, $courseId, $isInstructor);
+    }
+
+    /**
+     * Save existing user to course in database.
+     *
+     * @param array $data
+     * @param string $ltiId
+     * @param int $courseId
+     * @param bool $isInstructor
+     * @return bool
+     */
+    public function saveExistingUserToCourse($data, $ltiId, $courseId, $isInstructor)
+    {
+        if ($this->addUserToCourse($data['User']['id'], $courseId, $isInstructor)) {
+            // User might not have an lti_id, so save one
+            $data['User']['lti_id'] = $ltiId;
+            return (bool)$this->User->save($data);
+        }
+        return false;
+    }
+
+    /**
+     * Save new user to course in database.
+     *
+     * @param array $data
+     * @param int $courseId
+     * @param bool $isInstructor
+     * @return bool
+     */
+    public function saveNewUserToCourse($data, $courseId, $isInstructor)
+    {
+        $this->User->create();
+        if ($this->User->save($data)) {
+            return $this->addUserToCourse($this->User->id, $courseId, $isInstructor);
+        }
+        return false;
+    }
+
+    /**
+     * Add user to course in database.
+     *
+     * @param string $userId
+     * @param int $courseId
+     * @param bool $isInstructor
+     * @return bool
+     */
+    public function addUserToCourse($userId, $courseId, $isInstructor)
+    {
+        if ($isInstructor) {
+            if ($roleId = $this->Role->field('id', array('name' => 'instructor'))) {
+                $this->User->registerRole($userId, $roleId);
+                $this->Course->addInstructor($courseId, $userId);
+                return true;
+            }
+        } else {
+            if ($roleId = $this->Role->getDefaultId()) {
+                $this->User->registerRole($userId, $roleId);
+                $this->User->UserEnrol->insertCourses($userid, array($courseId));
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check if provided role is a LTI instructor.
+     *
+     * @param string $role
+     * @return bool
+     */
+    public function isInstructor($role)
+    {
+        return stripos($role, "Instructor") !== false;
     }
 }
