@@ -312,7 +312,7 @@ class Lti13 extends AppModel
      * Get user type by role.
      *
      * @param bool $isInstructor
-     * @return bool
+     * @return int
      */
     public function getUserType($isInstructor)
     {

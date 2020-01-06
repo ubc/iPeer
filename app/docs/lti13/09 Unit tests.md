@@ -6,6 +6,10 @@
 cd ~/Code/ctlt/iPeer
 cake/console/cake testsuite app case models/lti13
 ```
+```
+PHP Warning:  mysqli_connect(): (HY000/2002): No such file or directory in
+/Users/steven/Code/ctlt/iPeer/cake/libs/model/datasources/dbo/dbo_mysqli.php on line 63
+```
 
 ## Check the MySQL schema and data
 
@@ -13,8 +17,13 @@ In `app/tests/fixtures/course_fixture.php`,
 it shows `public $import = array('model' => 'Course', 'records' => true);`
 so it imports the schema and data from the default settings in `app/config/database.php`
 
+> In `docker-compose.yml`,
+> edit `services.web-unittest.ports`
+> from `- "8081:80"` to `- "8082:80"`
+
 ```bash
 cd ~/Code/ctlt/iPeer
+docker-compose up -d
 docker exec -it ipeer_db /bin/bash
 mysql ipeer -h db -u ipeer -p
 ```
@@ -83,47 +92,62 @@ record_status: I
    updater_id: NULL
      modified: NULL
     canvas_id: NULL
-*************************** 4. row ***************************
-           id: 4
-       course: CPSC 404
-        title: Advanced Software Engineering
-     homepage: http://www.ugrad.cs.ubc.ca/~cs404/
-  self_enroll: off
-     password: NULL
-record_status: A
-   creator_id: 1
-      created: 2014-12-15 00:00:00
-   updater_id: NULL
-     modified: 2014-12-15 00:00:00
-    canvas_id: NULL
-*************************** 5. row ***************************
-           id: 5
-       course: APSC 201 001
-        title: Technical Communication
-     homepage:
-  self_enroll: off
-     password: NULL
-record_status: A
-   creator_id: 1
-      created: 2019-11-21 22:53:19
-   updater_id: 1
-     modified: 2019-11-21 22:53:19
-    canvas_id: NULL
-5 rows in set (0.00 sec)
+...
 ```
 
 ## Run unit tests in Docker
 
-In `docker-compose.yml`,
-edit `services.web-unittest.ports` from `- "8081:80"` to `- "8082:80"`
+> In `docker-compose.yml`,
+> edit `services.web-unittest.ports`
+> from `- "8081:80"` to `- "8082:80"`
+
 
 ```bash
 cd ~/Code/ctlt/iPeer
+docker-compose up -d
 docker exec -it ipeer_app_unittest /bin/bash
 ```
 
 `root@f56a39a0172f:/var/www/html#`
 
+### Missing ipeer_test database
+
+A `could not find driver` error seems to be because the database named `ipeer_test` is missing.
+
 ```bash
-vendor/bin/phing test
+IPEER_DB_NAME=ipeer vendor/bin/phing test
+IPEER_DB_NAME=ipeer vendor/bin/phing init-test-db
+IPEER_DB_NAME=ipeer_test vendor/bin/phing test
+IPEER_DB_NAME=ipeer_test vendor/bin/phing init-test-db
+```
+```
+BUILD FAILED
+/var/www/html/build.xml:57:116: /var/www/html/build.xml:57:116: could not find driver
+```
+
+```bash
+IPEER_DB_NAME=ipeer_test cake/console/cake testsuite app case models/lti13
+```
+```
+Warning: mysqli_connect(): (HY000/1044): Access denied for user 'ipeer'@'%' to database 'ipeer_test' 
+in /var/www/html/cake/libs/model/datasources/dbo/dbo_mysqli.php on line 63
+```
+
+#### Can't create database
+
+MySQL user `ipeer` does not have permissions to `CREATE DATABASE ipeer_test;`
+so I can't manually create and copy the `ipeer` database to `ipeer_test`.
+
+> I think PHPUnit is trying to `CREATE DATABASE ipeer_test;`
+> and doesn't have the permission using user `ipeer`.
+
+### Running unit tests on app database
+
+Trying to run unit tests with the app database named `ipeer` blocks PHPUnit from creating test dB tables.
+
+```bash
+IPEER_DB_NAME=ipeer cake/console/cake testsuite app case models/lti13
+```
+```
+Error: Missing database table 'test_suite_evaluation_submissions' for model 'Submission'
 ```
