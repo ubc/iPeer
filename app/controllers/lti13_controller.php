@@ -50,24 +50,12 @@ class Lti13Controller extends AppController
 
     public function launch()
     {
-        $launch = LTI_Message_Launch::new($this->Lti13->db);
-        try {
-            $launch->validate();
-        } catch (\Exception $e) {
-            echo "Launch validation failed.";
-        }
-        $this->Lti13->launchId = $launch->get_launch_id();
-
-        // $data = $this->Lti13->getLaunchData();
-        // $this->set($data);
-        // $this->set('customLogo', null);
-        // $this->render();
+        $this->Lti13->launch();
+        $this->redirect('/update');
     }
 
     public function update()
     {
-        $launch = LTI_Message_Launch::from_cache($this->Lti13->launchId, $this->Lti13->db);
-        $this->Lti13->jwtPayload = json_decode($launch->get_launch_data(), true);
         $this->Lti13->update();
         // $this->log_in();                // TO BE DETERMINED (from legacy code)
         $this->redirect('/home');

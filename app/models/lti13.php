@@ -39,10 +39,31 @@ class Lti13 extends AppModel
     }
 
     /**
-     * Update course roster from LTI data.
+     * Initialize LTI_Message_Launch object and validate its data.
+     *
+     * @return string
+     */
+    public function launch()
+    {
+        $launch = LTI_Message_Launch::new($this->db);
+        try {
+            $launch->validate();
+        } catch (\Exception $e) {
+            echo "Launch validation failed.";
+        }
+        $this->launchId = $launch->get_launch_id();
+        return $this->launchId;
+    }
+
+    /**
+     * Update course roster from LTI data from current LTI launch.
      */
     public function update()
     {
+        // Get JWT payload
+        $launch = LTI_Message_Launch::from_cache($this->launchId, $this->db);
+        $this->jwtPayload = json_decode($launch->get_launch_data(), true);
+
         // Get course label and title from LTI launch's JWT payload
         $this->ltiCourse = $this->getLtiCourseData();
 
@@ -51,6 +72,38 @@ class Lti13 extends AppModel
 
         // Update or create iPeer course roster from the LTI data
         $this->saveCourseRoster();
+    }
+
+    /**
+     * Check if course data is available in JWT payload and get `label` and `title` from it.
+     *
+     * @return array|null
+     */
+    public function getLtiCourseData()
+    {
+        $key = 'https://purl.imsglobal.org/spec/lti/claim/context';
+        if (! $context = @$this->jwtPayload[$key]) {
+            throw new LTI_Exception(sprintf("Missing '%s'", $key));
+            return;
+        }
+        $keys = array('label', 'title');
+        foreach ($keys as $key) {
+            if (!isset($context[$key])) {
+                throw new LTI_Exception(sprintf("Missing 'context %s'", $key));
+                return;
+            }
+        }
+        return array_intersect_key($context, array_flip($keys));
+    }
+
+    /**
+     * Get LTI course roster from API call.
+     *
+     * @return array
+     */
+    public function getLtiRoster()
+    {
+
     }
 
     /**
@@ -110,38 +163,6 @@ class Lti13 extends AppModel
             return;
         }
         $this->addUsersInIpeerRoster($this->Course->id);
-    }
-
-    /**
-     * Check if course data is available in JWT payload and get `label` and `title` from it.
-     *
-     * @return array|null
-     */
-    public function getLtiCourseData()
-    {
-        $key = 'https://purl.imsglobal.org/spec/lti/claim/context';
-        if (! $context = @$this->jwtPayload[$key]) {
-            throw new LTI_Exception(sprintf("Missing '%s'", $key));
-            return;
-        }
-        $keys = array('label', 'title');
-        foreach ($keys as $key) {
-            if (!isset($context[$key])) {
-                throw new LTI_Exception(sprintf("Missing 'context %s'", $key));
-                return;
-            }
-        }
-        return array_intersect_key($context, array_flip($keys));
-    }
-
-    /**
-     * Get LTI course roster from API call.
-     *
-     * @return array
-     */
-    public function getLtiRoster()
-    {
-
     }
 
     /**
@@ -309,7 +330,7 @@ class Lti13 extends AppModel
     }
 
     /**
-     * Get user type by role.
+     * Get user type.
      *
      * @param bool $isInstructor
      * @return int
