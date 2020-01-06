@@ -149,4 +149,10 @@ JSON;
         $this->assertTrue($this->Lti13->isInstructor("Winstructor"));
         $this->assertFalse($this->Lti13->isInstructor("Instructo"));
     }
+
+    function test_getUserType()
+    {
+        $this->assertEqual(3, $this->Lti13->getUserType($isInstructor=true));
+        $this->assertEqual(5, $this->Lti13->getUserType($isInstructor=false));
+    }
 }

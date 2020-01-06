@@ -39,6 +39,21 @@ class Lti13 extends AppModel
     }
 
     /**
+     * Update course roster from LTI data.
+     */
+    public function update()
+    {
+        // Get course label and title from LTI launch's JWT payload
+        $this->ltiCourse = $this->getLtiCourseData();
+
+        // Call LTI Resource Link to get LTI roster data
+        $this->ltiRoster = $this->getLtiRoster();
+
+        // Update or create iPeer course roster from the LTI data
+        $this->saveCourseRoster();
+    }
+
+    /**
      * Save course roster.
      */
     public function saveCourseRoster()
@@ -98,7 +113,7 @@ class Lti13 extends AppModel
     }
 
     /**
-     * Check if course data is available and get `label` and `title` from it.
+     * Check if course data is available in JWT payload and get `label` and `title` from it.
      *
      * @return array|null
      */
@@ -214,7 +229,7 @@ class Lti13 extends AppModel
                 'created' => date('Y-m-d H:i:s'),
             ),
             'Role' => array(
-                'RolesUser' => $isInstructor ? $this->User->USER_TYPE_INSTRUCTOR : $this->User->USER_TYPE_STUDENT,
+                'RolesUser' => $this->getUserType($isInstructor),
             ),
         );
         return $this->saveNewUserToCourse($userData, $courseId, $isInstructor);
@@ -291,5 +306,16 @@ class Lti13 extends AppModel
     public function isInstructor($role)
     {
         return stripos($role, "Instructor") !== false;
+    }
+
+    /**
+     * Get user type by role.
+     *
+     * @param bool $isInstructor
+     * @return bool
+     */
+    public function getUserType($isInstructor)
+    {
+        return $isInstructor ? $this->User->USER_TYPE_INSTRUCTOR : $this->User->USER_TYPE_STUDENT;
     }
 }

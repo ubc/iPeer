@@ -68,9 +68,7 @@ class Lti13Controller extends AppController
     {
         $launch = LTI_Message_Launch::from_cache($this->Lti13->launchId, $this->Lti13->db);
         $this->Lti13->jwtPayload = json_decode($launch->get_launch_data(), true);
-        $this->Lti13->ltiCourse = $this->Lti13->getLtiCourseData();
-        $this->Lti13->ltiRoster = $this->getLtiRoster();
-        $this->Lti13Component->saveCourseRoster();
+        $this->Lti13->update();
         // $this->log_in();                // TO BE DETERMINED (from legacy code)
         $this->redirect('/home');
     }
