@@ -11,6 +11,14 @@ PHP Warning:  mysqli_connect(): (HY000/2002): No such file or directory in
 /Users/steven/Code/ctlt/iPeer/cake/libs/model/datasources/dbo/dbo_mysqli.php on line 63
 ```
 
+## Run basic PHPUnit
+
+```bash
+cd ~/Code/ctlt/iPeer
+wget -O phpunit.phar https://phar.phpunit.de/phpunit-5.phar
+php phpunit.phar app/tests/cases/models/lti13.test.php
+```
+
 ## Check the MySQL schema and data
 
 In `app/tests/fixtures/course_fixture.php`,
@@ -115,6 +123,7 @@ docker exec -it ipeer_app_unittest /bin/bash
 A `could not find driver` error seems to be because the database named `ipeer_test` is missing.
 
 ```bash
+vendor/bin/phing test
 IPEER_DB_NAME=ipeer vendor/bin/phing test
 IPEER_DB_NAME=ipeer vendor/bin/phing init-test-db
 IPEER_DB_NAME=ipeer_test vendor/bin/phing test
@@ -131,6 +140,41 @@ IPEER_DB_NAME=ipeer_test cake/console/cake testsuite app case models/lti13
 ```
 Warning: mysqli_connect(): (HY000/1044): Access denied for user 'ipeer'@'%' to database 'ipeer_test' 
 in /var/www/html/cake/libs/model/datasources/dbo/dbo_mysqli.php on line 63
+```
+
+```bash
+cd ~/Code/ctlt/iPeer
+docker-compose up -d
+docker exec -it ipeer_db /bin/bash
+```
+
+`root@bdae36de7a7d:/#`
+
+```bash
+mysql -h db -u root -p
+```
+
+Use root password found in `docker-compose.yml`.
+
+```bash
+MariaDB [(none)]> CREATE DATABASE ipeer_test; quit;
+```
+```bash
+exit
+```
+
+```bash
+docker exec -it ipeer_app_unittest /bin/bash
+```
+
+`root@f56a39a0172f:/var/www/html#`
+
+```bash
+vendor/bin/phing test
+```
+```
+BUILD FAILED
+/var/www/html/build.xml:57:116: /var/www/html/build.xml:57:116: could not find driver
 ```
 
 #### Can't create database
