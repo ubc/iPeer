@@ -19,6 +19,8 @@ wget -O phpunit.phar https://phar.phpunit.de/phpunit-5.phar
 php phpunit.phar app/tests/cases/models/lti13.test.php
 ```
 
+Many notices of missing files.
+
 ## Check the MySQL schema and data
 
 In `app/tests/fixtures/course_fixture.php`,

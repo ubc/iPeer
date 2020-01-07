@@ -6,6 +6,11 @@ App::import('Model', 'Lti13');
  * Usage `cake/console/cake testsuite app case models/lti13`
  *
  * @link https://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html#testing-models
+ * @package   CTLT.iPeer
+ * @since     3.4.5
+ * @author    Steven Marshall <steven.marshall@ubc.ca>
+ * @copyright 2019 All rights reserved.
+ * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
 class Lti13TestCase extends CakeTestCase {
 
