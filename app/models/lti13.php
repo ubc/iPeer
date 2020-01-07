@@ -103,30 +103,16 @@ class Lti13 extends AppModel
      * Get all members of the LTI_Names_Roles_Provisioning_Service instance.
      *
      * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L48
+     * Obtained through Resource Link, not Deep Link.
      * @return array
      */
     public function getNrpsMembers()
     {
-        if ($nrps = @$this->getNrps()) {
+        $launch = LTI_Message_Launch::from_cache($this->launchId, $this->db);
+        if ($launch->has_nrps()) {
+            $nrps = $launch->get_nrps();
             return $nrps->get_members();
         }
-    }
-
-    /**
-     * Get LTI_Names_Roles_Provisioning_Service instance.
-     *
-     * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L48
-     * Obtained through Resource Link, not Deep Link.
-     * @return LTI_Names_Roles_Provisioning_Service
-     */
-    public function getNrps()
-    {
-        $launch = LTI_Message_Launch::from_cache($this->launchId, $this->db);
-        if (!$launch->has_nrps()) {
-            throw new \Exception("LTI 1.3 response does not have names and roles.");
-            return;
-        }
-        return $launch->get_nrps();
     }
 
     /**
@@ -349,6 +335,18 @@ class Lti13 extends AppModel
             }
         }
         return false;
+    }
+
+    /**
+     * Find user by `Users.lti_id` in database.
+     *
+     * @param string $ltiId
+     * @return array
+     */
+    public function findUserByLtiId($ltiId)
+    {
+        $conditions = array('User.lti_id' => $ltiId);
+        return $this->User->find('first', compact('conditions'));
     }
 
     /**
