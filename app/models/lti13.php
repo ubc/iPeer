@@ -19,7 +19,9 @@ class Lti13 extends AppModel
 {
     public $useTable = false;
     public $db, $User, $Course, $Role;
-    public $launchId, $jwtPayload, $ipeerRoster, $ltiRoster, $ltiCourse;
+    public $launchId, $jwtPayload;
+    public $nrps, $nrpsMembers;
+    public $ipeerRoster, $ltiRoster, $ltiCourse;
 
     public function __construct()
     {
@@ -69,10 +71,10 @@ class Lti13 extends AppModel
         $this->ltiCourse = $this->getLtiCourseData();
 
         // Call LTI Resource Link to get LTI roster data
-        $this->ltiRoster = $this->getLtiRoster();
-
-        // Update or create iPeer course roster from the LTI data
-        $this->saveCourseRoster();
+        if ($this->ltiRoster = $this->getNrpsMembers()) {
+            // Update or create iPeer course roster from the LTI data
+            $this->saveCourseRoster();
+        }
     }
 
     /**
@@ -99,14 +101,33 @@ class Lti13 extends AppModel
     }
 
     /**
-     * Get LTI course roster from API call.
+     * Get all members of the LTI_Names_Roles_Provisioning_Service instance.
      *
      * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L48
      * @return array
      */
-    public function getLtiRoster()
+    public function getNrpsMembers()
     {
+        if ($nrps = @$this->getNrps()) {
+            return $nrps->get_members();
+        }
+    }
 
+    /**
+     * Get LTI_Names_Roles_Provisioning_Service instance.
+     *
+     * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L48
+     * Obtained through Resource Link, not Deep Link.
+     * @return LTI_Names_Roles_Provisioning_Service
+     */
+    public function getNrps()
+    {
+        $launch = LTI_Message_Launch::from_cache($this->launchId, $this->db);
+        if (!$launch->has_nrps()) {
+            throw new \Exception("LTI 1.3 response does not have names and roles.");
+            return;
+        }
+        return $launch->get_nrps();
     }
 
     /**
@@ -332,15 +353,15 @@ class Lti13 extends AppModel
     }
 
     /**
-     * Check if provided role is a LTI instructor.
+     * Check if provided role(s) is a LTI instructor.
      *
      * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L219
-     * @param string $role
+     * @param mixed $roles Array or string
      * @return bool
      */
-    public function isInstructor($role)
+    public function isInstructor($roles)
     {
-        return stripos($role, "Instructor") !== false;
+        return (bool)preg_grep('/Instructor/i', (array)$roles);
     }
 
     /**
