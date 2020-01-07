@@ -69,7 +69,7 @@ class Lti13Controller extends AppController
 
     public function signInUser()
     {
-        if (!$userId = $this->Lti13->findUserByLtiId()) {
+        if (!$userId = $this->Lti13->findUserByLtiUserId()) {
             throw new LTI_Exception("User not found.");
         }
         if (!$this->Auth->login($userId)) {

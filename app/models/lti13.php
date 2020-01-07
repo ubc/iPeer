@@ -165,7 +165,10 @@ class Lti13 extends AppModel
     public function updateCourseRoster($data)
     {
         $courseId = $data['Course']['id'];
-        $this->ipeerRoster = $this->User->getEnrolledStudents($courseId);
+        if (!$this->ipeerRoster = $this->User->getEnrolledStudents($courseId)) {
+            throw new LTI_Exception("Unable to find roster.");
+            return;
+        }
         $this->removeUsersFoundInBothRosters();
         $this->removeRemainingUsersFromIpeerRoster($courseId);
         $this->addRemainingUsersInIpeerRoster($courseId);
@@ -348,7 +351,7 @@ class Lti13 extends AppModel
      *
      * @return array
      */
-    public function findUserByLtiId()
+    public function findUserByLtiUserId()
     {
         $conditions = array('User.lti_id' => $this->jwtPayload['sub']);
         return $this->User->find('first', compact('conditions'));
