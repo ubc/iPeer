@@ -340,12 +340,11 @@ class Lti13 extends AppModel
     /**
      * Find user by `Users.lti_id` in database.
      *
-     * @param string $ltiId
      * @return array
      */
-    public function findUserByLtiId($ltiId)
+    public function findUserByLtiId()
     {
-        $conditions = array('User.lti_id' => $ltiId);
+        $conditions = array('User.lti_id' => $this->jwtPayload['sub']);
         return $this->User->find('first', compact('conditions'));
     }
 
