@@ -63,11 +63,11 @@ class Lti13 extends AppModel
      */
     public function update()
     {
-        // Get JWT payload after LTI launch
-        $launch = LTI_Message_Launch::from_cache($this->launchId, $this->db);
-        $this->jwtPayload = json_decode($launch->get_launch_data(), true);
-
         try {
+            // Get JWT payload after LTI launch
+            $launch = LTI_Message_Launch::from_cache($this->launchId, $this->db);
+            $this->jwtPayload = json_decode($launch->get_launch_data(), true);
+
             // Get course label and title from LTI launch's JWT payload
             $this->ltiCourse = $this->getLtiCourseData();
 
@@ -251,36 +251,31 @@ class Lti13 extends AppModel
      */
     public function addUser($data, $courseId)
     {
-        try {
-            $username = $this->getUsername($data);
-            $ltiId = $data['user_id'];
-            $isInstructor = $this->isInstructor($data['roles']);
+        $username = $this->getUsername($data);
+        $ltiId = $data['user_id'];
+        $isInstructor = $this->isInstructor($data['roles']);
 
-            // If user exists, save existing user to course
-            if ($userData = $this->User->getByUsername($username)) {
-                return $this->saveExistingUserToCourse($userData, $ltiId, $courseId, $isInstructor);
-            }
-
-            // If user doesn't exist, save new user to course
-            $userData = array(
-                'User' => array(
-                    'username' => $username,
-                    'first_name' => $data['given_name'],
-                    'last_name' => $data['family_name'],
-                    'email' => $data['email'],
-                    'send_email_notification' => false,
-                    'lti_id' => $ltiId,
-                    'created' => date('Y-m-d H:i:s'),
-                ),
-                'Role' => array(
-                    'RolesUser' => $this->getUserType($isInstructor),
-                ),
-            );
-            return $this->saveNewUserToCourse($userData, $courseId, $isInstructor);
-
-        } catch (LTI_Exception $e) {
-            echo $e->getMessage();
+        // If user exists, save existing user to course
+        if ($userData = $this->User->getByUsername($username)) {
+            return $this->saveExistingUserToCourse($userData, $ltiId, $courseId, $isInstructor);
         }
+
+        // If user doesn't exist, save new user to course
+        $userData = array(
+            'User' => array(
+                'username' => $username,
+                'first_name' => $data['given_name'],
+                'last_name' => $data['family_name'],
+                'email' => $data['email'],
+                'send_email_notification' => false,
+                'lti_id' => $ltiId,
+                'created' => date('Y-m-d H:i:s'),
+            ),
+            'Role' => array(
+                'RolesUser' => $this->getUserType($isInstructor),
+            ),
+        );
+        return $this->saveNewUserToCourse($userData, $courseId, $isInstructor);
     }
 
     /**
