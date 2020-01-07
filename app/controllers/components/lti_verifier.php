@@ -12,11 +12,12 @@
 /**
  * LtiVerifierComponent
  *
- * @uses Object
- * @package   CTLT.iPeer
- * @author    John Hsu <john.hsu@ubc.ca>
- * @copyright 2012 All rights reserved.
- * @license   MIT {@link http://www.opensource.org/licenses/MIT}
+ * @deprecated since 3.4.5
+ * @uses       Object
+ * @package    CTLT.iPeer
+ * @author     John Hsu <john.hsu@ubc.ca>
+ * @copyright  2012 All rights reserved.
+ * @license    MIT {@link http://www.opensource.org/licenses/MIT}
  */
 class LtiVerifierComponent extends CakeObject
 {

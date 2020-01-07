@@ -8,14 +8,16 @@
  * is that some of the libraries aren't compliant, so couldn't talk to Moodle's
  * OAuth module.
  * ***************************/
+
 /**
  * LtiRequesterComponent
  *
- * @uses Object
- * @package   CTLT.iPeer
- * @author    John Hsu <john.hsu@ubc.ca>
- * @copyright 2012 All rights reserved.
- * @license   MIT {@link http://www.opensource.org/licenses/MIT}
+ * @deprecated since 3.4.5
+ * @uses       Object
+ * @package    CTLT.iPeer
+ * @author     John Hsu <john.hsu@ubc.ca>
+ * @copyright  2012 All rights reserved.
+ * @license    MIT {@link http://www.opensource.org/licenses/MIT}
  */
 class LtiRequesterComponent extends CakeObject
 {
