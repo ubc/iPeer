@@ -105,8 +105,9 @@ JSON;
 
     function test_getLtiCourseDataEmptyJwtPayload()
     {
+        $this->Lti13->jwtPayload = array();
         $this->expectException('IMSGlobal\LTI\LTI_Exception', "Missing 'https://purl.imsglobal.org/spec/lti/claim/context'");
-        $this->Lti13->getLtiCourseData(array());
+        $this->Lti13->getLtiCourseData();
     }
 
     function test_removeUsersFoundInBothRosters()
