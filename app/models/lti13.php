@@ -4,6 +4,7 @@ App::import('Lib', 'LTI13Database', array('file'=>'lti13'.DS.'LTI13Database.php'
 
 use App\LTI13\LTI13Database;
 use IMSGlobal\LTI\LTI_Exception;
+use IMSGlobal\LTI\LTI_Message_Launch;
 
 /**
  * LTI 1.3 Model
@@ -50,7 +51,7 @@ class Lti13 extends AppModel
         $launch = LTI_Message_Launch::new($this->db);
         try {
             $launch->validate();
-        } catch (\Exception $e) {
+        } catch (LTI_Exception $e) {
             echo "Launch validation failed.";
         }
         $this->launchId = $launch->get_launch_id();
@@ -85,7 +86,7 @@ class Lti13 extends AppModel
     public function getLtiCourseData()
     {
         $key = 'https://purl.imsglobal.org/spec/lti/claim/context';
-        if (! $context = @$this->jwtPayload[$key]) {
+        if (!$context = @$this->jwtPayload[$key]) {
             throw new LTI_Exception(sprintf("Missing '%s'", $key));
             return;
         }
@@ -245,11 +246,9 @@ class Lti13 extends AppModel
      */
     public function addUser($data, $courseId)
     {
-        $isInstructor = $this->isInstructor($data['roles']);
-        $firstName = $data['person_name_given'];
-        $lastName = $data['person_name_family'];
-        $username = $firstName . $lastName;
+        $username = $this->getUsername($data);
         $ltiId = $data['user_id'];
+        $isInstructor = $this->isInstructor($data['roles']);
 
         // If user exists, save existing user to course
         if ($userData = $this->User->getByUsername($username)) {
@@ -260,9 +259,9 @@ class Lti13 extends AppModel
         $userData = array(
             'User' => array(
                 'username' => $username,
-                'first_name' => $firstName,
-                'last_name' => $lastName,
-                'email' => $data['person_contact_email_primary'],
+                'first_name' => $data['given_name'],
+                'last_name' => $data['family_name'],
+                'email' => $data['email'],
                 'send_email_notification' => false,
                 'lti_id' => $ltiId,
                 'created' => date('Y-m-d H:i:s'),
@@ -358,6 +357,17 @@ class Lti13 extends AppModel
     public function isInstructor($roles)
     {
         return (bool)preg_grep('/Instructor/i', (array)$roles);
+    }
+
+    /**
+     * Get username from LTI data.
+     *
+     * @param array $data
+     * @return string
+     */
+    public function getUsername($data)
+    {
+        return $data['given_name'].$data['family_name'];
     }
 
     /**
