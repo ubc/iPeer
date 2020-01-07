@@ -8,8 +8,6 @@ services:
       - MYSQL_DATABASE=ipeer
       - MYSQL_USER=ipeer
       - MYSQL_PASSWORD=ipeer
-    ports:
-      - "13306:3306"
     volumes:
       - ./.data:/var/lib/mysql
     ports:
