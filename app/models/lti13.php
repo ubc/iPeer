@@ -10,6 +10,7 @@ use IMSGlobal\LTI\LTI_Exception;
  *
  * @uses      AppModel
  * @package   CTLT.iPeer
+ * @since     3.4.5
  * @author    Steven Marshall <steven.marshall@ubc.ca>
  * @copyright 2019 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
@@ -60,7 +61,7 @@ class Lti13 extends AppModel
      */
     public function update()
     {
-        // Get JWT payload
+        // Get JWT payload after LTI launch
         $launch = LTI_Message_Launch::from_cache($this->launchId, $this->db);
         $this->jwtPayload = json_decode($launch->get_launch_data(), true);
 
@@ -77,6 +78,7 @@ class Lti13 extends AppModel
     /**
      * Check if course data is available in JWT payload and get `label` and `title` from it.
      *
+     * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L55
      * @return array|null
      */
     public function getLtiCourseData()
@@ -88,7 +90,7 @@ class Lti13 extends AppModel
         }
         $keys = array('label', 'title');
         foreach ($keys as $key) {
-            if (!isset($context[$key])) {
+            if (!array_key_exists($key, $context)) {
                 throw new LTI_Exception(sprintf("Missing 'context %s'", $key));
                 return;
             }
@@ -99,6 +101,7 @@ class Lti13 extends AppModel
     /**
      * Get LTI course roster from API call.
      *
+     * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L48
      * @return array
      */
     public function getLtiRoster()
@@ -108,6 +111,8 @@ class Lti13 extends AppModel
 
     /**
      * Save course roster.
+     *
+     * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L64
      */
     public function saveCourseRoster()
     {
@@ -140,6 +145,7 @@ class Lti13 extends AppModel
     /**
      * Update course roster in database.
      *
+     * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L88
      * @param array $data
      */
     public function updateCourseRoster($data)
@@ -154,6 +160,7 @@ class Lti13 extends AppModel
     /**
      * Create course roster in database.
      *
+     * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L70
      * @param array $data
      */
     public function createCourseRoster($data)
@@ -167,6 +174,8 @@ class Lti13 extends AppModel
 
     /**
      * Remove users in both rosters.
+     *
+     * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L92
      */
     public function removeUsersFoundInBothRosters()
     {
@@ -183,6 +192,7 @@ class Lti13 extends AppModel
     /**
      * Remove remaining users from iPeer roster.
      *
+     * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L102
      * @param int $courseId
      */
     public function removeRemainingUsersFromIpeerRoster($courseId)
@@ -195,6 +205,7 @@ class Lti13 extends AppModel
     /**
      * Add remaining users in iPeer roster.
      *
+     * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L107
      * @param $courseId
      */
     public function addRemainingUsersInIpeerRoster($courseId)
@@ -221,6 +232,7 @@ class Lti13 extends AppModel
     /**
      * Add user to database.
      *
+     * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L137
      * @param array $data
      * @param int $courseId
      * @return bool
@@ -295,6 +307,7 @@ class Lti13 extends AppModel
     /**
      * Add user to course in database.
      *
+     * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L194
      * @param string $userId
      * @param int $courseId
      * @param bool $isInstructor
@@ -321,6 +334,7 @@ class Lti13 extends AppModel
     /**
      * Check if provided role is a LTI instructor.
      *
+     * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L219
      * @param string $role
      * @return bool
      */

@@ -8,8 +8,9 @@ use IMSGlobal\LTI\OIDC_Exception;
 /**
  * LTI 1.3 Controller
  *
- * @uses AppController
+ * @uses      AppController
  * @package   CTLT.iPeer
+ * @since     3.4.5
  * @author    Steven Marshall <steven.marshall@ubc.ca>
  * @copyright 2019 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
@@ -57,7 +58,7 @@ class Lti13Controller extends AppController
     public function update()
     {
         $this->Lti13->update();
-        // $this->log_in();                // TO BE DETERMINED (from legacy code)
+        $this->signInUser();
         $this->redirect('/home');
     }
 }
