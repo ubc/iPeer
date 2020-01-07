@@ -115,10 +115,12 @@ class Lti13 extends AppModel
     public function getNrpsMembers()
     {
         $launch = LTI_Message_Launch::from_cache($this->launchId, $this->db);
-        if ($launch->has_nrps()) {
-            $nrps = $launch->get_nrps();
-            return $nrps->get_members();
+        if (!$launch->has_nrps()) {
+            throw new LTI_Exception("LTI JWT payload does not have names and roles.");
+            return;
         }
+        $nrps = $launch->get_nrps();
+        return $nrps->get_members();
     }
 
     /**
