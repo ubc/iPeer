@@ -1,7 +1,8 @@
 <?php
+App::import('Lib', 'Lti13Bootstrap');
 App::import('Model', 'Lti13');
 
-use IMSGlobal\LTI\LTI_Message_Launch;
+use IMSGlobal\LTI\LTI_Exception;
 use IMSGlobal\LTI\LTI_OIDC_Login;
 use IMSGlobal\LTI\OIDC_Exception;
 
@@ -58,7 +59,21 @@ class Lti13Controller extends AppController
     public function update()
     {
         $this->Lti13->update();
-        $this->signInUser();
-        $this->redirect('/home');
+        try {
+            $this->signInUser();
+            $this->redirect('/home');
+        } catch (LTI_Exception $e) {
+            echo $e->getMessage();
+        }
+    }
+
+    public function signInUser()
+    {
+        if (!$userId = $this->Lti13->findUserByLtiId()) {
+            throw new LTI_Exception("User not found.");
+        }
+        if (!$this->Auth->login($userId)) {
+            throw new LTI_Exception("Access denied.");
+        }
     }
 }
