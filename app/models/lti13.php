@@ -20,7 +20,6 @@ class Lti13 extends AppModel
     public $useTable = false;
     public $db, $User, $Course, $Role;
     public $launchId, $jwtPayload;
-    public $nrps, $nrpsMembers;
     public $ipeerRoster, $ltiRoster, $ltiCourse;
 
     public function __construct()
