@@ -153,10 +153,37 @@ JSON;
         $this->assertTrue($this->Lti13->isInstructor("Instructor"));
         $this->assertTrue($this->Lti13->isInstructor("Winstructor"));
         $this->assertFalse($this->Lti13->isInstructor("Instructo"));
+        $this->assertTrue($this->Lti13->isInstructor(array("#Mentor", "#Instructor"));
+        $this->assertFalse($this->Lti13->isInstructor(array("Student", "Mentor"));
+    }
+
+    function test_getUsername()
+    {
+        $data = array(
+            'given_name' => "John",
+            'family_name' => "Smith",
+        );
+        $this->assertEqual("JohnSmith", $this->Lti13->getUsername($data));
+
+        $this->expectException('IMSGlobal\LTI\LTI_Exception', "Missing 'family_name'");
+        $data = array(
+            'given_name' => "John",
+        );
+        $this->Lti13->getUsername($data);
+
+        $this->expectException('IMSGlobal\LTI\LTI_Exception', "Missing 'given_name'");
+        $data = array(
+            'family_name' => "Smith",
+        );
+        $this->Lti13->getUsername($data);
+
+        $this->expectException('IMSGlobal\LTI\LTI_Exception');
+        $this->Lti13->getUsername($data);
     }
 
     function test_getUserType()
     {
+        $this->Lti13->User = $this->UserTest;
         $this->assertEqual(3, $this->Lti13->getUserType($isInstructor=true));
         $this->assertEqual(5, $this->Lti13->getUserType($isInstructor=false));
     }
