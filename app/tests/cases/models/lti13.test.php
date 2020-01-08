@@ -97,7 +97,7 @@ JSON;
 }
 JSON;
         $this->Lti13->jwtPayload = json_decode($json, true);
-        $this->expectException('IMSGlobal\LTI\LTI_Exception', "Missing 'https://purl.imsglobal.org/spec/lti/claim/context'");
+        $this->expectException('IMSGlobal\LTI\LTI_Exception');
         $this->Lti13->getLtiCourseData();
     }
 
@@ -115,7 +115,7 @@ JSON;
 }
 JSON;
         $this->Lti13->jwtPayload = json_decode($json, true);
-        $this->expectException('IMSGlobal\LTI\LTI_Exception', "Missing 'context label'");
+        $this->expectException('IMSGlobal\LTI\LTI_Exception');
         $this->Lti13->getLtiCourseData();
     }
 
@@ -133,15 +133,21 @@ JSON;
 }
 JSON;
         $this->Lti13->jwtPayload = json_decode($json, true);
-        $this->expectException('IMSGlobal\LTI\LTI_Exception', "Missing 'context title'");
+        $this->expectException('IMSGlobal\LTI\LTI_Exception');
         $this->Lti13->getLtiCourseData();
     }
 
     function test_getLtiCourseDataEmptyJwtPayload()
     {
         $this->Lti13->jwtPayload = array();
-        $this->expectException('IMSGlobal\LTI\LTI_Exception', "Missing 'https://purl.imsglobal.org/spec/lti/claim/context'");
+        $this->expectException('IMSGlobal\LTI\LTI_Exception');
         $this->Lti13->getLtiCourseData();
+    }
+
+    function test_getNrpsMembers()
+    {
+        $this->expectException('IMSGlobal\LTI\LTI_Exception');
+        @$this->Lti13->getNrpsMembers();
     }
 
     function test_removeUsersFoundInBothRosters()
@@ -183,6 +189,19 @@ JSON;
         $this->assertEqual($expectedIpeerRoster, $this->Lti13->ipeerRoster);
     }
 
+    function test_createCourseRoster()
+    {
+        $this->expectException('IMSGlobal\LTI\LTI_Exception');
+        $this->Lti13->createCourseRoster(array());
+
+        $data = array(
+            'course' => "CPSC 405",
+            'title' => "Advanced Software Engineering 405",
+            'record_status' => Course::STATUS_ACTIVE,
+        );
+        $this->Lti13->createCourseRoster($data);
+    }
+
     function test_findCourseByLabel()
     {
         $this->assertTrue($data = $this->Lti13->findCourseByLabel('MECH 328'));
@@ -215,13 +234,13 @@ JSON;
         );
         $this->assertEqual("JohnSmith", $this->Lti13->getUsername($data));
 
-        $this->expectException('IMSGlobal\LTI\LTI_Exception', "Missing 'family_name'");
+        $this->expectException('IMSGlobal\LTI\LTI_Exception');
         $data = array(
             'given_name' => "John",
         );
         $this->Lti13->getUsername($data);
 
-        $this->expectException('IMSGlobal\LTI\LTI_Exception', "Missing 'given_name'");
+        $this->expectException('IMSGlobal\LTI\LTI_Exception');
         $data = array(
             'family_name' => "Smith",
         );
