@@ -146,7 +146,9 @@ in /var/www/html/cake/libs/model/datasources/dbo/dbo_mysqli.php on line 63
 exit
 ```
 
-### Create test database table
+---
+
+## Create test database table
 
 `app/config/sql/ipeer_samples_data.sql` does not contain a `CREATE DATABASE IF NOT EXISTS ipeer_test;` statement.
 
@@ -210,8 +212,42 @@ BUILD FAILED
 ```
 
 ```bash
-IPEER_DB_NAME=ipeer_test cake/console/cake testsuite app case models/lti13
+cake/console/cake testsuite app case models/lti13
 ```
 ```
 Error: Missing database table 'users' for model 'User'
 ```
+
+---
+
+## Importing sample SQL file manually
+
+```bash
+cd ~/Code/ctlt/iPeer
+docker-compose up -d
+docker exec -it ipeer_db /bin/bash
+```
+
+`root@9acf1ec69d64:/#`
+
+```bash
+mysql ipeer-test -h db -u ipeer -p < app/config/sql/ipeer_samples_data.sql
+```
+```bash
+exit
+```
+
+```bash
+docker exec -it ipeer_app_unittest /bin/bash
+```
+
+`root@7885d4d2f2fc:/var/www/html#`
+
+```bash
+cake/console/cake testsuite app case models/lti13
+```
+
+---
+
+## Fixing phing
+

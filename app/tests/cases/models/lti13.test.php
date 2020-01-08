@@ -4,6 +4,7 @@ App::import('Model', 'Lti13');
 
 /**
  * Usage `cake/console/cake testsuite app case models/lti13`
+ * Usage `cake/console/cake -app app testsuite app case models/lti13`
  *
  * @link https://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html#testing-models
  * @package   CTLT.iPeer
@@ -14,7 +15,40 @@ App::import('Model', 'Lti13');
  */
 class Lti13TestCase extends CakeTestCase {
 
-    public $fixtures = array('app.user', 'app.course', 'app.role');
+    public $fixtures = array(
+        'app.user',
+        'app.course',
+        'app.role',
+        'app.evaluation_submission',
+        'app.sys_parameter',
+        'app.event',
+        'app.event_template_type',
+        'app.group',
+        'app.group_event',
+        'app.evaluation_simple',
+        'app.survey_input',
+        'app.survey_group_member',
+        'app.survey_group_set',
+        'app.survey',
+        'app.question',
+        'app.response',
+        'app.survey_question',
+        'app.survey_group',
+        'app.faculty',
+        'app.user_faculty',
+        'app.roles_user',
+        'app.user_course',
+        'app.user_tutor',
+        'app.user_enrol',
+        'app.groups_member',
+        'app.department',
+        'app.course_department',
+        'app.penalty',
+        'app.evaluation_rubric',
+        'app.evaluation_rubric_detail',
+        'app.evaluation_mixeval',
+        'app.evaluation_mixeval_detail',
+    );
     public $UserTest, $CourseTest, $RoleTest;
 
     function startCase()

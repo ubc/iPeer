@@ -379,7 +379,7 @@ class Lti13 extends AppModel
     {
         $keys = array('given_name', 'family_name');
         foreach ($keys as $key) {
-            if (!isset($context[$key])) {
+            if (!isset($data[$key])) {
                 throw new LTI_Exception(sprintf("Missing '%s'", $key));
                 return;
             }
