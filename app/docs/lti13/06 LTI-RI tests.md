@@ -4,8 +4,8 @@
 
 ```bash
 cd ~/Code/ctlt/iPeer
-git checkout lti-1.3-debug
 docker-compose up -d
+git checkout lti-1.3-debug
 ```
 
 ## Browse to the LTI 1.3 index

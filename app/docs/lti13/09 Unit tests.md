@@ -111,7 +111,6 @@ record_status: I
 > edit `services.web-unittest.ports`
 > from `- "8081:80"` to `- "8082:80"`
 
-
 ```bash
 cd ~/Code/ctlt/iPeer
 docker-compose up -d
@@ -126,10 +125,10 @@ A `could not find driver` error seems to be because the database named `ipeer_te
 
 ```bash
 vendor/bin/phing test
-IPEER_DB_NAME=ipeer vendor/bin/phing test
-IPEER_DB_NAME=ipeer vendor/bin/phing init-test-db
 IPEER_DB_NAME=ipeer_test vendor/bin/phing test
 IPEER_DB_NAME=ipeer_test vendor/bin/phing init-test-db
+IPEER_DB_NAME=ipeer vendor/bin/phing test
+IPEER_DB_NAME=ipeer vendor/bin/phing init-test-db
 ```
 ```
 BUILD FAILED
@@ -143,6 +142,17 @@ IPEER_DB_NAME=ipeer_test cake/console/cake testsuite app case models/lti13
 Warning: mysqli_connect(): (HY000/1044): Access denied for user 'ipeer'@'%' to database 'ipeer_test' 
 in /var/www/html/cake/libs/model/datasources/dbo/dbo_mysqli.php on line 63
 ```
+```bash
+exit
+```
+
+### Create test database table
+
+`app/config/sql/ipeer_samples_data.sql` does not contain a `CREATE DATABASE IF NOT EXISTS ipeer_test;` statement.
+
+`phing` is trying to import `ipeer_samples_data.sql` in a non-existant `ipeer_test` table.
+
+So we have to manually create the `ipeer_test` table.
 
 ```bash
 cd ~/Code/ctlt/iPeer
@@ -152,14 +162,34 @@ docker exec -it ipeer_db /bin/bash
 
 `root@bdae36de7a7d:/#`
 
-```bash
-mysql -h db -u root -p
-```
-
 Use root password found in `docker-compose.yml`.
 
 ```bash
-MariaDB [(none)]> CREATE DATABASE ipeer_test; quit;
+mysql -h db -u root -p -e "CREATE DATABASE ipeer_test;"
+mysql -h db -u root -p -e "SHOW DATABASES;"
+mysql -h db -u root -p -e "SHOW GRANTS FOR ipeer;"
+```
+```
++------------------------------------------------------------------------------------------------------+
+| Grants for ipeer@%                                                                                   |
++------------------------------------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO 'ipeer'@'%' IDENTIFIED BY PASSWORD '*D4BA1077F133A335E045EAC769AAEDFFC639F5E3' |
+| GRANT ALL PRIVILEGES ON `ipeer`.* TO 'ipeer'@'%'                                                     |
++------------------------------------------------------------------------------------------------------+
+```
+```bash
+mysql -h db -u root -p -e "GRANT ALL PRIVILEGES ON ipeer_test.* TO 'ipeer'@'%'"
+mysql -h db -u root -p -e "SHOW DATABASES;"
+mysql -h db -u root -p -e "SHOW GRANTS FOR ipeer;"
+```
+```
++------------------------------------------------------------------------------------------------------+
+| Grants for ipeer@%                                                                                   |
++------------------------------------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO 'ipeer'@'%' IDENTIFIED BY PASSWORD '*D4BA1077F133A335E045EAC769AAEDFFC639F5E3' |
+| GRANT ALL PRIVILEGES ON `ipeer`.* TO 'ipeer'@'%'                                                     |
+| GRANT ALL PRIVILEGES ON `ipeer_test`.* TO 'ipeer'@'%'                                                     |
++------------------------------------------------------------------------------------------------------+
 ```
 ```bash
 exit
@@ -179,21 +209,9 @@ BUILD FAILED
 /var/www/html/build.xml:57:116: /var/www/html/build.xml:57:116: could not find driver
 ```
 
-#### Can't create database
-
-MySQL user `ipeer` does not have permissions to `CREATE DATABASE ipeer_test;`
-so I can't manually create and copy the `ipeer` database to `ipeer_test`.
-
-> I think PHPUnit is trying to `CREATE DATABASE ipeer_test;`
-> and doesn't have the permission using user `ipeer`.
-
-### Running unit tests on app database
-
-Trying to run unit tests with the app database named `ipeer` blocks PHPUnit from creating test dB tables.
-
 ```bash
-IPEER_DB_NAME=ipeer cake/console/cake testsuite app case models/lti13
+IPEER_DB_NAME=ipeer_test cake/console/cake testsuite app case models/lti13
 ```
 ```
-Error: Missing database table 'test_suite_evaluation_submissions' for model 'Submission'
+Error: Missing database table 'users' for model 'User'
 ```

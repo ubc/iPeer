@@ -5,7 +5,7 @@
 - <https://api.cakephp.org/1.3>
 - <https://github.com/ubc/iPeer>
 
-### Existing LTI files
+### Existing LTI 1.1 files
 
 - [app/controllers/lti_controller.php](app/controllers/lti_controller.php)
 - [app/controllers/components/lti_requester.php](app/controllers/components/lti_requester.php)
@@ -15,7 +15,7 @@
 
 ```bash
 cd ~/Code/ctlt/iPeer
-git checkout lti-1.3
+git checkout lti-1.3-debug
 
 touch app/controllers/lti13_controller.php
 touch app/models/lti13.php
@@ -28,11 +28,12 @@ touch app/views/lti13/launch.ctp
 ```php
 class Lti13Controller extends AppController
 {
-    public function login()
-    {}
+    public $uses = array('Lti13');
 
-    public function launch()
-    {}
+    public function __construct()
+    {
+        parent::__construct();
+    }
 }
 ```
 
@@ -42,6 +43,10 @@ class Lti13Controller extends AppController
 class Lti13 extends AppModel
 {
     public $useTable = false;
+
+    public function __construct()
+    {
+    }
 }
 ```
 

@@ -154,8 +154,8 @@ JSON;
         $this->assertTrue($this->Lti13->isInstructor("Instructor"));
         $this->assertTrue($this->Lti13->isInstructor("Winstructor"));
         $this->assertFalse($this->Lti13->isInstructor("Instructo"));
-        $this->assertTrue($this->Lti13->isInstructor(array("#Mentor", "#Instructor"));
-        $this->assertFalse($this->Lti13->isInstructor(array("Student", "Mentor"));
+        $this->assertTrue($this->Lti13->isInstructor(array("#Mentor", "#Instructor")));
+        $this->assertFalse($this->Lti13->isInstructor(array("Student", "Mentor")));
     }
 
     function test_getUsername()

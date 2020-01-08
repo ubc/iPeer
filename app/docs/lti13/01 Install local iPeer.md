@@ -5,8 +5,6 @@
 
 ## Local installation of iPeer
 
-2019-11-06
-
 <https://github.com/ubc/iPeer/blob/master/readme.md>
 
 ## Prerequisites
@@ -44,12 +42,32 @@ Error starting userland proxy: listen tcp 0.0.0.0:8081: bind: address already in
 ERROR: Encountered errors while bringing up the project.
 ```
 
+### Fix port in ipeer_web_unittest
+
+> McAfee Security Endpoint for Mac uses port 8081.
+
+Change ports in `docker-compose.yml`: `services.web-unittest.ports`.
+
+```diff
+- - "8081:80"
++ - "8082:80"
+```
+
+```bash
+docker-compose down
+docker-compose up -d
+```
+
+Success.
+
 ### Install PHP Webdriver and Sausage under `vendors` directory.
 
 ```bash
 git submodule init
 git submodule update
 ```
+
+## Installation wizard
 
 Browse to: <http://localhost:8080>
 
