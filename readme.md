@@ -31,9 +31,33 @@ docker-compose up -d
 
 #### Running iPeer unit tests
 
-- To run the unit tests on containers:
-    - On host, run an interactive shell in the unit test app container: `docker exec -it ipeer_app_unittest bash`
-    - In the interactive shell, while at `/var/www/html`, run the command `vendor/bin/phing test`
+- On host, run an interactive shell in the mysql container:
+
+```
+docker exec -it ipeer_db /bin/bash
+```
+
+- Create test database table and grant permissions:
+  (Use root password found in `docker-compose.yml` for the following commands)
+
+```
+mysql -h db -u root -p -e "CREATE DATABASE ipeer_test; GRANT ALL PRIVILEGES ON ipeer_test.* TO 'ipeer'@'%'"
+mysql -h db -u root -p -e "SHOW GRANTS FOR ipeer; SHOW DATABASES;"
+```
+
+Exit `ipeer_db` container.
+
+- On host, run an interactive shell in the unit test app container:
+
+```
+docker exec -it ipeer_app_unittest bash
+```
+
+- In the interactive shell, while at `/var/www/html`:
+
+```
+vendor/bin/phing test
+```
     
 #### Running integration tests
 
