@@ -183,6 +183,13 @@ JSON;
         $this->assertEqual($expectedIpeerRoster, $this->Lti13->ipeerRoster);
     }
 
+    function test_findCourseByLabel()
+    {
+        $this->assertTrue($data = $this->Lti13->findCourseByLabel('MECH 328'));
+        $this->assertEqual("Mechanical Engineering Design Project", $data['Course']['title']);
+        $this->assertFalse($this->Lti13->findCourseByLabel(null));
+    }
+
     function test_findUserByLtiUserId()
     {
         $this->Lti13->jwtPayload['sub'] = null;
