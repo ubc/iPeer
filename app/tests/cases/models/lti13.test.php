@@ -183,6 +183,14 @@ JSON;
         $this->assertEqual($expectedIpeerRoster, $this->Lti13->ipeerRoster);
     }
 
+    function test_findUserByLtiUserId()
+    {
+        $this->Lti13->jwtPayload['sub'] = null;
+        $this->assertTrue($this->Lti13->findUserByLtiUserId());
+        $this->Lti13->jwtPayload['sub'] = 'aaaaa';
+        $this->assertFalse($this->Lti13->findUserByLtiUserId());
+    }
+
     function test_isInstructor()
     {
         $this->assertTrue($this->Lti13->isInstructor("Instructor"));
@@ -213,7 +221,7 @@ JSON;
         $this->Lti13->getUsername($data);
 
         $this->expectException('IMSGlobal\LTI\LTI_Exception');
-        $this->Lti13->getUsername($data);
+        $this->Lti13->getUsername(array());
     }
 
     function test_getUserType()
