@@ -33,6 +33,11 @@ docker-compose up -d
 
 #### Running iPeer unit tests
 
+- Running unit tests within docker containers with `phing` requires additional libraries to be installed. This can be done by building the `ipeer-app` image with `Dockerfile-app-unittest` which is specific for running test cases:
+    - If the containers are up, stop them by running `docker-compose down`
+    - Rebuild the `ipeer-app` image with the command `docker-compose build --no-cache app-unittest`
+    - Start the containers by running `docker-compose up -d`
+
 - To run the unit tests on containers:
     - On host, run an interactive shell in the unit test app container: `docker exec -it ipeer_app_unittest bash`
     - In the interactive shell, while at `/var/www/html`, run the command `vendor/bin/phing test`
