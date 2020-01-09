@@ -171,6 +171,7 @@ JSON;
     {
         $this->assertTrue($data = $this->Lti13->findCourseByLabel('MECH 328'));
         $this->assertEqual("Mechanical Engineering Design Project", $data['Course']['title']);
+
         $this->assertFalse($this->Lti13->findCourseByLabel(null));
     }
 
@@ -222,6 +223,7 @@ JSON;
     {
         $this->Lti13->jwtPayload['sub'] = null;
         $this->assertTrue($this->Lti13->findUserByLtiUserId());
+
         $this->Lti13->jwtPayload['sub'] = 'aaaaa';
         $this->assertFalse($this->Lti13->findUserByLtiUserId());
     }
@@ -261,7 +263,6 @@ JSON;
 
     function test_getUserType()
     {
-        $this->Lti13->User = $this->UserTest;
         $this->assertEqual(3, $this->Lti13->getUserType($isInstructor=true));
         $this->assertEqual(5, $this->Lti13->getUserType($isInstructor=false));
     }
