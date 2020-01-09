@@ -1,6 +1,8 @@
 # Unit tests
 
-## Run in console
+## Troubleshooting
+
+### Run in console
 
 ```bash
 cd ~/Code/ctlt/iPeer
@@ -11,7 +13,7 @@ PHP Warning:  mysqli_connect(): (HY000/2002): No such file or directory in
 /Users/steven/Code/ctlt/iPeer/cake/libs/model/datasources/dbo/dbo_mysqli.php on line 63
 ```
 
-## Run basic PHPUnit
+### Run basic PHPUnit
 
 ```bash
 cd ~/Code/ctlt/iPeer
@@ -21,7 +23,7 @@ php phpunit.phar app/tests/cases/models/lti13.test.php
 
 Many notices of missing files.
 
-## Check the MySQL schema and data
+### Check the MySQL schema and data
 
 In `app/tests/fixtures/course_fixture.php`,
 it shows `public $import = array('model' => 'Course', 'records' => true);`
@@ -35,6 +37,13 @@ so it imports the schema and data from the default settings in `app/config/datab
 cd ~/Code/ctlt/iPeer
 docker-compose up -d
 docker exec -it ipeer_db /bin/bash
+```
+
+`root@bdae36de7a7d:/#`
+
+Use root password found in `docker-compose.yml`.
+
+```bash
 mysql ipeer -h db -u ipeer -p
 ```
 
@@ -105,7 +114,7 @@ record_status: I
 ...
 ```
 
-## Run unit tests in Docker
+### Run unit tests in Docker
 
 > In `docker-compose.yml`,
 > edit `services.web-unittest.ports`
@@ -119,7 +128,7 @@ docker exec -it ipeer_app_unittest /bin/bash
 
 `root@f56a39a0172f:/var/www/html#`
 
-### Missing ipeer_test database
+#### Missing ipeer_test database
 
 A `could not find driver` error seems to be because the database named `ipeer_test` is missing.
 
@@ -146,15 +155,13 @@ in /var/www/html/cake/libs/model/datasources/dbo/dbo_mysqli.php on line 63
 exit
 ```
 
----
-
-## Create test database table
+### Create test database table
 
 `app/config/sql/ipeer_samples_data.sql` does not contain a `CREATE DATABASE IF NOT EXISTS ipeer_test;` statement.
 
-`phing` is trying to import `ipeer_samples_data.sql` in a non-existant `ipeer_test` table.
+`phing` is trying to import `ipeer_samples_data.sql` in a non-existant `ipeer_test` database.
 
-So we have to manually create the `ipeer_test` table.
+So we have to manually create the `ipeer_test` database.
 
 ```bash
 cd ~/Code/ctlt/iPeer
@@ -167,9 +174,8 @@ docker exec -it ipeer_db /bin/bash
 Use root password found in `docker-compose.yml`.
 
 ```bash
-mysql -h db -u root -p -e "CREATE DATABASE ipeer_test;"
-mysql -h db -u root -p -e "SHOW DATABASES;"
-mysql -h db -u root -p -e "SHOW GRANTS FOR ipeer;"
+mysql -h db -u root -p -e "CREATE DATABASE IF NOT EXISTS ipeer_test;"
+mysql -h db -u root -p -e "SHOW GRANTS FOR ipeer; SHOW DATABASES;"
 ```
 ```
 +------------------------------------------------------------------------------------------------------+
@@ -181,8 +187,7 @@ mysql -h db -u root -p -e "SHOW GRANTS FOR ipeer;"
 ```
 ```bash
 mysql -h db -u root -p -e "GRANT ALL PRIVILEGES ON ipeer_test.* TO 'ipeer'@'%'"
-mysql -h db -u root -p -e "SHOW DATABASES;"
-mysql -h db -u root -p -e "SHOW GRANTS FOR ipeer;"
+mysql -h db -u root -p -e "SHOW GRANTS FOR ipeer; SHOW DATABASES;"
 ```
 ```
 +------------------------------------------------------------------------------------------------------+
@@ -218,9 +223,24 @@ cake/console/cake testsuite app case models/lti13
 Error: Missing database table 'users' for model 'User'
 ```
 
----
+> So `phing` failed to import `ipeer_samples_data.sql` but connection to `ipeer_test` database is successful.
+
+---------------------------------------------------------------------------------------------------
 
 ## Importing sample SQL file manually
+
+Reproducing manually what `vendor/bin/phing test` does.
+
+### Copy ipeer_samples_data.sql to .data
+
+`./.data` is mapped to `/var/lib/mysql` inside the `ipeer_db` container in `docker-compose.yml::services.db.volumes`.
+
+```bash
+cd ~/Code/ctlt/iPeer
+cp app/config/sql/ipeer_samples_data.sql .data/
+```
+
+### Create ipeer_test database
 
 ```bash
 cd ~/Code/ctlt/iPeer
@@ -230,14 +250,21 @@ docker exec -it ipeer_db /bin/bash
 
 `root@9acf1ec69d64:/#`
 
+Use mysql passwords found in `docker-compose.yml`.
+
 ```bash
-mysql ipeer-test -h db -u ipeer -p < app/config/sql/ipeer_samples_data.sql
+mysql -h db -u root -p -e "CREATE DATABASE IF NOT EXISTS ipeer_test; GRANT ALL PRIVILEGES ON ipeer_test.* TO 'ipeer'@'%'"
+mysql -h db -u root -p -e "SHOW GRANTS FOR ipeer; SHOW DATABASES LIKE 'ipeer%';"
+mysql ipeer_test -h db -u ipeer -p < /var/lib/mysql/ipeer_samples_data.sql
 ```
 ```bash
 exit
 ```
 
+### Execute unit tests
+
 ```bash
+cd ~/Code/ctlt/iPeer
 docker exec -it ipeer_app_unittest /bin/bash
 ```
 
@@ -247,7 +274,42 @@ docker exec -it ipeer_app_unittest /bin/bash
 cake/console/cake testsuite app case models/lti13
 ```
 
----
+**Success!**
 
-## Fixing phing
+---------------------------------------------------------------------------------------------------
 
+## Fix phing
+
+> We suspect that adding the `imsglobal/lti-1p3-tool` Composer package
+> caused a missing `ext-intl` Composer error
+> when rebuilding the `ipeer_app_unittest` Docker container.
+
+Edit `Dockerfile-app-unittest`:
+
+```diff
+- && docker-php-ext-install -j$(nproc) xml gd ldap mysqli pdo_mysql\
++ && docker-php-ext-install -j$(nproc) xml gd ldap mysqli pdo_mysql intl \
+```
+
+```bash
+cd ~/Code/ctlt/iPeer
+docker-compose down
+docker-compose build --no-cache app-unittest
+docker-compose up -d
+```
+
+### Re-run unit tests
+
+```bash
+cd ~/Code/ctlt/iPeer
+docker exec -it ipeer_app_unittest /bin/bash
+```
+
+`root@541c6f2b91ec:/var/www/html#`
+
+```bash
+vendor/bin/phing init-test-db
+cake/console/cake -app app testsuite app case models/lti13
+```
+
+**Success!**
