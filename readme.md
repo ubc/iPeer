@@ -1,3 +1,5 @@
+*Please note that with MySQL 5.7 and later, [the default sql_mode](https://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sql-mode-changes) has been changed. Please make sure the following modes are disabled: ONLY_FULL_GROUP_BY, STRICT_TRANS_TABLES, NO_ZERO_IN_DATE, and NO_ZERO_DATE.*
+
 Running with Docker
 ---------------------------
 ### Prerequisites
@@ -31,33 +33,14 @@ docker-compose up -d
 
 #### Running iPeer unit tests
 
-- On host, run an interactive shell in the mysql container:
+- Running unit tests within docker containers with `phing` requires additional libraries to be installed. This can be done by building the `ipeer-app` image with `Dockerfile-app-unittest` which is specific for running test cases:
+    - If the containers are up, stop them by running `docker-compose down`
+    - Rebuild the `ipeer-app` image with the command `docker-compose build --no-cache app-unittest`
+    - Start the containers by running `docker-compose up -d`
 
-```
-docker exec -it ipeer_db /bin/bash
-```
-
-- Create test database table and grant permissions:
-  (Use root password found in `docker-compose.yml` for the following commands)
-
-```
-mysql -h db -u root -p -e "CREATE DATABASE ipeer_test; GRANT ALL PRIVILEGES ON ipeer_test.* TO 'ipeer'@'%'"
-mysql -h db -u root -p -e "SHOW GRANTS FOR ipeer; SHOW DATABASES;"
-```
-
-Exit `ipeer_db` container.
-
-- On host, run an interactive shell in the unit test app container:
-
-```
-docker exec -it ipeer_app_unittest bash
-```
-
-- In the interactive shell, while at `/var/www/html`:
-
-```
-vendor/bin/phing test
-```
+- To run the unit tests on containers:
+    - On host, run an interactive shell in the unit test app container: `docker exec -it ipeer_app_unittest bash`
+    - In the interactive shell, while at `/var/www/html`, run the command `vendor/bin/phing test`
     
 #### Running integration tests
 
@@ -186,6 +169,15 @@ You may optionally override the user default IRI (from `$base_url/users/view/$us
 iPeer 3.4.4
 -----------
 * Added Caliper and delayed jobs support
+* Utilize Canvas's new gradebook Posting Policy
+* Add `term` field to `courses`.
+
+After deployment, login to the url `/upgrade` as administrator to upgrade the DB.
+Otherwise users won't be able to load the homepage.
+
+iPeer 3.4.3
+-----------
+* Fix problems with instructors not able to copy evaluation templates
 
 iPeer 3.4.2
 -----------
