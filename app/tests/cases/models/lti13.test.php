@@ -150,6 +150,35 @@ JSON;
         @$this->Lti13->getNrpsMembers();
     }
 
+    function test_updateCourseRoster()
+    {
+        $this->assertFalse($this->Lti13->updateCourseRoster(array()));
+    }
+
+    function test_createCourseRoster()
+    {
+        $this->assertFalse($this->Lti13->createCourseRoster(array()));
+
+        $data = array(
+            'course' => "CPSC 405",
+            'title' => "Advanced Software Engineering 405",
+            'record_status' => Course::STATUS_ACTIVE,
+        );
+        $this->assertFalse($this->Lti13->createCourseRoster($data));
+    }
+
+    function test_findCourseByLabel()
+    {
+        $this->assertTrue($data = $this->Lti13->findCourseByLabel('MECH 328'));
+        $this->assertEqual("Mechanical Engineering Design Project", $data['Course']['title']);
+        $this->assertFalse($this->Lti13->findCourseByLabel(null));
+    }
+
+    function test_saveExistingUserToCourse()
+    {
+        $this->assertFalse($this->Lti13->saveExistingUserToCourse(array(), 0, false, ""));
+    }
+
     function test_removeUsersFoundInBothRosters()
     {
         $this->Lti13->ltiRoster = array(
@@ -187,26 +216,6 @@ JSON;
         $this->Lti13->removeUsersFoundInBothRosters();
         $this->assertEqual($expectedLtiRoster, $this->Lti13->ltiRoster);
         $this->assertEqual($expectedIpeerRoster, $this->Lti13->ipeerRoster);
-    }
-
-    function test_createCourseRoster()
-    {
-        $this->expectException('IMSGlobal\LTI\LTI_Exception');
-        $this->Lti13->createCourseRoster(array());
-
-        $data = array(
-            'course' => "CPSC 405",
-            'title' => "Advanced Software Engineering 405",
-            'record_status' => Course::STATUS_ACTIVE,
-        );
-        $this->Lti13->createCourseRoster($data);
-    }
-
-    function test_findCourseByLabel()
-    {
-        $this->assertTrue($data = $this->Lti13->findCourseByLabel('MECH 328'));
-        $this->assertEqual("Mechanical Engineering Design Project", $data['Course']['title']);
-        $this->assertFalse($this->Lti13->findCourseByLabel(null));
     }
 
     function test_findUserByLtiUserId()

@@ -20,8 +20,10 @@ class Lti13 extends AppModel
 {
     public $useTable = false;
     public $db, $User, $Course, $Role;
-    public $launchId, $jwtPayload;
-    public $ipeerRoster, $ltiRoster, $ltiCourse;
+    public $launchId, $ltiCourse;
+    public $jwtPayload = array();
+    public $ipeerRoster = array();
+    public $ltiRoster = array();
 
     public function __construct()
     {
@@ -162,16 +164,17 @@ class Lti13 extends AppModel
      * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L88
      * @param array $data
      */
-    public function updateCourseRoster($data)
+    public function updateCourseRoster(array $data)
     {
-        $courseId = $data['Course']['id'];
-        if (!$this->ipeerRoster = $this->User->getEnrolledStudents($courseId)) {
-            throw new LTI_Exception("Unable to find roster.");
-            return;
+        if ($courseId = @$data['Course']['id']) {
+            if (!$this->ipeerRoster = $this->User->getEnrolledStudents($courseId)) {
+                throw new LTI_Exception("Unable to find roster.");
+                return;
+            }
+            $this->removeUsersFoundInBothRosters();
+            $this->removeRemainingUsersFromIpeerRoster($courseId);
+            $this->addRemainingUsersInIpeerRoster($courseId);
         }
-        $this->removeUsersFoundInBothRosters();
-        $this->removeRemainingUsersFromIpeerRoster($courseId);
-        $this->addRemainingUsersInIpeerRoster($courseId);
     }
 
     /**
@@ -180,10 +183,10 @@ class Lti13 extends AppModel
      * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L70
      * @param array $data
      */
-    public function createCourseRoster($data)
+    public function createCourseRoster(array $data)
     {
         if (!$this->Course->save($data)) {
-            throw new LTI_Exception("Unable to add course.");
+            throw new LTI_Exception("Unable to save new course.");
             return;
         }
         $this->addUsersInIpeerRoster($this->Course->id);
@@ -198,9 +201,11 @@ class Lti13 extends AppModel
     {
         foreach ($this->ltiRoster as $ltiKey => $ltiData) {
             foreach ($this->ipeerRoster as $ipeerKey => $ipeerData) {
-                if ($ltiData['user_id'] == $ipeerData['User']['lti_id']) {
-                    unset($this->ltiRoster[$ltiKey], $this->ipeerRoster[$ipeerKey]);
-                    continue;
+                if ($userLtiId = @$ipeerData['User']['lti_id']) {
+                    if ($ltiData['user_id'] == $userLtiId) {
+                        unset($this->ltiRoster[$ltiKey], $this->ipeerRoster[$ipeerKey]);
+                        continue;
+                    }
                 }
             }
         }
@@ -215,7 +220,9 @@ class Lti13 extends AppModel
     public function removeRemainingUsersFromIpeerRoster($courseId)
     {
         foreach ($this->ipeerRoster as $data) {
-            $this->User->removeStudent($data['User']['id'], $courseId);
+            if ($userId = @$data['User']['id']) {
+                $this->User->removeStudent($userId, $courseId);
+            }
         }
     }
 
@@ -223,7 +230,7 @@ class Lti13 extends AppModel
      * Add remaining users in iPeer roster.
      *
      * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L107
-     * @param $courseId
+     * @param int $courseId
      */
     public function addRemainingUsersInIpeerRoster($courseId)
     {
@@ -254,7 +261,7 @@ class Lti13 extends AppModel
      * @param int $courseId
      * @return bool
      */
-    public function addUser($data, $courseId)
+    public function addUser(array $data, $courseId)
     {
         $username = $this->getUsername($data);
         $ltiId = $data['user_id'];
@@ -262,7 +269,7 @@ class Lti13 extends AppModel
 
         // If user exists, save existing user to course
         if ($userData = $this->User->getByUsername($username)) {
-            return $this->saveExistingUserToCourse($userData, $ltiId, $courseId, $isInstructor);
+            $this->saveExistingUserToCourse($userData, $courseId, $isInstructor, $ltiId);
         }
 
         // If user doesn't exist, save new user to course
@@ -280,43 +287,45 @@ class Lti13 extends AppModel
                 'RolesUser' => $this->getUserType($isInstructor),
             ),
         );
-        return $this->saveNewUserToCourse($userData, $courseId, $isInstructor);
+        $this->saveNewUserToCourse($userData, $courseId, $isInstructor);
     }
 
     /**
      * Save existing user to course in database.
      *
-     * @param array $data
-     * @param string $ltiId
+     * @param array $userData
      * @param int $courseId
      * @param bool $isInstructor
+     * @param string $ltiId
      * @return bool
      */
-    public function saveExistingUserToCourse($data, $ltiId, $courseId, $isInstructor)
+    public function saveExistingUserToCourse(array $userData, $courseId, $isInstructor, $ltiId)
     {
-        if ($this->addUserToCourse($data['User']['id'], $courseId, $isInstructor)) {
-            // User might not have an lti_id, so save one
-            $data['User']['lti_id'] = $ltiId;
-            return (bool)$this->User->save($data);
+        if ($userId = @$userData['User']['id']) {
+            if ($this->addUserToCourse($userId, $courseId, $isInstructor)) {
+                // User might not have an lti_id, so save one
+                $userData['User']['lti_id'] = $ltiId;
+                $this->User->save($userData);
+            }
         }
-        return false;
     }
 
     /**
      * Save new user to course in database.
      *
-     * @param array $data
+     * @param array $userData
      * @param int $courseId
      * @param bool $isInstructor
      * @return bool
      */
-    public function saveNewUserToCourse($data, $courseId, $isInstructor)
+    public function saveNewUserToCourse(array $userData, $courseId, $isInstructor)
     {
         $this->User->create();
-        if ($this->User->save($data)) {
-            return $this->addUserToCourse($this->User->id, $courseId, $isInstructor);
+        if (!$this->User->save($userData)) {
+            throw new LTI_Exception("Unable to save new user.");
+            return;
         }
-        return false;
+        $this->addUserToCourse($this->User->id, $courseId, $isInstructor);
     }
 
     /**
@@ -334,16 +343,13 @@ class Lti13 extends AppModel
             if ($roleId = $this->Role->field('id', array('name' => 'instructor'))) {
                 $this->User->registerRole($userId, $roleId);
                 $this->Course->addInstructor($courseId, $userId);
-                return true;
             }
         } else {
             if ($roleId = $this->Role->getDefaultId()) {
                 $this->User->registerRole($userId, $roleId);
                 $this->User->UserEnrol->insertCourses($userid, array($courseId));
-                return true;
             }
         }
-        return false;
     }
 
     /**
@@ -375,7 +381,7 @@ class Lti13 extends AppModel
      * @param array $data
      * @return string
      */
-    public function getUsername($data)
+    public function getUsername(array $data)
     {
         $keys = array('given_name', 'family_name');
         foreach ($keys as $key) {
