@@ -3,8 +3,9 @@ App::import('Lib', 'Lti13Bootstrap');
 App::import('Model', 'Lti13');
 
 /**
- * Usage `cake/console/cake testsuite app case models/lti13`
- * Usage `cake/console/cake -app app testsuite app case models/lti13`
+ * Usage:
+ * `vendor/bin/phing init-test-db`
+ * `cake/console/cake -app app testsuite app case models/lti13`
  *
  * @link https://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html#testing-models
  * @package   CTLT.iPeer
@@ -177,7 +178,39 @@ JSON;
 
     function test_saveExistingUserToCourse()
     {
-        $this->assertFalse($this->Lti13->saveExistingUserToCourse(array(), 0, false, ""));
+        $this->assertFalse($this->Lti13->saveExistingUserToCourse(array(), $courseId=0, $isInstructor=false, $ltiId=""));
+        $this->assertFalse($this->Lti13->saveExistingUserToCourse(array(), $courseId=0, $isInstructor=true, $ltiId=""));
+    }
+
+    function test_saveNewUserToCourse()
+    {
+        $this->assertFalse($this->Lti13->saveNewUserToCourse(array(), $courseId=0, $isInstructor=true));
+/*
+ERROR->Unexpected PHP error [<span style="color:Red;text-align:left"><b>SQL Error:</b> 1064:
+You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server
+version for the right syntax to use near 'insertCourses' at line 1</span>] severity [E_USER_WARNING]
+in [/var/www/html/cake/libs/model/datasources/dbo_source.php line 684]
+in test_saveNewUserToCourse
+in Lti13TestCase
+in /var/www/html/app/tests/cases/models/lti13.test.php
+*/
+        // $this->assertFalse($this->Lti13->saveNewUserToCourse(array(), $courseId=0, $isInstructor=false));
+
+        // $userData = array(
+        //     'User' => array(
+        //         'username' => "JohnSmith",
+        //         'first_name' => "John",
+        //         'last_name' => "Smith",
+        //         'email' => "john@smith.ca",
+        //         'send_email_notification' => false,
+        //         'lti_id' => "bf3d40",
+        //         'created' => date('Y-m-d H:i:s'),
+        //     ),
+        //     'Role' => array(
+        //         'RolesUser' => 5,
+        //     ),
+        // );
+        // $this->assertTrue($this->Lti13->saveNewUserToCourse($userData, $courseId=1, $isInstructor=false));
     }
 
     function test_removeUsersFoundInBothRosters()

@@ -259,7 +259,6 @@ class Lti13 extends AppModel
      * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L137
      * @param array $data
      * @param int $courseId
-     * @return bool
      */
     public function addUser(array $data, $courseId)
     {
@@ -297,7 +296,6 @@ class Lti13 extends AppModel
      * @param int $courseId
      * @param bool $isInstructor
      * @param string $ltiId
-     * @return bool
      */
     public function saveExistingUserToCourse(array $userData, $courseId, $isInstructor, $ltiId)
     {
@@ -316,7 +314,6 @@ class Lti13 extends AppModel
      * @param array $userData
      * @param int $courseId
      * @param bool $isInstructor
-     * @return bool
      */
     public function saveNewUserToCourse(array $userData, $courseId, $isInstructor)
     {
@@ -335,7 +332,6 @@ class Lti13 extends AppModel
      * @param string $userId
      * @param int $courseId
      * @param bool $isInstructor
-     * @return bool
      */
     public function addUserToCourse($userId, $courseId, $isInstructor)
     {
@@ -345,9 +341,9 @@ class Lti13 extends AppModel
                 $this->Course->addInstructor($courseId, $userId);
             }
         } else {
-            if ($roleId = $this->Role->getDefaultId()) {
+            if ($roleId = $this->Role->field('id', array('name' => 'student'))) {
                 $this->User->registerRole($userId, $roleId);
-                $this->User->UserEnrol->insertCourses($userid, array($courseId));
+                $this->User->UserEnrol->insertCourses($userId, array($courseId));
             }
         }
     }
