@@ -1,6 +1,5 @@
 <?php
 App::import('Lib', 'Lti13Bootstrap');
-App::import('Model', 'Lti13');
 
 /**
  * Usage:
@@ -54,7 +53,7 @@ class Lti13TestCase extends CakeTestCase {
 
     function startCase()
     {
-        $this->Lti13 = ClassRegistry::init('Lti13');
+        $this->Lti13Test = ClassRegistry::init('Lti13');
         $this->UserTest = ClassRegistry::init('User');
         $this->CourseTest = ClassRegistry::init('Course');
         $this->RoleTest = ClassRegistry::init('Role');
@@ -74,12 +73,12 @@ class Lti13TestCase extends CakeTestCase {
   }
 }
 JSON;
-        $this->Lti13->jwtPayload = json_decode($json, true);
+        $this->Lti13Test->jwtPayload = json_decode($json, true);
         $expected = array(
             'label' => "Test iPeer course label",
             'title' => "Test iPeer course title",
         );
-        $actual = $this->Lti13->getLtiCourseData();
+        $actual = $this->Lti13Test->getLtiCourseData();
         $this->assertEqual($expected, $actual);
     }
 
@@ -97,9 +96,9 @@ JSON;
   }
 }
 JSON;
-        $this->Lti13->jwtPayload = json_decode($json, true);
+        $this->Lti13Test->jwtPayload = json_decode($json, true);
         $this->expectException('IMSGlobal\LTI\LTI_Exception');
-        $this->Lti13->getLtiCourseData();
+        $this->Lti13Test->getLtiCourseData();
     }
 
     function test_getLtiCourseDataMissingLabel()
@@ -115,9 +114,9 @@ JSON;
   }
 }
 JSON;
-        $this->Lti13->jwtPayload = json_decode($json, true);
+        $this->Lti13Test->jwtPayload = json_decode($json, true);
         $this->expectException('IMSGlobal\LTI\LTI_Exception');
-        $this->Lti13->getLtiCourseData();
+        $this->Lti13Test->getLtiCourseData();
     }
 
     function test_getLtiCourseDataMissingTitle()
@@ -133,58 +132,58 @@ JSON;
   }
 }
 JSON;
-        $this->Lti13->jwtPayload = json_decode($json, true);
+        $this->Lti13Test->jwtPayload = json_decode($json, true);
         $this->expectException('IMSGlobal\LTI\LTI_Exception');
-        $this->Lti13->getLtiCourseData();
+        $this->Lti13Test->getLtiCourseData();
     }
 
     function test_getLtiCourseDataEmptyJwtPayload()
     {
-        $this->Lti13->jwtPayload = array();
+        $this->Lti13Test->jwtPayload = array();
         $this->expectException('IMSGlobal\LTI\LTI_Exception');
-        $this->Lti13->getLtiCourseData();
+        $this->Lti13Test->getLtiCourseData();
     }
 
     function test_getNrpsMembers()
     {
         $this->expectException('IMSGlobal\LTI\LTI_Exception');
-        @$this->Lti13->getNrpsMembers();
+        @$this->Lti13Test->getNrpsMembers();
     }
 
     function test_updateCourseRoster()
     {
-        $this->assertFalse($this->Lti13->updateCourseRoster(array()));
+        $this->assertFalse($this->Lti13Test->updateCourseRoster(array()));
     }
 
     function test_createCourseRoster()
     {
-        $this->assertFalse($this->Lti13->createCourseRoster(array()));
+        $this->assertFalse($this->Lti13Test->createCourseRoster(array()));
 
         $data = array(
             'course' => "CPSC 405",
             'title' => "Advanced Software Engineering 405",
             'record_status' => Course::STATUS_ACTIVE,
         );
-        $this->assertFalse($this->Lti13->createCourseRoster($data));
+        $this->assertFalse($this->Lti13Test->createCourseRoster($data));
     }
 
     function test_findCourseByLabel()
     {
-        $this->assertTrue($data = $this->Lti13->findCourseByLabel('MECH 328'));
+        $this->assertTrue($data = $this->Lti13Test->findCourseByLabel('MECH 328'));
         $this->assertEqual("Mechanical Engineering Design Project", $data['Course']['title']);
 
-        $this->assertFalse($this->Lti13->findCourseByLabel(null));
+        $this->assertFalse($this->Lti13Test->findCourseByLabel(null));
     }
 
     function test_saveExistingUserToCourse()
     {
-        $this->assertFalse($this->Lti13->saveExistingUserToCourse(array(), $courseId=0, $isInstructor=false, $ltiId=""));
-        $this->assertFalse($this->Lti13->saveExistingUserToCourse(array(), $courseId=0, $isInstructor=true, $ltiId=""));
+        $this->assertFalse($this->Lti13Test->saveExistingUserToCourse(array(), $courseId=0, $isInstructor=false, $ltiId=""));
+        $this->assertFalse($this->Lti13Test->saveExistingUserToCourse(array(), $courseId=0, $isInstructor=true, $ltiId=""));
     }
 
     function test_saveNewUserToCourse()
     {
-        $this->assertFalse($this->Lti13->saveNewUserToCourse(array(), $courseId=0, $isInstructor=true));
+        $this->assertFalse($this->Lti13Test->saveNewUserToCourse(array(), $courseId=0, $isInstructor=true));
 /*
 ERROR->Unexpected PHP error [<span style="color:Red;text-align:left"><b>SQL Error:</b> 1064:
 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server
@@ -194,7 +193,7 @@ in test_saveNewUserToCourse
 in Lti13TestCase
 in /var/www/html/app/tests/cases/models/lti13.test.php
 */
-        // $this->assertFalse($this->Lti13->saveNewUserToCourse(array(), $courseId=0, $isInstructor=false));
+        // $this->assertFalse($this->Lti13Test->saveNewUserToCourse(array(), $courseId=0, $isInstructor=false));
 
         // $userData = array(
         //     'User' => array(
@@ -210,12 +209,12 @@ in /var/www/html/app/tests/cases/models/lti13.test.php
         //         'RolesUser' => 5,
         //     ),
         // );
-        // $this->assertTrue($this->Lti13->saveNewUserToCourse($userData, $courseId=1, $isInstructor=false));
+        // $this->assertTrue($this->Lti13Test->saveNewUserToCourse($userData, $courseId=1, $isInstructor=false));
     }
 
     function test_removeUsersFoundInBothRosters()
     {
-        $this->Lti13->ltiRoster = array(
+        $this->Lti13Test->ltiRoster = array(
             '1' => array(
                 'user_id' => '0123',
             ),
@@ -223,7 +222,7 @@ in /var/www/html/app/tests/cases/models/lti13.test.php
                 'user_id' => '9870',
             ),
         );
-        $this->Lti13->ipeerRoster = array(
+        $this->Lti13Test->ipeerRoster = array(
             '8' => array(
                 'User' => array(
                     'lti_id' => '7777',
@@ -247,27 +246,27 @@ in /var/www/html/app/tests/cases/models/lti13.test.php
                 ),
             ),
         );
-        $this->Lti13->removeUsersFoundInBothRosters();
-        $this->assertEqual($expectedLtiRoster, $this->Lti13->ltiRoster);
-        $this->assertEqual($expectedIpeerRoster, $this->Lti13->ipeerRoster);
+        $this->Lti13Test->removeUsersFoundInBothRosters();
+        $this->assertEqual($expectedLtiRoster, $this->Lti13Test->ltiRoster);
+        $this->assertEqual($expectedIpeerRoster, $this->Lti13Test->ipeerRoster);
     }
 
     function test_findUserByLtiUserId()
     {
-        $this->Lti13->jwtPayload['sub'] = null;
-        $this->assertTrue($this->Lti13->findUserByLtiUserId());
+        $this->Lti13Test->jwtPayload['sub'] = null;
+        $this->assertTrue($this->Lti13Test->findUserByLtiUserId());
 
-        $this->Lti13->jwtPayload['sub'] = 'aaaaa';
-        $this->assertFalse($this->Lti13->findUserByLtiUserId());
+        $this->Lti13Test->jwtPayload['sub'] = 'aaaaa';
+        $this->assertFalse($this->Lti13Test->findUserByLtiUserId());
     }
 
     function test_isInstructor()
     {
-        $this->assertTrue($this->Lti13->isInstructor("Instructor"));
-        $this->assertTrue($this->Lti13->isInstructor("Winstructor"));
-        $this->assertFalse($this->Lti13->isInstructor("Instructo"));
-        $this->assertTrue($this->Lti13->isInstructor(array("#Mentor", "#Instructor")));
-        $this->assertFalse($this->Lti13->isInstructor(array("Student", "Mentor")));
+        $this->assertTrue($this->Lti13Test->isInstructor("Instructor"));
+        $this->assertTrue($this->Lti13Test->isInstructor("Winstructor"));
+        $this->assertFalse($this->Lti13Test->isInstructor("Instructo"));
+        $this->assertTrue($this->Lti13Test->isInstructor(array("#Mentor", "#Instructor")));
+        $this->assertFalse($this->Lti13Test->isInstructor(array("Student", "Mentor")));
     }
 
     function test_getUsername()
@@ -276,27 +275,27 @@ in /var/www/html/app/tests/cases/models/lti13.test.php
             'given_name' => "John",
             'family_name' => "Smith",
         );
-        $this->assertEqual("JohnSmith", $this->Lti13->getUsername($data));
+        $this->assertEqual("JohnSmith", $this->Lti13Test->getUsername($data));
 
         $this->expectException('IMSGlobal\LTI\LTI_Exception');
         $data = array(
             'given_name' => "John",
         );
-        $this->Lti13->getUsername($data);
+        $this->Lti13Test->getUsername($data);
 
         $this->expectException('IMSGlobal\LTI\LTI_Exception');
         $data = array(
             'family_name' => "Smith",
         );
-        $this->Lti13->getUsername($data);
+        $this->Lti13Test->getUsername($data);
 
         $this->expectException('IMSGlobal\LTI\LTI_Exception');
-        $this->Lti13->getUsername(array());
+        $this->Lti13Test->getUsername(array());
     }
 
     function test_getUserType()
     {
-        $this->assertEqual(3, $this->Lti13->getUserType($isInstructor=true));
-        $this->assertEqual(5, $this->Lti13->getUserType($isInstructor=false));
+        $this->assertEqual(3, $this->Lti13Test->getUserType($isInstructor=true));
+        $this->assertEqual(5, $this->Lti13Test->getUserType($isInstructor=false));
     }
 }
