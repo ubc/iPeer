@@ -49,7 +49,7 @@ class Lti13TestCase extends CakeTestCase {
         'app.evaluation_mixeval',
         'app.evaluation_mixeval_detail',
     );
-    public $UserTest, $CourseTest, $RoleTest;
+    public $Lti13Test, $UserTest, $CourseTest, $RoleTest;
 
     function startCase()
     {
