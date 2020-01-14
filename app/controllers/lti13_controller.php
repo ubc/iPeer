@@ -71,9 +71,11 @@ class Lti13Controller extends AppController
     {
         if (!$userId = $this->Lti13->findUserByLtiUserId()) {
             throw new LTI_Exception("User not found.");
+            return;
         }
         if (!$this->Auth->login($userId)) {
             throw new LTI_Exception("Access denied.");
+            return;
         }
     }
 }

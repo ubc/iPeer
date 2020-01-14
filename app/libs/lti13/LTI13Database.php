@@ -10,11 +10,11 @@ use IMSGlobal\LTI\LTI_Registration;
  */
 class LTI13Database implements LTI_Database {
 
-    private $issuers = [];
+    private $issuers = array();
 
     public function __construct()
     {
-        $this->set_issuers();
+        return $this->set_issuers();
     }
 
     /**
@@ -76,7 +76,7 @@ class LTI13Database implements LTI_Database {
         if (!in_array($deployment_id, $this->issuers[$iss]['deployment'])) {
             return false;
         }
-        return (new LTI_Deployment())->set_deployment_id($deployment_id);
+        return LTI_Deployment::new()->set_deployment_id($deployment_id);
     }
 
     /**
