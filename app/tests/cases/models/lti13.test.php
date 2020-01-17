@@ -13,7 +13,8 @@ App::import('Lib', 'Lti13Bootstrap');
  * @copyright 2019 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
-class Lti13TestCase extends CakeTestCase {
+class Lti13TestCase extends CakeTestCase
+{
 
     public $fixtures = array(
         'app.user',
