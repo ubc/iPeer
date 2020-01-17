@@ -43,15 +43,19 @@ class Lti13LoginTestCase extends SystemBaseTestCase
         error_reporting($this->error_reporting);
     }
 
-    public function testLogin()
+    public function login()
     {
-       // $w = new PHPWebDriver_WebDriverWait($this->session);
        $this->session->deleteAllCookies();
        $login = PageFactory::initElements($this->session, 'Login');
-       $home = $login->login('root', 'ipeeripeer');
-       $this->assertEqual($this->session->url(), $this->url);
-       // make sure we are landed on home page
-       $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
-       $this->assertEqual($title, 'Home');
+       return $login->login('root', 'ipeeripeer');
+    }
+
+    public function testLogin()
+    {
+        $this->login();
+        $this->assertEqual($this->session->url(), $this->url);
+        // Make sure we are landed on home page
+        $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
+        $this->assertEqual($title, 'Home');
     }
 }
