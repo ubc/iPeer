@@ -24,7 +24,7 @@ if (!function_exists('split')) {
  */
 class Lti13LoginTestCase extends SystemBaseTestCase
 {
-    private $error_reporting;
+    private $errorReporting;
     private $saveScreenshot = true;
 
     public function startCase()
@@ -32,8 +32,8 @@ class Lti13LoginTestCase extends SystemBaseTestCase
         parent::startCase();
         echo "Start LTI 1.3 Login system test.", PHP_EOL;
 
-        $this->error_reporting = error_reporting();
-        error_reporting($this->error_reporting & ~E_WARNING);
+        $this->errorReporting = error_reporting();
+        error_reporting($this->errorReporting & ~E_WARNING);
 
         $this->getSession()->open($this->url);
     }
@@ -41,7 +41,7 @@ class Lti13LoginTestCase extends SystemBaseTestCase
     public function endCase()
     {
         parent::endCase();
-        error_reporting($this->error_reporting);
+        error_reporting($this->errorReporting);
     }
 
     /**
