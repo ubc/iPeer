@@ -25,6 +25,7 @@ if (!function_exists('split')) {
 class Lti13LoginTestCase extends SystemBaseTestCase
 {
     private $error_reporting;
+    private $saveScreenshot = true;
 
     public function startCase()
     {
@@ -43,19 +44,37 @@ class Lti13LoginTestCase extends SystemBaseTestCase
         error_reporting($this->error_reporting);
     }
 
+    /**
+     * @see vendors/webdriver/README.md -> Screenshotting
+     */
+    public function saveScreenshot()
+    {
+        if ($this->saveScreenshot) {
+            $img = $this->session->screenshot();
+            $data = base64_decode($img);
+            $u = explode(".", microtime(1))[1];
+            $filename = sprintf('%s/app/tmp/tests/%s%s.png', ROOT, date('YmdHis'), $u);
+            printf("Screenshot: %s%s", $filename, PHP_EOL);
+            return file_put_contents($filename, $data);
+        }
+    }
+
     public function login()
     {
-       $this->session->deleteAllCookies();
-       $login = PageFactory::initElements($this->session, 'Login');
-       return $login->login('root', 'ipeeripeer');
+        $this->session->deleteAllCookies();
+        $login = PageFactory::initElements($this->session, 'Login');
+        $this->saveScreenshot();
+        return $login->login('root', 'ipeeripeer');
     }
 
     public function testLogin()
     {
         $this->login();
         $this->assertEqual($this->session->url(), $this->url);
+
         // Make sure we are landed on home page
         $title = $this->session->elementWithWait(PHPWebDriver_WebDriverBy::CSS_SELECTOR, "h1.title")->text();
+        $this->saveScreenshot();
         $this->assertEqual($title, 'Home');
     }
 }
