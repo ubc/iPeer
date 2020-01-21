@@ -12,9 +12,14 @@ if (!function_exists('split')) {
 }
 
 /**
- * To bypass `vendors/webdriver/PHPWebDriver/WebDriverBase.php::__call()` -> count() PHP error
+ * To bypass `vendors/webdriver/PHPWebDriver/WebDriverBase.php::__call()` -> count() PHP error.
  *
  * @link https://www.php.net/manual/en/function.set-error-handler
+ * @param int $errno
+ * @param string $errstr
+ * @param string $errfile
+ * @param int $errline
+ * @return bool
  */
 function error_handler($errno, $errstr, $errfile, $errline) {
     $args = compact('errno', 'errstr', 'errfile', 'errline');
