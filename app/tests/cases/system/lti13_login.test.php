@@ -7,9 +7,26 @@ App::import('Lib', 'Lti13Bootstrap');
  */
 if (!function_exists('split')) {
     function split($pattern, $string, $limit = -1) {
-        return preg_split('@'.$pattern.'@', $string, $limit = -1);
+        return preg_split('@'.$pattern.'@', $string, $limit);
     }
 }
+
+/**
+ * To bypass `vendors/webdriver/PHPWebDriver/WebDriverBase.php::__call()` -> count() PHP error
+ *
+ * @link https://www.php.net/manual/en/function.set-error-handler
+ */
+function error_handler($errno, $errstr, $errfile, $errline) {
+    $args = compact('errno', 'errstr', 'errfile', 'errline');
+    $error = array(
+        'errno'   => E_WARNING,
+        'errstr'  => "count(): Parameter must be an array or an object that implements Countable",
+        'errfile' => '/var/www/html/vendors/webdriver/PHPWebDriver/WebDriverBase.php',
+        'errline' => 242,
+    );
+    return $args + $error == $error;
+}
+set_error_handler('error_handler');
 
 /**
  * Usage:
@@ -24,24 +41,24 @@ if (!function_exists('split')) {
  */
 class Lti13LoginTestCase extends SystemBaseTestCase
 {
-    private $errorReporting;
     private $saveScreenshot = true;
 
     public function startCase()
     {
         parent::startCase();
         echo "Start LTI 1.3 Login system test.", PHP_EOL;
-
-        $this->errorReporting = error_reporting();
-        error_reporting($this->errorReporting & ~E_WARNING);
-
         $this->getSession()->open($this->url);
     }
 
-    public function endCase()
-    {
-        parent::endCase();
-        error_reporting($this->errorReporting);
+    /**
+     * Override SimpleTestCase::error()
+     *
+     * @see app/vendors/simpletest/test_case.php
+     */
+    public function error($severity, $message, $file, $line) {
+        if (!error_handler(constant($severity), $message, $file, $line)) {
+            parent::error($severity, $message, $file, $line);
+        }
     }
 
     /**

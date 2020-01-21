@@ -10,9 +10,9 @@ App::import('Lib', 'system_base');
 // - Modify the following constants accordingly
 
 // TODO: move to environment variable
-const ENABLE_CANVAS_TEST = false;
+const ENABLE_CANVAS_TEST = true;
 const CANVAS_TEST_BASE_URL = 'http://docker-canvas_app_1';
-const CANVAS_ADMIN_LOGIN = 'ipeertest';
+const CANVAS_ADMIN_LOGIN = 'ipeertest@docker-canvas_app_1';
 const CANVAS_ADMIN_PASSWORD = 'password';
 
 //// testing data
