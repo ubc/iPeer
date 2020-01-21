@@ -59,6 +59,10 @@ class Lti13LoginTestCase extends SystemBaseTestCase
      * Override SimpleTestCase::error()
      *
      * @see app/vendors/simpletest/test_case.php
+     * @param string $severity
+     * @param string $message
+     * @param string $file
+     * @param int $line
      */
     public function error($severity, $message, $file, $line) {
         if (!error_handler(constant($severity), $message, $file, $line)) {
