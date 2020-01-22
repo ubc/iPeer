@@ -27,6 +27,10 @@ class ResourceIRI {
         return self::getBaseUrl() . "/session/$session_id";
     }
 
+	public static function user_client( $session_id ) {
+		return self::user_session( $session_id ) . '#client';
+	}
+
     public static function webpage($relativePath) {
         if (!is_string($relativePath)) {
             throw new \InvalidArgumentException(__METHOD__ . ': string expected');

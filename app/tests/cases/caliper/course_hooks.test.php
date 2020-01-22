@@ -90,6 +90,7 @@ class CaliperCourseHooksTest extends CaliperAuthTestCase
         );
         $expected_event = array(
             'type' => 'ResourceManagementEvent',
+            'profile' => 'ResourceManagementProfile',
             'action' => 'Deleted',
             'object' => $this->expected_course,
             'group' => $this->expected_group,
@@ -132,6 +133,7 @@ class CaliperCourseHooksTest extends CaliperAuthTestCase
         $this->setupSession();
         $expected_event = array(
             'type' => 'ResourceManagementEvent',
+            'profile' => 'ResourceManagementProfile',
             'action' => 'Created',
             'object' => $this->expected_course,
             'group' => $this->expected_group,

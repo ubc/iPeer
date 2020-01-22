@@ -1,6 +1,7 @@
 <?php
 namespace caliper;
 
+use IMSGlobal\Caliper\profiles\Profile;
 use IMSGlobal\Caliper\actions\Action;
 use IMSGlobal\Caliper\events\SessionEvent;
 use IMSGlobal\Caliper\events\NavigationEvent;
@@ -10,7 +11,6 @@ use IMSGlobal\Caliper\events\AssessmentEvent;
 use IMSGlobal\Caliper\events\AssessmentItemEvent;
 use IMSGlobal\Caliper\events\FeedbackEvent;
 use IMSGlobal\Caliper\events\ResourceManagementEvent;
-use caliper\ResourceIRI;
 use caliper\CaliperActor;
 use caliper\CaliperEntity;
 use caliper\CaliperSensor;
@@ -31,6 +31,7 @@ class CaliperHooks {
         // skip favicon views
         if ($relativePath != 'favicon.ico') {
             $event = (new NavigationEvent())
+                ->setProfile( new Profile( Profile::READING ) )
                 ->setAction(new Action(Action::NAVIGATED_TO))
                 ->setObject(CaliperEntity::webpage($relativePath))
                 ->setExtensions([
@@ -48,6 +49,7 @@ class CaliperHooks {
 
         $app_controller->Session->write('session_start', time());
         $event = (new SessionEvent())
+            ->setProfile( new Profile( Profile::SESSION ) )
             ->setAction(new Action(Action::LOGGED_IN))
             ->setObject(CaliperEntity::iPeer());
         CaliperSensor::sendEvent($event);
@@ -58,6 +60,7 @@ class CaliperHooks {
 
         $app_controller->Session->write('session_end', time());
         $event = (new SessionEvent())
+            ->setProfile( new Profile( Profile::SESSION ) )
             ->setAction(new Action(Action::LOGGED_OUT))
             ->setObject(CaliperEntity::iPeer());
         CaliperSensor::sendEvent($event);
@@ -79,6 +82,7 @@ class CaliperHooks {
         unset($model->data['caliper_delete']);
 
         $event = (new ResourceManagementEvent())
+            ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
             ->setAction(new Action(Action::DELETED))
             ->setObject(CaliperEntity::course(
                 $results['Course']));
@@ -96,6 +100,7 @@ class CaliperHooks {
 
         // Potential TODO: add activate/deactivate event based on record_status
         $event = (new ResourceManagementEvent())
+            ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
             ->setAction(new Action($action))
             ->setObject(CaliperEntity::course(
                 $results['Course']));
@@ -131,6 +136,7 @@ class CaliperHooks {
             $results = $SimpleEvaluation->getEvaluation($event_obj['template_id']);
 
             $events[]= (new ResourceManagementEvent())
+                ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                 ->setAction(new Action(Action::DELETED))
                 ->setObject(CaliperEntity::event_simple_evaluation(
                     $event_obj,
@@ -143,6 +149,7 @@ class CaliperHooks {
             ));
 
             $events[]= (new ResourceManagementEvent())
+                ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                 ->setAction(new Action(Action::DELETED))
                 ->setObject(CaliperEntity::event_mixeval(
                     $event_obj,
@@ -150,6 +157,7 @@ class CaliperHooks {
                     $results['MixevalQuestion']));
             foreach($results['MixevalQuestion'] as $question) {
                 $events[] = (new ResourceManagementEvent())
+                    ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                     ->setAction(new Action(Action::DELETED))
                     ->setObject(CaliperEntity::mixeval_question(
                         $event_obj,
@@ -168,6 +176,7 @@ class CaliperHooks {
             ));
 
             $events[]= (new ResourceManagementEvent())
+                ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                 ->setAction(new Action(Action::DELETED))
                 ->setObject(CaliperEntity::event_rubric(
                     $event_obj,
@@ -175,6 +184,7 @@ class CaliperHooks {
                     $results['RubricsCriteria']));
             foreach($results['RubricsCriteria'] as $question) {
                 $events[] = (new ResourceManagementEvent())
+                    ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                     ->setAction(new Action(Action::DELETED))
                     ->setObject(CaliperEntity::rubric_question(
                         $event_obj,
@@ -195,6 +205,7 @@ class CaliperHooks {
             ));
 
             $events[]= (new ResourceManagementEvent())
+                ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                 ->setAction(new Action(Action::DELETED))
                 ->setObject(CaliperEntity::event_survey(
                     $event_obj,
@@ -202,6 +213,7 @@ class CaliperHooks {
                     $results['Question']));
             foreach($results['Question'] as $question) {
                 $events[]= (new ResourceManagementEvent())
+                    ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                     ->setAction(new Action(Action::DELETED))
                     ->setObject(CaliperEntity::survey_item(
                         $event_obj,
@@ -237,6 +249,7 @@ class CaliperHooks {
 
             if ($created) {
                 $events[]= (new ResourceManagementEvent())
+                    ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                     ->setAction(new Action(Action::COPIED))
                     ->setObject(CaliperEntity::simple_evaluation(
                         $results['SimpleEvaluation']))
@@ -245,6 +258,7 @@ class CaliperHooks {
                         $results['SimpleEvaluation']));
             } else {
                 $events[]= (new ResourceManagementEvent())
+                    ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                     ->setAction(new Action(Action::MODIFIED))
                     ->setObject(CaliperEntity::event_simple_evaluation(
                         $event_obj,
@@ -259,6 +273,7 @@ class CaliperHooks {
 
             if ($created) {
                 $events[]= (new ResourceManagementEvent())
+                    ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                     ->setAction(new Action(Action::COPIED))
                     ->setObject(CaliperEntity::mixeval(
                         $results['Mixeval'],
@@ -269,6 +284,7 @@ class CaliperHooks {
                         $results['MixevalQuestion']));
                     foreach($results['MixevalQuestion'] as $question) {
                         $events[] = (new ResourceManagementEvent())
+                            ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                             ->setAction(new Action(Action::COPIED))
                             ->setObject(CaliperEntity::mixeval_question(
                                 NULL, //event
@@ -283,6 +299,7 @@ class CaliperHooks {
                     }
             } else {
                 $events[] = (new ResourceManagementEvent())
+                    ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                     ->setAction(new Action(Action::MODIFIED))
                     ->setObject(CaliperEntity::event_mixeval(
                         $event_obj,
@@ -301,6 +318,7 @@ class CaliperHooks {
 
             if ($created) {
                 $events[]= (new ResourceManagementEvent())
+                    ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                     ->setAction(new Action(Action::COPIED))
                     ->setObject(CaliperEntity::rubric(
                         $results['Rubric'],
@@ -311,6 +329,7 @@ class CaliperHooks {
                         $results['RubricsCriteria']));
                 foreach($results['RubricsCriteria'] as $question) {
                     $events[] = (new ResourceManagementEvent())
+                        ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                         ->setAction(new Action(Action::COPIED))
                         ->setObject(CaliperEntity::rubric_question(
                             NULL, //event
@@ -327,6 +346,7 @@ class CaliperHooks {
                 }
             } else {
                 $events[] = (new ResourceManagementEvent())
+                    ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                     ->setAction(new Action(Action::MODIFIED))
                     ->setObject(CaliperEntity::event_rubric(
                         $event_obj,
@@ -346,6 +366,7 @@ class CaliperHooks {
 
             if ($created) {
                 $events[]= (new ResourceManagementEvent())
+                    ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                     ->setAction(new Action(Action::COPIED))
                     ->setObject(CaliperEntity::survey(
                         $results['Survey'],
@@ -356,6 +377,7 @@ class CaliperHooks {
                         $results['Question']));
                 foreach($results['Question'] as $question) {
                     $events[]= (new ResourceManagementEvent())
+                        ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                         ->setAction(new Action(Action::COPIED))
                         ->setObject(CaliperEntity::survey_item(
                             NULL, //event
@@ -370,6 +392,7 @@ class CaliperHooks {
                 }
             } else {
                 $events[] = (new ResourceManagementEvent())
+                    ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                     ->setAction(new Action(Action::MODIFIED))
                     ->setObject(CaliperEntity::event_survey(
                         $event_obj,
@@ -429,6 +452,7 @@ class CaliperHooks {
             }
             if ($group_member) {
                 $events[]= (new AssessmentItemEvent())
+                    ->setProfile( new Profile( Profile::ASSESSMENT ) )
                     ->setAction(new Action(Action::COMPLETED))
                     ->setObject(CaliperEntity::simple_evaluation_group_member_question(
                         $event_obj,
@@ -442,6 +466,7 @@ class CaliperHooks {
                         $group_member,
                         $evaluation_simple));
                 $events[]= (new FeedbackEvent())
+                    ->setProfile( new Profile( Profile::FEEDBACK ) )
                     ->setAction(new Action(Action::RANKED))
                     ->setObject(CaliperActor::generateActor($group_member))
                     ->setGenerated(CaliperEntity::simple_evaluation_feedback_rating(
@@ -455,6 +480,7 @@ class CaliperHooks {
         }
 
         $events[]= (new AssessmentEvent())
+            ->setProfile( new Profile( Profile::ASSESSMENT ) )
             ->setAction(new Action(Action::SUBMITTED))
             ->setObject(CaliperEntity::event_simple_evaluation(
                 $event_obj,
@@ -475,6 +501,7 @@ class CaliperHooks {
         unset($model->data['caliper_delete']);
 
         $event = (new ResourceManagementEvent())
+            ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
             ->setAction(new Action(Action::DELETED))
             ->setObject(CaliperEntity::simple_evaluation(
                 $results['SimpleEvaluation']));
@@ -487,6 +514,7 @@ class CaliperHooks {
         $results = $model->getEvaluation($model->id);
 
         $event = (new ResourceManagementEvent())
+            ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
             ->setAction(new Action($action))
             ->setObject(CaliperEntity::simple_evaluation(
                 $results['SimpleEvaluation']));
@@ -536,6 +564,7 @@ class CaliperHooks {
             }
             if (count($survey_inputs) > 0) {
                 $events[]= (new QuestionnaireItemEvent())
+                    ->setProfile( new Profile( Profile::SURVEY ) )
                     ->setAction(new Action(Action::COMPLETED))
                     ->setObject(CaliperEntity::survey_item(
                         $event_obj, //event
@@ -552,6 +581,7 @@ class CaliperHooks {
         }
 
         $events[]= (new QuestionnaireEvent())
+            ->setProfile( new Profile( Profile::SURVEY ) )
             ->setAction(new Action(Action::SUBMITTED))
             ->setObject(CaliperEntity::event_survey(
                 $event_obj,
@@ -583,6 +613,7 @@ class CaliperHooks {
 
         foreach($results['Question'] as $question) {
             $events[]= (new ResourceManagementEvent())
+                ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                 ->setAction(new Action(Action::DELETED))
                 ->setObject(CaliperEntity::survey_item(
                     NULL, //event
@@ -591,6 +622,7 @@ class CaliperHooks {
                     $question));
         }
         $events[]= (new ResourceManagementEvent())
+            ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
             ->setAction(new Action(Action::DELETED))
             ->setObject(CaliperEntity::survey(
                 $results['Survey'],
@@ -614,6 +646,7 @@ class CaliperHooks {
         ));
 
         $event = (new ResourceManagementEvent())
+            ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
             ->setAction(new Action(Action::MODIFIED))
             ->setObject(CaliperEntity::survey(
                 $results['Survey'],
@@ -637,6 +670,7 @@ class CaliperHooks {
             'recursive' => 2,
         ));
         $events[] = (new ResourceManagementEvent())
+            ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
             ->setAction(new Action(Action::CREATED))
             ->setObject(CaliperEntity::survey(
                 $results['Survey'],
@@ -644,6 +678,7 @@ class CaliperHooks {
 
         foreach($results['Question'] as $question) {
             $events[] = (new ResourceManagementEvent())
+                ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                 ->setAction(new Action(Action::CREATED))
                 ->setObject(CaliperEntity::survey_item(
                     NULL, //event
@@ -672,6 +707,7 @@ class CaliperHooks {
         $question = $results['Question'][$question_key];
 
         $event = (new ResourceManagementEvent())
+            ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
             ->setAction(new Action(Action::MODIFIED))
             ->setObject(CaliperEntity::survey_item(
                 NULL, //event
@@ -700,6 +736,7 @@ class CaliperHooks {
         $question = $results['Question'][$question_key];
 
         $events[]= (new ResourceManagementEvent())
+            ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
             ->setAction(new Action(Action::DELETED))
             ->setObject(CaliperEntity::survey_item(
                 NULL, //event
@@ -708,6 +745,7 @@ class CaliperHooks {
                 $question));
 
         $events[]= (new ResourceManagementEvent())
+            ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
             ->setAction(new Action(Action::MODIFIED))
             ->setObject(CaliperEntity::survey(
                 $results['Survey'],
@@ -734,6 +772,7 @@ class CaliperHooks {
         $question = $results['Question'][$question_key];
 
         $events[]= (new ResourceManagementEvent())
+            ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
             ->setAction(new Action(Action::CREATED))
             ->setObject(CaliperEntity::survey_item(
                 NULL, //event
@@ -741,6 +780,7 @@ class CaliperHooks {
                 $results['Question'],
                 $question));
         $events[]= (new ResourceManagementEvent())
+            ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
             ->setAction(new Action(Action::MODIFIED))
             ->setObject(CaliperEntity::survey(
                 $results['Survey'],
@@ -812,6 +852,7 @@ class CaliperHooks {
                     }
                     if ($question) {
                         $events[]= (new AssessmentItemEvent())
+                            ->setProfile( new Profile( Profile::ASSESSMENT ) )
                             ->setAction(new Action(Action::COMPLETED))
                             ->setObject(CaliperEntity::rubric_group_member_question(
                                 $event_obj,
@@ -829,6 +870,7 @@ class CaliperHooks {
                                 $evaluation_rubric,
                                 $evaluation_rubric_detail));
                         $events[]= (new FeedbackEvent())
+                            ->setProfile( new Profile( Profile::FEEDBACK ) )
                             ->setAction(new Action(Action::RANKED))
                             ->setObject(CaliperActor::generateActor($group_member))
                             ->setGenerated(CaliperEntity::rubric_feedback_rating(
@@ -842,6 +884,7 @@ class CaliperHooks {
                     }
                 }
                 $events[]= (new FeedbackEvent())
+                    ->setProfile( new Profile( Profile::FEEDBACK ) )
                     ->setAction(new Action(Action::RANKED))
                     ->setObject(CaliperActor::generateActor($group_member))
                     ->setGenerated(CaliperEntity::rubric_overall_feedback_rating(
@@ -855,6 +898,7 @@ class CaliperHooks {
         }
 
         $events[]= (new AssessmentEvent())
+            ->setProfile( new Profile( Profile::ASSESSMENT ) )
             ->setAction(new Action(Action::SUBMITTED))
             ->setObject(CaliperEntity::event_rubric(
                 $event_obj,
@@ -885,6 +929,7 @@ class CaliperHooks {
 
         foreach($results['RubricsCriteria'] as $question) {
             $events[] = (new ResourceManagementEvent())
+                ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                 ->setAction(new Action(Action::DELETED))
                 ->setObject(CaliperEntity::rubric_question(
                     NULL, //event
@@ -895,6 +940,7 @@ class CaliperHooks {
         }
 
         $events[] = (new ResourceManagementEvent())
+            ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
             ->setAction(new Action(Action::DELETED))
             ->setObject(CaliperEntity::rubric(
                 $results['Rubric'],
@@ -907,6 +953,7 @@ class CaliperHooks {
 
         return (new ResourceManagementEvent())
             # all criteria and loms are deleted on every save
+            ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
             ->setAction(new Action(Action::DELETED))
             ->setObject(CaliperEntity::rubric_question(
                 NULL, //event
@@ -935,6 +982,7 @@ class CaliperHooks {
 
             $events[] = (new ResourceManagementEvent())
                 # all criteria and loms are deleted on every save
+                ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                 ->setAction(new Action($action))
                 ->setObject(CaliperEntity::rubric_question(
                     NULL, //event
@@ -946,6 +994,7 @@ class CaliperHooks {
 
         $action = $is_new ? Action::CREATED : Action::MODIFIED;
         $events[] = (new ResourceManagementEvent())
+            ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
             ->setAction(new Action($action))
             ->setObject(CaliperEntity::rubric(
                 $results['Rubric'],
@@ -1017,6 +1066,7 @@ class CaliperHooks {
                     }
                     if ($question) {
                         $events[]= (new AssessmentItemEvent())
+                            ->setProfile( new Profile( Profile::ASSESSMENT ) )
                             ->setAction(new Action(Action::COMPLETED))
                             ->setObject(CaliperEntity::mixeval_group_member_question(
                                 $event_obj,
@@ -1038,6 +1088,7 @@ class CaliperHooks {
                             Action::RANKED : Action::COMMENTED;
 
                         $events[]= (new FeedbackEvent())
+                            ->setProfile( new Profile( Profile::FEEDBACK ) )
                             ->setAction(new Action($action))
                             ->setObject(CaliperActor::generateActor($group_member))
                             ->setGenerated(CaliperEntity::mixeval_feedback(
@@ -1051,6 +1102,7 @@ class CaliperHooks {
                     }
                 }
                 $events[]= (new FeedbackEvent())
+                    ->setProfile( new Profile( Profile::FEEDBACK ) )
                     ->setAction(new Action(Action::RANKED))
                     ->setObject(CaliperActor::generateActor($group_member))
                     ->setGenerated(CaliperEntity::mixeval_overall_feedback_rating(
@@ -1064,6 +1116,7 @@ class CaliperHooks {
         }
 
         $events[]= (new AssessmentEvent())
+            ->setProfile( new Profile( Profile::ASSESSMENT ) )
             ->setAction(new Action(Action::SUBMITTED))
             ->setObject(CaliperEntity::event_mixeval(
                 $event_obj,
@@ -1095,6 +1148,7 @@ class CaliperHooks {
 
         foreach($results['MixevalQuestion'] as $question) {
             $events[] = (new ResourceManagementEvent())
+                ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                 ->setAction(new Action(Action::DELETED))
                 ->setObject(CaliperEntity::mixeval_question(
                     NULL, //event
@@ -1104,6 +1158,7 @@ class CaliperHooks {
         }
 
         $events[] = (new ResourceManagementEvent())
+            ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
             ->setAction(new Action(Action::DELETED))
             ->setObject(CaliperEntity::mixeval(
                 $results['Mixeval'],
@@ -1125,6 +1180,7 @@ class CaliperHooks {
         foreach($results['MixevalQuestion'] as $question) {
             if (in_array($question['id'], $deleted_question_ids)) {
                 $events[] = (new ResourceManagementEvent())
+                    ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                     ->setAction(new Action(Action::DELETED))
                     ->setObject(CaliperEntity::mixeval_question(
                         NULL, //event
@@ -1150,6 +1206,7 @@ class CaliperHooks {
                 Action::MODIFIED : Action::CREATED;
             $events[] = (new ResourceManagementEvent())
                 # all criteria and loms are deleted on every save
+                ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
                 ->setAction(new Action($action))
                 ->setObject(CaliperEntity::mixeval_question(
                     NULL, //event
@@ -1161,6 +1218,7 @@ class CaliperHooks {
         $action = $is_new ? Action::CREATED : Action::MODIFIED;
         $events[] = (new ResourceManagementEvent())
             # all criteria and loms are deleted on every save
+            ->setProfile( new Profile( Profile::RESOURCE_MANAGEMENT ) )
             ->setAction(new Action($action))
             ->setObject(CaliperEntity::mixeval(
                 $results['Mixeval'],

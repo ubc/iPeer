@@ -17,11 +17,16 @@ use IMSGlobal\Caliper\request\HttpRequestor;
 class CaliperSensor {
     private static $options = null;
     private static $sensor = null;
-    private static $sendEvents = true; //allows disabling for unit tests
+    private static $isTest = false;
+    private static $sendTestEvents = false;
     private static $tempStore = array();
 
-    public static function setSendEvents($sendEvents) {
-        self::$sendEvents = $sendEvents;
+    public static function isTest($isTest) {
+        self::$isTest = $isTest;
+    }
+
+    public static function sendTestEvents($sendTestEvents) {
+        self::$sendTestEvents = $sendTestEvents;
     }
 
     public static function getEnvelopes() {
@@ -76,8 +81,11 @@ class CaliperSensor {
 
 
             // used for unit tests
-            if (!self::$sendEvents) {
+            if ( self::$isTest ) {
                 self::$tempStore[] = $envelopeJson;
+                if (self::$sendTestEvents) {
+                    self::_sendEvent($envelopeJson);
+                }
             } else {
                 $CakeDjjobComponent->enqueue(new \SendCaliperEventsJob($envelopeJson));
             }
@@ -116,6 +124,9 @@ class CaliperSensor {
         if ($responseCode != 200) {
             \CakeLog::write('error', 'Caliper Emit Error: '. $responseCode);
             \CakeLog::write('error', 'Caliper Envelope JSON: '. $envelopeJson);
+            if ( self::$isTest ) {
+                throw new \Exception('Caliper Emit Error: '. $responseCode .'\n'.$envelopeJson);
+            }
         }
         return true;
     }

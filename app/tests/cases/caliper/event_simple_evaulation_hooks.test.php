@@ -135,7 +135,6 @@ class CaliperEventSimpleEvaluationHooksTest extends CaliperAuthTestCase
             ),
         );
         $this->expected_simple_evaluation_event_question_scale = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/FeedbackProfile-extension',
             'id' => 'http://test.ipeer.com/events/view/1/questions/1/scale',
             'type' => 'NumericScale',
             'extensions' => array(
@@ -203,6 +202,7 @@ class CaliperEventSimpleEvaluationHooksTest extends CaliperAuthTestCase
         $expected_events = array();
         $expected_events[] = array(
             'type' => 'ResourceManagementEvent',
+            'profile' => 'ResourceManagementProfile',
             'action' => 'Deleted',
             'object' => $this->expected_simple_evaluation_event,
             'group' => $this->expected_group,
@@ -263,6 +263,7 @@ class CaliperEventSimpleEvaluationHooksTest extends CaliperAuthTestCase
             if ($created) {
                 $expected_events[] = array(
                     'type' => 'ResourceManagementEvent',
+                    'profile' => 'ResourceManagementProfile',
                     'action' => 'Copied',
                     'object' => $this->expected_simple_evaluation,
                     'generated' => $this->expected_simple_evaluation_event,
@@ -272,6 +273,7 @@ class CaliperEventSimpleEvaluationHooksTest extends CaliperAuthTestCase
             } else {
                 $expected_events[] = array(
                     'type' => 'ResourceManagementEvent',
+                    'profile' => 'ResourceManagementProfile',
                     'action' => 'Modified',
                     'object' => $this->expected_simple_evaluation_event,
                     'group' => $this->expected_group,
@@ -306,7 +308,6 @@ class CaliperEventSimpleEvaluationHooksTest extends CaliperAuthTestCase
                 $generated = array();
                 if ($user_id == 5) {
                     $generated = array(
-                        '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/SurveyProfile-extension',
                         'id' => 'http://test.ipeer.com/events/view/1/questions/1/group/1/user/5/responses/1',
                         'type' => 'RatingScaleResponse',
                         'extensions' =>  array(
@@ -323,7 +324,6 @@ class CaliperEventSimpleEvaluationHooksTest extends CaliperAuthTestCase
                     );
                 } else if ($user_id == 6) {
                     $generated = array(
-                        '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/SurveyProfile-extension',
                         'id' => 'http://test.ipeer.com/events/view/1/questions/1/group/1/user/6/responses/2',
                         'type' => 'RatingScaleResponse',
                         'extensions' =>  array(
@@ -342,6 +342,7 @@ class CaliperEventSimpleEvaluationHooksTest extends CaliperAuthTestCase
 
                 $expected_events[] = array(
                     'type' => 'AssessmentItemEvent',
+                    'profile' => 'AssessmentProfile',
                     'action' => 'Completed',
                     'object' => array(
                         'id' => 'http://test.ipeer.com/events/view/1/questions/1/group/1/user/'.$user_id,
@@ -379,6 +380,7 @@ class CaliperEventSimpleEvaluationHooksTest extends CaliperAuthTestCase
                 }
                 $expected_events[] = array(
                     'type' => 'FeedbackEvent',
+                    'profile' => 'FeedbackProfile',
                     'action' => 'Ranked',
                     'object' => $expected_group_member,
                     'generated' => $generated,
@@ -390,6 +392,7 @@ class CaliperEventSimpleEvaluationHooksTest extends CaliperAuthTestCase
         }
         $expected_events[] = array(
             'type' => 'AssessmentEvent',
+            'profile' => 'AssessmentProfile',
             'action' => 'Submitted',
             'object' => $this->expected_simple_evaluation_event,
             'group' => $this->expected_group,
