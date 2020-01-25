@@ -3,6 +3,32 @@ require_once(VENDORS.'webdriver/PHPWebDriver/WebDriverActionChains.php');
 require_once(VENDORS.'webdriver/PHPWebDriver/WebDriverKeys.php');
 App::import('Lib', 'system_base');
 
+/**
+ * To bypass `vendors/webdriver/PHPWebDriver/WebDriverBase.php::__call()` -> count() PHP error.
+ *
+ * @link https://www.php.net/manual/en/function.set-error-handler
+ * @param int $errno
+ * @param string $errstr
+ * @param string $errfile
+ * @param int $errline
+ * @return bool
+ */
+function error_handler($errno, $errstr, $errfile, $errline) {
+    $kwargs = compact('errno', 'errstr', 'errfile', 'errline');
+    $args = array_merge(array_values($kwargs), [null]);
+    if (call_user_func_array('PHPWebDriver_deprecation_handler', $args)) {
+        return true;
+    }
+    $error = array(
+        'errno'   => E_WARNING,
+        'errstr'  => "count(): Parameter must be an array or an object that implements Countable",
+        'errfile' => '/var/www/html/vendors/webdriver/PHPWebDriver/WebDriverBase.php',
+        'errline' => 242,
+    );
+    return $kwargs + $error == $error;
+}
+set_error_handler('error_handler');
+
 // Assumptions:
 // - A Canvas testing environment is available.  If using docker, refer to iPeer readme.md on how
 //   to create a bridge to connect the iPeer app and Canvas app containers
@@ -101,6 +127,7 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
             CANVAS_INSTRUCTOR1_LOGIN, CANVAS_INSTRUCTOR1_FULLNAME, CANVAS_INSTRUCTOR1_PASSWORD,
             CANVAS_INSTRUCTOR1_EMAIL, IPEER_INSTRUCTOR1_LOGIN, true);
         for ($i = 1; $i <= 2; $i++) {
+            printf("Creating user `%s` ...\n", constant('CANVAS_TA'.$i.'_LOGIN'));
             $this->_canvasUserCreate(
                 constant('CANVAS_TA'.$i.'_LOGIN'),
                 constant('CANVAS_TA'.$i.'_FULLNAME'),
@@ -109,6 +136,7 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
                 constant('IPEER_TA'.$i.'_LOGIN'), true);
         }
         for ($i = 1; $i <= 3; $i++) {
+            printf("Creating user `%s` ...\n", constant('CANVAS_STUDENT'.$i.'_LOGIN'));
             $this->_canvasUserCreate(
                 constant('CANVAS_STUDENT'.$i.'_LOGIN'),
                 constant('CANVAS_STUDENT'.$i.'_FULLNAME'),
@@ -117,6 +145,7 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
                 constant('IPEER_STUDENT'.$i.'_LOGIN'), true);
         }
         for ($i = 1; $i <= 2; $i++) {
+            printf("Creating user `%s` ...\n", constant('CANVAS_NEW_STUDENT'.$i.'_LOGIN'));
             $this->_canvasUserCreate(
                 constant('CANVAS_NEW_STUDENT'.$i.'_LOGIN'),
                 constant('CANVAS_NEW_STUDENT'.$i.'_FULLNAME'),
@@ -621,6 +650,8 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
      */
     private function _canvasUserCreate($login, $fullname, $password, $email, $integrationId, $forceCreateNew=true)
     {
+        $xpath_users = '//div[@id="content"]//table//a[starts-with(@href, "/accounts/")]';
+
         if ($forceCreateNew) {
             // In Canvas, integration IDs are unique and can't be duplicated.
             // However, deleting a login won't clear the integration ID for a new login to use.
@@ -637,22 +668,26 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
         } else {
             
             $this->getSession()->open(CANVAS_TEST_BASE_URL . '/accounts/site_admin/users');
-            $users = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH, '//ul[contains(@class, "users")]//a[starts-with(@href, "/accounts/")]');
+            $users = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::XPATH, $xpath_users);
             $foundUser = false;
             foreach ($users as $user) {
-                if ($user->text() == $email || $user->text() == $login) {
+                $text = $user->text();
+                if ($this->_checkFullname($email, $text) || $this->_checkFullname($login, $text)) {
                     return;
                 }
             }
         }
         
         $this->getSession()->open(CANVAS_TEST_BASE_URL . '/accounts/site_admin/users');
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//a[contains(@class, "add_user_link")]/span')->click();
-        sleep(1);  // allow ajax pop-up
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH,
-            '//table[@class="formtable"]//input[@id="user_name"]')->sendKeys($fullname);
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH,
-            '//table[@class="formtable"]//input[@id="pseudonym_unique_id"]')->sendKeys($email);
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//div[@id="content"]//form[1]//button[@aria-label="Add people"]')->click();
+        sleep(2);  // allow ajax pop-up
+        $required_inputs = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::XPATH, '//form[@aria-label="Add a New User"]//input[@required]');
+        $this->assertTrue(count($required_inputs) > 1);
+        if (count($required_inputs) > 1) {
+            $required_inputs[0]->sendKeys($fullname);
+            $required_inputs[1]->sendKeys($email);
+        }
+
         sleep(2); // allow auto-fillin to complete
         // set display name and sortable name
         // $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH,
@@ -664,15 +699,15 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
         // $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH,
         //     '//table[@class="formtable"]//input[@id="user_sortable_name"]')->sendKeys($login.'_last, '.$login.'_first');
             
-        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//span[starts-with(text(), "Add User")]')->click();
+        $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//form[@aria-label="Add a New User"]//button[@type="submit"]')->click();
         sleep(2);
 
         // reload the page and see if new user created
         $this->getSession()->open(CANVAS_TEST_BASE_URL . '/accounts/site_admin/users');
-        $users = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH, '//ul[contains(@class, "users")]//a[starts-with(@href, "/accounts/")]');
+        $users = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::XPATH, $xpath_users);
         $foundUser = false;
         foreach ($users as $user) {
-            if ($user->text() == $this->_fullname_to_display_name($fullname)) {
+            if ($this->_checkFullname($fullname, $user->text())) {
                 $foundUser = $user;
                 break;
             }
@@ -701,10 +736,10 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
         $this->_canvasLoginAdmin();
         
         $this->getSession()->open(CANVAS_TEST_BASE_URL . '/accounts/site_admin/users');
-        $users = $this->session->elements(PHPWebDriver_WebDriverBy::XPATH, '//ul[contains(@class, "users")]//a[starts-with(@href, "/accounts/")]');
+        $users = $this->session->elementsWithWait(PHPWebDriver_WebDriverBy::XPATH, $xpath_users);
         $foundUser = false;
         foreach ($users as $user) {
-            if ($user->text() == $this->_fullname_to_display_name($fullname)) {
+            if ($this->_checkFullname($fullname, $user->text())) {
                 $foundUser = $user;
                 break;
             }
@@ -720,6 +755,19 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
                 '//table[@class="formtable"]//input[@id="pseudonym_integration_id"]')->sendKeys($login);
             $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//button[starts-with(text(), "Update Login")]')->click();
         }
+    }
+
+    /**
+     * Check if $fullname is found in $user->text()
+     *
+     * @param string $fullname
+     * @param string $text
+     * @return bool
+     */
+    private function _checkFullname($fullname, $text)
+    {
+        $pattern = sprintf("@%s$@", $this->_fullname_to_display_name($fullname));
+        return preg_match($pattern, $text) !== false;
     }
     
     // loop through all login and clear the given save but slow.
@@ -814,8 +862,7 @@ class CanvasIntegrationTestCase extends SystemBaseTestCase
                 $course->click();
                 $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH,
                     '//nav[@role="navigation"]//a[normalize-space(text())="People"]')->click();
-                $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH,
-                    '//a[contains(@class, "btn") and @id="addUsers"]')->click();
+                $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH, '//form[@aria-label="Add a New User"]//button[@type="submit"]')->click();
                 sleep(1);   // wait for ajax pop-up
                 // search by login
                 $this->session->elementWithWait(PHPWebDriver_WebDriverBy::XPATH,
