@@ -11,6 +11,7 @@ use IMSGlobal\Caliper\events\AssessmentEvent;
 use IMSGlobal\Caliper\events\AssessmentItemEvent;
 use IMSGlobal\Caliper\events\FeedbackEvent;
 use IMSGlobal\Caliper\events\ResourceManagementEvent;
+use IMSGlobal\Caliper\events\ToolUseEvent;
 use caliper\CaliperActor;
 use caliper\CaliperEntity;
 use caliper\CaliperSensor;
@@ -478,13 +479,16 @@ class CaliperHooks {
                         $evaluation_simple));
             }
         }
-
         $events[]= (new AssessmentEvent())
             ->setProfile( new Profile( Profile::ASSESSMENT ) )
             ->setAction(new Action(Action::SUBMITTED))
             ->setObject(CaliperEntity::event_simple_evaluation(
                 $event_obj,
                 $results['SimpleEvaluation']));
+        $events[]= (new ToolUseEvent())
+            ->setProfile( new Profile( Profile::TOOL_USE ) )
+            ->setAction(new Action(Action::USED))
+            ->setObject(CaliperEntity::iPeer());
 
         CaliperSensor::sendEvent($events, $course, $group);
     }
@@ -904,6 +908,10 @@ class CaliperHooks {
                 $event_obj,
                 $results['Rubric'],
                 $results['RubricsCriteria']));
+        $events[]= (new ToolUseEvent())
+            ->setProfile( new Profile( Profile::TOOL_USE ) )
+            ->setAction(new Action(Action::USED))
+            ->setObject(CaliperEntity::iPeer());
 
         CaliperSensor::sendEvent($events, $course, $group);
     }
@@ -1122,6 +1130,10 @@ class CaliperHooks {
                 $event_obj,
                 $results['Mixeval'],
                 $results['MixevalQuestion']));
+        $events[]= (new ToolUseEvent())
+            ->setProfile( new Profile( Profile::TOOL_USE ) )
+            ->setAction(new Action(Action::USED))
+            ->setObject(CaliperEntity::iPeer());
 
         CaliperSensor::sendEvent($events, $course, $group);
     }

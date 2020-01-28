@@ -822,6 +822,14 @@ class CaliperEventMixevalHooksTest extends CaliperAuthTestCase
             'group' => $this->expected_group,
             'membership' => $this->expected_membership,
         );
+        $expected_events[] = array(
+            'type' => 'ToolUseEvent',
+            'profile' => 'ToolUseProfile',
+            'action' => 'Used',
+            'object' => $this->expected_ed_app,
+            'group' => $this->expected_group,
+            'membership' => $this->expected_membership,
+        );
 
         # check disabled
         CaliperHooks::submit_mixeval(
