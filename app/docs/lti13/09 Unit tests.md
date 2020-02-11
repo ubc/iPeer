@@ -265,6 +265,7 @@ exit
 
 ```bash
 cd ~/Code/ctlt/iPeer
+docker-compose up -d
 docker exec -it ipeer_app_unittest /bin/bash
 ```
 
@@ -302,6 +303,7 @@ docker-compose up -d
 
 ```bash
 cd ~/Code/ctlt/iPeer
+docker-compose up -d
 docker exec -it ipeer_app_unittest /bin/bash
 ```
 
