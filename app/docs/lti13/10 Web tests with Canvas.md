@@ -1,4 +1,4 @@
-# Web tests
+# Web tests with Canvas
 
 - <https://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Testing.html#web-testing-testing-views>
 - <http://simpletest.sourceforge.net/en/web_tester_documentation.html>
@@ -14,7 +14,7 @@
 
 ## Install Docker Canvas for Integration Testing
 
-- (canvas-integration.md)[/canvas-integration.md]
+- [canvas-integration.md](/canvas-integration.md)
 - <https://github.com/ubc/docker-canvas>
 
 ```bash
@@ -24,9 +24,7 @@ cd ~/Code/ctlt/docker-canvas
 docker-compose up -d db
 ```
 
-**WAIT 10 MINUTES!**
-
-Edit `app/tests/cases/system/canvas_integration.test.php`
+Edit `~/Code/ctlt/iPeer/app/tests/cases/system/canvas_integration.test.php`
 
 ```diff
 - const CANVAS_ADMIN_LOGIN = 'ipeertest';
@@ -65,15 +63,28 @@ Initial data loaded
 ```
 
 ```bash
-cd ~/Code/ctlt/docker-canvas
 docker-compose run --rm app bundle exec rake canvas:compile_assets
-docker-compose run --rm app bundle exec rake brand_configs:generate_and_upload_all
 ```
 
 **THIS WILL TAKE MANY MINUTES!**
 
+Press Ctrl-C when the line is:
+
+```
+--> Finished: 'js:webpack_development' in 176.38646499400056
+```
+
+```bash
+docker-compose run --rm app bundle exec rake brand_configs:generate_and_upload_all
+```
+
 ```bash
 docker-compose up -d --build
+```
+
+**WAIT a while**
+
+```bash
 docker ps -a
 ```
 ```
@@ -203,7 +214,6 @@ reset the Selenium container.
 cd ~/Code/ctlt/iPeer
 docker network disconnect canvas_ipeer_network_it selenium-local
 docker container stop selenium-local
-docker container rm selenium-local
 ```
 
 ### Up
@@ -215,6 +225,28 @@ docker network connect canvas_ipeer_network_it selenium-local
 ```
 
 ```bash
+docker exec -it ipeer_app_unittest bash
+```
+
+`root@62e7ea10f889:/var/www/html#`
+
+```bash
+cake/console/cake -app app testsuite app case system/canvas_integration
+cake/console/cake -app app testsuite app case system/lti13_login
+```
+
+---
+
+## Commands
+
+```bash
+cd ~/Code/ctlt/docker-canvas
+docker ps -a
+docker-compose up -d
+cd ~/Code/ctlt/iPeer
+docker-compose up -d
+docker run --rm -d -p 4444:4444 -e SE_OPTS="-enablePassThrough false" -e TZ="Canada/Pacific" --name selenium-local --shm-size 2g selenium/standalone-chrome:3.7.1-argon
+docker network connect canvas_ipeer_network_it selenium-local
 docker exec -it ipeer_app_unittest bash
 ```
 

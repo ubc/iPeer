@@ -2,6 +2,8 @@
 
 Read [canvas-integration.md](/canvas-integration.md)
 
+<https://canvas.instructure.com/doc/api/file.oauth.html#accessing-lti-advantage-services>
+
 ---
 
 ## System parameters from canvas integration tests
