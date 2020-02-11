@@ -53,7 +53,10 @@ class Lti13Controller extends AppController
     public function launch()
     {
         $this->Lti13->launch();
-        $this->redirect('/update');
+        $data = $this->Lti13->getLaunchData();
+        $this->set($data);
+        $this->set('customLogo', null);
+        $this->render();
     }
 
     public function update()

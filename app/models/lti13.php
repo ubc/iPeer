@@ -1,10 +1,16 @@
 <?php
 App::import('Lib', 'Lti13Bootstrap');
 App::import('Lib', 'LTI13Database', array('file'=>'lti13'.DS.'LTI13Database.php'));
+App::import('Lib', 'LTI_Assignments_Grades_Service_Override', array('file'=>'lti13'.DS.'LTI_Assignments_Grades_Service_Override.php'));
 
 use App\LTI13\LTI13Database;
+use App\LTI13\LTI_Assignments_Grades_Service_Override;
+use Firebase\JWT\JWT;
+use IMSGlobal\LTI\LTI_Deep_Link_Resource;
 use IMSGlobal\LTI\LTI_Exception;
+use IMSGlobal\LTI\LTI_Lineitem;
 use IMSGlobal\LTI\LTI_Message_Launch;
+use IMSGlobal\LTI\LTI_Service_Connector;
 
 /**
  * LTI 1.3 Model
@@ -61,6 +67,131 @@ class Lti13 extends AppModel
     }
 
     /**
+     * Encode the LTI_Message_Launch object into JSON.
+     *
+     * @return string
+     */
+    public function getLaunchData()
+    {
+        $launch = LTI_Message_Launch::from_cache($this->launchId, $this->db);
+        $jwtPayload = $launch->get_launch_data();
+        return [
+            'launch_id'    => $this->launchId,
+            'message_type' => $jwtPayload['https://purl.imsglobal.org/spec/lti/claim/message_type'],
+            'post_as_json' => json_encode($_POST, 448),
+            'jwt_header'   => json_encode($this->jwtHeader(), 448),
+            'jwt_payload'  => json_encode($jwtPayload, 448),
+            'nrps_members' => json_encode($this->getNrpsMembers(), 448),
+            'ags_grades'   => json_encode($this->getAgsGrades(), 448),
+            'dl_response'  => json_encode($this->getResponseJwt(), 448),
+        ];
+    }
+
+    /**
+     * Get JWT header.
+     *
+     * @return array
+     */
+    private function jwtHeader()
+    {
+        if ($jwt = @$_REQUEST['id_token']) {
+            return $this->jwtDecode($jwt, 0);
+        }
+    }
+
+    /**
+     * Get all members of the LTI_Names_Roles_Provisioning_Service instance.
+     *
+     * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L48
+     * Obtained through Resource Link, not Deep Link.
+     * @return array
+     */
+    public function getNrpsMembers()
+    {
+        $launch = LTI_Message_Launch::from_cache($this->launchId, $this->db);
+        if ($launch->has_nrps()) {
+            $nrps = $launch->get_nrps();
+            return $nrps->get_members();
+        }
+    }
+
+    /**
+     * Get all members of the LTI_Assignments_Grades_Service instance.
+     *
+     * @return array
+     */
+    public function getAgsGrades()
+    {
+        $launch = LTI_Message_Launch::from_cache($this->launchId, $this->db);
+        if ($launch->has_ags()) {
+            $ags = $this->getAgsOverride();
+            $lineitem = LTI_Lineitem::new();
+            return $ags->get_grades($lineitem);
+        }
+    }
+
+    /**
+     * Override LTI_Message_Launch::get_ags();
+     *
+     * @see vendor/imsglobal/lti-1p3-tool/src/lti/LTI_Message_Launch.php::get_ags()
+     * @return LTI_Assignments_Grades_Service_Override
+     */
+    public function getAgsOverride() {
+        $launch = LTI_Message_Launch::from_cache($this->launchId, $this->db);
+        $jwt['body'] = $launch->get_launch_data();
+        $registration = $this->db->find_registration_by_issuer($jwt['body']['iss']);
+        $service_connector = new LTI_Service_Connector($registration);
+        $service_data = $jwt['body']['https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'];
+        return new LTI_Assignments_Grades_Service_Override($service_connector, $service_data);
+    }
+
+    /**
+     * Get LTI_Deep_Link instance.
+     *
+     * @return LTI_Deep_Link
+     */
+    public function getDeepLink()
+    {
+        $launch = LTI_Message_Launch::from_cache($this->launchId, $this->db);
+        if (!$launch->is_deep_link_launch()) {
+            return;
+        }
+        return $launch->get_deep_link();
+    }
+
+    /**
+     * Get Deep Link response.
+     *
+     * @return array
+     */
+    public function getResponseJwt()
+    {
+        if ($dl = @$this->getDeepLink()) {
+            $resource = LTI_Deep_Link_Resource::new()
+                ->set_url("https://my.tool/launch")
+                ->set_custom_params(['my_param' => '\$my_param'])
+                ->set_title('My Resource');
+            $dlResponse = $dl->get_response_jwt([$resource]);
+            return [
+                'JWT HEADER'  => $this->jwtDecode($dlResponse, 0),
+                'JWT PAYLOAD' => $this->jwtDecode($dlResponse, 1),
+            ];
+        }
+    }
+
+    /**
+     * Decode JWT header or payload.
+     *
+     * @param string $jwt
+     * @param int $i 0 = header, 1 = payload, 2 = signature
+     * @return array
+     */
+    private function jwtDecode($jwt, $i)
+    {
+        return json_decode(JWT::urlsafeB64Decode(explode('.', $jwt)[$i]));
+    }
+
+    /**
      * Update course roster from LTI data from current LTI launch.
      */
     public function update()
@@ -68,7 +199,7 @@ class Lti13 extends AppModel
         try {
             // Get JWT payload after LTI launch
             $launch = LTI_Message_Launch::from_cache($this->launchId, $this->db);
-            $this->jwtPayload = json_decode($launch->get_launch_data(), true);
+            $this->jwtPayload = $launch->get_launch_data();
 
             // Get course label and title from LTI launch's JWT payload
             $this->ltiCourse = $this->getLtiCourseData();
@@ -105,24 +236,6 @@ class Lti13 extends AppModel
             }
         }
         return array_intersect_key($context, array_flip($keys));
-    }
-
-    /**
-     * Get all members of the LTI_Names_Roles_Provisioning_Service instance.
-     *
-     * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L48
-     * Obtained through Resource Link, not Deep Link.
-     * @return array
-     */
-    public function getNrpsMembers()
-    {
-        $launch = LTI_Message_Launch::from_cache($this->launchId, $this->db);
-        if (!$launch->has_nrps()) {
-            throw new LTI_Exception("LTI JWT payload does not have names and roles.");
-            return;
-        }
-        $nrps = $launch->get_nrps();
-        return $nrps->get_members();
     }
 
     /**
