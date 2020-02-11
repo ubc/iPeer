@@ -19,17 +19,18 @@ if (!function_exists('split')) {
  * @param string $errstr
  * @param string $errfile
  * @param int $errline
+ * @param array $errcontext DEPRECATED as of PHP 7.2.0
  * @return bool
  */
-function error_handler($errno, $errstr, $errfile, $errline) {
-    $args = compact('errno', 'errstr', 'errfile', 'errline');
+function error_handler($errno, $errstr, $errfile, $errline, $errcontext = array()) {
+    $kwargs = compact('errno', 'errstr', 'errfile', 'errline');
     $error = array(
         'errno'   => E_WARNING,
         'errstr'  => "count(): Parameter must be an array or an object that implements Countable",
         'errfile' => '/var/www/html/vendors/webdriver/PHPWebDriver/WebDriverBase.php',
         'errline' => 242,
     );
-    return $args + $error == $error;
+    return $kwargs + $error == $error;
 }
 set_error_handler('error_handler');
 
