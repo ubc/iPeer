@@ -60,7 +60,7 @@ class Lti13 extends AppModel
         try {
             $launch->validate();
         } catch (LTI_Exception $e) {
-            echo "Launch validation failed.";
+            echo $this->errorMessage("Launch validation failed.");
         }
         $this->launchId = $launch->get_launch_id();
         return $this->launchId;
@@ -153,10 +153,9 @@ class Lti13 extends AppModel
     public function getDeepLink()
     {
         $launch = LTI_Message_Launch::from_cache($this->launchId, $this->db);
-        if (!$launch->is_deep_link_launch()) {
-            return;
+        if ($launch->is_deep_link_launch()) {
+            return $launch->get_deep_link();
         }
-        return $launch->get_deep_link();
     }
 
     /**
@@ -211,7 +210,7 @@ class Lti13 extends AppModel
             }
 
         } catch (LTI_Exception $e) {
-            echo $e->getMessage();
+            echo $this->errorMessage($e->getMessage());
         }
     }
 
@@ -511,5 +510,19 @@ class Lti13 extends AppModel
     public function getUserType($isInstructor)
     {
         return $isInstructor ? $this->User->USER_TYPE_INSTRUCTOR : $this->User->USER_TYPE_STUDENT;
+    }
+
+    /**
+     * Format Exception message.
+     *
+     * @param string $msg
+     * @return string
+     */
+    public function errorMessage($msg)
+    {
+        if (php_sapi_name() != 'cli') {
+            return sprintf('<p class="message error-message">%s</p>', $msg);
+        }
+        return $msg;
     }
 }

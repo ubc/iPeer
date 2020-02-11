@@ -45,7 +45,7 @@ class Lti13Controller extends AppController
             $url = Router::url('/lti13/launch', true);
             $redirect = $login->do_oidc_login_redirect($url);
         } catch (OIDC_Exception $e) {
-            echo "Error doing OIDC login.";
+            echo $this->Lti13->errorMessage("Error doing OIDC login.");
         }
         $redirect->do_redirect();
     }
@@ -54,6 +54,11 @@ class Lti13Controller extends AppController
     {
         $this->Lti13->launch();
         $data = $this->Lti13->getLaunchData();
+        $this->log($data, 'lti13/launch');
+
+        // $this->redirect('/lti13/update');
+        $this->update();
+
         $this->set($data);
         $this->set('customLogo', null);
         $this->render();
@@ -62,11 +67,13 @@ class Lti13Controller extends AppController
     public function update()
     {
         $this->Lti13->update();
+        $this->log($this->Lti13->ltiRoster, 'lti13/update');
+        return;
         try {
             $this->signInUser();
-            $this->redirect('/home');
+            // $this->redirect('/home');
         } catch (LTI_Exception $e) {
-            echo $e->getMessage();
+            echo $this->Lti13->errorMessage($e->getMessage());
         }
     }
 
