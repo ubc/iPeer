@@ -19,6 +19,7 @@ use IMSGlobal\LTI\OIDC_Exception;
 class Lti13Controller extends AppController
 {
     public $uses = array('Lti13');
+    public $log_path = ROOT.'/app/tmp/logs/lti13';
 
     public function __construct()
     {
@@ -42,10 +43,14 @@ class Lti13Controller extends AppController
     {
         $login = LTI_OIDC_Login::new($this->Lti13->db);
         try {
+
             $url = Router::url('/lti13/launch', true);
             $redirect = $login->do_oidc_login_redirect($url);
+
         } catch (OIDC_Exception $e) {
+
             echo $this->Lti13->errorMessage("Error doing OIDC login.");
+
         }
         $redirect->do_redirect();
     }
@@ -54,38 +59,65 @@ class Lti13Controller extends AppController
     {
         $this->Lti13->launch();
         $data = $this->Lti13->getLaunchData();
+
+        $this->resetLogs();
+
+        $this->log("LTI 1.3 launch", 'lti13/launch');
         $this->log($data, 'lti13/launch');
 
-        // $this->redirect('/lti13/update');
-        $this->update();
+        $this->roster();
 
+        $data += array(
+            'log_launch' => file_get_contents($this->log_path.'/launch.log'),
+            'log_roster' => file_get_contents($this->log_path.'/roster.log'),
+            'log_user' => file_get_contents($this->log_path.'/user.log'),
+        );
         $this->set($data);
         $this->set('customLogo', null);
         $this->render();
     }
 
-    public function update()
+    public function roster()
     {
-        $this->Lti13->update();
-        $this->log($this->Lti13->ltiRoster, 'lti13/update');
-        return;
+        $this->Lti13->roster();
+
+        $this->log("LTI 1.3 roster updates", 'lti13/roster');
+        $this->log($this->Lti13->ltiRoster, 'lti13/roster');
+
         try {
-            $this->signInUser();
-            // $this->redirect('/home');
+
+            $user = $this->signInUser();
+
+            $this->log("LTI 1.3 user signed in", 'lti13/user');
+            $this->log($user, 'lti13/user');
+
+            $this->redirect('/home');
+
         } catch (LTI_Exception $e) {
+
             echo $this->Lti13->errorMessage($e->getMessage());
+
         }
     }
 
     public function signInUser()
     {
-        if (!$userId = $this->Lti13->findUserByLtiUserId()) {
+        if (!$user = $this->Lti13->findUserByLtiUserId()) {
             throw new LTI_Exception("User not found.");
             return;
         }
-        if (!$this->Auth->login($userId)) {
+        if (!$this->Auth->login($user['User']['id'])) {
             throw new LTI_Exception("Access denied.");
             return;
+        }
+        return $user;
+    }
+
+    private function resetLogs()
+    {
+        $filenames = glob($this->log_path.'/*.log');
+        foreach ($filenames as $filename) {
+            unlink($filename);
         }
     }
 }

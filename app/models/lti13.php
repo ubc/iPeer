@@ -58,9 +58,13 @@ class Lti13 extends AppModel
     {
         $launch = LTI_Message_Launch::new($this->db);
         try {
+
             $launch->validate();
+
         } catch (LTI_Exception $e) {
+
             echo $this->errorMessage("Launch validation failed.");
+
         }
         $this->launchId = $launch->get_launch_id();
         return $this->launchId;
@@ -168,9 +172,9 @@ class Lti13 extends AppModel
         if ($dl = @$this->getDeepLink()) {
             $resource = LTI_Deep_Link_Resource::new()
                 ->set_url("https://my.tool/launch")
-                ->set_custom_params(['my_param' => '\$my_param'])
+                ->set_custom_params(array('my_param' => '\$my_param'))
                 ->set_title('My Resource');
-            $dlResponse = $dl->get_response_jwt([$resource]);
+            $dlResponse = $dl->get_response_jwt(array($resource));
             return [
                 'JWT HEADER'  => $this->jwtDecode($dlResponse, 0),
                 'JWT PAYLOAD' => $this->jwtDecode($dlResponse, 1),
@@ -193,9 +197,10 @@ class Lti13 extends AppModel
     /**
      * Update course roster from LTI data from current LTI launch.
      */
-    public function update()
+    public function roster()
     {
         try {
+
             // Get JWT payload after LTI launch
             $launch = LTI_Message_Launch::from_cache($this->launchId, $this->db);
             $this->jwtPayload = $launch->get_launch_data();
@@ -210,7 +215,9 @@ class Lti13 extends AppModel
             }
 
         } catch (LTI_Exception $e) {
+
             echo $this->errorMessage($e->getMessage());
+
         }
     }
 
@@ -279,10 +286,7 @@ class Lti13 extends AppModel
     public function updateCourseRoster(array $data)
     {
         if ($courseId = @$data['Course']['id']) {
-            if (!$this->ipeerRoster = $this->User->getEnrolledStudents($courseId)) {
-                throw new LTI_Exception("Unable to find roster.");
-                return;
-            }
+            $this->ipeerRoster = $this->User->getEnrolledStudents($courseId);
             $this->removeUsersFoundInBothRosters();
             $this->removeRemainingUsersFromIpeerRoster($courseId);
             $this->addRemainingUsersInIpeerRoster($courseId);
@@ -297,11 +301,9 @@ class Lti13 extends AppModel
      */
     public function createCourseRoster(array $data)
     {
-        if (!$this->Course->save($data)) {
-            throw new LTI_Exception("Unable to save new course.");
-            return;
+        if ($this->Course->save($data)) {
+            $this->addUsersInIpeerRoster($this->Course->id);
         }
-        $this->addUsersInIpeerRoster($this->Course->id);
     }
 
     /**
@@ -430,11 +432,9 @@ class Lti13 extends AppModel
     public function saveNewUserToCourse(array $userData, $courseId, $isInstructor)
     {
         $this->User->create();
-        if (!$this->User->save($userData)) {
-            throw new LTI_Exception("Unable to save new user.");
-            return;
+        if ($this->User->save($userData)) {
+            $this->addUserToCourse($this->User->id, $courseId, $isInstructor);
         }
-        $this->addUserToCourse($this->User->id, $courseId, $isInstructor);
     }
 
     /**
@@ -455,7 +455,16 @@ class Lti13 extends AppModel
         } else {
             if ($roleId = $this->Role->field('id', array('name' => 'student'))) {
                 $this->User->registerRole($userId, $roleId);
-                $this->User->UserEnrol->insertCourses($userId, array($courseId));
+                $data = array(
+                    'UserEnrol' => array(
+                        'course_id' => $courseId,
+                        'user_id' => $userId,
+                        'record_status' => 'A',
+                    ),
+                );
+                if ($this->User->UserEnrol->save($data)) {
+                    $this->User->UserEnrol->id = null;
+               }
             }
         }
     }
@@ -522,6 +531,20 @@ class Lti13 extends AppModel
     {
         if (php_sapi_name() != 'cli') {
             return sprintf('<p class="message error-message">%s</p>', $msg);
+        }
+        return sprintf('<!> %s', $msg);
+    }
+
+    /**
+     * Format Success message.
+     *
+     * @param string $msg
+     * @return string
+     */
+    public function successMessage($msg)
+    {
+        if (php_sapi_name() != 'cli') {
+            return sprintf('<p class="message good-message green">%s</p>', $msg);
         }
         return $msg;
     }

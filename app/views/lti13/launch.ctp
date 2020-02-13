@@ -20,8 +20,18 @@
 <h3>LTI_Names_Roles_Provisioning_Service members</h3>
 <pre style="font-family:monospace;"><?php echo $nrps_members; ?></pre>
 
+<?php if (!empty($ags_grades)): ?>
 <h3>LTI_Assignments_Grades_Service grades</h3>
 <pre style="font-family:monospace;"><?php echo $ags_grades; ?></pre>
+<? endif; ?>
 
+<?php if (!empty($dl_response)): ?>
 <h3>LTI_Deep_Link response</h3>
 <pre style="font-family:monospace;"><?php echo $dl_response; ?></pre>
+<? endif; ?>
+
+<h3>Launch log</h3>
+<pre style="font-family:monospace;"><?php echo $log_launch; ?></pre>
+
+<h3>Update roster log</h3>
+<pre style="font-family:monospace;"><?php echo $log_roster; ?></pre>

@@ -53,6 +53,9 @@ class LTI_Assignments_Grades_Service_Override extends LTI_Assignments_Grades_Ser
             'application/vnd.ims.lis.v2.lineitem+json',
             'application/vnd.ims.lis.v2.lineitem+json'
         );
+        if (isset($created_line_item['body']['error'])) {
+            return new LTI_Lineitem();
+        }
         return new LTI_Lineitem($created_line_item['body']);
     }
 
