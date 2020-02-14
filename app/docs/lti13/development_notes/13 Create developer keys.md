@@ -1,4 +1,4 @@
-# Developer Keys
+# Create developer keys
 
 - <https://canvas.instructure.com/doc/api/file.oauth.html#accessing-lti-advantage-services>
 - <https://community.canvaslms.com/docs/DOC-16729-42141110178>
@@ -74,6 +74,7 @@ Go to <http://canvas.docker/accounts/site_admin/settings/configurations>
 ## Dump new data
 
 ```bash
+cd ~/Code/ctlt/canvas
 docker exec -it canvas_postgres_1 bash
 ```
 

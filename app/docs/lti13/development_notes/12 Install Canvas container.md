@@ -26,7 +26,7 @@ docker system prune -a -f --volumes
 For macOS:
 
 ```bash
-dinghy destroy
+dinghy destroy -f
 brew uninstall dinghy
 ```
 
@@ -48,20 +48,58 @@ cd ~/Code/ctlt/canvas
 git reset --hard dc6478a81bbcfa85f9886d7d6d7ff5dcfbaf5686
 ```
 
-Edit `Dockerfile`
+### Edit Dockerfiles
+
+#### Minimize Webpack complications
+
+Edit the last line of `Dockerfile`.
 
 ```diff
 - RUN COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rake canvas:compile_assets
++ # RUN COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rake canvas:compile_assets
 + RUN COMPILE_ASSETS_BUILD_JS=0 bundle exec rake canvas:compile_assets_dev
 ```
 
-Save `Dockerfile`
+Save `Dockerfile`.
+
+#### Fix postgres container
+
+- Fix missing pgxs.mk error.
+- Use `psql` version 9.5, not 9.6.
+
+Edit `docker-compose/postgres/Dockerfile`
+
+In the `apt-get install` lines:
+
+```diff
+    postgresql-server-dev-9.5 \
++   postgresql-server-dev-9.6 \
+    pgxnclient \
+```
+
+In the `apt-get remove` lines:
+
+```diff
+    postgresql-server-dev-9.5 \
++   postgresql-server-dev-9.6 \
++   postgresql-client-9.6 \
+    pgxnclient \
+```
+
+Save `docker-compose/postgres/Dockerfile`
+
+### Run setup script
 
 ```bash
+cd ~/Code/ctlt/canvas
 ./script/docker_dev_setup.sh
 ```
 ```
 OK to run 'brew install dinghy'? [y/n] y
+OK to create a dinghy VM? [y/n] y
+How much memory should I allocate to the VM (in MB)? [8192]
+How many CPUs should I allocate to the VM? [4]
+How big should the VM's disk be (in GB)? [150]
 ```
 ```
 Starting NFS daemon, this will require sudo
@@ -102,13 +140,14 @@ Running Canvas:
 
 > SUCCESS!
 
+### Start Canvas
+
 ```bash
 eval "$(dinghy env)"
 docker-compose up -d
-open http://canvas.docker
 ```
 
-<http://canvas.docker>
+Browse to <http://canvas.docker>
 
 ```bash
 docker container ls
@@ -137,12 +176,14 @@ Edit `docker-compose.override.yml`
 ```
 
 ```bash
+cd ~/Code/ctlt/canvas
 docker-compose up -d --build postgres
 ```
 
 ### Dump new data
 
 ```bash
+cd ~/Code/ctlt/canvas
 docker exec -it canvas_postgres_1 bash
 ```
 
