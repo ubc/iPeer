@@ -19,7 +19,7 @@ use IMSGlobal\LTI\OIDC_Exception;
 class Lti13Controller extends AppController
 {
     public $uses = array('Lti13');
-    public $log_path = ROOT.'/app/tmp/logs/lti13';
+    private $log_path = ROOT.'/app/tmp/logs/lti13';
 
     public function __construct()
     {

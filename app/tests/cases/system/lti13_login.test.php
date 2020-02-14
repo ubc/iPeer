@@ -7,7 +7,8 @@ App::import('Lib', 'Lti13Bootstrap');
  */
 if (!function_exists('split')) {
     function split($pattern, $string, $limit = -1) {
-        return preg_split('@'.$pattern.'@', $string, $limit);
+        $pattern = '/'.preg_quote($pattern, '/').'/';
+        return preg_split($pattern, $string, $limit);
     }
 }
 

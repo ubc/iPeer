@@ -1,12 +1,22 @@
 {
-  "https://lti-ri.imsglobal.org": {
-    "client_id": "ipeer-lti13-001",
-    "auth_login_url": "https://lti-ri.imsglobal.org/platforms/652/authorizations/new",
-    "auth_token_url": "https://lti-ri.imsglobal.org/platforms/652/access_tokens",
-    "key_set_url": "https://lti-ri.imsglobal.org/platforms/652/platform_keys/654.json",
-    "private_key_file": "app/config/lti13/tool.private.key",
-    "deployment": [
-      "1"
-    ]
-  }
+    "https://lti-ri.imsglobal.org": {
+        "client_id": "ipeer-lti13-001",
+        "auth_login_url": "https://lti-ri.imsglobal.org/platforms/652/authorizations/new",
+        "auth_token_url": "https://lti-ri.imsglobal.org/platforms/652/access_tokens",
+        "key_set_url": "https://lti-ri.imsglobal.org/platforms/652/platform_keys/654.json",
+        "private_key_file": "app/config/lti13/tool.private.key",
+        "deployment": [
+            "1"
+        ]
+    },
+    "http://canvas.docker": {
+        "client_id": "10000000000001",
+        "auth_login_url": "http://canvas.docker/api/lti/authorize",
+        "auth_token_url": "http://canvas.docker/login/oauth2/token",
+        "key_set_url": "http://canvas.docker/api/lti/security/jwks",
+        "private_key_file": "app/config/lti13/canvas.private.key",
+        "deployment": [
+            "1"
+        ]
+    }
 }
