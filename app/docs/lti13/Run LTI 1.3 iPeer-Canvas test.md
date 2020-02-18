@@ -225,3 +225,63 @@ OK. I'm logged in.
 
 ## Run iPeer LTI 1.3 tests
 
+### Before test
+
+```bash
+cd ~/Code/ctlt/iPeer
+docker-compose up -d
+docker exec -it ipeer_db bash
+```
+
+`root@0ae4f272871c:/#`
+
+```bash
+mysql ipeer -u ipeer -p
+```
+
+`MariaDB [ipeer]>`
+
+```
+SELECT u.id, u.username, u.first_name, u.last_name, u.student_no, u.email, u.record_status, u.lti_id, e.course_id, c.course, c.title, c.canvas_id FROM users AS u INNER JOIN user_enrols AS e ON e.user_id = u.id LEFT JOIN courses AS c on c.id = e.course_id;
++----+--------------+------------+-----------+------------+-------+---------------+--------+-----------+----------+----------------------------------+-----------+
+| id | username     | first_name | last_name | student_no | email | record_status | lti_id | course_id | course   | title                            | canvas_id |
++----+--------------+------------+-----------+------------+-------+---------------+--------+-----------+----------+----------------------------------+-----------+
+|  8 | redshirt0004 | Chris      | Student   | 16585158   |       | A             | NULL   |         3 | CPSC 101 | Connecting with Computer Science | NULL      |
+| 33 | redshirt0029 | Joe        | Student   | 51516498   |       | A             | NULL   |         3 | CPSC 101 | Connecting with Computer Science | NULL      |
++----+--------------+------------+-----------+------------+-------+---------------+--------+-----------+----------+----------------------------------+-----------+
+2 rows in set (0.01 sec)
+```
+
+### Run manual test
+
+Browse to <http://localhost:8080/lti13>
+
+
+---------------------------------------------------------------------------------------------------
+
+## Make a SQL file of diff
+
+We just want to test the LTI 1.3 connection, so:
+
+- Input directly in dB
+    - Hardcode keys in web test
+    - Just add users to course
+- Code a test that logs in to iPeer and generates the LTI 1.3 launch sequence
+
+Canvas:
+
+    - run rake to reset/start the .data for canvas
+    - pg_dump
+    - http://canvas.docker to populate the accounts in the course(s)
+    - pg_dump
+    - diff the two dumps
+    - add a developer key
+    - make a SQL for a migration file specifically for this test
+
+iPeer:
+
+    - add logging to the test
+    - in test, log the list of ipeer roster before launch
+    - test launch and log it
+    - log the list of ipeer roster after launch
+
