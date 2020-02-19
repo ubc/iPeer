@@ -41,45 +41,24 @@ cd ~/Code/ctlt/canvas
 git reset --hard dc6478a81bbcfa85f9886d7d6d7ff5dcfbaf5686
 ```
 
-### Edit Dockerfiles
+### Patch Canvas files
 
 #### Minimize Webpack complications
 
-Edit the last line of `Dockerfile`.
+- Bypass `webpack:production` errors
 
-```diff
-- RUN COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rake canvas:compile_assets
-+ # RUN COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rake canvas:compile_assets
-+ RUN COMPILE_ASSETS_BUILD_JS=0 bundle exec rake canvas:compile_assets_dev
+```bash
+patch -p0 ~/Code/ctlt/canvas/Dockerfile < ~/Code/ctlt/iPeer/app/config/lti13/patches/canvas/Dockerfile.diff
 ```
-
-Save `Dockerfile`.
 
 #### Fix postgres container
 
-- Fix missing pgxs.mk error.
+- Fix missing `pgxs.mk` error.
 - Use `psql` version 9.5, not 9.6.
 
-Edit `docker-compose/postgres/Dockerfile`
-
-In the `apt-get install` lines:
-
-```diff
-    postgresql-server-dev-9.5 \
-+   postgresql-server-dev-9.6 \
-    pgxnclient \
+```bash
+patch -p0 ~/Code/ctlt/canvas/docker-compose/postgres/Dockerfile < ~/Code/ctlt/iPeer/app/config/lti13/patches/canvas/postgres-Dockerfile.diff
 ```
-
-In the `apt-get remove` lines:
-
-```diff
-    postgresql-server-dev-9.5 \
-+   postgresql-server-dev-9.6 \
-+   postgresql-client-9.6 \
-    pgxnclient \
-```
-
-Save `docker-compose/postgres/Dockerfile`
 
 ### Run setup script
 
@@ -157,7 +136,7 @@ docker-compose up -d --build postgres
 
 ```bash
 cd ~/Code/ctlt/canvas
-cp ~/Code/ctlt/iPeer/.data/canvas.sql.dump .postgres_app_tmp/
+cp ~/Code/ctlt/iPeer/app/config/lti13/canvas.sql.dump .postgres_app_tmp/
 docker-compose down
 docker-compose up -d postgres
 docker exec -it canvas_postgres_1 bash
