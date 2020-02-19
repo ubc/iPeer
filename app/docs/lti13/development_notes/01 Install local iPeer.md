@@ -75,7 +75,8 @@ I see Installation Wizard.
 
 - Step 1: Example app
 - Step 2
-- Step 3:
+- Step 3: Installation with Sample Data
+- Step 4
     - root
     - password
 
