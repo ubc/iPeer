@@ -15,17 +15,24 @@ It's not the current stable version.
 
 ---
 
-## Wipe-out if necessary
+## Delete Docker items if necessary
+
+### For macOS
+
+Try this first, this might be enough:
+
+```bash
+dinghy destroy -f
+```
+
+> If experiencing problems with the local installation of Canvas,
+it's best to delete all docker containers, images, volumes and networks,
+and start over.
 
 ```bash
 docker rm -vf $(docker ps -a -q)
 docker rmi -f $(docker images -a -q)
 docker system prune -a -f --volumes
-```
-
-For macOS:
-
-```bash
 dinghy destroy -f
 brew uninstall dinghy
 ```

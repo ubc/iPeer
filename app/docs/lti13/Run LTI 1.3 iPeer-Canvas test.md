@@ -8,6 +8,14 @@
 
 ## Delete Docker items if necessary
 
+### For macOS
+
+Try this first, this might be enough:
+
+```bash
+dinghy destroy -f
+```
+
 > If experiencing problems with the local installation of Canvas,
 it's best to delete all docker containers, images, volumes and networks,
 and start over.

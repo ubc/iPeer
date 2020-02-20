@@ -8,18 +8,18 @@
 
 Based on: [Configure LTI 1.3 RI Tool for Canvas](https://confluence.it.ubc.ca/pages/viewpage.action?spaceKey=LTHub&title=Configure+LTI+1.3+RI+Tool+for+Canvas)
 
-Create `ctlt/iPeer/app/config/lti13/canvas.json`
+Create `ctlt/iPeer/app/config/lti13/registration.json`
 
 ```json
 {
-  "http://canvas.docker": {
+  "https://canvas.instructure.com": {
     "client_id": "10000000000001",
     "auth_login_url": "http://canvas.docker/api/lti/authorize",
     "auth_token_url": "http://canvas.docker/login/oauth2/token",
     "key_set_url": "http://canvas.docker/api/lti/security/jwks",
-    "private_key_file": "app/config/lti13/tool.private.key",
+    "private_key_file": "app/config/lti13/canvas.private.key",
     "deployment": [
-      "1"
+      "1:b82229c6e10bcb87beb1f1b287faee560ddc3109"
     ]
   }
 }
@@ -58,7 +58,10 @@ textarea:
 
 - On `Developer Keys` page:
     - State: `On`
-    - Copy `Details` number: this is the **Client ID** to put in `canvas.json` > `http://canvas.docker` > `client_id`
+    - Copy `Details` number: this is the **Client ID** to put in `registration.json` > `https://canvas.instructure.com` > `client_id`
+    - Click the `Show Key` button.
+    - Copy the hash that appears in popup modal.
+    - Paste this hash in `app/config/lti13/canvas.private.key`
 
 Go to <http://canvas.docker/accounts/site_admin/settings/configurations>
 
@@ -70,6 +73,12 @@ Go to <http://canvas.docker/accounts/site_admin/settings/configurations>
         - Click the `Submit` button.
         - Tool "iPeer LTI 1.3 test" found for client ID 10000000000001. Would you like to install it?
             - Click the `Install` button.
+    - When `iPeer LTI 1.3 test` appears in the list:
+        - Click the cog icon on the right.
+        - Select `Deployment Id`.
+        - Copy the hash that appears in the popup modal.
+        - Close the popup modal.
+        - Paste in `registration.json` > `https://canvas.instructure.com` > `deployment` array.
 
 ## Dump new data
 
