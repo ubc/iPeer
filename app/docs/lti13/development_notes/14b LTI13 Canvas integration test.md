@@ -96,14 +96,7 @@ Go to: <http://localhost:8900>
 ### Dump new data
 
 ```bash
-docker exec -it docker-canvas_db_1 bash
-```
-
-`root@8b29d8fe5962:/#`
-
-```bash
-pg_dump -U canvas canvas > /var/lib/postgresql/data/canvas_0.sql
-exit
+docker exec -it docker-canvas_db_1 sh -c "pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_0.sql"
 ```
 
 Look in `~/Code/ctlt/docker-canvas/.data/postgres`
@@ -162,14 +155,7 @@ Go back to <http://localhost:8900/courses> to see `All Courses`.
 ### Dump new data
 
 ```bash
-docker exec -it docker-canvas_db_1 bash
-```
-
-`root@8b29d8fe5962:/#`
-
-```bash
-pg_dump -U canvas canvas > /var/lib/postgresql/data/canvas_1.sql
-exit
+docker exec -it docker-canvas_db_1 sh -c "pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_1.sql"
 ```
 
 Look in `~/Code/ctlt/docker-canvas/.data/postgres`
@@ -202,14 +188,7 @@ Go to <http://localhost:8900/accounts/site_admin/users>
 ### Dump new data
 
 ```bash
-docker exec -it docker-canvas_db_1 bash
-```
-
-`root@8b29d8fe5962:/#`
-
-```bash
-pg_dump -U canvas canvas > /var/lib/postgresql/data/canvas_2.sql
-exit
+docker exec -it docker-canvas_db_1 sh -c "pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_2.sql"
 ```
 
 Look in `~/Code/ctlt/docker-canvas/.data/postgres`
@@ -271,41 +250,15 @@ Click the `Stop Acting as User` button at bottom left.
 ### Dump new data
 
 ```bash
-docker exec -it docker-canvas_db_1 bash
-```
-
-`root@8b29d8fe5962:/#`
-
-```bash
-pg_dump -U canvas canvas > /var/lib/postgresql/data/canvas_3.sql
-exit
+docker exec -it docker-canvas_db_1 sh -c "pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_3.sql"
 ```
 
 Look in `~/Code/ctlt/docker-canvas/.data/postgres`
+
+---
 
 ### Diff new vs old data dumps
 
 ```bash
 diff ~/Code/ctlt/docker-canvas/.data/postgres/canvas_0.sql ~/Code/ctlt/docker-canvas/.data/postgres/canvas_4.sql > ~/Code/ctlt/docker-canvas/canvas.sql.diff
 ```
-
-
-### Make a SQL file of diff
-
-Canvas:
-
-    - run rake to reset/start the .data for canvas
-    - pg_dump
-    - localhost:8900 to populate the accounts in the course(s)
-    - pg_dump
-    - diff the two dumps
-    - add a developer key
-- make a SQL for a migration file specifically for this test
-
-iPeer:
-
-- add logging to the test
-- in test, log the list of ipeer roster before launch
-- test launch and log it
-- log the list of ipeer roster after launch
-

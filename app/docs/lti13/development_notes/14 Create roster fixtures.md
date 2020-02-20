@@ -171,13 +171,8 @@ Go back to <http://canvas.docker/courses> to see `All Courses`.
 ## Dump new data
 
 ```bash
-docker exec -it canvas_postgres_1 bash
-```
-
-`root@27c698737093:/#`
-
-```bash
-pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_2.sql; exit
+cd ~/Code/ctlt/canvas
+docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_2.sql"
 ```
 
 ---
@@ -239,13 +234,8 @@ Go to <http://canvas.docker/accounts/site_admin/users>
 ## Dump new data
 
 ```bash
-docker exec -it canvas_postgres_1 bash
-```
-
-`root@27c698737093:/#`
-
-```bash
-pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_3.sql; exit
+cd ~/Code/ctlt/canvas
+docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_3.sql"
 ```
 
 ---
@@ -324,13 +314,8 @@ Steps:
 ## Dump new data
 
 ```bash
-docker exec -it canvas_postgres_1 bash
-```
-
-`root@27c698737093:/#`
-
-```bash
-pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_4.sql; exit
+cd ~/Code/ctlt/canvas
+docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_4.sql"
 ```
 
 ---

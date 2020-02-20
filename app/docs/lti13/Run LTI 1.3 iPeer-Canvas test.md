@@ -131,26 +131,15 @@ docker-compose up -d --build postgres
 
 1. Copy dump file from iPeer to Canvas.
 2. Disconnect all users from `canvas` dB with `docker-compose down`.
-3. Drop `canvas` dB.
-4. Restore `canvas` dB with custom format dump file.
+3. Drop & Restore `canvas` dB with custom format dump file.
 
 ```bash
 cd ~/Code/ctlt/canvas
-cp ~/Code/ctlt/iPeer/app/config/lti13/canvas.sql.dump .postgres_app_tmp/
+cp ~/Code/ctlt/iPeer/.data/canvas.postgresql.dump .postgres_app_tmp/
 docker-compose down
 docker-compose up -d postgres
-docker exec -it canvas_postgres_1 bash
-```
-
-`root@27c698737093:/#`
-
-```bash
-dropdb -U postgres canvas
-pg_restore -U postgres -C -d postgres /usr/src/app/tmp/canvas.sql.dump
-exit
-```
-
-```bash
+docker exec -it canvas_postgres_1 sh -c "dropdb -U postgres canvas"
+docker exec -it canvas_postgres_1 sh -c "pg_restore -U postgres -C -d postgres /usr/src/app/tmp/canvas.postgresql.dump"
 docker-compose up -d
 ```
 
@@ -206,34 +195,21 @@ OK. I'm logged in.
 
 ### Before test
 
-```bash
-cd ~/Code/ctlt/iPeer
-docker-compose up -d
-docker exec -it ipeer_db bash
-```
+Look at students enrolled in courses:
 
-`root@0ae4f272871c:/#`
-
-```bash
-mysql ipeer -u ipeer -p
-```
-
-`MariaDB [ipeer]>`
-
-```
-SELECT u.id, u.username, u.first_name, u.last_name, u.student_no, u.email, u.record_status, u.lti_id, e.course_id, c.course, c.title, c.canvas_id FROM users AS u INNER JOIN user_enrols AS e ON e.user_id = u.id LEFT JOIN courses AS c on c.id = e.course_id;
-+----+--------------+------------+-----------+------------+-------+---------------+--------+-----------+----------+----------------------------------+-----------+
-| id | username     | first_name | last_name | student_no | email | record_status | lti_id | course_id | course   | title                            | canvas_id |
-+----+--------------+------------+-----------+------------+-------+---------------+--------+-----------+----------+----------------------------------+-----------+
-|  8 | redshirt0004 | Chris      | Student   | 16585158   |       | A             | NULL   |         3 | CPSC 101 | Connecting with Computer Science | NULL      |
-| 33 | redshirt0029 | Joe        | Student   | 51516498   |       | A             | NULL   |         3 | CPSC 101 | Connecting with Computer Science | NULL      |
-+----+--------------+------------+-----------+------------+-------+---------------+--------+-----------+----------+----------------------------------+-----------+
-2 rows in set (0.01 sec)
-```
+- [MECH 328 enrolment](http://localhost:8080/users/goToClassList/1)
+- [APSC 201 enrolment](http://localhost:8080/users/goToClassList/2)
 
 ### Run manual test
 
 Browse to <http://localhost:8080/lti13>
+
+### After test
+
+Look again at students enrolled in courses:
+
+- [MECH 328 enrolment](http://localhost:8080/users/goToClassList/1)
+- [APSC 201 enrolment](http://localhost:8080/users/goToClassList/2)
 
 
 ---------------------------------------------------------------------------------------------------

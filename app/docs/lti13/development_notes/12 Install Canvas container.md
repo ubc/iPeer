@@ -64,7 +64,7 @@ Save `Dockerfile`.
 
 #### Fix postgres container
 
-- Fix missing pgxs.mk error.
+- Fix missing `pgxs.mk` error.
 - Use `psql` version 9.5, not 9.6.
 
 Edit `docker-compose/postgres/Dockerfile`
@@ -184,11 +184,5 @@ docker-compose up -d --build postgres
 
 ```bash
 cd ~/Code/ctlt/canvas
-docker exec -it canvas_postgres_1 bash
-```
-
-`root@27c698737093:/#`
-
-```bash
-pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_0.sql; exit
+docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_0.sql"
 ```

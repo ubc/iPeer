@@ -75,11 +75,5 @@ Go to <http://canvas.docker/accounts/site_admin/settings/configurations>
 
 ```bash
 cd ~/Code/ctlt/canvas
-docker exec -it canvas_postgres_1 bash
-```
-
-`root@27c698737093:/#`
-
-```bash
-pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_1.sql; exit
+docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_1.sql"
 ```

@@ -60,6 +60,14 @@ docker-compose up -d
 
 Success.
 
+### Modify users.lti_id type
+
+If necessary.
+
+```bash
+docker exec -it ipeer_db sh -c 'mysql ipeer -u ipeer -p -e "ALTER TABLE users MODIFY lti_id VARCHAR(64) NULL DEFAULT NULL;"'
+```
+
 ### Install PHP Webdriver and Sausage under `vendors` directory.
 
 ```bash

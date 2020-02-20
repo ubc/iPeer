@@ -1,7 +1,7 @@
 ---------------------------------------------------------------------------------------------------
 
-DID NOT WORK!
-TRY NEW [INSTALL](/app/docs/lti13/12%20Install%20Canvas%20container.md) INSTEAD.
+## DID NOT WORK!
+## TRY NEW [INSTALL](/app/docs/lti13/12%20Install%20Canvas%20container.md) INSTEAD.
 
 ---------------------------------------------------------------------------------------------------
 
