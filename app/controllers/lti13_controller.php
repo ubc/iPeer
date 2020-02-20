@@ -28,14 +28,15 @@ class Lti13Controller extends AppController
 
     public function beforeFilter()
     {
-        $this->Auth->allow('index');
+        $this->Auth->allow();
+        $this->set('customLogo', null);
+        $this->set('title_for_layout', "LTI 1.3");
     }
 
     public function index()
     {
         $json = $this->Lti13->getRegistrationJson();
         $this->set('json', $json);
-        $this->set('customLogo', null);
         $this->render();
     }
 
@@ -46,13 +47,13 @@ class Lti13Controller extends AppController
 
             $url = Router::url('/lti13/launch', true);
             $redirect = $login->do_oidc_login_redirect($url);
+            $redirect->do_redirect();
 
         } catch (OIDC_Exception $e) {
 
-            echo $this->Lti13->errorMessage("Error doing OIDC login.");
+            echo $this->Lti13->errorMessage(sprintf("Error doing OIDC login: %s", $e->getMessage()));
 
         }
-        $redirect->do_redirect();
     }
 
     public function launch()
@@ -73,7 +74,6 @@ class Lti13Controller extends AppController
             'log_user' => file_get_contents($this->log_path.'/user.log'),
         );
         $this->set($data);
-        $this->set('customLogo', null);
         $this->render();
     }
 
