@@ -1,7 +1,13 @@
 <h2>LTI 1.3 tool debug <u>index</u> page.</h2>
 
-<p>Initial JSON to register the tool to the platform.</p>
+<p>Initial JSON to register the tool to the platform:</p>
 <pre style="font-family:monospace;"><?php echo $json; ?></pre>
+
+<h3>Check enrolment</h3>
+<ul>
+    <li><a target="_blank" href="/users/goToClassList/1">MECH 328 enrolment</a></li>
+    <li><a target="_blank" href="/users/goToClassList/2">APSC 201 enrolment</a></li>
+</ul>
 
 <h3>Test LTI 1.3 connections with LTI-RI</h3>
 <ul>
