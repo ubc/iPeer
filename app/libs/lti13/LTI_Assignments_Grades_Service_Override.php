@@ -58,15 +58,4 @@ class LTI_Assignments_Grades_Service_Override extends LTI_Assignments_Grades_Ser
         }
         return new LTI_Lineitem($created_line_item['body']);
     }
-
-    /**
-     * Override LTI_Assignments_Grades_Service::get_grades()
-     *
-     * @see vendor/imsglobal/lti-1p3-tool/src/lti/LTI_Assignments_Grades_Service.php::get_grades()
-     * @param LTI_Lineitem $lineitem
-     * @return string
-     */
-    public function get_grades(LTI_Lineitem $lineitem) {
-        return parent::get_grades($lineitem);
-    }
 }
