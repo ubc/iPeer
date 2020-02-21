@@ -18,5 +18,5 @@
 
 <h3>Test LTI 1.3 connections with Canvas</h3>
 <ul>
-    <li><a target="_blank" href="http://canvas.docker/accounts/2/external_tools/1">Canvas test</a></li>
+    <li><a target="_blank" href="http://canvas.docker/courses/2/external_tools/2">Canvas test for APSC 201</a></li>
 </ul>

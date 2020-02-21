@@ -31,6 +31,7 @@ php composer.phar install
 In Mac terminal:
 
 ```bash
+cd ~/Code/ctlt/iPeer
 docker-compose up -d
 ```
 ```
@@ -54,6 +55,7 @@ Change ports in `docker-compose.yml`: `services.web-unittest.ports`.
 ```
 
 ```bash
+cd ~/Code/ctlt/iPeer
 docker-compose down
 docker-compose up -d
 ```
@@ -62,10 +64,11 @@ Success.
 
 ### Modify users.lti_id type
 
-If necessary.
+If necessary:
 
 ```bash
-docker exec -it ipeer_db sh -c 'mysql ipeer -u ipeer -p -e "ALTER TABLE users MODIFY lti_id VARCHAR(64) NULL DEFAULT NULL;"'
+cd ~/Code/ctlt/iPeer
+docker exec -it ipeer_db mysql ipeer -u ipeer -p -e "ALTER TABLE users MODIFY lti_id VARCHAR(64) NULL DEFAULT NULL;"
 ```
 
 ### Install PHP Webdriver and Sausage under `vendors` directory.
@@ -96,3 +99,11 @@ Browse to: <http://localhost:8080/login>
 - password
 
 OK. I'm logged in.
+
+## Dump original data
+
+```bash
+cd ~/Code/ctlt/iPeer
+docker-compose up -d db
+docker exec -it ipeer_db sh -c "mysqldump ipeer -u ipeer -p > /var/lib/mysql/ipeer.reset.sql"
+```

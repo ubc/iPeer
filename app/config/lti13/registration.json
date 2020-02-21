@@ -16,7 +16,7 @@
         "key_set_url": "http://canvas.docker/api/lti/security/jwks",
         "private_key_file": "app/config/lti13/canvas.private.key",
         "deployment": [
-            "1:b82229c6e10bcb87beb1f1b287faee560ddc3109"
+            "2:f97330a96452fc363a34e0ef6d8d0d3e9e1007d2"
         ]
     }
 }

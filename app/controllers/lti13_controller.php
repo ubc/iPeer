@@ -91,7 +91,7 @@ class Lti13Controller extends AppController
             $this->log("LTI 1.3 user signed in", 'lti13/user');
             $this->log($user, 'lti13/user');
 
-            $this->redirect('/home');
+            // $this->redirect('/home');
 
         } catch (LTI_Exception $e) {
 
@@ -103,11 +103,12 @@ class Lti13Controller extends AppController
     public function signInUser()
     {
         if (!$user = $this->Lti13->findUserByLtiUserId()) {
-            throw new LTI_Exception("User not found.");
+            throw new LTI_Exception("LTI user ID not found.");
             return;
         }
-        if (!$this->Auth->login($user['User']['id'])) {
-            throw new LTI_Exception("Access denied.");
+        $id = $user['User']['id'];
+        if (!$this->Auth->login($id)) {
+            throw new LTI_Exception(sprintf("Access denied to user ID %s.", $id));
             return;
         }
         return $user;

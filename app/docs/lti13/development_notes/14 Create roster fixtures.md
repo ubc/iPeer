@@ -316,6 +316,8 @@ Steps:
 ```bash
 cd ~/Code/ctlt/canvas
 docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_4.sql"
+docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres -Fc canvas > /usr/src/app/tmp/canvas.postgresql.dump"
+cp ~/Code/ctlt/canvas/.postgres_app_tmp/canvas.postgresql.dump ~/Code/ctlt/iPeer/app/config/lti13/canvas.postgresql.dump
 ```
 
 ---

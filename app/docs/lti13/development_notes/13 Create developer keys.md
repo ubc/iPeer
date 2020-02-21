@@ -12,23 +12,23 @@ Create `ctlt/iPeer/app/config/lti13/registration.json`
 
 ```json
 {
-  "https://canvas.instructure.com": {
-    "client_id": "10000000000001",
-    "auth_login_url": "http://canvas.docker/api/lti/authorize",
-    "auth_token_url": "http://canvas.docker/login/oauth2/token",
-    "key_set_url": "http://canvas.docker/api/lti/security/jwks",
-    "private_key_file": "app/config/lti13/canvas.private.key",
-    "deployment": [
-      "1:b82229c6e10bcb87beb1f1b287faee560ddc3109"
-    ]
-  }
+    "https://canvas.instructure.com": {
+        "client_id": "10000000000001",
+        "auth_login_url": "http://canvas.docker/api/lti/authorize",
+        "auth_token_url": "http://canvas.docker/login/oauth2/token",
+        "key_set_url": "http://canvas.docker/api/lti/security/jwks",
+        "private_key_file": "app/config/lti13/canvas.private.key",
+        "deployment": [
+            "2:f97330a96452fc363a34e0ef6d8d0d3e9e1007d2"
+        ]
+    }
 }
 ```
 
 Go to <http://canvas.docker/accounts/site_admin/developer_keys>
 
-- Click on `+ Developer Key` button.
-- Select `+ LTI Key`.
+- Click on `+ Developer Key` button
+- Select `+ LTI Key`
 - On `Key Settings` modal window:
     - Configure > Method: `Manual Entry`
     - Key Name: `iPeer LTI 1.3`
@@ -54,31 +54,34 @@ textarea:
 - Still on `Key Settings` modal window:
     - Expand `Additional Settings`:
     - Privacy Level: `Public`
-    - Click the `Save` button.
+    - Click on `Placements`:
+    - Select `Course Navigation`
+        - It adds the `Course Navigation` tag to the list
+    - Click the `Save` button
 
 - On `Developer Keys` page:
     - State: `On`
     - Copy `Details` number: this is the **Client ID** to put in `registration.json` > `https://canvas.instructure.com` > `client_id`
-    - Click the `Show Key` button.
-    - Copy the hash that appears in popup modal.
+    - Click the `Show Key` button
+    - Copy the hash that appears in popup modal
     - Paste this hash in `app/config/lti13/canvas.private.key`
 
 Go to <http://canvas.docker/accounts/site_admin/settings/configurations>
 
 - On `Apps` tab:
-    - Click on `+ App` button.
+    - Click on `+ App` button
     - On `Add App` modal window:
         - Configuration Type: `By Client ID`
         - Client ID: `10000000000001`
-        - Click the `Submit` button.
+        - Click the `Submit` button
         - Tool "iPeer LTI 1.3 test" found for client ID 10000000000001. Would you like to install it?
-            - Click the `Install` button.
+            - Click the `Install` button
     - When `iPeer LTI 1.3 test` appears in the list:
-        - Click the cog icon on the right.
-        - Select `Deployment Id`.
-        - Copy the hash that appears in the popup modal.
-        - Close the popup modal.
-        - Paste in `registration.json` > `https://canvas.instructure.com` > `deployment` array.
+        - Click the cog icon on the right
+        - Select `Deployment Id`
+        - Copy the hash that appears in the popup modal
+        - Close the popup modal
+        - Paste in `registration.json` > `https://canvas.instructure.com` > `deployment` array
 
 ## Dump new data
 

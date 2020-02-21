@@ -187,9 +187,10 @@ cd ~/Code/ctlt/canvas
 docker-compose up -d --build postgres
 ```
 
-### Dump new data
+### Dump original data
 
 ```bash
 cd ~/Code/ctlt/canvas
 docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_0.sql"
+docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres -Fc canvas > /usr/src/app/tmp/canvas.postgresql.reset.dump"
 ```

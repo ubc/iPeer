@@ -1,44 +1,24 @@
 # Run LTI 1.3 iPeer-Canvas test
 
-0. Delete Docker items if necessary.
 1. Install Canvas locally.
 2. Import fixtures in Canvas.
 3. Install iPeer locally.
-4. Run iPeer LTI 1.3 tests.
-
-## Delete Docker items if necessary
-
-### For macOS
-
-Try this first, this might be enough:
-
-```bash
-dinghy destroy -f
-```
-
-> If experiencing problems with the local installation of Canvas,
-it's best to delete all docker containers, images, volumes and networks,
-and start over.
-
-```bash
-docker rm -vf $(docker ps -a -q)
-docker rmi -f $(docker images -a -q)
-docker system prune -a -f --volumes
-dinghy destroy -f
-brew uninstall dinghy
-```
-
-- And restart Docker Desktop for macOS!
-- And restart Terminal!
+4. Import fixtures in Canvas.
+5. Run iPeer LTI 1.3 tests.
 
 ---
 
-## Install Canvas locally
+## 1. Install Canvas locally
 
-1. Install stable branch of Canvas.
-2. Edit Dockerfile.
-3. Run setup script.
-4. Start Canvas.
+### Destroy Dinghy
+
+If you have dinghy installed and running:
+
+```bash
+dinghy destroy -f
+```
+
+### Install stable branch of Canvas
 
 <https://github.com/instructure/canvas-lms/wiki/Quick-Start>
 
@@ -135,7 +115,7 @@ docker-compose up -d --build postgres
 
 ---
 
-## Import fixtures in Canvas
+## 2. Import fixtures in Canvas
 
 1. Copy dump file from iPeer to Canvas.
 2. Disconnect all users from `canvas` dB with `docker-compose down`.
@@ -155,10 +135,7 @@ Refresh <http://canvas.docker>
 
 ---
 
-## Install iPeer locally
-
-1. Install Lti 1.3 version of iPeer.
-2. Run installation wizard.
+## 3. Install iPeer locally
 
 - <http://ipeer.ctlt.ubc.ca>
 - <https://github.com/ubc/iPeer>
@@ -199,7 +176,36 @@ OK. I'm logged in.
 
 ---
 
-## Run iPeer LTI 1.3 tests
+## 4. Import fixtures in iPeer
+
+#### If first time
+
+Dump initial iPeer data:
+
+```bash
+cd ~/Code/ctlt/iPeer
+docker-compose up -d db
+docker exec -it ipeer_db sh -c "mysqldump ipeer -u ipeer -p > /var/lib/mysql/ipeer.sql"
+```
+
+#### If subsequent time
+
+Reset data in `ipeer` table:
+
+```bash
+cd ~/Code/ctlt/iPeer
+docker-compose up -d
+docker exec -it ipeer_db sh -c "mysql ipeer -u ipeer -p < /var/lib/mysql/ipeer.sql"
+```
+
+## 5. Run iPeer LTI 1.3 tests
+
+### Log in
+
+<http://localhost:8080/login>
+
+- username: `root`
+- password: `password`
 
 ### Before test
 
@@ -222,14 +228,12 @@ Look again at students enrolled in courses:
 
 ---------------------------------------------------------------------------------------------------
 
-## Make a SQL file of diff
-
 We just want to test the LTI 1.3 connection, so:
 
-- Input directly in dB
-    - Hardcode keys in web test
-    - Just add users to course
-- Code a test that logs in to iPeer and generates the LTI 1.3 launch sequence
+    - Input directly in dB
+        - Hardcode keys in web test
+        - Just add users to course
+    - Code a test that logs in to iPeer and generates the LTI 1.3 launch sequence
 
 Canvas:
 
