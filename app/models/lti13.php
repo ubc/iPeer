@@ -30,6 +30,7 @@ class Lti13 extends AppModel
     public $jwtPayload = array();
     public $ipeerRoster = array();
     public $ltiRoster = array();
+    public $rosterUpdatesLog = array();
 
     public function __construct()
     {
@@ -287,9 +288,9 @@ class Lti13 extends AppModel
     {
         if ($courseId = @$data['Course']['id']) {
             $this->ipeerRoster = $this->User->getEnrolledStudents($courseId);
-            $this->removeUsersFoundInBothRosters();
-            $this->removeRemainingUsersFromIpeerRoster($courseId);
-            $this->addRemainingUsersInIpeerRoster($courseId);
+            $this->rosterUpdatesLog['removeUsersFoundInBothRosters'] = $this->removeUsersFoundInBothRosters();
+            $this->rosterUpdatesLog['removeRemainingUsersFromIpeerRoster'] = $this->removeRemainingUsersFromIpeerRoster($courseId);
+            $this->rosterUpdatesLog['addRemainingUsersInIpeerRoster'] = $this->addRemainingUsersInIpeerRoster($courseId);
         }
     }
 
@@ -310,19 +311,23 @@ class Lti13 extends AppModel
      * Remove users in both rosters.
      *
      * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L92
+     * @return array
      */
     public function removeUsersFoundInBothRosters()
     {
+        $log = array();
         foreach ($this->ltiRoster as $ltiKey => $ltiData) {
             foreach ($this->ipeerRoster as $ipeerKey => $ipeerData) {
                 if ($userLtiId = @$ipeerData['User']['lti_id']) {
                     if ($ltiData['user_id'] == $userLtiId) {
+                        $log []= $ipeerData['User'];
                         unset($this->ltiRoster[$ltiKey], $this->ipeerRoster[$ipeerKey]);
                         continue;
                     }
                 }
             }
         }
+        return $log;
     }
 
     /**
@@ -330,14 +335,18 @@ class Lti13 extends AppModel
      *
      * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L102
      * @param int $courseId
+     * @return array
      */
     public function removeRemainingUsersFromIpeerRoster($courseId)
     {
+        $log = array();
         foreach ($this->ipeerRoster as $data) {
             if ($userId = @$data['User']['id']) {
+                $log []= $data['User'];
                 $this->User->removeStudent($userId, $courseId);
             }
         }
+        return $log;
     }
 
     /**
@@ -345,14 +354,18 @@ class Lti13 extends AppModel
      *
      * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L107
      * @param int $courseId
+     * @return array
      */
     public function addRemainingUsersInIpeerRoster($courseId)
     {
+        $log = array();
         foreach ($this->ltiRoster as $data) {
             if (!$this->isInstructor($data['roles'])) {
+                $log []= $data;
                 $this->addUser($data, $courseId);
             }
         }
+        return $log;
     }
 
     /**

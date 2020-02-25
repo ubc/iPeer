@@ -82,7 +82,7 @@ class Lti13Controller extends AppController
         $this->Lti13->roster();
 
         $this->log("LTI 1.3 roster updates", 'lti13/roster');
-        $this->log($this->Lti13->ltiRoster, 'lti13/roster');
+        $this->log($this->Lti13->rosterUpdatesLog, 'lti13/roster');
 
         try {
 
