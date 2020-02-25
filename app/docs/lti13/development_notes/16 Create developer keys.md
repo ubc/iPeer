@@ -19,7 +19,7 @@ Update `~/Code/ctlt/iPeer/app/config/lti13/registration.json`
         "key_set_url": "http://canvas.docker/api/lti/security/jwks",
         "private_key_file": "app/config/lti13/tool.private.key",
         "deployment": [
-            "2:f97330a96452fc363a34e0ef6d8d0d3e9e1007d2"
+            "1:4dde05e8ca1973bcca9bffc13e1548820eee93a3"
         ]
     }
 }
