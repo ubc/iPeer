@@ -239,15 +239,7 @@ f26afacc-9f3a-4c8e-8c82-85a9b2eee1cd
 
 ## 6. Run iPeer LTI 1.3 demo test
 
-### Reset data
-
-```bash
-cd ~/Code/ctlt/iPeer
-docker-compose up -d
-docker cp ~/Code/ctlt/iPeer/app/config/lti13/canvas/ipeer.reset.sql ipeer_db:/tmp/
-docker exec -it ipeer_db ls -lAFh /tmp
-docker exec -it ipeer_db sh -c "mysql ipeer -u ipeer -p < /tmp/ipeer.reset.sql"
-```
+> Reset data by following Step 5 above.
 
 Open a new tab to look at page of students enrolled in courses:
 
