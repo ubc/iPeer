@@ -1,4 +1,4 @@
-# Run LTI 1.3 iPeer-Canvas test
+# Run LTI 1.3 iPeer-Canvas demo test
 
 ## Steps
 
@@ -7,7 +7,7 @@
 3. Import fixtures in Canvas.
 4. Install iPeer locally.
 5. Import fixtures in Canvas.
-6. Run iPeer LTI 1.3 tests.
+6. Run iPeer LTI 1.3 demo test.
 
 ---
 
@@ -230,7 +230,7 @@ f26afacc-9f3a-4c8e-8c82-85a9b2eee1cd
 
 ---
 
-## 6. Run iPeer LTI 1.3 tests
+## 6. Run iPeer LTI 1.3 demo test
 
 ### Reset data
 
