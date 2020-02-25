@@ -1,9 +1,35 @@
 ---------------------------------------------------------------------------------------------------
 
 ## DID NOT WORK!
-## TRY NEW [INSTALL](/app/docs/lti13/12%20Install%20Canvas%20container.md) INSTEAD.
+## TRY NEW [INSTALL](./13%20Install%20Canvas%20container.md) INSTEAD.
 
 ---------------------------------------------------------------------------------------------------
+
+We just want to test the LTI 1.3 connection, so:
+
+    - Input directly in dB
+        - Hardcode keys in web test
+        - Just add users to course
+    - Code a test that logs in to iPeer and generates the LTI 1.3 launch sequence
+
+Canvas:
+
+    - run rake to reset/start the .data for canvas
+    - pg_dump
+    - http://canvas.docker to populate the accounts in the course(s)
+    - pg_dump
+    - diff the two dumps
+    - add a developer key
+    - make a SQL for a migration file specifically for this test
+
+iPeer:
+
+    - add logging to the test
+    - in test, log the list of ipeer roster before launch
+    - test launch and log it
+    - log the list of ipeer roster after launch
+
+---
 
 # Update docker-canvas container
 

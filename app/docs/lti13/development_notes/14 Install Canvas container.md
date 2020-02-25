@@ -11,34 +11,7 @@ It's not the current stable version.
 ## Which operating system?
 
 - For macOS: this page shows `dinghy` that applies only to macOS.
-- For Linux: follow the Linux instructions on [Quick-Start](https://github.com/instructure/canvas-lms/wiki/Quick-Start)
-
----
-
-## Delete Docker items if necessary
-
-### For macOS
-
-Try this first, this might be enough:
-
-```bash
-dinghy destroy -f
-```
-
-> If experiencing problems with the local installation of Canvas,
-it's best to delete all docker containers, images, volumes and networks,
-and start over.
-
-```bash
-docker rm -vf $(docker ps -a -q)
-docker rmi -f $(docker images -a -q)
-docker system prune -a -f --volumes
-dinghy destroy -f
-brew uninstall dinghy
-```
-
-> And restart Docker Desktop for macOS!
-> And restart Terminal!
+- For Linux: use `dory`; follow the Linux instructions on [Quick-Start](https://github.com/instructure/canvas-lms/wiki/Quick-Start)
 
 ---
 
@@ -49,7 +22,7 @@ brew uninstall dinghy
 > commit dc6478a81bbcfa85f9886d7d6d7ff5dcfbaf5686  doesn't have bugs!
 
 ```bash
-cd ~/Code/ctlt
+mkdir -p ~/Code/ctlt && cd $_
 git clone -b stable https://github.com/instructure/canvas-lms.git canvas
 cd ~/Code/ctlt/canvas
 git reset --hard dc6478a81bbcfa85f9886d7d6d7ff5dcfbaf5686
@@ -94,6 +67,29 @@ In the `apt-get remove` lines:
 ```
 
 Save `docker-compose/postgres/Dockerfile`
+
+### Destroy Dinghy
+
+Try this first, this might be enough:
+
+```bash
+dinghy destroy -f
+```
+
+> If experiencing problems with the local installation of Canvas,
+it's best to delete all docker containers, images, volumes and networks,
+and start over.
+
+```bash
+docker rm -vf $(docker ps -a -q)
+docker rmi -f $(docker images -a -q)
+docker system prune -a -f --volumes
+dinghy destroy -f
+brew uninstall dinghy
+```
+
+> And restart Docker Desktop for macOS!
+> And restart Terminal!
 
 ### Run setup script
 
@@ -169,28 +165,14 @@ CONTAINER ID        IMAGE                               COMMAND                 
 25bb59254989        codekitchen/dinghy-http-proxy:2.5   "/app/docker-entrypo…"   44 minutes ago      Up 44 minutes       0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 19322/tcp, 0.0.0.0:19322->19322/udp   dinghy_http_proxy
 ```
 
-## Post setup
-
-### Mount volume to access data
-
-Edit `docker-compose.override.yml`
-
-```diff
-  postgres:
-    volumes:
-      - pg_data:/var/lib/postgresql/data
-+     - ./.postgres_app_tmp:/usr/src/app/tmp
-```
-
-```bash
-cd ~/Code/ctlt/canvas
-docker-compose up -d --build postgres
-```
-
 ### Dump original data
 
+In case you need to reset data.
+
 ```bash
 cd ~/Code/ctlt/canvas
-docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_0.sql"
-docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres -Fc canvas > /usr/src/app/tmp/canvas.postgresql.reset.dump"
+docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres canvas > /tmp/canvas_0.sql"
+docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres -Fc canvas > /tmp/canvas.postgresql.reset.dump"
+docker cp canvas_postgres_1:/tmp/canvas.postgresql.reset.dump ~/Code/ctlt/iPeer/app/config/lti13/canvas/
+docker exec -it canvas_postgres_1 ls -lAFh /tmp
 ```

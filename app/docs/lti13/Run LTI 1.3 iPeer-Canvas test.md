@@ -1,29 +1,24 @@
 # Run LTI 1.3 iPeer-Canvas test
 
+## Steps
+
 1. Install Canvas locally.
-2. Import fixtures in Canvas.
-3. Install iPeer locally.
-4. Import fixtures in Canvas.
-5. Run iPeer LTI 1.3 tests.
+2. Build Canvas.
+3. Import fixtures in Canvas.
+4. Install iPeer locally.
+5. Import fixtures in Canvas.
+6. Run iPeer LTI 1.3 tests.
 
 ---
 
 ## 1. Install Canvas locally
-
-### Destroy Dinghy
-
-If you have dinghy installed and running:
-
-```bash
-dinghy destroy -f
-```
 
 ### Install stable branch of Canvas
 
 <https://github.com/instructure/canvas-lms/wiki/Quick-Start>
 
 ```bash
-cd ~/Code/ctlt
+mkdir -p ~/Code/ctlt && cd $_
 git clone -b stable https://github.com/instructure/canvas-lms.git canvas
 cd ~/Code/ctlt/canvas
 git reset --hard dc6478a81bbcfa85f9886d7d6d7ff5dcfbaf5686
@@ -36,7 +31,7 @@ git reset --hard dc6478a81bbcfa85f9886d7d6d7ff5dcfbaf5686
 - Bypass `webpack:production` errors
 
 ```bash
-patch -p0 ~/Code/ctlt/canvas/Dockerfile < ~/Code/ctlt/iPeer/app/config/lti13/patches/canvas/Dockerfile.diff
+patch -p0 ~/Code/ctlt/canvas/Dockerfile < ~/Code/ctlt/iPeer/app/config/lti13/canvas/Dockerfile.diff
 ```
 
 #### Fix postgres container
@@ -45,7 +40,19 @@ patch -p0 ~/Code/ctlt/canvas/Dockerfile < ~/Code/ctlt/iPeer/app/config/lti13/pat
 - Use `psql` version 9.5, not 9.6.
 
 ```bash
-patch -p0 ~/Code/ctlt/canvas/docker-compose/postgres/Dockerfile < ~/Code/ctlt/iPeer/app/config/lti13/patches/canvas/postgres-Dockerfile.diff
+patch -p0 ~/Code/ctlt/canvas/docker-compose/postgres/Dockerfile < ~/Code/ctlt/iPeer/app/config/lti13/canvas/postgres-Dockerfile.diff
+```
+
+---
+
+## 2. Build Canvas
+
+### Destroy Dinghy
+
+If you have dinghy installed and running:
+
+```bash
+dinghy destroy -f
 ```
 
 ### Run setup script
@@ -97,25 +104,21 @@ docker-compose up -d
 
 Browse to <http://canvas.docker>
 
-### Mount volume to access data
+### Dump original data
 
-Edit `docker-compose.override.yml`
-
-```diff
-  postgres:
-    volumes:
-      - pg_data:/var/lib/postgresql/data
-+     - ./.postgres_app_tmp:/usr/src/app/tmp
-```
+In case you need to reset data.
 
 ```bash
 cd ~/Code/ctlt/canvas
-docker-compose up -d --build postgres
+docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres canvas > /tmp/canvas_0.sql"
+docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres -Fc canvas > /tmp/canvas.postgresql.reset.dump"
+docker cp canvas_postgres_1:/tmp/canvas.postgresql.reset.dump ~/Code/ctlt/iPeer/app/config/lti13/canvas/
+docker exec -it canvas_postgres_1 ls -lAFh /tmp
 ```
 
 ---
 
-## 2. Import fixtures in Canvas
+## 3. Import fixtures in Canvas
 
 1. Copy dump file from iPeer to Canvas.
 2. Disconnect all users from `canvas` dB with `docker-compose down`.
@@ -123,11 +126,11 @@ docker-compose up -d --build postgres
 
 ```bash
 cd ~/Code/ctlt/canvas
-cp ~/Code/ctlt/iPeer/.data/canvas.postgresql.dump .postgres_app_tmp/
 docker-compose down
 docker-compose up -d postgres
-docker exec -it canvas_postgres_1 sh -c "dropdb -U postgres canvas"
-docker exec -it canvas_postgres_1 sh -c "pg_restore -U postgres -C -d postgres /usr/src/app/tmp/canvas.postgresql.dump"
+docker cp ~/Code/ctlt/iPeer/app/config/lti13/canvas/canvas.postgresql.dump canvas_postgres_1:/tmp/
+docker exec -it canvas_postgres_1 dropdb -U postgres canvas
+docker exec -it canvas_postgres_1 pg_restore -U postgres -C -d postgres /tmp/canvas.postgresql.dump
 docker-compose up -d
 ```
 
@@ -135,7 +138,7 @@ Refresh <http://canvas.docker>
 
 ---
 
-## 3. Install iPeer locally
+## 4. Install iPeer locally
 
 - <http://ipeer.ctlt.ubc.ca>
 - <https://github.com/ubc/iPeer>
@@ -145,10 +148,16 @@ Refresh <http://canvas.docker>
 ```bash
 mkdir -p ~/Code/ctlt && cd $_
 git clone -b lti-1.3-port https://repo.code.ubc.ca:smarsh05/ipeer-lti13.git
+```
+
+### Build iPeer
+
+```bash
 cd ~/Code/ctlt/iPeer
 curl -sS https://getcomposer.org/installer | php
 php composer.phar install
 docker-compose up -d
+docker exec -it ipeer_db mysql ipeer -u ipeer -p -e "ALTER TABLE users MODIFY lti_id VARCHAR(64) NULL DEFAULT NULL;"
 git submodule init
 git submodule update
 ```
@@ -174,81 +183,86 @@ Browse to: <http://localhost:8080/login>
 
 OK. I'm logged in.
 
----
-
-## 4. Import fixtures in iPeer
-
-#### If first time
-
-Dump initial iPeer data:
-
-```bash
-cd ~/Code/ctlt/iPeer
-docker-compose up -d db
-docker exec -it ipeer_db sh -c "mysqldump ipeer -u ipeer -p > /var/lib/mysql/ipeer.sql"
-```
-
-#### If subsequent time
-
-Reset data in `ipeer` table:
+### Dump original data
 
 ```bash
 cd ~/Code/ctlt/iPeer
 docker-compose up -d
-docker exec -it ipeer_db sh -c "mysql ipeer -u ipeer -p < /var/lib/mysql/ipeer.sql"
+docker exec -it ipeer_db sh -c "mysqldump ipeer -u ipeer -p > /tmp/ipeer.reset.sql"
+docker exec -it ipeer_db ls -lAFh /tmp
+docker cp ipeer_db:/tmp/ipeer.reset.sql ~/Code/ctlt/iPeer/app/config/lti13/canvas/
 ```
 
-## 5. Run iPeer LTI 1.3 tests
+---
 
-### Log in
+## 5. Import fixtures in iPeer
 
-<http://localhost:8080/login>
+### Reset data
 
-- username: `root`
-- password: `password`
+```bash
+cd ~/Code/ctlt/iPeer
+docker-compose up -d
+docker cp ~/Code/ctlt/iPeer/app/config/lti13/canvas/ipeer.reset.sql ipeer_db:/tmp/
+docker exec -it ipeer_db ls -lAFh /tmp
+docker exec -it ipeer_db sh -c "mysql ipeer -u ipeer -p < /tmp/ipeer.reset.sql"
+```
 
-### Before test
+### Update lti_id of root user
 
-Look at students enrolled in courses:
+```bash
+cd ~/Code/ctlt/canvas
+docker exec -it canvas_postgres_1 psql -U postgres canvas -tc "SELECT lti_id FROM users WHERE name LIKE 'root@canvas';"
+```
+```
+ f26afacc-9f3a-4c8e-8c82-85a9b2eee1cd
+```
+
+```bash
+cd ~/Code/ctlt/iPeer
+docker exec -it ipeer_db mysql ipeer -u ipeer -p -e "UPDATE users SET lti_id = 'f26afacc-9f3a-4c8e-8c82-85a9b2eee1cd' WHERE username LIKE 'root';"
+docker exec -it ipeer_db mysql ipeer -u ipeer -p -sNe "SELECT lti_id FROM users WHERE username LIKE 'root';"
+```
+```
+f26afacc-9f3a-4c8e-8c82-85a9b2eee1cd
+```
+
+---
+
+## 6. Run iPeer LTI 1.3 tests
+
+### Reset data
+
+```bash
+cd ~/Code/ctlt/iPeer
+docker-compose up -d
+docker cp ~/Code/ctlt/iPeer/app/config/lti13/canvas/ipeer.reset.sql ipeer_db:/tmp/
+docker exec -it ipeer_db ls -lAFh /tmp
+docker exec -it ipeer_db sh -c "mysql ipeer -u ipeer -p < /tmp/ipeer.reset.sql"
+```
+
+Open a new tab to look at page of students enrolled in courses:
 
 - [MECH 328 enrolment](http://localhost:8080/users/goToClassList/1)
 - [APSC 201 enrolment](http://localhost:8080/users/goToClassList/2)
 
 ### Run manual test
 
-Browse to <http://localhost:8080/lti13>
+Go to <http://localhost:8080/login>
+
+- username: `root`
+- password: `password`
+
+Go to <http://localhost:8080/lti13>
 
 ### After test
 
-Look again at students enrolled in courses:
+Refresh page of students enrolled in courses:
 
 - [MECH 328 enrolment](http://localhost:8080/users/goToClassList/1)
 - [APSC 201 enrolment](http://localhost:8080/users/goToClassList/2)
 
+Check iPeer LTI 1.3 test logs:
 
----------------------------------------------------------------------------------------------------
-
-We just want to test the LTI 1.3 connection, so:
-
-    - Input directly in dB
-        - Hardcode keys in web test
-        - Just add users to course
-    - Code a test that logs in to iPeer and generates the LTI 1.3 launch sequence
-
-Canvas:
-
-    - run rake to reset/start the .data for canvas
-    - pg_dump
-    - http://canvas.docker to populate the accounts in the course(s)
-    - pg_dump
-    - diff the two dumps
-    - add a developer key
-    - make a SQL for a migration file specifically for this test
-
-iPeer:
-
-    - add logging to the test
-    - in test, log the list of ipeer roster before launch
-    - test launch and log it
-    - log the list of ipeer roster after launch
-
+- `~/Code/ctlt/iPeer/app/tmp/logs/lti13/launch.log`
+- `~/Code/ctlt/iPeer/app/tmp/logs/lti13/roster.log`
+- `~/Code/ctlt/iPeer/app/tmp/logs/lti13/user.log`

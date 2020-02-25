@@ -21,17 +21,14 @@ In Mac terminal:
 ```bash
 mkdir -p ~/Code/ctlt && cd $_
 git clone https://github.com/ubc/iPeer.git
-cd ~/Code/ctlt/iPeer
-curl -sS https://getcomposer.org/installer | php
-php composer.phar install
 ```
 
-## Run Docker
-
-In Mac terminal:
+## Build
 
 ```bash
 cd ~/Code/ctlt/iPeer
+curl -sS https://getcomposer.org/installer | php
+php composer.phar install
 docker-compose up -d
 ```
 ```
@@ -64,10 +61,7 @@ Success.
 
 ### Modify users.lti_id type
 
-If necessary:
-
 ```bash
-cd ~/Code/ctlt/iPeer
 docker exec -it ipeer_db mysql ipeer -u ipeer -p -e "ALTER TABLE users MODIFY lti_id VARCHAR(64) NULL DEFAULT NULL;"
 ```
 
@@ -104,6 +98,8 @@ OK. I'm logged in.
 
 ```bash
 cd ~/Code/ctlt/iPeer
-docker-compose up -d db
-docker exec -it ipeer_db sh -c "mysqldump ipeer -u ipeer -p > /var/lib/mysql/ipeer.reset.sql"
+docker-compose up -d
+docker exec -it ipeer_db sh -c "mysqldump ipeer -u ipeer -p > /tmp/ipeer.reset.sql"
+docker exec -it ipeer_db ls -lAFh /tmp
+docker cp ipeer_db:/tmp/ipeer.reset.sql ~/Code/ctlt/iPeer/app/config/lti13/canvas/
 ```

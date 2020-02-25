@@ -24,16 +24,16 @@ echo 'app/config/**/*.key' | tee -a .gitignore
 
 ```json
 {
-  "https://lti-ri.imsglobal.org": {
-    "client_id": "ipeer-lti13-001",
-    "auth_login_url": "https://lti-ri.imsglobal.org/platforms/652/authorizations/new",
-    "auth_token_url": "https://lti-ri.imsglobal.org/platforms/652/access_tokens",
-    "key_set_url": "https://lti-ri.imsglobal.org/platforms/652/platform_keys/654.json",
-    "private_key_file": "app/config/lti13/tool.private.key",
-    "deployment": [
-      "1"
-    ]
-  }
+    "https://lti-ri.imsglobal.org": {
+        "client_id": "ipeer-lti13-001",
+        "auth_login_url": "https://lti-ri.imsglobal.org/platforms/652/authorizations/new",
+        "auth_token_url": "https://lti-ri.imsglobal.org/platforms/652/access_tokens",
+        "key_set_url": "https://lti-ri.imsglobal.org/platforms/652/platform_keys/654.json",
+        "private_key_file": "app/config/lti13/tool.private.key",
+        "deployment": [
+            "1"
+        ]
+    }
 }
 ```
 

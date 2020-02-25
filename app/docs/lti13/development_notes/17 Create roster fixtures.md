@@ -97,7 +97,7 @@ Go to <http://canvas.docker/courses>
 
 - Click the `+ Course` button.
 - On `Start a New Course` modal window:
-    - Course Name: `Mechanical Engineering Design Project`
+    - Course Name: `MECH 328 Mechanical Engineering Design Project`
     - Content License: `Public Domain`
     - Make course publicly visible: `On`
     - Click the `Create course` button.
@@ -116,13 +116,30 @@ On <http://canvas.docker/courses/1/settings>
     - Course Code: `MECH 328`
     - Click `Update Course Details` button.
 
+Go to <http://canvas.docker/courses/1/settings/configurations>
+
+- On `Apps` tab:
+    - Click on `+ App` button
+    - On `Add App` modal window:
+        - Configuration Type: `By Client ID`
+        - Client ID: `10000000000001`
+        - Click the `Submit` button
+        - Tool "iPeer LTI 1.3 test" found for client ID 10000000000001. Would you like to install it?
+            - Click the `Install` button
+    - When `iPeer LTI 1.3 test` appears in the list:
+        - Click the cog icon on the right
+        - Select `Deployment Id`
+        - Copy the hash that appears in the popup modal
+        - Close the popup modal
+        - Paste in `registration.json` > `https://canvas.instructure.com` > `deployment` array
+
 ### Existing course APSC 201
 
 Go to <http://canvas.docker/courses>
 
 - Click the `+ Course` button.
 - On `Start a New Course` modal window:
-    - Course Name: `Technical Communication`
+    - Course Name: `APSC 201 Technical Communication`
     - Content License: `Public Domain`
     - Make course publicly visible: `On`
     - Click the `Create course` button.
@@ -141,18 +158,35 @@ On <http://canvas.docker/courses/2/settings>
     - Course Code: `APSC 201`
     - Click `Update Course Details` button.
 
+Go to <http://canvas.docker/courses/2/settings/configurations>
+
+- On `Apps` tab:
+    - Click on `+ App` button
+    - On `Add App` modal window:
+        - Configuration Type: `By Client ID`
+        - Client ID: `10000000000001`
+        - Click the `Submit` button
+        - Tool "iPeer LTI 1.3 test" found for client ID 10000000000001. Would you like to install it?
+            - Click the `Install` button
+    - When `iPeer LTI 1.3 test` appears in the list:
+        - Click the cog icon on the right
+        - Select `Deployment Id`
+        - Copy the hash that appears in the popup modal
+        - Close the popup modal
+        - Paste in `registration.json` > `https://canvas.instructure.com` > `deployment` array
+
 ### New course ABCD 101
 
 Go to <http://canvas.docker/courses>
 
 - Click the `+ Course` button.
 - On `Start a New Course` modal window:
-    - Course Name: `Alphabet Design Project`
+    - Course Name: `ABCD 101 Alphabet Design Project`
     - Content License: `Public Domain`
     - Make course publicly visible: `On`
     - Click the `Create course` button.
 
-On <http://canvas.docker/courses/2>
+On <http://canvas.docker/courses/3>
 
 - Click the `√ Publish` button.
 - On `Choose Course Home Page` modal window:
@@ -160,11 +194,28 @@ On <http://canvas.docker/courses/2>
     - Click the `Choose and Publish` button.
 - Click `Settings` left menu item.
 
-On <http://canvas.docker/courses/2/settings>
+On <http://canvas.docker/courses/3/settings>
 
 - On `Course Details` tab:
     - Course Code: `ABCD 101`
     - Click `Update Course Details` button.
+
+Go to <http://canvas.docker/courses/3/settings/configurations>
+
+- On `Apps` tab:
+    - Click on `+ App` button
+    - On `Add App` modal window:
+        - Configuration Type: `By Client ID`
+        - Client ID: `10000000000001`
+        - Click the `Submit` button
+        - Tool "iPeer LTI 1.3 test" found for client ID 10000000000001. Would you like to install it?
+            - Click the `Install` button
+    - When `iPeer LTI 1.3 test` appears in the list:
+        - Click the cog icon on the right
+        - Select `Deployment Id`
+        - Copy the hash that appears in the popup modal
+        - Close the popup modal
+        - Paste in `registration.json` > `https://canvas.instructure.com` > `deployment` array
 
 Go back to <http://canvas.docker/courses> to see `All Courses`.
 
@@ -172,7 +223,7 @@ Go back to <http://canvas.docker/courses> to see `All Courses`.
 
 ```bash
 cd ~/Code/ctlt/canvas
-docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_2.sql"
+docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres canvas > /tmp/canvas_2.sql"
 ```
 
 ---
@@ -227,7 +278,7 @@ Go to <http://canvas.docker/accounts/site_admin/users>
 - On `Add a New User` modal window:
     - Full Name: `Harry Newuser`
     - Email: `harry.newuser@ipeer.test.ubc.ca`
-    - SIS ID: `88888888`
+    - SIS ID: (blank)
     - Email the user about this account creation: `Off`
     - Click the `Add User` button.
 
@@ -235,7 +286,7 @@ Go to <http://canvas.docker/accounts/site_admin/users>
 
 ```bash
 cd ~/Code/ctlt/canvas
-docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_3.sql"
+docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres canvas > /tmp/canvas_3.sql"
 ```
 
 ---
@@ -315,9 +366,9 @@ Steps:
 
 ```bash
 cd ~/Code/ctlt/canvas
-docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_4.sql"
-docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres -Fc canvas > /usr/src/app/tmp/canvas.postgresql.dump"
-cp ~/Code/ctlt/canvas/.postgres_app_tmp/canvas.postgresql.dump ~/Code/ctlt/iPeer/app/config/lti13/canvas.postgresql.dump
+docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres canvas > /tmp/canvas_4.sql"
+docker exec -it canvas_postgres_1 sh -c "pg_dump -U postgres -Fc canvas > /tmp/canvas.postgresql.dump"
+docker cp canvas_postgres_1:/tmp/canvas.postgresql.dump ~/Code/ctlt/iPeer/app/config/lti13/canvas/
 ```
 
 ---
@@ -326,9 +377,6 @@ cp ~/Code/ctlt/canvas/.postgres_app_tmp/canvas.postgresql.dump ~/Code/ctlt/iPeer
 
 ```bash
 cd ~/Code/ctlt/canvas
-diff -u .postgres_app_tmp/canvas_0.sql .postgres_app_tmp/canvas_1.sql > .postgres_app_tmp/canvas_0_1.sql.diff
-diff -u .postgres_app_tmp/canvas_1.sql .postgres_app_tmp/canvas_2.sql > .postgres_app_tmp/canvas_1_2.sql.diff
-diff -u .postgres_app_tmp/canvas_2.sql .postgres_app_tmp/canvas_3.sql > .postgres_app_tmp/canvas_2_3.sql.diff
-diff -u .postgres_app_tmp/canvas_3.sql .postgres_app_tmp/canvas_4.sql > .postgres_app_tmp/canvas_3_4.sql.diff
-diff -u .postgres_app_tmp/canvas_0.sql .postgres_app_tmp/canvas_4.sql > .postgres_app_tmp/canvas_0_4.sql.diff
+docker exec -it canvas_postgres_1 ls -lAFh /tmp
+docker exec -it canvas_postgres_1 sh -c "diff -u /tmp/canvas_1.sql /tmp/canvas_4.sql | more"
 ```

@@ -96,7 +96,7 @@ Go to: <http://localhost:8900>
 ### Dump new data
 
 ```bash
-docker exec -it docker-canvas_db_1 sh -c "pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_0.sql"
+docker exec -it docker-canvas_db_1 sh -c "pg_dump -U postgres canvas > /tmp/canvas_0.sql"
 ```
 
 Look in `~/Code/ctlt/docker-canvas/.data/postgres`
@@ -155,7 +155,7 @@ Go back to <http://localhost:8900/courses> to see `All Courses`.
 ### Dump new data
 
 ```bash
-docker exec -it docker-canvas_db_1 sh -c "pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_1.sql"
+docker exec -it docker-canvas_db_1 sh -c "pg_dump -U postgres canvas > /tmp/canvas_1.sql"
 ```
 
 Look in `~/Code/ctlt/docker-canvas/.data/postgres`
@@ -188,7 +188,7 @@ Go to <http://localhost:8900/accounts/site_admin/users>
 ### Dump new data
 
 ```bash
-docker exec -it docker-canvas_db_1 sh -c "pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_2.sql"
+docker exec -it docker-canvas_db_1 sh -c "pg_dump -U postgres canvas > /tmp/canvas_2.sql"
 ```
 
 Look in `~/Code/ctlt/docker-canvas/.data/postgres`
@@ -250,7 +250,7 @@ Click the `Stop Acting as User` button at bottom left.
 ### Dump new data
 
 ```bash
-docker exec -it docker-canvas_db_1 sh -c "pg_dump -U postgres canvas > /usr/src/app/tmp/canvas_3.sql"
+docker exec -it docker-canvas_db_1 sh -c "pg_dump -U postgres canvas > /tmp/canvas_3.sql"
 ```
 
 Look in `~/Code/ctlt/docker-canvas/.data/postgres`
