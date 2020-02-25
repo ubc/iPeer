@@ -27,9 +27,7 @@ git clone https://github.com/ubc/iPeer.git
 
 ```bash
 cd ~/Code/ctlt/iPeer
-curl -sS https://getcomposer.org/installer | php
-php composer.phar install
-docker-compose up -d
+docker-compose up -d --build
 ```
 ```
 ERROR: for 7627c664aa24_ipeer_web_unittest  
@@ -59,12 +57,6 @@ docker-compose up -d
 
 Success.
 
-### Modify users.lti_id type
-
-```bash
-docker exec -it ipeer_db mysql ipeer -u ipeer -p -e "ALTER TABLE users MODIFY lti_id VARCHAR(64) NULL DEFAULT NULL;"
-```
-
 ### Install PHP Webdriver and Sausage under `vendors` directory.
 
 ```bash
@@ -72,20 +64,23 @@ git submodule init
 git submodule update
 ```
 
-## Installation wizard
+### Run installation wizard
 
 Browse to: <http://localhost:8080>
 
-I see Installation Wizard.
+I see "Installation Wizard"
 
-- Step 1: Example app
-- Step 2
-- Step 3: Installation with Sample Data
-- Step 4
-    - root
-    - password
+- Step 1: System Requirements Check
+- Step 2: License Agreement
+    - Check ON `I Accept the GPL License`
+- Step 3: iPeer Database Configuration
+    - Check ON `Installation with Sample Data`
+- Step 4: System Parameters Configuration
+    - Username: `root`
+    - Password: `password`
+    - Confirm Password: `password`
 
-iPeer Installation Complete!
+I see "iPeer Installation Complete!"
 
 Browse to: <http://localhost:8080/login>
 
@@ -93,6 +88,12 @@ Browse to: <http://localhost:8080/login>
 - password
 
 OK. I'm logged in.
+
+### Modify users.lti_id type
+
+```bash
+docker exec -it ipeer_db mysql ipeer -u ipeer -p -e "ALTER TABLE users MODIFY lti_id VARCHAR(64) NULL DEFAULT NULL;"
+```
 
 ## Dump original data
 
