@@ -57,6 +57,8 @@ dinghy destroy -f
 
 ### Run setup script
 
+Expect 30 minutes for this build process.
+
 ```bash
 cd ~/Code/ctlt/canvas
 ./script/docker_dev_setup.sh
