@@ -163,6 +163,8 @@ git submodule init
 git submodule update
 ```
 
+**Wait 5 minutes for the database to build**
+
 ### Run installation wizard
 
 Browse to: <http://localhost:8080>
