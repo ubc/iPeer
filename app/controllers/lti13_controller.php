@@ -91,6 +91,7 @@ class Lti13Controller extends AppController
             $this->log("LTI 1.3 user signed in", 'lti13/user');
             $this->log($user, 'lti13/user');
 
+            echo $this->Lti13->successMessage(sprintf("Signed in as `%s`", $user['User']['username']));
             // $this->redirect('/home');
 
         } catch (LTI_Exception $e) {
