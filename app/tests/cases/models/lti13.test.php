@@ -185,6 +185,7 @@ JSON;
     function test_saveNewUserToCourse()
     {
         $this->assertFalse($this->Lti13->saveNewUserToCourse(array(), $courseId=0, $isInstructor=true));
+        $this->assertFalse($this->Lti13->saveNewUserToCourse(array(), $courseId=0, $isInstructor=false));
 /*
 ERROR->Unexpected PHP error [<span style="color:Red;text-align:left"><b>SQL Error:</b> 1064:
 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server
@@ -194,8 +195,6 @@ in test_saveNewUserToCourse
 in Lti13TestCase
 in /var/www/html/app/tests/cases/models/lti13.test.php
 */
-        // $this->assertFalse($this->Lti13->saveNewUserToCourse(array(), $courseId=0, $isInstructor=false));
-
         // $userData = array(
         //     'User' => array(
         //         'username' => "JohnSmith",
