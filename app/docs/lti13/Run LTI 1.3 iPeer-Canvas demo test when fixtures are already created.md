@@ -1,8 +1,6 @@
-# Run LTI 1.3 iPeer-Canvas demo test
+# Run LTI 1.3 iPeer-Canvas demo test when fixtures are already created
 
-## Run when fixtures are already created
-
-### Set up Canvas
+## Set up Canvas
 
 > If not already built.
 
@@ -22,7 +20,7 @@ docker-compose up -d
 
 Browse to <http://canvas.docker>
 
-### Set up iPeer
+## Set up iPeer
 
 Second terminal tab:
 

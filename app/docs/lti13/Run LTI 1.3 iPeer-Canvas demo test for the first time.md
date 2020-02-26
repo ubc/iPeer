@@ -1,4 +1,4 @@
-# Run LTI 1.3 iPeer-Canvas demo test
+# Run LTI 1.3 iPeer-Canvas demo test for the first time
 
 1. Install Canvas locally.
 2. Build Canvas.
