@@ -1,7 +1,5 @@
 # Run LTI 1.3 iPeer-Canvas demo test
 
-## Steps
-
 1. Install Canvas locally.
 2. Build Canvas.
 3. Import fixtures in Canvas.
@@ -12,6 +10,8 @@
 ---
 
 ## 1. Install Canvas locally
+
+Open a first terminal tab.
 
 ### Install stable branch of Canvas
 
@@ -145,6 +145,8 @@ Refresh <http://canvas.docker>
 - <http://ipeer.ctlt.ubc.ca>
 - <https://github.com/ubc/iPeer>
 
+Open a second terminal tab.
+
 ### Install Lti 1.3 version of iPeer
 
 ```bash
@@ -188,8 +190,34 @@ OK. I'm logged in.
 
 ### Modify users.lti_id type
 
+In iPeer.
+
 ```bash
+cd ~/Code/ctlt/iPeer
 docker exec -it ipeer_db mysql ipeer -u ipeer -p -e "ALTER TABLE users MODIFY lti_id VARCHAR(64) NULL DEFAULT NULL;"
+```
+
+### Update users.lti_id of root user
+
+#### Get lti_id from Canvas
+
+```bash
+cd ~/Code/ctlt/canvas
+docker exec -it canvas_postgres_1 psql -U postgres canvas -tc "SELECT lti_id FROM users WHERE name LIKE 'root@canvas';"
+```
+```
+ f26afacc-9f3a-4c8e-8c82-85a9b2eee1cd
+```
+
+#### Update lti_id in iPeer
+
+```bash
+cd ~/Code/ctlt/iPeer
+docker exec -it ipeer_db mysql ipeer -u ipeer -p -e "UPDATE users SET lti_id = 'f26afacc-9f3a-4c8e-8c82-85a9b2eee1cd' WHERE username LIKE 'root';"
+docker exec -it ipeer_db mysql ipeer -u ipeer -p -sNe "SELECT lti_id FROM users WHERE username LIKE 'root';"
+```
+```
+f26afacc-9f3a-4c8e-8c82-85a9b2eee1cd
 ```
 
 ### Dump original data
@@ -216,30 +244,9 @@ docker exec -it ipeer_db ls -lAFh /tmp
 docker exec -it ipeer_db sh -c "mysql ipeer -u ipeer -p < /tmp/ipeer.reset.sql"
 ```
 
-### Update lti_id of root user
-
-```bash
-cd ~/Code/ctlt/canvas
-docker exec -it canvas_postgres_1 psql -U postgres canvas -tc "SELECT lti_id FROM users WHERE name LIKE 'root@canvas';"
-```
-```
- f26afacc-9f3a-4c8e-8c82-85a9b2eee1cd
-```
-
-```bash
-cd ~/Code/ctlt/iPeer
-docker exec -it ipeer_db mysql ipeer -u ipeer -p -e "UPDATE users SET lti_id = 'f26afacc-9f3a-4c8e-8c82-85a9b2eee1cd' WHERE username LIKE 'root';"
-docker exec -it ipeer_db mysql ipeer -u ipeer -p -sNe "SELECT lti_id FROM users WHERE username LIKE 'root';"
-```
-```
-f26afacc-9f3a-4c8e-8c82-85a9b2eee1cd
-```
-
 ---
 
 ## 6. Run iPeer LTI 1.3 demo test
-
-> Reset data by following Step 5 above.
 
 Open a new tab to look at page of students enrolled in courses:
 
