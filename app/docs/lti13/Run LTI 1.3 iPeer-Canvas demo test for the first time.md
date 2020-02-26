@@ -248,12 +248,14 @@ docker exec -it ipeer_db sh -c "mysql ipeer -u ipeer -p < /tmp/ipeer.reset.sql"
 
 ## 6. Run iPeer LTI 1.3 demo test
 
+### Before
+
 Open a new tab to look at page of students enrolled in courses:
 
 - [MECH 328 enrolment](http://localhost:8080/users/goToClassList/1)
 - [APSC 201 enrolment](http://localhost:8080/users/goToClassList/2)
 
-### Run manual test
+### Run
 
 Go to <http://localhost:8080/login>
 
@@ -262,7 +264,7 @@ Go to <http://localhost:8080/login>
 
 Go to <http://localhost:8080/lti13>
 
-### After test
+### After
 
 Refresh page of students enrolled in courses:
 
