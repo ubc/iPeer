@@ -303,7 +303,7 @@ class Lti13 extends AppModel
     public function createCourseRoster(array $data)
     {
         if ($this->Course->save($data)) {
-            $this->addUsersInIpeerRoster($this->Course->id);
+            $this->rosterUpdatesLog['addUsersInIpeerRoster'] = $this->addUsersInIpeerRoster($this->Course->id);
         }
     }
 
@@ -375,9 +375,12 @@ class Lti13 extends AppModel
      */
     public function addUsersInIpeerRoster($courseId)
     {
+        $log = array();
         foreach ($this->ltiRoster as $data) {
+            $log []= $data;
             $this->addUser($data, $courseId);
         }
+        return $log;
     }
 
     /**
