@@ -2,14 +2,13 @@
 
 ## Set up Canvas
 
-> If not already built.
+> Assuming Canvas already built in a dinghy VM.
 
 First terminal tab:
 
 ```bash
 cd ~/Code/ctlt/canvas
-dinghy destroy -f
-./script/docker_dev_setup.sh
+dinghy restart
 eval "$(dinghy env)"
 docker-compose up -d postgres
 docker cp ~/Code/ctlt/iPeer/app/config/lti13/canvas/canvas.postgresql.dump canvas_postgres_1:/tmp/
