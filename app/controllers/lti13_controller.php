@@ -19,7 +19,6 @@ use IMSGlobal\LTI\OIDC_Exception;
 class Lti13Controller extends AppController
 {
     public $uses = array('Lti13');
-    private $log_path = ROOT.'/app/tmp/logs/lti13';
 
     public function __construct()
     {
@@ -61,7 +60,7 @@ class Lti13Controller extends AppController
         $this->Lti13->launch();
         $data = $this->Lti13->getLaunchData();
 
-        $this->resetLogs();
+        $this->Lti13->resetLogs();
 
         $this->log("LTI 1.3 launch", 'lti13/launch');
         $this->log($data, 'lti13/launch');
@@ -69,9 +68,9 @@ class Lti13Controller extends AppController
         $this->roster();
 
         $data += array(
-            'log_launch' => file_get_contents($this->log_path.'/launch.log'),
-            'log_roster' => file_get_contents($this->log_path.'/roster.log'),
-            'log_user' => file_get_contents($this->log_path.'/user.log'),
+            'log_launch' => file_get_contents($this->Lti13->log_path.'/launch.log'),
+            'log_roster' => file_get_contents($this->Lti13->log_path.'/roster.log'),
+            'log_user' => file_get_contents($this->Lti13->log_path.'/user.log'),
         );
         $this->set($data);
         $this->render();
@@ -113,13 +112,5 @@ class Lti13Controller extends AppController
             return;
         }
         return $user;
-    }
-
-    private function resetLogs()
-    {
-        $filenames = glob($this->log_path.'/*.log');
-        foreach ($filenames as $filename) {
-            unlink($filename);
-        }
     }
 }

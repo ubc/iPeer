@@ -31,6 +31,7 @@ class Lti13 extends AppModel
     public $ipeerRoster = array();
     public $ltiRoster = array();
     public $rosterUpdatesLog = array();
+    public $log_path = ROOT.'/app/tmp/logs/lti13';
 
     public function __construct()
     {
@@ -372,6 +373,7 @@ class Lti13 extends AppModel
      * Add users in iPeer roster.
      *
      * @param int $courseId
+     * @return array
      */
     public function addUsersInIpeerRoster($courseId)
     {
@@ -480,7 +482,7 @@ class Lti13 extends AppModel
                 );
                 if ($this->User->UserEnrol->save($data)) {
                     $this->User->UserEnrol->id = null;
-               }
+                }
             }
         }
     }
@@ -563,5 +565,10 @@ class Lti13 extends AppModel
             return sprintf('<p class="message good-message green">%s</p>', $msg);
         }
         return $msg;
+    }
+
+    public function resetLogs()
+    {
+        array_map('unlink', glob($this->log_path.'/*.log'));
     }
 }
