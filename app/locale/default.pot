@@ -4776,6 +4776,14 @@ msgstr ""
 msgid "Compare"
 msgstr ""
 
+#: /Users/compass/projects/ipeer/src//users/go_to_class_list.ctp:20
+msgid "Update roster from Canvas"
+msgstr ""
+
+#: /Users/compass/projects/ipeer/src//users/go_to_class_list.ctp:20
+msgid "Updated roster from Canvas"
+msgstr ""
+
 #: /Users/compass/projects/ipeer/src//users/import.ctp:5
 msgid "All fields mandatory, except email and password."
 msgstr ""
