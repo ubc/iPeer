@@ -8,6 +8,15 @@ First terminal tab:
 
 ```bash
 cd ~/Code/ctlt/canvas
+dinghy start
+eval "$(dinghy env)"
+docker-compose up -d
+```
+
+OR
+
+```bash
+cd ~/Code/ctlt/canvas
 dinghy restart
 eval "$(dinghy env)"
 docker-compose up -d postgres
@@ -16,6 +25,8 @@ docker exec -it canvas_postgres_1 dropdb -U postgres canvas
 docker exec -it canvas_postgres_1 pg_restore -U postgres -C -d postgres /tmp/canvas.postgresql.dump
 docker-compose up -d
 ```
+
+Wait 3 minutes.
 
 Browse to <http://canvas.docker>
 
@@ -26,7 +37,7 @@ Second terminal tab:
 ```bash
 cd ~/Code/ctlt/iPeer
 docker-compose up -d
-docker cp ~/Code/ctlt/iPeer/app/config/lti13/canvas/ipeer.reset.sql ipeer_db:/tmp/
+docker cp ~/Code/ctlt/iPeer/app/config/lti13/ipeer/ipeer.reset.sql ipeer_db:/tmp/
 docker exec -it ipeer_db sh -c "mysql ipeer -u ipeer -p < /tmp/ipeer.reset.sql"
 ```
 
