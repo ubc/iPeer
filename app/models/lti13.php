@@ -62,14 +62,14 @@ class Lti13 extends AppModel
         try {
 
             $launch->validate();
+            $this->launchId = $launch->get_launch_id();
+            return $this->launchId;
 
         } catch (LTI_Exception $e) {
 
             echo $this->errorMessage(sprintf("Launch validation failed: %s", $e->getMessage()));
 
         }
-        $this->launchId = $launch->get_launch_id();
-        return $this->launchId;
     }
 
     /**
