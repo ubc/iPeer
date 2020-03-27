@@ -1,21 +1,13 @@
-27c27,41
-<         setcookie($name, $value, array_merge($cookie_options, $same_site_options, $options));
----
+26a27,38
 >         if (PHP_VERSION_ID < 70300) {
->             $legacy_options = [
->                 'path' => "",
+>             $options += [
+>                 'path' => "/",
 >                 'domain' => "",
+>                 'secure' => false,
 >                 'httponly' => false
 >             ];
->             extract(array_merge($legacy_options, $cookie_options, $same_site_options, $options)); // $expires, $path, $domain, $secure, $httponly, $samesite
->             setcookie($name, $value, $expires, "$path; samesite=$samesite", $domain, $secure, $httponly);
+>             extract(array_merge($cookie_options, $same_site_options, $options)); // => $expires, $path, $domain, $secure, $httponly
+>             setcookie("LEGACY_" . $name, $value, $expires, $path, $domain, $secure, $httponly);
+>             return $this;
 >         }
->         else {
->             setcookie($name, $value, array_merge($cookie_options, $same_site_options, $options));
 > 
->             // Set a second fallback cookie in the event that "SameSite" is not supported
->             setcookie("LEGACY_" . $name, $value, array_merge($cookie_options, $options));
->         }
-29,30d42
-<         // Set a second fallback cookie in the event that "SameSite" is not supported
-<         setcookie("LEGACY_" . $name, $value, array_merge($cookie_options, $options));
