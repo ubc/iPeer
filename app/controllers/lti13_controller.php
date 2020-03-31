@@ -36,12 +36,12 @@ class Lti13Controller extends AppController
     {
         $json = $this->Lti13->getRegistrationJson();
         $this->set('json', $json);
-        $this->render();
     }
 
     public function login()
     {
         $login = LTI_OIDC_Login::new($this->Lti13->db);
+
         try {
 
             $url = Router::url('/lti13/launch', true);
@@ -57,60 +57,54 @@ class Lti13Controller extends AppController
 
     public function launch()
     {
-        $this->Lti13->launch();
-        $data = $this->Lti13->getLaunchData();
+        $launch = $this->Lti13->launch();
+        $data['referer'] = $this->referer();
+        $data += $this->Lti13->getData($launch->get_launch_id());
 
         $this->Lti13->resetLogs();
-
         $this->log("LTI 1.3 launch", 'lti13/launch');
-        $this->log($data, 'lti13/launch');
+        $this->log(json_encode($data, 448), 'lti13/launch');
 
-        $this->roster();
-
-        $data += array(
-            'log_launch' => file_get_contents($this->Lti13->log_path.'/launch.log'),
-            'log_roster' => file_get_contents($this->Lti13->log_path.'/roster.log'),
-            'log_user' => file_get_contents($this->Lti13->log_path.'/user.log'),
-        );
+        if ($this->referer() != '/') {
+            $this->redirect($this->referer(array('action' => 'roster')));
+        }
         $this->set($data);
-        $this->render();
     }
 
     public function roster()
     {
-        $this->Lti13->roster();
+        $this->Lti13->roster($launch_id);
 
         $this->log("LTI 1.3 roster updates", 'lti13/roster');
         $this->log($this->Lti13->rosterUpdatesLog, 'lti13/roster');
 
+        $this->redirect($this->referer(array('action' => 'signin')));
+    }
+
+    public function signin()
+    {
         try {
 
-            $user = $this->signInUser();
+            if (!$user = $this->Lti13->findUserByLtiUserId()) {
+                throw new LTI_Exception("LTI user ID not found.");
+                return;
+            }
+
+            $id = $user['User']['id'];
+            if (!$this->Auth->login($id)) {
+                throw new LTI_Exception(sprintf("Access denied to user ID %s.", $id));
+                return;
+            }
 
             $this->log("LTI 1.3 user signed in", 'lti13/user');
             $this->log($user, 'lti13/user');
 
-            echo $this->Lti13->successMessage(sprintf("Signed in as `%s`", $user['User']['username']));
-            // $this->redirect('/home');
+            return;
 
         } catch (LTI_Exception $e) {
 
             echo $this->Lti13->errorMessage($e->getMessage());
 
         }
-    }
-
-    public function signInUser()
-    {
-        if (!$user = $this->Lti13->findUserByLtiUserId()) {
-            throw new LTI_Exception("LTI user ID not found.");
-            return;
-        }
-        $id = $user['User']['id'];
-        if (!$this->Auth->login($id)) {
-            throw new LTI_Exception(sprintf("Access denied to user ID %s.", $id));
-            return;
-        }
-        return $user;
     }
 }
