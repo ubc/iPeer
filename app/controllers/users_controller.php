@@ -2048,7 +2048,7 @@ class UsersController extends AppController
     {
         // Update roster with LTI 1.3
         $this->loadModel('Lti13');
-        $this->Lti13->launch();
+        // $this->Lti13->launch();
         $this->Lti13->roster();
 
         // Refresh page

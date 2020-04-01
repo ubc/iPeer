@@ -182,14 +182,14 @@ class Lti13 extends AppModel
                 ->set_title('My Resource');
             $dlResponse = $dl->get_response_jwt(array($resource));
             return [
-                'JWT HEADER'  => $this->jwtDecode($dlResponse, 0),
-                'JWT PAYLOAD' => $this->jwtDecode($dlResponse, 1),
+                'JWT HEADER' => $this->jwtDecode($dlResponse, 0),
+                'JWT BODY'   => $this->jwtDecode($dlResponse, 1),
             ];
         }
     }
 
     /**
-     * Decode JWT header or payload.
+     * Decode JWT header or body.
      *
      * @param string $jwt
      * @param int $i 0 = header, 1 = payload, 2 = signature
@@ -209,15 +209,15 @@ class Lti13 extends AppModel
     {
         try {
 
-            // Get JWT payload after LTI launch
+            // Get JWT body after LTI launch
             $launch = LTI_Message_Launch::from_cache($launch_id, $this->db);
             $this->jwtBody = $launch->get_launch_data();
 
-            // Get course label and title from LTI launch's JWT payload
+            // Get course label and title from LTI launch's JWT body
             $this->ltiCourse = $this->getLtiCourseData();
 
             // Call LTI Resource Link to get LTI roster data
-            if ($this->ltiRoster = $this->getNrpsMembers()) {
+            if ($this->ltiRoster = $this->getNrpsMembers($launch_id)) {
                 // Update or create iPeer course roster from the LTI data
                 $this->saveCourseRoster();
             }
@@ -230,7 +230,7 @@ class Lti13 extends AppModel
     }
 
     /**
-     * Check if course data is available in JWT payload and get `label` and `title` from it.
+     * Check if course data is available in JWT body and get `label` and `title` from it.
      *
      * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L55
      * @return array|null

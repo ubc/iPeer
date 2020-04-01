@@ -1,3 +1,5 @@
+<!-- Used for demo only -->
+
 <h2>LTI 1.3 tool debug <u>LTI_Message_Launch</u> data.</h2>
 
 <?php if (!empty($nrps_members)): ?>

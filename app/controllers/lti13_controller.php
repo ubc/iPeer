@@ -32,6 +32,10 @@ class Lti13Controller extends AppController
         $this->set('title_for_layout', "LTI 1.3");
     }
 
+    /**
+     * Used for demo only
+     * View: app/views/lti13/index.ctp
+     */
     public function index()
     {
         $json = $this->Lti13->getRegistrationJson();
@@ -55,29 +59,34 @@ class Lti13Controller extends AppController
         }
     }
 
+    /**
+     * Used for demo only
+     * View: app/views/lti13/launch.ctp
+     */
     public function launch()
     {
         $launch = $this->Lti13->launch();
         $data['referer'] = $this->referer();
         $data += $this->Lti13->getData($launch->get_launch_id());
-
         $this->Lti13->resetLogs();
-        $this->log("LTI 1.3 launch", 'lti13/launch');
         $this->log(json_encode($data, 448), 'lti13/launch');
 
-        if ($this->referer() != '/') {
-            $this->redirect($this->referer(array('action' => 'roster')));
-        }
+        $this->Lti13->roster($launch->get_launch_id());
+        $this->log(json_encode($this->Lti13->rosterUpdatesLog, 448), 'lti13/roster');
+
+        // $this->redirect(array('action' => 'signin'));
+
+        // if ($this->referer() != '/') {
+            // $this->redirect($this->referer(array('action' => 'roster')));
+        // }
         $this->set($data);
     }
 
     public function roster()
     {
-        $this->Lti13->roster($launch_id);
-
-        $this->log("LTI 1.3 roster updates", 'lti13/roster');
+        $launch = $this->Lti13->launch();
+        $this->Lti13->roster($launch->get_launch_id());
         $this->log($this->Lti13->rosterUpdatesLog, 'lti13/roster');
-
         $this->redirect($this->referer(array('action' => 'signin')));
     }
 
@@ -96,9 +105,7 @@ class Lti13Controller extends AppController
                 return;
             }
 
-            $this->log("LTI 1.3 user signed in", 'lti13/user');
-            $this->log($user, 'lti13/user');
-
+            $this->log($user, 'lti13/signin');
             return;
 
         } catch (LTI_Exception $e) {
