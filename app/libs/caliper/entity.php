@@ -40,12 +40,13 @@ class CaliperEntity {
         $user_session = new \SessionComponent();
         $user = $user_session->read('Auth.User');
         $session_id = !is_null($user_session->id()) ? $user_session->id() : '';
+        $session_id_hash = sha1($session_id);
         $session_start = $user_session->read('session_start');
         $session_end = $user_session->read('session_end');
 
-        $session = (new Session( ResourceIRI::user_session($session_id)) )
+        $session = (new Session( ResourceIRI::user_session($session_id_hash)) )
             ->setUser(CaliperActor::generateActor($user))
-            ->setClient( CaliperEntity::client( $session_id ) );
+            ->setClient( CaliperEntity::client( $session_id_hash ) );
 
         if ($session_start) {
             $session->setStartedAtTime(new \DateTime('@'. $session_start));
@@ -72,8 +73,8 @@ class CaliperEntity {
 	/**
 	 * Generates a SoftwareApplication entity
 	 */
-	public static function client( $session_id ) {
-		$user_client = ( new SoftwareApplication( ResourceIRI::user_client( $session_id ) ) );
+	public static function client( $session_id_hash ) {
+		$user_client = ( new SoftwareApplication( ResourceIRI::user_client( $session_id_hash ) ) );
 
 		if ( array_key_exists( 'HTTP_HOST', $_SERVER ) ) {
 			$user_client->setHost( $_SERVER['HTTP_HOST'] );
