@@ -84,12 +84,12 @@ class CaliperEntity {
 		}
 
 		// get ip address if available.
-		if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
-			$user_client->setIpAddress( $_SERVER['HTTP_CLIENT_IP'] );
-		} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+		if ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
 			$user_client->setIpAddress( $_SERVER['HTTP_X_FORWARDED_FOR'] );
 		} elseif ( ! empty( $_SERVER['REMOTE_ADDR'] ) ) {
 			$user_client->setIpAddress( $_SERVER['REMOTE_ADDR'] );
+		} elseif ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+			$user_client->setIpAddress( $_SERVER['HTTP_CLIENT_IP'] );
 		}
 
 		return $user_client;
