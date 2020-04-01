@@ -154,7 +154,6 @@ class CaliperEventRubricHooksTest extends CaliperAuthTestCase
         );
 
         $this->expected_rubric_event_question_1_scale = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/FeedbackProfile-extension',
             'id' => 'http://test.ipeer.com/events/view/2/questions/1/scale',
             'type' => 'LikertScale',
             'extensions' => array(
@@ -186,7 +185,6 @@ class CaliperEventRubricHooksTest extends CaliperAuthTestCase
         );
 
         $this->expected_rubric_event_question_2_scale = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/FeedbackProfile-extension',
             'id' => 'http://test.ipeer.com/events/view/2/questions/2/scale',
             'type' => 'LikertScale',
             'extensions' => array(
@@ -218,7 +216,6 @@ class CaliperEventRubricHooksTest extends CaliperAuthTestCase
         );
 
         $this->expected_rubric_event_question_3_scale = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/FeedbackProfile-extension',
             'id' => 'http://test.ipeer.com/events/view/2/questions/3/scale',
             'type' => 'LikertScale',
             'extensions' => array(
@@ -287,7 +284,6 @@ class CaliperEventRubricHooksTest extends CaliperAuthTestCase
         );
 
         $this->expected_rubric_question_1_scale = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/FeedbackProfile-extension',
             'id' => 'http://test.ipeer.com/rubrics/view/1/questions/1/scale',
             'type' => 'LikertScale',
             'extensions' => array(
@@ -310,7 +306,6 @@ class CaliperEventRubricHooksTest extends CaliperAuthTestCase
             'isPartOf' => $this->expected_rubric,
         );
         $this->expected_rubric_question_2_scale = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/FeedbackProfile-extension',
             'id' => 'http://test.ipeer.com/rubrics/view/1/questions/2/scale',
             'type' => 'LikertScale',
             'extensions' => array(
@@ -333,7 +328,6 @@ class CaliperEventRubricHooksTest extends CaliperAuthTestCase
             'isPartOf' => $this->expected_rubric,
         );
         $this->expected_rubric_question_3_scale = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/FeedbackProfile-extension',
             'id' => 'http://test.ipeer.com/rubrics/view/1/questions/3/scale',
             'type' => 'LikertScale',
             'extensions' => array(
@@ -384,6 +378,7 @@ class CaliperEventRubricHooksTest extends CaliperAuthTestCase
         $expected_events = array();
         $expected_events[] = array(
             'type' => 'ResourceManagementEvent',
+            'profile' => 'ResourceManagementProfile',
             'action' => 'Deleted',
             'object' => $this->expected_rubric_event,
             'group' => $this->expected_group,
@@ -392,6 +387,7 @@ class CaliperEventRubricHooksTest extends CaliperAuthTestCase
         foreach($this->expected_rubric_event_questions as $expected_rubric_event_question) {
             $expected_events[] = array(
                 'type' => 'ResourceManagementEvent',
+                'profile' => 'ResourceManagementProfile',
                 'action' => 'Deleted',
                 'object' => $expected_rubric_event_question,
                 'group' => $this->expected_group,
@@ -453,6 +449,7 @@ class CaliperEventRubricHooksTest extends CaliperAuthTestCase
             if ($created) {
                 $expected_events[] = array(
                     'type' => 'ResourceManagementEvent',
+                    'profile' => 'ResourceManagementProfile',
                     'action' => 'Copied',
                     'object' => $this->expected_rubric,
                     'generated' => $this->expected_rubric_event,
@@ -462,6 +459,7 @@ class CaliperEventRubricHooksTest extends CaliperAuthTestCase
                 foreach($this->expected_rubric_event_questions as $index => $expected_rubric_event_question) {
                     $expected_events[] = array(
                         'type' => 'ResourceManagementEvent',
+                        'profile' => 'ResourceManagementProfile',
                         'action' => 'Copied',
                         'object' => $this->expected_rubric_questions[$index],
                         'generated' => $expected_rubric_event_question,
@@ -472,6 +470,7 @@ class CaliperEventRubricHooksTest extends CaliperAuthTestCase
             } else {
                 $expected_events[] = array(
                     'type' => 'ResourceManagementEvent',
+                    'profile' => 'ResourceManagementProfile',
                     'action' => 'Modified',
                     'object' => $this->expected_rubric_event,
                     'group' => $this->expected_group,
@@ -508,7 +507,6 @@ class CaliperEventRubricHooksTest extends CaliperAuthTestCase
                     $expected_rubric_event_question = $this->expected_rubric_event_questions[$i];
 
                     $generated = array(
-                        '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/SurveyProfile-extension',
                         'id' => NULL,
                         'type' => 'RatingScaleResponse',
                         'extensions' => array(
@@ -554,6 +552,7 @@ class CaliperEventRubricHooksTest extends CaliperAuthTestCase
 
                     $expected_events[] = array(
                         'type' => 'AssessmentItemEvent',
+                        'profile' => 'AssessmentProfile',
                         'action' => 'Completed',
                         'object' => array(
                             'id' => 'http://test.ipeer.com/events/view/2/questions/'.$question_id.'/group/1/user/'.$user_id,
@@ -609,6 +608,7 @@ class CaliperEventRubricHooksTest extends CaliperAuthTestCase
                     }
                     $expected_events[] = array(
                         'type' => 'FeedbackEvent',
+                        'profile' => 'FeedbackProfile',
                         'action' => 'Ranked',
                         'object' => $expected_group_member,
                         'generated' => $generated,
@@ -653,6 +653,7 @@ class CaliperEventRubricHooksTest extends CaliperAuthTestCase
 
                 $expected_events[] = array(
                     'type' => 'FeedbackEvent',
+                    'profile' => 'FeedbackProfile',
                     'action' => 'Ranked',
                     'object' => $expected_group_member,
                     'generated' => $generated,
@@ -663,8 +664,17 @@ class CaliperEventRubricHooksTest extends CaliperAuthTestCase
         }
         $expected_events[] = array(
             'type' => 'AssessmentEvent',
+            'profile' => 'AssessmentProfile',
             'action' => 'Submitted',
             'object' => $this->expected_rubric_event,
+            'group' => $this->expected_group,
+            'membership' => $this->expected_membership,
+        );
+        $expected_events[] = array(
+            'type' => 'ToolUseEvent',
+            'profile' => 'ToolUseProfile',
+            'action' => 'Used',
+            'object' => $this->expected_ed_app,
             'group' => $this->expected_group,
             'membership' => $this->expected_membership,
         );

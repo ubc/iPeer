@@ -8,7 +8,7 @@
   "require": {
       "compass/cake-guard": "1.0.5",
       "nategood/httpful": "^0.2.20",
-      "imsglobal/caliper": "dev-develop#68a084cfc5c3d3c757cf410e380e0595b7e964ca as 1.1.0"
+      "imsglobal/caliper": "dev-develop#c7e34e230abc7bbb647f8f94245cb649f6191bcd as 1.2.0"
   },
   "require-dev": {
     "roave/security-advisories": "dev-master",

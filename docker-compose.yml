@@ -61,7 +61,7 @@ services:
       - "8080:80"
     depends_on:
       - app
-      
+
   # for running unit tests
   app-unittest:
     image: ubcctlt/ipeer-app

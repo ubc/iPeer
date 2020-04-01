@@ -3,14 +3,10 @@ namespace caliper;
 
 use caliper\ResourceIRI;
 use caliper\CaliperSensor;
-use IMSGlobal\Caliper\entities\agent\Person;
 use IMSGlobal\Caliper\entities\agent\SoftwareApplication;
-use IMSGlobal\Caliper\entities\EntityType;
 use IMSGlobal\Caliper\entities\session\Session;
 use IMSGlobal\Caliper\entities\reading\WebPage;
 use IMSGlobal\Caliper\entities\lis\CourseOffering;
-use IMSGlobal\Caliper\entities\DigitalResource;
-use IMSGlobal\Caliper\entities\DigitalResourceCollection;
 use IMSGlobal\Caliper\entities\assessment\Assessment;
 use IMSGlobal\Caliper\entities\assessment\AssessmentItem;
 use IMSGlobal\Caliper\entities\survey\Questionnaire;
@@ -48,7 +44,8 @@ class CaliperEntity {
         $session_end = $user_session->read('session_end');
 
         $session = (new Session( ResourceIRI::user_session($session_id)) )
-            ->setUser(CaliperActor::generateActor($user));
+            ->setUser(CaliperActor::generateActor($user))
+            ->setClient( CaliperEntity::client( $session_id ) );
 
         if ($session_start) {
             $session->setStartedAtTime(new \DateTime('@'. $session_start));
@@ -60,8 +57,43 @@ class CaliperEntity {
             $duration = $session_end - $session_start;
             $session->setDuration(CaliperSensor::iso8601_duration($duration));
         }
+
+		$extensions = [];
+		if ( array_key_exists( 'HTTP_REFERER', $_SERVER ) ) {
+			$extensions['referer'] = $_SERVER['HTTP_REFERER'];
+		}
+		if ( [] !== $extensions ) {
+			$session->setExtensions( $extensions );
+        }
+
         return $session;
     }
+
+	/**
+	 * Generates a SoftwareApplication entity
+	 */
+	public static function client( $session_id ) {
+		$user_client = ( new SoftwareApplication( ResourceIRI::user_client( $session_id ) ) );
+
+		if ( array_key_exists( 'HTTP_HOST', $_SERVER ) ) {
+			$user_client->setHost( $_SERVER['HTTP_HOST'] );
+		}
+
+		if ( array_key_exists( 'HTTP_USER_AGENT', $_SERVER ) ) {
+			$user_client->setUserAgent( $_SERVER['HTTP_USER_AGENT'] );
+		}
+
+		// get ip address if available.
+		if ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+			$user_client->setIpAddress( $_SERVER['HTTP_X_FORWARDED_FOR'] );
+		} elseif ( ! empty( $_SERVER['REMOTE_ADDR'] ) ) {
+			$user_client->setIpAddress( $_SERVER['REMOTE_ADDR'] );
+		} elseif ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+			$user_client->setIpAddress( $_SERVER['HTTP_CLIENT_IP'] );
+		}
+
+		return $user_client;
+	}
 
     public static function webpage($relativePath) {
         if (!is_string($relativePath)) {

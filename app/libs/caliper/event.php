@@ -1,7 +1,6 @@
 <?php
 namespace caliper;
 
-use caliper\ResourceIRI;
 use caliper\CaliperActor;
 use caliper\CaliperEntity;
 use IMSGlobal\Caliper\events\Event;
@@ -20,21 +19,6 @@ class CaliperEvent {
 
         if (!$event->getEventTime()) {
             $event->setEventTime(new \DateTime('@'. time()));
-        }
-
-        $extensions = $event->getExtensions() ?: [];
-        if (getenv('HTTP_USER_AGENT')) {
-            $extensions['browser-info']['userAgent'] = getenv('HTTP_USER_AGENT');
-        }
-        if (getenv("HTTP_REFERER")) {
-            $extensions['browser-info']['referer'] = getenv("HTTP_REFERER");
-        }
-        if (CaliperEvent::_getIP()) {
-            $extensions['browser-info']['ipAddress'] = self::_getIP();
-        }
-
-        if ([] !== $extensions) {
-            $event->setExtensions($extensions);
         }
 
         if (!is_null($course)) {
@@ -92,24 +76,5 @@ class CaliperEvent {
             }
         }
         return $roles;
-    }
-
-    # from https://stackoverflow.com/a/15699240
-    private static function _getIP() {
-        $ipaddress = NULL;
-        if (getenv('HTTP_CLIENT_IP')) {
-            $ipaddress = getenv('HTTP_CLIENT_IP');
-        } else if(getenv('HTTP_X_FORWARDED_FOR')) {
-            $ipaddress = getenv('HTTP_X_FORWARDED_FOR');
-        } else if(getenv('HTTP_X_FORWARDED')) {
-            $ipaddress = getenv('HTTP_X_FORWARDED');
-        } else if(getenv('HTTP_FORWARDED_FOR')) {
-            $ipaddress = getenv('HTTP_FORWARDED_FOR');
-        } else if(getenv('HTTP_FORWARDED')) {
-            $ipaddress = getenv('HTTP_FORWARDED');
-        } else if(getenv('REMOTE_ADDR')) {
-            $ipaddress = getenv('REMOTE_ADDR');
-        }
-        return $ipaddress;
     }
 }

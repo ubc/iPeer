@@ -152,7 +152,6 @@ class CaliperEventMixevalHooksTest extends CaliperAuthTestCase
         );
 
         $this->expected_mixeval_event_question_1_scale = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/FeedbackProfile-extension',
             'id' => 'http://test.ipeer.com/events/view/3/questions/1/scale',
             'type' => 'LikertScale',
             'scalePoints' => 5,
@@ -184,7 +183,6 @@ class CaliperEventMixevalHooksTest extends CaliperAuthTestCase
         );
 
         $this->expected_mixeval_event_question_2_scale = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/FeedbackProfile-extension',
             'id' => 'http://test.ipeer.com/events/view/3/questions/2/scale',
             'type' => 'LikertScale',
             'scalePoints' => 5,
@@ -216,7 +214,6 @@ class CaliperEventMixevalHooksTest extends CaliperAuthTestCase
         );
 
         $this->expected_mixeval_event_question_3_scale = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/FeedbackProfile-extension',
             'id' => 'http://test.ipeer.com/events/view/3/questions/3/scale',
             'type' => 'LikertScale',
             'scalePoints' => 5,
@@ -340,7 +337,6 @@ class CaliperEventMixevalHooksTest extends CaliperAuthTestCase
         );
 
         $this->expected_mixeval_question_1_scale = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/FeedbackProfile-extension',
             'id' => 'http://test.ipeer.com/mixevals/view/1/questions/1/scale',
             'type' => 'LikertScale',
             'scalePoints' => 5,
@@ -363,7 +359,6 @@ class CaliperEventMixevalHooksTest extends CaliperAuthTestCase
             'isPartOf' => $this->expected_mixeval,
         );
         $this->expected_mixeval_question_2_scale = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/FeedbackProfile-extension',
             'id' => 'http://test.ipeer.com/mixevals/view/1/questions/2/scale',
             'type' => 'LikertScale',
             'scalePoints' => 5,
@@ -386,7 +381,6 @@ class CaliperEventMixevalHooksTest extends CaliperAuthTestCase
             'isPartOf' => $this->expected_mixeval,
         );
         $this->expected_mixeval_question_3_scale = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/FeedbackProfile-extension',
             'id' => 'http://test.ipeer.com/mixevals/view/1/questions/3/scale',
             'type' => 'LikertScale',
             'scalePoints' => 5,
@@ -482,6 +476,7 @@ class CaliperEventMixevalHooksTest extends CaliperAuthTestCase
         $expected_events = array();
         $expected_events[] = array(
             'type' => 'ResourceManagementEvent',
+            'profile' => 'ResourceManagementProfile',
             'action' => 'Deleted',
             'object' => $this->expected_mixeval_event,
             'group' => $this->expected_group,
@@ -490,6 +485,7 @@ class CaliperEventMixevalHooksTest extends CaliperAuthTestCase
         foreach($this->expected_mixeval_event_questions as $expected_mixeval_event_question) {
             $expected_events[] = array(
                 'type' => 'ResourceManagementEvent',
+                'profile' => 'ResourceManagementProfile',
                 'action' => 'Deleted',
                 'object' => $expected_mixeval_event_question,
                 'group' => $this->expected_group,
@@ -551,6 +547,7 @@ class CaliperEventMixevalHooksTest extends CaliperAuthTestCase
             if ($created) {
                 $expected_events[] = array(
                     'type' => 'ResourceManagementEvent',
+                    'profile' => 'ResourceManagementProfile',
                     'action' => 'Copied',
                     'object' => $this->expected_mixeval,
                     'generated' => $this->expected_mixeval_event,
@@ -560,6 +557,7 @@ class CaliperEventMixevalHooksTest extends CaliperAuthTestCase
                 foreach($this->expected_mixeval_event_questions as $index => $expected_mixeval_event_question) {
                     $expected_events[] = array(
                         'type' => 'ResourceManagementEvent',
+                        'profile' => 'ResourceManagementProfile',
                         'action' => 'Copied',
                         'object' => $this->expected_mixeval_questions[$index],
                         'generated' => $expected_mixeval_event_question,
@@ -570,6 +568,7 @@ class CaliperEventMixevalHooksTest extends CaliperAuthTestCase
             } else {
                 $expected_events[] = array(
                     'type' => 'ResourceManagementEvent',
+                    'profile' => 'ResourceManagementProfile',
                     'action' => 'Modified',
                     'object' => $this->expected_mixeval_event,
                     'group' => $this->expected_group,
@@ -607,7 +606,6 @@ class CaliperEventMixevalHooksTest extends CaliperAuthTestCase
 
                     if (in_array($question_id, array(1, 2, 3))) {
                         $generated = array(
-                            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/SurveyProfile-extension',
                             'id' => NULL,
                             'type' => 'RatingScaleResponse',
                             'extensions' => array(
@@ -647,7 +645,6 @@ class CaliperEventMixevalHooksTest extends CaliperAuthTestCase
                         }
                     } else if (in_array($question_id, array(4, 5, 6))) {
                         $generated = array(
-                            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/SurveyProfile-extension',
                             'id' => NULL,
                             'type' => 'OpenEndedResponse',
                             'extensions' => array(
@@ -691,6 +688,7 @@ class CaliperEventMixevalHooksTest extends CaliperAuthTestCase
 
                     $expected_events[] = array(
                         'type' => 'AssessmentItemEvent',
+                        'profile' => 'AssessmentProfile',
                         'action' => 'Completed',
                         'object' => array(
                             'id' => 'http://test.ipeer.com/events/view/3/questions/'.$question_id.'/group/1/user/'.$user_id,
@@ -726,6 +724,7 @@ class CaliperEventMixevalHooksTest extends CaliperAuthTestCase
                         }
                         $expected_events[] = array(
                             'type' => 'FeedbackEvent',
+                            'profile' => 'FeedbackProfile',
                             'action' => 'Ranked',
                             'object' => $expected_group_member,
                             'generated' => $generated,
@@ -770,6 +769,7 @@ class CaliperEventMixevalHooksTest extends CaliperAuthTestCase
                         }
                         $expected_events[] = array(
                             'type' => 'FeedbackEvent',
+                            'profile' => 'FeedbackProfile',
                             'action' => 'Commented',
                             'object' => $expected_group_member,
                             'generated' => $generated,
@@ -805,6 +805,7 @@ class CaliperEventMixevalHooksTest extends CaliperAuthTestCase
 
                 $expected_events[] = array(
                     'type' => 'FeedbackEvent',
+                    'profile' => 'FeedbackProfile',
                     'action' => 'Ranked',
                     'object' => $expected_group_member,
                     'generated' => $generated,
@@ -815,8 +816,17 @@ class CaliperEventMixevalHooksTest extends CaliperAuthTestCase
         }
         $expected_events[] = array(
             'type' => 'AssessmentEvent',
+            'profile' => 'AssessmentProfile',
             'action' => 'Submitted',
             'object' => $this->expected_mixeval_event,
+            'group' => $this->expected_group,
+            'membership' => $this->expected_membership,
+        );
+        $expected_events[] = array(
+            'type' => 'ToolUseEvent',
+            'profile' => 'ToolUseProfile',
+            'action' => 'Used',
+            'object' => $this->expected_ed_app,
             'group' => $this->expected_group,
             'membership' => $this->expected_membership,
         );

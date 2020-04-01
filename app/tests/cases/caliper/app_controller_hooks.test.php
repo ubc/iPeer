@@ -86,6 +86,7 @@ class CaliperAppControllerHooksTest extends CaliperAuthTestCase
         $this->setupSession('/home/index');
         $expected_event = array(
             'type' => 'NavigationEvent',
+            'profile' => 'ReadingProfile',
             'action' => 'NavigatedTo',
             'object' => array(
                 'id' => 'http://test.ipeer.com/',
@@ -119,6 +120,7 @@ class CaliperAppControllerHooksTest extends CaliperAuthTestCase
         $this->setupSession();
         $expected_event = array(
             'type' => 'SessionEvent',
+            'profile' => 'SessionProfile',
             'action' => 'LoggedIn',
             'object' => $this->expected_ed_app
         );
