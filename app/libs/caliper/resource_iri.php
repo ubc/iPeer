@@ -20,15 +20,15 @@ class ResourceIRI {
         return self::getBaseUrl() . "/users/view/$user_id";
     }
 
-    public static function user_session($session_id) {
-        if (!is_string($session_id)) {
+    public static function user_session($session_id_hash) {
+        if (!is_string($session_id_hash)) {
             throw new \InvalidArgumentException(__METHOD__ . ': string expected');
         }
-        return self::getBaseUrl() . "/session/$session_id";
+        return self::getBaseUrl() . "/session/$session_id_hash";
     }
 
-	public static function user_client( $session_id ) {
-		return self::user_session( $session_id ) . '#client';
+	public static function user_client( $session_id_hash ) {
+		return self::user_session( $session_id_hash ) . '#client';
 	}
 
     public static function webpage($relativePath) {
