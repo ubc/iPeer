@@ -83,8 +83,8 @@ class Lti13 extends AppModel
         return array(
             'launch_id'    => $launch_id,
             'message_type' => $jwtBody['https://purl.imsglobal.org/spec/lti/claim/message_type'],
-            'post_as_json' => $_POST,
-            'jwt_header'   => $this->jwtHeader(),
+            '$_POST'       => $_POST,
+            'jwt_header'   => json_decode($this->jwtHeader(), 448),
             'jwt_body'     => $jwtBody,
             'nrps_members' => $this->getNrpsMembers($launch_id),
             'ags_grades'   => $this->getAgsGrades($launch_id),
@@ -100,7 +100,7 @@ class Lti13 extends AppModel
     private function jwtHeader()
     {
         if ($jwt = @$_REQUEST['id_token']) {
-            return $this->jwtDecode($jwt, 0);
+            return JWT::urlsafeB64Decode(explode('.', $jwt)[0]);
         }
     }
 
@@ -181,23 +181,12 @@ class Lti13 extends AppModel
                 ->set_custom_params(array('my_param' => '\$my_param'))
                 ->set_title('My Resource');
             $dlResponse = $dl->get_response_jwt(array($resource));
-            return [
-                'JWT HEADER' => $this->jwtDecode($dlResponse, 0),
-                'JWT BODY'   => $this->jwtDecode($dlResponse, 1),
-            ];
+            $dlJwt = explode('.', $dlResponse);
+            return array(
+                'JWT HEADER' => $dlJwt[0],
+                'JWT BODY'   => $dlJwt[1],
+            );
         }
-    }
-
-    /**
-     * Decode JWT header or body.
-     *
-     * @param string $jwt
-     * @param int $i 0 = header, 1 = payload, 2 = signature
-     * @return array
-     */
-    private function jwtDecode($jwt, $i)
-    {
-        return json_decode(JWT::urlsafeB64Decode(explode('.', $jwt)[$i]));
     }
 
     /**
