@@ -2038,21 +2038,4 @@ class UsersController extends AppController
         $this->set('numDue', $numDue);
         $this->render('student_events');
     }
-
-    /**
-     * Update roster from Canvas
-     *
-     * @param mixed $courseId the course id to list users for
-     */
-    function updateRosterFromCanvas($courseId)
-    {
-        // Update roster with LTI 1.3
-        $this->loadModel('Lti13');
-        // $this->Lti13->launch();
-        $this->Lti13->roster();
-
-        // Refresh page
-        $this->Session->setFlash(__('Updated roster from Canvas', true), 'good');
-        $this->redirect(array('action'=>'goToClassList', $courseId));
-    }
 }

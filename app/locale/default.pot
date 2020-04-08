@@ -4776,12 +4776,16 @@ msgstr ""
 msgid "Compare"
 msgstr ""
 
-#: /Users/compass/projects/ipeer/src//users/go_to_class_list.ctp:20
+#: /Users/compass/projects/ipeer/src//users/go_to_class_list.ctp
 msgid "Update roster from Canvas"
 msgstr ""
 
-#: /Users/compass/projects/ipeer/src//users/go_to_class_list.ctp:20
+#: 
 msgid "Updated roster from Canvas"
+msgstr ""
+
+#: 
+msgid "LTI 1.3 launch success"
 msgstr ""
 
 #: /Users/compass/projects/ipeer/src//users/import.ctp:5

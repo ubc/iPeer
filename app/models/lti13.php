@@ -1,16 +1,11 @@
 <?php
 App::import('Lib', 'Lti13Bootstrap');
 App::import('Lib', 'LTI13Database', array('file'=>'lti13'.DS.'LTI13Database.php'));
-App::import('Lib', 'LTI_Assignments_Grades_Service_Override', array('file'=>'lti13'.DS.'LTI_Assignments_Grades_Service_Override.php'));
 
 use App\LTI13\LTI13Database;
-use App\LTI13\LTI_Assignments_Grades_Service_Override;
 use Firebase\JWT\JWT;
-use IMSGlobal\LTI\LTI_Deep_Link_Resource;
 use IMSGlobal\LTI\LTI_Exception;
-use IMSGlobal\LTI\LTI_Lineitem;
 use IMSGlobal\LTI\LTI_Message_Launch;
-use IMSGlobal\LTI\LTI_Service_Connector;
 
 /**
  * LTI 1.3 Model
@@ -57,15 +52,62 @@ class Lti13 extends AppModel
      */
     public function launch()
     {
-        $launch = LTI_Message_Launch::new($this->db);
         try {
 
+            $launch = LTI_Message_Launch::new($this->db);
             $launch->validate();
             return $launch;
 
         } catch (LTI_Exception $e) {
 
-            echo $this->errorMessage(sprintf("Launch validation failed: %s", $e->getMessage()));
+            printf("Launch validation failed: %s", $e->getMessage());
+
+        }
+    }
+
+    /**
+     * Get LTI_Message_Launch object from Cache.
+     *
+     * @return LTI_Message_Launch
+     */
+    public function launchFromCache()
+    {
+        $launchId = $this->getLaunchIdFromCache();
+        return LTI_Message_Launch::from_cache($launchId, $this->db);
+    }
+
+    /**
+     * Get launch ID from LTI cache
+     *
+     * @see IMSGlobal\LTI\Cache
+     * @return string
+     */
+    public function getLaunchIdFromCache()
+    {
+        try {
+
+            if (!$json = file_get_contents(sys_get_temp_dir() . '/lti_cache.txt')) {
+                throw new LTI_Exception("LTI cache is empty.");
+                return;
+            }
+
+            $assoc = json_decode($json, true);
+            if (!$keys = preg_grep("/^lti1p3_launch_/", array_keys($assoc))) {
+                throw new LTI_Exception("LTI launch ID not found in LTI cache.");
+                return;
+            }
+
+            $keys = array_values($keys);
+            if (count($keys) > 1) {
+                throw new LTI_Exception("More than one LTI launch ID found in LTI cache.");
+                return;
+            }
+
+            return $keys[0];
+
+        } catch (LTI_Exception $e) {
+
+            echo $e->getMessage();
 
         }
     }
@@ -73,29 +115,35 @@ class Lti13 extends AppModel
     /**
      * Encode the LTI_Message_Launch data object into JSON.
      *
-     * @param string $launch_id
      * @return string
      */
-    public function getData($launch_id)
+    public function getData()
     {
-        $launch = LTI_Message_Launch::from_cache($launch_id, $this->db);
+        $launch = $this->launchFromCache();
         $jwtBody = $launch->get_launch_data();
         return array(
-            'launch_id'    => $launch_id,
-            'message_type' => $jwtBody['https://purl.imsglobal.org/spec/lti/claim/message_type'],
+            'launch_id'    => $launch->get_launch_id(),
+            'message_type' => $jwtBody["https://purl.imsglobal.org/spec/lti/claim/message_type"],
             '$_POST'       => $_POST,
             'jwt_header'   => json_decode($this->jwtHeader(), 448),
             'jwt_body'     => $jwtBody,
-            'nrps_members' => $this->getNrpsMembers($launch_id),
-            'ags_grades'   => $this->getAgsGrades($launch_id),
-            'dl_response'  => $this->getResponseJwt($launch_id),
+            'nrps_members' => $this->getNrpsMembers(),
         );
+    }
+
+    public function getCourseId()
+    {
+        $launch = $this->launchFromCache();
+        $jwtBody = $launch->get_launch_data();
+        $label = $jwtBody["https://purl.imsglobal.org/spec/lti/claim/context"]["label"];
+        $data = $this->findCourseByLabel($label);
+        return $data['Course']['id'];
     }
 
     /**
      * Get JWT header.
      *
-     * @return array
+     * @return string
      */
     private function jwtHeader()
     {
@@ -109,12 +157,11 @@ class Lti13 extends AppModel
      *
      * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L48
      * Obtained through Resource Link, not Deep Link.
-     * @param string $launch_id
      * @return array
      */
-    public function getNrpsMembers($launch_id)
+    public function getNrpsMembers()
     {
-        $launch = LTI_Message_Launch::from_cache($launch_id, $this->db);
+        $launch = $this->launchFromCache();
         if ($launch->has_nrps()) {
             $nrps = $launch->get_nrps();
             return $nrps->get_members();
@@ -122,98 +169,37 @@ class Lti13 extends AppModel
     }
 
     /**
-     * Get all members of the LTI_Assignments_Grades_Service instance.
-     *
-     * @param string $launch_id
-     * @return array
-     */
-    public function getAgsGrades($launch_id)
-    {
-        $launch = LTI_Message_Launch::from_cache($launch_id, $this->db);
-        if ($launch->has_ags()) {
-            $ags = $this->getAgsOverride($launch_id);
-            $lineitem = LTI_Lineitem::new();
-            return $ags->get_grades($lineitem);
-        }
-    }
-
-    /**
-     * Override LTI_Message_Launch::get_ags();
-     *
-     * @see vendor/imsglobal/lti-1p3-tool/src/lti/LTI_Message_Launch.php::get_ags()
-     * @param string $launch_id
-     * @return LTI_Assignments_Grades_Service_Override
-     */
-    public function getAgsOverride($launch_id) {
-        $launch = LTI_Message_Launch::from_cache($launch_id, $this->db);
-        $jwt['body'] = $launch->get_launch_data();
-        $registration = $this->db->find_registration_by_issuer($jwt['body']['iss']);
-        $service_connector = new LTI_Service_Connector($registration);
-        $service_data = $jwt['body']['https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'];
-        return new LTI_Assignments_Grades_Service_Override($service_connector, $service_data);
-    }
-
-    /**
-     * Get LTI_Deep_Link instance.
-     *
-     * @param string $launch_id
-     * @return LTI_Deep_Link
-     */
-    public function getDeepLink($launch_id)
-    {
-        $launch = LTI_Message_Launch::from_cache($launch_id, $this->db);
-        if ($launch->is_deep_link_launch()) {
-            return $launch->get_deep_link();
-        }
-    }
-
-    /**
-     * Get Deep Link response.
-     *
-     * @param string $launch_id
-     * @return array
-     */
-    public function getResponseJwt($launch_id)
-    {
-        if ($dl = @$this->getDeepLink($launch_id)) {
-            $resource = LTI_Deep_Link_Resource::new()
-                ->set_url("https://my.tool/launch")
-                ->set_custom_params(array('my_param' => '\$my_param'))
-                ->set_title('My Resource');
-            $dlResponse = $dl->get_response_jwt(array($resource));
-            $dlJwt = explode('.', $dlResponse);
-            return array(
-                'JWT HEADER' => $dlJwt[0],
-                'JWT BODY'   => $dlJwt[1],
-            );
-        }
-    }
-
-    /**
      * Update course roster from LTI data from current LTI launch.
      *
-     * @param string $launch_id
+     * @param string $courseId
      */
-    public function roster($launch_id)
+    public function updateRoster($courseId)
     {
         try {
 
             // Get JWT body after LTI launch
-            $launch = LTI_Message_Launch::from_cache($launch_id, $this->db);
+            $launch = $this->launchFromCache();
             $this->jwtBody = $launch->get_launch_data();
 
             // Get course label and title from LTI launch's JWT body
             $this->ltiCourse = $this->getLtiCourseData();
 
+            // Check $courseId against course in database
+            $data = $this->findCourseByLabel($this->ltiCourse['label']);
+            if ($data['Course']['id'] != $courseId) {
+                throw new LTI_Exception("Wrong course for this roster update.");
+                return;
+            }
+
             // Call LTI Resource Link to get LTI roster data
-            if ($this->ltiRoster = $this->getNrpsMembers($launch_id)) {
+            if ($this->ltiRoster = $this->getNrpsMembers()) {
                 // Update or create iPeer course roster from the LTI data
                 $this->saveCourseRoster();
             }
 
         } catch (LTI_Exception $e) {
 
-            echo $this->errorMessage($e->getMessage());
+            echo $e->getMessage();
 
         }
     }
@@ -226,18 +212,20 @@ class Lti13 extends AppModel
      */
     public function getLtiCourseData()
     {
-        $key = 'https://purl.imsglobal.org/spec/lti/claim/context';
+        $key = "https://purl.imsglobal.org/spec/lti/claim/context";
         if (!$context = @$this->jwtBody[$key]) {
             throw new LTI_Exception(sprintf("Missing '%s'", $key));
             return;
         }
-        $keys = array('label', 'title');
+
+        $keys = array('id', 'label', 'title');
         foreach ($keys as $key) {
             if (!array_key_exists($key, $context)) {
                 throw new LTI_Exception(sprintf("Missing 'context %s'", $key));
                 return;
             }
         }
+
         return array_intersect_key($context, array_flip($keys));
     }
 
@@ -248,12 +236,18 @@ class Lti13 extends AppModel
      */
     public function saveCourseRoster()
     {
-        extract($this->ltiCourse); // => $label, $title
+        extract($this->ltiCourse); // => $id, $label, $title
 
         if ($data = $this->findCourseByLabel($label)) {
+            if (empty($data['Course']['canvas_id'])) {
+                $data['Course']['canvas_id'] = $id;
+                $this->Course->save($data);
+            }
+
             $this->updateCourseRoster($data);
         } else {
             $data = array(
+                'canvas_id' => $id,
                 'course' => $label,
                 'title' => $title,
                 'record_status' => Course::STATUS_ACTIVE,
@@ -483,13 +477,13 @@ class Lti13 extends AppModel
     }
 
     /**
-     * Find user by `Users.lti_id` in database.
+     * Find user by `users.lti_id` in database.
      *
      * @return array
      */
     public function findUserByLtiUserId()
     {
-        $conditions = array('User.lti_id' => $this->jwtBody['sub']);
+        $conditions = array('User.lti_id' => $this->jwtBody["sub"]);
         return $this->User->find('first', compact('conditions'));
     }
 
@@ -535,33 +529,8 @@ class Lti13 extends AppModel
     }
 
     /**
-     * Format Exception message.
-     *
-     * @param string $msg
-     * @return string
+     * Delete LTI 1.3 log files.
      */
-    public function errorMessage($msg)
-    {
-        if (php_sapi_name() != 'cli') {
-            return sprintf('<p class="message error-message">%s</p>', $msg);
-        }
-        return sprintf('<!> %s', $msg);
-    }
-
-    /**
-     * Format Success message.
-     *
-     * @param string $msg
-     * @return string
-     */
-    public function successMessage($msg)
-    {
-        if (php_sapi_name() != 'cli') {
-            return sprintf('<p class="message good-message green">%s</p>', $msg);
-        }
-        return $msg;
-    }
-
     public function resetLogs()
     {
         array_map('unlink', glob($this->log_path.'/*.log'));

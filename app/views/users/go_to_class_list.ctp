@@ -14,10 +14,10 @@
     </div>
 <?php endif ?>
 
-<?php if (User::hasPermission('controllers/users/updaterosterfromcanvas')): ?>
+<?php if (User::hasPermission('controllers/users/enrol')): ?>
 <div class="button-row">
     <ul>
-        <li><?php echo $html->link(__('Update roster from Canvas', true), '/users/updateRosterFromCanvas/'.$courseId, array('class'=>'canvas-button')); ?></li>
+        <li><?php echo $html->link(__('Update roster from Canvas', true), '/lti13/roster/'.$courseId, array('class'=>'canvas-button')); ?></li>
     </ul>
 </div>
 <?php endif; ?>

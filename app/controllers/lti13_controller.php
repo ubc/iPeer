@@ -15,6 +15,7 @@ use IMSGlobal\LTI\OIDC_Exception;
  * @author    Steven Marshall <steven.marshall@ubc.ca>
  * @copyright 2019 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
+ * @link      https://www.imsglobal.org/spec/security/v1p0/#openid_connect_launch_flow
  */
 class Lti13Controller extends AppController
 {
@@ -28,69 +29,65 @@ class Lti13Controller extends AppController
     public function beforeFilter()
     {
         $this->Auth->allow();
-        $this->set('customLogo', null);
-        $this->set('title_for_layout', "LTI 1.3");
     }
 
     /**
-     * Used for demo only
-     * View: app/views/lti13/index.ctp
+     * OIDC login action called by platform.
      */
-    public function index()
-    {
-        $json = $this->Lti13->getRegistrationJson();
-        $this->set('json', $json);
-    }
-
     public function login()
     {
-        $login = LTI_OIDC_Login::new($this->Lti13->db);
-
         try {
 
+            $login = LTI_OIDC_Login::new($this->Lti13->db);
             $url = Router::url('/lti13/launch', true);
             $redirect = $login->do_oidc_login_redirect($url);
             $redirect->do_redirect();
 
         } catch (OIDC_Exception $e) {
 
-            echo $this->Lti13->errorMessage(sprintf("Error doing OIDC login: %s", $e->getMessage()));
+            printf("Error doing OIDC login: %s", $e->getMessage());
 
         }
     }
 
     /**
-     * Used for demo only
-     * View: app/views/lti13/launch.ctp
+     * Launch action called by platform.
      */
     public function launch()
     {
         $launch = $this->Lti13->launch();
-        $data['referer'] = $this->referer();
-        $data += $this->Lti13->getData($launch->get_launch_id());
+        $data = $this->Lti13->getData($launch->get_launch_id());
         $this->Lti13->resetLogs();
         $this->log(json_encode($data, 448), 'lti13/launch');
 
-        $this->Lti13->roster($launch->get_launch_id());
-        $this->log(json_encode($this->Lti13->rosterUpdatesLog, 448), 'lti13/roster');
-
-        // $this->redirect(array('action' => 'signin'));
-
-        // if ($this->referer() != '/') {
-            // $this->redirect($this->referer(array('action' => 'roster')));
-        // }
-        $this->set($data);
+        if ($courseId = $this->Lti13->getCourseId()) {
+            $this->Session->setFlash(__('LTI 1.3 launch success', true), 'good');
+            $this->redirect(array('controller'=>'courses', 'action'=>'home', $courseId));
+        }
+        $this->autoRender = false;
     }
 
-    public function roster()
+    /**
+     * Update roster by course ID from platform.
+     *
+     * Called by tool, not platform.
+     * @param string $courseId
+     */
+    public function roster($courseId)
     {
-        $launch = $this->Lti13->launch();
-        $this->Lti13->roster($launch->get_launch_id());
+        $this->Lti13->updateRoster($courseId);
         $this->log($this->Lti13->rosterUpdatesLog, 'lti13/roster');
-        $this->redirect($this->referer(array('action' => 'signin')));
+
+        $this->checkUserAccess();
+
+        $this->Session->setFlash(__('Updated roster from Canvas', true), 'good');
+        $this->redirect($this->referer(array('controller'=>'home', 'action'=>'index')));
     }
 
-    public function signin()
+    /**
+     * Check if current user has LTI user ID in dB and has access to tool.
+     */
+    private function checkUserAccess()
     {
         try {
 
@@ -105,12 +102,11 @@ class Lti13Controller extends AppController
                 return;
             }
 
-            $this->log($user, 'lti13/signin');
-            return;
+            $this->log($user, 'lti13/user');
 
         } catch (LTI_Exception $e) {
 
-            echo $this->Lti13->errorMessage($e->getMessage());
+            echo $e->getMessage();
 
         }
     }
