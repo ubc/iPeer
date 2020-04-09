@@ -133,11 +133,19 @@ class Lti13 extends AppModel
 
     public function getCourseId()
     {
-        $launch = $this->launchFromCache();
-        $jwtBody = $launch->get_launch_data();
-        $label = $jwtBody["https://purl.imsglobal.org/spec/lti/claim/context"]["label"];
-        $data = $this->findCourseByLabel($label);
-        return $data['Course']['id'];
+        try {
+
+            $launch = $this->launchFromCache();
+            $jwtBody = $launch->get_launch_data();
+            $label = $jwtBody["https://purl.imsglobal.org/spec/lti/claim/context"]["label"];
+            $data = $this->findCourseByLabel($label);
+            return $data['Course']['id'];
+
+        } catch (LTI_Exception $e) {
+
+            echo $e->getMessage();
+
+        }
     }
 
     /**
