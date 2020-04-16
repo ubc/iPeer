@@ -4,6 +4,9 @@
 - roster update when an instructor logs in
 - roster update when clicking a sync button
 
+1. The instructor connects with iPeer on the Canvas platform.
+2. On the course roster page, the instructor clicks an update button to perform an iPeer roster update fetching Canvas course data.
+
 ---
 
 ## Instructor workflow (primary workflow)
@@ -61,6 +64,41 @@ if ($this->canvasEnabled && !empty($course['Course']['canvas_id'])) {
 
 Check with John Hsu
 
-- Create a `lti_deployment_ids` table
+- Create a `platform_deployment_ids` table
 - id (primary key), deployment_id (unique), course_id
 - course_id -> on cascade delete
+
+```json
+"https://purl.imsglobal.org/spec/lti/claim/deployment_id": "1:4dde05e8ca1973bcca9bffc13e1548820eee93a3",
+...
+
+"https://purl.imsglobal.org/spec/lti/claim/context": {
+    "id": "4dde05e8ca1973bcca9bffc13e1548820eee93a3",
+    "label": "MECH 328",
+    "title": "Mechanical Engineering Design Project",
+    "type": [
+        "http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering"
+    ],
+    "validation_context": null,
+    "errors": {
+        "errors": []
+    }
+},
+```
+
+Build a Model for it.
+
+```sql
+DROP TABLE IF EXISTS `courses_lti_platform_deployments`;
+CREATE TABLE `courses_lti_platform_deployments` (
+  `deployment_id` varchar(64) NOT NULL DEFAULT '' COMMENT 'Not a foreign key! Platform deployment ID hash. https://purl.imsglobal.org/spec/lti/claim/deployment_id',
+  `course_id` int(11) NOT NULL,
+  UNIQUE KEY `deployment_id` (`deployment_id`),
+  KEY `course_id` (`course_id`),
+  CONSTRAINT `courses_lti_platform_deployments_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+```
+
+- `courses_lti_platform_deployments`.`lti_platform_deployment_id` <- https://purl.imsglobal.org/spec/lti/claim/deployment_id
+- `courses`.`canvas_id` <- https://purl.imsglobal.org/spec/lti/claim/context['id']
+

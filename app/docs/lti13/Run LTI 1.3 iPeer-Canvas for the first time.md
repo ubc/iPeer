@@ -1,11 +1,11 @@
-# Run LTI 1.3 iPeer-Canvas demo test for the first time
+# Run LTI 1.3 iPeer-Canvas for the first time
 
 1. Install Canvas locally.
 2. Build Canvas.
 3. Import fixtures in Canvas.
 4. Install iPeer locally.
 5. Import fixtures in Canvas.
-6. Run iPeer LTI 1.3 demo test.
+6. Run iPeer.
 
 ---
 
@@ -192,13 +192,33 @@ Browse to: <http://localhost:8080/login>
 
 OK. I'm logged in.
 
-### Modify users.lti_id type
+### Patch LTI 1.3 PHP library files
 
-In iPeer.
+#### Fix EOL
+
+```bash
+dos2unix ~/Code/ctlt/iPeer/vendor/imsglobal/lti-1p3-tool/src/lti/Cache.php
+dos2unix ~/Code/ctlt/iPeer/vendor/imsglobal/lti-1p3-tool/src/lti/Cookie.php
+dos2unix ~/Code/ctlt/iPeer/vendor/imsglobal/lti-1p3-tool/src/lti/LTI_Deep_Link.php
+dos2unix ~/Code/ctlt/iPeer/vendor/imsglobal/lti-1p3-tool/src/lti/LTI_Message_Launch.php
+dos2unix ~/Code/ctlt/iPeer/vendor/imsglobal/lti-1p3-tool/src/lti/LTI_OIDC_Login.php
+dos2unix ~/Code/ctlt/iPeer/vendor/imsglobal/lti-1p3-tool/src/lti/LTI_Service_Connector.php
+```
+
+#### Modify Cookie class
+
+- Add `setcookie()` code compatible with PHP < 7.3
+
+```bash
+patch -p0 ~/Code/ctlt/iPeer/vendor/imsglobal/lti-1p3-tool/src/lti/Cookie.php < ~/Code/ctlt/iPeer/app/config/lti13/ipeer/Cookie.php.diff
+```
+
+### Import iPeer schema and data
 
 ```bash
 cd ~/Code/ctlt/iPeer
-docker exec -it ipeer_db mysql ipeer -u ipeer -p -e "ALTER TABLE users MODIFY lti_id VARCHAR(64) NULL DEFAULT NULL;"
+docker cp ~/Code/ctlt/iPeer/app/config/lti13/ipeer/ipeer.reset.sql ipeer_db:/tmp/
+docker exec -it ipeer_db sh -c "mysql ipeer -u ipeer -p < /tmp/ipeer.reset.sql"
 ```
 
 ### Update users.lti_id of root user
@@ -231,7 +251,7 @@ cd ~/Code/ctlt/iPeer
 docker-compose up -d
 docker exec -it ipeer_db sh -c "mysqldump ipeer -u ipeer -p > /tmp/ipeer.reset.sql"
 docker exec -it ipeer_db ls -lAFh /tmp
-docker cp ipeer_db:/tmp/ipeer.reset.sql ~/Code/ctlt/iPeer/app/config/lti13/canvas/
+docker cp ipeer_db:/tmp/ipeer.reset.sql ~/Code/ctlt/iPeer/app/config/lti13/ipeer/
 ```
 
 ---
@@ -250,9 +270,7 @@ docker exec -it ipeer_db sh -c "mysql ipeer -u ipeer -p < /tmp/ipeer.reset.sql"
 
 ---
 
-## 6. Run iPeer LTI 1.3 demo test
-
-### Before
+## 6. Run iPeer
 
 Go to <http://localhost:8080/login>
 
@@ -263,20 +281,3 @@ Open a new tab to look at page of students enrolled in courses:
 
 - [MECH 328 enrolment](http://localhost:8080/users/goToClassList/1)
 - [APSC 201 enrolment](http://localhost:8080/users/goToClassList/2)
-
-### Run
-
-Go to <http://localhost:8080/lti13>
-
-### After
-
-Refresh page of students enrolled in courses:
-
-- [MECH 328 enrolment](http://localhost:8080/users/goToClassList/1)
-- [APSC 201 enrolment](http://localhost:8080/users/goToClassList/2)
-
-Check iPeer LTI 1.3 test logs:
-
-- `~/Code/ctlt/iPeer/app/tmp/logs/lti13/launch.log`
-- `~/Code/ctlt/iPeer/app/tmp/logs/lti13/roster.log`
-- `~/Code/ctlt/iPeer/app/tmp/logs/lti13/user.log`

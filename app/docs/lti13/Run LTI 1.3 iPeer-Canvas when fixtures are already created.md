@@ -1,4 +1,4 @@
-# Run LTI 1.3 iPeer-Canvas demo test when fixtures are already created
+# Run LTI 1.3 iPeer-Canvas when fixtures are already created
 
 ## Set up Canvas
 
@@ -41,9 +41,7 @@ docker cp ~/Code/ctlt/iPeer/app/config/lti13/ipeer/ipeer.reset.sql ipeer_db:/tmp
 docker exec -it ipeer_db sh -c "mysql ipeer -u ipeer -p < /tmp/ipeer.reset.sql"
 ```
 
-## Run demo test
-
-### Before
+## Run iPeer
 
 Go to <http://localhost:8080/login>
 
@@ -54,20 +52,3 @@ Open a new tab to look at page of students enrolled in courses:
 
 - [MECH 328 enrolment](http://localhost:8080/users/goToClassList/1)
 - [APSC 201 enrolment](http://localhost:8080/users/goToClassList/2)
-
-### Run
-
-Go to <http://localhost:8080/lti13>
-
-### After
-
-Refresh page of students enrolled in courses:
-
-- [MECH 328 enrolment](http://localhost:8080/users/goToClassList/1)
-- [APSC 201 enrolment](http://localhost:8080/users/goToClassList/2)
-
-Check iPeer LTI 1.3 test logs:
-
-- `~/Code/ctlt/iPeer/app/tmp/logs/lti13/launch.log`
-- `~/Code/ctlt/iPeer/app/tmp/logs/lti13/roster.log`
-- `~/Code/ctlt/iPeer/app/tmp/logs/lti13/user.log`
