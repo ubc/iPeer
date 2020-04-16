@@ -3,6 +3,7 @@ App::import('Lib', 'Lti13Bootstrap');
 
 /**
  * Usage:
+ * `docker exec -it ipeer_app_unittest bash`
  * `vendor/bin/phing init-test-db`
  * `cake/console/cake -app app testsuite app case models/lti13`
  *
@@ -74,8 +75,9 @@ class Lti13TestCase extends CakeTestCase
   }
 }
 JSON;
-        $this->Lti13->jwtPayload = json_decode($json, true);
+        $this->Lti13->jwtBody = json_decode($json, true);
         $expected = array(
+            'id' => "4287",
             'label' => "Test iPeer course label",
             'title' => "Test iPeer course title",
         );
@@ -97,7 +99,25 @@ JSON;
   }
 }
 JSON;
-        $this->Lti13->jwtPayload = json_decode($json, true);
+        $this->Lti13->jwtBody = json_decode($json, true);
+        $this->expectException('IMSGlobal\LTI\LTI_Exception');
+        $this->Lti13->getLtiCourseData();
+    }
+
+    function test_getLtiCourseDataMissingId()
+    {
+        $json = <<<JSON
+{
+  "https://purl.imsglobal.org/spec/lti/claim/context": {
+    "label": "Test iPeer course label",
+    "title": "Test iPeer course title",
+    "type": [
+      "Test iPeer course type"
+    ]
+  }
+}
+JSON;
+        $this->Lti13->jwtBody = json_decode($json, true);
         $this->expectException('IMSGlobal\LTI\LTI_Exception');
         $this->Lti13->getLtiCourseData();
     }
@@ -115,7 +135,7 @@ JSON;
   }
 }
 JSON;
-        $this->Lti13->jwtPayload = json_decode($json, true);
+        $this->Lti13->jwtBody = json_decode($json, true);
         $this->expectException('IMSGlobal\LTI\LTI_Exception');
         $this->Lti13->getLtiCourseData();
     }
@@ -133,22 +153,16 @@ JSON;
   }
 }
 JSON;
-        $this->Lti13->jwtPayload = json_decode($json, true);
+        $this->Lti13->jwtBody = json_decode($json, true);
         $this->expectException('IMSGlobal\LTI\LTI_Exception');
         $this->Lti13->getLtiCourseData();
     }
 
-    function test_getLtiCourseDataEmptyJwtPayload()
+    function test_getLtiCourseDataEmptyJwtBody()
     {
-        $this->Lti13->jwtPayload = array();
+        $this->Lti13->jwtBody = array();
         $this->expectException('IMSGlobal\LTI\LTI_Exception');
         $this->Lti13->getLtiCourseData();
-    }
-
-    function test_getNrpsMembers()
-    {
-        $this->expectException('IMSGlobal\LTI\LTI_Exception');
-        @$this->Lti13->getNrpsMembers();
     }
 
     function test_updateCourseRoster()
@@ -170,9 +184,6 @@ JSON;
 
     function test_findCourseByLabel()
     {
-        $this->assertTrue($data = $this->Lti13->findCourseByLabel('MECH 328'));
-        $this->assertEqual("Mechanical Engineering Design Project", $data['Course']['title']);
-
         $this->assertFalse($this->Lti13->findCourseByLabel(null));
     }
 
@@ -186,30 +197,6 @@ JSON;
     {
         $this->assertFalse($this->Lti13->saveNewUserToCourse(array(), $courseId=0, $isInstructor=true));
         $this->assertFalse($this->Lti13->saveNewUserToCourse(array(), $courseId=0, $isInstructor=false));
-/*
-ERROR->Unexpected PHP error [<span style="color:Red;text-align:left"><b>SQL Error:</b> 1064:
-You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server
-version for the right syntax to use near 'insertCourses' at line 1</span>] severity [E_USER_WARNING]
-in [/var/www/html/cake/libs/model/datasources/dbo_source.php line 684]
-in test_saveNewUserToCourse
-in Lti13TestCase
-in /var/www/html/app/tests/cases/models/lti13.test.php
-*/
-        // $userData = array(
-        //     'User' => array(
-        //         'username' => "JohnSmith",
-        //         'first_name' => "John",
-        //         'last_name' => "Smith",
-        //         'email' => "john@smith.ca",
-        //         'send_email_notification' => false,
-        //         'lti_id' => "bf3d40",
-        //         'created' => date('Y-m-d H:i:s'),
-        //     ),
-        //     'Role' => array(
-        //         'RolesUser' => 5,
-        //     ),
-        // );
-        // $this->assertTrue($this->Lti13->saveNewUserToCourse($userData, $courseId=1, $isInstructor=false));
     }
 
     function test_removeUsersFoundInBothRosters()
@@ -253,10 +240,10 @@ in /var/www/html/app/tests/cases/models/lti13.test.php
 
     function test_findUserByLtiUserId()
     {
-        $this->Lti13->jwtPayload['sub'] = null;
+        $this->Lti13->jwtBody['sub'] = null;
         $this->assertTrue($this->Lti13->findUserByLtiUserId());
 
-        $this->Lti13->jwtPayload['sub'] = 'aaaaa';
+        $this->Lti13->jwtBody['sub'] = 'aaaaa';
         $this->assertFalse($this->Lti13->findUserByLtiUserId());
     }
 
