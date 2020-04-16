@@ -178,9 +178,10 @@ CREATE TABLE `courses` (
   `created` datetime DEFAULT NULL,
   `updater_id` int(11) DEFAULT NULL,
   `modified` datetime DEFAULT NULL,
-  `canvas_id` varchar(25) DEFAULT NULL,
+  `canvas_id` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `course` (`course`)
+  UNIQUE KEY `course` (`course`),
+  KEY `canvas_id` (`canvas_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -193,6 +194,19 @@ LOCK TABLES `courses` WRITE;
 INSERT INTO `courses` VALUES (1,'MECH 328','Mechanical Engineering Design Project','http://www.mech.ubc.ca','off',NULL,'A',1,'2006-06-20 14:14:45',NULL,'2006-06-20 14:14:45',NULL),(2,'APSC 201','Technical Communication','http://www.apsc.ubc.ca','off',NULL,'A',1,'2006-06-20 14:15:38',NULL,'2006-06-20 14:39:31',NULL),(3,'CPSC 101','Connecting with Computer Science','http://www.ugrad.cs.ubc.ca/~cs101/','off',NULL,'I',1,'2006-06-20 00:00:00',NULL,NULL,NULL),(4,'CPSC 404','Advanced Software Engineering','http://www.ugrad.cs.ubc.ca/~cs404/','off',NULL,'A',1,'2014-12-15 00:00:00',NULL,'2014-12-15 00:00:00',NULL);
 /*!40000 ALTER TABLE `courses` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `courses_lti_platform_deployments`
+--
+
+DROP TABLE IF EXISTS `courses_lti_platform_deployments`;
+CREATE TABLE `courses_lti_platform_deployments` (
+  `deployment_id` varchar(64) NOT NULL DEFAULT '' COMMENT 'Not a foreign key! Platform deployment ID hash. https://purl.imsglobal.org/spec/lti/claim/deployment_id',
+  `course_id` int(11) NOT NULL,
+  UNIQUE KEY `deployment_id` (`deployment_id`),
+  KEY `course_id` (`course_id`),
+  CONSTRAINT `courses_lti_platform_deployments_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 --
 -- Table structure for table `departments`
