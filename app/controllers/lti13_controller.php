@@ -15,7 +15,7 @@ use IMSGlobal\LTI\OIDC_Exception;
  * @author    Steven Marshall <steven.marshall@ubc.ca>
  * @copyright 2019 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
- * @link      https://www.imsglobal.org/spec/security/v1p0/#openid_connect_launch_flow
+ * @link      https://www.imsglobal.org/spec/security/v1p0/#fig_oidcflow
  */
 class Lti13Controller extends AppController
 {
