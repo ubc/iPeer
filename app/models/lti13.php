@@ -15,11 +15,12 @@ use IMSGlobal\LTI\LTI_Message_Launch;
  * @since     3.4.5
  * @author    Steven Marshall <steven.marshall@ubc.ca>
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
+ * @link      https://www.imsglobal.org/spec/security/v1p0/#fig_oidcflow
  */
 class Lti13 extends AppModel
 {
     public $useTable = false;
-    public $db, $User, $Course, $Role;
+    public $db, $User, $Course, $Role, $LtiToolRegistration;
     public $ltiCourse;
     public $jwtBody = array();
     public $ipeerRoster = array();
@@ -29,20 +30,12 @@ class Lti13 extends AppModel
 
     public function __construct()
     {
-        $this->db = new LTI13Database();
         $this->User = ClassRegistry::init('User');
         $this->Course = ClassRegistry::init('Course');
         $this->Role = ClassRegistry::init('Role');
-    }
-
-    /**
-     * Encode the LTI13Database::$issuers array into JSON.
-     *
-     * @return string
-     */
-    public function getRegistrationJson()
-    {
-        return json_encode($this->db->get_issuers(), 448);
+        $this->LtiToolRegistration = ClassRegistry::init('LtiToolRegistration');
+        $issuers = $this->LtiToolRegistration->findIssuers();
+        $this->db = new LTI13Database($issuers);
     }
 
     /**
@@ -113,7 +106,7 @@ class Lti13 extends AppModel
     }
 
     /**
-     * Encode the LTI_Message_Launch data object into JSON.
+     * Get the LTI_Message_Launch data for logging.
      *
      * @return string
      */
@@ -131,6 +124,11 @@ class Lti13 extends AppModel
         );
     }
 
+    /**
+     * Get course id from cached launch data.
+     *
+     * @return string
+     */
     public function getCourseId()
     {
         try {

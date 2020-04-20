@@ -12,34 +12,10 @@ class LTI13Database implements LTI_Database {
 
     private $issuers = array();
 
-    public function __construct()
+    public function __construct($issuers)
     {
-        return $this->set_issuers();
-    }
-
-    /**
-     * Load all registration JSON files from app/config/lti13 folder.
-     *
-     * @return App\LTI13\LTI13Database
-     */
-    private function set_issuers()
-    {
-        $filenames = glob(ROOT.'/app/config/lti13/*.json');
-        foreach ($filenames as $filename) {
-            $json = json_decode(file_get_contents($filename), true);
-            $this->issuers = array_merge($this->issuers, $json);
-        }
+        $this->issuers = $issuers;
         return $this;
-    }
-
-    /**
-     * Get the LTI13Database::$issuers array.
-     *
-     * @return array
-     */
-    public function get_issuers()
-    {
-        return $this->issuers;
     }
 
     /**

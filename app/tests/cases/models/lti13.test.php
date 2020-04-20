@@ -50,6 +50,8 @@ class Lti13TestCase extends CakeTestCase
         'app.evaluation_rubric_detail',
         'app.evaluation_mixeval',
         'app.evaluation_mixeval_detail',
+        'app.lti_platform_deployment',
+        'app.lti_tool_registration',
     );
     public $Lti13, $User, $Course, $Role;
 
@@ -59,6 +61,7 @@ class Lti13TestCase extends CakeTestCase
         $this->User = ClassRegistry::init('User');
         $this->Course = ClassRegistry::init('Course');
         $this->Role = ClassRegistry::init('Role');
+        $this->LtiToolRegistration = ClassRegistry::init('LtiToolRegistration');
     }
 
     function test_getLtiCourseData()
@@ -284,5 +287,37 @@ JSON;
     {
         $this->assertEqual(3, $this->Lti13->getUserType($isInstructor=true));
         $this->assertEqual(5, $this->Lti13->getUserType($isInstructor=false));
+    }
+
+    function test_findIssuers()
+    {
+        $json = <<<JSON
+{
+    "https://canvas.instructure.com": {
+        "client_id": "10000000000001",
+        "auth_login_url": "http://canvas.docker/api/lti/authorize_redirect",
+        "auth_token_url": "http://canvas.docker/login/oauth2/token",
+        "key_set_url": "http://canvas.docker/api/lti/security/jwks",
+        "private_key_file": "app/config/lti13/tool.private.key",
+        "deployment": [
+            "1:4dde05e8ca1973bcca9bffc13e1548820eee93a3",
+            "2:f97330a96452fc363a34e0ef6d8d0d3e9e1007d2",
+            "3:d3a2504bba5184799a38f141e8df2335cfa8206d"
+        ]
+    },
+    "https://lti-ri.imsglobal.org": {
+        "client_id": "ipeer-lti13-001",
+        "auth_login_url": "https://lti-ri.imsglobal.org/platforms/652/authorizations/new",
+        "auth_token_url": "https://lti-ri.imsglobal.org/platforms/652/access_tokens",
+        "key_set_url": "https://lti-ri.imsglobal.org/platforms/652/platform_keys/654.json",
+        "private_key_file": "app/config/lti13/tool.private.key",
+        "deployment": [
+            "1"
+        ]
+    }
+}
+JSON;
+        $issuers = $this->LtiToolRegistration->findIssuers();
+        $this->assertEqual(json_decode($json, true), $issuers);
     }
 }
