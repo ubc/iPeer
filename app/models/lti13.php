@@ -469,6 +469,21 @@ class Lti13 extends AppModel
     }
 
     /**
+     * Get deployment_id from JWT body.
+     *
+     * @return string
+     */
+    public function getDeploymentId()
+    {
+        $key = "https://purl.imsglobal.org/spec/lti/claim/deployment_id";
+        if (!$deployment_id = @$this->jwtBody[$key]) {
+            throw new LTI_Exception(sprintf("Missing '%s'", $key));
+            return;
+        }
+        return $deployment_id;
+    }
+
+    /**
      * Check if provided role(s) is a LTI instructor.
      *
      * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L219

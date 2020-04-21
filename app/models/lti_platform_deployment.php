@@ -29,6 +29,16 @@ class LtiPlatformDeployment extends AppModel
      */
     public function findDeployments()
     {
-      return $this->find('all', array('order'=>'iss ASC'));
+        return $this->find('all', array('order'=>'iss ASC'));
+    }
+
+    /**
+     * Save deployment for provided issuer.
+     *
+     * @return array
+     */
+    public function saveDeployment($data)
+    {
+        return $this->save($data);
     }
 }
