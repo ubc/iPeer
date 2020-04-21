@@ -170,12 +170,8 @@ class Lti13 extends AppModel
         // Check $courseId against course in database
         $data = $this->findCourseByLabel($this->ltiCourse['label']);
         if ($data['Course']['id'] != $courseId) {
-            $message = sprintf(
-                "Wrong course for this roster update.\n
-                Canvas is currently connected to `%s`",
-                $this->ltiCourse['label']
-            );
-            throw new LTI_Exception($message);
+            $message = "Wrong course for this roster update.\nCanvas is currently connected to `%s`";
+            throw new LTI_Exception(sprintf($message, $this->ltiCourse['label']));
             return;
         }
 
