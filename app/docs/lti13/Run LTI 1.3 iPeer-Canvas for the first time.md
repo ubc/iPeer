@@ -1,11 +1,12 @@
 # Run LTI 1.3 iPeer-Canvas for the first time
 
-1. Install Canvas locally.
-2. Build Canvas.
-3. Import fixtures in Canvas.
-4. Install iPeer locally.
-5. Import fixtures in Canvas.
-6. Run iPeer.
+1. Install Canvas locally
+2. Build Canvas
+3. Import fixtures in Canvas
+4. Install iPeer locally
+5. Import fixtures in Canvas
+6. Run iPeer
+7. Run Canvas
 
 ---
 
@@ -104,7 +105,7 @@ eval "$(dinghy env)"
 docker-compose up -d
 ```
 
-Browse to <http://canvas.docker>
+Browse to <http://canvas.docker> to see the login page.
 
 ### Dump original data
 
@@ -185,32 +186,33 @@ I see "Installation Wizard"
 
 I see "iPeer Installation Complete!"
 
-Browse to: <http://localhost:8080/login>
-
-- root
-- password
-
-OK. I'm logged in.
+Browse to <http://localhost:8080> to see the login page.
 
 ### Patch LTI 1.3 PHP library files
+
+```bash
+cd ~/Code/ctlt/iPeer/vendor/imsglobal/lti-1p3-tool/src/lti
+```
 
 #### Fix EOL
 
 ```bash
-dos2unix ~/Code/ctlt/iPeer/vendor/imsglobal/lti-1p3-tool/src/lti/Cache.php
-dos2unix ~/Code/ctlt/iPeer/vendor/imsglobal/lti-1p3-tool/src/lti/Cookie.php
-dos2unix ~/Code/ctlt/iPeer/vendor/imsglobal/lti-1p3-tool/src/lti/LTI_Deep_Link.php
-dos2unix ~/Code/ctlt/iPeer/vendor/imsglobal/lti-1p3-tool/src/lti/LTI_Message_Launch.php
-dos2unix ~/Code/ctlt/iPeer/vendor/imsglobal/lti-1p3-tool/src/lti/LTI_OIDC_Login.php
-dos2unix ~/Code/ctlt/iPeer/vendor/imsglobal/lti-1p3-tool/src/lti/LTI_Service_Connector.php
+dos2unix Cache.php
+dos2unix Cookie.php
+dos2unix LTI_Deep_Link.php
+dos2unix LTI_Message_Launch.php
+dos2unix LTI_OIDC_Login.php
+dos2unix LTI_Service_Connector.php
 ```
 
-#### Modify Cookie class
+#### Patch Cookie class
 
 - Add `setcookie()` code compatible with PHP < 7.3
 
 ```bash
-patch -p0 ~/Code/ctlt/iPeer/vendor/imsglobal/lti-1p3-tool/src/lti/Cookie.php < ~/Code/ctlt/iPeer/app/config/lti13/ipeer/Cookie.php.diff
+cp ~/Code/ctlt/iPeer/app/config/lti13/ipeer/Cookie.php.diff .
+patch -p0 Cookie.php < Cookie.php.diff
+rm Cookie.php.diff
 ```
 
 ### Import iPeer schema and data
@@ -272,12 +274,23 @@ docker exec -it ipeer_db sh -c "mysql ipeer -u ipeer -p < /tmp/ipeer.reset.sql"
 
 ## 6. Run iPeer
 
-Go to <http://localhost:8080/login>
+Browse to <http://localhost:8080/login>
 
 - username: `root`
 - password: `password`
 
-Open a new tab to look at page of students enrolled in courses:
+Open a new browser tab to look at page of students enrolled in courses:
 
 - [MECH 328 enrolment](http://localhost:8080/users/goToClassList/1)
 - [APSC 201 enrolment](http://localhost:8080/users/goToClassList/2)
+
+---
+
+## 7. Run Canvas
+
+Browse to <http://canvas.docker>
+
+- username: `root@canvas`
+- password: `password`
+
+Browse to <http://canvas.docker/courses/1/external_tools/1> for OIDC login and launch for the MECH 328 course.

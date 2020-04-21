@@ -56,8 +56,6 @@ if ($this->canvasEnabled && !empty($course['Course']['canvas_id'])) {
 
 `$course['Course']['canvas_id']` is empty => `$linkedWithCanvas` is `false`.
 
-
-
 ---
 
 ## Deployment IDs
