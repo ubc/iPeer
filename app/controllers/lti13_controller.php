@@ -45,7 +45,8 @@ class Lti13Controller extends AppController
 
         } catch (OIDC_Exception $e) {
 
-            printf("Error doing OIDC login: %s", $e->getMessage());
+            $this->Session->setFlash(sprintf("Error doing OIDC login: %s", $e->getMessage()));
+            $this->redirect(array('controller'=>'home', 'action'=>'index'));
 
         }
     }
@@ -55,16 +56,25 @@ class Lti13Controller extends AppController
      */
     public function launch()
     {
-        $launch = $this->Lti13->launch();
-        $data = $this->Lti13->getData($launch->get_launch_id());
-        $this->Lti13->resetLogs();
-        $this->log(json_encode($data, 448), 'lti13/launch');
+        try {
 
-        if ($courseId = $this->Lti13->getCourseId()) {
+            $launch = $this->Lti13->launch();
+            $data = $this->Lti13->getData($launch->get_launch_id());
+            $this->Lti13->resetLogs();
+            $this->log(json_encode($data, 448), 'lti13/launch');
+
             $this->Session->setFlash(__('LTI 1.3 launch success', true), 'good');
-            $this->redirect(array('controller'=>'courses', 'action'=>'home', $courseId));
+            if ($courseId = $this->Lti13->getCourseId()) {
+                $this->redirect(array('controller'=>'courses', 'action'=>'home', $courseId));
+            }
+            $this->redirect(array('controller'=>'courses', 'action'=>'index'));
+
+        } catch (LTI_Exception $e) {
+
+            $this->Session->setFlash($e->getMessage());
+            $this->redirect(array('controller'=>'home', 'action'=>'index'));
+
         }
-        $this->autoRender = false;
     }
 
     /**
@@ -75,13 +85,22 @@ class Lti13Controller extends AppController
      */
     public function roster($courseId)
     {
-        $this->Lti13->updateRoster($courseId);
-        $this->log($this->Lti13->rosterUpdatesLog, 'lti13/roster');
+        try {
 
-        $this->checkUserAccess();
+            $this->Lti13->updateRoster($courseId);
+            $this->log($this->Lti13->rosterUpdatesLog, 'lti13/roster');
 
-        $this->Session->setFlash(__('Updated roster from Canvas', true), 'good');
-        $this->redirect($this->referer(array('controller'=>'home', 'action'=>'index')));
+            $this->checkUserAccess();
+
+            $this->Session->setFlash(__('Updated roster from Canvas', true), 'good');
+            $this->redirect($this->referer(array('controller'=>'home', 'action'=>'index')));
+
+        } catch (LTI_Exception $e) {
+
+            $this->Session->setFlash($e->getMessage());
+            $this->redirect($this->referer(array('controller'=>'home', 'action'=>'index')));
+
+        }
     }
 
     /**
@@ -89,25 +108,17 @@ class Lti13Controller extends AppController
      */
     private function checkUserAccess()
     {
-        try {
-
-            if (!$user = $this->Lti13->findUserByLtiUserId()) {
-                throw new LTI_Exception("LTI user ID not found.");
-                return;
-            }
-
-            $id = $user['User']['id'];
-            if (!$this->Auth->login($id)) {
-                throw new LTI_Exception(sprintf("Access denied to user ID %s.", $id));
-                return;
-            }
-
-            $this->log($user, 'lti13/user');
-
-        } catch (LTI_Exception $e) {
-
-            echo $e->getMessage();
-
+        if (!$user = $this->Lti13->findUserByLtiUserId()) {
+            throw new LTI_Exception("LTI user ID not found.");
+            return;
         }
+
+        $id = $user['User']['id'];
+        if (!$this->Auth->login($id)) {
+            throw new LTI_Exception(sprintf("Access denied to user ID %s.", $id));
+            return;
+        }
+
+        $this->log($user, 'lti13/user');
     }
 }

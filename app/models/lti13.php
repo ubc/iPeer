@@ -45,17 +45,9 @@ class Lti13 extends AppModel
      */
     public function launch()
     {
-        try {
-
-            $launch = LTI_Message_Launch::new($this->db);
-            $launch->validate();
-            return $launch;
-
-        } catch (LTI_Exception $e) {
-
-            printf("Launch validation failed: %s", $e->getMessage());
-
-        }
+        $launch = LTI_Message_Launch::new($this->db);
+        $launch->validate();
+        return $launch;
     }
 
     /**
@@ -77,32 +69,24 @@ class Lti13 extends AppModel
      */
     public function getLaunchIdFromCache()
     {
-        try {
-
-            if (!$json = file_get_contents(sys_get_temp_dir() . '/lti_cache.txt')) {
-                throw new LTI_Exception("LTI cache is empty.");
-                return;
-            }
-
-            $assoc = json_decode($json, true);
-            if (!$keys = preg_grep("/^lti1p3_launch_/", array_keys($assoc))) {
-                throw new LTI_Exception("LTI launch ID not found in LTI cache.");
-                return;
-            }
-
-            $keys = array_values($keys);
-            if (count($keys) > 1) {
-                throw new LTI_Exception("More than one LTI launch ID found in LTI cache.");
-                return;
-            }
-
-            return $keys[0];
-
-        } catch (LTI_Exception $e) {
-
-            echo $e->getMessage();
-
+        if (!$json = file_get_contents(sys_get_temp_dir() . '/lti_cache.txt')) {
+            throw new LTI_Exception("LTI cache is empty.");
+            return;
         }
+
+        $assoc = json_decode($json, true);
+        if (!$keys = preg_grep("/^lti1p3_launch_/", array_keys($assoc))) {
+            throw new LTI_Exception("LTI launch ID not found in LTI cache.");
+            return;
+        }
+
+        $keys = array_values($keys);
+        if (count($keys) > 1) {
+            throw new LTI_Exception("More than one LTI launch ID found in LTI cache.");
+            return;
+        }
+
+        return $keys[0];
     }
 
     /**
@@ -131,19 +115,14 @@ class Lti13 extends AppModel
      */
     public function getCourseId()
     {
-        try {
-
-            $launch = $this->launchFromCache();
-            $jwtBody = $launch->get_launch_data();
-            $label = $jwtBody["https://purl.imsglobal.org/spec/lti/claim/context"]["label"];
-            $data = $this->findCourseByLabel($label);
-            return $data['Course']['id'];
-
-        } catch (LTI_Exception $e) {
-
-            echo $e->getMessage();
-
+        $launch = $this->launchFromCache();
+        $jwtBody = $launch->get_launch_data();
+        $label = $jwtBody["https://purl.imsglobal.org/spec/lti/claim/context"]["label"];
+        if (!$data = $this->findCourseByLabel($label)) {
+            throw new LTI_Exception("LTI course label not found.");
+            return;
         }
+        return $data['Course']['id'];
     }
 
     /**
@@ -181,32 +160,29 @@ class Lti13 extends AppModel
      */
     public function updateRoster($courseId)
     {
-        try {
+        // Get JWT body after LTI launch
+        $launch = $this->launchFromCache();
+        $this->jwtBody = $launch->get_launch_data();
 
-            // Get JWT body after LTI launch
-            $launch = $this->launchFromCache();
-            $this->jwtBody = $launch->get_launch_data();
+        // Get course [id, label, title] from LTI launch's JWT body
+        $this->ltiCourse = $this->getLtiCourseData();
 
-            // Get course label and title from LTI launch's JWT body
-            $this->ltiCourse = $this->getLtiCourseData();
+        // Check $courseId against course in database
+        $data = $this->findCourseByLabel($this->ltiCourse['label']);
+        if ($data['Course']['id'] != $courseId) {
+            $message = sprintf(
+                "Wrong course for this roster update.\n
+                Canvas is currently connected to `%s`",
+                $this->ltiCourse['label']
+            );
+            throw new LTI_Exception($message);
+            return;
+        }
 
-            // Check $courseId against course in database
-            $data = $this->findCourseByLabel($this->ltiCourse['label']);
-            if ($data['Course']['id'] != $courseId) {
-                throw new LTI_Exception("Wrong course for this roster update.");
-                return;
-            }
-
-            // Call LTI Resource Link to get LTI roster data
-            if ($this->ltiRoster = $this->getNrpsMembers()) {
-                // Update or create iPeer course roster from the LTI data
-                $this->saveCourseRoster();
-            }
-
-        } catch (LTI_Exception $e) {
-
-            echo $e->getMessage();
-
+        // Call LTI Resource Link to get LTI roster data
+        if ($this->ltiRoster = $this->getNrpsMembers()) {
+            // Update or create iPeer course roster from the LTI data
+            $this->saveCourseRoster();
         }
     }
 
@@ -249,7 +225,6 @@ class Lti13 extends AppModel
                 $data['Course']['canvas_id'] = $id;
                 $this->Course->save($data);
             }
-
             $this->updateCourseRoster($data);
         } else {
             $data = array(
