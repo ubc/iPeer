@@ -35,9 +35,7 @@ class LtiToolRegistration extends AppModel
             extract($array); // => $LtiToolRegistration, $LtiPlatformDeployment
             $key = $LtiToolRegistration['iss'];
             $registrations[$key] = array_diff_key($LtiToolRegistration, array('iss'=>0));
-            foreach ($LtiPlatformDeployment as $deployment) {
-                $registrations[$key]['deployment'] []= $deployment['deployment'];
-            }
+            $registrations[$key]['deployment'] = array_column($LtiPlatformDeployment, 'deployment');
         }
         return $registrations;
     }
