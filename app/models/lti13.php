@@ -97,13 +97,13 @@ class Lti13 extends AppModel
     public function getData()
     {
         $launch = $this->launchFromCache();
-        $jwtBody = $launch->get_launch_data();
+        $this->jwtBody = $launch->get_launch_data();
         return array(
             'launch_id'    => $launch->get_launch_id(),
-            'message_type' => $jwtBody["https://purl.imsglobal.org/spec/lti/claim/message_type"],
+            'message_type' => $this->jwtBody["https://purl.imsglobal.org/spec/lti/claim/message_type"],
             '$_POST'       => $_POST,
             'jwt_header'   => json_decode($this->jwtHeader(), 448),
-            'jwt_body'     => $jwtBody,
+            'jwt_body'     => $this->jwtBody,
             'nrps_members' => $this->getNrpsMembers(),
         );
     }
@@ -116,8 +116,8 @@ class Lti13 extends AppModel
     public function getCourseId()
     {
         $launch = $this->launchFromCache();
-        $jwtBody = $launch->get_launch_data();
-        $label = $jwtBody["https://purl.imsglobal.org/spec/lti/claim/context"]["label"];
+        $this->jwtBody = $launch->get_launch_data();
+        $label = $this->jwtBody["https://purl.imsglobal.org/spec/lti/claim/context"]["label"];
         if (!$data = $this->findCourseByLabel($label)) {
             throw new LTI_Exception("LTI course label not found.");
             return;

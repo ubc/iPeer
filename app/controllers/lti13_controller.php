@@ -64,15 +64,23 @@ class Lti13Controller extends AppController
             $this->log(json_encode($data, 448), 'lti13/launch');
 
             $this->Session->setFlash(__('LTI 1.3 launch success', true), 'good');
-            if ($courseId = $this->Lti13->getCourseId()) {
+
+            $this->checkUserAccess();
+
+            if (!$this->Auth->isLoggedIn()) {
+                $this->redirect('/');
+            }
+
+            if ($courseId = @$this->Lti13->getCourseId()) {
                 $this->redirect(array('controller'=>'courses', 'action'=>'home', $courseId));
             }
+
             $this->redirect(array('controller'=>'courses', 'action'=>'index'));
 
         } catch (LTI_Exception $e) {
 
             $this->Session->setFlash($e->getMessage());
-            $this->redirect(array('controller'=>'home', 'action'=>'index'));
+            $this->redirect('/logout');
 
         }
     }
@@ -90,8 +98,6 @@ class Lti13Controller extends AppController
             $this->Lti13->updateRoster($courseId);
             $this->log($this->Lti13->rosterUpdatesLog, 'lti13/roster');
 
-            $this->checkUserAccess();
-
             $this->Session->setFlash(__('Updated roster from Canvas', true), 'good');
             $this->redirect($this->referer(array('controller'=>'home', 'action'=>'index')));
 
@@ -104,18 +110,12 @@ class Lti13Controller extends AppController
     }
 
     /**
-     * Check if current user has LTI user ID in dB and has access to tool.
+     * Check if current user has LTI user ID in dB.
      */
     private function checkUserAccess()
     {
         if (!$user = $this->Lti13->findUserByLtiUserId()) {
             throw new LTI_Exception("LTI user ID not found.");
-            return;
-        }
-
-        $id = $user['User']['id'];
-        if (!$this->Auth->login($id)) {
-            throw new LTI_Exception(sprintf("Access denied to user ID %s.", $id));
             return;
         }
 
