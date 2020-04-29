@@ -65,17 +65,20 @@ class Lti13Controller extends AppController
 
             $this->Session->setFlash(__('LTI 1.3 launch success', true), 'good');
 
-            $this->checkUserAccess();
-
             if (!$this->Auth->isLoggedIn()) {
                 $this->redirect('/');
             }
 
-            if ($courseId = @$this->Lti13->getCourseId()) {
-                $this->redirect(array('controller'=>'courses', 'action'=>'home', $courseId));
+            $user = $this->checkUser();
+
+            if ($this->isAdminOrInstructor($user)) {
+                if ($courseId = @$this->Lti13->getCourseId()) {
+                    $this->redirect(array('controller'=>'courses', 'action'=>'home', $courseId));
+                }
+                $this->redirect(array('controller'=>'courses', 'action'=>'index'));
             }
 
-            $this->redirect(array('controller'=>'courses', 'action'=>'index'));
+            $this->redirect(array('controller'=>'home', 'action'=>'index'));
 
         } catch (LTI_Exception $e) {
 
@@ -111,14 +114,36 @@ class Lti13Controller extends AppController
 
     /**
      * Check if current user has LTI user ID in dB.
+     *
+     * @return array
      */
-    private function checkUserAccess()
+    private function checkUser()
     {
         if (!$user = $this->Lti13->findUserByLtiUserId()) {
             throw new LTI_Exception("LTI user ID not found.");
             return;
         }
 
+        if ($user['User']['id'] != $this->Auth->user('id')) {
+            throw new LTI_Exception("Mismatched user logged in.");
+            return;
+        }
+
         $this->log($user, 'lti13/user');
+
+        return $user;
     }
+
+    /**
+     * Check if current user is in ['superadmin', 'admin', 'instructor']
+     *
+     * @param array $user
+     * @return bool
+     */
+    private function isAdminOrInstructor($user)
+    {
+        $roles = array_column($user['Role'], 'name');
+        return (bool)preg_grep('/superadmin|admin|instructor/i', $roles);
+    }
+
 }
