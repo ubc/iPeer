@@ -2395,8 +2395,8 @@ ALTER TABLE `courses` ADD COLUMN `term` VARCHAR(50) NULL DEFAULT NULL;
 --- START: Added by DB upgrade to version 18
 ALTER TABLE `users` MODIFY `lti_id` varchar(64) NULL DEFAULT NULL;
 
+DROP INDEX `canvas_id` ON `courses`;
 ALTER TABLE `courses` MODIFY `canvas_id` varchar(64) NULL DEFAULT NULL;
-DROP INDEX IF EXISTS `canvas_id` ON `courses`;
 ALTER TABLE `courses` ADD INDEX `canvas_id` (`canvas_id`);
 
 DROP TABLE IF EXISTS `lti_platform_deployments`;
