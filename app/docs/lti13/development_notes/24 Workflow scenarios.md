@@ -39,29 +39,13 @@
 - SuperAdmin and Instructor roles are authorized to perform roster update.
 - Student role is not authorized to perform roster update.
 
-| iPeer role      | Update roster     |
-|                 | button appears    |
-|                 | on ClassList page |
-|-----------------|-------------------|
-| SuperAdmin      | Yes               |
-| u: root         |                   |
-| p: password     |                   |
-|-----------------|-------------------|
-| Instructor      | Yes               |
-| u: instructor1  |                   |
-| p: ipeeripeer   |                   |
-|-----------------|-------------------|
-| Professor       | No permission     |
-| u: instructor2  |                   |
-| p: ipeeripeer   |                   |
-|-----------------|-------------------|
-| Student         | No permission     |
-| u: redshirt0001 |                   |
-| p: ipeeripeer   |                   |
-|-----------------|-------------------|
-| Tutor           | No permission     |
-| u: tutor1       |                   |
-| p: ipeeripeer   |                   |
+| iPeer role                              | Update roster button appears on ClassList page |
+|-----------------------------------------|------------------------------------------------|
+| SuperAdmin u: root p: password          | Yes                                            |
+| Instructor u: instructor1 p: ipeeripeer | Yes                                            |
+| Professor u: instructor2 p: ipeeripeer  | No permission                                  |
+| Student u: redshirt0001 p: ipeeripeer   | No permission                                  |
+| Tutor u: tutor1 p: ipeeripeer           | No permission                                  |
 
 ---------------------------------------------------------------------------------------------------
 
