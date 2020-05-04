@@ -124,7 +124,6 @@ class CaliperMixevalHooksTest extends CaliperAuthTestCase
         );
 
         $this->expected_mixeval_question_1_scale = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/FeedbackProfile-extension',
             'id' => 'http://test.ipeer.com/mixevals/view/1/questions/1/scale',
             'type' => 'LikertScale',
             'scalePoints' => 5,
@@ -147,7 +146,6 @@ class CaliperMixevalHooksTest extends CaliperAuthTestCase
             'isPartOf' => $this->expected_mixeval,
         );
         $this->expected_mixeval_question_2_scale = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/FeedbackProfile-extension',
             'id' => 'http://test.ipeer.com/mixevals/view/1/questions/2/scale',
             'type' => 'LikertScale',
             'scalePoints' => 5,
@@ -170,7 +168,6 @@ class CaliperMixevalHooksTest extends CaliperAuthTestCase
             'isPartOf' => $this->expected_mixeval,
         );
         $this->expected_mixeval_question_3_scale = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/FeedbackProfile-extension',
             'id' => 'http://test.ipeer.com/mixevals/view/1/questions/3/scale',
             'type' => 'LikertScale',
             'scalePoints' => 5,
@@ -264,12 +261,14 @@ class CaliperMixevalHooksTest extends CaliperAuthTestCase
         foreach($this->expected_mixeval_questions as $expected_mixeval_question) {
             $expected_events[] = array(
                 'type' => 'ResourceManagementEvent',
+                'profile' => 'ResourceManagementProfile',
                 'action' => 'Deleted',
                 'object' => $expected_mixeval_question,
             );
         }
         $expected_events[] = array(
             'type' => 'ResourceManagementEvent',
+            'profile' => 'ResourceManagementProfile',
             'action' => 'Deleted',
             'object' => $this->expected_mixeval,
         );
@@ -314,11 +313,13 @@ class CaliperMixevalHooksTest extends CaliperAuthTestCase
         $expected_events = array();
         $expected_events[] = array(
             'type' => 'ResourceManagementEvent',
+            'profile' => 'ResourceManagementProfile',
             'action' => 'Deleted',
             'object' => $this->expected_mixeval_questions[2],
         );
         $expected_events[] = array(
             'type' => 'ResourceManagementEvent',
+            'profile' => 'ResourceManagementProfile',
             'action' => 'Deleted',
             'object' => $this->expected_mixeval_questions[3],
         );
@@ -359,11 +360,13 @@ class CaliperMixevalHooksTest extends CaliperAuthTestCase
         $fake_removed_question_events = array(
             array(
                 'type' => 'ResourceManagementEvent',
+                'profile' => 'ResourceManagementProfile',
                 'action' => 'Deleted',
                 'object' => $this->expected_mixeval_questions[2],
             ),
             array(
                 'type' => 'ResourceManagementEvent',
+                'profile' => 'ResourceManagementProfile',
                 'action' => 'Deleted',
                 'object' => $this->expected_mixeval_questions[3],
             ),
@@ -386,6 +389,7 @@ class CaliperMixevalHooksTest extends CaliperAuthTestCase
                 $action = in_array($question['id'], $existing_question_ids) ? 'Modified' : 'Created';
                 $expected_events[] = array(
                     'type' => 'ResourceManagementEvent',
+                    'profile' => 'ResourceManagementProfile',
                     'action' => $action,
                     'object' => $expected_mixeval_question,
                 );
@@ -393,6 +397,7 @@ class CaliperMixevalHooksTest extends CaliperAuthTestCase
             $action = $is_new ? 'Created' : 'Modified';
             $expected_events[] = array(
                 'type' => 'ResourceManagementEvent',
+                'profile' => 'ResourceManagementProfile',
                 'action' => $action,
                 'object' => $this->expected_mixeval,
             );

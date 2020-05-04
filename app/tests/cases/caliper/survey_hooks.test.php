@@ -91,7 +91,6 @@ class CaliperSurveyHooksTest extends CaliperAuthTestCase
         $this->questions = $results['Question'];
 
         $this->expected_survey = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/SurveyProfile-extension',
             'id' => 'http://test.ipeer.com/surveys/view/2',
             'type' => 'Questionnaire',
             'name' => 'Survey, all Q types',
@@ -134,7 +133,6 @@ class CaliperSurveyHooksTest extends CaliperAuthTestCase
             'itemValues' => array('A', 'B', 'C', 'D'),
         );
         $this->expected_survey_questionnaire_item_1 = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/SurveyProfile-extension',
             'id' => 'http://test.ipeer.com/surveys/view/2/questions/3',
             'type' => 'QuestionnaireItem',
             'extensions' => array(
@@ -156,7 +154,6 @@ class CaliperSurveyHooksTest extends CaliperAuthTestCase
             'itemValues' => array('choose me', 'no, me', 'me please'),
         );
         $this->expected_survey_questionnaire_item_2 = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/SurveyProfile-extension',
             'id' => 'http://test.ipeer.com/surveys/view/2/questions/4',
             'type' => 'QuestionnaireItem',
             'extensions' => array(
@@ -175,7 +172,6 @@ class CaliperSurveyHooksTest extends CaliperAuthTestCase
             'questionPosed' => 'Testing out single line answers',
         );
         $this->expected_survey_questionnaire_item_3 = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/SurveyProfile-extension',
             'id' => 'http://test.ipeer.com/surveys/view/2/questions/5',
             'type' => 'QuestionnaireItem',
             'extensions' => array(
@@ -194,7 +190,6 @@ class CaliperSurveyHooksTest extends CaliperAuthTestCase
             'questionPosed' => 'Testing out multi-line long answers',
         );
         $this->expected_survey_questionnaire_item_4 = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/SurveyProfile-extension',
             'id' => 'http://test.ipeer.com/surveys/view/2/questions/6',
             'type' => 'QuestionnaireItem',
             'extensions' => array(
@@ -233,12 +228,14 @@ class CaliperSurveyHooksTest extends CaliperAuthTestCase
         foreach($this->expected_survey_questionnaire_items as $expected_survey_questionnaire_item) {
             $expected_events[] = array(
                 'type' => 'ResourceManagementEvent',
+                'profile' => 'ResourceManagementProfile',
                 'action' => 'Deleted',
                 'object' => $expected_survey_questionnaire_item,
             );
         }
         $expected_events[] = array(
             'type' => 'ResourceManagementEvent',
+            'profile' => 'ResourceManagementProfile',
             'action' => 'Deleted',
             'object' => $this->expected_survey,
         );
@@ -280,6 +277,7 @@ class CaliperSurveyHooksTest extends CaliperAuthTestCase
         $this->setupSession();
         $expected_event = array(
             'type' => 'ResourceManagementEvent',
+            'profile' => 'ResourceManagementProfile',
             'action' => 'Modified',
             'object' => $this->expected_survey,
         );
@@ -315,12 +313,14 @@ class CaliperSurveyHooksTest extends CaliperAuthTestCase
 
         $expected_events[] = array(
             'type' => 'ResourceManagementEvent',
+            'profile' => 'ResourceManagementProfile',
             'action' => 'Created',
             'object' => $this->expected_survey,
         );
         foreach($this->expected_survey_questionnaire_items as $expected_survey_questionnaire_item) {
             $expected_events[] = array(
                 'type' => 'ResourceManagementEvent',
+                'profile' => 'ResourceManagementProfile',
                 'action' => 'Created',
                 'object' => $expected_survey_questionnaire_item,
             );
@@ -339,6 +339,7 @@ class CaliperSurveyHooksTest extends CaliperAuthTestCase
         $this->setupSession();
         $expected_event = array(
             'type' => 'ResourceManagementEvent',
+            'profile' => 'ResourceManagementProfile',
             'action' => 'Modified',
             'object' => $this->expected_survey_questionnaire_items[0],
         );
@@ -364,11 +365,13 @@ class CaliperSurveyHooksTest extends CaliperAuthTestCase
         $expected_events = array();
         $expected_events[] = array(
             'type' => 'ResourceManagementEvent',
+            'profile' => 'ResourceManagementProfile',
             'action' => 'Deleted',
             'object' => $this->expected_survey_questionnaire_items[0],
         );
         $expected_events[] = array(
             'type' => 'ResourceManagementEvent',
+            'profile' => 'ResourceManagementProfile',
             'action' => 'Modified',
             'object' => $this->expected_survey,
         );
@@ -395,11 +398,13 @@ class CaliperSurveyHooksTest extends CaliperAuthTestCase
         $expected_events = array();
         $expected_events[] = array(
             'type' => 'ResourceManagementEvent',
+            'profile' => 'ResourceManagementProfile',
             'action' => 'Created',
             'object' => $this->expected_survey_questionnaire_items[0],
         );
         $expected_events[] = array(
             'type' => 'ResourceManagementEvent',
+            'profile' => 'ResourceManagementProfile',
             'action' => 'Modified',
             'object' => $this->expected_survey,
         );

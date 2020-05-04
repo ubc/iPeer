@@ -3,13 +3,8 @@ namespace caliper;
 
 use caliper\ResourceIRI;
 use IMSGlobal\Caliper\entities\agent\Person;
-use IMSGlobal\Caliper\entities\EntityType;
 
 class CaliperActor {
-    private static function _generateAnonymousActor() {
-        return (new Person( 'http://purl.imsglobal.org/ctx/caliper/v1p1/Person' ));
-    }
-
     private static function _generateIPeerActor(&$user) {
         $id = ResourceIRI::actor_homepage($user['id']);
 
@@ -49,7 +44,7 @@ class CaliperActor {
     public static function generateActor(&$user) {
         # happens when not logged in
         if (!$user['id']) {
-            return self::_generateAnonymousActor();
+            return Person::makeAnonymous();
         }
 
         return self::_generateIPeerActor($user);

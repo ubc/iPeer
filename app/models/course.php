@@ -173,8 +173,9 @@ class Course extends AppModel
     {
         parent::__construct($id, $table, $ds);
         $this->virtualFields['student_count'] = sprintf('SELECT count(*) as count FROM user_enrols as enrol WHERE enrol.course_id = %s.id', $this->alias);
-        $this->virtualFields['full_name'] = sprintf('CONCAT(%s.course, " - ", %s.title)', $this->alias, $this->alias);
-
+        $this->virtualFields['full_name'] = sprintf('CONCAT_WS(" ", %s.course, "-", %s.title, CONCAT("(", CASE WHEN trim(%s.term)="" THEN null ELSE %s.term END, ")"))', $this->alias, $this->alias, $this->alias,  $this->alias);
+        $this->virtualFields['title_w_term'] = sprintf('CONCAT_WS(" ", %s.title, CONCAT("(", CASE WHEN trim(%s.term)="" THEN null ELSE %s.term END, ")"))', $this->alias, $this->alias,  $this->alias);
+        $this->virtualFields['course_w_term'] = sprintf('CONCAT_WS(" ", %s.course, CONCAT("(", CASE WHEN trim(%s.term)="" THEN null ELSE %s.term END, ")"))', $this->alias, $this->alias,  $this->alias);
     }
 
     /**

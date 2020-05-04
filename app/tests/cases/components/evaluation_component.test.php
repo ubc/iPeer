@@ -44,8 +44,10 @@ class EvaluationTestCase extends CakeTestCase
         $this->controller->startupProcess();
         $this->controller->Component->startup($this->controller);
         $this->controller->Auth->startup($this->controller);
-        ClassRegistry::addObject('view', new View($this->Controller));
-        ClassRegistry::addObject('Auth', $this->controller->Auth);
+        $newView = new View($this->Controller);
+        ClassRegistry::addObject('view', $newView);
+        $newAuth = $this->controller->Auth;
+        ClassRegistry::addObject('Auth', $newAuth);
         $admin = array('User' => array('username' => 'Admin',
             'password' => 'passwordA'));
         $this->controller->Auth->login($admin);
@@ -493,7 +495,7 @@ class EvaluationTestCase extends CakeTestCase
         );
         $include = array(5);
         $required = array(1, 2, 3, 4, 5);
-        $eval = $this->EvaluationComponentTest->getMixevalResultDetail($groupEventId, $groupMembers, $include, $require);
+        $eval = $this->EvaluationComponentTest->getMixevalResultDetail($groupEventId, $groupMembers, $include, $required);
         // Set up expected results
         $expected = $this->setUpMixevalResultDetail();
         $this->assertEqual($eval, $expected);
@@ -977,6 +979,7 @@ class EvaluationTestCase extends CakeTestCase
                         "created" => "2006-06-21 08:53:14",
                         "updater_id" => 1,
                         "modified" => "2006-06-21 09:07:26",
+                        "canvas_assignment_id" => null,
                         "creator" => "Super Admin",
                         "updater" => "Super Admin",
                         "response_count" => 2,

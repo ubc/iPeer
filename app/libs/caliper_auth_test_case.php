@@ -64,7 +64,8 @@ class CaliperAuthTestCase extends ExtendedAuthTestCase {
 
         $this->_setup_super_admin();
 
-        CaliperSensor::setSendEvents(false);
+        CaliperSensor::isTest(true);
+        // CaliperSensor::sendTestEvents(true);
         CaliperSensor::getEnvelopes(); //clear envelopes if present
     }
 
@@ -80,7 +81,8 @@ class CaliperAuthTestCase extends ExtendedAuthTestCase {
         }
         unset($this->controller);
         ClassRegistry::flush();
-        CaliperSensor::setSendEvents(true);
+        CaliperSensor::isTest(false);
+        CaliperSensor::sendTestEvents(false);
     }
 
     public function getController()
@@ -205,18 +207,10 @@ class CaliperAuthTestCase extends ExtendedAuthTestCase {
 
             $this->assertEqual($envelope['sensor'], 'http://test.ipeer.com');
             $this->assertNotNull($envelope['sendTime']);
-            $this->assertEqual($envelope['dataVersion'], "http://purl.imsglobal.org/ctx/caliper/v1p1");
+            $this->assertEqual($envelope['dataVersion'], "http://purl.imsglobal.org/ctx/caliper/v1p2");
 
             foreach($envelope['data'] as $event) {
-                if ($event['type'] == 'ResourceManagementEvent') {
-                    $this->assertEqual($event['@context'], "http://purl.imsglobal.org/ctx/caliper/v1p1/ResourceManagementProfile-extension");
-                } else if (in_array($event['type'], array('SurveyEvent', 'QuestionnaireItemEvent', 'QuestionnaireEvent'))) {
-                    $this->assertEqual($event['@context'], "http://purl.imsglobal.org/ctx/caliper/v1p1/SurveyProfile-extension");
-                } else if ($event['type'] == 'FeedbackEvent') {
-                    $this->assertEqual($event['@context'], "http://purl.imsglobal.org/ctx/caliper/v1p1/FeedbackProfile-extension");
-                } else {
-                    $this->assertEqual($event['@context'], "http://purl.imsglobal.org/ctx/caliper/v1p1");
-                }
+                $this->assertEqual($event['@context'], "http://purl.imsglobal.org/ctx/caliper/v1p2");
                 unset($event['@context']);
 
                 $this->assertNotNull($event['id']);
@@ -247,9 +241,15 @@ class CaliperAuthTestCase extends ExtendedAuthTestCase {
                     unset($event['session']['duration']);
                 }
 
+                $this->assertNotNull($event['session']['client']['id']);
+                unset($event['session']['client']['id']);
+
                 $this->assertEqual($event['session'], array(
                     'type' => "Session",
-                    'user' => $this->expected_actor
+                    'user' => $this->expected_actor,
+                    'client' => array(
+                        'type' => 'SoftwareApplication'
+                    )
                 ));
                 unset($event['session']);
 
@@ -281,6 +281,11 @@ class CaliperAuthTestCase extends ExtendedAuthTestCase {
         putenv('CALIPER_BASE_URL=http://test.ipeer.com');
         putenv('CALIPER_ACTOR_BASE_URL=http://www.ubc.ca/%s');
         putenv('CALIPER_ACTOR_UNIQUE_IDENTIFIER_PARAM=username');
+
+        // to automatically send tests to suite, add info here and
+        // uncomment `CaliperSensor::sendTestEvents(true);` above
+        // putenv('CALIPER_API_KEY=be4947b8-3b6b-4fe4-99c1-86faff4c4aba');
+        // putenv('CALIPER_HOST=https://caliper-dev.imsglobal.org/caliper/be4947b8-3b6b-4fe4-99c1-86faff4c4aba/message');
     }
 
     function _disable_caliper() {

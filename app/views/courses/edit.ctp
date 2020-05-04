@@ -40,6 +40,8 @@ echo $form->input('Course.course');
 echo $html->div('help-text', __('Course subjects and course numbers, e.g. APSC 201 001', true));
 echo $form->input('Course.title');
 echo $html->div('help-text', __('Course title, e.g. Technical Communication', true));
+echo $form->input('Course.term');
+echo $html->div('help-text', __('Course term, e.g. 2019 W1', true));
 
 // instructors field
 function makeInstructor($i, $userId, $fullName, $html, $form) {

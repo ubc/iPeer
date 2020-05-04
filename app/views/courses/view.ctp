@@ -6,7 +6,7 @@ $maillToAll = join(';', Set::extract($data['Instructor'], '/email'));
         <th><?php __('Course')?></th>
         <td><?php echo $data['Course']['course']; ?></td>
         <th><?php __('Instructor(s)')?></th>
-        <td rowspan="2">
+        <td rowspan="3">
             <?php foreach($data['Instructor'] as $i): ?>
                 <a href="mailto:<?php echo $i['email']?>"><?php echo $html->image('icons/email_icon.gif',array('border'=>'0','alt'=>__('Email', true)))?></a>
                 <?php echo $this->element('users/user_info', array('data' => $i))?>
@@ -20,6 +20,10 @@ $maillToAll = join(';', Set::extract($data['Instructor'], '/email'));
     <tr>
         <th><?php __('Title')?></th>
         <td colspan="2"><?php echo $data['Course']['title']; ?></td>
+    </tr>
+    <tr>
+        <th><?php __('Term')?></th>
+        <td colspan="2"><?php echo $data['Course']['term']; ?></td>
     </tr>
     <tr>
         <th><?php __('Status')?></th>

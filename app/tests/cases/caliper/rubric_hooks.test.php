@@ -120,7 +120,6 @@ class CaliperRubricHooksTest extends CaliperAuthTestCase
         );
 
         $this->expected_rubric_question_1_scale = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/FeedbackProfile-extension',
             'id' => 'http://test.ipeer.com/rubrics/view/1/questions/1/scale',
             'type' => 'LikertScale',
             'extensions' => array(
@@ -143,7 +142,6 @@ class CaliperRubricHooksTest extends CaliperAuthTestCase
             'isPartOf' => $this->expected_rubric,
         );
         $this->expected_rubric_question_2_scale = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/FeedbackProfile-extension',
             'id' => 'http://test.ipeer.com/rubrics/view/1/questions/2/scale',
             'type' => 'LikertScale',
             'extensions' => array(
@@ -166,7 +164,6 @@ class CaliperRubricHooksTest extends CaliperAuthTestCase
             'isPartOf' => $this->expected_rubric,
         );
         $this->expected_rubric_question_3_scale = array(
-            '@context' => 'http://purl.imsglobal.org/ctx/caliper/v1p1/FeedbackProfile-extension',
             'id' => 'http://test.ipeer.com/rubrics/view/1/questions/3/scale',
             'type' => 'LikertScale',
             'extensions' => array(
@@ -216,12 +213,14 @@ class CaliperRubricHooksTest extends CaliperAuthTestCase
         foreach($this->expected_rubric_questions as $expected_rubric_question) {
             $expected_events[] = array(
                 'type' => 'ResourceManagementEvent',
+                'profile' => 'ResourceManagementProfile',
                 'action' => 'Deleted',
                 'object' => $expected_rubric_question,
             );
         }
         $expected_events[] = array(
             'type' => 'ResourceManagementEvent',
+            'profile' => 'ResourceManagementProfile',
             'action' => 'Deleted',
             'object' => $this->expected_rubric,
         );
@@ -262,6 +261,7 @@ class CaliperRubricHooksTest extends CaliperAuthTestCase
         $this->setupSession();
         $expected_event = array(
             'type' => 'ResourceManagementEvent',
+            'profile' => 'ResourceManagementProfile',
             'action' => 'Deleted',
             'object' => $this->expected_rubric_questions[2],
         );
@@ -309,6 +309,7 @@ class CaliperRubricHooksTest extends CaliperAuthTestCase
         $fake_removed_question_events = array(
             array(
                 'type' => 'ResourceManagementEvent',
+                'profile' => 'ResourceManagementProfile',
                 'action' => 'Deleted',
                 'object' => $this->expected_rubric_questions[2],
             ),
@@ -334,6 +335,7 @@ class CaliperRubricHooksTest extends CaliperAuthTestCase
                 $action = in_array($question['id'], $existing_question_ids) ? 'Modified' : 'Created';
                 $expected_events[] = array(
                     'type' => 'ResourceManagementEvent',
+                    'profile' => 'ResourceManagementProfile',
                     'action' => $action,
                     'object' => $expected_rubric_question,
                 );
@@ -341,6 +343,7 @@ class CaliperRubricHooksTest extends CaliperAuthTestCase
             $action = $is_new ? 'Created' : 'Modified';
             $expected_events[] = array(
                 'type' => 'ResourceManagementEvent',
+                'profile' => 'ResourceManagementProfile',
                 'action' => $action,
                 'object' => $this->expected_rubric,
             );

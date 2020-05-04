@@ -118,6 +118,7 @@ class CaliperSimpleEvaluationHooksTest extends CaliperAuthTestCase
         );
         $expected_event = array(
             'type' => 'ResourceManagementEvent',
+            'profile' => 'ResourceManagementProfile',
             'action' => 'Deleted',
             'object' => $this->expected_simple_evaluation,
         );
@@ -158,6 +159,7 @@ class CaliperSimpleEvaluationHooksTest extends CaliperAuthTestCase
         $this->setupSession();
         $expected_event = array(
             'type' => 'ResourceManagementEvent',
+            'profile' => 'ResourceManagementProfile',
             'action' => 'Created',
             'object' => $this->expected_simple_evaluation,
         );

@@ -72,6 +72,7 @@ class CoursesController extends AppController
             array("Course.id",            "",            "",      "hidden"),
             array("Course.course",        __("Course", true),      "15em",  "action", "Course Home"),
             array("Course.title",         __("Title", true),       "auto", "action", "Course Home"),
+            array("Course.term",          __("Term", true),       "auto", "action", "Course Home"),
             array("Course.creator_id",           "",            "",     "hidden"),
             array("Course.record_status", __("Status", true),      "5em",  "map",     array("A" => __("Active", true), "I" => __("Inactive", true))),
             array("Course.creator",     __("Created by", true),  "10em", "action", "View Creator")
@@ -280,6 +281,9 @@ class CoursesController extends AppController
        if (!empty($selectedCanvasCourse)) {
            $this->data['Course']['course'] = $selectedCanvasCourse->course_code;
            $this->data['Course']['title'] = $selectedCanvasCourse->name;
+           if ($selectedCanvasCourse->term && $selectedCanvasCourse->term->name) {
+               $this->data['Course']['term'] = $selectedCanvasCourse->term->name;
+           }
 
            // get instructors and TAs from the Canvas course
            $canvasusers = $selectedCanvasCourse->getUsers(
