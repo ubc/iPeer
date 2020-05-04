@@ -52,7 +52,7 @@
 ## Scenario 1 - Canvas Root user exists in iPeer
 
 > The `root@canvas` user in Canvas has been saved as `root` in iPeer with the corresponding `users.lti_id`  
-> See [19 Import fixtures in iPeer.md](/19%20Import%20fixtures%20in%20iPeer.md)
+> See [19 Import fixtures in iPeer.md](./19%20Import%20fixtures%20in%20iPeer.md)
 
 ### Expectations
 
