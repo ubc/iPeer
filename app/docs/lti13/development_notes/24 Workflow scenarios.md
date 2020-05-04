@@ -8,13 +8,11 @@
 
 ## Workflow scenario roles
 
-|------------|---------|
 | iPeer      | Canvas  |
 |------------|---------|
 | SuperAdmin | Root    |
 | Instructor | Teacher |
 | Student    | Student |
-|------------|---------|
 
 ## Workflows
 
@@ -41,7 +39,6 @@
 - SuperAdmin and Instructor roles are authorized to perform roster update.
 - Student role is not authorized to perform roster update.
 
-|-----------------|-------------------|
 | iPeer role      | Update roster     |
 |                 | button appears    |
 |                 | on ClassList page |
@@ -65,7 +62,6 @@
 | Tutor           | No permission     |
 | u: tutor1       |                   |
 | p: ipeeripeer   |                   |
-|-----------------|-------------------|
 
 ---------------------------------------------------------------------------------------------------
 
