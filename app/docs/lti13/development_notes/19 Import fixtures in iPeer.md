@@ -40,5 +40,3 @@ docker exec -it ipeer_db mysql ipeer -u ipeer -p -sNe "SELECT lti_id FROM users 
 ```
 f26afacc-9f3a-4c8e-8c82-85a9b2eee1cd
 ```
-
-Refresh <http://localhost:8080/lti13>
