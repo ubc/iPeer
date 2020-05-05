@@ -23,6 +23,7 @@ git tag -a 3.4.5 -m "LTI 1.3 plus roster update"
 git remote set-url origin git@github.com:ubc/iPeer.git
 git remote -v
 git push --set-upstream origin lti-1.3-roster-update
+git push origin --tags
 ```
 
 ## Create a Pull Request
