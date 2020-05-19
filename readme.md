@@ -13,6 +13,9 @@ cd iPeer
 # optionally, checkout the version you wanted to run
 # git checkout tags/3.4.4
 
+# pull git submodules
+git submodule update --init --recursive
+
 # use the default database config
 cp app/config/database.php.default app/config/database.php 
 
