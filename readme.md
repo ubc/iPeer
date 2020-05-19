@@ -1,5 +1,38 @@
 *Please note that with MySQL 5.7 and later, [the default sql_mode](https://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sql-mode-changes) has been changed. Please make sure the following modes are disabled: ONLY_FULL_GROUP_BY, STRICT_TRANS_TABLES, NO_ZERO_IN_DATE, and NO_ZERO_DATE.*
 
+Quick Start
+---------------------------
+If you have `docker` and `docker-compose` environment setup on your machine, you can start running iPeer for testing / development quickly by following these steps.
+```
+# get the source
+git clone https://github.com/ubc/iPeer.git
+
+# change to iPeer directory
+cd iPeer
+
+# optionally, checkout the version you wanted to run
+# git checkout tags/3.4.4
+
+# use the default database config
+cp app/config/database.php.default app/config/database.php 
+
+# pull images and start containers
+docker-compose pull && docker-compose up -d
+
+# open a shell into the app container
+docker exec -it ipeer_app bash
+# within the container, install any missing packages
+composer install
+# exit the container
+exit
+
+# on host, change the permission of tmp folders
+chmod -R 777 app/tmp
+# restart containers
+docker-compose restart
+```
+Launch a browser and go to http://localhost:8080/ to continue the initial setup.
+
 Running with Docker
 ---------------------------
 ### Prerequisites
