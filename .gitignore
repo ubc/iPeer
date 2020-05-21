@@ -20,6 +20,5 @@ vendor/
 .idea
 .data
 composer.phar
-composer.lock
 app/config/**/*.key
 .DS_Store
