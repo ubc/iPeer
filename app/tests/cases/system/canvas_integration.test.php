@@ -36,7 +36,7 @@ set_error_handler('error_handler');
 // - Modify the following constants accordingly
 
 // TODO: move to environment variable
-const ENABLE_CANVAS_TEST = true;
+const ENABLE_CANVAS_TEST = false;
 const CANVAS_TEST_BASE_URL = 'http://docker-canvas_app_1';
 const CANVAS_ADMIN_LOGIN = 'ipeertest@docker-canvas_app_1';
 const CANVAS_ADMIN_PASSWORD = 'password';
