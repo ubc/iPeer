@@ -26,6 +26,15 @@ git push --set-upstream origin lti-1.3-roster-update
 git push origin --tags
 ```
 
+## Delete local GitLab dirtree
+
+```bash
+cd ~/Code/ctlt
+rm -rf ~/Code/ctlt/iPeer
+mv ipeer-lti13 iPeer
+cd ~/Code/ctlt/iPeer
+```
+
 ## Create a Pull Request
 
 <https://github.com/ubc/iPeer/pull/new/lti-1.3-roster-update>
