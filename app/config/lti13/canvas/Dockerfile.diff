@@ -1,5 +1,0 @@
-105c105,106
-< RUN COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rake canvas:compile_assets
----
-> # RUN COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rake canvas:compile_assets
-> RUN COMPILE_ASSETS_BUILD_JS=0 bundle exec rake canvas:compile_assets_dev
