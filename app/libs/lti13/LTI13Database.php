@@ -30,13 +30,14 @@ class LTI13Database implements LTI_Database {
             return false;
         }
         $issuer = $this->issuers[$iss];
+        $tool_private_key = $this->tool_private_key($iss);
         return LTI_Registration::new()
             ->set_auth_login_url($issuer['auth_login_url'])
             ->set_auth_token_url($issuer['auth_token_url'])
             ->set_client_id($issuer['client_id'])
             ->set_key_set_url($issuer['key_set_url'])
             ->set_issuer($iss)
-            ->set_tool_private_key($issuer['tool_private_key']);
+            ->set_tool_private_key($tool_private_key);
     }
 
     /**
@@ -52,5 +53,16 @@ class LTI13Database implements LTI_Database {
             return false;
         }
         return LTI_Deployment::new()->set_deployment_id($deployment_id);
+    }
+
+    /**
+     * Load tool private key from file in storage folder.
+     *
+     * @param string $iss
+     * @return string
+     */
+    private function tool_private_key($iss) {
+        $filename = ROOT.DS.$this->issuers[$iss]['tool_private_key_file'];
+        return file_get_contents($filename);
     }
 }

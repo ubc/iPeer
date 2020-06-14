@@ -2418,7 +2418,7 @@ CREATE TABLE `lti_tool_registrations` (
   `auth_login_url` varchar(255) NOT NULL,
   `auth_token_url` varchar(255) NOT NULL,
   `key_set_url` varchar(255) NOT NULL,
-  `tool_private_key` text NOT NULL,
+  `tool_private_key_file` varchar(255) NOT NULL,
   PRIMARY KEY `iss` (`iss`),
   UNIQUE KEY `iss_client` (`iss`,`client_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
@@ -2430,33 +2430,7 @@ INSERT INTO `lti_tool_registrations` VALUES
     'https://lti-ri.imsglobal.org/platforms/652/authorizations/new',
     'https://lti-ri.imsglobal.org/platforms/652/access_tokens',
     'https://lti-ri.imsglobal.org/platforms/652/platform_keys/654.json',
-    '-----BEGIN RSA PRIVATE KEY-----
-MIIEowIBAAKCAQEA0p6MHsFSIKZsX0ABU2UEy08JYJOSBu3Pb5XErkqWdO0AZ9MZ
-i3hW94im6qr3aC7ZCgKHbyY9RwSCKolUY/HUdI/LF4389hg6jobFlQtagcIkgOF4
-F0d75ygPb8/ihWi8uQAB0S0H2GDzldj2FL6SRx7Nob/1A1LY63NXEXwIkXIdQfFR
-3fjkptGSy4PhJOb6o498lV4AOVC8GMW0kJdjH0SsXm1clga3QSaFyyAylnE+0cyx
-db8osH6v2/iLUSpZ0rnmX6AOJZwePB4bp1ne+c6JokBiumw9bZdyXGFG0tuHkwZG
-yCVN+mcgfHnz3IQy956hVIkprpkCM/Pu5EADuwIDAQABAoIBAQDSFFSdBKT/biBg
-bX4lCXjbtY0b6HXaNXAX0+InGryyCgfCh5xOMg1Ev+gF39wA7eGMi3M9WX37jTKs
-bOhg/EC2twqTBwxPB2G48hK4FGgFT3mLl9lqFuIuchXbqBZAjXTYbnphgzH1ENdG
-Gu9xR5iuGbpv4QDpfMRjLVumU/pT3xiz2q0JdsJ1K23p8ibhpRl1epRxXQZDZ8ht
-2vNBxhjlUHg/CKOaenYW8OCjcoNnll0a0IibsNoKsNCwcz8wtlO3sUJc4ClbC0Dc
-HbFC6zZJj8qJmJ2YeNdyRSwe8A703T8Y25ZB1Q0ptnYh34AwtoEDprZc78oK2I3C
-BDBbre/hAoGBAOpAtQlmWQ1y9s9yFzlhS0yS2+zHaWvYg5aKFumIBVBNlfETCEZ6
-BN5uEfzRD3jUkkNCr/uChkx5QpbGX7pwxh1iGxRQ5AjUEjwtFj45HO2zYWvXkP8O
-Tz25fxEF9YcVcrJfl9tdGwV0nQXVgVuUfD5FKVPAxQOUp8vFzEZ3TTexAoGBAOYs
-KeiW8HjhZRV/o4S59GbWqKjFTHcVQtJ82sieRWAdsfPVxnkAZsYYddPdmAAmsPvc
-IVCH1lk4POU5gE0+kCaoZDnHQt8OX3V61KKiRWmYJFg4adEYaDTYppu6ZsqclDaJ
-0xf6MFtdURPbNAj+WDFP2D8brahzVu8vG5UshXkrAoGANq8iU+5rjYMv8J9eoot+
-64JBCtZGWuGxXjwgOyYAr41dGmjp/qHPbylc05ruNLPS7RatRFZlCYcpL09h24Em
-DofvcF+tzA3Nr/SKg74LbcX5URaCh7gMcYlTC2NLvNwZ6V/9cD0c6LofSdRcnUdd
-dZ/plN6kX0CdpykmlbCV+xECgYBBiSmVlAR8JpEFggYo8FlqPoxfIW4YKfGQxQP2
-Qzo1l77nUmLkaPzaQnSqEloJEPsrew3xQ/wAA0czbR/e3oVkvGVtHhMoN4tug76v
-X8yruCoBBG78nhptkZI+nOBPqC17Kdr05MOIABXptWwnc2PhBn7n2RWk9NI34A3W
-d4q5aQKBgAWZoIU0Bz4UNko/Sydman2kAygi4ftOkVrnGdYgkAtv/T97LwW2CPOo
-gRMwkfLriWUUtLxe1eOPgtFvKBOgPTPW6A+fOuYwrPeQU0d1OSqDEJOS/zJMxVzt
-x2yDLJugpGiqM7qCIY93U4JfnpXA2UfBkoL6N11LjWCD7cNS3lN1
------END RSA PRIVATE KEY-----'
+    'app/config/lti13/tool.private.key'
 ),
 (
     'https://canvas.instructure.com',
@@ -2464,32 +2438,6 @@ x2yDLJugpGiqM7qCIY93U4JfnpXA2UfBkoL6N11LjWCD7cNS3lN1
     'http://canvas.docker/api/lti/authorize_redirect',
     'http://canvas.docker/login/oauth2/token',
     'http://canvas.docker/api/lti/security/jwks',
-    '-----BEGIN RSA PRIVATE KEY-----
-MIIEowIBAAKCAQEA0p6MHsFSIKZsX0ABU2UEy08JYJOSBu3Pb5XErkqWdO0AZ9MZ
-i3hW94im6qr3aC7ZCgKHbyY9RwSCKolUY/HUdI/LF4389hg6jobFlQtagcIkgOF4
-F0d75ygPb8/ihWi8uQAB0S0H2GDzldj2FL6SRx7Nob/1A1LY63NXEXwIkXIdQfFR
-3fjkptGSy4PhJOb6o498lV4AOVC8GMW0kJdjH0SsXm1clga3QSaFyyAylnE+0cyx
-db8osH6v2/iLUSpZ0rnmX6AOJZwePB4bp1ne+c6JokBiumw9bZdyXGFG0tuHkwZG
-yCVN+mcgfHnz3IQy956hVIkprpkCM/Pu5EADuwIDAQABAoIBAQDSFFSdBKT/biBg
-bX4lCXjbtY0b6HXaNXAX0+InGryyCgfCh5xOMg1Ev+gF39wA7eGMi3M9WX37jTKs
-bOhg/EC2twqTBwxPB2G48hK4FGgFT3mLl9lqFuIuchXbqBZAjXTYbnphgzH1ENdG
-Gu9xR5iuGbpv4QDpfMRjLVumU/pT3xiz2q0JdsJ1K23p8ibhpRl1epRxXQZDZ8ht
-2vNBxhjlUHg/CKOaenYW8OCjcoNnll0a0IibsNoKsNCwcz8wtlO3sUJc4ClbC0Dc
-HbFC6zZJj8qJmJ2YeNdyRSwe8A703T8Y25ZB1Q0ptnYh34AwtoEDprZc78oK2I3C
-BDBbre/hAoGBAOpAtQlmWQ1y9s9yFzlhS0yS2+zHaWvYg5aKFumIBVBNlfETCEZ6
-BN5uEfzRD3jUkkNCr/uChkx5QpbGX7pwxh1iGxRQ5AjUEjwtFj45HO2zYWvXkP8O
-Tz25fxEF9YcVcrJfl9tdGwV0nQXVgVuUfD5FKVPAxQOUp8vFzEZ3TTexAoGBAOYs
-KeiW8HjhZRV/o4S59GbWqKjFTHcVQtJ82sieRWAdsfPVxnkAZsYYddPdmAAmsPvc
-IVCH1lk4POU5gE0+kCaoZDnHQt8OX3V61KKiRWmYJFg4adEYaDTYppu6ZsqclDaJ
-0xf6MFtdURPbNAj+WDFP2D8brahzVu8vG5UshXkrAoGANq8iU+5rjYMv8J9eoot+
-64JBCtZGWuGxXjwgOyYAr41dGmjp/qHPbylc05ruNLPS7RatRFZlCYcpL09h24Em
-DofvcF+tzA3Nr/SKg74LbcX5URaCh7gMcYlTC2NLvNwZ6V/9cD0c6LofSdRcnUdd
-dZ/plN6kX0CdpykmlbCV+xECgYBBiSmVlAR8JpEFggYo8FlqPoxfIW4YKfGQxQP2
-Qzo1l77nUmLkaPzaQnSqEloJEPsrew3xQ/wAA0czbR/e3oVkvGVtHhMoN4tug76v
-X8yruCoBBG78nhptkZI+nOBPqC17Kdr05MOIABXptWwnc2PhBn7n2RWk9NI34A3W
-d4q5aQKBgAWZoIU0Bz4UNko/Sydman2kAygi4ftOkVrnGdYgkAtv/T97LwW2CPOo
-gRMwkfLriWUUtLxe1eOPgtFvKBOgPTPW6A+fOuYwrPeQU0d1OSqDEJOS/zJMxVzt
-x2yDLJugpGiqM7qCIY93U4JfnpXA2UfBkoL6N11LjWCD7cNS3lN1
------END RSA PRIVATE KEY-----'
+    'app/config/lti13/tool.private.key'
 );
 --- END: Added by DB upgrade to version 18
