@@ -164,6 +164,9 @@ cd ~/Code/ctlt/iPeer
 docker-compose up -d --build
 git submodule init
 git submodule update
+docker exec -it ipeer_db mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS ipeer_test"
+docker exec -it ipeer_db mysql -u root -p -e "GRANT ALL PRIVILEGES ON ipeer_test.* TO 'ipeer'@'%'"
+docker exec -it ipeer_db mysql -u root -p -e "SHOW GRANTS FOR ipeer; SHOW DATABASES"
 ```
 
 **Wait 5 minutes for the database to build**
