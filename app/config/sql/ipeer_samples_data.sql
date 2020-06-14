@@ -2419,7 +2419,8 @@ CREATE TABLE `lti_tool_registrations` (
   `auth_token_url` varchar(255) NOT NULL,
   `key_set_url` varchar(255) NOT NULL,
   `tool_private_key` text NOT NULL,
-  PRIMARY KEY `iss` (`iss`)
+  PRIMARY KEY `iss` (`iss`),
+  UNIQUE KEY `iss_client` (`iss`,`client_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 INSERT INTO `lti_tool_registrations` VALUES
