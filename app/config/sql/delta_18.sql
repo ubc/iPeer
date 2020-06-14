@@ -24,7 +24,7 @@ CREATE TABLE `lti_tool_registrations` (
   `auth_login_url` varchar(255) NOT NULL,
   `auth_token_url` varchar(255) NOT NULL,
   `key_set_url` varchar(255) NOT NULL,
-  `private_key_file` varchar(255) NOT NULL,
+  `tool_private_key_file` varchar(255) NOT NULL,
   PRIMARY KEY `iss` (`iss`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 

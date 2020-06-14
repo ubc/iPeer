@@ -19,7 +19,7 @@ class LtiToolRegistrationFixture extends CakeTestFixture
         'auth_login_url' => array('type' => 'string', 'length' => 255, 'null' => false),
         'auth_token_url' => array('type' => 'string', 'length' => 255, 'null' => false),
         'key_set_url' => array('type' => 'string', 'length' => 255, 'null' => false),
-        'private_key_file' => array('type' => 'string', 'length' => 255, 'null' => false),
+        'tool_private_key_file' => array('type' => 'string', 'length' => 255, 'null' => false),
     );
 
     public $import = array('table' => 'lti_tool_registrations', 'records' => true);

@@ -298,7 +298,7 @@ JSON;
         "auth_login_url": "http://canvas.docker/api/lti/authorize_redirect",
         "auth_token_url": "http://canvas.docker/login/oauth2/token",
         "key_set_url": "http://canvas.docker/api/lti/security/jwks",
-        "private_key_file": "app/config/lti13/tool.private.key",
+        "tool_private_key_file": "app/config/lti13/tool.private.key",
         "deployment": [
             "1:4dde05e8ca1973bcca9bffc13e1548820eee93a3",
             "2:f97330a96452fc363a34e0ef6d8d0d3e9e1007d2",
@@ -310,7 +310,7 @@ JSON;
         "auth_login_url": "https://lti-ri.imsglobal.org/platforms/652/authorizations/new",
         "auth_token_url": "https://lti-ri.imsglobal.org/platforms/652/access_tokens",
         "key_set_url": "https://lti-ri.imsglobal.org/platforms/652/platform_keys/654.json",
-        "private_key_file": "app/config/lti13/tool.private.key",
+        "tool_private_key_file": "app/config/lti13/tool.private.key",
         "deployment": [
             "1"
         ]
