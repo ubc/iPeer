@@ -161,6 +161,7 @@ git clone -b lti-1.3-port https://repo.code.ubc.ca:smarsh05/ipeer-lti13.git
 
 ```bash
 cd ~/Code/ctlt/iPeer
+rm -rf .data
 docker-compose up -d --build
 git submodule init
 git submodule update
