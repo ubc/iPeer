@@ -24,6 +24,15 @@ if (User::hasPermission('controllers/departments')) {
     echo '</li>';
 }
 
+if (User::hasPermission('functions/user/admin')) {
+    echo '<li>';
+    echo $this->Html->link(
+        __('LTI 1.3 Tool Registrations',true),
+        array('controller' => 'lti_tool_registrations')
+    );
+    echo '</li>';
+}
+
 if (User::hasPermission('functions/user/superadmin')) {
     echo "<li>";
         echo $this->Html->link(

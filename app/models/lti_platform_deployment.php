@@ -12,33 +12,19 @@
 class LtiPlatformDeployment extends AppModel
 {
     public $name = 'LtiPlatformDeployment';
-    public $primaryKey = 'iss';
-
     public $belongsTo = array(
         'LtiToolRegistration' => array(
             'className' => 'LtiToolRegistration',
-            'foreignKey' => 'iss',
-            'fields' => array('deployment'),
+            'order'     => 'LtiToolRegistration.iss ASC, LtiToolRegistration.client_id ASC',
         ),
     );
-
-    /**
-     * Find all deployments.
-     *
-     * @return array
-     */
-    public function findDeployments()
-    {
-        return $this->find('all', array('order'=>'iss ASC'));
-    }
-
-    /**
-     * Save deployment for provided issuer.
-     *
-     * @return array
-     */
-    public function saveDeployment($data)
-    {
-        return $this->save($data);
-    }
+    public $validate = array(
+        'deployment' => array(
+            'maxLength' => array(
+                'rule'    => array('maxLength', 64),
+                'message' => 'Maximum 64 characters',
+                'required' => false,
+            ),
+        ),
+    );
 }
