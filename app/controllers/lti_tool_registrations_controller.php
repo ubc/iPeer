@@ -48,10 +48,14 @@ class LtiToolRegistrationsController extends AppController
 
             // POST request
             if (!empty($this->data)) {
-                // To avoid validation errors
+
+                // Avoid validation errors on foreign key
                 unset($this->LtiToolRegistration->LtiPlatformDeployment->validate['lti_tool_registration_id']);
 
-                $this->_filterDeployments();
+                // Filter out related deployment ID blanks
+                $this->data = $this->LtiPlatformDeployment->filterDeploymentRows($this->data);
+
+                // Save all
                 if ($this->LtiToolRegistration->saveAll($this->data)) {
                     $this->Session->setFlash(__('Tool registration has been created', true), 'good');
                     $this->redirect(array('action' => 'index'));
@@ -83,8 +87,19 @@ class LtiToolRegistrationsController extends AppController
 
             // PUT request
             if (!empty($this->data)) {
-                $this->_filterDeployments();
-                $this->_replaceDeployments();
+
+                // Delete associated deployments from dB
+                $id = $this->data['LtiToolRegistration']['id'];
+                $conditions = 'lti_tool_registration_id = ' . $id;
+                $this->LtiToolRegistration->LtiPlatformDeployment->deleteAll($conditions);
+
+                // Filter out related deployment ID blanks
+                $this->data = $this->LtiPlatformDeployment->filterDeploymentRows($this->data);
+
+                // Fill related deployment ID rows with foreign key
+                $this->data = $this->LtiPlatformDeployment->fillDeploymentRows($this->data, $id);
+
+                // Save all
                 if ($this->LtiToolRegistration->saveAll($this->data)) {
                     $this->Session->setFlash(__('Tool registration has been updated', true), 'good');
                     $this->redirect(array('action' => 'index'));
@@ -98,50 +113,6 @@ class LtiToolRegistrationsController extends AppController
             $this->Session->setFlash($e->getMessage());
             $this->redirect(array('action'=>'index'));
 
-        }
-    }
-
-    /**
-     * Filter out related deployment ID blanks
-     *
-     * @return array
-     */
-    private function _filterDeployments()
-    {
-        if (!empty($this->data['LtiPlatformDeployment'])) {
-            foreach ($this->data['LtiPlatformDeployment'] as $i => $row) {
-                if (isset($row['deployment'])) {
-                    if (empty(trim($row['deployment']))) {
-                        unset($this->data['LtiPlatformDeployment'][$i]);
-                    }
-                }
-            }
-        }
-        if (empty($this->data['LtiPlatformDeployment'])) {
-            unset($this->data['LtiPlatformDeployment']);
-        }
-    }
-
-    /**
-     * Replace related deployment ID rows
-     *
-     * @return array
-     */
-    private function _replaceDeployments()
-    {
-        $id = $this->data['LtiToolRegistration']['id'];
-
-        // Delete from dB
-        $conditions = 'lti_tool_registration_id = ' . $id;
-        if ($this->LtiToolRegistration->LtiPlatformDeployment->deleteAll($conditions)) {
-            $this->Session->setFlash(__('Tool registration deployments have been deleted.', true), 'good');
-        }
-
-        // Fill with foreign key
-        if (!empty($this->data['LtiPlatformDeployment'])) {
-            foreach ($this->data['LtiPlatformDeployment'] as $i => $row) {
-                $this->data['LtiPlatformDeployment'][$i]['lti_tool_registration_id'] = $id;
-            }
         }
     }
 
