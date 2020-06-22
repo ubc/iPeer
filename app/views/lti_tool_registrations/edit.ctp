@@ -53,7 +53,7 @@ echo $this->Form->input('LtiPlatformDeployment.0.deployment', array(
     'size'  => '60',
     'after' => $remove_button,
 ));
-foreach ((array)$this->data['LtiPlatformDeployment'] as $i => $row) {
+foreach ((array)@$this->data['LtiPlatformDeployment'] as $i => $row) {
     if ($i > 0) {
         echo $this->Form->input('LtiPlatformDeployment.' . $i . '.deployment', array(
             'label' => 'Deployment ID',
