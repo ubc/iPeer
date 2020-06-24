@@ -48,7 +48,6 @@ Running with Docker
 Note: if you are planning to do development, you can skip this step.
 ```
 docker pull ubcctlt/ipeer-app
-docker pull ubcctlt/ipeer-web
 ```
 
 #### Edit docker-compose.yml

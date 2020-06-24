@@ -27,6 +27,8 @@ class UpgradeBase
     public function isUpgradable()
     {
         $sysparameter = ClassRegistry::init('SysParameter');
+        # make sure to get the value from DB
+        $sysparameter->reload();
         $this->currentVersion = $sysparameter->get('system.version');
         return in_array($this->currentVersion, $this->fromVersions);
     }
@@ -66,6 +68,7 @@ class UpgradeBase
             // because there's no pre-existing database.version entry,
             // upgrade_310 should properly add this back
             $sysparameter->setValue('database.version', $this->dbVersion);
+            $sysparameter->setValue('system.version', $this->toVersion);
             if (!$sysparameter->get('system.absolute_url')) {
                 $sysparameter->setValue('system.absolute_url', Router::url('/', true));
             }

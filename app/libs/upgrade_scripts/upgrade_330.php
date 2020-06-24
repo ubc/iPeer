@@ -20,9 +20,9 @@ require_once('upgrade_base.php');
 	 */
 	public function __construct()
 	{
-		$this->fromVersions = array(null, '3.2.0');
+		$this->fromVersions = array(null, '3.1.9', '3.2.0');
 		$this->toVersion = '3.3.0';
-		$this->dbVersion = Configure::read('DATABASE_VERSION');
+		$this->dbVersion = 14;
 	}
 
 	/**
