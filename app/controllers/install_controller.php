@@ -20,6 +20,7 @@ class InstallController extends Controller
     public $components   = array(
         'Session',
         'installHelper',
+        'Upgrader'
     );
     public $helpers = array('Session', 'Html', 'Js');
     public $layout = 'installer';
@@ -158,6 +159,15 @@ class InstallController extends Controller
             $db = ConnectionManager::getDataSource('default');
             $db->cacheSources = false;
 
+            // Try to patch the database if needed, note that this database patching
+            // is only for small changes, not for large version changes
+            $ret = $this->Upgrader->upgrade();
+            if (!$ret) {
+                $this->Session->setFlash(__('Database patching failed - '.$ret, true));
+                $this->redirect(array('action' => 'install4'));
+                return;
+            }
+
             $this->createSuperAdmin(
                 $this->data['InstallValidationStep4']['super_admin'],
                 $this->data['InstallValidationStep4']['password'],
@@ -178,27 +188,10 @@ class InstallController extends Controller
                 )
             );
             $this->installHelper->updateSystemParameters($sysparams);
-            // mark this instance as installed
-            $f = fopen(TMP.'installed.txt', 'w');
-            if (!$f) {
-                $this->Session->setFlash(sprintf(__('Installation failed, unable to write to %s dir', true), CONFIGS));
-                $this->redirect(array('action' => 'install4'));
-                return;
-            }
-            fclose($f);
 
             // congratulate the user for a successful install
             $this->redirect(array('action' => 'install5'));
-        } /*else {
-            // Try to patch the database if needed, note that this database patching
-            // is only for small changes, not for large version changes
-            $ret = $this->patchDB();
-            if ($ret) {
-                $this->Session->setFlash(__('Database patching failed - '.$ret, true));
-                $this->redirect(array('action' => 'install3'));
-                return;
-            }
-        }*/
+        }
     }
 
     /**

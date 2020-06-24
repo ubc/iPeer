@@ -25,7 +25,7 @@ class UpgraderComponent extends CakeObject
         $scriptNames = glob(APP.DS.'libs'.DS.'upgrade_scripts/*.php');
         sort($scriptNames);
         foreach ($scriptNames as $script) {
-            if (basename($script) == 'upgrade_base.php') {
+            if (basename($script) == 'upgrade_base.php' || basename($script) == 'upgrade_default.php') {
                 continue;
             }
             require_once($script);

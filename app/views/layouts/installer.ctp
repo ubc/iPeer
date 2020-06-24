@@ -10,20 +10,20 @@
     <link rel="shortcut icon" href="img/favicon.png" type="image/png" />
     <?php
     // CSS files
-    echo $html->css('http://fonts.googleapis.com/css?family=Lato:400,400italic,700');
-    echo $html->css('http://fonts.googleapis.com/css?family=Open+Sans:400,600,700');
+    echo $html->css('https://fonts.googleapis.com/css?family=Lato:400,400italic,700');
+    echo $html->css('https://fonts.googleapis.com/css?family=Open+Sans:400,600,700');
 
-// 
+//
     echo $html->css('ipeer');
     echo $html->css('install');
-    
-    // Scripts 
+
+    // Scripts
     // as prototype does not appear to be maintained anymore, we should
     // switch to jquery. Load jquery from Google.
     echo $html->script('https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js');
 
     // Custom View Include Files
-    echo $scripts_for_layout; 
+    echo $scripts_for_layout;
     ?>
   </head>
 <body>

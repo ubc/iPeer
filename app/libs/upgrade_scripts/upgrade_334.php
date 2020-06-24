@@ -22,7 +22,7 @@ require_once('upgrade_base.php');
     {
         $this->fromVersions = array(null, '3.3.2', '3.3.3');
         $this->toVersion = '3.3.4';
-        $this->dbVersion = Configure::read('DATABASE_VERSION');
+        $this->dbVersion = 15;
     }
 
     /**
