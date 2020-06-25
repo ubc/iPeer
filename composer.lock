@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0c697edb97d11e5da69c9f196935c4d5",
+    "content-hash": "183e128fc3be2cad46ff12f0e7d2f210",
     "packages": [
         {
             "name": "compass/cake-guard",
-            "version": "1.0.5",
+            "version": "1.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/xcompass/CakePHP-Guard-Plugin.git",
-                "reference": "96d815561a6c3fb77982f080c6e6b7fea1b5042a"
+                "reference": "637389ece1a434d41f51f66ce47f04a7ac4cc92a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/xcompass/CakePHP-Guard-Plugin/zipball/96d815561a6c3fb77982f080c6e6b7fea1b5042a",
-                "reference": "96d815561a6c3fb77982f080c6e6b7fea1b5042a",
+                "url": "https://api.github.com/repos/xcompass/CakePHP-Guard-Plugin/zipball/637389ece1a434d41f51f66ce47f04a7ac4cc92a",
+                "reference": "637389ece1a434d41f51f66ce47f04a7ac4cc92a",
                 "shasum": ""
             },
             "require": {
@@ -35,7 +35,7 @@
                 }
             ],
             "description": "Authentication Plugin for CakePHP 1.3",
-            "time": "2019-03-15T23:22:30+00:00"
+            "time": "2020-06-24T22:13:27+00:00"
         },
         {
             "name": "imsglobal/caliper",
