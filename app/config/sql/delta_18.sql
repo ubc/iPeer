@@ -28,8 +28,11 @@ CREATE TABLE `lti_tool_registrations` (
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 INSERT INTO `acos` VALUES
-(338,1,NULL,NULL,'LtiToolRegistrations',664,673),
+(338,2,NULL,NULL,'Lti_Tool_Registrations',664,673),
 (339,338,NULL,NULL,'index',665,666),
 (340,338,NULL,NULL,'add',667,668),
 (341,338,NULL,NULL,'edit',669,670),
 (342,338,NULL,NULL,'delete',671,672);
+
+INSERT INTO `aros_acos` VALUES
+(NULL,1,338,'1','1','1','1');

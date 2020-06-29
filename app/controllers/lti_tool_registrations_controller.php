@@ -16,17 +16,6 @@ class LtiToolRegistrationsController extends AppController
     public $name = 'LtiToolRegistrations';
     public $uses = array('LtiToolRegistration', 'LtiPlatformDeployment');
 
-    public function __construct()
-    {
-        parent::__construct();
-        $this->set('customLogo', null);
-    }
-
-    public function beforeFilter()
-    {
-        $this->Auth->allow();
-    }
-
     /**
      * Index action
      */
