@@ -2434,14 +2434,14 @@ INSERT INTO `lti_tool_registrations` VALUES
 (1,'https://canvas.instructure.com','10000000000001','http://canvas.docker/api/lti/authorize_redirect','http://canvas.docker/login/oauth2/token','http://canvas.docker/api/lti/security/jwks','app/config/lti13/tool.private.key'),
 (2,'https://lti-ri.imsglobal.org','ipeer-lti13-001','https://lti-ri.imsglobal.org/platforms/652/authorizations/new','https://lti-ri.imsglobal.org/platforms/652/access_tokens','https://lti-ri.imsglobal.org/platforms/652/platform_keys/654.json','app/config/lti13/tool.private.key');
 
-INSERT INTO `acos` VALUES
-(338,2,NULL,NULL,'Lti_Tool_Registrations',664,673),
+INSERT INTO `acos` (id, parent_id, model, foreign_key, alias, lft, rght) VALUES
+(338,2,NULL,NULL,'Ltitoolregistrations',664,673),
 (339,338,NULL,NULL,'index',665,666),
 (340,338,NULL,NULL,'add',667,668),
 (341,338,NULL,NULL,'edit',669,670),
 (342,338,NULL,NULL,'delete',671,672);
 
-INSERT INTO `aros_acos` VALUES
+INSERT INTO `aros_acos` (id, aro_id, aco_id, _create, _read, _update, _delete) VALUES
 (NULL,1,338,'1','1','1','1');
 
 --- END: Added by DB upgrade to version 18

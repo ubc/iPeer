@@ -9,7 +9,7 @@
     <p><span style="color:red;">*</span><?php __('All fields required'); ?></p>
 
 <?php
-echo $this->Form->create('LtiToolRegistration');
+echo $this->Form->create('Ltitoolregistration');
 
 echo $this->Form->input('LtiToolRegistration.iss', array(
     'type'  => 'text',

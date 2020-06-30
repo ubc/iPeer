@@ -70,11 +70,7 @@ class LtiToolRegistrationsController extends AppController
 
         try {
 
-            if (empty($id)) {
-                $this->redirect(array('action' => 'index'));
-            }
-
-            // PUT request
+            // POST request
             if (!empty($this->data)) {
 
                 // Delete associated deployments from dB
@@ -93,6 +89,13 @@ class LtiToolRegistrationsController extends AppController
                     $this->Session->setFlash(__('Tool registration has been updated', true), 'good');
                     $this->redirect(array('action' => 'index'));
                 }
+
+            } else {
+
+                if (empty($id)) {
+                    $this->redirect(array('action' => 'index'));
+                }
+
             }
 
             $this->data = $this->LtiToolRegistration->findById($id);
