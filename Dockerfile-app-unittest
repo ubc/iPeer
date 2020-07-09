@@ -24,7 +24,7 @@ COPY docker/php.ini /usr/local/etc/php/
 COPY . /var/www/html
 
 RUN cd /var/www/html \
-    && composer install \
+    && composer install --no-ansi --no-dev --no-interaction --no-plugins --no-progress --no-suggest --optimize-autoloader \
     && mkdir -p /var/www/html/app/tmp/cache/persistent /var/www/html/app/tmp/cache/models \
     && chown www-data:www-data -R /var/www/html/app/tmp/cache
 

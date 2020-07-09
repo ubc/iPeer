@@ -20,7 +20,7 @@ COPY docker/php.ini /usr/local/etc/php/
 COPY . /var/www/html
 
 RUN cd /var/www/html \
-    && composer install --no-ansi --no-dev --no-interaction --no-plugins --no-progress --no-suggest --optimize-autoloader \
+    && composer install --no-ansi --no-dev --no-interaction --no-plugins --no-progress --no-scripts --no-suggest --optimize-autoloader \
     && mkdir -p /var/www/html/app/tmp/cache/persistent /var/www/html/app/tmp/cache/models /var/www/html/app/tmp/logs \
     && chown www-data:www-data -R /var/www/html/app/tmp/cache \
     && ln -sf /dev/stdout /var/www/html/app/tmp/logs/api.log \
