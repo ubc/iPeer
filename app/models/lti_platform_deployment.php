@@ -34,7 +34,7 @@ class LtiPlatformDeployment extends AppModel
      * @param array $data
      * @return array
      */
-    public function filterDeploymentRows($data)
+    public function filterDeploymentRows(array $data)
     {
         // Remove empty deployment values
         if (!empty($data['LtiPlatformDeployment'])) {
@@ -62,7 +62,7 @@ class LtiPlatformDeployment extends AppModel
      * @param int $lti_tool_registration_id
      * @return array
      */
-    public function fillDeploymentRows($data, $lti_tool_registration_id)
+    public function fillDeploymentRows(array $data, $lti_tool_registration_id)
     {
         if (!empty($data['LtiPlatformDeployment'])) {
             foreach ($data['LtiPlatformDeployment'] as $i => $row) {
