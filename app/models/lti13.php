@@ -443,7 +443,7 @@ class Lti13 extends AppModel
                     'UserEnrol' => array(
                         'course_id' => $courseId,
                         'user_id' => $userId,
-                        'record_status' => 'A',
+                        'record_status' => Course::STATUS_ACTIVE,
                     ),
                 );
                 if ($this->User->UserEnrol->save($data)) {
