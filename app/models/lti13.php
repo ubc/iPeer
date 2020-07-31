@@ -109,6 +109,54 @@ class Lti13 extends AppModel
     }
 
     /**
+     * Get user object by puid
+     *
+     * @return string
+     */
+    public function getPuidUser()
+    {
+        $puid = $this->getPuid();
+        if (!$user = @$this->findUserByPuid($puid)) {
+            throw new LTI_Exception(sprintf("Could not find user '%s'", $puid));
+            return;
+        }
+        return $user;
+    }
+
+    /**
+     * Get puid from LTI data.
+     *
+     * @return string
+     */
+    public function getPuid()
+    {
+        $key = "https://purl.imsglobal.org/spec/lti/claim/custom";
+        if (!$custom = @$this->jwtBody[$key]) {
+            throw new LTI_Exception(sprintf("Missing '%s'", $key));
+            return;
+        }
+
+        if (!$ubc_puid = @$custom['ubc_puid']) {
+            throw new LTI_Exception(sprintf("Missing ubc_puid in '%s'", $key));
+            return;
+        }
+
+        return $ubc_puid;
+    }
+
+    /**
+     * Find user by `users.username` in database.
+     *
+     * @param string $puid
+     * @return array
+     */
+    public function findUserByPuid($puid)
+    {
+        $conditions = array('User.username' => $puid);
+        return $this->User->find('first', compact('conditions'));
+    }
+
+    /**
      * Get course id from cached launch data.
      *
      * @return string
@@ -480,18 +528,6 @@ class Lti13 extends AppModel
     }
 
     /**
-     * Check if provided role(s) is a LTI instructor.
-     *
-     * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L219
-     * @param mixed $roles Array or string
-     * @return bool
-     */
-    public function isInstructor($roles)
-    {
-        return (bool)preg_grep('/Instructor/i', (array)$roles);
-    }
-
-    /**
      * Get username from LTI data.
      *
      * @param array $data
@@ -518,6 +554,30 @@ class Lti13 extends AppModel
     public function getUserType($isInstructor)
     {
         return $isInstructor ? $this->User->USER_TYPE_INSTRUCTOR : $this->User->USER_TYPE_STUDENT;
+    }
+
+    /**
+     * Check if provided role(s) is a LTI instructor.
+     *
+     * Previously https://github.com/ubc/iPeer/blob/3.4.4/app/controllers/lti_controller.php#L219
+     * @param mixed $roles Array or string
+     * @return bool
+     */
+    public function isInstructor($roles)
+    {
+        return (bool)preg_grep('/Instructor/i', (array)$roles);
+    }
+
+    /**
+     * Check if current user is in ['superadmin', 'admin', 'instructor']
+     *
+     * @param array $user
+     * @return bool
+     */
+    public function isAdminOrInstructor($user)
+    {
+        $roles = array_column($user['Role'], 'name');
+        return (bool)preg_grep('/superadmin|admin|instructor/i', $roles);
     }
 
     /**
