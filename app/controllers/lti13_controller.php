@@ -144,6 +144,7 @@ class Lti13Controller extends AppController
                     'uri'                => $this->Lti13->log_path,
                     'is_dir_bool'        => is_dir($this->Lti13->log_path) ? 'true' : 'false',
                     'chown'              => posix_getpwuid(fileowner($this->Lti13->log_path))['name'],
+                    'chgrp'              => posix_getgrgid(filegroup($this->Lti13->log_path))['name'],
                     'chmod'              => substr(sprintf('%o', fileperms($this->Lti13->log_path)), -4),
                     'is_readable_bool'   => is_readable($this->Lti13->log_path) ? 'true' : 'false',
                     'is_writable_bool'   => is_writable($this->Lti13->log_path) ? 'true' : 'false',
