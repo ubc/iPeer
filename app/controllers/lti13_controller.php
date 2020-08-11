@@ -29,6 +29,7 @@ class Lti13Controller extends AppController
     public function beforeFilter()
     {
         $this->Auth->allow();
+        $this->Auth->autoRedirect = false;
     }
 
     /**
@@ -60,26 +61,134 @@ class Lti13Controller extends AppController
 
             // LTI 1.3 launch and log
             $launch = $this->Lti13->launch();
-            $data = $this->Lti13->getData($launch->get_launch_id());
+            $data = $this->Lti13->getData($launch->get_launch_id()); // Needs launch cache
             $this->Lti13->resetLogs();
             $this->log(json_encode($data, 448), 'lti13/launch');
 
             $this->Session->setFlash(__('LTI 1.3 launch success', true), 'good');
 
             // Automatic user login and log
-            $user = $this->Lti13->getPuidUser();
+            $user = $this->Lti13->getPuidUser(); // Needs launch cache
             $this->Auth->login($user);
             $this->log($user, 'lti13/user');
 
             // Redirect to course page
+            $courseId = @$this->Lti13->getCourseId(); // Needs launch cache
+            $course_home_courseId_url = Router::url(array('controller'=>'courses', 'action'=>'home', $courseId));
+            $course_index_url = Router::url(array('controller'=>'courses', 'action'=>'index'));
+            $home_index_url = Router::url(array('controller'=>'home', 'action'=>'index'));
             if ($this->Lti13->isAdminOrInstructor($user)) {
-                if ($courseId = @$this->Lti13->getCourseId()) {
-                    $this->redirect(array('controller'=>'courses', 'action'=>'home', $courseId));
+                if ($courseId) {
+                    $this->Auth->redirect($course_home_courseId_url);
+                } else {
+                    $this->Auth->redirect($course_index_url);
                 }
-                $this->redirect(array('controller'=>'courses', 'action'=>'index'));
+            } else {
+                $this->Auth->redirect($home_index_url);
             }
+            // $this->redirect($this->Auth->redirect());
 
-            $this->redirect(array('controller'=>'home', 'action'=>'index'));
+
+            // ####################################################################################
+            // TEST page app/views/lti13/launch.ctp
+            // ####################################################################################
+
+            if ($cached_launch = @$this->Lti13->launchFromCache()) {
+                $cached_launch_id = $cached_launch->get_launch_id();
+            }
+            $this->set('test', json_encode(array(
+
+                // New launch object
+
+                'new_launch_class'                 => get_class($launch),
+                'new_launch_id'                    => $launch->get_launch_id(),
+
+                // User
+
+                'current_user'                     => $this->Auth->user(),
+                'current_user_roles'               => array_column($user['Role'], 'name'),
+                'current_user_isAuthorized_bool'   => $this->Auth->isAuthorized() ? 'true' : 'false',
+                'isAdminOrInstructor_bool'         => $this->Lti13->isAdminOrInstructor($user) ? 'true' : 'false',
+
+                // Course
+
+                'courseId'                         => $courseId,
+
+                // Redirect URLs
+
+                'course_home_courseId_url'         => $course_home_courseId_url,
+                'course_index_url'                 => $course_index_url,
+                'home_index_url'                   => $home_index_url,
+                'Auth_redirect_url'                => $this->Auth->redirect(),
+
+                // Cache
+
+                'cached_launch_class'              => get_class($cached_launch),
+                'cached_launch_id'                 => $cached_launch_id,
+                'sys_get_temp_dir'                 => sys_get_temp_dir(),
+                'lti_cache_txt' => array(
+                    'file_exists_bool'   => file_exists(sys_get_temp_dir() . '/lti_cache.txt') ? 'true' : 'false',
+                    'is_file_bool'       => is_file(sys_get_temp_dir() . '/lti_cache.txt') ? 'true' : 'false',
+                    'chown'              => posix_getpwuid(fileowner(sys_get_temp_dir() . '/lti_cache.txt'))['name'],
+                    'chgrp'              => posix_getgrgid(filegroup(sys_get_temp_dir() . '/lti_cache.txt'))['name'],
+                    'chmod'              => substr(sprintf('%o', fileperms(sys_get_temp_dir() . '/lti_cache.txt')), -4),
+                    'is_readable_bool'   => is_readable(sys_get_temp_dir() . '/lti_cache.txt') ? 'true' : 'false',
+                    'is_writable_bool'   => is_writable(sys_get_temp_dir() . '/lti_cache.txt') ? 'true' : 'false',
+                    'is_executable_bool' => is_executable(sys_get_temp_dir() . '/lti_cache.txt') ? 'true' : 'false',
+                    'file_get_contents'  => json_decode(file_get_contents(sys_get_temp_dir() . '/lti_cache.txt')),
+                ),
+
+                // Logging
+
+                'log_path' => array(
+                    'uri'                => $this->Lti13->log_path,
+                    'is_dir_bool'        => is_dir($this->Lti13->log_path) ? 'true' : 'false',
+                    'chown'              => posix_getpwuid(fileowner($this->Lti13->log_path))['name'],
+                    'chmod'              => substr(sprintf('%o', fileperms($this->Lti13->log_path)), -4),
+                    'is_readable_bool'   => is_readable($this->Lti13->log_path) ? 'true' : 'false',
+                    'is_writable_bool'   => is_writable($this->Lti13->log_path) ? 'true' : 'false',
+                    'is_executable_bool' => is_executable($this->Lti13->log_path) ? 'true' : 'false',
+                ),
+
+                'launch_file' => array(
+                    'file_exists_bool'   => file_exists($this->Lti13->log_path . '/launch.log') ? 'true' : 'false',
+                    'is_file_bool'       => is_file($this->Lti13->log_path . '/launch.log') ? 'true' : 'false',
+                    'chown'              => posix_getpwuid(fileowner($this->Lti13->log_path . '/launch.log'))['name'],
+                    'chgrp'              => posix_getgrgid(filegroup($this->Lti13->log_path . '/launch.log'))['name'],
+                    'chmod'              => substr(sprintf('%o', fileperms($this->Lti13->log_path . '/launch.log')), -4),
+                    'is_readable_bool'   => is_readable($this->Lti13->log_path . '/launch.log') ? 'true' : 'false',
+                    'is_writable_bool'   => is_writable($this->Lti13->log_path . '/launch.log') ? 'true' : 'false',
+                    'is_executable_bool' => is_executable($this->Lti13->log_path . '/launch.log') ? 'true' : 'false',
+                ),
+
+                'user_file' => array(
+                    'file_exists_bool'   => file_exists($this->Lti13->log_path . '/user.log') ? 'true' : 'false',
+                    'is_file_bool'       => is_file($this->Lti13->log_path . '/user.log') ? 'true' : 'false',
+                    'chown'              => posix_getpwuid(fileowner($this->Lti13->log_path . '/user.log'))['name'],
+                    'chgrp'              => posix_getgrgid(filegroup($this->Lti13->log_path . '/user.log'))['name'],
+                    'chmod'              => substr(sprintf('%o', fileperms($this->Lti13->log_path . '/user.log')), -4),
+                    'is_readable_bool'   => is_readable($this->Lti13->log_path . '/user.log') ? 'true' : 'false',
+                    'is_writable_bool'   => is_writable($this->Lti13->log_path . '/user.log') ? 'true' : 'false',
+                    'is_executable_bool' => is_executable($this->Lti13->log_path . '/user.log') ? 'true' : 'false',
+                ),
+
+                'test_file' => array(
+                    'file_put_contents_int' => (int)file_put_contents($this->Lti13->log_path . '/test.log', uniqid('test log ')), // => number of bytes or 0
+                    'file_exists_bool'      => file_exists($this->Lti13->log_path . '/test.log') ? 'true' : 'false',
+                    'is_file_bool'          => is_file($this->Lti13->log_path . '/test.log') ? 'true' : 'false',
+                    'chown'                 => posix_getpwuid(fileowner($this->Lti13->log_path . '/test.log'))['name'],
+                    'chgrp'                 => posix_getgrgid(filegroup($this->Lti13->log_path . '/test.log'))['name'],
+                    'chmod'                 => substr(sprintf('%o', fileperms($this->Lti13->log_path . '/test.log')), -4),
+                    'is_readable_bool'      => is_readable($this->Lti13->log_path . '/test.log') ? 'true' : 'false',
+                    'is_writable_bool'      => is_writable($this->Lti13->log_path . '/test.log') ? 'true' : 'false',
+                    'is_executable_bool'    => is_executable($this->Lti13->log_path . '/test.log') ? 'true' : 'false',
+                    'file_get_contents'     => file_get_contents($this->Lti13->log_path . '/test.log'),
+                ),
+
+            ), 448));
+
+            // ####################################################################################
+
 
         } catch (LTI_Exception $e) {
 
