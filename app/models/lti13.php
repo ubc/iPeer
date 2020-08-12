@@ -139,7 +139,7 @@ class Lti13 extends AppModel
         }
 
         if (!$ubc_puid = @$custom['ubc_puid']) {
-return 'root';
+// return 'root';
             throw new LTI_Exception(sprintf("Missing ubc_puid in '%s'", $key));
             return;
         }

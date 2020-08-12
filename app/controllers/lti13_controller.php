@@ -86,13 +86,13 @@ class Lti13Controller extends AppController
             } else {
                 $this->Auth->redirect($home_index_url);
             }
-            // $this->redirect($this->Auth->redirect());
+            $this->redirect($this->Auth->redirect());
 
 
             // ####################################################################################
             // TEST page app/views/lti13/launch.ctp
             // ####################################################################################
-
+/*
             if ($cached_launch = @$this->Lti13->launchFromCache()) {
                 $cached_launch_id = $cached_launch->get_launch_id();
             }
@@ -187,7 +187,7 @@ class Lti13Controller extends AppController
                 ),
 
             ), 448));
-
+*/
             // ####################################################################################
 
 
