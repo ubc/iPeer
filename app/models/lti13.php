@@ -104,7 +104,6 @@ class Lti13 extends AppModel
             '$_POST'       => $_POST,
             'jwt_header'   => json_decode($this->jwtHeader(), 448),
             'jwt_body'     => $this->jwtBody,
-            'nrps_members' => $this->getNrpsMembers(),
         );
     }
 
@@ -139,7 +138,6 @@ class Lti13 extends AppModel
         }
 
         if (!$ubc_puid = @$custom['ubc_puid']) {
-// return 'root';
             throw new LTI_Exception(sprintf("Missing ubc_puid in '%s'", $key));
             return;
         }
