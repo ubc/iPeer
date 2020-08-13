@@ -85,6 +85,14 @@ class LtiToolRegistration extends AppModel
                 'required' => true,
             ),
         ),
+        'kid' => array(
+            'maxLength' => array(
+                'rule'    => array('maxLength', 255),
+                'message' => 'Maximum 255 characters',
+                'required' => false,
+                'allowEmpty' => true,
+            ),
+        ),
         'tool_private_key_file' => array(
             'maxLength' => array(
                 'rule'    => array('maxLength', 255),

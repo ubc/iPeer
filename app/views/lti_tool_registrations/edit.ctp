@@ -36,6 +36,10 @@ echo $this->Form->input('LtiToolRegistration.key_set_url', array(
     'size'  => '60',
     'placeholder' => 'Ex.: http://canvas.docker/api/lti/security/jwks',
 ));
+echo $this->Form->input('LtiToolRegistration.kid', array(
+    'size'  => '60',
+    'placeholder' => 'Ex.: 2018-06-18T22:33:20Z',
+));
 echo $this->Form->input('LtiToolRegistration.tool_private_key_file', array(
     'size'  => '60',
     'placeholder' => 'Ex.: app/config/lti13/tool.private.key',

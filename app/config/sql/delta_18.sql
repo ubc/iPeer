@@ -21,6 +21,7 @@ CREATE TABLE `lti_tool_registrations` (
   `auth_login_url` varchar(255) NOT NULL,
   `auth_token_url` varchar(255) NOT NULL,
   `key_set_url` varchar(255) NOT NULL,
+  `kid` varchar(255) DEFAULT NULL,
   `tool_private_key_file` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `iss_client` (`iss`,`client_id`),

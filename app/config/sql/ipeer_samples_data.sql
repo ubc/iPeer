@@ -2421,6 +2421,7 @@ CREATE TABLE `lti_tool_registrations` (
   `auth_login_url` varchar(255) NOT NULL,
   `auth_token_url` varchar(255) NOT NULL,
   `key_set_url` varchar(255) NOT NULL,
+  `kid` varchar(255) DEFAULT NULL,
   `tool_private_key_file` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `iss_client` (`iss`,`client_id`),
@@ -2428,8 +2429,8 @@ CREATE TABLE `lti_tool_registrations` (
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 INSERT INTO `lti_tool_registrations` VALUES
-(1,'https://canvas.instructure.com','10000000000001','http://canvas.docker/api/lti/authorize_redirect','http://canvas.docker/login/oauth2/token','http://canvas.docker/api/lti/security/jwks','app/config/lti13/tool.private.key'),
-(2,'https://lti-ri.imsglobal.org','ipeer-lti13-001','https://lti-ri.imsglobal.org/platforms/652/authorizations/new','https://lti-ri.imsglobal.org/platforms/652/access_tokens','https://lti-ri.imsglobal.org/platforms/652/platform_keys/654.json','app/config/lti13/tool.private.key');
+(1,'https://canvas.instructure.com','10000000000001','http://canvas.docker/api/lti/authorize_redirect','http://canvas.docker/login/oauth2/token','http://canvas.docker/api/lti/security/jwks','1cd3d64350b4b8a3e8f31370eceb347a18e1df38aebb4aa7fd532ed42602394a','app/config/lti13/tool.private.key'),
+(2,'https://lti-ri.imsglobal.org','ipeer-lti13-001','https://lti-ri.imsglobal.org/platforms/652/authorizations/new','https://lti-ri.imsglobal.org/platforms/652/access_tokens','https://lti-ri.imsglobal.org/platforms/652/platform_keys/654.json',NULL,'app/config/lti13/tool.private.key');
 
 INSERT INTO `acos` VALUES
 (NULL,2,NULL,NULL,'Ltitoolregistrations',664,673);

@@ -36,6 +36,7 @@ class LTI13Database implements LTI_Database {
             ->set_auth_token_url($issuer['auth_token_url'])
             ->set_client_id($issuer['client_id'])
             ->set_key_set_url($issuer['key_set_url'])
+            ->set_kid($issuer['kid'])
             ->set_issuer($iss)
             ->set_tool_private_key($tool_private_key);
     }
