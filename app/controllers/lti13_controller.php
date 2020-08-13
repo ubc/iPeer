@@ -77,8 +77,8 @@ class Lti13Controller extends AppController
             $course_home_courseId_url = Router::url(array('controller'=>'courses', 'action'=>'home', $courseId));
             $course_index_url = Router::url(array('controller'=>'courses', 'action'=>'index'));
             $home_index_url = Router::url(array('controller'=>'home', 'action'=>'index'));
-            if ($courseId) {
-                if ($this->Lti13->isAdminOrInstructor($user)) {
+            if ($this->Auth->isAuthorized() && $courseId) {
+                if ($this->Auth->isAuthorized() && $this->Lti13->isAdminOrInstructor($user)) {
                     $this->Auth->redirect($course_home_courseId_url);
                 } else {
                     $this->Auth->redirect($course_index_url);
