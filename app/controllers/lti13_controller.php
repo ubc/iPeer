@@ -70,6 +70,7 @@ class Lti13Controller extends AppController
             // Automatic user login and log
             $user = $this->Lti13->getPuidUser(); // Needs launch cache
             $this->Auth->login($user);
+            $this->_afterLogin();
             $this->log($user, 'lti13/user');
 
             // Redirect to course page
