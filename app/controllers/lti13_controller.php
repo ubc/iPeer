@@ -73,22 +73,18 @@ class Lti13Controller extends AppController
             $this->log($user, 'lti13/user');
 
             // Redirect to course page
-            if ($this->Auth->isAuthorized()) {
-                if ($courseId = @$this->Lti13->getcourseId()) {
-                    if ($this->Lti13->isAdminOrInstructor($user)) {
-                        if ($this->Lti13->isEnrolled($user, $courseId)) {
-                            $this->Auth->redirect(Router::url(array('controller'=>'courses', 'action'=>'home', $courseId)));
-                        } else {
-                            $this->Auth->redirect(Router::url(array('controller'=>'courses', 'action'=>'index')));
-                        }
-                    } else {
-                        $this->Auth->redirect('/');
-                    }
+            $courseId = @$this->Lti13->getCourseId(); // Needs launch cache
+            $course_home_courseId_url = Router::url(array('controller'=>'courses', 'action'=>'home', $courseId));
+            $course_index_url = Router::url(array('controller'=>'courses', 'action'=>'index'));
+            $home_index_url = Router::url(array('controller'=>'home', 'action'=>'index'));
+            if ($this->Lti13->isAdminOrInstructor($user)) {
+                if ($courseId) {
+                    $this->Auth->redirect($course_home_courseId_url);
                 } else {
-                    $this->Auth->redirect('/');
+                    $this->Auth->redirect($course_index_url);
                 }
             } else {
-                $this->Auth->redirect('/');
+                $this->Auth->redirect($home_index_url);
             }
             $this->redirect($this->Auth->redirect());
 

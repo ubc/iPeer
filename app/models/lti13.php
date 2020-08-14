@@ -175,18 +175,6 @@ class Lti13 extends AppModel
     }
 
     /**
-     * Check if $user is enrolled in Course by $courseId.
-     *
-     * @param array $user
-     * @param int $courseId
-     * @return bool
-     */
-    public function isEnrolled($user, $courseId)
-    {
-        return (bool)array_column((array)@$user['Enrolment'], 'id');
-    }
-
-    /**
      * Get JWT header.
      *
      * @return string
