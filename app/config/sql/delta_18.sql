@@ -4,6 +4,15 @@ ALTER TABLE `courses` MODIFY `canvas_id` varchar(64) NULL DEFAULT NULL;
 -- DROP INDEX IF EXISTS `canvas_id` ON `courses`;
 ALTER TABLE `courses` ADD INDEX `canvas_id` (`canvas_id`);
 
+DROP TABLE IF EXISTS `lti_cache`;
+CREATE TABLE IF NOT EXISTS `lti_cache` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `cache_id` varchar(16) NOT NULL,
+  `json` text DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `cache_id` (`cache_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `lti_platform_deployments`;
 CREATE TABLE `lti_platform_deployments` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

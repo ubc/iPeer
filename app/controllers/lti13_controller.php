@@ -3,7 +3,6 @@ App::import('Lib', 'Lti13Bootstrap');
 App::import('Model', 'Lti13');
 
 use IMSGlobal\LTI\LTI_Exception;
-use IMSGlobal\LTI\LTI_OIDC_Login;
 use IMSGlobal\LTI\OIDC_Exception;
 
 /**
@@ -39,7 +38,7 @@ class Lti13Controller extends AppController
     {
         try {
 
-            $login = LTI_OIDC_Login::new($this->Lti13->db);
+            $login = $this->Lti13->login();
             $url = Router::url('/lti13/launch', true);
             $redirect = $login->do_oidc_login_redirect($url);
             $redirect->do_redirect();

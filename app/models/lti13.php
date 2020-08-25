@@ -1,11 +1,14 @@
 <?php
 App::import('Lib', 'Lti13Bootstrap');
 App::import('Lib', 'LTI13Database', array('file'=>'lti13'.DS.'LTI13Database.php'));
+App::import('Lib', 'LTI13Cache', array('file'=>'lti13'.DS.'LTI13Cache.php'));
 
 use App\LTI13\LTI13Database;
+use App\LTI13\LTI13Cache;
 use Firebase\JWT\JWT;
 use IMSGlobal\LTI\LTI_Exception;
 use IMSGlobal\LTI\LTI_Message_Launch;
+use IMSGlobal\LTI\LTI_OIDC_Login;
 
 /**
  * LTI 1.3 Model
@@ -20,7 +23,9 @@ use IMSGlobal\LTI\LTI_Message_Launch;
 class Lti13 extends AppModel
 {
     public $useTable = false;
-    public $db, $User, $Course, $Role, $LtiToolRegistration;
+    public $db, $LTI13Cache;
+    static public $cacheId = null;
+    public $User, $Course, $Role, $LtiToolRegistration, $LtiCache;
     public $ltiCourse;
     public $jwtBody = array();
     public $ipeerRoster = array();
@@ -30,12 +35,32 @@ class Lti13 extends AppModel
 
     public function __construct()
     {
+        // Models
         $this->User = ClassRegistry::init('User');
         $this->Course = ClassRegistry::init('Course');
         $this->Role = ClassRegistry::init('Role');
         $this->LtiToolRegistration = ClassRegistry::init('LtiToolRegistration');
+        $this->LtiCache = ClassRegistry::init('LtiCache');
+
+        // Create cached unique id for LtiCache model and LTI13Cache library
+        if (empty(self::$cacheId)) {
+            self::$cacheId = uniqid();
+        }
+
+        // Libraries
         $issuers = $this->LtiToolRegistration->findIssuers();
         $this->db = new LTI13Database($issuers);
+        $this->LTI13Cache = new LTI13Cache($this->LtiCache, self::$cacheId);
+    }
+
+    /**
+     * OIDC login with injected dB and LTI13Cache.
+     *
+     * @return LTI_OIDC_Login
+     */
+    public function login()
+    {
+        return LTI_OIDC_Login::new($this->db, $this->LTI13Cache);
     }
 
     /**
@@ -45,7 +70,7 @@ class Lti13 extends AppModel
      */
     public function launch()
     {
-        $launch = LTI_Message_Launch::new($this->db);
+        $launch = LTI_Message_Launch::new($this->db, $this->LTI13Cache);
         $launch->validate();
         return $launch;
     }
@@ -58,7 +83,7 @@ class Lti13 extends AppModel
     public function launchFromCache()
     {
         $launchId = $this->getLaunchIdFromCache();
-        return LTI_Message_Launch::from_cache($launchId, $this->db);
+        return LTI_Message_Launch::from_cache($launchId, $this->db, $this->LTI13Cache);
     }
 
     /**
@@ -69,12 +94,14 @@ class Lti13 extends AppModel
      */
     public function getLaunchIdFromCache()
     {
-        if (!$json = file_get_contents(sys_get_temp_dir() . '/lti_cache.txt')) {
+        // if (!$json = file_get_contents(sys_get_temp_dir() . '/lti_cache.txt')) {
+        if (!$json = $this->LTI13Cache->load_cache()) {
             throw new LTI_Exception("LTI cache is empty.");
             return;
         }
 
         $assoc = json_decode($json, true);
+        // echo '<pre>', print_r($assoc,1), '</pre>';
         if (!$keys = preg_grep("/^lti1p3_launch_/", array_keys($assoc))) {
             throw new LTI_Exception("LTI launch ID not found in LTI cache.");
             return;
@@ -138,6 +165,7 @@ class Lti13 extends AppModel
         }
 
         if (!$ubc_puid = @$custom['ubc_puid']) {
+return 'root';
             throw new LTI_Exception(sprintf("Missing ubc_puid in '%s'", $key));
             return;
         }
