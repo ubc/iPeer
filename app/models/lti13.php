@@ -43,14 +43,14 @@ class Lti13 extends AppModel
         $this->LtiCache = ClassRegistry::init('LtiCache');
 
         // Create cached unique id for LtiCache model and LTI13Cache library
-        if (empty(self::$cacheId)) {
-            self::$cacheId = uniqid();
+        if (empty(static::$cacheId)) {
+            static::$cacheId = uniqid();
         }
 
         // Libraries
         $issuers = $this->LtiToolRegistration->findIssuers();
         $this->db = new LTI13Database($issuers);
-        $this->LTI13Cache = new LTI13Cache($this->LtiCache, self::$cacheId);
+        $this->LTI13Cache = new LTI13Cache($this->LtiCache, static::$cacheId);
     }
 
     /**

@@ -6,7 +6,7 @@ use IMSGlobal\LTI\Cache as LTI_Cache;
 class LTI13Cache extends LTI_Cache {
 
     protected $LtiCache; // Model
-    protected $cacheId = null;
+    static protected $cacheId = null;
 
     /**
      * Inject LtiCache model and its unique cache id.
@@ -17,16 +17,18 @@ class LTI13Cache extends LTI_Cache {
     public function __construct($LtiCache, $cacheId)
     {
         $this->LtiCache = $LtiCache;
-        $this->cacheId = $cacheId;
+        if (empty(static::$cacheId)) {
+            static::$cacheId = $cacheId;
+        }
     }
 
     /**
      * Override LTI_Cache::load_cache().
      */
     public function load_cache() {
-        $cache = $this->LtiCache->load_cache($this->cacheId);
+        $cache = $this->LtiCache->load_cache(static::$cacheId);
         if (empty($cache)) {
-            $this->LtiCache->save_cache($this->cacheId, '{}');
+            $this->LtiCache->save_cache(static::$cacheId, '{}');
             $this->cache = [];
         }
         $this->cache = json_decode($cache, true);
@@ -37,6 +39,6 @@ class LTI13Cache extends LTI_Cache {
      * Override LTI_Cache::save_cache().
      */
     public function save_cache() {
-        $this->LtiCache->save_cache($this->cacheId, json_encode($this->cache));
+        $this->LtiCache->save_cache(static::$cacheId, json_encode($this->cache));
     }
 }
