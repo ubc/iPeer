@@ -13,18 +13,18 @@ class LtiCache extends AppModel
 {
     public $name = 'LtiCache';
     public $useTable = 'lti_cache';
+    static public $cacheId = null; // Value input from Lti13::__construct()
 
     /**
      * Find content of `lti_cache`.`json`
      *
-     * @param string $cacheId
      * @return array
      */
-    public function load_cache($cacheId)
+    public function load_cache()
     {
         $this->log(__METHOD__, 'lti13/cache');
-        $this->log('$cacheId = ' . $cacheId, 'lti13/cache');
-        if ($data = $this->find_cache($cacheId)) {
+        $this->log('self::$cacheId = ' . self::$cacheId, 'lti13/cache');
+        if ($data = $this->find_cache()) {
             return $data['LtiCache']['json'];
         }
     }
@@ -32,67 +32,42 @@ class LtiCache extends AppModel
     /**
      * Save content of `lti_cache`.`json`
      *
-     * @param string $cacheId
      * @param string $json
      */
-    public function save_cache($cacheId, $json)
+    public function save_cache($json)
     {
-        if ($data = $this->find_cache($cacheId)) {
+        $this->log(__METHOD__, 'lti13/cache');
+        if ($data = $this->find_cache()) {
+            // Update
+            $data['LtiCache']['json'] = $json;
+            $this->log('update = ', 'lti13/cache');
             $this->log($data, 'lti13/cache');
-            $this->update_cache($data['LtiCache']['id'], $cacheId, $json);
+            return (bool)$this->save($data);
         } else {
-            $this->create_cache($cacheId, $json);
+            // Create
+            $data = array(
+                'LtiCache' => array(
+                    'cache_id' => self::$cacheId,
+                    'json' => $json,
+                ),
+            );
+            $this->create($data);
+            $this->log('create = ', 'lti13/cache');
+            $this->log($data, 'lti13/cache');
+            return (bool)$this->save();
         }
     }
 
     /**
      * Find data row by $this->login_hint.
      *
-     * @param string $cacheId
      * @return array
      */
-    protected function find_cache($cacheId)
+    protected function find_cache()
     {
         $this->log(__METHOD__, 'lti13/cache');
-        $this->log('$cacheId = ' . $cacheId, 'lti13/cache');
-        $conditions = array('LtiCache.cache_id' => $cacheId);
+        $this->log('self::$cacheId = ' . self::$cacheId, 'lti13/cache');
+        $conditions = array('LtiCache.cache_id' => self::$cacheId);
         return $this->find('first', compact('conditions'));
-    }
-
-    /**
-     * Create data row with $this->login_hint.
-     *
-     * @param string $cacheId
-     * @param string $json
-     * @return bool
-     */
-    protected function create_cache($cacheId, $json)
-    {
-        $this->log(__METHOD__, 'lti13/cache');
-        $this->log('$cacheId = ' . $cacheId, 'lti13/cache');
-        $this->create(array(
-            'cache_id' => $cacheId,
-            'json' => $json,
-        ));
-        return (bool)$this->save();
-    }
-
-    /**
-     * Update data row with $this->login_hint.
-     *
-     * @param int $id
-     * @param string $cacheId
-     * @param string $json
-     * @return bool
-     */
-    protected function update_cache($id, $cacheId, $json)
-    {
-        $this->log(__METHOD__, 'lti13/cache');
-        $this->log('$cacheId = ' . $cacheId, 'lti13/cache');
-        $this->id = $id;
-        return (bool)$this->save(array(
-            'id' => $id,
-            'json' => $json,
-        ));
     }
 }

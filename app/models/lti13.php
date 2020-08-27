@@ -24,7 +24,7 @@ class Lti13 extends AppModel
 {
     public $useTable = false;
     public $db, $LTI13Cache;
-    public $User, $Course, $Role, $LtiToolRegistration;
+    public $User, $Course, $Role, $LtiToolRegistration, $LtiCache;
     public $ltiCourse;
     public $jwtBody = array();
     public $ipeerRoster = array();
@@ -39,11 +39,15 @@ class Lti13 extends AppModel
         $this->Course = ClassRegistry::init('Course');
         $this->Role = ClassRegistry::init('Role');
         $this->LtiToolRegistration = ClassRegistry::init('LtiToolRegistration');
+        $this->LtiCache = ClassRegistry::init('LtiCache');
+        if (empty($this->LtiCache::$cacheId)) {
+            $this->LtiCache::$cacheId = uniqid();
+        }
 
         // Libraries
         $issuers = $this->LtiToolRegistration->findIssuers();
         $this->db = new LTI13Database($issuers);
-        $this->LTI13Cache = new LTI13Cache();
+        $this->LTI13Cache = new LTI13Cache($this->LtiCache);
     }
 
     /**
@@ -53,11 +57,7 @@ class Lti13 extends AppModel
      */
     public function login()
     {
-        $login = LTI_OIDC_Login::new($this->db, $this->LTI13Cache);
-        if (empty($this->LTI13Cache::$cacheId)) {
-            $this->LTI13Cache::$cacheId = $_REQUEST['login_hint'];
-        }
-        return $login;
+        return LTI_OIDC_Login::new($this->db, $this->LTI13Cache);
     }
 
     /**
@@ -97,7 +97,6 @@ class Lti13 extends AppModel
         }
 
         $assoc = json_decode($json, true);
-        // echo '<pre>', print_r($assoc,1), '</pre>';
         if (!$keys = preg_grep("/^lti1p3_launch_/", array_keys($assoc))) {
             throw new LTI_Exception("LTI launch ID not found in LTI cache.");
             return;
@@ -161,7 +160,6 @@ class Lti13 extends AppModel
         }
 
         if (!$ubc_puid = @$custom['ubc_puid']) {
-return 'root';
             throw new LTI_Exception(sprintf("Missing ubc_puid in '%s'", $key));
             return;
         }
