@@ -1,34 +1,28 @@
 <?php
 namespace App\LTI13;
 
+\App::import('Model', 'LtiCache', array('file'=>'models'.DS.'lti_cache.php'));
+
+use App\LTI13\LtiCache;
 use IMSGlobal\LTI\Cache as LTI_Cache;
 
 class LTI13Cache extends LTI_Cache {
 
-    protected $LtiCache; // Model
-    static protected $cacheId = null;
+    public $LtiCache;
+    static public $cacheId = null; // Value from Lti13::login()
 
-    /**
-     * Inject LtiCache model and its unique cache id.
-     *
-     * @param LtiCache $LtiCache
-     * @param int $cacheId
-     */
-    public function __construct($LtiCache, $cacheId)
+    public function __construct()
     {
-        $this->LtiCache = $LtiCache;
-        if (empty(static::$cacheId)) {
-            static::$cacheId = $cacheId;
-        }
+        $this->LtiCache = new LtiCache();
     }
 
     /**
      * Override LTI_Cache::load_cache().
      */
     public function load_cache() {
-        $cache = $this->LtiCache->load_cache(static::$cacheId);
+        $cache = $this->LtiCache->load_cache(self::$cacheId);
         if (empty($cache)) {
-            $this->LtiCache->save_cache(static::$cacheId, '{}');
+            $this->LtiCache->save_cache(self::$cacheId, '{}');
             $this->cache = [];
         }
         $this->cache = json_decode($cache, true);
@@ -39,6 +33,6 @@ class LTI13Cache extends LTI_Cache {
      * Override LTI_Cache::save_cache().
      */
     public function save_cache() {
-        $this->LtiCache->save_cache(static::$cacheId, json_encode($this->cache));
+        $this->LtiCache->save_cache(self::$cacheId, json_encode($this->cache));
     }
 }

@@ -24,8 +24,7 @@ class Lti13 extends AppModel
 {
     public $useTable = false;
     public $db, $LTI13Cache;
-    static public $cacheId = null;
-    public $User, $Course, $Role, $LtiToolRegistration, $LtiCache;
+    public $User, $Course, $Role, $LtiToolRegistration;
     public $ltiCourse;
     public $jwtBody = array();
     public $ipeerRoster = array();
@@ -40,17 +39,11 @@ class Lti13 extends AppModel
         $this->Course = ClassRegistry::init('Course');
         $this->Role = ClassRegistry::init('Role');
         $this->LtiToolRegistration = ClassRegistry::init('LtiToolRegistration');
-        $this->LtiCache = ClassRegistry::init('LtiCache');
-
-        // Create cached unique id for LtiCache model and LTI13Cache library
-        if (empty(static::$cacheId)) {
-            static::$cacheId = uniqid();
-        }
 
         // Libraries
         $issuers = $this->LtiToolRegistration->findIssuers();
         $this->db = new LTI13Database($issuers);
-        $this->LTI13Cache = new LTI13Cache($this->LtiCache, static::$cacheId);
+        $this->LTI13Cache = new LTI13Cache();
     }
 
     /**
@@ -60,7 +53,11 @@ class Lti13 extends AppModel
      */
     public function login()
     {
-        return LTI_OIDC_Login::new($this->db, $this->LTI13Cache);
+        $login = LTI_OIDC_Login::new($this->db, $this->LTI13Cache);
+        if (empty($this->LTI13Cache::$cacheId)) {
+            $this->LTI13Cache::$cacheId = $_REQUEST['login_hint'];
+        }
+        return $login;
     }
 
     /**
@@ -94,7 +91,6 @@ class Lti13 extends AppModel
      */
     public function getLaunchIdFromCache()
     {
-        // if (!$json = file_get_contents(sys_get_temp_dir() . '/lti_cache.txt')) {
         if (!$json = $this->LTI13Cache->load_cache()) {
             throw new LTI_Exception("LTI cache is empty.");
             return;

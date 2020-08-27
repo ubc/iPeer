@@ -7,7 +7,7 @@ ALTER TABLE `courses` ADD INDEX `canvas_id` (`canvas_id`);
 DROP TABLE IF EXISTS `lti_cache`;
 CREATE TABLE IF NOT EXISTS `lti_cache` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `cache_id` varchar(16) NOT NULL,
+  `cache_id` varchar(255) NOT NULL,
   `json` text DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `cache_id` (`cache_id`)
