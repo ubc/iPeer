@@ -642,6 +642,13 @@ class MixevalsController extends AppController
         // Save changes if there are any
         if (!empty($this->data)) {
             $this->_dataSavePrep();
+            // This is kind of a hack. Inside _transactionSave, it will call saveAll with 'validate' option
+            // equals to 'only' to perform validation.  In turn, the cake library Model's __save function
+            // will call create() to reset the model with default values, including the 'creator_id'.
+            // Setting the created date here will let TraceableBehavior to update the creator_id properly and
+            // avoid saving the creator_id as 0.
+            $eval = $this->Mixeval->findById($id);
+            $this->data['Mixeval']['created'] = $eval['Mixeval']['created'];
             $this->_transactionalSave();
         } else {
 
