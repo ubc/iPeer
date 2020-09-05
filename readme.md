@@ -201,6 +201,28 @@ You may optionally override the user default IRI (from `$base_url/users/view/$us
 
 `CALIPER_ACTOR_UNIQUE_IDENTIFIER_PARAM`: Optionally set the actor's unique identifier using any column from the `user` table (ex: `username`, `id`, `email`). Will be inserted into the `CALIPER_ACTOR_BASE_URL` string.
 
+iPeer 3.4.6
+-----------
+* FIX mixeval edit (#660)
+* Update cake-guard to 1.0.7 to support eldap
+* Fix docker-compose build (#645)
+* Update cake-guard to 1.0.6
+* Update composer deps
+* Fix mixed content issue
+* Fix fresh installation and simplify Dockerfile and docker-compose
+* Redirect ipeer logs to stdout/stderr and optimize composer
+* Update readme.md
+* Update readme.md
+* Caliper session hashing (#636)
+* Caliper v1p2 update
+* Merge pull request #631 from ubc/fix-tests
+* Fix events model test
+* Add steps on how to run test cases in containers
+
+iPeer 3.4.5
+-----------
+Skip this version. Failed release
+
 iPeer 3.4.4
 -----------
 * Added Caliper and delayed jobs support
