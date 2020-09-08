@@ -22,7 +22,6 @@ class LTI13Cache extends LTI_Cache {
             $this->cache = [];
         }
         $this->cache = json_decode($cache, true);
-        echo '<pre>$this->cache = ', print_r( $this->cache, 1), '</pre>';
     }
 
     /**
