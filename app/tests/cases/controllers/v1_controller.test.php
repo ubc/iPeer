@@ -2,6 +2,8 @@
 class V1ControllerTest extends CakeTestCase {
     public $fixtures = array(
         'app.evaluation_mixeval', 'app.evaluation_rubric',
+        'app.lti_user', 'app.lti_nonce', 'app.lti_tool_registration',
+        'app.lti_resource_link', 'app.lti_context',
         'app.evaluation_simple', 'app.course', 'app.role', 'app.user',
         'app.group', 'app.roles_user', 'app.event', 'app.event_template_type',
         'app.group_event', 'app.evaluation_submission', 'app.survey_group_set',
@@ -1011,7 +1013,7 @@ class V1ControllerTest extends CakeTestCase {
                 'id' => '10',
             ),
         );
-        
+
         $expectedSubmittableEvents = array(
             array(
                 'title' => 'Term 1 Evaluation',
@@ -1082,7 +1084,7 @@ class V1ControllerTest extends CakeTestCase {
                 'id' => '5',
             )
         );
-        
+
         $expectedResultReleasedEvents = array(
             array(
                 'title' => 'simple evaluation 4',
@@ -1113,7 +1115,7 @@ class V1ControllerTest extends CakeTestCase {
                 'id' => '9',
             )
         );
-        
+
         $expectedFilteredEvents = array(
             array(
                 'title' => 'Term 1 Evaluation',
@@ -1212,7 +1214,7 @@ class V1ControllerTest extends CakeTestCase {
                 'id' => '9',
             )
         );
-        
+
         // get ALL events for redshirt0001
         $url = $this->_getURL('/v1/users/redshirt0001/events/sub/0/results/0');
         $actualEvents = $this->_oauthReq("$url");
@@ -1224,19 +1226,19 @@ class V1ControllerTest extends CakeTestCase {
         $courseUserEvents = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($courseUserEvents, true), '{n}.id', 'asc');
         $this->assertEqual($expectedEvents, $events);
-        
+
         // get events for redshirt0001 available for submissions
         $url = $this->_getURL('/v1/users/redshirt0001/events/sub/1/results/0');
         $eventsSubmittable = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($eventsSubmittable, true), '{n}.id', 'asc');
         $this->assertEqual($expectedSubmittableEvents, $events);
-        
+
         // get events for redshirt0001 that have results released
         $url = $this->_getURL('/v1/users/redshirt0001/events/sub/0/results/1');
         $eventsResult = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($eventsResult, true), '{n}.id', 'asc');
         $this->assertEqual($expectedResultReleasedEvents, $events);
-        
+
         // get events for redshirt0001 available for submissions OR have results released
         $url = $this->_getURL('/v1/users/redshirt0001/events/sub/1/results/1');
         $filteredEvents = $this->_oauthReq("$url");
@@ -1248,25 +1250,25 @@ class V1ControllerTest extends CakeTestCase {
         $eventsSubmittable = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($eventsSubmittable, true), '{n}.id', 'asc');
         $this->assertEqual($expectedSubmittableEvents, $events);
-        
+
         // get events in course id 1 for redshirt0001 that have results released
         $url = $this->_getURL('/v1/courses/1/users/redshirt0001/events/sub/0/results/1');
         $eventsResult = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($eventsResult, true), '{n}.id', 'asc');
         $this->assertEqual($expectedResultReleasedEvents, $events);
-        
+
         // get events in course id 1 for redshirt0001 available for submissions OR have results released
         $url = $this->_getURL('/v1/courses/1/users/redshirt0001/events/sub/1/results/1');
         $filteredEvents = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($filteredEvents, true), '{n}.id', 'asc');
         $this->assertEqual($expectedFilteredEvents, $events);
-        
+
         // get ALL events for redshirt0001 - no filters
         $url = $this->_getURL('/v1/users/redshirt0001/events');
         $events = $this->_oauthReq("$url");
         $events = Set::sort(json_decode($events, true), '{n}.id', 'asc');
         $this->assertEqual($expectedEvents, $events);
-        
+
         // get ALL events in course id 1 for redshirt0001 - no filters
         $url = $this->_getURL('/v1/courses/1/users/redshirt0001/events');
         $events = $this->_oauthReq("$url");

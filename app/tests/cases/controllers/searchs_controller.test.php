@@ -12,6 +12,8 @@ App::import('Controller', 'Searchs');
 
 class SearchsControllerTest extends CakeTestCase {
     var $fixtures = array('app.course', 'app.role', 'app.user', 'app.group',
+        'app.lti_user', 'app.lti_nonce', 'app.lti_tool_registration',
+        'app.lti_resource_link', 'app.lti_context',
         'app.roles_user', 'app.event', 'app.event_template_type', 'app.rubrics_lom',
         'app.group_event', 'app.evaluation_submission', 'app.rubrics_criteria_comment',
         'app.survey_group_set', 'app.survey_group', 'app.rubrics_criteria',

@@ -6,7 +6,7 @@ App::import('Controller', 'Accesses');
 Mock::generatePartial('AccessesController',
     'MockAccessesController',
     array('isAuthorized', 'render', 'redirect', '_stop', 'header'));
-    
+
 /**
  * AccessesControllerTest Accesses controller test case
  *
@@ -16,10 +16,12 @@ Mock::generatePartial('AccessesController',
 class AccessesControllerTest extends ExtendedAuthTestCase
 {
     public $controller = null;
-    
+
     public $fixtures = array(
         'app.access', 'app.oauth_token', 'app.sys_parameter',
         'app.user', 'app.evaluation_submission', 'app.event', 'app.event_template_type',
+        'app.lti_user', 'app.lti_nonce', 'app.lti_tool_registration',
+        'app.lti_resource_link', 'app.lti_context',
         'app.course', 'app.group', 'app.group_event', 'app.evaluation_simple',
         'app.survey_input', 'app.survey_group_member', 'app.survey_group_set',
         'app.survey', 'app.question', 'app.response', 'app.survey_question',
@@ -28,7 +30,7 @@ class AccessesControllerTest extends ExtendedAuthTestCase
         'app.department', 'app.course_department', 'app.penalty', 'app.evaluation_rubric',
         'app.evaluation_rubric_detail', 'app.evaluation_mixeval', 'app.evaluation_mixeval_detail'
     );
-    
+
     /**
      * startCase case startup
      *
@@ -45,7 +47,7 @@ class AccessesControllerTest extends ExtendedAuthTestCase
             )
         );
     }
-    
+
     /**
      * endCase case ending
      *
@@ -55,7 +57,7 @@ class AccessesControllerTest extends ExtendedAuthTestCase
     public function endCase()
     {
     }
-    
+
     /**
      * startTest prepare tests
      * @access public
@@ -66,7 +68,7 @@ class AccessesControllerTest extends ExtendedAuthTestCase
         echo $method.TEST_LB;
         $this->controller = new MockAccessesController();
     }
-    
+
     /**
      * @access public
      * @return void
@@ -79,12 +81,12 @@ class AccessesControllerTest extends ExtendedAuthTestCase
         unset($this->controller);
         ClassRegistry::flush();
     }
-    
+
     public function getController()
     {
         return $this->controller;
     }
-    
+
     function testView()
     {
     	//id should not be used since it can change
@@ -96,43 +98,43 @@ class AccessesControllerTest extends ExtendedAuthTestCase
         $this->assertEqual($superadmin['permissions']['controllers/courses/add'], $allow);
         $this->assertEqual($superadmin['roleId'], 1);
         $this->assertEqual($superadmin['title_for_layout'], 'Permissions Editor > superadmin');
-        
+
         $admin = $this->testAction('/accesses/view/2', array('return' => 'vars'));
         unset($admin['permissions']['controllers/courses/add']["id"]);
         $this->assertEqual($admin['permissions']['controllers/courses/add'], $allow);
         $this->assertEqual($admin['roleId'], 2);
         $this->assertEqual($admin['title_for_layout'], 'Permissions Editor > admin');
-        
+
         $instructor = $this->testAction('/accesses/view/3', array('return' => 'vars'));
         unset($instructor['permissions']['controllers/courses/add']["id"]);
         $this->assertEqual($instructor['permissions']['controllers/courses/add'], $allow);
         $this->assertEqual($instructor['roleId'], 3);
         $this->assertEqual($instructor['title_for_layout'], 'Permissions Editor > instructor');
-        
+
         $tutor = $this->testAction('/accesses/view/4', array('return' => 'vars'));
         unset($tutor['permissions']['controllers/courses/add']["id"]);
         $this->assertEqual($tutor['permissions']['controllers/courses/add'], $deny);
         $this->assertEqual($tutor['roleId'], 4);
         $this->assertEqual($tutor['title_for_layout'], 'Permissions Editor > tutor');
-        
+
         $student = $this->testAction('/accesses/view/5', array('return' => 'vars'));
         unset($student['permissions']['controllers/courses/add']["id"]);
         $this->assertEqual($student['permissions']['controllers/courses/add'], $deny);
         $this->assertEqual($student['roleId'], 5);
         $this->assertEqual($student['title_for_layout'], 'Permissions Editor > student');
     }
-    
+
     function testEdit()
     {
         $this->Access = ClassRegistry::init('Access');
-        
+
         // no entry existed before the next test
         $result = $this->Access->find('first', array(
             'conditions' => array('aro_id' => 2, 'aco_id' => 11)
         ));
         $this->assertEqual($result, array());
-        
-        // testing allowing access to ALL actions that has no entry in the aros_acos table       
+
+        // testing allowing access to ALL actions that has no entry in the aros_acos table
         $this->testAction('/accesses/edit/allow/11/2');
         $result = $this->Access->find('first', array(
             'conditions' => array('aro_id' => 2, 'aco_id' => 11)
@@ -141,7 +143,7 @@ class AccessesControllerTest extends ExtendedAuthTestCase
         $this->assertEqual($result['Access']['_read'], 1);
         $this->assertEqual($result['Access']['_update'], 1);
         $this->assertEqual($result['Access']['_delete'], 1);
-        
+
         // testing denying access to ALL actions that has an entry in the aros_acos table
         $this->testAction('/accesses/edit/deny/11/2');
         $result = $this->Access->find('first', array(
@@ -151,15 +153,15 @@ class AccessesControllerTest extends ExtendedAuthTestCase
         $this->assertEqual($result['Access']['_read'], -1);
         $this->assertEqual($result['Access']['_update'], -1);
         $this->assertEqual($result['Access']['_delete'], -1);
-        
+
         $this->Access->delete($result['Access']['id']);
-        
+
         // no entry existed before the next test
         $result = $this->Access->find('first', array(
             'conditions' => array('aro_id' => 2, 'aco_id' => 12)
         ));
         $this->assertEqual($result, array());
-        
+
         // testing allowing access to ONE action that has no entry in the aros_acos table
         $this->testAction('/accesses/edit/allow/12/2/create');
         $result = $this->Access->find('first', array(
@@ -169,7 +171,7 @@ class AccessesControllerTest extends ExtendedAuthTestCase
         $this->assertEqual($result['Access']['_read'], -1);
         $this->assertEqual($result['Access']['_update'], -1);
         $this->assertEqual($result['Access']['_delete'], -1);
-        
+
         // testing denying access to ONE action that has an entry in the aros_acos table
         $this->testAction('/accesses/edit/deny/12/2/create');
         $result = $this->Access->find('first', array(
@@ -179,7 +181,7 @@ class AccessesControllerTest extends ExtendedAuthTestCase
         $this->assertEqual($result['Access']['_read'], -1);
         $this->assertEqual($result['Access']['_update'], -1);
         $this->assertEqual($result['Access']['_delete'], -1);
-        
+
         $this->Access->delete($result['Access']['id']);
     }
 }

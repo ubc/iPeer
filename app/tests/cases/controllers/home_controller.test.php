@@ -22,6 +22,8 @@ class HomeControllerTest extends ExtendedAuthTestCase
 
     public $fixtures = array(
         'app.course', 'app.role', 'app.user', 'app.group',
+        'app.lti_user', 'app.lti_nonce', 'app.lti_tool_registration',
+        'app.lti_resource_link', 'app.lti_context',
         'app.roles_user', 'app.event', 'app.event_template_type',
         'app.group_event', 'app.evaluation_submission',
         'app.survey_group_set', 'app.survey_group',
@@ -80,7 +82,7 @@ class HomeControllerTest extends ExtendedAuthTestCase
         $this->assertTrue(
             strtotime($result['course_list']['A'][0]['Course']['created']) >
             strtotime($result['course_list']['A'][1]['Course']['created']));
-        
+
         $this->assertEqual(
             $result['course_list']['A'][1]['Course']['course'], 'APSC 201');
         $this->assertEqual(

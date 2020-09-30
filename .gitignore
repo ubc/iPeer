@@ -19,3 +19,4 @@ tags
 vendor/
 .idea
 .data
+.DS_Store

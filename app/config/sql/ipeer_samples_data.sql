@@ -2220,8 +2220,6 @@ INSERT INTO user_tutors (id, user_id, course_id, creator_id, created, updater_id
 (3, 37, 2, 0, NOW(), NULL, NOW()),
 (4, 37, 3, 0, NOW(), NULL, NOW());
 
-SET foreign_key_checks = 1;
-
 
 
 ------------------------
@@ -2268,7 +2266,7 @@ VALUES (
 );
 
 INSERT INTO `sys_parameters` (
-    `parameter_code`, `parameter_value`, `parameter_type`, 
+    `parameter_code`, `parameter_value`, `parameter_type`,
     `description`, `record_status`, `creator_id`, `created`,
     `updater_id`, `modified`)
 VALUES (
@@ -2277,7 +2275,7 @@ VALUES (
 );
 
 INSERT INTO `sys_parameters` (
-    `parameter_code`, `parameter_value`, `parameter_type`, 
+    `parameter_code`, `parameter_value`, `parameter_type`,
     `description`, `record_status`, `creator_id`, `created`,
     `updater_id`, `modified`)
 VALUES (
@@ -2311,6 +2309,7 @@ INSERT INTO `acos`
 ALTER TABLE `courses` ADD COLUMN `canvas_id` VARCHAR(25) NULL DEFAULT NULL;
 
 -- add table to store oauth access/refresh tokens and expiry timestamp of the access token
+DROP TABLE IF EXISTS `user_oauths`;
 CREATE TABLE IF NOT EXISTS `user_oauths` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL DEFAULT '0',
@@ -2375,6 +2374,7 @@ ALTER TABLE `events` ADD COLUMN `canvas_assignment_id` VARCHAR(25) NULL DEFAULT 
 
 --- START: Added by DB upgrade to version 17
 -- add table to store delayed jobs
+DROP TABLE IF EXISTS `jobs`;
 CREATE TABLE IF NOT EXISTS `jobs` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `handler` TEXT NOT NULL,
@@ -2391,3 +2391,127 @@ CREATE TABLE IF NOT EXISTS `jobs` (
 -- store course term
 ALTER TABLE `courses` ADD COLUMN `term` VARCHAR(50) NULL DEFAULT NULL;
 --- END: Added by DB upgrade to version 17
+
+--- START: Added by DB upgrade to version 18
+ALTER TABLE `courses` MODIFY `canvas_id` varchar(255) NULL DEFAULT NULL;
+ALTER TABLE `courses` ADD INDEX `canvas_id` (`canvas_id`);
+ALTER TABLE `users` DROP `lti_id`;
+
+DROP TABLE IF EXISTS `lti_tool_registrations`;
+CREATE TABLE `lti_tool_registrations` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `iss` varchar(255) NOT NULL,
+  `client_id` varchar(255) NOT NULL,
+  `auth_login_url` varchar(255) NOT NULL,
+  `auth_token_url` varchar(255) NOT NULL,
+  `key_set_url` varchar(255) NOT NULL,
+  `tool_private_key` text NOT NULL,
+  `tool_public_key` text NOT NULL,
+  `user_identifier_field` varchar(255) DEFAULT NULL,
+  `student_number_field` varchar(255) DEFAULT NULL,
+  `term_field` varchar(255) DEFAULT NULL,
+  `canvas_id_field` varchar(255) DEFAULT NULL,
+  `faculty_name_field` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `iss` (`iss`),
+  KEY `client_id` (`client_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `lti_tool_registrations`
+--
+INSERT INTO `lti_tool_registrations` (`id`, `iss`, `client_id`, `auth_login_url`, `auth_token_url`, `key_set_url`, `tool_private_key`, `tool_public_key`, `user_identifier_field`, `student_number_field`, `term_field`, `canvas_id_field`, `faculty_name_field`) VALUES
+(1, 'https://docker-canvas.instructure.com', '10000000000013', 'http://mock_lti.com/api/lti/authorize_redirect', 'http://mock_lti.com/login/oauth2/token', 'http://mock_lti.com/api/lti/security/jwks', '-----BEGIN RSA PRIVATE KEY-----\nMIIEogIBAAKCAQEApBK2zJCDg9s8QDeci6E4QWlTSGav3qh5edjbXULo5Mv0KxN7\nqLyC05QfRrs/I+P5a6D18S/ecAGYPH5xQKuPvqOEotPrRhHCkJB5PtLDsF4ZZbr/\nwWLWG5OYhCkY/H2Wip9rsx1GjKG73EMMTqT2p14K+GW4dg8/HbxQLA4yGeNnGr4D\nd87A+n9wUvMZYAxoCiHiSFD7x0hVIg/q4VXoWHBGEnnqCMC9Gtd7g7HZtQzbYMm4\nm2uY5JHhs+MXS8YKf6Ftc58sJHK5fMtjs9vMVOCkAlrEiEEn+tEHOjSNlzMg+P03\nUU79Lt/MDjXv3mtEPVmPjpJevT4Kjf1HxCSUNQIDAQABAoIBAF5Jmt9IFSwLKz7E\nNqRPS+LbQk8TI/JS4yxQoQ+hSfFh+7ldguzfGFe6gZbGOGzJsCZX475tAelgITpy\nd2bwsLSfh7ODEWu8/RDS1bpyqJ6MFRBPPHbH8775POaGL6O6EG8tWlkec9KRh0H3\nDfWL+2sHMkq5Oh4ueNj/xRrsNYKGLsD0bJMS9eFswDCpvL3fscu/JrrQT+CltBTJ\nj8lTHmGRIF9UOg0Ef1kEgOxcR+AZ2djP3d+zkKZxMATLKWnA1HRFPb7XpJQfjA+k\nsismB4FuhvTSN6IRaci1U5qASHUnIjbTMfFsqJ3h17RivQmSEz1r28OE1HyD/tdE\nIIy3WikCgYEAz6r27/MfEWXgOAwloKJAQi0sqa/0VkWQcNPN3jSgO+AN0iqPLSuj\nAlrLqlLcRlyYAfe7t6B/8SAklJtdy0x9uBaJXrmHhby4jeBksyycQULUzTUhGdbW\nGDfR+XbvNoGUaH1q+vIpglz2jw3N1/M6B/i16wd6Q81UO5WYxQj1j7sCgYEAykJW\nIq4A4UQmtM6gdsXXranV80NOlcH0p521Ec6wpU0dxfI+qVVbT4FxqxfB9Pq5N4V0\nreEYN1ALbjLi3fvChbx8P+lg6k/Tuhn7oiH3kado8iUUR00KyRwWeaMbVwUzU9sQ\nUhB/XfR3J7l3inN/dAlfdSsYbnQJN2U88CKEVM8CgYBfM2UZAz+O3kE38HmfdkI3\nFDaRY9SDaEibML4Dy+RZDpHHczNH5eVIww7y+iF5MCGPZV5tA+sjQzUB22fYNyy7\nI7m97xetu6JviBsh+KV5VYXwvRZ7nf1wBMcBsgBf4G+Ep1pPyIw28x8k3ZMsGJjV\n5rKfGEJ4qryexCnQyhao2QKBgCel71qm/3cpM+k3pA8EY24gn9cq94m11q7Q5IDU\nIp6UymRWQ2BQYjDosA6Y/qV2TL6Mg73eJTAamdMFWKGpS42J0FV6+0uTUG7nzwMO\nY4iC57in+hysBpQ71FAN4DsjwtcKV12u7DjPxlfcLInQcEif2b2PMB/e0Tuxtcth\nCM3TAoGAM+z4u7mi5jxyW9teAYtx3Yb6RGeuly7XvlknV0Lwf2438P2HNZiOa4SE\nSXHZir6LWNv8HOdGapYxUlDfmeNneo4D9B8lBpVs/FsuQF1aOI6B299SlVLPmF+a\nl88qKzXKv7M1pcOv74GK1AIVDF8XJvt1PyaQX92M14q2Ga8Jdjk=\n-----END RSA PRIVATE KEY-----', '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApBK2zJCDg9s8QDeci6E4\nQWlTSGav3qh5edjbXULo5Mv0KxN7qLyC05QfRrs/I+P5a6D18S/ecAGYPH5xQKuP\nvqOEotPrRhHCkJB5PtLDsF4ZZbr/wWLWG5OYhCkY/H2Wip9rsx1GjKG73EMMTqT2\np14K+GW4dg8/HbxQLA4yGeNnGr4Dd87A+n9wUvMZYAxoCiHiSFD7x0hVIg/q4VXo\nWHBGEnnqCMC9Gtd7g7HZtQzbYMm4m2uY5JHhs+MXS8YKf6Ftc58sJHK5fMtjs9vM\nVOCkAlrEiEEn+tEHOjSNlzMg+P03UU79Lt/MDjXv3mtEPVmPjpJevT4Kjf1HxCSU\nNQIDAQAB\n-----END PUBLIC KEY-----', 'https://purl.imsglobal.org/spec/lti/claim/custom|username', 'https://purl.imsglobal.org/spec/lti/claim/custom|student_number', 'https://purl.imsglobal.org/spec/lti/claim/custom|term_name', 'https://purl.imsglobal.org/spec/lti/claim/custom|canvas_course_id', 'https://purl.imsglobal.org/spec/lti/claim/custom|account_name');
+
+INSERT INTO `acos` (id, parent_id, model, foreign_key, alias, lft, rght) VALUES
+(338,2,NULL,NULL,'Ltitoolregistrations',664,673),
+(339,338,NULL,NULL,'index',665,666),
+(340,338,NULL,NULL,'add',667,668),
+(341,338,NULL,NULL,'edit',669,670),
+(342,338,NULL,NULL,'delete',671,672),
+(343,2,NULL,NULL,'Lti',673,674),
+(344,343,NULL,NULL,'roster',675,676);
+
+INSERT INTO `aros_acos` (id, aro_id, aco_id, _create, _read, _update, _delete) VALUES
+(NULL,1,338,'1','1','1','1'),
+(NULL,2,344,'1','1','1','1'),
+(NULL,3,344,'1','1','1','1'),
+(NULL,4,344,'-1','-1','-1','-1'),
+(NULL,5,344,'-1','-1','-1','-1');
+
+DROP TABLE IF EXISTS `lti_nonces`;
+CREATE TABLE `lti_nonces` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nonce` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `nonce` (`nonce`)
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `lti_contexts`;
+CREATE TABLE `lti_contexts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `lti_tool_registration_id` int(11) NOT NULL,
+  `context_id` varchar(255) NOT NULL,
+  `course_id` int(11) DEFAULT NULL,
+  `nrps_context_memberships_url` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`lti_tool_registration_id`) REFERENCES `lti_tool_registrations` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE,
+  UNIQUE KEY `lti_tool_registration_id_context_id` (`lti_tool_registration_id`,`context_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `lti_contexts`
+--
+INSERT INTO `lti_contexts` (`id`, `lti_tool_registration_id`, `context_id`, `course_id`, `nrps_context_memberships_url`) VALUES
+(1, 1, 'mock_lti_context_id', 1, 'http://mock_lti.com/api/lti/courses/13/names_and_roles');
+
+
+DROP TABLE IF EXISTS `lti_resource_links`;
+CREATE TABLE `lti_resource_links` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `lti_context_id` int(11) NOT NULL,
+  `resource_link_id` varchar(255) NOT NULL,
+  `event_id` int(11) DEFAULT NULL,
+  `lineitems_url` varchar(255) DEFAULT NULL,
+  `lineitem_url` varchar(255) DEFAULT NULL,
+  `scope_lineitem` INT(1) DEFAULT '0',
+  `scope_lineitem_read_only` INT(1) DEFAULT '0',
+  `scope_result_readonly` INT(1) DEFAULT '0',
+  `scope_result_score` INT(1) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`lti_context_id`) REFERENCES `lti_contexts` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
+  UNIQUE KEY `lti_context_id_resource_link_id` (`lti_context_id`,`resource_link_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `lti_resource_links`
+--
+INSERT INTO `lti_resource_links` (`id`, `lti_context_id`, `resource_link_id`, `event_id`, `lineitems_url`, `lineitem_url`, `scope_lineitem`, `scope_lineitem_read_only`, `scope_result_readonly`, `scope_result_score`) VALUES
+(1, 1, 'mock_lti_resource_id', null, 'http://mock_lti.com/api/lti/courses/13/line_items', null, 1, 1, 0, 1),
+(2, 1, 'mock_lti_context_id', null, 'http://mock_lti.com/api/lti/courses/13/line_items', null, 1, 1, 0, 1);
+
+DROP TABLE IF EXISTS `lti_users`;
+CREATE TABLE `lti_users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `lti_tool_registration_id` int(11) NOT NULL,
+  `lti_user_id` varchar(255) NOT NULL,
+  `ipeer_user_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`lti_tool_registration_id`) REFERENCES `lti_tool_registrations` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`ipeer_user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  UNIQUE KEY `lti_tool_registration_id_lti_user_id` (`lti_tool_registration_id`,`lti_user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+--- END: Added by DB upgrade to version 18
+
+
+--
+-- Dumping data for table `lti_users`
+--
+INSERT INTO `lti_users` (`id`, `lti_tool_registration_id`, `lti_user_id`, `ipeer_user_id`) VALUES
+(1, 1, 'mock_lti_user_id_instructor', 2);
+
+
+
+SET foreign_key_checks = 1;

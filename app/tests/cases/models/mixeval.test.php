@@ -6,6 +6,8 @@ class MixevalTestCase extends CakeTestCase
     public $name = 'Mixeval';
     public $fixtures = array(
         'app.course', 'app.role', 'app.user', 'app.group',
+        'app.lti_user', 'app.lti_nonce', 'app.lti_tool_registration',
+        'app.lti_resource_link', 'app.lti_context',
         'app.roles_user', 'app.event', 'app.event_template_type',
         'app.group_event', 'app.evaluation_submission',
         'app.survey', 'app.oauth_token',
@@ -16,7 +18,7 @@ class MixevalTestCase extends CakeTestCase
         'app.mixeval_question', 'app.mixeval_question_desc', 'app.faculty',
         'app.user_faculty', 'app.department', 'app.course_department',
         'app.sys_parameter', 'app.user_tutor', 'app.penalty',
-        'app.evaluation_simple', 'app.survey_input', 
+        'app.evaluation_simple', 'app.survey_input',
         'app.mixeval_question_type', 'app.evaluation_rubric', 'app.evaluation_rubric_detail',
         'app.evaluation_mixeval', 'app.evaluation_mixeval_detail'
     );

@@ -5,6 +5,8 @@ class SurveyInputTestCase extends CakeTestCase
 {
     public $name = 'SurveyInput';
     public $fixtures = array('app.course', 'app.role', 'app.user', 'app.group',
+        'app.lti_user', 'app.lti_nonce', 'app.lti_tool_registration',
+        'app.lti_resource_link', 'app.lti_context',
         'app.roles_user', 'app.event', 'app.event_template_type',
         'app.group_event', 'app.evaluation_submission',
         'app.survey_group_set', 'app.survey_group', 'app.penalty',

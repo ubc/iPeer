@@ -4776,6 +4776,14 @@ msgstr ""
 msgid "Compare"
 msgstr ""
 
+#:
+msgid "Updated roster from Canvas"
+msgstr ""
+
+#:
+msgid "LTI 1.3 launch success"
+msgstr ""
+
 #: /Users/compass/projects/ipeer/src//users/import.ctp:5
 msgid "All fields mandatory, except email and password."
 msgstr ""

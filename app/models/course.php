@@ -35,6 +35,11 @@ class Course extends AppModel
             'exclusive'   => false,
             'finderSql'   => ''
         ),
+        'LtiContext' => array(
+            'className'   => 'LtiContext',
+            'foreignKey'  => 'course_id',
+            'dependent'   => true
+        ),
         'Event' => array(
             'className'   => 'Event',
             'conditions'  => 'Event.record_status = "A"',

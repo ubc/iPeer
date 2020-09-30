@@ -43,9 +43,7 @@ services:
   worker: &worker
     <<: *app
     container_name: ipeer_worker
-    command: cake/console/cake worker run
-    ports:
-      - "9002:9000"
+    command: bash -c "sleep 5 && cake/console/cake worker run"
   web:
     image: nginx:1.19-alpine
     container_name: ipeer_web
@@ -59,15 +57,13 @@ services:
 
   # for running unit tests
   app-unittest:
-    image: ubcctlt/ipeer-app
+    image: ubcctlt/ipeer-app-unittest
     build:
       context: .
       dockerfile: Dockerfile-app-unittest
     container_name: ipeer_app_unittest
     volumes:
       - .:/var/www/html
-    ports:
-      - "9001:9000"
     environment:
       - IPEER_DB_HOST=db
       - IPEER_DB_USER=ipeer

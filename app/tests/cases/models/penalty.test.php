@@ -5,6 +5,8 @@ class PenaltyTestCase extends CakeTestCase
 {
     public $name = 'Penalty';
     public $fixtures = array('app.course', 'app.role', 'app.user', 'app.group',
+        'app.lti_user', 'app.lti_nonce', 'app.lti_tool_registration',
+        'app.lti_resource_link', 'app.lti_context',
         'app.roles_user', 'app.event', 'app.event_template_type',
         'app.group_event', 'app.evaluation_submission',
         'app.survey_group_set', 'app.survey_group',
@@ -16,7 +18,7 @@ class PenaltyTestCase extends CakeTestCase
         'app.evaluation_simple', 'app.survey_input', 'app.oauth_token',
         'app.evaluation_rubric', 'app.evaluation_rubric_detail', 'app.evaluation_mixeval',
         'app.evaluation_mixeval_detail'
-        
+
     );
     public $Penalty = null;
 
@@ -111,7 +113,7 @@ class PenaltyTestCase extends CakeTestCase
         $ret = $this->Penalty->getPenaltyDays(999);
         $this->assertEqual($ret, null);
     }
-    
+
     function testGetPenaltyByPenaltiesAndDaysLate()
     {
         // valid event penalties set
@@ -124,7 +126,7 @@ class PenaltyTestCase extends CakeTestCase
         $this->assertEqual($penalties['1']['Penalty']['days_late'], 2);
         $this->assertEqual($penalties['2']['Penalty']['days_late'], 3);
         $this->assertEqual($penalties['3']['Penalty']['days_late'], 4);
-        
+
         // valid event - right on time
         $ret = $this->Penalty->getPenaltyByPenaltiesAndDaysLate($penalties, 0);
         $this->assertEqual($ret, null);
@@ -140,11 +142,11 @@ class PenaltyTestCase extends CakeTestCase
         // valid event - final deduction
         $ret = $this->Penalty ->getPenaltyByPenaltiesAndDaysLate($penalties, 5);
         $this->assertEqual($ret['Penalty']['percent_penalty'], 60);
-        
+
         // test inbetween penalties with several days between days late
         // 1 day 15% to 4 days 60%
         $penalties = array( $penalties['0'],  $penalties['3'] );
-        
+
         // valid event between 1 amd 4 days
         $ret = $this->Penalty->getPenaltyByPenaltiesAndDaysLate($penalties, 1);
         $this->assertEqual($ret['Penalty']['percent_penalty'], 15);
@@ -156,8 +158,8 @@ class PenaltyTestCase extends CakeTestCase
         $this->assertEqual($ret['Penalty']['percent_penalty'], 60);
         $ret = $this->Penalty->getPenaltyByPenaltiesAndDaysLate($penalties, 4);
         $this->assertEqual($ret['Penalty']['percent_penalty'], 60);
-        
-        
+
+
         // valid empty event penalties set
         $penalties = $this->Penalty->getPenaltyByEventId(3);
         $this->assertEqual(empty($penalties), true);
@@ -241,7 +243,7 @@ class PenaltyTestCase extends CakeTestCase
         $ret = $this->Penalty->getPenaltyByEventAndDaysLate(999, 5);
         $this->assertEqual($ret, null);
     }
-    
+
     function testGetPenaltyPercent()
     {
         //TODO

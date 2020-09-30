@@ -29,6 +29,8 @@ class CoursesControllerTest extends ExtendedAuthTestCase
 
     public $fixtures = array(
         'app.course', 'app.role', 'app.user', 'app.group',
+        'app.lti_user', 'app.lti_nonce', 'app.lti_tool_registration',
+        'app.lti_resource_link', 'app.lti_context',
         'app.roles_user', 'app.event', 'app.event_template_type',
         'app.group_event', 'app.evaluation_submission',
         'app.survey_group_set', 'app.survey_group',
@@ -137,7 +139,6 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'created' => '2006-06-19 16:25:24',
                 'updater_id' => null,
                 'modified' => '2006-06-19 16:25:24',
-                'lti_id' => null,
                 'full_name' => 'Instructor 1',
                 'student_no_with_full_name' => 'Instructor 1',
                 'creator' => 'Super Admin',
@@ -171,7 +172,6 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'created' => '2006-06-20 14:17:02',
                 'updater_id' => null,
                 'modified' => '2006-06-20 14:17:02',
-                'lti_id' => null,
                 'full_name' => 'Instructor 2',
                 'student_no_with_full_name' => 'Instructor 2',
                 'creator' => 'Super Admin',
@@ -206,7 +206,6 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'created' => '2006-06-20 14:17:53',
                 'updater_id' => null,
                 'modified' => '2006-06-20 14:17:53',
-                'lti_id' => null,
                 'full_name' => 'Instructor 3',
                 'student_no_with_full_name' => 'Instructor 3',
                 'creator' => 'Super Admin',

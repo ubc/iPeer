@@ -90,6 +90,13 @@ switch($submenu) {
         //     array('name' => 'Sync Canvas Groups', 'link' => "/groups/syncCanvas/$course_id")
         // );
     }
+    case "LTI":
+      if ($ltiNrpsEnabled){
+          array_push(
+              $items,
+              array('name' => 'Sync Users from LMS Course Roster',  'link' => "/lti/roster/$course_id")
+          );
+      }
     break;
 }
 ?>

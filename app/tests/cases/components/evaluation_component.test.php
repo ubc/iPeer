@@ -12,6 +12,8 @@ class EvaluationTestCase extends CakeTestCase
 {
     public $fixtures = array('app.course', 'app.role', 'app.user', 'app.group', 'app.penalty', 'app.user_grade_penalty',
         'app.roles_user', 'app.event', 'app.event_template_type',
+        'app.lti_user', 'app.lti_nonce', 'app.lti_tool_registration',
+        'app.lti_resource_link', 'app.lti_context',
         'app.group_event', 'app.evaluation_submission','app.evaluation_mixeval',
         'app.survey_group_set', 'app.survey_group', 'app.groups_member',
         'app.survey_group_member', 'app.question', 'app.survey_input', 'app.rubrics_lom', 'app.evaluation_rubric', 'app.evaluation_rubric_detail',
@@ -181,7 +183,7 @@ class EvaluationTestCase extends CakeTestCase
     {
 
     }
-    
+
     /**
      * testGetStudentViewRubricResultDetailReview
      *
@@ -361,7 +363,7 @@ class EvaluationTestCase extends CakeTestCase
             ),
         );
         $this->assertEqual($expected, $result);
-        
+
         // Tests null instance
         $result = Toolkit::formatRubricEvaluationResultsMatrix(null);
         $this->assertFalse($result);
@@ -465,7 +467,7 @@ class EvaluationTestCase extends CakeTestCase
         // Get the grade with real values
         $grade = $this->EvaluationComponentTest->saveNGetEvaluationMixevalDetail ($evalMixevalId, $mixeval, $form, $auto_release);
         $this->assertEqual($grade, 0.8);
-        
+
         // Test the method with null values
         $grade = $this->EvaluationComponentTest->saveNGetEvaluationMixevalDetail (null, null, null, null);
         $this->assertFalse($grade);
@@ -528,7 +530,7 @@ class EvaluationTestCase extends CakeTestCase
         $this->assertWithinMargin($currentTime, $eval[5][0]['Event']['due_in'], 5);
         // Null due_in time since we are doing assertEqual
         $eval[5][0]['Event']['due_in'] = null;
-        
+
         // Set up expected return value
         $expected = $this->setUpMixevalResultDetailReview();
         $this->assertEqual($eval, $expected);
@@ -539,10 +541,10 @@ class EvaluationTestCase extends CakeTestCase
         $eval = $this->EvaluationComponentTest->getStudentViewMixevalResultDetailReview(1, null);
         $this->assertFalse(!empty($eval));
     }
-    
+
     function testFormatMixevalEvaluationResultsMatrix()
     {
-    
+
     }
 
 
@@ -641,19 +643,19 @@ class EvaluationTestCase extends CakeTestCase
         $survey = $this->EvaluationComponentTest->formatSurveyEvaluationSummary($surveyId, $eventId, $userIds);
         $expected = $this->setUpSurveyTestData();
         $this->assertEqual($expected, $survey);
-        
+
         // Testing null and 'random' values
         $survey = $this->EvaluationComponentTest->formatSurveyEvaluationSummary(999, $eventId, $userIds);
         $this->assertFalse($survey);
         // Set up survey results with no responses
         $expected = $this->setUpSurveyBlankData();
-        
+
         $survey = $this->EvaluationComponentTest->formatSurveyEvaluationSummary($surveyId, 999, $userIds);
         $this->assertEqual($expected, $survey);
-        
+
         $survey = $this->EvaluationComponentTest->formatSurveyEvaluationSummary($surveyId, $eventId, array(84, 180, 230));
         $this->assertEqual($expected, $survey);
-        
+
         $survey = $this->EvaluationComponentTest->formatSurveyEvaluationSummary(null, null, null);
         $this->assertFalse($survey);
     }
