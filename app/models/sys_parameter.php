@@ -67,7 +67,7 @@ class SysParameter extends AppModel
             if ($param) {
                 // decrypt the parameter if it's encrypted
                 if ($param['SysParameter']['parameter_type'] === 'E'){
-                    $param['SysParameter']['parameter_value'] = Security::cipher($param['SysParameter']['parameter_value'], Configure::read('Security.cipherSeed'));
+                    $param['SysParameter']['parameter_value'] = Security::cipher(base64_decode($param['SysParameter']['parameter_value']), Configure::read('Security.cipherSeed'));
                 } elseif ($param['SysParameter']['parameter_type'] === 'B') {
                     $param['SysParameter']['parameter_value'] =
                         !($param['SysParameter']['parameter_value'] === 'false' ||
@@ -117,7 +117,7 @@ class SysParameter extends AppModel
         $this->data[$this->name]['modified'] = date('Y-m-d H:i:s');
 
         if ($this->data[$this->name]['parameter_type'] == 'E'){
-            $this->data[$this->name]['parameter_value'] = Security::cipher($this->data[$this->name]['parameter_value'], Configure::read('Security.cipherSeed'));
+            $this->data[$this->name]['parameter_value'] = base64_encode(Security::cipher($this->data[$this->name]['parameter_value'], Configure::read('Security.cipherSeed')));
         }
 
         return true;
@@ -133,14 +133,8 @@ class SysParameter extends AppModel
      */
     function afterSave($created)
     {
-        if (empty($this->data['SysParameter']['parameter_value'])) {
-            // cake cache doesn't allow storing empty value. so we have to remove
-            // the old value instead of overwrite
-            Cache::delete($this->data['SysParameter']['parameter_code'], 'configuration');
-        } else {
-            Cache::write($this->data['SysParameter']['parameter_code'], $this->data['SysParameter']['parameter_value'], 'configuration');
-        }
-
+        // clear the cache. let the next read retrieve/decrypt/convert it again
+        Cache::delete($this->data['SysParameter']['parameter_code'], 'configuration');
         return true;
     }
 
