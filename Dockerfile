@@ -18,15 +18,13 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
 
 COPY docker/php.ini /usr/local/etc/php/
 COPY . /var/www/html
+COPY docker/docker-entrypoint-php-fpm.sh /
 
 RUN cd /var/www/html \
     && composer install --no-ansi --no-dev --no-interaction --no-plugins --no-progress --no-suggest --optimize-autoloader \
     && mkdir -p /var/www/html/app/tmp/cache/persistent /var/www/html/app/tmp/cache/models /var/www/html/app/tmp/logs \
     && chown www-data:www-data -R /var/www/html/app/tmp/cache \
-    && ln -sf /dev/stdout /var/www/html/app/tmp/logs/api.log \
-    && ln -sf /dev/stdout /var/www/html/app/tmp/logs/debug.log \
-    && ln -sf /dev/stdout /var/www/html/app/tmp/logs/login.log \
-    && ln -sf /dev/stderr /var/www/html/app/tmp/logs/error.log
+    && chown www-data:www-data -R /var/www/html/app/tmp/logs
 
 RUN set -ex \
     ## Customize PHP fpm configuration
@@ -34,3 +32,4 @@ RUN set -ex \
     && sed -i -e "s/;request_terminate_timeout\s*=[^\n]*/request_terminate_timeout = 300/g" /usr/local/etc/php-fpm.conf \
     && php-fpm --test
 
+CMD ["/docker-entrypoint-php-fpm.sh"]
