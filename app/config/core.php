@@ -347,7 +347,7 @@
   $CWL['applicationID'] = '';
   $CWL['applicationPassword'] = '';
 
-  define('IPEER_VERSION', '3.4.6');
+  define('IPEER_VERSION', '3.4.7');
 
 
 /**
