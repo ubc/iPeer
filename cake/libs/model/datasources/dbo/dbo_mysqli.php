@@ -73,6 +73,18 @@ class DboMysqli extends DboMysqlBase {
 		if (!empty($config['encoding'])) {
 			$this->setEncoding($config['encoding']);
 		}
+
+		// A quick hack to disable MariaDB / MySQL Strict Mode.
+		// This CakePHP version uses empty string '' for empty values.
+		// This causes problems when inserting datatime fields under strict mode.
+		if ($sql_modes = $this->connection->query('SELECT @@SQL_MODE;')) {
+			if ($row = $sql_modes->fetch_row()) {
+				// simply remove strict modes. ok to leave extra commas in the resulting string.
+				$new_sql_modes = str_replace(["STRICT_TRANS_TABLES", "STRICT_ALL_TABLES"], "", $row[0]);
+				$this->connection->query("SET sql_mode = '" . $new_sql_modes . "'");
+			}
+		}
+
 		return $this->connected;
 	}
 
