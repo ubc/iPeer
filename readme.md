@@ -201,6 +201,10 @@ You may optionally override the user default IRI (from `$base_url/users/view/$us
 
 `CALIPER_ACTOR_UNIQUE_IDENTIFIER_PARAM`: Optionally set the actor's unique identifier using any column from the `user` table (ex: `username`, `id`, `email`). Will be inserted into the `CALIPER_ACTOR_BASE_URL` string.
 
+iPeer 3.4.9
+-----------
+* Fix unsecure form submission when deployed load balancer with SSL offload (#663)
+
 iPeer 3.4.8
 -----------
 * Fix a bug preventing instructor adding survey based event
