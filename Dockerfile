@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
     && rm -rf /var/lib/apt/lists/* \
     && ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so \
     && ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so \
-    && docker-php-ext-install -j$(nproc) xml gd ldap mysqli \
+    && docker-php-ext-install -j$(nproc) xml gd ldap mysqli pdo_mysql \
     && pecl install timezonedb xdebug\
     && docker-php-ext-enable timezonedb xdebug\
     && curl https://getcomposer.org/download/1.8.4/composer.phar -o /usr/local/bin/composer \

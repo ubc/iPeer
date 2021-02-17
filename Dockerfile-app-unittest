@@ -12,9 +12,11 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
     && rm -rf /var/lib/apt/lists/* \
     && ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so \
     && ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so \
-    && docker-php-ext-install -j$(nproc) xml gd ldap mysqli pdo_mysql\
+    && docker-php-ext-install -j$(nproc) xml gd ldap mysqli pdo_mysql intl \
     && pecl install timezonedb \
     && docker-php-ext-enable timezonedb \
+    && pecl install xdebug \
+    && docker-php-ext-enable xdebug \
     && curl https://getcomposer.org/download/1.8.4/composer.phar -o /usr/local/bin/composer \
     && chmod +x /usr/local/bin/composer \
     && pecl install -f oauth-2.0.2 \
