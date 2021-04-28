@@ -169,7 +169,7 @@ class CreateAclShell extends Shell
         // some users can't explicitly see username
         $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'viewusername'));
         $this->Acl->Aco->save();
-        
+
         // functions/submitstudenteval
         // allow users to submit evaluation/survey for students in student view
         $this->Acl->Aco->create(array('parent_id' => $root['Aco']['id'], 'model' => null, 'alias' => 'submitstudenteval'));
@@ -310,7 +310,7 @@ class CreateAclShell extends Shell
      */
     function _isPlugin($ctrlName = null)
     {
-        $arr = String::tokenize($ctrlName, '/');
+        $arr = CakeString::tokenize($ctrlName, '/');
         if (count($arr) > 1) {
             return true;
         } else {
@@ -329,7 +329,7 @@ class CreateAclShell extends Shell
      */
     function _getPluginControllerPath($ctrlName = null)
     {
-        $arr = String::tokenize($ctrlName, '/');
+        $arr = CakeString::tokenize($ctrlName, '/');
         if (count($arr) == 2) {
             return $arr[0] . '.' . $arr[1];
         } else {
@@ -348,7 +348,7 @@ class CreateAclShell extends Shell
      */
     function _getPluginName($ctrlName = null)
     {
-        $arr = String::tokenize($ctrlName, '/');
+        $arr = CakeString::tokenize($ctrlName, '/');
         if (count($arr) == 2) {
             return $arr[0];
         } else {
@@ -367,7 +367,7 @@ class CreateAclShell extends Shell
      */
     function _getPluginControllerName($ctrlName = null)
     {
-        $arr = String::tokenize($ctrlName, '/');
+        $arr = CakeString::tokenize($ctrlName, '/');
         if (count($arr) == 2) {
             return $arr[1];
         } else {
