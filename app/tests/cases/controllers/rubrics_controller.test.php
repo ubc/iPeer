@@ -21,6 +21,8 @@ class RubricsControllerTest extends ExtendedAuthTestCase {
 
     public $fixtures = array(
         'app.course', 'app.role', 'app.user', 'app.group',
+        'app.lti_user', 'app.lti_nonce', 'app.lti_tool_registration',
+        'app.lti_resource_link', 'app.lti_context',
         'app.roles_user', 'app.event', 'app.event_template_type',
         'app.group_event', 'app.evaluation_submission',
         'app.survey_group_set', 'app.survey_group',
@@ -76,37 +78,37 @@ class RubricsControllerTest extends ExtendedAuthTestCase {
         $result = $this->testAction('/rubrics/index', array('connection' => 'test_suite', 'return' => 'contents'));
         //$this->assertEqual($result['paramsForList']['data']['entries'][0]['Course']['course'], 'Math303');
     }
-    
+
     function testPostProcess() {
-        
+
     }
-    
+
     function testSetUpAjaxList() {
-    
+
     }
-    
+
     function testAjaxList() {
-    
+
     }
-    
+
     function testView() {
-    
+
     }
-    
+
     function testAdd() {
         $result = $this->testAction('/rubrics/add', array('connection' => 'test_suite', 'return' => 'vars'));
     }
-    
+
     function testEdit() {
-    
+
     }
-    
+
     function testCopy() {
-    
+
     }
-    
+
     function testDelete() {
-    
+
     }
 
 }

@@ -5,6 +5,8 @@ App::import('Model', 'User');
 class UserTestCase extends CakeTestCase {
     var $fixtures = array(
         'app.user', 'app.evaluation_submission', 'app.event',
+        'app.lti_user', 'app.lti_nonce', 'app.lti_tool_registration',
+        'app.lti_resource_link', 'app.lti_context',
         'app.event_template_type', 'app.course', 'app.group',
         'app.group_event', 'app.groups_member', 'app.survey',
         'app.survey_group_set', 'app.survey_group', 'app.survey_group_member',

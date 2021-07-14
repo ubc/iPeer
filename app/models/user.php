@@ -53,6 +53,11 @@ class User extends AppModel
             'className' => 'SurveyGroupMember',
             'foreignKey' => 'user_id',
         ),
+        'LtiUser' => array(
+            'className'   => 'LtiUser',
+            'foreignKey'  => 'ipeer_user_id',
+            'dependent'   => true
+        ),
     );
 
     public $hasAndBelongsToMany = array(
@@ -1499,16 +1504,9 @@ class User extends AppModel
     protected function validEmail($check)
     {
         $email = $check['email'];
-        if (function_exists('filter_var')) {
-            // filter_var() requires php >= 5.2.0
-            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                return true;
-            }
-        } else {
-            // really basic fallback validation
-            if (preg_match('/.+@.+/', $email)) {
-                return true;
-            }
+        // really basic fallback validation
+        if (preg_match('/.+@.+/', $email)) {
+            return true;
         }
         return false;
     }

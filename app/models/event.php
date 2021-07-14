@@ -178,6 +178,11 @@ class Event extends AppModel
             'dependent' => true,
             'foreignKey' => 'event_id'
         ),
+        'LtiResourceLink' => array(
+            'className'   => 'LtiResourceLink',
+            'foreignKey'  => 'event_id',
+            'dependent'   => true
+        ),
     );
 
     private $timezone = null;
@@ -1099,9 +1104,13 @@ class Event extends AppModel
             $event_date_fields = array('due_date', 'release_date_begin', 'release_date_end', 'result_release_date_begin', 'result_release_date_end');
             foreach ($event_date_fields as $eventDate) {
                 if (is_string($eventData[$eventDate])) {
-                    $timeStamp = strtotime($eventData[$eventDate]);
-                    if($timeStamp) {
-                        $eventData[$eventDate] = date("Y-m-d H:i:s", $timeStamp);
+                    if(empty($eventData[$eventDate])) {
+                        $eventData[$eventDate] = NULL;
+                    } else {
+                        $timeStamp = strtotime($eventData[$eventDate]);
+                        if($timeStamp) {
+                            $eventData[$eventDate] = date("Y-m-d H:i:s", $timeStamp);
+                        }
                     }
                 }
             }

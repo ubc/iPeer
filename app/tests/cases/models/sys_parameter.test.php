@@ -5,6 +5,8 @@ class SysParameterTestCase extends CakeTestCase
 {
     public $name = 'EvaluationSimple';
     public $fixtures = array('app.course', 'app.role', 'app.user', 'app.group', 'app.sys_parameter',
+        'app.lti_user', 'app.lti_nonce', 'app.lti_tool_registration',
+        'app.lti_resource_link', 'app.lti_context',
         'app.roles_user', 'app.event', 'app.event_template_type',
         'app.group_event', 'app.evaluation_submission',
         'app.survey_group_set', 'app.survey_group',
@@ -60,19 +62,19 @@ class SysParameterTestCase extends CakeTestCase
         $result = $this->SysParameter->get('non.existing.key', 'default');
         $this->assertEqual($result, 'default');
     }
-    
+
     function testNumberSysParam()
     {
         $result = $this->SysParameter->find('count');
         $this->assertEqual($result, 31);
-        
+
         $result = $this->SysParameter->find('list', array('fields' => array('SysParameter.parameter_code')));
         $result_values = array_values($result);
         $expected = array(
             'system.super_admin', 'system.admin_email', 'display.date_format', 'system.version',
             'database.version', 'email.port', 'email.host', 'email.username', 'email.password',
             'display.contact_info', 'display.login.header', 'display.login.footer', 'system.absolute_url',
-            'google_analytics.tracking_id', 'google_analytics.domain', 'banner.custom_logo', 'system.timezone', 
+            'google_analytics.tracking_id', 'google_analytics.domain', 'banner.custom_logo', 'system.timezone',
             'system.student_number', 'course.creation.instructions', 'system.canvas_enabled',
             'system.canvas_baseurl', 'system.canvas_baseurl_ext', 'system.canvas_user_key',
             'system.canvas_client_id', 'system.canvas_client_secret', 'system.canvas_force_login',

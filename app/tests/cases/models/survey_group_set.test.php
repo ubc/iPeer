@@ -6,6 +6,8 @@ class SurveyGroupSetTestCase extends CakeTestCase
     public $name = 'SurveyGroupSet';
     public $fixtures = array(
         'app.course', 'app.role', 'app.user', 'app.group',
+        'app.lti_user', 'app.lti_nonce', 'app.lti_tool_registration',
+        'app.lti_resource_link', 'app.lti_context',
         'app.roles_user', 'app.event', 'app.event_template_type',
         'app.group_event', 'app.evaluation_submission',
         'app.survey_group_set', 'app.survey_group',
@@ -16,7 +18,7 @@ class SurveyGroupSetTestCase extends CakeTestCase
         'app.faculty', 'app.user_faculty', 'app.department',
         'app.course_department', 'app.sys_parameter', 'app.user_tutor',
         'app.penalty', 'app.evaluation_simple', 'app.survey_input',
-        'app.oauth_token', 'app.evaluation_mixeval', 'app.evaluation_rubric', 
+        'app.oauth_token', 'app.evaluation_mixeval', 'app.evaluation_rubric',
         'app.evaluation_mixeval_detail', 'app.evaluation_rubric_detail'
     );
     public $SurveyGroupSet = null;

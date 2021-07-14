@@ -142,9 +142,6 @@ class CaliperEntity {
         if (array_key_exists('canvas_id', $course) && $course['canvas_id']) {
             $extensions['canvas_course_id'] = $course['canvas_id'];
         }
-        if (array_key_exists('lti_id', $user) && $user['lti_id']) {
-            $extensions['lti_user_id'] = $user['lti_id'];
-        }
 
         if (count($extensions) > 0) {
             $entity->setExtensions($extensions);

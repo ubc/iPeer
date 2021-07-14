@@ -369,7 +369,10 @@ INSERT INTO acos (id, parent_id, model, foreign_key, alias, lft, rght) VALUES
 (331,300,NULL,NULL,'viewusername',660,661),
 (332,300,NULL,NULL,'submitstudenteval',662,663),
 (333,84,NULL,NULL,'export',193,194),
-(334,84,NULL,NULL,'import',195,196);
+(334,84,NULL,NULL,'import',195,196),
+(335,16,NULL,NULL,'syncCanvasEnrollment',NULL,NULL),
+(336,112,NULL,NULL,'syncCanvas',NULL,NULL),
+(337,64,NULL,NULL,'exportCanvas',NULL,NULL);
 
 -- --------------------------------------------------------
 

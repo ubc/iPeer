@@ -12,7 +12,7 @@ class CoursesController extends AppController
 {
     public $name = 'Courses';
     public $uses =  array('GroupEvent', 'Course', 'Personalize', 'UserCourse',
-        'UserEnrol', 'Group', 'Event', 'User', 'UserFaculty', 'Department',
+        'UserEnrol', 'Group', 'Event', 'User', 'UserFaculty', 'Department', 'LtiContext',
         'CourseDepartment', 'EvaluationSubmission', 'SurveyInput', 'UserTutor', 'SysParameter');
     public $helpers = array('Html', 'Ajax', 'excel', 'Javascript', 'Time',
         'Js' => array('Prototype'), 'FileUpload.FileUpload');
@@ -203,10 +203,19 @@ class CoursesController extends AppController
             $this->redirect('index');
             return;
         }
+        $lti_contexts = $this->LtiContext->getByCourseId($id);
+        $ltiNrpsEnabled = false;
+        foreach ($lti_contexts as $lti_context) {
+            if (!empty($lti_context['LtiContext']['nrps_context_memberships_url'])) {
+                $ltiNrpsEnabled = true;
+                break;
+            }
+        }
 
         $this->set('data', $course);
         $this->set('title_for_layout', $course['Course']['full_name']);
         $this->set('canvasEnabled', in_array($this->SysParameter->get('system.canvas_enabled', 'false'), array('1', 'true', 'yes')));
+        $this->set('ltiNrpsEnabled', $ltiNrpsEnabled);
 
         //Setup the courseId to session
         $this->Session->write('ipeerSession.courseId', $id);

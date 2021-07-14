@@ -22,6 +22,8 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
 
     public $fixtures = array(
         'app.course', 'app.role', 'app.user', 'app.group',
+        'app.lti_user', 'app.lti_nonce', 'app.lti_tool_registration',
+        'app.lti_resource_link', 'app.lti_context',
         'app.roles_user', 'app.event', 'app.event_template_type',
         'app.group_event', 'app.evaluation_submission',
         'app.survey_group_set', 'app.survey_group',
@@ -163,13 +165,13 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
         $result = $this->testAction('/evaluations/makeEvaluation/4', array('return' => 'vars'));
         $this->assertEqual($result['eventId'], 4);
         $this->assertEqual(count($result['questions']), 2);
-        $this->assertEqual($result['questions'][0]['Question']['prompt'], 
+        $this->assertEqual($result['questions'][0]['Question']['prompt'],
             'What was your GPA last term?');
-        $this->assertEqual($result['questions'][1]['Question']['prompt'], 
+        $this->assertEqual($result['questions'][1]['Question']['prompt'],
             'Do you own a laptop?');
-        $this->assertEqual(count($result['questions'][0]['ResponseOptions']), 
+        $this->assertEqual(count($result['questions'][0]['ResponseOptions']),
             4);
-        $this->assertEqual(count($result['questions'][1]['ResponseOptions']), 
+        $this->assertEqual(count($result['questions'][1]['ResponseOptions']),
             2);
         $message = $this->controller->Session->read('Message.flash');
         $this->assertEqual($message['message'], '');

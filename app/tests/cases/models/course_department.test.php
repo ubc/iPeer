@@ -3,7 +3,16 @@
 App::import('Model', 'CourseDepartment');
 
 class CourseDepartmentTestCase extends CakeTestCase {
-	var $fixtures = array('app.course_department', 'app.course', 'app.group', 'app.user', 'app.evaluation_submission', 'app.event', 'app.event_template_type', 'app.group_event', 'app.user_faculty', 'app.faculty', 'app.department', 'app.user_course', 'app.user_enrol', 'app.groups_member', 'app.role', 'app.roles_user', 'app.survey', 'app.survey_group_set', 'app.survey_group', 'app.survey_group_member', 'app.question', 'app.response', 'app.survey_question');
+	var $fixtures = array(
+        'app.course_department', 'app.course', 'app.group', 'app.user',
+        'app.lti_user', 'app.lti_nonce', 'app.lti_tool_registration',
+        'app.lti_resource_link', 'app.lti_context',
+        'app.evaluation_submission', 'app.event', 'app.event_template_type',
+        'app.group_event', 'app.user_faculty', 'app.faculty', 'app.department',
+        'app.user_course', 'app.user_enrol', 'app.groups_member', 'app.role',
+        'app.roles_user', 'app.survey', 'app.survey_group_set', 'app.survey_group',
+        'app.survey_group_member', 'app.question', 'app.response', 'app.survey_question'
+    );
 
 	function startTest($method) {
         echo "Start CourseDepartment model test.\n";
@@ -11,7 +20,7 @@ class CourseDepartmentTestCase extends CakeTestCase {
 
 	function endTest($method) {
 	}
-	
+
 	function testinsertCourses() {
 	    //TODO
 	}

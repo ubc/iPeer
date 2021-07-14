@@ -50,7 +50,6 @@ $submenuTitle = __('Students', true);
 $params = array('submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'course_id'=>$data['Course']['id']);
 echo $this->element('courses/submenu', $params);
 
-
 $submenu = 'Group';
 $submenuTitle = __('Groups', true);
 $params = array('controller'=>'courses', 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'course_id'=>$data['Course']['id']);
@@ -68,11 +67,18 @@ if (User::hasPermission('controllers/Surveys')) {
   echo $this->element('courses/submenu', $params);
 }
 
+if ($ltiNrpsEnabled) {
+    $submenu = 'LTI';
+    $submenuTitle = __('LTI', true);
+    $params = array('controller'=>'courses', 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'course_id'=>$data['Course']['id']);
+    echo $this->element('courses/submenu', $params);
+}
+
 if ($canvasEnabled) {
-  $submenu = 'Canvas';
-  $submenuTitle = __('Canvas', true);
-  $params = array('controller'=>'courses', 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'course_id'=>$data['Course']['id']);
-  echo $this->element('courses/submenu', $params);
+    $submenu = 'Canvas';
+    $submenuTitle = __('Canvas', true);
+    $params = array('controller'=>'courses', 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'course_id'=>$data['Course']['id']);
+    echo $this->element('courses/submenu', $params);
 }
 
 ?>

@@ -1,229 +1,176 @@
 <?php
+App::import('Lib', 'lti');
+
+use lti\LTIDatabase;
+use lti\LTICache;
+use lti\LTICookie;
+use lti\LaunchDataParser;
+use lti\NamesAndRolesService;
+use IMSGlobal\LTI\LTI_Exception;
+use IMSGlobal\LTI\LTI_Message_Launch;
+use IMSGlobal\LTI\LTI_OIDC_Login;
+use IMSGlobal\LTI\OIDC_Exception;
+
 /**
- * LtiController
+ * LTI 1.3 Controller
  *
- * @uses AppController
+ * @uses      AppController
  * @package   CTLT.iPeer
- * @author    John Hsu <john.hsu@ubc.ca>
- * @copyright 2012 All rights reserved.
+ * @author    Steven Marshall <steven.marshall@ubc.ca>
+ * @copyright 2019 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
+ * @link      https://www.imsglobal.org/spec/security/v1p0/#fig_oidcflow
  */
 class LtiController extends AppController
 {
-    public $name = "Lti";
-    public $uses = array('User', 'Course', 'Role');
-    public $components = array('LtiVerifier', 'LtiRequester');
+    public $uses = array('LtiContext', 'LtiResourceLink', 'LtiUser',
+        'User', 'Course');
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
     /**
      * beforeFilter
-     *
      *
      * @access public
      * @return void
      */
     function beforeFilter()
     {
-        $this->Auth->allow('index');
+        //ensure the user is logged out of iPeer when starting the login/launch actions
+        if (!empty($this->params['action']) && in_array($this->params['action'], ['login', 'launch'])) {
+            if ($this->Auth->isAuthorized()) {
+                $this->Auth->logout();
+            }
+        }
+        $this->Auth->allow('login', 'launch');
+        parent::beforeFilter();
     }
 
+    /**
+     * OIDC login action called by platform.
+     */
+    public function login()
+    {
+        try {
+            $login = LTI_OIDC_Login::new(
+                new LTIDatabase(),
+                new LTICache(),
+                new LTICookie()
+            );
+            $url = Router::url('/lti/launch', true);
+            $redirect = $login->do_oidc_login_redirect($url);
+            // fix `die` call issue for testing by redirecting manually using framework
+            $this->redirect($redirect->get_redirect_url());
+        } catch (OIDC_Exception $e) {
+            $this->Session->setFlash(sprintf("Error doing OIDC login: %s", $e->getMessage()));
+            $this->redirect('/home/index');
+        }
+    }
 
     /**
-     * index
-     *
-     *
-     * @access public
-     * @return void
+     * Launch action called by platform.
      */
-    public function index()
+    public function launch()
     {
-        // First verify that this is a legit LTI request
-        $ret = $this->LtiVerifier->checkParams($this->params['form']);
-        if ($ret) {
-            // param check failed
-            $this->set('invalidlti', $ret);
-            return;
+        // fixes potential warning when state/id_token param is missing
+        // (will still properly error out in validation)
+        if (empty($_POST['state'])) {
+            $_POST['state'] = null;
+        }
+        if (empty($_POST['id_token'])) {
+            $_POST['id_token'] = null;
         }
 
-        // Request the class roster
-        $roster = $this->LtiRequester->requestRoster($this->params['form']);
-        if (!is_array($roster)) {
-            $this->set('invalidlti', $roster);
-            return;
-        }
-
-        // Get course information
-        $ret = $this->LtiVerifier->getCourseInfo($this->params['form']);
-        if (!$ret) {
-            // failed to get course info
-            $this->set('invalidlti', "Missing course info in LTI request");
-            return;
-        }
-
-        // APP SPECIFIC CODE STARTS HERE
-        // Check whether the course already exists
-        $course = $this->Course->find(
-            'first',
-            array('conditions' => array('Course.course' => $ret['course']),)
+        $launch = LTI_Message_Launch::new(
+            new LTIDatabase(),
+            new LTICache(),
+            new LTICookie()
         );
-        if (empty($course)) {
-            // Non-existing course, create course
-            $this->data = array();
-            $this->data['course'] = $ret['course'];
-            $this->data['title'] = $ret['title'];
-            $this->data['record_status'] = Course::STATUS_ACTIVE;
-            $this->data = $this->Course->save($this->data);
-            if (!$this->data) {
-                $this->set('invalidlti', "Unable to add course");
-                return;
-            }
-
-            // Create users, if needed, and enrol them to the course
-            foreach ($roster as $person) {
-                $this->addUser($person, $this->Course->id);
-            }
-
-        } else {
-            // Existing course, update course
-            // Get current roster in iPeer
-            $courseid = $course['Course']['id'];
-            $ipeerroster = $this->User->getEnrolledStudents($courseid);
-            // Compare with roster from LTI
-            // Remove users that are on both lists
-            foreach ($roster as $ltikey => $ltiuser) {
-                foreach ($ipeerroster as $ipeerkey => $ipeeruser) {
-                    if ($ltiuser['user_id'] == $ipeeruser['User']['lti_id']) {
-                        unset($roster[$ltikey]);
-                        unset($ipeerroster[$ipeerkey]);
-                        continue;
-                    }
-                }
-            }
-            // Remaining users in ipeerroster needs to be dropped
-            foreach ($ipeerroster as $ipeeruser) {
-                $this->User->removeStudent(
-                    $ipeeruser['User']['id'], $courseid);
-            }
-            // Remaining users in roster needs to be added
-            foreach ($roster as $person) {
-                if (!$this->isLTIInstructor($person)) {
-                    $this->addUser($person, $courseid);
-                }
-            }
-        }
-        // END APP SPECIFIC CODE
-
-        // Let's try logging in:
-        $ret = $this->LtiVerifier->login($this->params['form'], $this->User);
-        if ($ret) {
-            $this->set('invalidlti', $ret);
+        try {
+            $launch->validate();
+        } catch (LTI_Exception $e) {
+            $this->Session->setFlash($e->getMessage());
+            $this->redirect('/logout');
             return;
         }
 
-        // APP SPECIFIC CODE BELOW
-        $this->redirect('/home');
+        if (!$launch->is_resource_launch()) {
+            $this->Session->setFlash("Not an LTI Launch.");
+            $this->redirect('/logout');
+            return;
+        }
+        $launch_data = $launch->get_launch_data();
+        $launch_data_parser = new LaunchDataParser($launch_data);
 
-    }
+        $this->log(json_encode($launch_data, 448), 'lti/launch');
 
+        // automatically create Faculty if needed
+        $faculty = $this->LtiContext->syncFaculty($launch_data_parser);
+        $faculty_id = $faculty['Faculty']['id'];
 
-    /**
-     * addUser
-     *
-     * @param mixed $info     info
-     * @param mixed $courseid course id
-     *
-     * @access private
-     * @return void
-     */
-    private function addUser($info, $courseid)
-    {
-        $first = $info['person_name_given'];
-        $last = $info['person_name_family'];
-        $email = $info['person_contact_email_primary'];
-        $lti_id = $info['user_id'];
-        $instructor = $this->isLTIInstructor($info);
+        // automatically create/update lti context + course
+        $lti_context = $this->LtiContext->syncLaunchContext($launch_data_parser);
+        $lti_context_id = $lti_context['LtiContext']['id'];
+        $course_id = $lti_context['Course']['id'];
 
-        // Prepare user data
-        $cdata = array();
-        $cdata['User']['username'] = $first . $last;
-        $cdata['User']['first_name'] = $first;
-        $cdata['User']['last_name'] = $last;
-        $cdata['User']['email'] = $email;
-        $cdata['User']['send_email_notification'] = false;
-        $cdata['User']['lti_id'] = $lti_id;
-        // TODO USER_TYPE_STUDENT needs to change to const instead of public later
-        $cdata['Role']['RolesUser']['role_id'] = $this->User->USER_TYPE_STUDENT;
-        $cdata['User']['created'] = date('Y-m-d H:i:s');
-        if ($instructor !== false) {
-            // this guy is a prof
-            $cdata['Role']['RolesUser']['role_id'] = $this->User->USER_TYPE_INSTRUCTOR;
+        // automatically create/update lti resource link + assignment (skipping assignment for now)
+        $lti_resource_link = $this->LtiResourceLink->syncLaunchResourceLink($launch_data_parser, $lti_context_id);
+
+        // automatically create/update lti user + user
+        $lti_user = $this->LtiUser->syncUser(
+            $launch_data_parser->lti_tool_registration['id'],
+            $launch_data_parser->getParam('sub'),
+            $launch_data_parser->getUserData()
+        );
+        $user_id = $lti_user['User']['id'];
+        $role_id = $launch_data_parser->getCourseRole();
+
+        // automatically update user enrollment
+        $this->LtiUser->syncUserEnrollment($course_id, $user_id, $faculty_id, $role_id);
+
+        // Automatic user login and log
+        $this->Auth->login($user_id);
+        if (method_exists($this, '_afterLogin')) {
+            $this->_afterLogin(false);
         }
 
-        // Check if user already exists
-        $user = $this->User->getByUsername($cdata['User']['username']);
-        if (!empty($user)) {
-            // pre-existing user, just need to add them to course
-            $this->addUserToCourse($user['User']['id'], $courseid, $instructor);
-            // user might not have an lti_id, so save one
-            $user['User']['lti_id'] = $lti_id;
-            $this->User->save($user);
-            return false;
-        }
+        $this->log($lti_user['User'], 'lti/user');
 
-        // Need to create a new user
-        $this->User->create();
-        if ($this->User->save($cdata)) {
-            // User enrolment
-            $this->addUserToCourse($this->User->id, $courseid, $instructor);
-            return false;
+        $this->Session->setFlash(__('LTI launch success', true), 'good');
+        if (in_array($role_id, [$this->User->USER_TYPE_ADMIN, $this->User->USER_TYPE_INSTRUCTOR, $this->User->USER_TYPE_TA])) {
+            // Redirect to course page is instructor/admin
+            $this->redirect("/courses/home/$course_id");
         } else {
-            return $cdata['User']['username'];
+            // else redirect to home page for students
+            $this->redirect('/home/index');
         }
     }
 
-
     /**
-     * addUserToCourse
+     * Update roster by course ID from platform.
      *
-     * @param mixed $userid     user id
-     * @param mixed $courseid   course id
-     * @param mixed $instructor instructor
-     *
-     * @access private
-     * @return void
+     * Called by tool, not platform.
+     * @param string $course_id
      */
-    private function addUserToCourse($userid, $courseid, $instructor)
+    public function roster($course_id)
     {
-        // TODO use Role methods instead of this if possible
-        $student_role_id = $this->Role->field('id', array('name =' => 'student'));
-        $instructor_role_id = $this->Role->field(
-            'id', array('name' => 'instructor'));
-
-        if ($instructor === false) {
-            $this->User->registerRole($userid, $student_role_id);
-            $this->User->UserEnrol->insertCourses($userid, array($courseid));
-        } else {
-            $this->User->registerRole($userid, $instructor_role_id);
-            $this->Course->addInstructor($courseid, $userid);
+        if (!User::hasPermission('controllers/Lti/roster')) {
+            return;
         }
-    }
+        $names_and_roles_service = new NamesAndRolesService($course_id);
+        try
+        {
+            $names_and_roles_service->sync_membership();
 
+            $this->Session->setFlash(__('Imported Users from LMS', true), 'good');
+            $this->redirect("/courses/home/$course_id");
 
-    /**
-     * isLTIInstructor
-     *
-     * @param mixed $info
-     *
-     * @access private
-     * @return void
-     */
-    private function isLTIInstructor($info)
-    {
-        $instructor = stripos($info['roles'], 'Instructor');
-        // note that !== is required, we MUST compare type since
-        // stripos() may return 0 for a valid match
-        if ($instructor === false) {
-            return false;
+        } catch (LTI_Exception $e) {
+            $this->Session->setFlash($e->getMessage());
+            $this->redirect("/courses/home/$course_id");
         }
-        return true;
     }
 }
