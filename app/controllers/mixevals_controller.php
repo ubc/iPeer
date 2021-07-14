@@ -639,8 +639,36 @@ class MixevalsController extends AppController
             }
         }
 
+        /**
+         * get the event id and event index
+         * Load event index for the view to use in the Event Self-Evaluation
+         */
+        $eval = $this->Mixeval->findById($id);
+        if($this->params['action'] == 'edit') {
+            function getEventById($array, $key) {
+                foreach ($array as $value) {
+                    if($value['template_id'] == $key){
+                        return $value['id'];
+                    }
+                }
+            }
+            $event_id = getEventById($eval['Event'], $id);
+            $event_index = array_search($event_id, array_values($events));
+            $this->set('event_index', $event_index);
+        }
+
         // Save changes if there are any
         if (!empty($this->data)) {
+            /**
+             * check if the form submission includes the event data before saving
+             */
+            if(!empty($this->data['Event'])) {
+                $this->data['Event'][$event_index]['id'] = $eval['Event'][$event_index]['id'];
+                $this->data['Event'][$event_index]['created'] = $eval['Event'][$event_index]['created'];
+                $this->data['Event'][$event_index]['event_template_type_id'] = $eval['Event'][$event_index]['event_template_type_id'];
+                $this->Event->save($this->data['Event'][$event_index]);
+            }
+
             $this->_dataSavePrep();
             // This is kind of a hack. Inside _transactionSave, it will call saveAll with 'validate' option
             // equals to 'only' to perform validation.  In turn, the cake library Model's __save function
