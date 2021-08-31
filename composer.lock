@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4b335c58c09584e5b513ed9b738fef15",
+    "content-hash": "bebe365ea94caf812d63683845de01e6",
     "packages": [
         {
             "name": "compass/cake-guard",
-            "version": "1.0.7",
+            "version": "1.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/xcompass/CakePHP-Guard-Plugin.git",
-                "reference": "7642c9ad8f53d2151be62025c969ffa19cbc0df7"
+                "reference": "278c1f7244c3da8f95a4dd05d2d3feee0c99e2c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/xcompass/CakePHP-Guard-Plugin/zipball/7642c9ad8f53d2151be62025c969ffa19cbc0df7",
-                "reference": "7642c9ad8f53d2151be62025c969ffa19cbc0df7",
+                "url": "https://api.github.com/repos/xcompass/CakePHP-Guard-Plugin/zipball/278c1f7244c3da8f95a4dd05d2d3feee0c99e2c4",
+                "reference": "278c1f7244c3da8f95a4dd05d2d3feee0c99e2c4",
                 "shasum": ""
             },
             "require": {
@@ -35,7 +35,11 @@
                 }
             ],
             "description": "Authentication Plugin for CakePHP 1.3",
-            "time": "2020-07-17T21:49:24+00:00"
+            "support": {
+                "issues": "https://github.com/xcompass/CakePHP-Guard-Plugin/issues",
+                "source": "https://github.com/xcompass/CakePHP-Guard-Plugin/tree/1.0.8"
+            },
+            "time": "2021-08-31T02:43:26+00:00"
         },
         {
             "name": "imsglobal/caliper",
@@ -4171,10 +4175,10 @@
     ],
     "aliases": [
         {
-            "alias": "1.2.0",
-            "alias_normalized": "1.2.0.0",
+            "package": "imsglobal/caliper",
             "version": "dev-develop",
-            "package": "imsglobal/caliper"
+            "alias": "1.2.0",
+            "alias_normalized": "1.2.0.0"
         }
     ],
     "minimum-stability": "stable",
@@ -4190,5 +4194,5 @@
     "platform-overrides": {
         "php": "7.2"
     },
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.1.0"
 }
