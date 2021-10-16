@@ -159,9 +159,10 @@ class UsersController extends AppController
                     $conditions[] = 'Role.id = '.$id;
                 }
             }
-            $result = $this->User->query($query.join(' OR ', $conditions));
-            $userIds = Set::extract($result, '/User/id');
-            $extraFilters['User.id'] = $userIds;
+//            $result = $this->User->query($query.join(' OR ', $conditions));
+//            $userIds = Set::extract($result, '/User/id');
+			// Use subquery instead of query the results. Too many user.ids will cause OOM
+            $extraFilters[] = 'User.id IN (' . $query.implode(' OR ', $conditions) . ')';
         }
 
         // define right click menu actions

@@ -351,7 +351,7 @@ class AjaxListComponent extends CakeObject
             'recursive'  => $this->recursive,
             'joins'      => array($joinTable)));
 
-        // Counts a a bit more difficult with grouped, joint tables.
+        // Counts a bit more difficult with grouped, joint tables.
         if (isset($customModelCountFunction)) {
             $count = $this->model->$customModelCountFunction
                 ($conditions, $groupBy, $this->recursive, array($joinTable));
