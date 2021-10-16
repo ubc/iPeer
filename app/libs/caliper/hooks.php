@@ -268,8 +268,11 @@ class CaliperHooks {
         } elseif($event_obj['event_template_type_id'] == $Mixeval::TEMPLATE_TYPE_ID) {
             $results = $Mixeval->find('first', array(
                 'conditions' => array('Mixeval.id' => $event_obj['template_id']),
-                'contain' => array('MixevalQuestion', 'MixevalQuestion.MixevalQuestionDesc'),
-                'recursive' => 2,
+                'contain' => array(
+                    'MixevalQuestion',
+                    'MixevalQuestion.MixevalQuestionDesc',
+                    'MixevalQuestion.MixevalQuestionType'
+                ),
             ));
 
             if ($created) {

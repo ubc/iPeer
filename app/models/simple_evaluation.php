@@ -16,6 +16,7 @@ class SimpleEvaluation extends EvaluationBase
 {
     const TEMPLATE_TYPE_ID = 1;
     public $name = 'SimpleEvaluation';
+    public $actsAs = array('Containable', 'Traceable');
     // use default table
     public $useTable = null;
 
@@ -60,7 +61,7 @@ class SimpleEvaluation extends EvaluationBase
      * getEvaluation
      *
      * @param mixed $id id
-     * 
+     *
      * @access public
      * @return void
      */
