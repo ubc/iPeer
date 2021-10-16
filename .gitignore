@@ -19,3 +19,4 @@ tags
 vendor/
 .idea
 .data
+docker-compose.override.yml
