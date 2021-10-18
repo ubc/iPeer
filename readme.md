@@ -204,6 +204,17 @@ You may optionally override the user default IRI (from `$base_url/users/view/$us
 iPeer 3.4.9
 -----------
 * Fix unsecure form submission when deployed load balancer with SSL offload (#663)
+* Add github action to build docker
+* Swich to xdebug 3 config and use env vars instead xdebug.ini
+* Fix another 502 Bad gateway error related to user page
+* Fix 502 timeout when adding new event with certain template
+* Update Guard plugin to 1.0.8
+* Merge pull request #665 from josephkh/567-mixed-evaluation-ordering
+* Fixed the order of questions in mixed evaluation in students view
+* Fix issue with the functionality of exporting to PDF
+* Change String::tokenize to CakeString::tokenize
+* Add pdo_mysql to dockerfile
+* Better detection of https requests
 
 iPeer 3.4.8
 -----------
