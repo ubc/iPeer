@@ -2268,7 +2268,7 @@ VALUES (
 );
 
 INSERT INTO `sys_parameters` (
-    `parameter_code`, `parameter_value`, `parameter_type`, 
+    `parameter_code`, `parameter_value`, `parameter_type`,
     `description`, `record_status`, `creator_id`, `created`,
     `updater_id`, `modified`)
 VALUES (
@@ -2277,7 +2277,7 @@ VALUES (
 );
 
 INSERT INTO `sys_parameters` (
-    `parameter_code`, `parameter_value`, `parameter_type`, 
+    `parameter_code`, `parameter_value`, `parameter_type`,
     `description`, `record_status`, `creator_id`, `created`,
     `updater_id`, `modified`)
 VALUES (
@@ -2377,7 +2377,7 @@ ALTER TABLE `events` ADD COLUMN `canvas_assignment_id` VARCHAR(25) NULL DEFAULT 
 -- add table to store delayed jobs
 CREATE TABLE IF NOT EXISTS `jobs` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `handler` TEXT NOT NULL,
+    `handler` LONGTEXT NOT NULL,
     `queue` VARCHAR(255) NOT NULL DEFAULT 'default',
     `attempts` INT UNSIGNED NOT NULL DEFAULT 0,
     `run_at` DATETIME NULL,
