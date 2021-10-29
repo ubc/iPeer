@@ -162,7 +162,7 @@ class Mixeval extends AppModel
      */
     public function getEvaluation($id)
     {
-        $eval = $this->find('first', array('conditions' => array($this->alias.'.id' => $id)));
+        $eval = $this->find('first', array( 'conditions' => array($this->alias.'.id' => $id ), 'contain' => 'MixevalQuestion') );
 
         return $eval;
     }
