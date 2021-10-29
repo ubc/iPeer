@@ -64,6 +64,13 @@ echo $this->Form->input('student_id', array(
 ?>
 <div class='error-message' id='greenError'><?php echo __('Please include at least one of the green fields', true); ?></div>
 <?php
+echo $this->Form->input('question_title', array(
+  'type' => 'checkbox',
+  'name' => 'include[question_title]',
+  'checked' => true,
+  'label' => __('Include Questions', true).' <span style="color: orange">*</span>',
+  'div' => array('id' => 'question_title')
+));
 echo $this->Form->input('comments', array(
     'type' => 'checkbox', 'name' => 'include[comments]', 'checked' => true,
     'label' => __('Include Comments', true).' <font color="orange">*</font>'
@@ -92,10 +99,12 @@ function exportTypeToggle() {
         case 'csv':
             jQuery("div#student_id").show();
             jQuery("div#student_name").show();
+            jQuery("div#question_title").show();
             break;
         case 'pdf':
             jQuery("div#student_id").hide();
             jQuery("div#student_name").hide();
+            jQuery("div#question_title").hide();
             break;
         case 'default':
             jQuery('#fileTypeHelp').html('');

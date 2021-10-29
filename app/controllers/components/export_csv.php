@@ -179,9 +179,17 @@ Class ExportCsvComponent extends ExportBaseNewComponent
                     continue; // skip self-evaluation questions
                 }
                 if (in_array($question['mixeval_question_type_id'], array(1, 4))) {
-                    $header[] = "Q".$num." ( /".$question['multiplier'].")";
+                   if ($peerEval && $params['include']['question_title']) {
+                     $header[] = "Q".$num." ( /".$question['multiplier'].")"." ".$question['title'];
+                   } else {
+                     $header[] = "Q" . $num . " ( /" . $question['multiplier'] . ")";
+                   }
                 } else if (in_array($question['mixeval_question_type_id'], array(2, 3))){
-                    $header[] = "Q".$num;
+                   if ($peerEval && $params['include']['question_title']) {
+                     $header[] = "Q".$num." ".$question['title'];
+                   } else {
+                     $header[] = "Q".$num;
+                   }
                 }
                 $num++;
             } else {
