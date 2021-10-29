@@ -154,7 +154,7 @@ class AppController extends Controller
     {
         $sysv = $this->SysParameter->get('system.version');
 
-        if (User::hasPermission('controllers/upgrade') && $sysv < IPEER_VERSION) {
+        if (User::hasPermission('controllers/upgrade') && version_compare(IPEER_VERSION, $sysv) > 0) {
         	$flashMessage = "Your system version is older than the current version. ";
         	$flashMessage .= "Please do the <a href=" . $this->webroot ."upgrade" .">upgrade</a>.";
         	$this->Session->setFlash($flashMessage);

@@ -22,7 +22,7 @@ class UpgradeDefault extends UpgradeBase
 	{
 		$this->dbVersion = Configure::read('DATABASE_VERSION');
 	}
-	
+
 	/**
 	 *
 	 * @access public
@@ -32,9 +32,9 @@ class UpgradeDefault extends UpgradeBase
 	{
 		$sysparameter = ClassRegistry::init('SysParameter');
 		$sysv = $sysparameter->get('system.version');
-		return empty($sysv) || $sysv < IPEER_VERSION;
+		return empty($sysv) || version_compare(IPEER_VERSION,$sysv) > 0;
 	}
-	
+
 	/**
 	 * up
 	 *
@@ -43,12 +43,8 @@ class UpgradeDefault extends UpgradeBase
 	 */
 	public function up()
 	{
-		$sysparameter = ClassRegistry::init('SysParameter');
+		$this->toVersion = IPEER_VERSION;
 
-		$sysparameter->setValue('system.version', IPEER_VERSION);
-
-		$sysparameter->reload();
-		
 		return true;
 	}
 }
