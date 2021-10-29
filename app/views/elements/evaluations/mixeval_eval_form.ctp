@@ -51,13 +51,25 @@
         <h1 id="peer-title" class="title"><?php __("Peer Evaluation Questions")?></h1>
 
         <?php
+        function sort_questions($array, $key) {
+            foreach ($array as $k => $v) {
+                $question[] = strtolower($v['MixevalQuestion'][$key]);
+            }
+            asort($question);
+            foreach ($question as $k => $v) {
+                $q[] = $array[$k];
+            }
+            return $q;
+        }
+        $sorted_questions = sort_questions($questions, 'question_num');
+
         if ($mixeval['Mixeval']['peer_question'] > 0 ) {
             foreach($groupMembers as $row): $user = $row['User']; ?>
                 <center><h2><?php echo $user['full_name']?></h2></center>
                 <?php
                 $params = array('controller'            => 'mixevals',
                                 'zero_mark'             => $mixeval['Mixeval']['zero_mark'],
-                                'questions'             => $questions,
+                                'questions'             => $sorted_questions,
                                 'event'                 => $event,
                                 'user'                  => $user,
                                 'evaluatee_count'       => $evaluatee_count,

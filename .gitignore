@@ -20,3 +20,4 @@ vendor/
 .idea
 .data
 .DS_Store
+docker-compose.override.yml

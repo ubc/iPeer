@@ -18,7 +18,7 @@ class Mixeval extends AppModel
 {
     const TEMPLATE_TYPE_ID = 4;
     public $name = 'Mixeval';
-    public $actsAs = array('Traceable');
+    public $actsAs = array('Containable', 'Traceable');
 
     public $hasMany = array(
         'Event' => array(
@@ -37,7 +37,7 @@ class Mixeval extends AppModel
             'order'     => array('question_num' => 'ASC', 'id' => 'ASC'),
         ),
     );
-    
+
     public $validate = array(
         'name' => array(
             'unique' => array(
@@ -247,11 +247,11 @@ class Mixeval extends AppModel
      * @access public
      * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Models.html#Callback-Methods#afterDelete-1055
      */
-	function afterDelete() {
+    function afterDelete() {
         parent::afterDelete();
 
         CaliperHooks::mixeval_after_delete($this);
-	}
+    }
 
 
     /**
@@ -262,8 +262,8 @@ class Mixeval extends AppModel
      * @access public
      * @link http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Models.html#Callback-Methods#beforeDelete-1054
      */
-	function beforeDelete($cascade = true) {
+     function beforeDelete($cascade = true) {
         CaliperHooks::mixeval_before_delete($this);
         return parent::beforeDelete($cascade);
-	}
+     }
 }

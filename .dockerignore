@@ -6,4 +6,4 @@ build.xml
 Boxfile
 Vagrantfile
 app/tmp
-vendor/
+/vendor/

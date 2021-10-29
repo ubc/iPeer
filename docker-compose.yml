@@ -19,8 +19,6 @@ services:
     container_name: ipeer_app
     volumes:
       - .:/var/www/html
-      # uncomment to enable xdebug remote debugging
-      #- ./docker/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
     environment:
       - IPEER_DB_HOST=db
       - IPEER_DB_USER=ipeer
@@ -36,8 +34,11 @@ services:
       #- IPEER_AUTH=Ldap
       #- IPEER_AUTH_LDAP_host=ldap.example.com
       #- IPEER_AUTH_LDAP_port=636
-      # uncomment to enable xdebug remote debugging
+      # uncomment or use docker-compose override to enable xdebug remote debugging
       #- PHP_IDE_CONFIG=serverName=docker
+      #- XDEBUG_MODE=debug
+      #- XDEBUG_SESSION=PHPSTORM
+      #- XDEBUG_CONFIG=client_host=host.docker.internal client_port=9000 log=/tmp/xdebug.log
     depends_on:
       - db
   worker: &worker

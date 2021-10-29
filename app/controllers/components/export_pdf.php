@@ -342,8 +342,10 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             $numEval[$evaluateeId] = $grades[$evaluateeId];
             foreach ($evaluators as $evaluator) {
                 foreach ($evaluator as $mark) {
-                    $grades[$evaluateeId][$mark['question_number']] += $mark['grade'];
-                    $numEval[$evaluateeId][$mark['question_number']]++;
+                    if (in_array( $mark['question_number'], array_keys($grades[$evaluateeId]))) {
+                        $grades[$evaluateeId][$mark['question_number']] += $mark['grade'];
+                        $numEval[$evaluateeId][$mark['question_number']]++;
+                    }
                 }
             }
         }
