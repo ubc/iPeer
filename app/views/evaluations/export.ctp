@@ -67,7 +67,7 @@ echo $this->Form->input('student_id', array(
 echo $this->Form->input('question_title', array(
   'type' => 'checkbox',
   'name' => 'include[question_title]',
-  'checked' => true,
+  'checked' => false,
   'label' => __('Include Questions', true).' <span style="color: orange">*</span>',
   'div' => array('id' => 'question_title')
 ));
