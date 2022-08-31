@@ -18,7 +18,9 @@ class HomeController extends AppController
     public $uses =  array( 'Group', 'GroupEvent',
         'User', 'UserCourse', 'Event', 'EvaluationSubmission',
         'Course', 'Role', 'UserEnrol', 'Rubric', 'Penalty');
-
+    // NOTE::JK:START
+    public $components = ['RequestHandler', 'JsonHandler'];
+    // NOTE::JK:END
     /**
      * __construct
      *
@@ -40,7 +42,7 @@ class HomeController extends AppController
     {
         parent::beforeFilter();
 
-        $this->set('title_for_layout', __('Home', true));
+        $this->set('title_for_layout', __('iPeer Dashboard', true));
     }
 
     /**
@@ -115,18 +117,47 @@ class HomeController extends AppController
         foreach ($evals['upcoming'] as $e) {
             $e['late'] ? $numOverdue++ : '';
         }
-
-
         $this->set('evals', $evals);
         $this->set('surveys', $surveys);
         $this->set('numOverdue', $numOverdue);
         $this->set('numDue', $numDue);
-        
+
+      // JK:Comment:START
+      if ($this->RequestHandler->accepts('html')) {
         if(!User::isInstructor()) {
-            $this->render('studentIndex');
+          $this->render('webapp_student_index');
+          //$this->render('studentIndex');
         } else {
-            $this->render('combined');
+          $this->render('combined');
         }
+      }
+      elseif ($this->RequestHandler->accepts('json')) {
+        if($this->RequestHandler->isGet()) {
+          
+          if(!User::isInstructor()) {
+            header('Content-Type: application/json');
+            http_response_code(200);
+            // Student view
+            echo json_encode(array_merge([
+              'current' => $this->JsonHandler->formatEvents($evals['upcoming']),
+              'completed' => $this->JsonHandler->formatEvents(array_merge($evals['submitted'], $evals['expired'])),
+              'num_overdue' => $numOverdue,
+              'num_due' => $numDue
+            ]));
+          }
+          exit;
+          // NOTE:: also we can render the result in json.ctp
+          // $this->set('statusCode', $statusCode);
+          // $this->set('result', $data);
+          // $this->render('json');
+        }
+      }
+      // JK:Comment:END
+      // if(!User::isInstructor()) {
+      //   $this->render('studentIndex');
+      // } else {
+      //   $this->render('combined');
+      // }
     }
 
     /**
