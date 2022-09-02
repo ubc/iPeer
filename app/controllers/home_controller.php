@@ -18,9 +18,9 @@ class HomeController extends AppController
     public $uses =  array( 'Group', 'GroupEvent',
         'User', 'UserCourse', 'Event', 'EvaluationSubmission',
         'Course', 'Role', 'UserEnrol', 'Rubric', 'Penalty');
-    // NOTE::JK:START
+    // JK:START
     public $components = ['RequestHandler', 'JsonHandler'];
-    // NOTE::JK:END
+    // JK:END
     /**
      * __construct
      *
@@ -122,7 +122,7 @@ class HomeController extends AppController
         $this->set('numOverdue', $numOverdue);
         $this->set('numDue', $numDue);
 
-      // JK:Comment:START
+      // JK::START
       if ($this->RequestHandler->accepts('html')) {
         if(!User::isInstructor()) {
           $this->render('webapp_student_index');
@@ -152,7 +152,7 @@ class HomeController extends AppController
           // $this->render('json');
         }
       }
-      // JK:Comment:END
+      // JK::END
       // if(!User::isInstructor()) {
       //   $this->render('studentIndex');
       // } else {
