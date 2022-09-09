@@ -15,7 +15,7 @@ App::import('Model', 'SurveyQuestion');
 class EvaluationComponent extends CakeObject
 {
     public $uses =  array('Mixeval');
-    public $components = array('Session', 'Auth');
+    public $components = array('Session', 'Auth', 'RequestHandler', 'NotificationHandler');
 
 
     /**
@@ -299,13 +299,25 @@ class EvaluationComponent extends CakeObject
             $totalPoints += $points[$pos];
             $pos ++;
         }
+        
         $event = $this->Event->getEventById($params['form']['event_id']);
         $simpleEval = $this->SimpleEvaluation->getEvaluation($event['Event']['template_id']);
         $required = $simpleEval['SimpleEvaluation']['point_per_member'] * count($evaluatees);
+        
         if ($totalPoints != $required) {
+          //JK:: returns an err message to user if criteria not met (see message below)
+          if ($this->RequestHandler->accepts('html')) {
             return false;
+          }
+          elseif ($this->RequestHandler->accepts('json')) {
+            // 202 Accepted / 206 Partial Content
+            // 202 Indicates that the request has been received but not completed yet.
+            // 206 Partial Content success status response code indicates that the request has succeeded and
+            // the body contains the requested ranges of data, as described in the Range header of the request.
+            $this->NotificationHandler->toJson('Distributed points must equal points allocated.', 202);
+          }//JK
         }
-
+        
         // create Evaluations for each evaluator-evaluatee pair
         $pos = 0;
         foreach ($evaluatees as $value) {

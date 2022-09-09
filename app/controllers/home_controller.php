@@ -122,18 +122,17 @@ class HomeController extends AppController
         $this->set('numOverdue', $numOverdue);
         $this->set('numDue', $numDue);
 
-      // JK::START
+      //JK:: Checks if the request from cake page
       if ($this->RequestHandler->accepts('html')) {
         if(!User::isInstructor()) {
-          $this->render('webapp_student_index');
           //$this->render('studentIndex');
+          $this->render('webapp_student_index');
         } else {
           $this->render('combined');
         }
       }
       elseif ($this->RequestHandler->accepts('json')) {
         if($this->RequestHandler->isGet()) {
-          
           if(!User::isInstructor()) {
             header('Content-Type: application/json');
             http_response_code(200);
@@ -151,13 +150,7 @@ class HomeController extends AppController
           // $this->set('result', $data);
           // $this->render('json');
         }
-      }
-      // JK::END
-      // if(!User::isInstructor()) {
-      //   $this->render('studentIndex');
-      // } else {
-      //   $this->render('combined');
-      // }
+      }//JK
     }
 
     /**

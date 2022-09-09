@@ -11,6 +11,10 @@ class JsonHandlerComponent extends CakeObject
     $this->settings = $settings;
   }
   
+  /**
+   * @param array $result
+   * @return array
+   */
   public function formatEvents(array $result): array
   {
     $data = [];
@@ -65,69 +69,100 @@ class JsonHandlerComponent extends CakeObject
     return $data;
   }
   
-  public function formatRubricEvaluation(array $result): array
+  /**
+   * @param array $data
+   * @return void
+   */
+  public function formatSimpleEvaluation(array $data): void
   {
-    $data = $this->getEventData($result);
-    //$data['penalty_final'] = $result['penaltyFinal']['Penalty'];
-    //$data['penalty_days'] = $result['penaltyDays'];
-    $data['evaluation'] = [
-      'rubric' => [
-        'id' => $result['data']['Rubric']['id'],
-        'name' => $result['data']['Rubric']['name'],
-        'zero_mark' => $result['data']['Rubric']['zero_mark'],
-        'view_mode' => $result['data']['Rubric']['view_mode'],
-        'template' => $result['data']['Rubric']['template'],
-        'availability' => $result['data']['Rubric']['availability'],
-        'lom_max' => $result['data']['Rubric']['lom_max'],
-        'criteria' => $result['data']['Rubric']['criteria'],
-      ],
-      'rubrics_criteria' => $this->getRubricsCriteria($result['data']['RubricsCriteria']),
-      'rubrics_lom' => $result['data']['RubricsLom']
-    ];
-    $data['submission'] = $this->getRubricsResponse($result['groupMembers']);
-    
-    $data['userIds'] = $result['userIds'];
-    $data['evaluateeCount'] = $result['evaluateeCount'];
-    $data['allDone'] = $result['allDone'];
-    $data['comReq'] = $result['comReq'];
-    $data['studentId'] = $result['studentId'];
-    $data['fullName'] = $result['fullName'];
-    $data['userId'] = $result['userId'];
+    $json               = $this->getEventData($data);
+    $json['questions']  = $this->getSimpleEvaluationQuestions($data['questions']);
+    $json['submission'] = $this->getSimpleEvaluationSubmission($data['submission'], $data['evaluation']);
+    // NOTE:: Specific to Simple Evaluation
+    $json['remaining']  = $data['remaining'];
     
     // header('Content-Type: application/json');
     http_response_code(200);
-    echo json_encode($data);
+    echo json_encode($json);
     exit;
   }
   
   /**
-   * @param array $result
-   * @return array
+   * @param array $data
+   * @return void
    */
-  private function getEventData(array $result): array
+  public function formatRubricEvaluation(array $data): void
   {
-    $data = [];
-    $data['event'] = [
-      'id' => $result['event']['Event']['id'],
-      'title' => $result['event']['Event']['title'],
-      'course_id' => $result['event']['Event']['course_id'],
-      'description' => $result['event']['Event']['description'],
-      'event_template_type_id' => $result['event']['Event']['event_template_type_id'],
-      'template_id' => $result['event']['Event']['template_id'],
-      'self_eval' => $result['event']['Event']['self_eval'],
-      'com_req' => $result['event']['Event']['com_req'],
-    ];
-    $data['group_event'] = $result['event']['GroupEvent'];
-    $data['group'] = $result['event']['Group'];
-    $data['members'] = $this->getGroupMembers($result['groupMembers']);
-    $data['penalties'] = $this->getPenalties($result['penalty']);
-    return $data;
+    $json               = $this->getEventData($data);
+    $json['questions']  = $this->getRubricEvaluationQuestions($data['questions']);
+    $json['submission'] = $this->getRubricEvaluationSubmission($data['submission'], $data['groupMembers']);
+    // NOTE:: Specific to Rubric Evaluation
+    $json['rubric_id']  = $data['rubricId'];
+    
+    // header('Content-Type: application/json');
+    http_response_code(200);
+    echo json_encode($json);
+    exit;
   }
   
+  
+  public function formatMixedEvaluation(array $data): void
+  {
+    $response               = $this->getEventData($data);
+    $response['questions']  = $data['questions'];
+    $response['answers']    = $data['mixedEvalViewData'];
+    $response['submission'] = $data['mixedEvalViewData'];
+    
+    //header('Content-Type: application/json');
+    http_response_code(200);
+    echo json_encode($response);
+    exit;
+  }
+  
+  
+  // JK:: PRIVATE HELPER METHODS
   /**
-   * @param array $group_members
+   * @param array $data
    * @return array
    */
+  private function getEventData(array $data): array
+  {
+    $output = [];
+    $output['event'] = [
+      'id'                      => $data['event']['Event']['id'],
+      'title'                   => $data['event']['Event']['title'],
+      'course_id'               => $data['event']['Event']['course_id'],
+      'description'             => $data['event']['Event']['description'],
+      'event_template_type_id'  => $data['event']['Event']['event_template_type_id'],
+      'template_id'             => $data['event']['Event']['template_id'],
+      'self_eval'               => $data['event']['Event']['self_eval'],
+      'com_req'                 => $data['event']['Event']['com_req'],
+      'due_date'                => $data['event']['Event']['due_date'],
+    ];
+    $output['course']           = $this->getCourseById($data['event']['Event']['course_id']);
+    $output['members']          = $this->getGroupMembers($data['groupMembers']);
+    $output['penalties']        = $this->getPenalties($data['penalty']);
+    $output['group_event']      = $data['event']['GroupEvent'];
+    $output['group']            = $data['event']['Group'];
+    $output['penalty_final']    = $data['penaltyFinal']['Penalty'];
+    $output['penalty_days']     = $data['penaltyDays'];
+    $output['member_ids']       = $data['memberIDs'];
+    $output['evaluatee_count']  = $data['evaluateeCount'];
+    $output['user_id']          = $data['userId'];
+    $output['allDone']          = $data['allDone'];
+    $output['comReq']           = $data['comReq'];
+    
+    return $output;
+  }
+  
+  private function getCourseById(string $courseId): array
+  {
+    return [
+      'id' => $courseId,
+      'title' => "Course Title:: TODO 101 $courseId"
+    ];
+  }
+
   private function getGroupMembers(array $group_members): array
   {
     if (empty($group_members)) return $group_members;
@@ -144,11 +179,7 @@ class JsonHandlerComponent extends CakeObject
     
     return $data;
   }
-  
-  /**
-   * @param array $penalties
-   * @return array
-   */
+
   private function getPenalties(array $penalties): array
   {
     if (empty($penalties)) return $penalties;
@@ -159,15 +190,67 @@ class JsonHandlerComponent extends CakeObject
     return $data;
   }
   
-  /**
-   * @param array $rubrics_criteria
-   * @return array
-   */
-  private function getRubricsCriteria(array $rubrics_criteria): array
+  
+  // Simple
+  private function getSimpleEvaluationSubmission(array $submission, array $evaluation): array
   {
-    if (empty($rubrics_criteria)) return $rubrics_criteria;
+    if(empty($submission['EvaluationSubmission']) || empty($evaluation)) return ['points' => [], 'comments' => []];
     $data = [];
-    foreach ($rubrics_criteria as $criteria) {
+    $data['id'] = $submission['EvaluationSubmission']['id'];
+    $data['submitter_id'] = $submission['EvaluationSubmission']['submitter_id'];
+    $data['submitted'] = $submission['EvaluationSubmission']['submitted'];
+    $data['date_submitted'] = $submission['EvaluationSubmission']['date_submitted'];
+    $data['points'] = [];
+    $data['comments'] = [];
+    /***/
+    foreach ($evaluation as $value) {
+      $tmp = [];
+      $tmp['score'] = $value['EvaluationSimple']['score'];
+      $tmp['comment'] = $value['EvaluationSimple']['comment'];
+  
+      $data['points'][] = $tmp['score'];
+      $data['comments'][] = $tmp['comment'];
+    };
+    return $data;
+  }
+  
+  private function getSimpleEvaluationQuestions($questions): array
+  {
+    if(empty($questions)) return [];
+    return [
+      'id'                => $questions['id'],
+      'availability'      => $questions['availability'],
+      'name'              => $questions['name'],
+      'description'       => $questions['description'],
+      'point_per_member'  => $questions['point_per_member'],
+      'status'            => $questions['record_status'],
+    ];
+  }
+  
+  // Rubrics
+  private function getRubricEvaluationQuestions(array $questions): array
+  {
+    if (empty($questions)) return $questions;
+    return ['rubric' => [
+        'id'              => $questions['Rubric']['id'],
+        'name'            => $questions['Rubric']['name'],
+        'zero_mark'       => $questions['Rubric']['zero_mark'],
+        'view_mode'       => $questions['Rubric']['view_mode'],
+        'template'        => $questions['Rubric']['template'],
+        'availability'    => $questions['Rubric']['availability'],
+        'lom_max'         => $questions['Rubric']['lom_max'],
+        'criteria'        => $questions['Rubric']['criteria'],
+      ],
+      'rubrics_criteria'  => $this->getRubricEvaluationCriteria($questions['RubricsCriteria']),
+      'rubrics_lom'       => $questions['RubricsLom']
+    ];
+  }
+  
+  private function getRubricEvaluationCriteria(array $RubricsCriteria): array
+  {
+    if (empty($RubricsCriteria)) return $RubricsCriteria;
+    $data = [];
+    foreach ($RubricsCriteria as $criteria) {
       $tmp = [];
       $tmp['id'] = $criteria['id'];
       $tmp['rubric_id'] = $criteria['rubric_id'];
@@ -175,14 +258,14 @@ class JsonHandlerComponent extends CakeObject
       $tmp['criteria'] = $criteria['criteria'];
       $tmp['multiplier'] = $criteria['multiplier'];
       $tmp['show_marks'] = $criteria['show_marks'];
-      
+    
       foreach ($criteria['RubricsCriteriaComment'] as $criteria_comment) {
         $comment = [];
         $comment['id'] = $criteria_comment['id'];
         $comment['criteria_id'] = $criteria_comment['criteria_id'];
         $comment['rubrics_loms_id'] = $criteria_comment['rubrics_loms_id'];
         $comment['criteria_comment'] = $criteria_comment['criteria_comment'];
-        
+      
         $tmp['rubrics_criteria_comment'][] = $comment;
       }
       $data[] = $tmp;
@@ -190,37 +273,62 @@ class JsonHandlerComponent extends CakeObject
     return $data;
   }
   
-  /**
-   * @param array $members
-   * @return array
-   */
-  private function getRubricsResponse(array $members): array
+  private function getRubricEvaluationSubmission(array $submission, array $groupMembers): array
   {
-    if (empty($members)) return $members;
-    $data = [];
-    foreach ($members as $member) {
-      $tmp = [];
-      isset($member['User']['Evaluation']) ? $tmp = [
-        'id' => $member['User']['Evaluation']['EvaluationRubric']['id'],
-        'evaluator' => $member['User']['Evaluation']['EvaluationRubric']['evaluator'],
-        'evaluatee' => $member['User']['Evaluation']['EvaluationRubric']['evaluatee'],
-        'comment' => $member['User']['Evaluation']['EvaluationRubric']['comment'],
-        'score' => $member['User']['Evaluation']['EvaluationRubric']['score'],
-        'comment_release' => $member['User']['Evaluation']['EvaluationRubric']['comment_release'],
-        'grade_release' => $member['User']['Evaluation']['EvaluationRubric']['grade_release'],
-        'grp_event_id' => $member['User']['Evaluation']['EvaluationRubric']['grp_event_id'],
-        'event_id' => $member['User']['Evaluation']['EvaluationRubric']['event_id'],
-        'record_status' => $member['User']['Evaluation']['EvaluationRubric']['record_status'],
-        'creator_id' => $member['User']['Evaluation']['EvaluationRubric']['creator_id'],
-        
-        'details' => $member['User']['Evaluation']['EvaluationRubricDetail']
-      ] : null;
+    if(empty($submission['EvaluationSubmission']) || empty($groupMembers)) return [];
+    $data['id']               = $submission['EvaluationSubmission']['id'];
+    $data['submitter_id']     = $submission['EvaluationSubmission']['submitter_id'];
+    $data['submitted']        = $submission['EvaluationSubmission']['submitted'];
+    $data['date_submitted']   = $submission['EvaluationSubmission']['date_submitted'];
     
-      isset($member['User']['Evaluation']) ? $data[] = $tmp : null;
-    }
-    
+    foreach ($groupMembers as $member) {
+      $tmp = [
+        'id'                => $member['User']['Evaluation']['EvaluationRubric']['id'],
+        //'evaluator'         => $member['User']['Evaluation']['EvaluationRubric']['evaluator'],
+        'evaluatee'         => $member['User']['Evaluation']['EvaluationRubric']['evaluatee'],
+        'comment'           => $member['User']['Evaluation']['EvaluationRubric']['comment'],
+        'score'             => $member['User']['Evaluation']['EvaluationRubric']['score'],
+        //'comment_release'   => $member['User']['Evaluation']['EvaluationRubric']['comment_release'],
+        //'grade_release'     => $member['User']['Evaluation']['EvaluationRubric']['grade_release'],
+        //'grp_event_id'      => $member['User']['Evaluation']['EvaluationRubric']['grp_event_id'],
+        //'event_id'          => $member['User']['Evaluation']['EvaluationRubric']['event_id'],
+        //'record_status'     => $member['User']['Evaluation']['EvaluationRubric']['record_status'],
+        //'creator_id'        => $member['User']['Evaluation']['EvaluationRubric']['creator_id'],
+  
+        'details'             => $this->getRubricEvaluationRubricDetail($member['User']['Evaluation']['EvaluationRubricDetail'])
+      ];
+
+      $data['response'][] = $tmp;
+    };
     return $data;
   }
   
+  private function getRubricEvaluationRubricDetail(array $rubricDetail): array
+  {
+    if(empty($rubricDetail)) return [];
+    $data = [];
+    foreach ($rubricDetail as $detail) {
+      $tmp = [];
+      $tmp['id']                    = $detail['id'];
+      //$tmp['evaluation_rubric_id']  = $detail['evaluation_rubric_id'];
+      $tmp['criteria_number']       = $detail['criteria_number'];
+      $tmp['criteria_comment']      = $detail['criteria_comment'];
+      $tmp['selected_lom']          = $detail['selected_lom'];
+      //$tmp['grade']                 = $detail['grade'];
+      //$tmp['comment_release']       = $detail['comment_release'];
+      //$tmp['record_status']         = $detail['record_status'];
+      //$tmp['creator_id']            = $detail['creator_id'];
+      //$tmp['updater_id']            = $detail['updater_id'];
+      //$tmp['created']               = $detail['created'];
+      //$tmp['modified']              = $detail['modified'];
+      //$tmp['creator']               = $detail['creator'];
+      //$tmp['updater']               = $detail['updater'];
+      
+      $data[] = $tmp;
+    }
+    return $data;
+  }
+  
+  // Mixed
   
 }
