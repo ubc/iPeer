@@ -256,9 +256,15 @@
       <Loader v-if="loading" />
     </div>
   </div>
+
+  <!--<ul v-if="Object.keys(evaluation).length > 0">
+    <li>{{ evaluation?.event?.id }}</li>
+    <li>{{ evaluation?.group?.id }}</li>
+    <li>{{ evaluation?.members.length }}</li>
+  </ul>-->
   
   <div class="">
-    <component
+    <component v-if="Object.keys(evaluation).length > 0"
         :is="dynamic_event_template"
         :evaluation="evaluation"
         @update:loading="setLoading"
@@ -269,9 +275,27 @@
 </div>
 
 <script src="https://unpkg.com/vue@3"></script>
+<script src="https://unpkg.com/lodash"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          primary: '#da373d',
+        }
+      }
+    }
+  }
+</script>
+<script>
+  function isNumeric(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+  }
+</script>
 
 <script type="module" lang="ts">
-  const { createApp, defineComponent, markRaw, ref, reactive, computed, onMounted, watchEffect, watch } = Vue
+  const { createApp, defineComponent, markRaw, ref, toRef, reactive, computed, onMounted, watchEffect, watch } = Vue
   
   const Events = markRaw(defineComponent({
     emits: ['update:fetch-evaluation', 'update:notification', 'update:loading'],
@@ -438,7 +462,7 @@
       // METHODS
       async function saveSimpleEvaluation(e) {
         e.preventDefault()
-        if(isEmpty(event_id.value) || !isNumeric(group_id.value)) {
+        if(_.isEmpty(event_id.value) || !isNumeric(event_id.value)) {
           emit('update:notification', {status: 'error', code: 404, message: `Invalid Id ${event_id.value}`})
           return;
         }
@@ -469,7 +493,7 @@
       }
       async function submitSimpleEvaluation(e) {
         e.preventDefault()
-        if(isEmpty(event_id.value) || !isNumeric(group_id.value)) {
+        if(_.isEmpty(event_id.value) || !isNumeric(event_id.value)) {
           emit('update:notification', {status: 'error', code: 404, message: `Invalid Id ${event_id.value}`})
           return;
         }
@@ -644,6 +668,7 @@
       function setInitialState() {
         if(Object.keys(evaluation.value).length === 0) return {}
         const state = {}
+        
         evaluation.value?.submission?.response?.forEach((response, response_idx) => {
           const evaluatee = response.evaluatee
           const comment = response.comment
@@ -663,7 +688,7 @@
       
       async function saveRubricEvaluation(e) {
         e.preventDefault()
-        if(isEmpty(event_id.value) || !isNumeric(group_id.value)) {
+        if(_.isEmpty(event_id.value) || !isNumeric(event_id.value)) {
           emit('update:notification', {status: 'error', code: 404, message: `Invalid Id ${event_id.value}`})
           return;
         }
@@ -695,7 +720,7 @@
       }
       async function submitRubricEvaluation(e) {
         e.preventDefault()
-        if(isEmpty(event_id.value) || !isNumeric(group_id.value)) {
+        if(_.isEmpty(event_id.value) || !isNumeric(event_id.value)) {
           emit('update:notification', {status: 'error', code: 404, message: `Invalid Id ${event_id.value}`})
           return;
         }
@@ -884,14 +909,419 @@
     emits: ['update:loading', 'update:notification', 'update:evaluation'],
     props: {evaluation: Object},
     setup(props, { emit }) {
-      return undefined
+
+      // DATA
+      const mixedRef        = ref('mixed')
+      const evaluation      = ref(props.evaluation || {})
+      
+      // COMPUTED
+      const initialState    = ref({
+        event_id: computed(() => evaluation.value.event.id || ''),
+        group_id: computed(() => evaluation.value.group.id || ''),
+        user_id: computed(() => evaluation.value.user_id || ''),
+        // member_ids: computed(() => _.map(evaluation.value.members, member => member.id) || ''),
+        member_count: computed(() => evaluation.value.member_count || ''),
+        template_id: computed(() => evaluation.value.event.template_id || ''),
+        group_event_id: computed(() => evaluation.value.group_event.id || ''),
+      })
+      
+      // METHODS
+      function setInitialState() {
+        // JK:: another option to try:
+        // JK to get the formData = new FormData(mixed) with mixed ref
+        if(_.isEmpty(props.evaluation)) return;
+        
+        const submission = props.evaluation?.submission
+        if(_.isEmpty(submission)) return;
+        //
+        const members = props.evaluation?.members
+        if(_.isEmpty(members)) return;
+        
+        try {
+          /*
+          _.map(members, (member) => {
+            const response = submission?.response
+            const res = _.find(response, {evaluatee: member.id})
+            let details = {}
+            _.map(res.details, (detail) => {
+              Object.assign(details, {
+                [detail.question_number]: {
+                  question_comment: detail.question_comment,
+                  selected_lom: detail.selected_lom
+                }
+              })
+            })
+            Object.assign(initialState.value, {[member.id]: details})
+          })
+          */
+
+          _.map(members, (member) => {
+            const response = submission?.response
+            const res = _.find(response, {evaluatee: member.id})
+            
+            return _.map(res.details, (detail) => (
+              Object.assign(initialState.value, {
+                ['comment_' + member.id + '_' + detail.question_number]: detail.question_comment,
+                ['selected_lom_' + member.id + '_' + detail.question_number]: detail.selected_lom
+              })
+            ))
+          })
+          
+        } catch (e) {
+          console.log({e})
+        }
+        
+      }
+      function updateInitialState(newValue) {
+        Object.assign(initialState.value, newValue)
+      }
+      //
+      async function saveMixedEvaluation(e) {
+        // name: 'Save Draft'
+        e.preventDefault()
+        if(_.isEmpty(initialState.value.event_id) || !isNumeric(initialState.value.event_id)) {
+          emit('update:notification', {status: 'error', code: 404, message: `Invalid Id ${initialState.value.event_id}`})
+          return;
+        }
+        emit('update:loading', true)
+        emit('update:notification', null)
+
+        const form = document.getElementById('mixed');
+        const formData = new FormData(form)
+        formData.append('form[_method]', 'PUT')
+        // here we can pass additional params with our request
+        // indicating its a draft or such
+        const searchParams = new URLSearchParams()
+        for (const pair of formData) {
+          searchParams.append(pair[0], pair[1])
+        }
+        
+        try {
+          const result = await fetch(`/evaluations/makeEvaluation/${initialState.value.event_id}/${initialState.value.group_id}`, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+            },
+            body: searchParams
+          })
+          const json = await result.json()
+          //emit('update:evaluation', json)
+          emit('update:notification', json)
+        } catch (err) {
+          emit('update:notification', {code: 404, status: 'error', message: err})
+        } finally {
+          emit('update:loading', false)
+        }
+        
+      }
+      async function submitMixedEvaluation(e) {
+        // name: 'Submit Peer Review'
+        e.preventDefault()
+        if(_.isEmpty(initialState.value.event_id) || !isNumeric(initialState.value.event_id)) {
+          emit('update:notification', {status: 'error', code: 404, message: `Invalid Id ${initialState.value.event_id}`})
+          return;
+        }
+        emit('update:loading', true)
+        emit('update:notification', null)
+        
+        const formData = new FormData(e.target)
+        formData.append('form[_method]', 'POST')
+        
+        
+        // for (let [key, value] of Object.entries(initialState)) {
+        //   // console.log({key, value})
+        //   formData.append(key, value)
+        // }
+        
+        // const formData = new FormData(e.target)
+        const searchParams = new URLSearchParams()
+        for (const pair of formData) {
+          searchParams.append(pair[0], pair[1])
+        }
+        try {
+          const result = await fetch(`/evaluations/makeEvaluation/${initialState.value.event_id}/${initialState.value.group_id}`, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+            },
+            // body: formData
+            body: searchParams
+          })
+          const json = await result.json()
+          //emit('update:evaluation', json)
+          emit('update:notification', json)
+        } catch (err) {
+          emit('update:notification', {code: 404, status: 'error', message: err})
+        } finally {
+          emit('update:loading', false)
+        }
+      }
+      
+      // LIFECYCLE
+      onMounted(() => {
+        setInitialState()
+      })
+      
+      // WATCH
+      //watchEffect(() => {})
+      watchEffect(onInvalidate => {
+        
+        if(JSON.stringify(initialState.value)) {
+          // async API call
+          //const apiCall = saveMixedEvaluation()
+          
+          const timeout = setTimeout(() => {
+            console.log('Value: ' + JSON.stringify(initialState.value, null, 2))
+            // const api = saveMixedEvaluation()
+            const form = document.getElementById('mixed');
+            // saveMixedEvaluation(form)
+            // document.getElementById('save-draft-button').click()
+          }, 2000)
+          
+          // onInvalidate method runs whenever the method is about to run again OR the watcher is stopped.
+          onInvalidate(() => {
+            clearTimeout(timeout)
+            // cancel the api call
+            //api.cancel()
+          })
+        }
+        
+      })
+      
+      return {
+        initialState,
+        evaluation,
+        saveMixedEvaluation,
+        submitMixedEvaluation,
+        updateInitialState
+      }
     },
     template: `<section class="evaluation-mixed">
-                <h2>Mixed Evaluation</h2>
+                <h2 class="text-3xl font-bold underline">Mixed Evaluation</h2>
                 <p>In progress</p>
+                
+                <h1>{{ evaluation?.event.title }}</h1>
+                <h5>{{ evaluation?.course?.course }} {{ evaluation?.group?.group_name }}</h5>
+                <div>Due: {{ evaluation?.event.due_date }}</div>
+                <div>Late Policy: Submit up to [] day(s) late, with [] deducted from your mark.</div>
+                
+                <div>About This Peer Review</div>
+                <div>Your Instructor says:</div>
+
+                  <!--<div style="display:none;"><input type="hidden" name="_method" value="__POST" /></div>-->
+                <form @submit.prevent="submitMixedEvaluation" id="mixed" class="mixed" ref="mixed">
+                  <input type="hidden" name="data[data][submitter_id]" :value="initialState.user_id" />
+                  <input type="hidden" name="data[data][event_id]" :value="initialState.event_id" />
+                  <input type="hidden" name="data[data][template_id]" :value="initialState.template_id" />
+                  <input type="hidden" name="data[data][grp_event_id]" :value="initialState.group_event_id" />
+                  <input type="hidden" name="data[data][members]" :value="initialState.member_count" />
+                 
+                  <template v-for="member of evaluation?.members" :key="member.id">
+                    <input type="hidden" :name="'data['+member.id+'][Evaluation][evaluatee_id]'" :value="member.id">
+                    <input type="hidden" :name="'data['+member.id+'][Evaluation][evaluator_id]'" :value="initialState.user_id" />
+                    <input type="hidden" :name="'data['+member.id+'][Evaluation][event_id]'" :value="initialState.event_id" />
+                    <input type="hidden" :name="'data['+member.id+'][Evaluation][group_event_id]'" :value="initialState.group_event_id" />
+                    <input type="hidden" :name="'data['+member.id+'][Evaluation][group_id]'" :value="initialState.group_id" />
+                  </template>
+
+                  <template v-for="(question, question_idx) of evaluation?.questions" :key="question.id">
+                    <div :class="'datatable question_'+ question.question_num " style="margin: 2rem auto">
+                      <p>{{ question.question_num }}. {{ question.title }} <span style="color: var(--red)">*</span></p>
+                      <div class="description">{{ question.instructions }}</div>
+
+                      <component
+                          :is="question.type"
+                          :question="question"
+                          :initialState="initialState"
+                          :members="evaluation?.members"
+                          @update:initialState="updateInitialState" />
+                      
+                      <div v-if="!parseInt(question.self_eval)">Comment if enabled</div>
+                    </div>
+                  </template>
+
+                  <div class="cta" style="display: flex; justify-content: center; align-items: center; column-gap: .5rem">
+                    <button type="button" :name="evaluation?.user_id" @click="saveMixedEvaluation" id=save-draft-button>Save Draft</button>
+                    <button type="submit" :name="evaluation?.user_id" class="button submit" >Submit Peer Review</button>
+                  </div>
+
+                </form>
               </section>`
   }))
 
+  const Likert = markRaw(defineComponent({
+    emits: ['update:loading', 'update:initialState'],
+    props: {question: Object, initialState: Object, members: Array},
+    setup(props, { emit }) {
+      const question = ref(props?.question)
+      const initialState = ref(props?.initialState)
+      const members = ref(props?.members)
+
+      function gradeRoundUp(num, precision) {
+        precision = Math.pow(10, precision)
+        return Math.floor(num * precision) / precision
+      }
+      
+      function setSelectedLom(value, member_id, question_num) {
+        emit('update:initialState', {[`selected_lom_${member_id}_${question_num}`]: value})
+      }
+      
+      return {question, initialState, members, gradeRoundUp, setSelectedLom}
+    },
+    template: `<table class="standardtable leftalignedtable">
+                <thead>
+                  <tr>
+                    <th style="width: 20%">
+                      <div class="" style="text-align: center">
+                        <div class="" style="font-weight: 400;">Peer</div>
+                        <small class="" style="font-size: 0.875rem; font-weight: 300;"></small>
+                      </div>
+                    </th>
+                    <th :style="'width: '+ 80/question.loms.length +'%; text-align: center'"
+                        v-for="(lom, lom_idx) of question.loms" :key="lom.id">
+                      <div class="" style="font-weight: 400;">{{ lom.descriptor }}</div>
+                      <small v-if="parseInt(question.show_marks)" class="" style="font-size: 0.875rem; font-weight: 300;">
+                        ({{ gradeRoundUp((question.multiplier/question.scale_level)*lom.scale_level, 1) }} mark{{ gradeRoundUp((question.multiplier/question.scale_level)*lom.scale_level, 1) > 1 ? 's' : '' }})
+                      </small>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                  <tr v-for="member of members" :key="member.id">
+                    <td>
+                      <div class="user" style="display: flex; justify-content: center; align-items: center;">
+                        <div class="icon"></div>
+                        <div class="name" style="text-align: center">{{ member.first_name }}<br />{{ member.last_name }}</div>
+                      </div>
+                    </td>
+                    <td style="text-align: center" v-for="lom of question.loms"
+                        :key="lom.id">
+                      <input
+                        type="radio"
+                        :name="'data['+member.id+'][EvaluationMixeval]['+question.question_num+'][grade]'"
+                        :value="gradeRoundUp((question.multiplier/question.scale_level)*lom.scale_level, 1)"
+                        :checked="initialState['selected_lom_'+member.id+'_'+question.question_num] === lom.scale_level"
+                        @change="setSelectedLom(lom.scale_level, member.id, question.question_num)"
+                      />
+                    </td>
+                    <input
+                      type="hidden"
+                      :name="'data['+member.id+'][EvaluationMixeval]['+question.question_num+'][selected_lom]'"
+                      :value="initialState['selected_lom_'+member.id+'_'+question.question_num]??''"
+                     >
+                  </tr>
+                </tbody>
+              </table>`
+  }))
+
+  const Paragraph = markRaw(defineComponent({
+    emits: ['update:loading'],
+    props: {question: Object, initialState: Object, members: Array},
+    setup(props, { emit }) {
+      const question = ref(props?.question)
+      const initialState = ref(props?.initialState)
+      const members = ref(props?.members)
+
+      return {question, initialState, members}
+    },
+    template: `<table class="standardtable leftalignedtable">
+                <thead>
+                  <tr>
+                    <th style="width: 20%">
+                      <div class="" style="text-align: center">
+                        <div class="" style="font-weight: 400;">Peer</div>
+                        <small class="" style="font-size: 0.875rem; font-weight: 300;"></small>
+                      </div>
+                    </th>
+                    <th :style="'width: 80%; text-align: center'">
+                      <div class="" style="font-weight: 400;">Comments</div>
+                      <small class="" style="font-size: 0.875rem; font-weight: 300;"></small>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="member of members" :key="member.id">
+                    <td>
+                      <div class="user" style="display: flex; justify-content: center; align-items: center;">
+                        <div class="icon"></div>
+                        <div class="name" style="text-align: center">{{ member.first_name }}<br />{{ member.last_name }}</div>
+                      </div>
+                    </td>
+                    <td style="text-align: center">
+                      <div class="" style="display: flex; ">
+                        <textarea
+                          style="flex: 1 1 0;"
+                          :name="'data['+member.id+'][EvaluationMixeval]['+question.question_num+'][question_comment]'"
+                          v-model="initialState['comment_'+member.id+'_'+question.question_num]"
+                        ></textarea>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>`
+  }))
+  
+  const Sentence = markRaw(defineComponent({
+    emits: ['update:loading'],
+    props: {question: Object, initialState: Object, members: Array},
+    setup(props, { emit }) {
+      const question = ref(props?.question)
+      const initialState = ref(props?.initialState)
+      const members = ref(props?.members)
+
+      return {question, initialState, members}
+    },
+    template: `<table class="standardtable leftalignedtable">
+                <thead>
+                  <tr>
+                    <th style="width: 20%">
+                      <div class="" style="text-align: center">
+                        <div class="" style="font-weight: 400;">Peer</div>
+                        <small class="" style="font-size: 0.875rem; font-weight: 300;"></small>
+                      </div>
+                    </th>
+                    <th :style="'width: 80%; text-align: center'">
+                      <div class="" style="font-weight: 400;">Comments</div>
+                      <small class="" style="font-size: 0.875rem; font-weight: 300;"></small>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="member of members" :key="member.id">
+                    <td>
+                      <div class="user" style="display: flex; justify-content: center; align-items: center;">
+                        <div class="icon"></div>
+                        <div class="name" style="text-align: center">{{ member.first_name }}<br />{{ member.last_name }}</div>
+                      </div>
+                    </td>
+                    <td style="text-align: center">
+                      <div class="" style="display: flex; ">
+                        <input
+                          type="text"
+                          style="flex: 1 1 0;"
+                          :name="'data['+member.id+'][EvaluationMixeval]['+question.question_num+'][question_comment]'"
+                          v-model="initialState['comment_'+member.id+'_'+question.question_num]"
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>`
+  }))
+  
+  const Sample = markRaw(defineComponent({
+    emits: ['update:loading'],
+    props: {},
+    setup(props, { emit }) {
+      
+      return {}
+    },
+    template: `<div></div>`
+  }))
+  
   const Loader = markRaw(defineComponent({
     emits: [],
     props: {loading: Boolean},
@@ -1031,6 +1461,9 @@
   web.component('EvaluationRubric', EvaluationRubric)
   web.component('EvaluationMixed', EvaluationMixed)
   web.component('Notification', Notification)
+  web.component('Likert', Likert)
+  web.component('Paragraph', Paragraph)
+  web.component('Sentence', Sentence)
   web.component('Loader', Loader)
   web.mount('#webapp')
 </script>

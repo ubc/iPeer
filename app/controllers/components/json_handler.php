@@ -108,14 +108,19 @@ class JsonHandlerComponent extends CakeObject
   
   public function formatMixedEvaluation(array $data): void
   {
-    $response               = $this->getEventData($data);
-    $response['questions']  = $data['questions'];
-    $response['answers']    = $data['mixedEvalViewData'];
-    $response['submission'] = $data['mixedEvalViewData'];
+    $json               = $this->getEventData($data);
+    $json['questions']  = $this->getMixedEvaluationQuestions($data['questions']);  // $data['questions'];
+    $json['submission'] = $this->getMixedEvaluationSubmission($data['submission'], $data['groupMembers']);
+    
+    $json['enrol']        = $data['enrol'];
+    $json['self']         = $data['self'];
+    $json['self']         = $data['self'];
+    $json['member_count']  = $data['memberCount'];
     
     //header('Content-Type: application/json');
     http_response_code(200);
-    echo json_encode($response);
+    echo json_encode($json);
+    //echo json_encode($data);
     exit;
   }
   
@@ -282,28 +287,30 @@ class JsonHandlerComponent extends CakeObject
     $data['date_submitted']   = $submission['EvaluationSubmission']['date_submitted'];
     
     foreach ($groupMembers as $member) {
-      $tmp = [
-        'id'                => $member['User']['Evaluation']['EvaluationRubric']['id'],
-        //'evaluator'         => $member['User']['Evaluation']['EvaluationRubric']['evaluator'],
-        'evaluatee'         => $member['User']['Evaluation']['EvaluationRubric']['evaluatee'],
-        'comment'           => $member['User']['Evaluation']['EvaluationRubric']['comment'],
-        'score'             => $member['User']['Evaluation']['EvaluationRubric']['score'],
-        //'comment_release'   => $member['User']['Evaluation']['EvaluationRubric']['comment_release'],
-        //'grade_release'     => $member['User']['Evaluation']['EvaluationRubric']['grade_release'],
-        //'grp_event_id'      => $member['User']['Evaluation']['EvaluationRubric']['grp_event_id'],
-        //'event_id'          => $member['User']['Evaluation']['EvaluationRubric']['event_id'],
-        //'record_status'     => $member['User']['Evaluation']['EvaluationRubric']['record_status'],
-        //'creator_id'        => $member['User']['Evaluation']['EvaluationRubric']['creator_id'],
-  
-        'details'             => $this->getRubricEvaluationRubricDetail($member['User']['Evaluation']['EvaluationRubricDetail'])
-      ];
-
-      $data['response'][] = $tmp;
+      if(isset($member['User']['Evaluation'])) {
+        $tmp = [
+          'id'                => $member['User']['Evaluation']['EvaluationRubric']['id'],
+          'evaluator'         => $member['User']['Evaluation']['EvaluationRubric']['evaluator'],
+          'evaluatee'         => $member['User']['Evaluation']['EvaluationRubric']['evaluatee'],
+          'comment'           => $member['User']['Evaluation']['EvaluationRubric']['comment'],
+          'score'             => $member['User']['Evaluation']['EvaluationRubric']['score'],
+          //'comment_release'   => $member['User']['Evaluation']['EvaluationRubric']['comment_release'],
+          //'grade_release'     => $member['User']['Evaluation']['EvaluationRubric']['grade_release'],
+          //'grp_event_id'      => $member['User']['Evaluation']['EvaluationRubric']['grp_event_id'],
+          //'event_id'          => $member['User']['Evaluation']['EvaluationRubric']['event_id'],
+          //'record_status'     => $member['User']['Evaluation']['EvaluationRubric']['record_status'],
+          //'creator_id'        => $member['User']['Evaluation']['EvaluationRubric']['creator_id'],
+    
+          'details'             => $this->getRubricEvaluationDetail($member['User']['Evaluation']['EvaluationRubricDetail'])
+        ];
+        $data['response'][] = $tmp;
+      }
+      
     };
     return $data;
   }
   
-  private function getRubricEvaluationRubricDetail(array $rubricDetail): array
+  private function getRubricEvaluationDetail(array $rubricDetail): array
   {
     if(empty($rubricDetail)) return [];
     $data = [];
@@ -330,5 +337,94 @@ class JsonHandlerComponent extends CakeObject
   }
   
   // Mixed
+  private function getMixedEvaluationQuestions(array $questions): array
+  {
+    if(empty($questions)) return $questions;
+    $output = [];
+    foreach ($questions as $question)  {
+      $tmp = [];
+      $tmp['id'] = $question['MixevalQuestion']['id'];
+      $tmp['type'] = $question['MixevalQuestionType']['type'];
+      $tmp['title'] = $question['MixevalQuestion']['title'];
+      $tmp['instructions'] = $question['MixevalQuestion']['instructions'];
+      $tmp['mixeval_id'] = $question['MixevalQuestion']['mixeval_id'];
+      $tmp['mixeval_question_type_id'] = $question['MixevalQuestion']['mixeval_question_type_id'];
+      $tmp['multiplier'] = $question['MixevalQuestion']['multiplier'];
+      $tmp['question_num'] = $question['MixevalQuestion']['question_num'];
+      $tmp['scale_level'] = $question['MixevalQuestion']['scale_level'];
+      $tmp['self_eval'] = (bool) $question['MixevalQuestion']['self_eval'];
+      $tmp['show_marks'] = $question['MixevalQuestion']['show_marks'];
+      $tmp['required'] = (bool) $question['MixevalQuestion']['required'];
+      
+      $tmp['loms'] = $question['MixevalQuestionDesc'];
+      
+      $output[] = $tmp;
+  }
+    
+    return $output;
+  }
+  
+  private function getMixedEvaluationSubmission(array $submission, array $groupMembers): array
+  {
+    if(empty($submission['EvaluationSubmission']) || empty($groupMembers)) return [];
+    $output['id']               = $submission['EvaluationSubmission']['id'];
+    $output['submitter_id']     = $submission['EvaluationSubmission']['submitter_id'];
+    $output['submitted']        = $submission['EvaluationSubmission']['submitted'];
+    $output['date_submitted']   = $submission['EvaluationSubmission']['date_submitted'];
+  
+    foreach ($groupMembers as $member) {
+      if(isset($member['User']['Evaluation'])) {
+        $tmp = [
+          'id'                => $member['User']['Evaluation']['EvaluationMixeval']['id'],
+          'evaluator'         => $member['User']['Evaluation']['EvaluationMixeval']['evaluator'],
+          'evaluatee'         => $member['User']['Evaluation']['EvaluationMixeval']['evaluatee'],
+          'score'             => $member['User']['Evaluation']['EvaluationMixeval']['score'],
+          //'comment_release'   => $member['User']['Evaluation']['EvaluationMixeval']['comment_release'],
+          //'grade_release'     => $member['User']['Evaluation']['EvaluationMixeval']['grade_release'],
+          //'grp_event_id'      => $member['User']['Evaluation']['EvaluationMixeval']['grp_event_id'],
+          //'event_id'          => $member['User']['Evaluation']['EvaluationMixeval']['event_id'],
+          //'record_status'     => $member['User']['Evaluation']['EvaluationMixeval']['record_status'],
+          //'creator_id'        => $member['User']['Evaluation']['EvaluationMixeval']['creator_id'],
+          //'updater_id'        => $member['User']['Evaluation']['EvaluationMixeval']['updater_id'],
+          //'created'           => $member['User']['Evaluation']['EvaluationMixeval']['created'],
+          //'modified'          => $member['User']['Evaluation']['EvaluationMixeval']['modified'],
+          //'creator'           => $member['User']['Evaluation']['EvaluationMixeval']['creator'],
+          //'updater'           => $member['User']['Evaluation']['EvaluationMixeval']['updater'],
+    
+          'details'             => $this->getMixedEvaluationDetail($member['User']['Evaluation']['EvaluationMixevalDetail'])
+        ];
+        $output['response'][] = $tmp;
+      }
+
+    };
+    
+    return $output;
+  }
+  
+  private function getMixedEvaluationDetail(array $mixedDetail):  array
+  {
+    if(empty($mixedDetail)) return [];
+    $output = [];
+    foreach ($mixedDetail as $detail) {
+      $tmp = [];
+      $tmp['id']                      = $detail['id'];
+      $tmp['evaluation_mixeval_id']   = $detail['evaluation_mixeval_id'];
+      $tmp['question_number']         = $detail['question_number'];
+      $tmp['question_comment']        = $detail['question_comment'];
+      $tmp['selected_lom']            = $detail['selected_lom'];
+      $tmp['grade']                   = $detail['grade'];
+      $tmp['comment_release']         = $detail['comment_release'];
+      $tmp['record_status']           = $detail['record_status'];
+      //$tmp['creator_id']            = $detail['creator_id'];
+      //$tmp['updater_id']            = $detail['updater_id'];
+      //$tmp['created']               = $detail['created'];
+      //$tmp['modified']              = $detail['modified'];
+      //$tmp['creator']               = $detail['creator'];
+      //$tmp['updater']               = $detail['updater'];
+  
+      $output[] = $tmp;
+    }
+    return $output;
+  }
   
 }
