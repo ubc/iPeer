@@ -591,12 +591,18 @@ class EvaluationComponent extends CakeObject
      * @access public
      * @return void
      */
+  function pre_r($val) {
+    echo '<pre>';
+    print_r($val);
+    echo  '</pre>';
+  }
     function saveRubricEvaluation($targetEvaluatee, $viewMode, $params=null, $targetCriteria=null)
     {
         $this->Event = ClassRegistry::init('Event');
         $this->Rubric = ClassRegistry::init('Rubric');
         $this->EvaluationRubric = ClassRegistry::init('EvaluationRubric');
-
+        $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
+        
         // assuming all are in the same order and same size
         $evaluator = $params['data']['Evaluation']['evaluator_id'];
         $groupEventId = $params['form']['group_event_id'];
@@ -631,12 +637,12 @@ class EvaluationComponent extends CakeObject
         } else {
             return false;
         }
-
+        
         // Save evaluation data
         // total grade for evaluatee from evaluator
         $evalRubric = $this->EvaluationRubric->getEvalRubricByGrpEventIdEvaluatorEvaluatee($groupEventId, $evaluator, $targetEvaluatee);
         if (empty($evalRubric)) {
-            //Save the master Evalution Rubric record if empty
+            //Save the master Evaluation Rubric record if empty
             $evalRubric['EvaluationRubric']['evaluator'] = $evaluator;
             $evalRubric['EvaluationRubric']['evaluatee'] = $targetEvaluatee;
             $evalRubric['EvaluationRubric']['grp_event_id'] = $groupEventId;
@@ -647,9 +653,33 @@ class EvaluationComponent extends CakeObject
             $this->EvaluationRubric->save($evalRubric);
             $evalRubric['EvaluationRubric']['id']=$this->EvaluationRubric->id;
             $evalRubric= $this->EvaluationRubric->read();
-
         }
+        
+        // NOTE:: update the evaluation submission table
+        // JK:: handling 'Save Draft' and 'Submit Peer Review'
+        $method = $params['form']['method'];
+//        $evaluationSubmission = $this->components->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
+//        if (empty($evaluationSubmission)) {
+//          $this->components->EvaluationSubmission->id = null;
+//          $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
+//          $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
+//          $evaluationSubmission['EvaluationSubmission']['submitter_id'] = empty($studentId) ? $evaluator : $studentId;
+//        }
+//        if($method === 'POST') {
+//          $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
+//          $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
+//        }
+//        if($method === 'PUT') {
+//          $evaluationSubmission['EvaluationSubmission']['submitted'] = $evaluationSubmission['EvaluationSubmission']['submitted'] ?? 0;
+//        }
+//
+//        if (!$this->components->EvaluationSubmission->save($evaluationSubmission)) {
+//          $this->NotificationHandler->toJson('Error: Unable to submit the evaluation. Please try again.', 404);
+//        }
+        // CaliperHooks::
 
+        // JK:: END
+        
         $evalRubric['EvaluationRubric']['comment'] = $params['form'][$targetEvaluatee.'gen_comment'];
         $score = $this->saveNGetEvalutionRubricDetail(
             $evalRubric['EvaluationRubric']['id'], $rubric, $targetEvaluatee, $params['form'], $viewMode, $auto_release, $targetCriteria);
@@ -660,7 +690,34 @@ class EvaluationComponent extends CakeObject
         if (!$this->EvaluationRubric->save($evalRubric)) {
             return false;
         }
-
+        
+      // TODO:: extract the following code in its own method
+      // NOTE:: if no submission exists, create one
+      $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
+      
+      if (empty($evaluationSubmission)) {
+        $this->EvaluationSubmission->id = null;
+        $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
+        $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
+        $evaluationSubmission['EvaluationSubmission']['submitter_id'] = empty($studentId) ? $evaluator : $studentId;
+        // save evaluation submission
+        $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
+        $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
+        if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
+          return false;
+        }
+      }
+      if($method === 'POST') {
+        $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
+      }
+      if($method === 'PUT') {
+        $evaluationSubmission['EvaluationSubmission']['submitted'] = $evaluationSubmission['EvaluationSubmission']['submitted'] ?? 0;
+      }
+      if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
+        $this->NotificationHandler->toJson('Error: Unable to submit the evaluation. Please try again.', 404);
+      }
+      // CaliperHooks::submit_mixeval($eventId, $evaluator, $groupEventId, $groupId);
+      // NOTE:: end
         return true;
     }
 

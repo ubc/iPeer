@@ -1329,14 +1329,12 @@ class EvaluationsController extends AppController
           $this->JsonHandler->formatRubricEvaluation($dataToJson);
         }
         elseif($this->RequestHandler->isPost() && !empty($this->params['data'])) {
-          // NOTE:: Form is submitting/saving formData
           $eventId = $this->params['form']['event_id'];
           $groupId = $this->params['form']['group_id'];
   
           $event = $this->Event->findById($eventId);
-  
           // Student View Mode
-          if(isset($this->params['form']['memberIDs'])){
+          if(isset($this->params['form']['memberIDs'])) {
             // find out whose evaluation is submitted
             $memberIds = explode(',', $this->params['form']['memberIDs']);
 
@@ -1418,7 +1416,7 @@ class EvaluationsController extends AppController
           
         }
         elseif($this->RequestHandler->isPut() && !empty($this->params)) {
-          $this->NotificationHandler->toJson('TODO - PUT', 200);
+          $this->NotificationHandler->toJson('TBD', 300);
         }
         else {
           $this->NotificationHandler->toJson('Not Supported.', 422);
@@ -1863,9 +1861,9 @@ class EvaluationsController extends AppController
                 $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
                 $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
                 $evaluationSubmission['EvaluationSubmission']['submitter_id'] = empty($studentId) ? $evaluator : $studentId;
-                $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
               }
               if($method === 'POST') {
+                $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
                 $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
               }
               if($method === 'PUT') {

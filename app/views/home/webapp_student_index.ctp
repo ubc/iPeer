@@ -256,14 +256,18 @@
       <Loader v-if="loading" />
     </div>
   </div>
-
-  <!--<ul v-if="Object.keys(evaluation).length > 0">
-    <li>{{ evaluation?.event?.id }}</li>
-    <li>{{ evaluation?.group?.id }}</li>
-    <li>{{ evaluation?.members.length }}</li>
-  </ul>-->
   
-  <div class="">
+  <div id="make_evaluation" class="make-evaluation">
+    <template v-if="Object.keys(evaluation).length > 0">
+      <h1 class="text-3xl font-bold underline">{{ evaluation?.event.title }}</h1>
+      <h5>{{ evaluation?.course?.course }} {{ evaluation?.group?.group_name }}</h5>
+      <div>Due: {{ evaluation?.event.due_date }}</div>
+      <div v-if="evaluation?.penalties?.length">Late Policy: Submit up to {{ evaluation?.penalties[evaluation?.penalties.length - 1]['days_late'] }} day(s) late, with {{ evaluation?.penalties[evaluation?.penalties.length - 1]['percent_penalty'] }}% deducted from your mark.</div>
+  
+      <div>About This Peer Review</div>
+      <div>Your Instructor says:</div>
+    </template>
+    
     <component v-if="Object.keys(evaluation).length > 0"
         :is="dynamic_event_template"
         :evaluation="evaluation"
@@ -295,7 +299,7 @@
 </script>
 
 <script type="module" lang="ts">
-  const { createApp, defineComponent, markRaw, ref, toRef, reactive, computed, onMounted, watchEffect, watch } = Vue
+  const { createApp, defineComponent, markRaw, ref, toRef, reactive, computed, onBeforeMount, onMounted, watchEffect, watch } = Vue
   
   const Events = markRaw(defineComponent({
     emits: ['update:fetch-evaluation', 'update:notification', 'update:loading'],
@@ -445,37 +449,49 @@
     emits: ['update:loading', 'update:notification', 'update:evaluation'],
     props: {evaluation: Object},
     setup(props, { emit }) {
+
       // DATA
-      const simple_form = ref('simple_form')
-      const initialState = ref({points: [], comments: []})
-      const evaluation = ref(props?.evaluation)
-      const event_id = ref(evaluation.value.event.id)
-      const group_id = ref(evaluation.value.group.id)
+      const formRef         = ref('evaluation_form')
+      const evaluation      = ref(props.evaluation || {})
+
+      // COMPUTED
+      const initialState    = ref({
+        event_id: computed(() => evaluation.value?.event?.id || ''),
+        group_id: computed(() => evaluation.value?.group?.id || ''),
+        course_id: computed(() => evaluation.value?.event?.course_id || ''),
+        user_id: computed(() => evaluation.value?.user_id || ''),
+        evaluatee_count: computed(() => evaluation.value?.evaluatee_count || ''),
+      })
 
       // COMPUTED
       function setInitialState() {
-        initialState.value = {
+        Object.assign(initialState.value, {
           points: evaluation.value?.submission?.points,
           comments: evaluation.value?.submission?.comments
-        }
+        })
       }
       
       // METHODS
-      async function saveSimpleEvaluation(e) {
+      async function saveAsDraft(e) {
+        // name: 'Save Draft'
         e.preventDefault()
-        if(_.isEmpty(event_id.value) || !isNumeric(event_id.value)) {
-          emit('update:notification', {status: 'error', code: 404, message: `Invalid Id ${event_id.value}`})
+        if(_.isEmpty(initialState.value.event_id) || !isNumeric(initialState.value.event_id)) {
+          emit('update:notification', {status: 'error', code: 404, message: `Invalid Id ${initialState.value.event_id}`})
           return;
         }
         emit('update:loading', true)
         emit('update:notification', null)
-        const formData = new FormData(e.target)
+
+        const form = document.getElementById('evaluation_form');
+        const formData = new FormData(form)
+        formData.append('method', 'PUT')
         const searchParams = new URLSearchParams()
         for (const pair of formData) {
           searchParams.append(pair[0], pair[1])
         }
+
         try {
-          const result = await fetch(`/evaluations/makeEvaluation/${event_id.value}/${group_id.value}`, {
+          const result = await fetch(`/evaluations/makeEvaluation/${initialState.value.event_id}/${initialState.value.group_id}`, {
             method: 'POST',
             headers: {
               'Accept': 'application/json',
@@ -484,7 +500,6 @@
             body: searchParams
           })
           const json = await result.json()
-          //emit('update:evaluation', json)
           emit('update:notification', json)
         } catch (err) {
           emit('update:notification', {code: 404, status: 'error', message: err})
@@ -492,22 +507,25 @@
           emit('update:loading', false)
         }
       }
-      async function submitSimpleEvaluation(e) {
+      async function submitPeerReview(e) {
+        // name: 'Submit Peer Review'
         e.preventDefault()
-        if(_.isEmpty(event_id.value) || !isNumeric(event_id.value)) {
-          emit('update:notification', {status: 'error', code: 404, message: `Invalid Id ${event_id.value}`})
+        if(_.isEmpty(initialState.value.event_id) || !isNumeric(initialState.value.event_id)) {
+          emit('update:notification', {status: 'error', code: 404, message: `Invalid Id ${initialState.value.event_id}`})
           return;
         }
+        emit('update:loading', true)
         emit('update:notification', null)
-        const formData = new FormData(simple_form.value)
+
+        const formData = new FormData(e.target)
+        formData.append('method', 'POST')
         const searchParams = new URLSearchParams()
         for (const pair of formData) {
           searchParams.append(pair[0], pair[1])
         }
-        
         try {
-          const result = await fetch(`/evaluations/makeEvaluation/${event_id.value}/${group_id.value}`, {
-            method: 'PUT',
+          const result = await fetch(`/evaluations/makeEvaluation/${initialState.value.event_id}/${initialState.value.group_id}`, {
+            method: 'POST',
             headers: {
               'Accept': 'application/json',
               'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
@@ -518,44 +536,48 @@
           emit('update:notification', json)
         } catch (err) {
           emit('update:notification', {code: 404, status: 'error', message: err})
+        } finally {
+          emit('update:loading', false)
         }
       }
-      //
-      function isNumeric(n) {
-        return !isNaN(parseFloat(n)) && isFinite(n);
+      async function autoSave() {
+        // TODO::
+        console.log('Auto Save: ' + JSON.stringify(initialState.value, null, 2))
       }
-      function isEmpty(element) {
-        // will implement lodash methods
-        if(element === '') return true;
-        if(element === null) return true;
-        if(element === undefined) return true;
-        if(element == null) return true;
-        return false;
-      }
-      
+
       // LIFECYCLE
-      onMounted(() => {
+      onBeforeMount(() => {
         setInitialState()
-        console.log(initialState.value)
+      })
+      onMounted(() => {})
+
+      // WATCH
+      watchEffect(onInvalidate => {
+        if(JSON.stringify(initialState.value)) {
+          const timeout = setTimeout(() => {
+            autoSave()
+          }, 2000)
+          // onInvalidate method runs whenever the method is about to run again OR the watcher is stopped.
+          onInvalidate(() => {
+            clearTimeout(timeout)
+          })
+        }
       })
       
       return {
-        evaluation, initialState, simple_form,
-        event_id, group_id,
-        saveSimpleEvaluation,
-        submitSimpleEvaluation,
-        //
-        isNumeric, isEmpty
+        evaluation, initialState,
+        saveAsDraft, submitPeerReview
       }
     },
     template: `<section class="evaluation-simple">
                 <h2>Simple Evaluation</h2>
-                <form @submit.prevent="saveSimpleEvaluation" id="simple" ref="simple_form">
-                  <input type="hidden" name="event_id" :value="event_id" />
-                  <input type="hidden" name="group_id" :value="group_id" />
-                  <input type="hidden" name="course_id" :value="evaluation?.event?.course_id" />
-                  <input type="hidden" name="data[Evaluation][evaluator_id]" :value="evaluation?.user_id" />
-                  <input type="hidden" name="evaluateeCount" :value="evaluation?.evaluatee_count" />
+
+                <form @submit.prevent="submitPeerReview" ref="evaluation_form" id="evaluation_form" class="simple">
+                  <input type="hidden" name="event_id" :value="initialState?.event_id" />
+                  <input type="hidden" name="group_id" :value="initialState?.group_id" />
+                  <input type="hidden" name="course_id" :value="initialState?.course_id" />
+                  <input type="hidden" name="data[Evaluation][evaluator_id]" :value="initialState?.user_id" />
+                  <input type="hidden" name="evaluateeCount" :value="initialState?.evaluatee_count" />
                   
                   <div class="datatable">
                     <p class="">1. Please rate each peer's relative contribution.</p>
@@ -643,11 +665,12 @@
                       </tbody>
                     </table>
                   </div>
-                  
-                  <div class="cta">
-                    <button type="submit">Save Draft</button>
-                    <button type="button" @click.prevent="submitSimpleEvaluation">Submit Peer Review</button>
+
+                  <div class="cta" style="display: flex; justify-content: center; align-items: center; column-gap: .5rem">
+                    <button type="button" :name="evaluation?.user_id" @click="saveAsDraft">Save Draft</button>
+                    <button type="submit" :name="evaluation?.user_id" class="button submit">Submit Peer Review</button>
                   </div>
+
                 </form>
               </section>`
   }))
@@ -656,53 +679,64 @@
     emits: ['update:loading', 'update:notification', 'update:evaluation'],
     props: {evaluation: Object},
     setup(props, { emit }) {
-      
+
       // DATA
-      const initialState = ref({})
-      const evaluation = ref(props?.evaluation)
-      const event_id = ref(evaluation.value.event.id)
-      const group_id = ref(evaluation.value.group.id)
+      const formRef         = ref('evaluation_form')
+      const evaluation      = ref(props.evaluation || {})
 
       // COMPUTED
+      const initialState    = ref({
+        event_id: computed(() => evaluation.value?.event?.id || ''),
+        group_id: computed(() => evaluation.value?.group?.id || ''),
+        group_event_id: computed(() => evaluation.value?.group_event?.id || ''),
+        course_id: computed(() => evaluation.value?.event?.course_id || ''),
+        rubric_id: computed(() => evaluation.value?.rubric_id || ''),
+        user_id: computed(() => evaluation.value?.user_id || ''),
+        evaluatee_count: computed(() => evaluation.value?.evaluatee_count || ''),
+        member_ids: computed(() => evaluation.value?.member_ids || ''),
+      })
 
       // METHODS
       function setInitialState() {
         if(Object.keys(evaluation.value).length === 0) return {}
         const state = {}
         
-        evaluation.value?.submission?.response?.forEach((response, response_idx) => {
+        evaluation.value?.submission?.response?.forEach(response => {
           const evaluatee = response.evaluatee
           const comment = response.comment
-          
-          console.log({response})
-          initialState.value = response.details.map((detail, detail_idx) => {
+          response.details.map(detail => {
             const tmp = [];
-            tmp['selected_lom_'+ evaluatee +'_'+ detail.criteria_number] = detail.selected_lom
-            tmp[evaluatee + 'comments_' + detail.criteria_number] = detail.criteria_comment
-            tmp[evaluatee + 'gen_comment'] = comment
-
+            if(detail) {
+              tmp['selected_lom_'+ evaluatee +'_'+ detail.criteria_number] = detail.selected_lom
+              tmp[evaluatee + 'comments_' + detail.criteria_number] = detail.criteria_comment
+              tmp[evaluatee + 'gen_comment'] = comment
+            }
             Object.assign(state, tmp)
           })
         })
-        initialState.value = state
+        Object.assign(initialState.value, state)
       }
-      
-      async function saveRubricEvaluation(e) {
+      //
+      async function saveAsDraft(e) {
+        // name: 'Save Draft'
         e.preventDefault()
-        if(_.isEmpty(event_id.value) || !isNumeric(event_id.value)) {
-          emit('update:notification', {status: 'error', code: 404, message: `Invalid Id ${event_id.value}`})
+        if(_.isEmpty(initialState.value.event_id) || !isNumeric(initialState.value.event_id)) {
+          emit('update:notification', {status: 'error', code: 404, message: `Invalid Id ${initialState.value.event_id}`})
           return;
         }
-        emit('update:loading', null)
+        emit('update:loading', true)
         emit('update:notification', null)
-        //
-        const formData = new FormData(e.target)
+
+        const form = document.getElementById('evaluation_form');
+        const formData = new FormData(form)
+        formData.append('method', 'PUT')
         const searchParams = new URLSearchParams()
         for (const pair of formData) {
           searchParams.append(pair[0], pair[1])
         }
+
         try {
-          const result = await fetch(`/evaluations/makeEvaluation/${event_id.value}/${group_id.value}`, {
+          const result = await fetch(`/evaluations/makeEvaluation/${initialState.value.event_id}/${initialState.value.group_id}`, {
             method: 'POST',
             headers: {
               'Accept': 'application/json',
@@ -712,60 +746,89 @@
           })
           const json = await result.json()
           emit('update:notification', json)
-        } catch(err) {
-          emit('update:notification', {status: 'error', code: 404, message: err})
+        } catch (err) {
+          emit('update:notification', {code: 404, status: 'error', message: err})
         } finally {
-          // await fetchEvaluation(event_id.value, group_id.value)
           emit('update:loading', false)
         }
       }
-      async function submitRubricEvaluation(e) {
+      async function submitPeerReview(e) {
+        // name: 'Submit Peer Review'
         e.preventDefault()
-        if(_.isEmpty(event_id.value) || !isNumeric(event_id.value)) {
-          emit('update:notification', {status: 'error', code: 404, message: `Invalid Id ${event_id.value}`})
+        if(_.isEmpty(initialState.value.event_id) || !isNumeric(initialState.value.event_id)) {
+          emit('update:notification', {status: 'error', code: 404, message: `Invalid Id ${initialState.value.event_id}`})
           return;
         }
-        console.log('Work in progress [717]')
+        emit('update:loading', true)
+        emit('update:notification', null)
+
+        const formData = new FormData(e.target)
+        formData.append('method', 'POST')
+        const searchParams = new URLSearchParams()
+        for (const pair of formData) {
+          searchParams.append(pair[0], pair[1])
+        }
+        try {
+          const result = await fetch(`/evaluations/makeEvaluation/${initialState.value.event_id}/${initialState.value.group_id}`, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+            },
+            body: searchParams
+          })
+          const json = await result.json()
+          emit('update:notification', json)
+        } catch (err) {
+          emit('update:notification', {code: 404, status: 'error', message: err})
+        } finally {
+          emit('update:loading', false)
+        }
       }
-      //
-      function isNumeric(n) {
-        return !isNaN(parseFloat(n)) && isFinite(n);
-      }
-      function isEmpty(element) {
-        // will implement lodash methods
-        if(element === '') return true;
-        if(element === null) return true;
-        if(element === undefined) return true;
-        if(element == null) return true;
-        return false;
+      async function autoSave() {
+        // TODO::
+        console.log('Auto Save: ' + JSON.stringify(initialState.value, null, 2))
       }
       
       // LIFECYCLE
-      onMounted(() => setInitialState())
+      onBeforeMount(() => {
+        setInitialState()
+      })
+      onMounted(() => {})
+
+      // WATCH
+      watchEffect(onInvalidate => {
+        if(JSON.stringify(initialState.value)) {
+          const timeout = setTimeout(() => {
+            autoSave()
+          }, 2000)
+          // onInvalidate method runs whenever the method is about to run again OR the watcher is stopped.
+          onInvalidate(() => {
+            clearTimeout(timeout)
+          })
+        }
+      })
       
       return {
         evaluation, initialState,
-        event_id, group_id,
-        saveRubricEvaluation,
-        submitRubricEvaluation,
-        isNumeric, isEmpty
+        saveAsDraft, submitPeerReview,
       }
     },
     template: `<section class="evaluation-rubric">
                 <h2>Rubric Evaluation</h2>
-                
-                <form @submit.prevent="saveRubricEvaluation" class="rubric" ref="rubric">
-                  <input type="hidden" name="event_id" :value="event_id" />
-                  <input type="hidden" name="group_id" :value="group_id" />
-                  <input type="hidden" name="group_event_id" :value="evaluation?.group_event?.id" />
-                  <input type="hidden" name="course_id" :value="evaluation?.event?.course_id" />
-                  <input type="hidden" name="rubric_id" :value="evaluation?.rubric_id" />
-                  <input type="hidden" name="data[Evaluation][evaluator_id]" :value="evaluation?.user_id" />
-                  <input type="hidden" name="evaluateeCount" :value="evaluation?.evaluatee_count" />
-                  <input type="hidden" name="memberIDs" :value="evaluation?.member_ids" />
+
+                <form @submit.prevent="submitPeerReview" ref="evaluation_form" id="evaluation_form" class="rubric">
+                  <input type="hidden" name="event_id" :value="initialState?.event_id" />
+                  <input type="hidden" name="group_id" :value="initialState?.group_id" />
+                  <input type="hidden" name="group_event_id" :value="initialState?.group_event_id" />
+                  <input type="hidden" name="course_id" :value="initialState?.course_id" />
+                  <input type="hidden" name="rubric_id" :value="initialState?.rubric_id" />
+                  <input type="hidden" name="data[Evaluation][evaluator_id]" :value="initialState?.user_id" />
+                  <input type="hidden" name="evaluateeCount" :value="initialState?.evaluatee_count" />
+                  <input type="hidden" name="memberIDs" :value="initialState?.member_ids" />
                   
                   <div class="datatable" style="margin: 2rem auto"
-                       v-for="(rubric_criteria, criteria_idx) of evaluation?.questions?.rubrics_criteria"
+                       v-for="rubric_criteria of evaluation?.questions?.rubrics_criteria"
                        :key="rubric_criteria.id">
                     <p>{{ rubric_criteria.id }}. {{ rubric_criteria.criteria }}</p>
                     <table class="standardtable leftalignedtable">
@@ -786,7 +849,7 @@
                         </tr>
                       </thead>
                       <tbody>
-                      <tr v-for="(member, member_idx) of evaluation?.members" :key="member.id">
+                      <tr v-for="member of evaluation?.members" :key="member.id">
                         <input
                           type="hidden"
                           :name="member.id +'criteria_points_'+ rubric_criteria.id"
@@ -831,7 +894,7 @@
                       </tr>
                       </thead>
                       <tbody>
-                      <tr v-for="(member, member_idx) of evaluation?.members" :key="member.id">
+                      <tr v-for="member of evaluation?.members" :key="member.id">
                         <td>
                           <div class="user" style="display: flex; justify-content: center; align-items: center;">
                             <div class="icon"></div>
@@ -872,7 +935,7 @@
                       </tr>
                       </thead>
                       <tbody>
-                      <tr v-for="(member, member_idx) of evaluation?.members" :key="member.id">
+                      <tr v-for="member of evaluation?.members" :key="member.id">
                         <td>
                           <div class="user" style="display: flex; justify-content: center; align-items: center;">
                             <div class="icon"></div>
@@ -892,16 +955,12 @@
                       </tbody>
                     </table>
                   </div>
-                  
+
                   <div class="cta" style="display: flex; justify-content: center; align-items: center; column-gap: .5rem">
-                    <button type="submit" :name="evaluation?.user_id">Save Draft</button>
-                    <button
-                        type="button"
-                        :name="evaluation?.user_id"
-                        class="button submit"
-                        @click="submitRubricEvaluation"
-                    >Submit Peer Review</button>
+                    <button type="button" :name="evaluation?.user_id" @click="saveAsDraft">Save Draft</button>
+                    <button type="submit" :name="evaluation?.user_id" class="button submit">Submit Peer Review</button>
                   </div>
+
                 </form>
               </section>`
   }))
@@ -912,7 +971,7 @@
     setup(props, { emit }) {
 
       // DATA
-      const mixedRef        = ref('mixed')
+      const formRef         = ref('evaluation_form')
       const evaluation      = ref(props.evaluation || {})
       
       // COMPUTED
@@ -928,36 +987,13 @@
       
       // METHODS
       function setInitialState() {
-        // JK:: another option to try:
-        // JK to get the formData = new FormData(mixed) with mixed ref
-        if(_.isEmpty(props.evaluation)) return;
-        
-        const submission = props.evaluation?.submission
-        if(_.isEmpty(submission)) return;
-        //
-        const members = props.evaluation?.members
-        if(_.isEmpty(members)) return;
+        if(_.isEmpty(evaluation.value)) return;
+        if(_.isEmpty(evaluation.value?.members)) return;
+        if(_.isEmpty(evaluation.value?.submission)) return;
         
         try {
-          /*
-          _.map(members, (member) => {
-            const response = submission?.response
-            const res = _.find(response, {evaluatee: member.id})
-            let details = {}
-            _.map(res.details, (detail) => {
-              Object.assign(details, {
-                [detail.question_number]: {
-                  question_comment: detail.question_comment,
-                  selected_lom: detail.selected_lom
-                }
-              })
-            })
-            Object.assign(initialState.value, {[member.id]: details})
-          })
-          */
-
-          _.map(members, (member) => {
-            const response = submission?.response
+          _.map(evaluation.value?.members, (member) => {
+            const response = evaluation.value?.submission?.response
             const res = _.find(response, {evaluatee: member.id})
             
             return _.map(res.details, (detail) => (
@@ -967,17 +1003,15 @@
               })
             ))
           })
-          
         } catch (e) {
           console.log({e})
         }
-        
       }
       function updateInitialState(newValue) {
         Object.assign(initialState.value, newValue)
       }
       //
-      async function saveMixedEvaluation(e) {
+      async function saveAsDraft(e) {
         // name: 'Save Draft'
         e.preventDefault()
         if(_.isEmpty(initialState.value.event_id) || !isNumeric(initialState.value.event_id)) {
@@ -987,11 +1021,9 @@
         emit('update:loading', true)
         emit('update:notification', null)
 
-        const form = document.getElementById('mixed');
+        const form = document.getElementById('evaluation_form');
         const formData = new FormData(form)
         formData.append('method', 'PUT')
-        // here we can pass additional params with our request
-        // indicating its a draft or such
         const searchParams = new URLSearchParams()
         for (const pair of formData) {
           searchParams.append(pair[0], pair[1])
@@ -1007,7 +1039,6 @@
             body: searchParams
           })
           const json = await result.json()
-          //emit('update:evaluation', json)
           emit('update:notification', json)
         } catch (err) {
           emit('update:notification', {code: 404, status: 'error', message: err})
@@ -1016,7 +1047,7 @@
         }
         
       }
-      async function submitMixedEvaluation(e) {
+      async function submitPeerReview(e) {
         // name: 'Submit Peer Review'
         e.preventDefault()
         if(_.isEmpty(initialState.value.event_id) || !isNumeric(initialState.value.event_id)) {
@@ -1028,14 +1059,6 @@
         
         const formData = new FormData(e.target)
         formData.append('method', 'POST')
-        
-        
-        // for (let [key, value] of Object.entries(initialState)) {
-        //   // console.log({key, value})
-        //   formData.append(key, value)
-        // }
-        
-        // const formData = new FormData(e.target)
         const searchParams = new URLSearchParams()
         for (const pair of formData) {
           searchParams.append(pair[0], pair[1])
@@ -1047,11 +1070,9 @@
               'Accept': 'application/json',
               'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
             },
-            // body: formData
             body: searchParams
           })
           const json = await result.json()
-          //emit('update:evaluation', json)
           emit('update:notification', json)
         } catch (err) {
           emit('update:notification', {code: 404, status: 'error', message: err})
@@ -1059,60 +1080,40 @@
           emit('update:loading', false)
         }
       }
-      
+      async function autoSave() {
+        // TODO::
+        console.log('Auto Save: ' + JSON.stringify(initialState.value, null, 2))
+      }
       // LIFECYCLE
-      onMounted(() => {
+      onBeforeMount(() => {
         setInitialState()
       })
       
       // WATCH
-      //watchEffect(() => {})
       watchEffect(onInvalidate => {
-        
         if(JSON.stringify(initialState.value)) {
-          // async API call
-          //const apiCall = saveMixedEvaluation()
-          
           const timeout = setTimeout(() => {
-            console.log('Value: ' + JSON.stringify(initialState.value, null, 2))
-            // const api = saveMixedEvaluation()
-            const form = document.getElementById('mixed');
-            // saveMixedEvaluation(form)
-            // document.getElementById('save-draft-button').click()
+            autoSave()
           }, 2000)
-          
           // onInvalidate method runs whenever the method is about to run again OR the watcher is stopped.
           onInvalidate(() => {
             clearTimeout(timeout)
-            // cancel the api call
-            //api.cancel()
           })
         }
-        
       })
       
       return {
         initialState,
         evaluation,
-        saveMixedEvaluation,
-        submitMixedEvaluation,
+        saveAsDraft,
+        submitPeerReview,
         updateInitialState
       }
     },
     template: `<section class="evaluation-mixed">
-                <h2 class="text-3xl font-bold underline">Mixed Evaluation</h2>
-                <p>In progress</p>
-                
-                <h1>{{ evaluation?.event.title }}</h1>
-                <h5>{{ evaluation?.course?.course }} {{ evaluation?.group?.group_name }}</h5>
-                <div>Due: {{ evaluation?.event.due_date }}</div>
-                <div>Late Policy: Submit up to [] day(s) late, with [] deducted from your mark.</div>
-                
-                <div>About This Peer Review</div>
-                <div>Your Instructor says:</div>
+                <h2>Mixed Evaluation</h2>
 
-                  <!--<div style="display:none;"><input type="hidden" name="_method" value="__POST" /></div>-->
-                <form @submit.prevent="submitMixedEvaluation" id="mixed" class="mixed" ref="mixed">
+                <form @submit.prevent="submitPeerReview" ref="evaluation_form" id="evaluation_form" class="mixed">
                   <input type="hidden" name="data[data][submitter_id]" :value="initialState.user_id" />
                   <input type="hidden" name="data[data][event_id]" :value="initialState.event_id" />
                   <input type="hidden" name="data[data][template_id]" :value="initialState.template_id" />
@@ -1127,7 +1128,7 @@
                     <input type="hidden" :name="'data['+member.id+'][Evaluation][group_id]'" :value="initialState.group_id" />
                   </template>
 
-                  <template v-for="(question, question_idx) of evaluation?.questions" :key="question.id">
+                  <template v-for="question of evaluation?.questions" :key="question.id">
                     <div :class="'datatable question_'+ question.question_num " style="margin: 2rem auto">
                       <p>{{ question.question_num }}. {{ question.title }} <span style="color: var(--red)">*</span></p>
                       <div class="description">{{ question.instructions }}</div>
@@ -1144,8 +1145,8 @@
                   </template>
 
                   <div class="cta" style="display: flex; justify-content: center; align-items: center; column-gap: .5rem">
-                    <button type="button" :name="evaluation?.user_id" @click="saveMixedEvaluation" id=save-draft-button>Save Draft</button>
-                    <button type="submit" :name="evaluation?.user_id" class="button submit" >Submit Peer Review</button>
+                    <button type="button" :name="evaluation?.user_id" @click="saveAsDraft">Save Draft</button>
+                    <button type="submit" :name="evaluation?.user_id" class="button submit">Submit Peer Review</button>
                   </div>
 
                 </form>
@@ -1386,7 +1387,7 @@
         evaluation.value = evaluation
       }
       async function fetchEvaluation({event_id, group_id}) {
-        if(isEmpty(event_id) || !isNumeric(event_id)) {
+        if(_.isEmpty(event_id) || !isNumeric(event_id)) {
           notification.value = {status: 'error', code: 404, message: `Invalid Id ${event_id}`}
           return;
         }
@@ -1410,18 +1411,6 @@
         }
       }
       
-      function isNumeric(n) {
-        return !isNaN(parseFloat(n)) && isFinite(n);
-      }
-      function isEmpty(element) {
-        // will implement lodash methods
-        if(element === '') return true;
-        if(element === null) return true;
-        if(element === undefined) return true;
-        if(element == null) return true;
-        return false;
-      }
-      
       // LIFECYCLE
       onMounted(() => {})
       
@@ -1434,24 +1423,9 @@
       })
       
       return {
-        debug,
-        loading,
-        notification,
-        evaluation,
-        selected_lom,
-        data,
-
-        dynamic_event_template,
-        event_template_type_id,
-        
-        setLoading,
-        updateNotification,
-        updateEvaluation,
-        
-        fetchEvaluation,
-        
-        isNumeric,
-        isEmpty,
+        debug, loading, notification, evaluation, selected_lom, data,
+        dynamic_event_template, event_template_type_id,
+        setLoading, fetchEvaluation, updateNotification, updateEvaluation
       }
     }
   })
