@@ -1880,7 +1880,7 @@ class EvaluationsController extends AppController
               //checks if all members in the group have submitted the number of
               //submission equals the number of members means that this group is ready to review
               $evaluators = $this->GroupsMembers->findAllByGroupId($groupId);
-              echo '<pre>'; print_r($evaluators); die();
+              
               $evaluators = Set::extract('/GroupsMembers/user_id', $evaluators);
               $memberCompletedNo = $this->EvaluationSubmission->find('count', array(
                 'conditions' => array('grp_event_id' => $groupEventId, 'submitter_id' => $evaluators)
