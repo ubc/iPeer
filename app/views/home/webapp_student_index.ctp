@@ -369,11 +369,12 @@
                       <td>
                         <div class="" style="padding-right: .6rem;">
                           <button
-                              class="button submit"
                               style="width: 100%;"
+                              class="button "
+                              :class="row?.event?.is_submitted === '0' ? 'secondary' : 'submit'"
                               @click="$emit('update:fetch-evaluation', {'event_id': row.event.id, 'group_id': row.group.id})"
                               
-                          >{{ row?.submission?.submitted === '0' ? 'Continue Eval.' : 'Evaluate Peers' }}/{{ row?.event?.event_template_type_id }} </button>
+                          >{{ row?.event?.is_submitted === '0' ? 'Continue Eval.' : 'Evaluate Peers' }}/{{ row?.event?.event_template_type_id }} </button>
                         </div>
                         <div style="display: none" @click="fetchEvaluation(row.event.id, row.group.id)" />
                       </td>
@@ -407,13 +408,13 @@
                       <td>
                         <div class="" style="padding-right: .6rem;">
                           <button
-                              v-if="row?.submission?.submitted && new Date() >= new Date(row.event.due_date)"
+                              v-if="row?.event?.is_submitted === '1' && new Date() >= new Date(row.event.due_date)"
                               class="button submit"
                               style="width: 100%; "
                               @click="fetchEvaluation(row.event.id, row.group.id)"
                           >See Reviews of Me</button>
                           <button
-                              v-else-if="row?.submission?.submitted && new Date() < new Date(row.event.due_date)"
+                              v-else-if="row?.event?.is_submitted === '1' && new Date() < new Date(row.event.due_date)"
                               class="button submit"
                               style="width: 100%; "
                               @click="$emit('update:fetch-evaluation', {'event_id': row.event.id, 'group_id': row.group.id})"

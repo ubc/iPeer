@@ -15,7 +15,7 @@ class JsonHandlerComponent extends CakeObject
    * @param array $result
    * @return array
    */
-  public function formatEvents(array $result): array
+  public function formatEvents(array $result, string $userId=null): array
   {
     $data = [];
     foreach ($result as $row) {
@@ -37,6 +37,7 @@ class JsonHandlerComponent extends CakeObject
         'result_release_date_begin' => $row['Event']['result_release_date_begin'],
         'result_release_date_end' => $row['Event']['result_release_date_end'],
         'record_status' => $row['Event']['record_status'],
+        'is_submitted' => $this->isSubmitted($row['Event']['id'], $row['Group']['id'], $userId),
         'is_released' => $row['Event']['is_released'],
         'is_result_released' => $row['Event']['is_result_released'],
         'is_ended' => $row['Event']['is_ended'],
@@ -53,12 +54,6 @@ class JsonHandlerComponent extends CakeObject
         'group_num' => $row['Group']['group_num'],
         'group_name' => $row['Group']['group_name'],
         'member_count' => $row['Group']['member_count'],
-      ] : null;
-      isset($row['EvaluationSubmission']['id']) ? $tmp['submission'] = [
-        'id' => $row['EvaluationSubmission']['id'],
-        'submitter_id' =>  $row['EvaluationSubmission']['submitter_id'],
-        'submitted' =>  $row['EvaluationSubmission']['submitted'],
-        'date_submitted' =>  $row['EvaluationSubmission']['date_submitted'],
       ] : null;
       isset($row['Penalty']) && !empty($row['Penalty']) ? $tmp['penalties'] = $row['Penalty'] : null;
       isset($row['late']) ? $tmp['late'] = $row['late'] : null;
@@ -126,6 +121,12 @@ class JsonHandlerComponent extends CakeObject
   
   
   // JK:: PRIVATE HELPER METHODS
+  private function isSubmitted(string $eventId, string $groupId, string $userId): string
+  {
+    $submission = $this->controller->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, $userId);
+    return $submission['EvaluationSubmission']['submitted'] ?? '';
+  }
+  
   /**
    * @param array $data
    * @return array

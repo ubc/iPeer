@@ -123,6 +123,7 @@ class HomeController extends AppController
         $this->set('numDue', $numDue);
 
       //JK:: Checks if the request from cake page
+      $userId = User::get('id');
       if ($this->RequestHandler->accepts('html')) {
         if(!User::isInstructor()) {
           //$this->render('studentIndex');
@@ -138,8 +139,8 @@ class HomeController extends AppController
             http_response_code(200);
             // Student view
             echo json_encode(array_merge([
-              'current' => $this->JsonHandler->formatEvents($evals['upcoming']),
-              'completed' => $this->JsonHandler->formatEvents(array_merge($evals['submitted'], $evals['expired'])),
+              'current' => $this->JsonHandler->formatEvents($evals['upcoming'], $userId),
+              'completed' => $this->JsonHandler->formatEvents(array_merge($evals['submitted'], $evals['expired']), $userId),
               'num_overdue' => $numOverdue,
               'num_due' => $numDue
             ]));

@@ -1050,7 +1050,6 @@ class EvaluationsController extends AppController
         $eventId = $event['Event']['id'];
   
         if (empty($this->params['data'])) {
-          echo '<pre>'; print_r('MakeRubricEvaluation GET'); print_r($this->body); print_r($this->params); die();
           $rubricId = $event['Event']['template_id'];
           $courseId = $event['Event']['course_id'];
     
@@ -1138,7 +1137,6 @@ class EvaluationsController extends AppController
           $this->render('rubric_eval_form');
         }
         else {
-          echo '<pre>'; print_r('MakeRubricEvaluation POST/PUT'); print_r($this->body); print_r($this->params); die();
           $eventId = $this->params['form']['event_id'];
           $groupId = $this->params['form']['group_id'];
   
@@ -1174,7 +1172,7 @@ class EvaluationsController extends AppController
                 $msg[] = __('you still have to submit the evaluation with the Submit button below', true);
               }
               $suffix = empty($msg) ? '.' : ', but '.implode(' and ', $msg).'.';
-              $this->Session->setFlash(__('Your evaluation has been saved', true).$suffix);
+              $this->Session->setFlash(__('Your evaluation has been saved ', true).$suffix);
               if (!$this->RequestHandler->isAjax()) {
                 $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
               }
@@ -1720,6 +1718,7 @@ class EvaluationsController extends AppController
       elseif ($this->RequestHandler->accepts('json')) {
         $this->autoRender = FALSE;
         $eventId = $event['Event']['id'];
+        $_method = $this->params['form']['form']['_method'];
         
         if($this->RequestHandler->isGet() && empty($this->params['data'])) {
           // invalid group id
@@ -1753,7 +1752,7 @@ class EvaluationsController extends AppController
           }
           // NOTE:: needed to include the GroupEventId to get the exact submission record
           // NOTE:: otherwise will pull the first match with 2 conditions which is inaccurate
-          $sub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId, $userId);
+          $sub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId, $userId, $event['GroupEvent']['id']);
           $members = $this->GroupsMembers->findAllByGroupId($groupId);
           
           $enrol = $this->UserEnrol->find('count', array(
@@ -1871,13 +1870,19 @@ class EvaluationsController extends AppController
                 $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
                 $evaluationSubmission['EvaluationSubmission']['submitter_id'] = empty($studentId) ? $evaluator : $studentId;
                 $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
+              }
+              if($_method === 'POST') {
                 $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
-                if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
-                  $this->NotificationHandler->toJson('Error: Unable to submit the evaluation. Please try again.', 404);
-                }
+              }
+              if($_method === 'PUT') {
+                $evaluationSubmission['EvaluationSubmission']['submitted'] = $evaluationSubmission['EvaluationSubmission']['submitted'] ?? 0;
+              }
+              
+              if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
+                $this->NotificationHandler->toJson('Error: Unable to submit the evaluation. Please try again.', 404);
               }
               CaliperHooks::submit_mixeval($eventId, $evaluator, $groupEventId, $groupId);
-      
+              
               //checks if all members in the group have submitted the number of
               //submission equals the number of members means that this group is ready to review
               $evaluators = $this->GroupsMembers->findAllByGroupId($groupId);
@@ -1893,10 +1898,14 @@ class EvaluationsController extends AppController
                 if (!$this->GroupEvent->save($groupEvent)) {
                   $this->NotificationHandler->toJson('Error', 404);
                 } else {
-                  $this->NotificationHandler->toJson('Your Evaluation was submitted successfully.', 200);
+                  if($_method === 'PUT') {
+                    $this->NotificationHandler->toJson('Your evaluation was save as draft.', 200);
+                  } else $this->NotificationHandler->toJson('Your evaluation was submitted successfully.', 200);
                 }
               } else {
-                $this->NotificationHandler->toJson('Your Evaluation was submitted successfully.', 200);
+                if($_method === 'PUT') {
+                  $this->NotificationHandler->toJson('Your evaluation was save as draft.', 200);
+                } else $this->NotificationHandler->toJson('Your evaluation was submitted successfully.', 200);
               }
             } else {
               // Supposed to go here

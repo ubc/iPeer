@@ -65,16 +65,16 @@ class EvaluationSubmission extends AppModel
     /**
      * getEvalSubmissionByGrpEventIdSubmitter
      *
-     * @param bool $grpEventId group event id
-     * @param bool $submitter  submitter
+     * @param string $grpEventId group event id
+     * @param string $submitter  submitter
      *
      * @access public
      * @return void
      */
-    function getEvalSubmissionByGrpEventIdSubmitter($grpEventId, $submitter)
+    function getEvalSubmissionByGrpEventIdSubmitter(string $grpEventId, string $submitter)
     {
         $findMethod = 'first';
-        // if grpEventId is array, there might be multple submissions matching
+        // if grpEventId is array, there might be multiple submissions matching
         if (is_array($grpEventId)) {
             $findMethod = 'all';
         }
@@ -82,7 +82,7 @@ class EvaluationSubmission extends AppModel
             'conditions' => array(
                 $this->alias.'.grp_event_id' => $grpEventId,
                 $this->alias.'.submitter_id' => $submitter,
-                $this->alias.'.submitted' => '1',
+                // $this->alias.'.submitted' => '1',
             ),
         ));
     }
@@ -90,19 +90,19 @@ class EvaluationSubmission extends AppModel
     /**
      * getEvalSubmissionByEventIdGroupIdSubmitter
      *
-     * @param bool $eventId   event id
-     * @param bool $groupId   group id
-     * @param bool $submitter submitter
+     * @param string $eventId   event id
+     * @param string $groupId   group id
+     * @param string $submitter submitter
      *
      * @access public
      * @return void
      */
-    function getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, $submitter)
+    function getEvalSubmissionByEventIdGroupIdSubmitter(string $eventId, string $groupId, string $submitter)
     {
         return $this->find('first', array(
             'conditions' => array(
                 $this->alias.'.submitter_id' => $submitter,
-                $this->alias.'.submitted' => 1,
+                //$this->alias.'.submitted' => 1,
                 'GroupEvent.group_id' => $groupId,
                 'GroupEvent.event_id' => $eventId,
             ),
@@ -113,19 +113,20 @@ class EvaluationSubmission extends AppModel
     /**
      * getEvalSubmissionByEventIdSubmitter
      *
-     * @param bool $eventId   event id
-     * @param bool $submitter submitter
+     * @param string $eventId   event id
+     * @param string|null $submitter submitter
      *
      * @access public
      * @return void
      */
-    function getEvalSubmissionByEventIdSubmitter($eventId, $submitter)
+    function getEvalSubmissionByEventIdSubmitter(string $eventId, string $submitter, string $groupEventId=null)
     {
         return $this->find('first', array(
             'conditions' => array(
                 $this->alias.'.event_id' => $eventId,
                 $this->alias.'.submitter_id' => $submitter,
-                $this->alias.'.submitted' => 1,
+                $this->alias.'.grp_event_id' => $groupEventId,
+                //$this->alias.'.submitted' => 1,
             ),
             'contain' => false,
         ));
