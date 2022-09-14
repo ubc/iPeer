@@ -989,7 +989,7 @@
 
         const form = document.getElementById('mixed');
         const formData = new FormData(form)
-        formData.append('form[_method]', 'PUT')
+        formData.append('method', 'PUT')
         // here we can pass additional params with our request
         // indicating its a draft or such
         const searchParams = new URLSearchParams()
@@ -1027,7 +1027,7 @@
         emit('update:notification', null)
         
         const formData = new FormData(e.target)
-        formData.append('form[_method]', 'POST')
+        formData.append('method', 'POST')
         
         
         // for (let [key, value] of Object.entries(initialState)) {

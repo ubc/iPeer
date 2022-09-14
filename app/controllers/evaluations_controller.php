@@ -1522,7 +1522,7 @@ class EvaluationsController extends AppController
      * @access public
      * @return void
      */
-    // JK:: In progress
+    // JK:: Check
     function _makeMixevalEvaluation ($event, $groupId, $studentId = null)
     {
       if ($this->RequestHandler->accepts('html')) {
@@ -1718,7 +1718,6 @@ class EvaluationsController extends AppController
       elseif ($this->RequestHandler->accepts('json')) {
         $this->autoRender = FALSE;
         $eventId = $event['Event']['id'];
-        $_method = $this->params['form']['form']['_method'];
         
         if($this->RequestHandler->isGet() && empty($this->params['data'])) {
           // invalid group id
@@ -1750,7 +1749,7 @@ class EvaluationsController extends AppController
             $now > strtotime($event['Event']['release_date_end'])) {
             $this->NotificationHandler->toJson('Error: Evaluation is unavailable', 404);
           }
-          // NOTE:: needed to include the GroupEventId to get the exact submission record
+          // NOTE:: had to include the GroupEventId to get the exact submission record
           // NOTE:: otherwise will pull the first match with 2 conditions which is inaccurate
           $sub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId, $userId, $event['GroupEvent']['id']);
           $members = $this->GroupsMembers->findAllByGroupId($groupId);
@@ -1769,7 +1768,6 @@ class EvaluationsController extends AppController
           
           $dataToJson = [
             'event'             => $event,
-            // NOTE:: rename to penalties
             'penalty'           => $this->Penalty->getPenaltyByEventId($eventId),
             'penaltyDays'       => $this->Penalty->getPenaltyDays($eventId),
             'penaltyFinal'      => $this->Penalty->getPenaltyFinal($eventId),
@@ -1797,11 +1795,6 @@ class EvaluationsController extends AppController
         }
         elseif($this->RequestHandler->isPost()) {
           // Check to see if all members are completed this evaluation
-          // NOTE:: If TA is included in group evaluation:
-          // 1. will TA be evaluated by other students
-          // 2. is TA required to evaluate other students
-          // NOTE:: if the answer is no to both questions then the statement below will never be evaluated to true
-  
           $data = $this->data['data'];
           unset($this->data['data']);
           $mixeval = $this->Mixeval->findById($data['template_id']);
@@ -1809,7 +1802,8 @@ class EvaluationsController extends AppController
           $evaluator = empty($studentId) ? $data['submitter_id'] : $studentId;
           $required = true;
           $failures = array();
-  
+          $method = $this->params['form']['method'];
+          
           // check peer evaluation questions
           if ($mixeval['Mixeval']['peer_question'] > 0) {
             foreach ($this->data as $userId => $eval) {
@@ -1871,10 +1865,10 @@ class EvaluationsController extends AppController
                 $evaluationSubmission['EvaluationSubmission']['submitter_id'] = empty($studentId) ? $evaluator : $studentId;
                 $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
               }
-              if($_method === 'POST') {
+              if($method === 'POST') {
                 $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
               }
-              if($_method === 'PUT') {
+              if($method === 'PUT') {
                 $evaluationSubmission['EvaluationSubmission']['submitted'] = $evaluationSubmission['EvaluationSubmission']['submitted'] ?? 0;
               }
               
@@ -1886,11 +1880,18 @@ class EvaluationsController extends AppController
               //checks if all members in the group have submitted the number of
               //submission equals the number of members means that this group is ready to review
               $evaluators = $this->GroupsMembers->findAllByGroupId($groupId);
+              echo '<pre>'; print_r($evaluators); die();
               $evaluators = Set::extract('/GroupsMembers/user_id', $evaluators);
               $memberCompletedNo = $this->EvaluationSubmission->find('count', array(
                 'conditions' => array('grp_event_id' => $groupEventId, 'submitter_id' => $evaluators)
               ));
               $evaluators = count($evaluators);
+              // NOTE:: If TA is included in group evaluation:
+              // 1. will TA be evaluated by other students
+              // 2. is TA required to evaluate other students
+              // NOTE:: if the answer is no to both questions then
+              // the if statement below will never be evaluated to true
+              
               //Check to see if all members are completed this evaluation
               if ($memberCompletedNo == $evaluators) {
                 $this->GroupEvent->id = $groupEventId;
@@ -1898,12 +1899,12 @@ class EvaluationsController extends AppController
                 if (!$this->GroupEvent->save($groupEvent)) {
                   $this->NotificationHandler->toJson('Error', 404);
                 } else {
-                  if($_method === 'PUT') {
+                  if($method === 'PUT') {
                     $this->NotificationHandler->toJson('Your evaluation was save as draft.', 200);
                   } else $this->NotificationHandler->toJson('Your evaluation was submitted successfully.', 200);
                 }
               } else {
-                if($_method === 'PUT') {
+                if($method === 'PUT') {
                   $this->NotificationHandler->toJson('Your evaluation was save as draft.', 200);
                 } else $this->NotificationHandler->toJson('Your evaluation was submitted successfully.', 200);
               }
