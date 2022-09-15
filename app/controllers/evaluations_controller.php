@@ -244,7 +244,12 @@ class EvaluationsController extends AppController
     }
 
     // =-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-
-
+  
+  function pre_r($val) {
+    echo '<pre>';
+    print_r($val);
+    echo  '</pre>';
+  }
     /**
      * Index
      *
@@ -869,7 +874,7 @@ class EvaluationsController extends AppController
           // check that all points given are not negative numbers
           $minimum = min($this->params['form']['points']);
           if ($minimum < 0) {
-            $this->NotificationHandler->toJson('One or more of your group members have negative points. Please use positive numbers.', 200);
+            $this->NotificationHandler->toJson('One or more of your group members have negative points. Please use positive numbers.', 300);
           }
   
           //Get the target event
@@ -893,14 +898,11 @@ class EvaluationsController extends AppController
             $this->NotificationHandler->toJson('Your Evaluation was submitted successfully.', 201);
           } else {
             $this->validateErrors($this->Event);
-            $this->NotificationHandler->toJson('Save Evaluation failure.', 200);
+            $this->NotificationHandler->toJson('Save Evaluation failure.', 404);
           }
         }
         elseif($this->RequestHandler->isPut()) {
-          
-          $this->NotificationHandler->toJson('TODO - [Submit Peer Review] on POST or PUT method.', 200);
-          // TODO:: [Submit Peer Review] on POST or PUT method.
-          
+          $this->NotificationHandler->toJson('TBD', 300);
         }
         else {
           $this->NotificationHandler->toJson('Not Supported.', 422);
@@ -1042,7 +1044,7 @@ class EvaluationsController extends AppController
      * @access public
      * @return void
      */
-    // JK:: In progress
+    // JK:: Check
     function _makeRubricEvaluation ($event, $groupId, $studentId = null)
     {
       if ($this->RequestHandler->accepts('html')) {
@@ -1411,9 +1413,7 @@ class EvaluationsController extends AppController
                 break;
               }
             }
-
           }
-          
         }
         elseif($this->RequestHandler->isPut() && !empty($this->params)) {
           $this->NotificationHandler->toJson('TBD', 300);
@@ -1818,11 +1818,14 @@ class EvaluationsController extends AppController
                   $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
                   return;
               }*/
-              if (!$this->Evaluation->saveMixevalEvaluation($eval)) {
+              // NOTE:: start peer evaluation
+              if ($this->Evaluation->saveMixevalEvaluation($eval, $method)) {
+                CaliperHooks::submit_mixeval($eventId, $evaluator, $groupEventId, $groupId);
+              } else {
                 $failures[] = $userId;
               }
-              $evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee(
-                $groupEventId, $evaluator, $evaluatee);
+              // NOTE:: end peer evaluation
+              $evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee($groupEventId, $evaluator, $evaluatee);
               $evaluation = !empty($evalMixeval['EvaluationMixevalDetail']) ? $evalMixeval['EvaluationMixevalDetail'] : null;
               $details = Set::combine($evaluation, '{n}.question_number', '{n}');
               foreach ($mixeval['MixevalQuestion'] as $ques) {
@@ -1839,11 +1842,15 @@ class EvaluationsController extends AppController
             $eventId = $this->data[$evaluatee]['Self-Evaluation']['event_id'];
             $groupId = $this->data[$evaluatee]['Self-Evaluation']['group_id'];
             $this->data[$evaluatee]['Evaluation'] = $this->data[$evaluatee]['Self-Evaluation'];
-            if (!$this->Evaluation->saveMixevalEvaluation($this->data[$evaluatee])) {
+            // NOTE:: start self evaluation
+            if ($this->Evaluation->saveMixevalEvaluation($this->data[$evaluatee], $method)) {
+              CaliperHooks::submit_mixeval($eventId, $evaluator, $groupEventId, $groupId);
+              // $this->NotificationHandler->toJson('Your Evaluation was submitted successfully.', 201);
+            } else {
               $failures[] = $evaluatee;
             }
-            $evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee(
-              $groupEventId, $evaluator, $evaluatee);
+            // NOTE:: end self evaluation
+            $evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee($groupEventId, $evaluator, $evaluatee);
             $evaluation = !empty($evalMixeval['EvaluationMixevalDetail']) ? $evalMixeval['EvaluationMixevalDetail'] : null;
             $details = Set::combine($evaluation, '{n}.question_number', '{n}');
             foreach ($mixeval['MixevalQuestion'] as $ques) {
@@ -1855,26 +1862,6 @@ class EvaluationsController extends AppController
           // success
           if (empty($failures)) {
             if ($required) {
-              $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
-              if (empty($evaluationSubmission)) {
-                $this->EvaluationSubmission->id = null;
-                $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
-                $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
-                $evaluationSubmission['EvaluationSubmission']['submitter_id'] = empty($studentId) ? $evaluator : $studentId;
-              }
-              if($method === 'POST') {
-                $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
-                $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
-              }
-              if($method === 'PUT') {
-                $evaluationSubmission['EvaluationSubmission']['submitted'] = $evaluationSubmission['EvaluationSubmission']['submitted'] ?? 0;
-              }
-              
-              if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
-                $this->NotificationHandler->toJson('Error: Unable to submit the evaluation. Please try again.', 404);
-              }
-              CaliperHooks::submit_mixeval($eventId, $evaluator, $groupEventId, $groupId);
-              
               //checks if all members in the group have submitted the number of
               //submission equals the number of members means that this group is ready to review
               $evaluators = $this->GroupsMembers->findAllByGroupId($groupId);
