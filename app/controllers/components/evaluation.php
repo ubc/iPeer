@@ -15,7 +15,12 @@ App::import('Model', 'SurveyQuestion');
 class EvaluationComponent extends CakeObject
 {
     public $uses =  array('Mixeval');
-    public $components = array('Session', 'Auth', 'RequestHandler', 'NotificationHandler');
+    public $components = array('Session', 'Auth', 'RequestHandler', 'RestResponseHandler');
+  /**
+   * @var bool|object
+   */
+  private $EvaluationSimple;
+  private $EvaluationSubmission;
   
   function pre_r($val) {
     echo '<pre>';
@@ -288,7 +293,7 @@ class EvaluationComponent extends CakeObject
         $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
         $this->SimpleEvaluation = ClassRegistry::init('SimpleEvaluation');
         $this->Event = ClassRegistry::init('Event');
-
+        
         // assuming all are in the same order and same size
         $evaluatees = $params['form']['memberIDs'];
         $points = $params['form']['points'];
@@ -296,7 +301,6 @@ class EvaluationComponent extends CakeObject
         $evaluator = $params['data']['Evaluation']['evaluator_id'];
         isset($params['form']['group_id']) ? $evaluators = $this->GroupsMembers->findAllByGroupId($params['form']['group_id']) : $evaluators = null;
         $evaluators = Set::extract('/GroupsMembers/user_id', $evaluators);
-        $method = $params['form']['method'];
       
         // If value is not within range, then don't save.
         $pos = 0;
@@ -305,25 +309,13 @@ class EvaluationComponent extends CakeObject
             $totalPoints += $points[$pos];
             $pos ++;
         }
-        
         $event = $this->Event->getEventById($params['form']['event_id']);
         $simpleEval = $this->SimpleEvaluation->getEvaluation($event['Event']['template_id']);
         $required = $simpleEval['SimpleEvaluation']['point_per_member'] * count($evaluatees);
-        
         if ($totalPoints != $required) {
-          //JK:: returns an err message to user if criteria not met (see message below)
-          if ($this->RequestHandler->accepts('html')) {
             return false;
-          }
-          elseif ($this->RequestHandler->accepts('json')) {
-            // 202 Accepted / 206 Partial Content
-            // 202 Indicates that the request has been received but not completed yet.
-            // 206 Partial Content success status response code indicates that the request has succeeded and
-            // the body contains the requested ranges of data, as described in the Range header of the request.
-            $this->NotificationHandler->toJson('Distributed points must equal points allocated.', 202);
-          }//JK
         }
-        
+      
         // create Evaluations for each evaluator-evaluatee pair
         $pos = 0;
         foreach ($evaluatees as $value) {
@@ -341,17 +333,27 @@ class EvaluationComponent extends CakeObject
             $totalPoints += $points[$pos];
             $evalMarkRecord['EvaluationSimple']['comment'] = $comments[$pos];
             $evalMarkRecord['EvaluationSimple']['date_submitted'] = date('Y-m-d H:i:s');
-
+            
             if (!$this->EvaluationSimple->save($evalMarkRecord)) {
                 return false;
             }
             $this->EvaluationSimple->id=null;
             $pos++;
         }
-  
-        // create/update evaluation submission
-        $this->setEvaluationSubmission($method, $groupEvent['GroupEvent']['event_id'], $groupEvent['GroupEvent']['group_id'], $groupEvent['GroupEvent']['id'], $evaluator);
-        
+      
+        // if no submission exists, create one
+        /**$sub = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['id'], $evaluator);
+        if (empty($sub)) {
+            $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEvent['GroupEvent']['id'];
+            $evaluationSubmission['EvaluationSubmission']['event_id'] = $groupEvent['GroupEvent']['event_id'];
+            $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
+            // save evaluation submission
+            $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
+            $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
+            if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
+                return false;
+            }
+        }*/
         //checks if all members in the group have submitted
         //the number of submission equals the number of members
         //means that this group is ready to review
@@ -598,19 +600,18 @@ class EvaluationComponent extends CakeObject
         $groupEventId = $params['form']['group_event_id'];
         $groupId = $params['form']['group_id'];
         $rubricId = $params['form']['rubric_id'];
-        $method = $params['form']['method'];
-
+        
         //Get the target event
         $eventId = $params['form']['event_id'];
-
+        
         $this->Event->id = $eventId;
         $event = $this->Event->read();
         $auto_release = $event['Event']['auto_release'];
-
+        
         //Get simple evaluation tool
         $this->Rubric->id = $event['Event']['template_id'];
         $rubric = $this->Rubric->read();
-
+      
         // validate
         $valid_lom_nums = SET::extract($rubric['RubricsLom'], '/lom_num');
         if ($viewMode == 0) {
@@ -628,12 +629,12 @@ class EvaluationComponent extends CakeObject
         } else {
             return false;
         }
-        
+      
         // Save evaluation data
         // total grade for evaluatee from evaluator
         $evalRubric = $this->EvaluationRubric->getEvalRubricByGrpEventIdEvaluatorEvaluatee($groupEventId, $evaluator, $targetEvaluatee);
         if (empty($evalRubric)) {
-            //Save the master Evaluation Rubric record if empty
+            //Save the master Evalution Rubric record if empty
             $evalRubric['EvaluationRubric']['evaluator'] = $evaluator;
             $evalRubric['EvaluationRubric']['evaluatee'] = $targetEvaluatee;
             $evalRubric['EvaluationRubric']['grp_event_id'] = $groupEventId;
@@ -645,25 +646,22 @@ class EvaluationComponent extends CakeObject
             $evalRubric['EvaluationRubric']['id']=$this->EvaluationRubric->id;
             $evalRubric= $this->EvaluationRubric->read();
         }
-        
+      
         $evalRubric['EvaluationRubric']['comment'] = $params['form'][$targetEvaluatee.'gen_comment'];
         $score = $this->saveNGetEvalutionRubricDetail(
             $evalRubric['EvaluationRubric']['id'], $rubric, $targetEvaluatee, $params['form'], $viewMode, $auto_release, $targetCriteria);
         $evalRubric['EvaluationRubric']['score'] = $score;
         $evalRubric['EvaluationRubric']['comment_release'] = $auto_release;
         $evalRubric['EvaluationRubric']['grade_release'] = $auto_release;
-
+        
         if (!$this->EvaluationRubric->save($evalRubric)) {
-            return false;
+          return false;
         }
-        
-        // create/update evaluation submission
-        $this->setEvaluationSubmission($method, $eventId, $groupId, $groupEventId, $evaluator);
-        
+      
         return true;
     }
-
-
+    
+    
     /**
      * saveNGetEvalutionRubricDetail
      *
@@ -765,7 +763,201 @@ class EvaluationComponent extends CakeObject
         }
         return $totalGrade;
     }
-
+  
+  
+  /**
+   * ReWrite - JK
+   * @param $targetEvaluatee
+   * @param $viewMode
+   * @param null $params
+   * @param null $targetCriteria
+   * @return bool
+   */
+  function _saveRubricEvaluation($targetEvaluatee, $viewMode, $params=null, $targetCriteria=null): bool
+  {
+    $this->Event = ClassRegistry::init('Event');
+    $this->Rubric = ClassRegistry::init('Rubric');
+    $this->EvaluationRubric = ClassRegistry::init('EvaluationRubric');
+    
+    // assuming all are in the same order and same size
+    $evaluator = $params['data']['Evaluation']['submitter_id'];
+    $groupEventId = $params['form']['grp_event_id'];
+    $groupId = $params['form']['group_id'];
+    $rubricId = $params['form']['rubric_id'];
+    
+    //Get the target event
+    $eventId = $params['form']['event_id'];
+    
+    $this->Event->id = $eventId;
+    $event = $this->Event->read();
+    $auto_release = $event['Event']['auto_release'];
+    
+    //Get simple evaluation tool
+    $this->Rubric->id = $event['Event']['template_id'];
+    $rubric = $this->Rubric->read();
+    
+    // validate
+    $valid_lom_nums = SET::extract($rubric['RubricsLom'], '/lom_num');
+    if ($viewMode == 0) {
+      for ($i=1; $i <= $rubric['Rubric']['criteria']; $i++) {
+        // JK:: $selectedLom = $params['form']['selected_lom_'.$targetEvaluatee.'_'.$i];
+        $selectedLom = $params['data'][$targetEvaluatee]['selected'][$i];
+        // $this->pre_r($rubric['Rubric']['criteria']);die();
+        
+        if (!in_array($selectedLom, $valid_lom_nums)) {
+          return false;
+        }
+      }
+    } elseif ($viewMode == 1) {
+      // JK:: $selectedLom = $params['form']['selected_lom_'.$targetEvaluatee.'_'.$targetCriteria];
+      $selectedLom = $params['data'][$targetEvaluatee]['selected_lom'][$targetCriteria];
+      if (!in_array($selectedLom, $valid_lom_nums)) {
+        return false;
+      }
+    } else {
+      return false;
+    }
+    
+    // Save evaluation data
+    // total grade for evaluatee from evaluator
+    $evalRubric = $this->EvaluationRubric->getEvalRubricByGrpEventIdEvaluatorEvaluatee($groupEventId, $evaluator, $targetEvaluatee);
+    if (empty($evalRubric)) {
+      //Save the master Evalution Rubric record if empty
+      $evalRubric['EvaluationRubric']['evaluator'] = $evaluator;
+      $evalRubric['EvaluationRubric']['evaluatee'] = $targetEvaluatee;
+      $evalRubric['EvaluationRubric']['grp_event_id'] = $groupEventId;
+      $evalRubric['EvaluationRubric']['event_id'] = $eventId;
+      $evalRubric['EvaluationRubric']['rubric_id'] = $rubricId;
+      $evalRubric['EvaluationRubric']['release_status'] = 0;
+      $evalRubric['EvaluationRubric']['grade_release'] = 0;
+      $this->EvaluationRubric->save($evalRubric);
+      $evalRubric['EvaluationRubric']['id']=$this->EvaluationRubric->id;
+      $evalRubric= $this->EvaluationRubric->read();
+      
+    }
+    
+    // JK:: $evalRubric['EvaluationRubric']['comment'] = $params['form'][$targetEvaluatee.'gen_comment'];
+    $evalRubric['EvaluationRubric']['comment'] = $params['data'][$targetEvaluatee]['gen_comment'];
+    $score = $this->_saveNGetEvalutionRubricDetail(
+      $evalRubric['EvaluationRubric']['id'], $rubric, $targetEvaluatee, $params['data'], $viewMode, $auto_release, $targetCriteria);
+    // JK:: $evalRubric['EvaluationRubric']['id'], $rubric, $targetEvaluatee, $params['form'], $viewMode, $auto_release, $targetCriteria);
+    $evalRubric['EvaluationRubric']['score'] = $score;
+    $evalRubric['EvaluationRubric']['comment_release'] = $auto_release;
+    $evalRubric['EvaluationRubric']['grade_release'] = $auto_release;
+    
+    if (!$this->EvaluationRubric->save($evalRubric)) {
+      return false;
+    }
+    
+    return true;
+  }
+  
+  /**
+   * ReWrite - JK
+   * @param $evalRubricId
+   * @param $rubric
+   * @param $targetEvaluatee
+   * @param $form
+   * @param $viewMode
+   * @param $auto_release
+   * @param null $targetCriteria
+   * @return float|int|string
+   */
+  function _saveNGetEvalutionRubricDetail ($evalRubricId, $rubric, $targetEvaluatee, $data, $viewMode, $auto_release, $targetCriteria=null)
+  {
+    $this->EvaluationRubricDetail = ClassRegistry::init('EvaluationRubricDetail');
+    $totalGrade = 0;
+    $totalLom = count($rubric['RubricsLom']);
+    
+    if ($viewMode == 0) {
+      $pos = 0;
+      for ($i=1; $i <= $rubric['Rubric']['criteria']; $i++) {
+        $this->EvaluationRubricDetail = ClassRegistry::init('EvaluationRubricDetail');
+        //TODO: LOM = 1
+        if ($rubric['Rubric']['lom_max'] == 1) {
+          // JK:: $data[$targetEvaluatee."selected$i"] = ($data[$targetEvaluatee."selected$i"] ? $data[$targetEvaluatee."selected$i"] : 0);
+          $data[$targetEvaluatee]['selected'][$i] = $data[$targetEvaluatee]['selected'][$i] ?? 0;
+        }
+        
+        // get total possible grade for the criteria number ($i)
+        foreach ($rubric['RubricsCriteria'] as $criteria) {
+          if ($criteria['criteria_num'] == $i) {
+            $multiplier = $criteria['multiplier'];
+            break;
+          }
+        }
+        $grade = isset($data[$targetEvaluatee]['selected'][$i]) ?
+          ($data[$targetEvaluatee]['selected'][$i] - $rubric['Rubric']['zero_mark']) *
+          ($multiplier/($totalLom - $rubric['Rubric']['zero_mark'])) : "";
+        
+        // JK:: $selectedLom = $form['selected_lom_'.$targetEvaluatee.'_'.$i];
+        $selectedLom = $data[$targetEvaluatee]['selected'][$i];
+        $evalRubricDetail = $this->EvaluationRubricDetail->getByEvalRubricIdCritera($evalRubricId, $i);
+        if (isset($evalRubricDetail)) {
+          $this->EvaluationRubricDetail->id = $evalRubricDetail['EvaluationRubricDetail']['id'] ;
+        }
+        $evalRubricDetail['EvaluationRubricDetail']['evaluation_rubric_id'] = $evalRubricId;
+        $evalRubricDetail['EvaluationRubricDetail']['criteria_number'] = $i;
+        $evalRubricDetail['EvaluationRubricDetail']['criteria_comment'] = $data[$targetEvaluatee]['comments'][$pos++];
+        $evalRubricDetail['EvaluationRubricDetail']['selected_lom'] = $selectedLom;
+        $evalRubricDetail['EvaluationRubricDetail']['grade'] = $grade;
+        $evalRubricDetail['EvaluationRubricDetail']['comment_release'] = $auto_release;
+        
+        if($selectedLom != null){
+          $this->EvaluationRubricDetail->save($evalRubricDetail);
+        }
+        $this->EvaluationRubricDetail->id=null;
+        
+        $totalGrade += $grade;
+      }
+    }
+    elseif ($viewMode == 1) {
+      $this->EvaluationRubricDetail = ClassRegistry::init('EvaluationRubricDetail');
+      //TODO: LOM = 1
+      if ($rubric['Rubric']['lom_max'] == 1) {
+        $data[$targetEvaluatee]['selected'][$targetCriteria] = $data[$targetEvaluatee]['selected'][$targetCriteria] ?? 0;
+      }
+      
+      foreach ($rubric['RubricsCriteria'] as $criteria) {
+        if ($criteria['criteria_num'] == $targetCriteria) {
+          $multiplier = $criteria['multiplier'];
+          break;
+        }
+      }
+      $grade = isset($data[$targetEvaluatee]['selected'][$targetCriteria]) ?
+        ($data[$targetEvaluatee]['selected'][$targetCriteria] - $rubric['Rubric']['zero_mark']) *
+        ($multiplier/($totalLom - $rubric['Rubric']['zero_mark'])) : "";
+      
+      $selectedLom = $data[$targetEvaluatee]['selected'][$targetCriteria];
+      
+      // Set up and save EvaluationRubricDetail
+      $evalRubricDetail = $this->EvaluationRubricDetail->getByEvalRubricIdCritera($evalRubricId, $targetCriteria);
+      if (isset($evalRubricDetail)) {
+        $this->EvaluationRubricDetail->id=$evalRubricDetail['EvaluationRubricDetail']['id'] ;
+      }
+      $evalRubricDetail['EvaluationRubricDetail']['evaluation_rubric_id'] = $evalRubricId;
+      $evalRubricDetail['EvaluationRubricDetail']['criteria_number'] = $targetCriteria;
+      $evalRubricDetail['EvaluationRubricDetail']['criteria_comment'] = $data[$targetEvaluatee]['comments'][$targetCriteria-1];
+      $evalRubricDetail['EvaluationRubricDetail']['selected_lom'] = $selectedLom;
+      $evalRubricDetail['EvaluationRubricDetail']['grade'] = $grade;
+      $this->EvaluationRubricDetail->save($evalRubricDetail);
+      $this->EvaluationRubricDetail->id=null;
+      
+      // Loop through all criteria to get total grade
+      foreach ($rubric['RubricsCriteria'] as $rubricCriteria) {
+        $criteriaNum = $rubricCriteria['criteria_num'];
+        $grade = isset($data[$targetEvaluatee]['selected'][$criteriaNum]) ? $data[$targetEvaluatee]['selected'][$criteriaNum]/$totalLom : 0;
+        $totalGrade += $grade;
+      }
+    }
+    return $totalGrade;
+  }
+  
+  
+  
+  
+  
+  
 
     /**
      * getStudentViewRubricResultDetailReview
@@ -979,7 +1171,7 @@ class EvaluationComponent extends CakeObject
      * @access public
      * @return void
      */
-    function saveMixevalEvaluation($params, $method=null)
+    function saveMixevalEvaluation($params)
     {
         $this->Event = ClassRegistry::init('Event');
         $this->Mixeval = ClassRegistry::init('Mixeval');
@@ -1040,7 +1232,7 @@ class EvaluationComponent extends CakeObject
         $evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee(
             $groupEventId, $evaluator, $evaluatee);
         if (empty($evalMixeval)) {
-            //Save the master Evalution Mixeval record if empty
+            //Save the master Evaluation Mixeval record if empty
             $this->EvaluationMixeval->id = null;
             $evalMixeval['EvaluationMixeval']['evaluator'] = $evaluator;
             $evalMixeval['EvaluationMixeval']['evaluatee'] = $evaluatee;
@@ -1053,14 +1245,12 @@ class EvaluationComponent extends CakeObject
         $score = $this->saveNGetEvaluationMixevalDetail(
             $evalMixeval['EvaluationMixeval']['id'], $mixeval, $params, $auto_release);
         $evalMixeval['EvaluationMixeval']['score'] = $score;
-        // save default grade release status 
+        // save default grade release status
         $evalMixeval['EvaluationMixeval']['grade_release'] = $auto_release;
         if (!$this->EvaluationMixeval->save($evalMixeval)) {
             return false;
         }
         
-        $this->setEvaluationSubmission($method, $eventId, $params['Evaluation']['group_id'], $groupEventId, $evaluator);
-
         return true;
     }
 
@@ -1539,39 +1729,4 @@ class EvaluationComponent extends CakeObject
         }
         return $questions;
     }
-  
-  /**
-   * @param string $method
-   * @param string $eventId
-   * @param string $groupId
-   * @param string $groupEventId
-   * @param string $evaluator
-   */
-  private function setEvaluationSubmission(string $method, string $eventId, string $groupId, string $groupEventId, string $evaluator): void
-  {
-    $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
-  
-    $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
-    if (empty($evaluationSubmission)) {
-      $this->EvaluationSubmission->id = null;
-      $evaluationSubmission['EvaluationSubmission']['grp_event_id']   = $groupEventId;
-      $evaluationSubmission['EvaluationSubmission']['event_id']       = $eventId;
-      $evaluationSubmission['EvaluationSubmission']['submitter_id']   = empty($studentId) ? $evaluator : $studentId;
-      $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
-    }
-    //if($method === 'POST') {
-    //  $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
-    //}
-    if($method === 'PUT') { // Save Draft
-      $evaluationSubmission['EvaluationSubmission']['submitted'] = $evaluationSubmission['EvaluationSubmission']['submitted'] ?? 0;
-    } else { // Submit Peer Evaluation NOTE:: this will take care the submission if the request accepts html
-      $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
-    }
-    // save evaluation submission
-    if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
-      $this->NotificationHandler->toJson('Error: Unable to submit the evaluation. Please try again.', 404);
-    }
-    // TODO:: CaliperHooks::submit_mixeval($eventId, $evaluator, $groupEventId, $groupId);
-    
-  }
 }

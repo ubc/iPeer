@@ -740,6 +740,7 @@ class Event extends AppModel
 
         return $result;
     }
+    
     /**
      * Get evaluations and surveys assigned to the given user. Also gets the
      * evaluation submission entries made by this specific user.
@@ -820,7 +821,7 @@ class Event extends AppModel
                 }
             }
             if (!$hasSubmission) {
-                // no submission matched, set EvaluationSubmission to emtpy
+                // no submission matched, set EvaluationSubmission to empty
                 $event['EvaluationSubmission'] = array();
             }
         }

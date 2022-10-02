@@ -18,9 +18,13 @@ class HomeController extends AppController
     public $uses =  array( 'Group', 'GroupEvent',
         'User', 'UserCourse', 'Event', 'EvaluationSubmission',
         'Course', 'Role', 'UserEnrol', 'Rubric', 'Penalty');
-    // JK:START
-    public $components = ['RequestHandler', 'JsonHandler'];
-    // JK:END
+    // NOTE::
+    public $components = ['RequestHandler', 'EventsRequest'];
+  
+    // NOTE::
+    public $body    = [];
+    public $method  = '';
+    
     /**
      * __construct
      *
@@ -30,6 +34,8 @@ class HomeController extends AppController
     function __construct()
     {
         parent::__construct();
+        // NOTE::
+        $this->method  = $_SERVER['REQUEST_METHOD'];
     }
 
     /**
@@ -42,7 +48,14 @@ class HomeController extends AppController
     {
         parent::beforeFilter();
 
-        $this->set('title_for_layout', __('iPeer Dashboard', true));
+        $this->set('title_for_layout', __('Home', true));
+    }
+    
+    
+    function pre_r($val) {
+      echo '<pre>';
+      print_r($val);
+      echo  '</pre>';
     }
 
     /**
@@ -117,41 +130,43 @@ class HomeController extends AppController
         foreach ($evals['upcoming'] as $e) {
             $e['late'] ? $numOverdue++ : '';
         }
-        $this->set('evals', $evals);
-        $this->set('surveys', $surveys);
-        $this->set('numOverdue', $numOverdue);
-        $this->set('numDue', $numDue);
-
-      //JK:: Checks if the request from cake page
-      $userId = User::get('id');
-      if ($this->RequestHandler->accepts('html')) {
-        if(!User::isInstructor()) {
-          //$this->render('studentIndex');
-          $this->render('webapp_student_index');
-        } else {
-          $this->render('combined');
+  
+        // NOTE:: Needs refactoring
+        if ($this->RequestHandler->accepts('json')) {
+            if(!User::isInstructor()) {
+                $this->layout = false;
+                $this->autoRender = false;
+                $work = $this->params['url']['_work'] ?? null;
+                $params = $this->params['url'] || null;
+                $userId = User::get('id');
+                
+                switch($work) {
+                    case 'current':
+                        $this->EventsRequest->processCollectionRequest($this->method, $evals['upcoming'], $userId, $params);
+                        break;
+                    case 'completed':
+                        $this->EventsRequest->processCollectionRequest($this->method, array_merge($evals['submitted'], $evals['expired']), $userId, $params);
+                        break;
+                    default:
+                        $this->EventsRequest->processCollectionRequest($this->method, $evals, $userId, $params);
+                        break;
+                }
+            } else {
+                $this->render('combined');
+            }
         }
-      }
-      elseif ($this->RequestHandler->accepts('json')) {
-        if($this->RequestHandler->isGet()) {
-          if(!User::isInstructor()) {
-            header('Content-Type: application/json');
-            http_response_code(200);
-            // Student view
-            echo json_encode(array_merge([
-              'current' => $this->JsonHandler->formatEvents($evals['upcoming'], $userId),
-              'completed' => $this->JsonHandler->formatEvents(array_merge($evals['submitted'], $evals['expired']), $userId),
-              'num_overdue' => $numOverdue,
-              'num_due' => $numDue
-            ]));
-          }
-          exit;
-          // NOTE:: also we can render the result in json.ctp
-          // $this->set('statusCode', $statusCode);
-          // $this->set('result', $data);
-          // $this->render('json');
+        elseif ($this->RequestHandler->accepts('html')) {
+            $this->set('evals', $evals);
+            $this->set('surveys', $surveys);
+            $this->set('numOverdue', $numOverdue);
+            $this->set('numDue', $numDue);
+    
+            if(!User::isInstructor()) {
+                $this->render('studentIndex');
+            } else {
+                $this->render('combined');
+            }
         }
-      }//JK
     }
 
     /**

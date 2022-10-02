@@ -1,0 +1,1451 @@
+<body>
+
+<div class="containerOuter pagewidth">
+  <!-- BANNER -->
+  <div id="bannerLarge" class="banner">
+    <div id="ipeerLogo">
+      <a href="/" id="home">
+        <img src="/img/layout/ipeer_logo.png" id="bannerLogoImgLeft" alt="logo"><span id="ipeerI">i</span><span id="ipeerText">Peer</span> <span id="bannerLogoText">3.4.10 with TeamMaker</span>
+      </a>
+    </div>
+    <div id="customLogo">
+    </div>
+  </div>
+
+  <!-- NAVIGATION -->
+
+  <!-- CONTENT -->
+  <!-- TITLE BAR -->
+  <!--  <h1 class='title'>-->
+  <!--  </h1>-->
+  <!-- ERRORS -->
+  <!-- ACTUAL PAGE -->
+  <script type="text/javascript">
+    var numQues = 3;
+    function saveButtonVal(userId) {
+      var complete = true;
+      for (var i=1; i <= numQues; i++) {
+        var value = jQuery('input[name='+userId+'criteria_points_'+i+']:checked').val();
+        if (value == null) {
+          jQuery('#'+userId+'criteria'+i).attr('color', 'red');
+          complete = false;
+        } else {
+          jQuery('#'+userId+'criteria'+i).removeAttr('color');
+        }
+      }
+      if (complete) {
+        jQuery('#'+userId+'likert').hide();
+      } else {
+        jQuery('#'+userId+'likert').show();
+      }
+      return complete;
+    }
+    var groupMembers = [31,32,33];
+    jQuery( document ).ready(function() {
+      jQuery("#submitForm").submit(function(e) {
+        e.preventDefault();
+        var thisForm = this;
+        var usersToSubmit = [];
+
+        for (var count = 0; count < groupMembers.length; count++) {
+          var userId = groupMembers[count];
+          var wasUpdated = jQuery("input[name='member_"+userId+"_updated']").val() == "1";
+          if (!wasUpdated) {
+            continue;
+          }
+
+          // check if form complete for user
+          var complete = saveButtonVal(userId);
+
+          if (complete) {
+            usersToSubmit.push(userId); // if complete, submit form for this user
+          } else {
+            // else we need to warn user that they will lose data for incompelte forms
+
+            var fullname = jQuery("#panel"+userId).data("fullname");
+            var message = "You have not completed all the questions for %fullname%. Would you like to discard changes?";
+            message = message.replace("%fullname%", fullname);
+            if (!confirm(message)) {
+              return;
+            }
+          }
+        }
+
+        // update button text indicating user should wait
+        jQuery(thisForm).find("input[type='submit']").attr("disabled", true).val("Saving... Please wait.");
+
+        if (usersToSubmit.length == 0) {
+          thisForm.submit();
+        } else {
+          var ajaxCalls = [];
+          var userEvalForm = jQuery('#evalForm');
+
+          for (count = 0; count < usersToSubmit.length; count++) {
+            var formData = userEvalForm.serialize();
+            formData += "&" + usersToSubmit[count] + "=Submit";
+            ajaxCalls.push(jQuery.post(userEvalForm.attr('action'), formData));
+          }
+
+          // when all the ajax calls are finished
+          jQuery.when.apply(jQuery, ajaxCalls).then(function() {
+            thisForm.submit();
+          });
+        }
+      });
+    });
+  </script>
+  <script type="text/javascript" src="/js/ricobase.js"></script><script type="text/javascript" src="/js/ricoeffects.js"></script><script type="text/javascript" src="/js/ricoanimation.js"></script><script type="text/javascript" src="/js/ricopanelcontainer.js"></script><script type="text/javascript" src="/js/ricoaccordion.js"></script><form name="evalForm" id="evalForm" method="POST" action="/evaluations/makeEvaluation/2/2">
+  <input type="hidden" name="event_id" value="2">
+  <input type="hidden" name="group_id" value="2">
+  <input type="hidden" name="group_event_id" value="4">
+  <input type="hidden" name="course_id" value="1">
+  <input type="hidden" name="rubric_id" value="1">
+  <input type="hidden" name="data[Evaluation][evaluator_id]" value="7">
+  <input type="hidden" name="evaluateeCount" value="3">
+
+  <table class="standardtable">
+    <tbody><tr>
+      <th colspan="4" align="center">Evaluation Event Detail</th>
+    </tr>
+    <tr>
+      <td width="10%">Evaluator:</td>
+      <td width="25%">Matt Student</td>
+      <td width="10%">Evaluating:</td>
+      <td width="25%">Peer Review for "Second Group"</td>
+    </tr>
+    <tr>
+      <td>Event Name:</td>
+      <td>Term Report Evaluation</td>
+      <td>Due Date:</td>
+      <td>Thu, Jun 8, 2023 8:59 am</td>
+    </tr>
+    <tr>
+      <td>Description:</td>
+      <td colspan="3">Event Description: </td>
+    </tr>
+    <tr>
+      <td colspan="4" style="text-align: left;">
+        <span class="instruction-icon"> Instructions:</span>
+        <ul class="instructions">
+          <li>Click <font color="#FF6666"><i>EACH</i></font> of your peer's name to rate their performance.</li>
+          <li>Enter Comments (Optional).</li>
+          <li>Press "Save This Section" to save the evaluation for each group member.</li>
+          <li>Press "Submit to Complete the Evaluation" to submit your evaluation to all peers. </li>
+          <li><i>NOTE:</i> You can click the "Submit to Complete the Evaluation" button only <font color="#FF6666">AFTER</font> all evaluations are completed.</li>
+          <li>The evaluation can be repeatedly submitted until Sun, Jul 2, 2023 8:59 am.</li>
+        </ul>
+
+        <div style="text-align:left; margin-left:3em;"><a href="#" onclick="javascript:$('penalty').toggle();return false;">( Show/Hide late penalty policy )</a></div>
+        <div id="penalty" style="border:1px solid red; margin: 0.5em 0 0 3em; width: 450px; padding:0.5em; color:darkred; display:none">
+          From the due date to 1 days(s) late, 15% will be deducted.<br>Then until 2 day(s) after the due date, 30% will be deducted.<br>Then until 3 day(s) after the due date, 45% will be deducted.<br>Then until 4 day(s) after the due date, 60% will be deducted.<br>60% is deducted afterwards.            </div>
+      </td>
+    </tr>
+    </tbody></table>
+
+  <table class="standardtable">
+    <tbody><tr>
+      <td>
+        <div id="accordion">
+          <input type="hidden" name="memberIDs[]" value="31">
+          <div id="panel31" class="panelName" data-fullname="Hui Student">
+            <div id="panel31Header" class="panelheader">
+              Hui Student                                    <font color="#259500"> ( Saved )</font>
+            </div>
+            <div style="height: 0px; overflow: hidden; display: block;" id="panel1Content" class="panelContent">
+              <br>
+              <!-- elements::ajax_rubric_view start -->
+
+              <!-- Sort by Student -->
+              <input type="hidden" name="member_31_updated" value="">
+              <table class="standardtable">
+                <tbody><tr>
+                  <th width="150" valign="top"></th>
+                  <!-- // horizontal template type -->
+                  <th>Poor</th>
+                  <th>Below Average</th>
+                  <th>Average</th>
+                  <th>Above Average</th>
+                  <th>Excellent</th>
+                  <!-- //Comment for Evaluation Form -->
+                  <th>Comments</th>
+                </tr>
+
+                <input type="hidden" name="selected_lom_31_1" value="3">
+                <tr>
+                  <th style="text-align: left; padding: 0.5em;">
+                    <font id="31criteria1">Participated in Team Meetings</font><br><br>
+                    <i>5 mark(s)</i>
+                  </th>
+
+                  <td>
+                    <div class="green">No participation.</div>
+                    <div>
+                      <input name="31criteria_points_1" type="radio" value="1" onclick="document.evalForm.selected_lom_31_1.value=1;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Little participation.</div>
+                    <div>
+                      <input name="31criteria_points_1" type="radio" value="2" onclick="document.evalForm.selected_lom_31_1.value=2;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Some participation.</div>
+                    <div>
+                      <input name="31criteria_points_1" type="radio" value="3" onclick="document.evalForm.selected_lom_31_1.value=3;document.evalForm.member_31_updated.value=1;" checked="">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Good participation.</div>
+                    <div>
+                      <input name="31criteria_points_1" type="radio" value="4" onclick="document.evalForm.selected_lom_31_1.value=4;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Great participation.</div>
+                    <div>
+                      <input name="31criteria_points_1" type="radio" value="5" onclick="document.evalForm.selected_lom_31_1.value=5;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+
+                  <td>
+                    <textarea cols="20" rows="2" name="31comments[]" onchange="document.evalForm.member_31_updated.value=1;">Quia quibusdam minim</textarea>
+                  </td>
+                </tr>
+                <input type="hidden" name="selected_lom_31_2" value="3">
+                <tr>
+                  <th style="text-align: left; padding: 0.5em;">
+                    <font id="31criteria2">Was Helpful and Co-operative</font><br><br>
+                    <i>5 mark(s)</i>
+                  </th>
+
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="31criteria_points_2" type="radio" value="1" onclick="document.evalForm.selected_lom_31_2.value=1;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="31criteria_points_2" type="radio" value="2" onclick="document.evalForm.selected_lom_31_2.value=2;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="31criteria_points_2" type="radio" value="3" onclick="document.evalForm.selected_lom_31_2.value=3;document.evalForm.member_31_updated.value=1;" checked="">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="31criteria_points_2" type="radio" value="4" onclick="document.evalForm.selected_lom_31_2.value=4;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="31criteria_points_2" type="radio" value="5" onclick="document.evalForm.selected_lom_31_2.value=5;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+
+                  <td>
+                    <textarea cols="20" rows="2" name="31comments[]" onchange="document.evalForm.member_31_updated.value=1;">Quia eu ut non repre</textarea>
+                  </td>
+                </tr>
+                <input type="hidden" name="selected_lom_31_3" value="3">
+                <tr>
+                  <th style="text-align: left; padding: 0.5em;">
+                    <font id="31criteria3">Submitted Work on Time</font><br><br>
+                    <i>5 mark(s)</i>
+                  </th>
+
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="31criteria_points_3" type="radio" value="1" onclick="document.evalForm.selected_lom_31_3.value=1;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="31criteria_points_3" type="radio" value="2" onclick="document.evalForm.selected_lom_31_3.value=2;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="31criteria_points_3" type="radio" value="3" onclick="document.evalForm.selected_lom_31_3.value=3;document.evalForm.member_31_updated.value=1;" checked="">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="31criteria_points_3" type="radio" value="4" onclick="document.evalForm.selected_lom_31_3.value=4;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="31criteria_points_3" type="radio" value="5" onclick="document.evalForm.selected_lom_31_3.value=5;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+
+                  <td>
+                    <textarea cols="20" rows="2" name="31comments[]" onchange="document.evalForm.member_31_updated.value=1;">Nesciunt dolor iust</textarea>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="7" class="tableheader2" align="center">General Comments<br>
+                    <textarea cols="80" rows="2" name="31gen_comment" onchange="document.evalForm.member_31_updated.value=1;">Quia esse commodo e</textarea>
+                  </td>
+                </tr>
+                </tbody></table>
+
+              <!-- Sort by Criteria -->
+
+              <!-- elements::ajax_rubric_preview end -->
+              <script type="text/javascript">
+                jQuery().ready(function() {
+                  var viewMode = 0;
+                  if(viewMode == 0){
+                    var userId = 31;
+                  }
+                  else if(viewMode == 1){
+                    var userId = 3;
+                  }
+                  jQuery("input[type='submit'][name='"+userId+"']").click(function() {
+                    return saveButtonVal(userId, viewMode);
+                  });
+                });
+              </script>
+              <table width="100%" align="center">
+                <tbody><tr>
+                  <td align="center">
+                    <div class="saveThisSection"><input name="31" type="submit" value="Save This Section"></div>                                                        <div style="color: red; display: none;" id="31likert">Please complete all the questions marked red before saving.</div>
+                    <div style="color: red">Make sure you save this section before moving on to the other ones!</div>
+                  </td>
+                </tr>
+                </tbody></table>
+            </div>
+          </div>
+          <input type="hidden" name="memberIDs[]" value="32">
+          <div id="panel32" class="panelName" data-fullname="Bowinn Student">
+            <div id="panel32Header" class="panelheader">
+              Bowinn Student                                    <font color="#259500"> ( Saved )</font>
+            </div>
+            <div style="height: 0px; display: block; overflow: hidden;" id="panel1Content" class="panelContent">
+              <br>
+              <!-- elements::ajax_rubric_view start -->
+
+              <!-- Sort by Student -->
+              <input type="hidden" name="member_32_updated" value="">
+              <table class="standardtable">
+                <tbody><tr>
+                  <th width="150" valign="top"></th>
+                  <!-- // horizontal template type -->
+                  <th>Poor</th>
+                  <th>Below Average</th>
+                  <th>Average</th>
+                  <th>Above Average</th>
+                  <th>Excellent</th>
+                  <!-- //Comment for Evaluation Form -->
+                  <th>Comments</th>
+                </tr>
+
+                <input type="hidden" name="selected_lom_32_1" value="5">
+                <tr>
+                  <th style="text-align: left; padding: 0.5em;">
+                    <font id="32criteria1">Participated in Team Meetings</font><br><br>
+                    <i>5 mark(s)</i>
+                  </th>
+
+                  <td>
+                    <div class="green">No participation.</div>
+                    <div>
+                      <input name="32criteria_points_1" type="radio" value="1" onclick="document.evalForm.selected_lom_32_1.value=1;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Little participation.</div>
+                    <div>
+                      <input name="32criteria_points_1" type="radio" value="2" onclick="document.evalForm.selected_lom_32_1.value=2;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Some participation.</div>
+                    <div>
+                      <input name="32criteria_points_1" type="radio" value="3" onclick="document.evalForm.selected_lom_32_1.value=3;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Good participation.</div>
+                    <div>
+                      <input name="32criteria_points_1" type="radio" value="4" onclick="document.evalForm.selected_lom_32_1.value=4;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Great participation.</div>
+                    <div>
+                      <input name="32criteria_points_1" type="radio" value="5" onclick="document.evalForm.selected_lom_32_1.value=5;document.evalForm.member_32_updated.value=1;" checked="">
+                    </div>
+
+                  </td>
+
+                  <td>
+                    <textarea cols="20" rows="2" name="32comments[]" onchange="document.evalForm.member_32_updated.value=1;">Enim eius quos conse</textarea>
+                  </td>
+                </tr>
+                <input type="hidden" name="selected_lom_32_2" value="3">
+                <tr>
+                  <th style="text-align: left; padding: 0.5em;">
+                    <font id="32criteria2">Was Helpful and Co-operative</font><br><br>
+                    <i>5 mark(s)</i>
+                  </th>
+
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="32criteria_points_2" type="radio" value="1" onclick="document.evalForm.selected_lom_32_2.value=1;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="32criteria_points_2" type="radio" value="2" onclick="document.evalForm.selected_lom_32_2.value=2;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="32criteria_points_2" type="radio" value="3" onclick="document.evalForm.selected_lom_32_2.value=3;document.evalForm.member_32_updated.value=1;" checked="">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="32criteria_points_2" type="radio" value="4" onclick="document.evalForm.selected_lom_32_2.value=4;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="32criteria_points_2" type="radio" value="5" onclick="document.evalForm.selected_lom_32_2.value=5;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+
+                  <td>
+                    <textarea cols="20" rows="2" name="32comments[]" onchange="document.evalForm.member_32_updated.value=1;">Aliquam commodi aut </textarea>
+                  </td>
+                </tr>
+                <input type="hidden" name="selected_lom_32_3" value="1">
+                <tr>
+                  <th style="text-align: left; padding: 0.5em;">
+                    <font id="32criteria3">Submitted Work on Time</font><br><br>
+                    <i>5 mark(s)</i>
+                  </th>
+
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="32criteria_points_3" type="radio" value="1" onclick="document.evalForm.selected_lom_32_3.value=1;document.evalForm.member_32_updated.value=1;" checked="">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="32criteria_points_3" type="radio" value="2" onclick="document.evalForm.selected_lom_32_3.value=2;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="32criteria_points_3" type="radio" value="3" onclick="document.evalForm.selected_lom_32_3.value=3;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="32criteria_points_3" type="radio" value="4" onclick="document.evalForm.selected_lom_32_3.value=4;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="32criteria_points_3" type="radio" value="5" onclick="document.evalForm.selected_lom_32_3.value=5;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+
+                  <td>
+                    <textarea cols="20" rows="2" name="32comments[]" onchange="document.evalForm.member_32_updated.value=1;">Debitis qui sed arch</textarea>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="7" class="tableheader2" align="center">General Comments<br>
+                    <textarea cols="80" rows="2" name="32gen_comment" onchange="document.evalForm.member_32_updated.value=1;">In eos quos eos nost</textarea>
+                  </td>
+                </tr>
+                </tbody></table>
+
+              <!-- Sort by Criteria -->
+
+              <!-- elements::ajax_rubric_preview end -->
+              <script type="text/javascript">
+                jQuery().ready(function() {
+                  var viewMode = 0;
+                  if(viewMode == 0){
+                    var userId = 32;
+                  }
+                  else if(viewMode == 1){
+                    var userId = 3;
+                  }
+                  jQuery("input[type='submit'][name='"+userId+"']").click(function() {
+                    return saveButtonVal(userId, viewMode);
+                  });
+                });
+              </script>
+              <table width="100%" align="center">
+                <tbody><tr>
+                  <td align="center">
+                    <div class="saveThisSection"><input name="32" type="submit" value="Save This Section"></div>                                                        <div style="color: red; display: none;" id="32likert">Please complete all the questions marked red before saving.</div>
+                    <div style="color: red">Make sure you save this section before moving on to the other ones!</div>
+                  </td>
+                </tr>
+                </tbody></table>
+            </div>
+          </div>
+          <input type="hidden" name="memberIDs[]" value="33">
+          <div id="panel33" class="panelName" data-fullname="Joe Student">
+            <div id="panel33Header" class="mdSelected">
+              Joe Student                                    <font color="#259500"> ( Saved )</font>
+            </div>
+            <div style="height: 600px; display: block; overflow: auto;" id="panel1Content" class="panelContent">
+              <br>
+              <!-- elements::ajax_rubric_view start -->
+
+              <!-- Sort by Student -->
+              <input type="hidden" name="member_33_updated" value="">
+              <table class="standardtable">
+                <tbody><tr>
+                  <th width="150" valign="top"></th>
+                  <!-- // horizontal template type -->
+                  <th>Poor</th>
+                  <th>Below Average</th>
+                  <th>Average</th>
+                  <th>Above Average</th>
+                  <th>Excellent</th>
+                  <!-- //Comment for Evaluation Form -->
+                  <th>Comments</th>
+                </tr>
+
+                <input type="hidden" name="selected_lom_33_1" value="3">
+                <tr>
+                  <th style="text-align: left; padding: 0.5em;">
+                    <font id="33criteria1">Participated in Team Meetings</font><br><br>
+                    <i>5 mark(s)</i>
+                  </th>
+
+                  <td>
+                    <div class="green">No participation.</div>
+                    <div>
+                      <input name="33criteria_points_1" type="radio" value="1" onclick="document.evalForm.selected_lom_33_1.value=1;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Little participation.</div>
+                    <div>
+                      <input name="33criteria_points_1" type="radio" value="2" onclick="document.evalForm.selected_lom_33_1.value=2;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Some participation.</div>
+                    <div>
+                      <input name="33criteria_points_1" type="radio" value="3" onclick="document.evalForm.selected_lom_33_1.value=3;document.evalForm.member_33_updated.value=1;" checked="">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Good participation.</div>
+                    <div>
+                      <input name="33criteria_points_1" type="radio" value="4" onclick="document.evalForm.selected_lom_33_1.value=4;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Great participation.</div>
+                    <div>
+                      <input name="33criteria_points_1" type="radio" value="5" onclick="document.evalForm.selected_lom_33_1.value=5;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+
+                  <td>
+                    <textarea cols="20" rows="2" name="33comments[]" onchange="document.evalForm.member_33_updated.value=1;">Dolorum at et harum </textarea>
+                  </td>
+                </tr>
+                <input type="hidden" name="selected_lom_33_2" value="2">
+                <tr>
+                  <th style="text-align: left; padding: 0.5em;">
+                    <font id="33criteria2">Was Helpful and Co-operative</font><br><br>
+                    <i>5 mark(s)</i>
+                  </th>
+
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="33criteria_points_2" type="radio" value="1" onclick="document.evalForm.selected_lom_33_2.value=1;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="33criteria_points_2" type="radio" value="2" onclick="document.evalForm.selected_lom_33_2.value=2;document.evalForm.member_33_updated.value=1;" checked="">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="33criteria_points_2" type="radio" value="3" onclick="document.evalForm.selected_lom_33_2.value=3;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="33criteria_points_2" type="radio" value="4" onclick="document.evalForm.selected_lom_33_2.value=4;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="33criteria_points_2" type="radio" value="5" onclick="document.evalForm.selected_lom_33_2.value=5;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+
+                  <td>
+                    <textarea cols="20" rows="2" name="33comments[]" onchange="document.evalForm.member_33_updated.value=1;">Est consequuntur aut</textarea>
+                  </td>
+                </tr>
+                <input type="hidden" name="selected_lom_33_3" value="2">
+                <tr>
+                  <th style="text-align: left; padding: 0.5em;">
+                    <font id="33criteria3">Submitted Work on Time</font><br><br>
+                    <i>5 mark(s)</i>
+                  </th>
+
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="33criteria_points_3" type="radio" value="1" onclick="document.evalForm.selected_lom_33_3.value=1;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="33criteria_points_3" type="radio" value="2" onclick="document.evalForm.selected_lom_33_3.value=2;document.evalForm.member_33_updated.value=1;" checked="">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="33criteria_points_3" type="radio" value="3" onclick="document.evalForm.selected_lom_33_3.value=3;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="33criteria_points_3" type="radio" value="4" onclick="document.evalForm.selected_lom_33_3.value=4;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="33criteria_points_3" type="radio" value="5" onclick="document.evalForm.selected_lom_33_3.value=5;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+
+                  <td>
+                    <textarea cols="20" rows="2" name="33comments[]" onchange="document.evalForm.member_33_updated.value=1;">Exercitationem quam </textarea>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="7" class="tableheader2" align="center">General Comments<br>
+                    <textarea cols="80" rows="2" name="33gen_comment" onchange="document.evalForm.member_33_updated.value=1;">Odio eiusmod ea etttt</textarea>
+                  </td>
+                </tr>
+                </tbody></table>
+
+              <!-- Sort by Criteria -->
+
+              <!-- elements::ajax_rubric_preview end -->
+              <script type="text/javascript">
+                jQuery().ready(function() {
+                  var viewMode = 0;
+                  if(viewMode == 0){
+                    var userId = 33;
+                  }
+                  else if(viewMode == 1){
+                    var userId = 3;
+                  }
+                  jQuery("input[type='submit'][name='"+userId+"']").click(function() {
+                    return saveButtonVal(userId, viewMode);
+                  });
+                });
+              </script>
+              <table width="100%" align="center">
+                <tbody><tr>
+                  <td align="center">
+                    <div class="saveThisSection"><input name="33" type="submit" value="Save This Section"></div>                                                        <div style="color: red; display: none;" id="33likert">Please complete all the questions marked red before saving.</div>
+                    <div style="color: red">Make sure you save this section before moving on to the other ones!</div>
+                  </td>
+                </tr>
+                </tbody></table>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+    </tbody></table>
+</form>
+  <table class="standardtable">
+    <tbody><tr><td colspan="4" align="center">
+      <form name="submitForm" id="submitForm" method="POST" action="/evaluations/completeEvaluationRubric">
+        <input type="hidden" name="event_id" value="2">
+        <input type="hidden" name="group_id" value="2">
+        <input type="hidden" name="group_event_id" value="4">
+        <input type="hidden" name="course_id" value="1">
+        <input type="hidden" name="rubric_id" value="1">
+        <input type="hidden" name="data[Evaluation][evaluator_id]" value="7">
+        <input type="hidden" name="evaluateeCount" value="3">
+        <div class="submitComplete"><input type="submit" value="Submit to Complete the Evaluation"></div></form></td></tr>
+    </tbody></table>
+  <script type="text/javascript">
+    new Rico.Accordion( 'accordion',
+      {panelHeight: 600,
+        hoverClass: 'mdHover',
+        selectedClass: 'mdSelected',
+        clickedClass: 'mdClicked',
+        unselectedClass: 'panelheader',
+        initHideAll: true});
+
+    var userIds = [31,32,33];
+    jQuery.each(userIds, function(index, userId) {
+      jQuery('#'+userId+'likert').hide();
+    });
+  </script>
+</div>
+
+<!-- FOOTER -->
+<div id="footer" class="pagewidth">
+  <p>
+    Powered by iPeer and TeamMaker - Created by UBC and Rose-Hulman  </p>
+</div>
+
+<!-- DEBUG -->
+
+
+
+</body>
+
+
+
+
+
+
+<!-- Make Evaluation Rubric
+<form name="evalForm" id="evalForm" method="POST" action="/evaluations/makeEvaluation/2/2">
+  <input type="hidden" name="event_id" value="2">
+  <input type="hidden" name="group_id" value="2">
+  <input type="hidden" name="group_event_id" value="4">
+  <input type="hidden" name="course_id" value="1">
+  <input type="hidden" name="rubric_id" value="1">
+  <input type="hidden" name="data[Evaluation][evaluator_id]" value="7">
+  <input type="hidden" name="evaluateeCount" value="3">
+
+  <table class="standardtable">
+    <tbody><tr>
+      <th colspan="4" align="center">Evaluation Event Detail</th>
+    </tr>
+    <tr>
+      <td width="10%">Evaluator:</td>
+      <td width="25%">Matt Student</td>
+      <td width="10%">Evaluating:</td>
+      <td width="25%">Peer Review for "Second Group"</td>
+    </tr>
+    <tr>
+      <td>Event Name:</td>
+      <td>Term Report Evaluation</td>
+      <td>Due Date:</td>
+      <td>Thu, Jun 8, 2023 8:59 am</td>
+    </tr>
+    <tr>
+      <td>Description:</td>
+      <td colspan="3">Event Description: </td>
+    </tr>
+    <tr>
+      <td colspan="4" style="text-align: left;">
+        <span class="instruction-icon"> Instructions:</span>
+        <ul class="instructions">
+          <li>Click <font color="#FF6666"><i>EACH</i></font> of your peer's name to rate their performance.</li>
+          <li>Enter Comments (Optional).</li>
+          <li>Press "Save This Section" to save the evaluation for each group member.</li>
+          <li>Press "Submit to Complete the Evaluation" to submit your evaluation to all peers. </li>
+          <li><i>NOTE:</i> You can click the "Submit to Complete the Evaluation" button only <font color="#FF6666">AFTER</font> all evaluations are completed.</li>
+          <li>The evaluation can be repeatedly submitted until Sun, Jul 2, 2023 8:59 am.</li>
+        </ul>
+
+        <div style="text-align:left; margin-left:3em;"><a href="#" onclick="javascript:$('penalty').toggle();return false;">( Show/Hide late penalty policy )</a></div>
+        <div id="penalty" style="border:1px solid red; margin: 0.5em 0 0 3em; width: 450px; padding:0.5em; color:darkred; display:none">
+          From the due date to 1 days(s) late, 15% will be deducted.<br>Then until 2 day(s) after the due date, 30% will be deducted.<br>Then until 3 day(s) after the due date, 45% will be deducted.<br>Then until 4 day(s) after the due date, 60% will be deducted.<br>60% is deducted afterwards.            </div>
+      </td>
+    </tr>
+    </tbody></table>
+
+  <table class="standardtable">
+    <tbody><tr>
+      <td>
+        <div id="accordion">
+          <input type="hidden" name="memberIDs[]" value="31">
+          <div id="panel31" class="panelName" data-fullname="Hui Student">
+            <div id="panel31Header" class="mdSelected">
+              Hui Student                                    <font color="#259500"> ( Saved )</font>
+            </div>
+            <div style="height: 600px; overflow: auto; display: block;" id="panel1Content" class="panelContent">
+              <br>
+
+
+              <input type="hidden" name="member_31_updated" value="">
+              <table class="standardtable">
+                <tbody><tr>
+                  <th width="150" valign="top"></th>
+
+                  <th>Poor</th>
+                  <th>Below Average</th>
+                  <th>Average</th>
+                  <th>Above Average</th>
+                  <th>Excellent</th>
+
+                  <th>Comments</th>
+                </tr>
+
+                <input type="hidden" name="selected_lom_31_1" value="3">
+                <tr>
+                  <th style="text-align: left; padding: 0.5em;">
+                    <font id="31criteria1">Participated in Team Meetings</font><br><br>
+                    <i>5 mark(s)</i>
+                  </th>
+
+                  <td>
+                    <div class="green">No participation.</div>
+                    <div>
+                      <input name="31criteria_points_1" type="radio" value="1" onclick="document.evalForm.selected_lom_31_1.value=1;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Little participation.</div>
+                    <div>
+                      <input name="31criteria_points_1" type="radio" value="2" onclick="document.evalForm.selected_lom_31_1.value=2;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Some participation.</div>
+                    <div>
+                      <input name="31criteria_points_1" type="radio" value="3" onclick="document.evalForm.selected_lom_31_1.value=3;document.evalForm.member_31_updated.value=1;" checked="">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Good participation.</div>
+                    <div>
+                      <input name="31criteria_points_1" type="radio" value="4" onclick="document.evalForm.selected_lom_31_1.value=4;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Great participation.</div>
+                    <div>
+                      <input name="31criteria_points_1" type="radio" value="5" onclick="document.evalForm.selected_lom_31_1.value=5;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+
+                  <td>
+                    <textarea cols="20" rows="2" name="31comments[]" onchange="document.evalForm.member_31_updated.value=1;">Quia quibusdam minim</textarea>
+                  </td>
+                </tr>
+                <input type="hidden" name="selected_lom_31_2" value="3">
+                <tr>
+                  <th style="text-align: left; padding: 0.5em;">
+                    <font id="31criteria2">Was Helpful and Co-operative</font><br><br>
+                    <i>5 mark(s)</i>
+                  </th>
+
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="31criteria_points_2" type="radio" value="1" onclick="document.evalForm.selected_lom_31_2.value=1;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="31criteria_points_2" type="radio" value="2" onclick="document.evalForm.selected_lom_31_2.value=2;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="31criteria_points_2" type="radio" value="3" onclick="document.evalForm.selected_lom_31_2.value=3;document.evalForm.member_31_updated.value=1;" checked="">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="31criteria_points_2" type="radio" value="4" onclick="document.evalForm.selected_lom_31_2.value=4;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="31criteria_points_2" type="radio" value="5" onclick="document.evalForm.selected_lom_31_2.value=5;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+
+                  <td>
+                    <textarea cols="20" rows="2" name="31comments[]" onchange="document.evalForm.member_31_updated.value=1;">Quia eu ut non repre</textarea>
+                  </td>
+                </tr>
+                <input type="hidden" name="selected_lom_31_3" value="3">
+                <tr>
+                  <th style="text-align: left; padding: 0.5em;">
+                    <font id="31criteria3">Submitted Work on Time</font><br><br>
+                    <i>5 mark(s)</i>
+                  </th>
+
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="31criteria_points_3" type="radio" value="1" onclick="document.evalForm.selected_lom_31_3.value=1;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="31criteria_points_3" type="radio" value="2" onclick="document.evalForm.selected_lom_31_3.value=2;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="31criteria_points_3" type="radio" value="3" onclick="document.evalForm.selected_lom_31_3.value=3;document.evalForm.member_31_updated.value=1;" checked="">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="31criteria_points_3" type="radio" value="4" onclick="document.evalForm.selected_lom_31_3.value=4;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="31criteria_points_3" type="radio" value="5" onclick="document.evalForm.selected_lom_31_3.value=5;document.evalForm.member_31_updated.value=1;">
+                    </div>
+
+                  </td>
+
+                  <td>
+                    <textarea cols="20" rows="2" name="31comments[]" onchange="document.evalForm.member_31_updated.value=1;">Nesciunt dolor iust</textarea>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="7" class="tableheader2" align="center">General Comments<br>
+                    <textarea cols="80" rows="2" name="31gen_comment" onchange="document.evalForm.member_31_updated.value=1;">Quia esse commodo e</textarea>
+                  </td>
+                </tr>
+                </tbody></table>
+
+              <script type="text/javascript">
+                jQuery().ready(function() {
+                  var viewMode = 0;
+                  if(viewMode == 0){
+                    var userId = 31;
+                  }
+                  else if(viewMode == 1){
+                    var userId = 3;
+                  }
+                  jQuery("input[type='submit'][name='"+userId+"']").click(function() {
+                    return saveButtonVal(userId, viewMode);
+                  });
+                });
+              </script>
+
+              <table width="100%" align="center">
+                <tbody><tr>
+                  <td align="center">
+                    <div class="saveThisSection"><input name="31" type="submit" value="Save This Section"></div>                                                        <div style="color: red; display: none;" id="31likert">Please complete all the questions marked red before saving.</div>
+                    <div style="color: red">Make sure you save this section before moving on to the other ones!</div>
+                  </td>
+                </tr>
+                </tbody></table>
+            </div>
+          </div>
+          <input type="hidden" name="memberIDs[]" value="32">
+          <div id="panel32" class="panelName" data-fullname="Bowinn Student">
+            <div id="panel32Header" class="panelheader">
+              Bowinn Student                                    <font color="#259500"> ( Saved )</font>
+            </div>
+            <div style="height: 0px; display: block; overflow: hidden;" id="panel1Content" class="panelContent">
+              <br>
+              <input type="hidden" name="member_32_updated" value="">
+              <table class="standardtable">
+                <tbody><tr>
+                  <th width="150" valign="top"></th>
+                  <th>Poor</th>
+                  <th>Below Average</th>
+                  <th>Average</th>
+                  <th>Above Average</th>
+                  <th>Excellent</th>
+                  <th>Comments</th>
+                </tr>
+
+                <input type="hidden" name="selected_lom_32_1" value="5">
+                <tr>
+                  <th style="text-align: left; padding: 0.5em;">
+                    <font id="32criteria1">Participated in Team Meetings</font><br><br>
+                    <i>5 mark(s)</i>
+                  </th>
+
+                  <td>
+                    <div class="green">No participation.</div>
+                    <div>
+                      <input name="32criteria_points_1" type="radio" value="1" onclick="document.evalForm.selected_lom_32_1.value=1;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Little participation.</div>
+                    <div>
+                      <input name="32criteria_points_1" type="radio" value="2" onclick="document.evalForm.selected_lom_32_1.value=2;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Some participation.</div>
+                    <div>
+                      <input name="32criteria_points_1" type="radio" value="3" onclick="document.evalForm.selected_lom_32_1.value=3;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Good participation.</div>
+                    <div>
+                      <input name="32criteria_points_1" type="radio" value="4" onclick="document.evalForm.selected_lom_32_1.value=4;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Great participation.</div>
+                    <div>
+                      <input name="32criteria_points_1" type="radio" value="5" onclick="document.evalForm.selected_lom_32_1.value=5;document.evalForm.member_32_updated.value=1;" checked="">
+                    </div>
+
+                  </td>
+
+                  <td>
+                    <textarea cols="20" rows="2" name="32comments[]" onchange="document.evalForm.member_32_updated.value=1;">Enim eius quos conse</textarea>
+                  </td>
+                </tr>
+                <input type="hidden" name="selected_lom_32_2" value="3">
+                <tr>
+                  <th style="text-align: left; padding: 0.5em;">
+                    <font id="32criteria2">Was Helpful and Co-operative</font><br><br>
+                    <i>5 mark(s)</i>
+                  </th>
+
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="32criteria_points_2" type="radio" value="1" onclick="document.evalForm.selected_lom_32_2.value=1;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="32criteria_points_2" type="radio" value="2" onclick="document.evalForm.selected_lom_32_2.value=2;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="32criteria_points_2" type="radio" value="3" onclick="document.evalForm.selected_lom_32_2.value=3;document.evalForm.member_32_updated.value=1;" checked="">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="32criteria_points_2" type="radio" value="4" onclick="document.evalForm.selected_lom_32_2.value=4;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="32criteria_points_2" type="radio" value="5" onclick="document.evalForm.selected_lom_32_2.value=5;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+
+                  <td>
+                    <textarea cols="20" rows="2" name="32comments[]" onchange="document.evalForm.member_32_updated.value=1;">Aliquam commodi aut </textarea>
+                  </td>
+                </tr>
+                <input type="hidden" name="selected_lom_32_3" value="1">
+                <tr>
+                  <th style="text-align: left; padding: 0.5em;">
+                    <font id="32criteria3">Submitted Work on Time</font><br><br>
+                    <i>5 mark(s)</i>
+                  </th>
+
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="32criteria_points_3" type="radio" value="1" onclick="document.evalForm.selected_lom_32_3.value=1;document.evalForm.member_32_updated.value=1;" checked="">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="32criteria_points_3" type="radio" value="2" onclick="document.evalForm.selected_lom_32_3.value=2;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="32criteria_points_3" type="radio" value="3" onclick="document.evalForm.selected_lom_32_3.value=3;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="32criteria_points_3" type="radio" value="4" onclick="document.evalForm.selected_lom_32_3.value=4;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="32criteria_points_3" type="radio" value="5" onclick="document.evalForm.selected_lom_32_3.value=5;document.evalForm.member_32_updated.value=1;">
+                    </div>
+
+                  </td>
+
+                  <td>
+                    <textarea cols="20" rows="2" name="32comments[]" onchange="document.evalForm.member_32_updated.value=1;">Debitis qui sed arch</textarea>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="7" class="tableheader2" align="center">General Comments<br>
+                    <textarea cols="80" rows="2" name="32gen_comment" onchange="document.evalForm.member_32_updated.value=1;">In eos quos eos nost</textarea>
+                  </td>
+                </tr>
+                </tbody></table>
+
+              <script type="text/javascript">
+                jQuery().ready(function() {
+                  var viewMode = 0;
+                  if(viewMode == 0){
+                    var userId = 32;
+                  }
+                  else if(viewMode == 1){
+                    var userId = 3;
+                  }
+                  jQuery("input[type='submit'][name='"+userId+"']").click(function() {
+                    return saveButtonVal(userId, viewMode);
+                  });
+                });
+              </script>
+              <table width="100%" align="center">
+                <tbody><tr>
+                  <td align="center">
+                    <div class="saveThisSection"><input name="32" type="submit" value="Save This Section"></div>                                                        <div style="color: red; display: none;" id="32likert">Please complete all the questions marked red before saving.</div>
+                    <div style="color: red">Make sure you save this section before moving on to the other ones!</div>
+                  </td>
+                </tr>
+                </tbody></table>
+            </div>
+          </div>
+          <input type="hidden" name="memberIDs[]" value="33">
+          <div id="panel33" class="panelName" data-fullname="Joe Student">
+            <div id="panel33Header" class="panelheader">
+              Joe Student                                    <font color="#259500"> ( Saved )</font>
+            </div>
+            <div style="height: 0px; display: block; overflow: hidden;" id="panel1Content" class="panelContent">
+              <br>
+
+              <input type="hidden" name="member_33_updated" value="">
+              <table class="standardtable">
+                <tbody><tr>
+                  <th width="150" valign="top"></th>
+
+                  <th>Poor</th>
+                  <th>Below Average</th>
+                  <th>Average</th>
+                  <th>Above Average</th>
+                  <th>Excellent</th>
+
+                  <th>Comments</th>
+                </tr>
+
+                <input type="hidden" name="selected_lom_33_1" value="3">
+                <tr>
+                  <th style="text-align: left; padding: 0.5em;">
+                    <font id="33criteria1">Participated in Team Meetings</font><br><br>
+                    <i>5 mark(s)</i>
+                  </th>
+
+                  <td>
+                    <div class="green">No participation.</div>
+                    <div>
+                      <input name="33criteria_points_1" type="radio" value="1" onclick="document.evalForm.selected_lom_33_1.value=1;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Little participation.</div>
+                    <div>
+                      <input name="33criteria_points_1" type="radio" value="2" onclick="document.evalForm.selected_lom_33_1.value=2;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Some participation.</div>
+                    <div>
+                      <input name="33criteria_points_1" type="radio" value="3" onclick="document.evalForm.selected_lom_33_1.value=3;document.evalForm.member_33_updated.value=1;" checked="">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Good participation.</div>
+                    <div>
+                      <input name="33criteria_points_1" type="radio" value="4" onclick="document.evalForm.selected_lom_33_1.value=4;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green">Great participation.</div>
+                    <div>
+                      <input name="33criteria_points_1" type="radio" value="5" onclick="document.evalForm.selected_lom_33_1.value=5;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+
+                  <td>
+                    <textarea cols="20" rows="2" name="33comments[]" onchange="document.evalForm.member_33_updated.value=1;">Dolorum at et harum </textarea>
+                  </td>
+                </tr>
+                <input type="hidden" name="selected_lom_33_2" value="2">
+                <tr>
+                  <th style="text-align: left; padding: 0.5em;">
+                    <font id="33criteria2">Was Helpful and Co-operative</font><br><br>
+                    <i>5 mark(s)</i>
+                  </th>
+
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="33criteria_points_2" type="radio" value="1" onclick="document.evalForm.selected_lom_33_2.value=1;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="33criteria_points_2" type="radio" value="2" onclick="document.evalForm.selected_lom_33_2.value=2;document.evalForm.member_33_updated.value=1;" checked="">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="33criteria_points_2" type="radio" value="3" onclick="document.evalForm.selected_lom_33_2.value=3;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="33criteria_points_2" type="radio" value="4" onclick="document.evalForm.selected_lom_33_2.value=4;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="33criteria_points_2" type="radio" value="5" onclick="document.evalForm.selected_lom_33_2.value=5;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+
+                  <td>
+                    <textarea cols="20" rows="2" name="33comments[]" onchange="document.evalForm.member_33_updated.value=1;">Est consequuntur aut</textarea>
+                  </td>
+                </tr>
+                <input type="hidden" name="selected_lom_33_3" value="2">
+                <tr>
+                  <th style="text-align: left; padding: 0.5em;">
+                    <font id="33criteria3">Submitted Work on Time</font><br><br>
+                    <i>5 mark(s)</i>
+                  </th>
+
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="33criteria_points_3" type="radio" value="1" onclick="document.evalForm.selected_lom_33_3.value=1;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="33criteria_points_3" type="radio" value="2" onclick="document.evalForm.selected_lom_33_3.value=2;document.evalForm.member_33_updated.value=1;" checked="">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="33criteria_points_3" type="radio" value="3" onclick="document.evalForm.selected_lom_33_3.value=3;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="33criteria_points_3" type="radio" value="4" onclick="document.evalForm.selected_lom_33_3.value=4;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+                  <td>
+                    <div class="green"></div>
+                    <div>
+                      <input name="33criteria_points_3" type="radio" value="5" onclick="document.evalForm.selected_lom_33_3.value=5;document.evalForm.member_33_updated.value=1;">
+                    </div>
+
+                  </td>
+
+                  <td>
+                    <textarea cols="20" rows="2" name="33comments[]" onchange="document.evalForm.member_33_updated.value=1;">Exercitationem quam </textarea>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="7" class="tableheader2" align="center">General Comments<br>
+                    <textarea cols="80" rows="2" name="33gen_comment" onchange="document.evalForm.member_33_updated.value=1;">Odio eiusmod ea etttt</textarea>
+                  </td>
+                </tr>
+                </tbody></table>
+
+              <script type="text/javascript">
+                jQuery().ready(function() {
+                  var viewMode = 0;
+                  if(viewMode == 0){
+                    var userId = 33;
+                  }
+                  else if(viewMode == 1){
+                    var userId = 3;
+                  }
+                  jQuery("input[type='submit'][name='"+userId+"']").click(function() {
+                    return saveButtonVal(userId, viewMode);
+                  });
+                });
+              </script>
+
+              <table width="100%" align="center">
+                <tbody><tr>
+                  <td align="center">
+                    <div class="saveThisSection"><input name="33" type="submit" value="Save This Section"></div>                                                        <div style="color: red; display: none;" id="33likert">Please complete all the questions marked red before saving.</div>
+                    <div style="color: red">Make sure you save this section before moving on to the other ones!</div>
+                  </td>
+                </tr>
+                </tbody></table>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>
+    </tbody></table>
+</form>
+-->
+
+<!-- Complete Evaluation Rubric
+<form name="submitForm" id="submitForm" method="POST" action="/evaluations/completeEvaluationRubric">
+  <input type="hidden" name="event_id" value="2">
+  <input type="hidden" name="group_id" value="2">
+  <input type="hidden" name="group_event_id" value="4">
+  <input type="hidden" name="course_id" value="1">
+  <input type="hidden" name="rubric_id" value="1">
+  <input type="hidden" name="data[Evaluation][evaluator_id]" value="7">
+  <input type="hidden" name="evaluateeCount" value="3">
+  <div class="submitComplete"><input type="submit" value="Submit to Complete the Evaluation"></div>
+</form>
+-->
+
+

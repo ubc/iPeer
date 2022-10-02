@@ -1019,7 +1019,7 @@ class User extends AppModel
 	 *
 	 * @return group members
 	 */
-    function getEventGroupMembersNoTutors($groupId, $selfEval, $userId)
+    function getEventGroupMembersNoTutors($groupId, $selfEval, $userId, $options=null)
     {
         $group = $this->Group->findById($groupId);
 

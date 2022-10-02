@@ -24,7 +24,12 @@ class UsersController extends AppController
         'EvaluationSubmission', 'EmailSchedule', 'RolesUser'
     );
     public $components = array('Session', 'AjaxList', 'RequestHandler',
-        'Email', 'FileUpload.FileUpload', 'PasswordGenerator');
+        'Email', 'FileUpload.FileUpload', 'PasswordGenerator', 'UsersRequest');
+  
+    // NOTE::
+    public $body    = [];
+    public $method  = '';
+    
     private $canvasEnabled;
 
     /**
@@ -36,6 +41,8 @@ class UsersController extends AppController
     function __construct()
     {
         parent::__construct();
+        // NOTE::
+        $this->method  = $_SERVER['REQUEST_METHOD'];
     }
 
     /**
@@ -854,55 +861,74 @@ class UsersController extends AppController
      * @access public
      * @return void
      */
+    function pre_r($val) {
+      echo '<pre>';
+      print_r($val);
+      echo  '</pre>';
+    }
     function editProfile()
     {
         // No security checks here, since we're editing the logged-in user
         $id = $this->Auth->user('id');
-
-        $this->set('viewPage', false);
-        if (!empty($this->data)) {
-            $this->data['User']['id'] = $id;
-
-            if (!empty($this->data['User']['temp_password'])) {
-                $user = $this->User->findUserByidWithFields($id, array('password'));
-                if (md5($this->data['User']['old_password'])==$user['password']) {
-                    if ($this->data['User']['temp_password']==$this->data['User']['confirm_password']) {
-                        $this->data['User']['password'] = md5($this->data['User']['temp_password']);
-                    } else {
-                        $this->Session->setFlash(__("New passwords do not match", true));
-                        $this->redirect('editProfile/'.$id);
-                    }
-                } else {
-                    $this->Session->setFlash(__("Old password is incorrect", true));
-                    $this->redirect('editProfile/'.$id);
-                }
+  
+        if ($this->RequestHandler->accepts('json')) {
+          $userId = $this->params['data']['User']['id'] = $id;
+            $this->layout = false;
+            $this->autoRender = false;
+            
+            if($userId) {
+                $this->UsersRequest->processResourceRequest($this->method, $userId, $this->params);
             } else {
-                unset($this->data['User']['temp_password']);
-            }
-
-            if ($this->__processForm()) {
-                $this->__setSessionData($this->data['User']);
-                $this->Session->setFlash((__("Your Profile Has Been Updated Successfully.", true)), 'good');
+                $this->UsersRequest->processCollectionRequest($this->method);
             }
         }
-        if (in_array($this->User->getRoleName($id), array("student", "tutor"))) {
-            $isStudent = true;
-        } else {
-            $isStudent = false;
+        elseif ($this->RequestHandler->accepts('html')) {
+            $this->set('viewPage', false);
+            if (!empty($this->data)) {
+                $this->data['User']['id'] = $id;
+      
+                if (!empty($this->data['User']['temp_password'])) {
+                    $user = $this->User->findUserByidWithFields($id, array('password'));
+                    if (md5($this->data['User']['old_password'])==$user['password']) {
+                        if ($this->data['User']['temp_password']==$this->data['User']['confirm_password']) {
+                            $this->data['User']['password'] = md5($this->data['User']['temp_password']);
+                        } else {
+                            $this->Session->setFlash(__("New passwords do not match", true));
+                            $this->redirect('editProfile/'.$id);
+                        }
+                  } else {
+                      $this->Session->setFlash(__("Old password is incorrect", true));
+                      $this->redirect('editProfile/'.$id);
+                  }
+                } else {
+                    unset($this->data['User']['temp_password']);
+                }
+      
+                if ($this->__processForm()) {
+                    $this->__setSessionData($this->data['User']);
+                    $this->Session->setFlash((__("Your Profile Has Been Updated Successfully.", true)), 'good');
+                }
+            }
+            if (in_array($this->User->getRoleName($id), array("student", "tutor"))) {
+                $isStudent = true;
+            } else {
+                $isStudent = false;
+            }
+            $oAuthClient = $this->OauthClient->find('all', array('conditions' => array('OauthClient.user_id' => $id)));
+            $oAuthToken = $this->OauthToken->find('all', array('conditions' => array('OauthToken.user_id' => $id)));
+    
+            $enabled = array('0' => 'Disabled', '1' => 'Enabled');
+            $this->data = $this->User->read(null, $id);
+    
+            $this->Output->br2nl($this->data);
+            $this->set('clients', $oAuthClient);
+            $this->set('tokens', $oAuthToken);
+            $this->set('enabled', $enabled);
+            $this->set('is_student', $isStudent);
+            $this->set('data', $this->data);
+            $this->set('title_for_layout', __('Edit Profile', true));
+            return;
         }
-        $oAuthClient = $this->OauthClient->find('all', array('conditions' => array('OauthClient.user_id' => $id)));
-        $oAuthToken = $this->OauthToken->find('all', array('conditions' => array('OauthToken.user_id' => $id)));
-
-        $enabled = array('0' => 'Disabled', '1' => 'Enabled');
-        $this->data = $this->User->read(null, $id);
-        $this->Output->br2nl($this->data);
-        $this->set('clients', $oAuthClient);
-        $this->set('tokens', $oAuthToken);
-        $this->set('enabled', $enabled);
-        $this->set('is_student', $isStudent);
-        $this->set('data', $this->data);
-        $this->set('title_for_layout', __('Edit Profile', true));
-        return;
     }
 
 
