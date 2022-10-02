@@ -245,7 +245,7 @@
         onMounted( async () => {
           await getUserAccount()
           
-          await getEvaluationByEventId(2, 2)
+          await getEvaluationByEventId(3, 2)
           /***/
            try {
             const current = await axios({

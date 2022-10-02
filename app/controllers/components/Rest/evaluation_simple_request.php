@@ -106,9 +106,8 @@ class EvaluationSimpleRequestComponent extends CakeObject
   
   private function get($event, $groupId, $studentId = null): void
   {
-    $eventId = $event['Event']['id'];
-  
-    // if (empty($this->params['data'])) { // REMOVE it already empty since its a GET
+      $eventId = $event['Event']['id'];
+    
       $userId = User::get('id');
     
       $grpMem = $this->GroupsMembers->find('first', array(

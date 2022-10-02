@@ -77,6 +77,10 @@ class EvaluationMixedRequestComponent extends CakeObject
           $this->set($event, $groupId, $studentId, '0');
         }
         break;
+      case 'PUT':
+        http_response_code(200);
+        echo json_encode(['message' => 'PUT Method']);
+        break;
       default:
         http_response_code(405);
         header('Allow, GET, POST');

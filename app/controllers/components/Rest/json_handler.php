@@ -76,7 +76,7 @@ class JsonHandlerComponent extends CakeObject
     // NOTE:: Specific to Simple Evaluation
     $json['remaining']  = $data['remaining'];
     
-    $this->controller->RestResponseHandler->toJson('SimpleEvaluation', 200, $json);
+    $this->RestResponseHandler->toJson('SimpleEvaluation', 200, $json);
     exit;
   }
   
@@ -117,7 +117,7 @@ class JsonHandlerComponent extends CakeObject
     ];
     $json['member_count'] = $data['memberCount'];
     
-    $this->controller->RestResponseHandler->toJson('MixedEvaluation', 200, $json);
+    $this->RestResponseHandler->toJson('MixedEvaluation', 200, $json);
     exit;
   }
   

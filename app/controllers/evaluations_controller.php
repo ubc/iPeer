@@ -613,15 +613,12 @@ class EvaluationsController extends AppController
             $this->autoRender = false;
             switch($templateTypeId) {
               case 1:
-                  print_r('processSimpleEvaluationRequest');die();
                   $this->EvaluationMake->processSimpleEvaluationRequest($this->method, $eventId, $objectId, $studentId);
                   break;
               case 2:
-                  // print_r('processRubricEvaluationRequest');die();
                   $this->EvaluationMake->processRubricEvaluationRequest($this->method, $eventId, $objectId, $studentId);
                   break;
               case 4:
-                  print_r('processMixedEvaluationRequest');die();
                   $this->EvaluationMake->processMixedEvaluationRequest($this->method, $eventId, $objectId, $studentId);
                   break;
             }
