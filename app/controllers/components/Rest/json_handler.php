@@ -70,6 +70,7 @@ class JsonHandlerComponent extends CakeObject
    */
   public function formatSimpleEvaluation(array $data): void
   {
+    $json['template']   = 'SimpleEvaluation';
     $json               = $this->getEventData($data);
     $json['questions']  = $this->getSimpleEvaluationQuestions($data['questions']);
     $json['submission'] = $this->getSimpleEvaluationSubmission($data['submission'], $data['evaluation']);
@@ -86,6 +87,7 @@ class JsonHandlerComponent extends CakeObject
    */
   public function formatRubricEvaluation(array $data): void
   {
+    $json['template']   = 'RubricEvaluation';
     $json               = $this->getEventData($data);
     isset($data['questions']) ? $json['questions']  = $this->getRubricEvaluationQuestions($data['questions']) : null;
     isset($data['groupMembers']) ? $json['submission'] = $this->getRubricEvaluationSubmission($data['submission'], $data['groupMembers']) : null;
@@ -99,6 +101,7 @@ class JsonHandlerComponent extends CakeObject
   
   public function formatMixedEvaluation(array $data): void
   {
+    $json['template']     = 'MixedEvaluation';
     $json                 = $this->getEventData($data);
     isset($data['questions']) ? $json['questions'] = $this->getMixedEvaluationQuestions($data['questions']) : null;  // $data['questions'];
     $json['submission']   = $this->getMixedEvaluationSubmission($data['submission'], $data['groupMembers']);
