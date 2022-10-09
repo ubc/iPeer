@@ -55,29 +55,38 @@
 <?php endif; ?>
 </head>
 <body>
-
-<div class='containerOuter pagewidth'>
-<!-- BANNER -->
-<?php echo $this->element('global/banner', array('customLogo' => $customLogo)); ?>
-
-<!-- NAVIGATION -->
-<?php echo $this->element('global/navigation', array());?>
-
-<!-- CONTENT -->
-  <!-- TITLE BAR -->
-  <h1 class='title'>
-    <?php if (isset($breadcrumb)): ?>
-        <?php echo $breadcrumb->render($html); ?>
+  <div class='containerOuter pagewidth'>
+  <!-- BANNER -->
+  <?php echo $this->element('global/banner', array('customLogo' => $customLogo)); ?>
+  
+  <!-- NAVIGATION -->
+  <?php echo $this->element('global/navigation', array());?>
+  
+  <?php if($isLoggedIn): ?>
+    <?php if(Configure::read('debug')): ?>
+      <div id="webapp">webapp</div>
+      <script type="module" src="http://localhost:5173/@vite/client"></script>
+      <script type="module" src="http://localhost:5173/src/main.ts"></script>
     <?php else: ?>
-        <?php echo $title_for_layout;?>
+      <?php echo $this->Html->script('vue/build/main.js'); ?>
     <?php endif; ?>
-  </h1>
-  <!-- ERRORS -->
-  <?php echo $this->Session->flash(); ?>
-  <?php echo $this->Session->flash('auth'); ?>
-  <?php echo $this->Session->flash('good'); ?>
-  <!-- ACTUAL PAGE -->
-  <?php echo $content_for_layout; ?>
+  <?php else: ?>
+    <!-- CONTENT -->
+    <!-- TITLE BAR -->
+    <h1 class='title'>
+      <?php if (isset($breadcrumb)): ?>
+          <?php echo $breadcrumb->render($html); ?>
+      <?php else: ?>
+          <?php echo $title_for_layout;?>
+      <?php endif; ?>
+    </h1>
+    <!-- ERRORS -->
+    <?php echo $this->Session->flash(); ?>
+    <?php echo $this->Session->flash('auth'); ?>
+    <?php echo $this->Session->flash('good'); ?>
+    <!-- ACTUAL PAGE -->
+    <?php echo $content_for_layout; ?>
+  <?php endif; ?>
 </div>
 
 <!-- FOOTER -->

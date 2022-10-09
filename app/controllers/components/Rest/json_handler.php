@@ -76,6 +76,7 @@ class JsonHandlerComponent extends CakeObject
     $json['submission'] = $this->getSimpleEvaluationSubmission($data['submission'], $data['evaluation']);
     // NOTE:: Specific to Simple Evaluation
     $json['remaining']  = $data['remaining'];
+    $json['template']   = 'SimpleEvaluation';
     
     $this->RestResponseHandler->toJson('SimpleEvaluation', 200, $json);
     exit;
@@ -93,6 +94,7 @@ class JsonHandlerComponent extends CakeObject
     isset($data['groupMembers']) ? $json['submission'] = $this->getRubricEvaluationSubmission($data['submission'], $data['groupMembers']) : null;
     // NOTE:: Specific to Rubric Evaluation
     isset($data['rubricId']) ? $json['rubric_id'] = $data['rubricId'] : null;
+    $json['template']   = 'RubricEvaluation';
     
     $this->RestResponseHandler->toJson('RubricEvaluation', 200, $json);
     exit;
@@ -101,13 +103,12 @@ class JsonHandlerComponent extends CakeObject
   
   public function formatMixedEvaluation(array $data): void
   {
-    $json['template']     = 'MixedEvaluation';
     $json                 = $this->getEventData($data);
     isset($data['questions']) ? $json['questions'] = $this->getMixedEvaluationQuestions($data['questions']) : null;  // $data['questions'];
     $json['submission']   = $this->getMixedEvaluationSubmission($data['submission'], $data['groupMembers']);
     
     $json['enrol']        = $data['enrol'];
-    $json['self']         = $data['self'];
+    // $json['self']         = $data['self'];
     $json['settings']     = [
       'id' => $data['mixeval']['Mixeval']['id'],
       'availability' => $data['mixeval']['Mixeval']['availability'],
@@ -119,6 +120,7 @@ class JsonHandlerComponent extends CakeObject
       'zero_mark' => $data['mixeval']['Mixeval']['zero_mark']
     ];
     $json['member_count'] = $data['memberCount'];
+    $json['template']     = 'MixedEvaluation';
     
     $this->RestResponseHandler->toJson('MixedEvaluation', 200, $json);
     exit;

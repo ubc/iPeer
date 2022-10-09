@@ -19,7 +19,7 @@ class HomeController extends AppController
         'User', 'UserCourse', 'Event', 'EvaluationSubmission',
         'Course', 'Role', 'UserEnrol', 'Rubric', 'Penalty');
     // NOTE::
-    public $components = ['RequestHandler', 'EventsRequest'];
+    public $components = ['RequestHandler', 'HomeRequest'];
   
     // NOTE::
     public $body    = [];
@@ -68,12 +68,18 @@ class HomeController extends AppController
     function index()
     {
         if (User::hasPermission('functions/coursemanager') || User::isInstructor()) {
-            // Admins and profs
-            $course_list = $this->Course->getAllAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'all', array(
-                'limit' => 10,
-                'order' => array('Course.created DESC'),
-                'contain' => array('Event', 'Instructor')));
-            $this->set('course_list', $this->_formatCourseList($course_list));
+            if ($this->RequestHandler->accepts('json')) {
+                // TODO:: add processInstructorCollectionRequest() for Instructor view
+                $this->HomeRequest->processInstructorCollectionRequest($this->_formatCourseList($course_list), User::get('id'));
+            }
+            elseif ($this->RequestHandler->accepts('html')) {
+              // Admins and profs
+              $course_list = $this->Course->getAllAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'all', array(
+                  'limit' => 10,
+                  'order' => array('Course.created DESC'),
+                  'contain' => array('Event', 'Instructor')));
+              $this->set('course_list', $this->_formatCourseList($course_list));
+            }
             if(!User::isStudentOrTutor()) {
                 return;
             }
@@ -134,23 +140,14 @@ class HomeController extends AppController
         // NOTE:: Needs refactoring
         if ($this->RequestHandler->accepts('json')) {
             if(!User::isInstructor()) {
+                //$this->pre_r($this->method);$this->pre_r($this->params); die();
                 $this->layout = false;
                 $this->autoRender = false;
-                $work = $this->params['url']['_work'] ?? null;
-                $params = $this->params['url'] || null;
+                $work = $this->params['url']['work'] ?? null;
                 $userId = User::get('id');
-                
-                switch($work) {
-                    case 'current':
-                        $this->EventsRequest->processCollectionRequest($this->method, $evals['upcoming'], $userId, $params);
-                        break;
-                    case 'completed':
-                        $this->EventsRequest->processCollectionRequest($this->method, array_merge($evals['submitted'], $evals['expired']), $userId, $params);
-                        break;
-                    default:
-                        $this->EventsRequest->processCollectionRequest($this->method, $evals, $userId, $params);
-                        break;
-                }
+        
+                $this->HomeRequest->processStudentCollectionRequest($evals, $userId);
+      
             } else {
                 $this->render('combined');
             }
