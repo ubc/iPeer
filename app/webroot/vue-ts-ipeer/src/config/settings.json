@@ -1,0 +1,15 @@
+{
+  "dashboard": {
+    "page": {
+      "title": "Welcome to iPeer!",
+      "description": "This application lets you review your team members’ contributions to group projects and assignments. Your feedback helps you reflect on teamwork and express your point-of-view. It also helps instructors understand how well groups work together and how much each group member contributes."
+    },
+    "section": {
+      "title": "",
+      "subtitle": {
+        "icon": { "src":  "", "size": ""},
+        "text": ""
+      }
+    }
+  }
+}

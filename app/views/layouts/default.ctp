@@ -10,37 +10,37 @@
   <link rel="shortcut icon" href="/img/favicon.png" type="image/png" />
   <?php
   // CSS files
-  echo $html->css('datepicker');
-  echo $html->css('jquery.dataTables');
-  echo $html->css('https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/jquery-ui.css');
-  echo $html->css('https://fonts.googleapis.com/css?family=Lato:400,400italic,700');
-  echo $html->css('https://fonts.googleapis.com/css?family=Open+Sans:400,600,700');
-  echo $html->css('ipeer');
+  //echo $html->css('datepicker');
+  //echo $html->css('jquery.dataTables');
+  //echo $html->css('https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/jquery-ui.css');
+  //echo $html->css('https://fonts.googleapis.com/css?family=Lato:400,400italic,700');
+  //echo $html->css('https://fonts.googleapis.com/css?family=Open+Sans:400,600,700');
+  echo $this->Html->css('ipeer');
 
   // Scripts
   // as prototype does not appear to be maintained anymore, we should
   // switch to jquery. Load jquery from Google.
-  echo $html->script('https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js');
-  echo $html->script('https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js');
-  echo $html->script('jquery.dataTables.min');
-  echo $html->script('fnGetHiddenNodes');
+  //echo $html->script('https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js');
+  //echo $html->script('https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js');
+  //echo $html->script('jquery.dataTables.min');
+  //echo $html->script('fnGetHiddenNodes');
   ?>
   <script type='text/javascript'>
-  jQuery.noConflict(); // prevent conflicts with prototype
+  //jQuery.noConflict(); // prevent conflicts with prototype
   </script>
   <?php
-  echo $html->script('prototype');
-  echo $html->script('ipeer');
-  echo $html->script('showhide');
+  //echo $html->script('prototype');
+  //echo $html->script('ipeer');
+  //echo $html->script('showhide');
   // AJAX Include Files
-  echo $html->script('scriptaculous');
-  echo $html->script('zebra_tables');
+  //echo $html->script('scriptaculous');
+  //echo $html->script('zebra_tables');
   // Validation Include Files
-  echo $html->script('validate');
-  echo $html->script('submitvalidate');
+  //echo $html->script('validate');
+  //echo $html->script('submitvalidate');
 
   // Custom View Include Files
-  echo $scripts_for_layout;
+  //echo $scripts_for_layout;
   ?>
 <?php if (!empty($trackingId) && !empty($trackingId['SysParameter']['parameter_value'])): ?>
   <!-- Global site tag (gtag.js) - Google Analytics -->
