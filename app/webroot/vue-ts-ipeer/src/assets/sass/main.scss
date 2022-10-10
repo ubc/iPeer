@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "base";
+@import "navigation";
+@import "button";
+@import "table";
+@import "form";
+
+.preview {
+  @apply text-sm flex justify-center text-slate-500 bg-slate-100;
+}
+.debug, .debugger, .preview {
+  //display: none;
+}
+
+#webapp {}
+
+
+section {
+  @apply mb-1;
+}
+@layer components {
+  .visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0,0,0,0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+  }
+  .debug {
+    @apply border shadow py-2 px-4 my-4;
+    &.code {
+      @apply bg-gray-50 text-sm font-light text-slate-500;
+    }
+  }
+  .page {
+    &-container {
+      @apply bg-white;
+      @apply p-8;
+      @apply border border-[#ccc];
+      @apply rounded-[10px];
+      @apply shadow-2xl; // box-shadow: 0 0 25px rgba(85, 85, 85, 0.28);
+    }
+    &-width {
+      //@apply sm:w-full;
+      @apply md:max-w-[1000px];
+      @apply mx-auto mt-0 md:mt-2;
+    }
+    &-title {
+      @apply font-serif;
+      @apply text-[2.6em];
+      @apply font-normal;
+    }
+  }
+  .section {
+    &-title {
+      @apply font-serif;
+      @apply py-[.3em] px-[.5em];
+      @apply text-[1.6em];
+      @apply font-semibold;
+      @apply bg-[#8c629f];
+      @apply text-white;
+      @apply shadow;
+      // box-shadow: 0 0 5px #55555547;
+      @apply mb-0;
+    }
+    &-subtitle {
+      @apply flex justify-start items-center;
+      @apply pb-1 mb-4;
+      // border-bottom-width: 2px;
+      border-bottom-style: solid;
+      // border-bottom-color: #ecbb06;
+      @apply border border-b-2 border-gold-500;
+      @apply space-x-2 space-y-2;
+
+      h3 {
+        @apply font-serif;
+        @apply text-[1.6em];
+        @apply font-medium;
+      }
+    }
+  }
+
+  .datatable {
+    @apply flex flex-col;
+    @apply mt-4 mb-8;
+
+    table {
+      @apply flex-1;
+      @apply md:mx-4;
+      @apply w-auto;
+
+      thead th {
+        @apply font-serif;
+        @apply text-center;
+      }
+    }
+  }
+
+  .cta {
+    @apply flex justify-center items-center space-x-4;
+    @apply mt-12 mb-4;
+  }
+
+  a.button.default,
+  a.button.submit {
+
+    &.btn {
+      &-sm {
+        @apply py-0 px-1;
+      }
+      &-md {
+        @apply py-1 px-2;
+      }
+      &-lg {
+        @apply py-2 px-4;
+      }
+      &-xl {
+        @apply py-3 px-6;
+      }
+      &-2xl {
+        @apply py-4 px-8;
+      }
+    }
+
+    &.with-icon {
+      @apply flex justify-center items-center space-x-2;
+    }
+  }
+
+  .completed {
+    @apply text-blue-500;
+
+    &::after {
+      content: "\bb";
+      @apply ml-1;
+    }
+
+  }
+}
+

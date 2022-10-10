@@ -1,0 +1,64 @@
+a.button, a.submit { text-align: center; }
+button:disabled {opacity: .5;cursor: not-allowed;}
+a.paginate.active, button.paginate.active { cursor: not-allowed; }
+.button, input[type="submit"], input[type="button"], button, a.button, a.submit {
+  background-color: #e6e6e6;
+  padding: 5px 5px 5px 25px;
+  background-position: 5px 6px;
+  border: solid 1px #ccc;
+  border-radius: 3px;
+  white-space:nowrap;
+  font-size: 0.9em;
+  background-repeat: no-repeat;
+  box-shadow: 0 0 5px rgba(85, 85, 85, 0.28);
+  cursor: pointer;
+  border-color: #adadad;
+  text-decoration: none;
+}
+
+input[type="submit"], input[type="button"], button, .button, a.button, a.submit {
+  padding: 5px 10px;
+  background: #e7e7e7; /* For browsers that do not support gradients */
+  background: -webkit-linear-gradient(left top, #e7e7e7, #c1c1c1); /* For Safari 5.1 to 6.0 */
+  background: -o-linear-gradient(bottom right, #e7e7e7, #c1c1c1); /* For Opera 11.1 to 12.0 */
+  background: -moz-linear-gradient(bottom right, #e7e7e7, #c1c1c1); /* For Firefox 3.6 to 15 */
+  background: linear-gradient(to bottom right, #e7e7e7, #c1c1c1); /* Standard syntax */
+  border-color: #636363;
+  color: #636363;
+}
+
+input[type="submit"], button.submit, a.submit {
+  padding: 5px 10px;
+  background: #e7d3f1; /* For browsers that do not support gradients */
+  background: -webkit-linear-gradient(left top, #e7d3f1, #c19bd4); /* For Safari 5.1 to 6.0 */
+  background: -o-linear-gradient(bottom right, #e7d3f1, #c19bd4); /* For Opera 11.1 to 12.0 */
+  background: -moz-linear-gradient(bottom right, #e7d3f1, #c19bd4); /* For Firefox 3.6 to 15 */
+  background: linear-gradient(to bottom right, #e7d3f1, #c19bd4); /* Standard syntax */
+  border-color: #632b7d;
+  color: #632b7d;
+  font-weight: normal;
+}
+
+.button:hover,
+input[type="submit"]:hover, input[type="button"]:hover,
+a.submit:hover, a.button:hover,
+button:hover,
+a.paginate.active, button.paginate.active {
+  background-color: #fbf9ea !important;
+  border-color: #f1cb00;
+  box-shadow: 0 0 5px #decc7c;
+  color: #5f5415 !important;
+}
+
+.button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+a.submit:hover, a.button:hover,
+button:hover,
+a.paginate.active, button.paginate.active {
+  background: #fbf9ea; /* For browsers that do not support gradients */
+  background: -webkit-linear-gradient(left top, #fbf9ea, #f8e988); /* For Safari 5.1 to 6.0 */
+  background: -o-linear-gradient(bottom right, #fbf9ea, #f8e988); /* For Opera 11.1 to 12.0 */
+  background: -moz-linear-gradient(bottom right, #fbf9ea, #f8e988); /* For Firefox 3.6 to 15 */
+  background: linear-gradient(to bottom right, #fbf9ea, #f8e988); /* Standard syntax */
+}

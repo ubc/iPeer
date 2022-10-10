@@ -1,0 +1,60 @@
+.standardtable {
+  width: 100%;
+  border: solid 1px #ccc;
+  border-radius: 5px;
+  border-collapse: separate;
+  box-shadow: 0 0 25px rgba(85, 85, 85, 0.10);
+  margin: 0.5em 0 0.7em;
+}
+
+.standardtable th {
+  @apply font-sans;
+  padding: 0.4em 0.1em;
+  background-color: #ececec;
+  font-weight: 600;
+  font-size: 0.95em;
+  border-left: solid 1px #ddd;
+  border-bottom: solid 1px #ddd;
+}
+
+.standardtable td {
+  border-left: solid 1px #e9e9e9;
+  border-bottom: solid 1px #e9e9e9;
+  padding: 0.4em 0.1em;
+  background-color: #f9f9f9;
+  text-align: center;
+}
+
+.standardtable tr th:first-child,
+.standardtable tr td:first-child {
+  border-left: none;
+}
+.standardtable tr:last-child td {
+  border-bottom: none;
+}
+
+.standardtable #details td {
+  background-color: #f1f1f1;
+}
+
+.standardtable table td {
+  border: none;
+}
+
+.leftalignedtable th, .leftalignedtable td {
+  padding: 0.4em;
+  text-align: left;
+}
+
+.standardtable tr:first-child th:first-child {
+  border-top-left-radius: 4px;
+}
+.standardtable tr:first-child th:last-child {
+  border-top-right-radius: 4px;
+}
+.standardtable tr:last-child td:first-child, .standardtable thead:only-child tr:last-child th:first-child {
+  border-bottom-left-radius: 4px;
+}
+.standardtable tr:last-child td:last-child, .standardtable thead:only-child tr:last-child th:last-child {
+  border-bottom-right-radius: 4px;
+}
