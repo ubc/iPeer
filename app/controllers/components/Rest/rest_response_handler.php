@@ -86,7 +86,7 @@ class RestResponseHandlerComponent extends CakeObject
       case 403:
       case 404:
       case 500:
-        $statusText = 'Error';
+        $statusText = 'error';
         $response = [
           'code' => "HTTP/1.1 $status",
           'details' => null,

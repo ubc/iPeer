@@ -1,168 +1,139 @@
-<script lang="ts" setup>
-//...
-// https://vee-validate.logaretm.com/v4/guide/composition-api/nested-objects-and-arrays/
-import {toRef, ref, reactive, onMounted, watchEffect, computed,} from "vue";
-import axios from 'axios'
-import {configure, useForm } from 'vee-validate'
+<script setup lang="ts">
+import { toRef } from 'vue'
+import { useField, useForm } from 'vee-validate'
 import * as Yup from 'yup'
+import swal from 'sweetalert'
+import useFetch from '@/composables/useFetch'
 
-import useLoader from '@/composables/useLoader'
-import useNotifications from '@/composables/useNotifications'
-
+import Loader from '@/components/Loader.vue'
 import PageTitle from '@/components/PageTitle.vue'
 import SectionTitle from '@/components/SectionTitle.vue'
 import SectionSubtitle from '@/components/SectionSubtitle.vue'
-import { VeeInputField } from '@/components/fields'
+import VInputField from '@/components/fields/VInputField.vue'
 import { IconUser, IconKey, IconSpinner } from '@/components/icons'
 
-import { User } from '@/types/typings'
-
+import type { User } from '@/types/typings'
 // REFERENCES
-const URL = 'http://localhost:8080/users/editProfile/7'
-const emit = defineEmits<{
-  (e: 'get:user-profile', option: null): void
+const emit              = defineEmits<{
+  (e: 'update:profile'): void
 }>()
 const props = defineProps<{
-  currentUser: User
+  user: User
 }>()
-const { loading, setLoading } = useLoader()
-const { setNotification } = useNotifications()
 
-// DATA
-const user = toRef<User>(props, 'currentUser') || {}
-// const schema = Yup.object().shape({
-//   'data[User][username]': Yup.string().required().label('Username'),
-//   'data[User][first_name]': Yup.string().required().label('First Name'),
-//   'data[User][last_name]': Yup.string().required().label('Last Name'),
-//   'data[User][email]': Yup.string().email().required().label('Email'),
-//   'data[User][student_no]': Yup.string().required().label('Student Number'),
-//   'data[User][old_password]': Yup.string().min(6).required(false),
-//   'data[User][temp_password]': Yup.string().min(6).required(false).label('New Password '),
-//   'data[User][confirm_password]': Yup.string().min(6).required(false)
-//       .oneOf([Yup.ref('data[User][temp_password]')], 'New Passwords do not match').label('Your Password '),
-// });
-
-// COMPUTED
-const form = computed(() => {
-  let tmp={};
-  for(const u of Object.entries(user.value)) {
-    Object.assign(tmp, {[`data[User][${u[0]}]`]: u[1]})
-  }
-  return tmp
-})
-const { handleSubmit, values, errors, meta, isSubmitting } = useForm({
-  // keep all values when their fields get unmounted
-  // keepValuesOnUnmount: true,
-  'invalid-submit': onInvalidSubmit,
-  initialValues: form,
-  validationSchema: Yup.object({
-    'data[User][username]': Yup.string().required('Username is required').label('Username'),
-    'data[User][first_name]': Yup.string().required('First name is required').label('First name'),
-    'data[User][last_name]': Yup.string().required('Last name is required').label('Last name'),
-    'data[User][email]': Yup.string().required('Email is required').email().label('Email'),
-    'data[User][student_no]': Yup.string().required('Student Number is required').label('Student Number'),
-    'data[User][old_password]': Yup.string().label('Old Password is required').label('Old Password'),
-    'data[User][temp_password]': Yup.string().label('New Password is required').label('New Password'),
-    'data[User][confirm_password]': Yup.string()
-      .test('passwords-match', 'New Passwords do not match', function(value){
-        return this.parent['data[User][temp_password]'] === value
-      })
-  }),
-})
-
-// METHODS
-function onInvalidSubmit({ errors }) {
-  console.log('onInvalidSubmit', errors)
-  const fieldName = Object.keys(errors)[0]
-  const element = document.querySelector(`input[name="${fieldName}"]`)
-  element.scrollIntoView()
-}
-
-const onSubmit = handleSubmit(async values => {
-  console.log('Submitting...')
-  const searchProfileParams = new URLSearchParams()
-  searchProfileParams.append('_method', 'PUT')
-  searchProfileParams.append('action', 'Save')
-
-  for (const pair of Object.entries(values)) {
-    searchProfileParams.append(pair[0], pair[1])
-  }
-
-  try {
-    await setLoading('PENDING')
-    let response = await axios({
-      method: 'POST',
-      url: URL,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', // application/json;
-      },
-      data: searchProfileParams // JSON.stringify(data)
-    })
-    await setNotification(response.data.response.message, 'success')
-  } catch (err: any) {
-    await setNotification(err.response.data.message, 'error')
-  } finally {
-    await emit('get:user-profile')
-    await setLoading('READY')
-  }
+const currentUser              = toRef(props, 'user')
+const { meta, values, errors, handleChange, handleBlur, handleSubmit, isSubmitting }  = useForm({
+  // initialValues: currentUser.value
 });
 
-// WATCH
+function onInvalidSubmit({ values, errors, results }) {
+  // console.log(values); // current form values
+  // console.log(errors); // a map of field names and their first error message
+  // console.log(results); // a detailed map of field names and their validation results
+  // NOTE:: here we can scroll to fields with error
+}
+const onSubmit = handleSubmit(async (values) => {
+  const profileSearchParams = new URLSearchParams()
+  for (const pair of Object.entries(values)) {
+    profileSearchParams.append(pair[0], pair[1])
+  }
+  try {
+    const response = await useFetch(
+        `${import.meta.env.VITE_BASE_URL}/users/editProfile/${currentUser.value?.id}`,
+        {
+          method: 'POST',
+          timeout: 300,
+          body: profileSearchParams,
+        }
+    )
+    await emit('update:profile')
+    await swal({text: response.message, icon: response.statusText})
+  } catch (err) {
+    await swal({text: err.message, icon: err.statusText})
+  }
 
-// LIFECYCLE
-onMounted(() => {
-  configure({
-    validateOnBlur: true,
-    validateOnChange: true,
-    validateOnInput: true,
-    validateOnModelUpdate: true
-  })
+}, onInvalidSubmit);
+
+const { value: username } = useField('data[User][username]', Yup.string().trim().required().min(2).label('Username'), {
+  initialValue: currentUser.value['username']
 })
-
+const { value: first_name } = useField('data[User][first_name]', Yup.string().trim().required().min(2).label('First name'), {
+  initialValue: currentUser.value['first_name']
+})
+const { value: last_name } = useField('data[User][last_name]', Yup.string().trim().required().min(2).label('Last name'), {
+  initialValue: currentUser.value['last_name']
+})
+const { value: email } = useField('data[User][email]', Yup.string().required().trim().email().label('Email'), {
+  initialValue: currentUser.value['email']
+})
+const { value: student_no } = useField('data[User][student_no]', Yup.string().trim().required().min(2).label('Student number'), {
+  initialValue: currentUser.value['student_no']
+})
+const { value: old_password, error: old_errorMessage } = useField(
+    'data[User][old_password]',
+    Yup.string()
+        .trim(),
+    {initialValue: ''}
+)
+const { value: temp_password, error: temp_errorMessage } = useField(
+    'data[User][temp_password]',
+    Yup.string()
+        .trim()
+        .label('New password'),
+    {initialValue: ''}
+)
+const { value: confirm_password, error: confirm_errorMessage } = useField(
+    'data[User][confirm_password]',
+    Yup.string()
+        .trim()
+        .test('passwords-match', 'New Passwords do not match', function(value) {
+          if(parent['data[User][temp_password]']['value'] === value) {
+            return true
+          } return false
+        })
+        .label('Confirm password'),
+    {initialValue: ''}
+)
 </script>
 
 <template>
-  <div id="users" class="user-profile" :class="loading === 'PENDING' ? 'bg-slate-50' : ''">
-    <PageTitle title="Edit Profile" />
-    <!--   novalidate  -->
-    <form @submit="onSubmit">
-      <div style="display:none;"><input type="hidden" name="_method" value="PUT"></div>
+  <PageTitle title="Edit Profile" />
+  <form @submit="onSubmit" novalidate class="flex flex-col">
+    <div style="display:none;"><VInputField type="hidden" name="_action" value="save" /></div>
+    <div style="display:none;"><VInputField type="hidden" name="_method" value="PUT" /></div>
 
-      <div class="form-fields">
-        <SectionTitle title="Your Account" class="mt-8" />
-        <SectionSubtitle subtitle="Update your iPeer profile" :icon="{src: IconUser, size: '3.5rem'}">
-          <p class="text-sm leading-relaxed text-slate-900 mx-4">Your first name and last name are shown to peers when they review you but not when they read reviews from you. No one other than your instructor and teaching assistants will know what you share about peers in iPeer.</p>
-        </SectionSubtitle>
+    <div class="form-section">
+      <SectionTitle title="Your Account" class="mt-8" />
+      <SectionSubtitle subtitle="Update your iPeer profile" :icon="{src: IconUser, size: '3.5rem'}">
+        <p class="text-sm leading-relaxed text-slate-900 mx-4">Your first name and last name are shown to peers when they review you but not when they read reviews from you. No one other than your instructor and teaching assistants will know what you share about peers in iPeer.</p>
+      </SectionSubtitle>
 
-        <VeeInputField type="text" name="data[User][username]" label="Username" placeholder="Username" :disabled="true" readonly="readonly" />
-        <VeeInputField type="text" name="data[User][first_name]" label="First Name" placeholder="Your First Name" />
-        <VeeInputField type="text" name="data[User][last_name]" label="Last Name" placeholder="Your Last Name" />
-        <VeeInputField type="email" name="data[User][email]" label="E-mail" placeholder="Your Email Address" />
-        <VeeInputField type="text" name="data[User][student_no]" label="Student Number" placeholder="Your Student Number" :disabled="true" readonly="readonly" />
-      </div>
+      <section class="mt-6 mb-4">
+        <VInputField type="text" name="data[User][username]" label="Username" v-model="username" />
+        <VInputField type="text" name="data[User][first_name]" label="First name" v-model="first_name" />
+        <VInputField type="text" name="data[User][last_name]" label="Last name" v-model="last_name" />
+        <VInputField type="text" name="data[User][email]" label="Email" v-model="email" />
+        <VInputField type="text" name="data[User][student_no]" label="Student number" v-model="student_no" />
+      </section>
+    </div>
 
-      <div class="form-fields">
-        <SectionTitle title="Your Password" />
-        <SectionSubtitle subtitle="Change your iPeer password" :icon="{src: IconKey, size: '3.5rem'}">
-          <p class="text-sm leading-relaxed text-slate-900 mx-4">Enter this information if you'd like to change your password. You can save updates to your account without changing your password.</p>
-        </SectionSubtitle>
+    <div class="form-section">
+      <SectionTitle title="Your Password" />
+      <SectionSubtitle subtitle="Change your iPeer password" :icon="{src: IconKey, size: '3.5rem'}">
+        <p class="text-sm leading-relaxed text-slate-900 mx-4">Enter this information if you'd like to change your password. You can save updates to your account without changing your password.</p>
+      </SectionSubtitle>
 
-        <VeeInputField type="password" name="data[User][old_password]" ref="old_password" label="Old Password" placeholder="Your Old Password" />
-        <VeeInputField type="password" name="data[User][temp_password]" ref="temp_password" label="New Password" placeholder="Your New Password" />
-        <VeeInputField type="password" name="data[User][confirm_password]" ref="confirm_password" label="Confirm New Password" placeholder="Confirm Your New Password" />
-      </div>
+      <section class="mt-6 mb-4">
+        <VInputField type="password" name="data[User][old_password]" label="Old password" v-model="old_password" />
+        <VInputField type="password" name="data[User][temp_password]" label="New password" v-model="temp_password" />
+        <VInputField type="password" name="data[User][confirm_password]" label="Confirm new password" v-model="confirm_password" />
+      </section>
+    </div>
 
-      <div class="cta">
-        <button type="submit" class="button submit submit-btn btn-lg flex items-center space-x-2" :disabled="!meta.valid === meta.touched">
-          <IconSpinner class="w-4 h-4" v-if="isSubmitting" /> Save
-        </button>
-      </div>
-
-    </form>
-  </div>
+    <div class="cta">
+      <button type="submit" class="button submit submitBtn btn-lg flex items-center space-x-2" :disabled="!meta.valid === meta.touched">
+        <IconSpinner class="w-4 h-4" v-if="isSubmitting" /> {{ isSubmitting }} Save
+      </button>
+    </div>
+  </form>
 </template>
-
-<style lang="scss" scoped>
-
-</style>

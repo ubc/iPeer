@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { toRef } from 'vue'
-import { useField } from 'vee-validate'
+import { useField, ErrorMessage } from 'vee-validate'
 
 interface Props {
   disabled?: boolean
@@ -8,7 +8,6 @@ interface Props {
   value: string
   name: string
   label?: string
-  successMessage?: string
   placeholder?: string
 }
 
@@ -28,10 +27,6 @@ const props = defineProps({
   label: {
     type: String,
     required: true,
-  },
-  successMessage: {
-    type: String,
-    default: '',
   },
   placeholder: {
     type: String,
@@ -62,7 +57,7 @@ const {
 </script>
 
 <template>
-  <div class="Text--Input form-field" :class="{ 'has-error': !!errorMessage, success: meta.valid }">
+  <div class="form-field" :class="{ 'has-error': !!errorMessage, success: meta.valid }">
     <label class="form-label" :for="name">{{ label }}</label>
     <div class="form-input">
       <input
@@ -79,15 +74,17 @@ const {
           }"
           :disabled="disabled"
       />
-      <span class="input-message" v-show="errorMessage || meta.valid">{{ errorMessage || successMessage }}</span>
+      <span class="input-message" v-show="errorMessage && !meta.valid">{{ errorMessage }}</span>
+<!--      <ErrorMessage class="input-message" :name="name">{{ errorMessage }}</ErrorMessage>-->
     </div>
+    <span class="text-xs">{{ meta.valid }}</span>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .form-field {
   position: relative;
-  margin-bottom: calc(1em * 1.5);
+  //margin-bottom: calc(1em * 1.5);
   width: 100%;
 }
 input[type="text"], input[type="email"], input[type="file"], input[type="password"], textarea, select, button {
@@ -136,6 +133,7 @@ input[type="text"], input[type="email"], input[type="file"], input[type="passwor
     @apply flex flex-col;
     @apply relative;
     @apply w-full md:w-[350px];
+    @apply pb-1.5;
 
     input {
       @apply rounded;                 // border-radius: 5px;
@@ -155,9 +153,9 @@ input[type="text"], input[type="email"], input[type="file"], input[type="passwor
     }
 
     .input-message {
-      @apply absolute left-0 -bottom-8;
+      @apply absolute left-0 -bottom-5;
       @apply text-xs;
-      @apply mt-1 mb-4;
+      @apply mt-0 mb-4;
       @apply ml-2 mr-0;
     }
 

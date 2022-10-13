@@ -38,24 +38,14 @@ class HomeRequestComponent extends CakeObject
     echo '</pre>';
   }
   
-  
+  // header('Content-Type: application/json');
   public function processInstructorCollectionRequest(array $courseList, string $userId)
   {
     switch ($this->controller->method) {
       case 'GET':
-        $data = [
-          'method' => $this->controller->method,
-          'user_id' => $userId,
-          'course_list' => [
-            'courses' => $courseList['A'][0]['Course'],
-            'events' => $courseList['A'][0]['Event'],
-            'user' => $courseList['A'][0]['Instructor'][0],
-          ],
-        ];
         header('Content-Type: application/json');
         http_response_code(200);
-        echo json_encode($data);
-        break;
+        echo json_encode($courseList['I'][0]); exit; // ['I'] for Instructor list
       default:
         break;
     }

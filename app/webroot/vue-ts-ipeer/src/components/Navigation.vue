@@ -1,0 +1,56 @@
+<script lang="ts" setup>
+import {computed, toRef} from 'vue'
+import { useRoute, useRouter, useLink } from 'vue-router'
+import NavigationItem from '@/components/NavigationItem.vue'
+import {User} from "@/types/typings";
+// REFERENCES
+const props = defineProps<{
+  user: object
+  routeTitle: string
+}>()
+const emit = defineEmits<{
+  // (e: 'updateModelValue', option: string): void
+}>()
+// DATA
+const user              = toRef<User>(props, 'user')
+// COMPUTED
+const currentRouteName  = computed(() => {
+  return useRoute().name;
+})
+const currentRouteTitle = computed(() => {
+  return useRoute().meta.routeTitle
+})
+// METHODS
+function toggleNavDropdown() {console.log('[Todo] Navigation Dropdown List')}
+// WATCH
+// LIFECYCLE
+</script>
+
+<template>
+  <nav class=" flex justify-between items-center bg-slate-50 mx-auto mt-4 mb-8 px-4 py-0 border shadow-md">
+    <div class="flex items-center space-x-2 text-sm text-slate-700 leading-relaxed tracking-wide space-x-4">
+      <NavigationItem class="py-1" route-name="dashboard" display-name="Dashboard"></NavigationItem>
+      <NavigationItem v-if="currentRouteTitle" class="text-gold-500 font-medium active" :route-name="null" :display-name="currentRouteTitle"></NavigationItem>
+    </div>
+
+    <div v-if="user" class="flex items-center text-sm text-slate-700 leading-relaxed tracking-wide space-x-2 ">
+      <router-link class="py-1 px-2" :to="{ name: 'user.profile' }">{{ user?.first_name }} {{ user?.last_name }}</router-link>
+      <svg @click="toggleNavDropdown" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+      </svg>
+    </div>
+  </nav>
+</template>
+
+<style lang="scss" scoped>
+.active {
+  border-bottom-style: solid;
+  @apply flex items-center space-x-8;
+  @apply space-x-4;
+}
+.active::before {
+  content: " > ";
+  @apply mr-4;
+  @apply text-slate-700;
+}
+</style>

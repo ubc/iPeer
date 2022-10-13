@@ -1,12 +1,23 @@
 export interface User {
-  "id": string | null
-  "role_id": string | null
-  "username": string | null
-  "first_name": string | null
-  "last_name": string | null
-  "student_no": string | null
-  "title": string | null
-  "email": string | null
+  id: string | null
+  role_id: string | null
+  username: string | null
+  first_name: string | null
+  last_name: string | null
+  student_no: string | null
+  title: string | null
+  email: string | null
+}
+
+export interface Evaluation {
+  event: Event
+  group: Group
+  group_event: GroupEvent
+  rubric_id: string
+  user_id: string
+  evaluatee_count: string
+  member_ids: string[]
+  submission: Submission
 }
 
 export interface Event {
@@ -47,10 +58,38 @@ export interface Group {
   member_count: string
 }
 
+export interface GroupEvent {
+  id: string
+}
+
 export interface Penalty {
   id: string
   event_id: string
   days_late: string
   percent_penalty: string
+}
+
+export interface Submission {
+  id: string
+  date_submitted: string
+  response: Response[]
+  submitted: string
+  submitter_id: string
+}
+
+export interface Response {
+  id: string
+  comment: string
+  details: Detail[]
+  evaluatee: string
+  evaluator: string
+  score: string
+}
+
+export interface Detail {
+  criteria_comment: string
+  criteria_number: string
+  id: string
+  selected_lom: string
 }
 

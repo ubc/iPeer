@@ -2,26 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+// @import "reset";
 @import "base";
+@import "animation";
 @import "navigation";
 @import "button";
 @import "table";
 @import "form";
 
-.preview {
-  @apply text-sm flex justify-center text-slate-500 bg-slate-100;
-}
-.debug, .debugger, .preview {
-  //display: none;
-}
-
-#webapp {}
-
-
-section {
-  @apply mb-1;
-}
 @layer components {
+  #webapp {}
+  section {
+    @apply mb-1;
+  }
   .visually-hidden {
     position: absolute !important;
     width: 1px !important;
@@ -32,12 +25,6 @@ section {
     clip: rect(0,0,0,0) !important;
     white-space: nowrap !important;
     border: 0 !important;
-  }
-  .debug {
-    @apply border shadow py-2 px-4 my-4;
-    &.code {
-      @apply bg-gray-50 text-sm font-light text-slate-500;
-    }
   }
   .page {
     &-container {

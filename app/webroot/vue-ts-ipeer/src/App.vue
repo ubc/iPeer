@@ -1,62 +1,34 @@
 <script lang="ts" setup>
-import { ref, reactive, watch, computed, onMounted } from 'vue';
-import config from 'envConfig'
-import axios from "axios";
-import useLoader from '@/composables/useLoader'
-import useNotifications from '@/composables/useNotifications'
-
-import EventsIndex from "@/pages/EventsIndex.vue";
-
+import { ref, reactive, computed, onMounted } from 'vue'
+import useFetch from '@/composables/useFetch'
+import Layout from '@/student/Layout.vue'
+import Loader from '@/components/Loader.vue'
+import type { User } from '@/types/typings'
 // REFERENCES
-const URL = 'http://localhost:8080/users/editProfile/7'
-interface Props {
-
-}
-const emit = defineEmits<{
-  // (e: 'updateModelValue', option: string): void
+const emit  = defineEmits<{}>()
+const props = defineProps<{
+  // pageTitle: string
 }>()
-const props = defineProps<Props>()
-const { loading, setLoading } = useLoader()
-const { setNotification } = useNotifications()
-
 // DATA
-const current_user  = reactive({})
-
+const initialized = ref(false);
+const user        = reactive({})
 // COMPUTED
-
 // METHODS
 async function getUserProfile() {
   try {
-    await setLoading('PENDING')
-    let response = await axios({
-      method: 'GET',
-      url: URL,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    })
-    Object.assign(current_user, response.data)
-  } catch (err: any) {
-    await setNotification(err.message, 'error')
-    await setLoading('ERROR')
-  } finally {
-    await setLoading('READY')
+    const response = await useFetch(`${import.meta.env.VITE_BASE_URL}/users/editProfile`, { method: 'GET', timeout: 100 })
+    Object.assign(user, response)
+    initialized.value = true;
+  } catch (err) {
+    error.value = {message: err, type: 'error'};
+    initialized.value = false;
   }
 }
-
 // WATCH
-console.log(config.log.msg)
-
 // LIFECYCLE
-onMounted(() => getUserProfile())
-
+onMounted(async () => await getUserProfile())
 </script>
 
 <template>
-  <div class="">
-    <router-link :to="{ name: 'dashboard' }">Dashboard</router-link>
-    <router-link :to="{ name: 'user.profile' }">Profile</router-link>
-    <router-view :current-user="current_user" @get:user-profile="getUserProfile"></router-view>
-  </div>
+  <Layout v-if="initialized === true" :user="user" @update:profile="getUserProfile" />
 </template>

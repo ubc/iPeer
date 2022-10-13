@@ -58,3 +58,13 @@
 .standardtable tr:last-child td:last-child, .standardtable thead:only-child tr:last-child th:last-child {
   border-bottom-right-radius: 4px;
 }
+
+
+table.standardtable thead th {
+  @apply font-serif font-medium;
+  @apply text-lg;
+  @apply py-1.5 pl-4;
+}
+table.standardtable tbody td {
+  @apply py-2 px-4;
+}

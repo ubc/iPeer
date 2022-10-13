@@ -34,6 +34,7 @@ class AppController extends Controller
     public $breadcrumb;
     public $validTZ;
     public $isLoggedIn;
+    public $loggedInUserRole;
 
     /**
      * if this request has session transfer data
@@ -127,10 +128,12 @@ class AppController extends Controller
         $domain = $this->SysParameter->findByParameterCode('google_analytics.domain');
         $customLogo = $this->SysParameter->findByParameterCode('banner.custom_logo');
         $this->isLoggedIn = $this->Auth->user() ? true : false;
+        $this->loggedInUserRole = User::get('id') ? array_keys($this->User->loadRoles(User::get('id')))[0] : 0;
         $this->set('trackingId', $trackingId);
         $this->set('domain', $domain);
         $this->set('customLogo', $customLogo);
         $this->set('isLoggedIn', $this->isLoggedIn);
+        $this->set('loggedInUserRole', $this->loggedInUserRole);
 
         parent::beforeFilter();
     }
