@@ -22,18 +22,18 @@ const props = defineProps<{
 }>()
 
 const currentUser              = toRef(props, 'user')
-const { meta, values, errors, handleChange, handleBlur, handleSubmit, isSubmitting }  = useForm({
+const { meta, values, errors, handleSubmit, isSubmitting }  = useForm({
   // initialValues: currentUser.value
 });
 
-function onInvalidSubmit({ values, errors, results }) {
+/** TODO:: onInvalidSubmit can scroll to fields with error */
+function onInvalidSubmit({ values, errors, results }: any) {
   // console.log(values); // current form values
   // console.log(errors); // a map of field names and their first error message
   // console.log(results); // a detailed map of field names and their validation results
-  // NOTE:: here we can scroll to fields with error
 }
 const onSubmit = handleSubmit(async (values) => {
-  const profileSearchParams = new URLSearchParams()
+  const profileSearchParams: any = new URLSearchParams()
   for (const pair of Object.entries(values)) {
     profileSearchParams.append(pair[0], pair[1])
   }
@@ -69,27 +69,25 @@ const { value: email } = useField('data[User][email]', Yup.string().required().t
 const { value: student_no } = useField('data[User][student_no]', Yup.string().trim().required().min(2).label('Student number'), {
   initialValue: currentUser.value['student_no']
 })
-const { value: old_password, error: old_errorMessage } = useField(
+const { value: old_password } = useField(
     'data[User][old_password]',
     Yup.string()
         .trim(),
     {initialValue: ''}
 )
-const { value: temp_password, error: temp_errorMessage } = useField(
+const { value: temp_password } = useField(
     'data[User][temp_password]',
     Yup.string()
         .trim()
         .label('New password'),
     {initialValue: ''}
 )
-const { value: confirm_password, error: confirm_errorMessage } = useField(
+const { value: confirm_password } = useField(
     'data[User][confirm_password]',
     Yup.string()
         .trim()
         .test('passwords-match', 'New Passwords do not match', function(value) {
-          if(parent['data[User][temp_password]']['value'] === value) {
-            return true
-          } return false
+          return parent['data[User][temp_password]']['value'] === value;
         })
         .label('Confirm password'),
     {initialValue: ''}
@@ -109,11 +107,11 @@ const { value: confirm_password, error: confirm_errorMessage } = useField(
       </SectionSubtitle>
 
       <section class="mt-6 mb-4">
-        <VInputField type="text" name="data[User][username]" label="Username" v-model="username" />
+        <VInputField type="text" name="data[User][username]" label="Username" v-model="username" :disabled="true" readonly="readonly" />
         <VInputField type="text" name="data[User][first_name]" label="First name" v-model="first_name" />
         <VInputField type="text" name="data[User][last_name]" label="Last name" v-model="last_name" />
         <VInputField type="text" name="data[User][email]" label="Email" v-model="email" />
-        <VInputField type="text" name="data[User][student_no]" label="Student number" v-model="student_no" />
+        <VInputField type="text" name="data[User][student_no]" label="Student number" v-model="student_no" :disabled="true" readonly="readonly" />
       </section>
     </div>
 
@@ -131,8 +129,8 @@ const { value: confirm_password, error: confirm_errorMessage } = useField(
     </div>
 
     <div class="cta">
-      <button type="submit" class="button submit submitBtn btn-lg flex items-center space-x-2" :disabled="!meta.valid === meta.touched">
-        <IconSpinner class="w-4 h-4" v-if="isSubmitting" /> {{ isSubmitting }} Save
+      <button type="submit" class="button submit btn-lg flex items-center space-x-2" :disabled="!meta.valid === meta.touched">
+        <IconSpinner class="w-4 h-4" v-if="isSubmitting" /> Save
       </button>
     </div>
   </form>

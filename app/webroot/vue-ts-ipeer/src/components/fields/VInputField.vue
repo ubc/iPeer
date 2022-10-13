@@ -8,6 +8,7 @@ const props = defineProps({
   name: {type: String, required: true},
   label: {type: String, required: true},
   placeholder: {type: String, default: ''},
+  disabled: {type: Boolean, default: false}
 });
 
 const name = toRef(props, 'name');
@@ -29,6 +30,7 @@ const { value: inputValue, errorMessage, handleBlur, handleChange, meta } = useF
              :placeholder="placeholder"
              @input="handleChange"
              @blur="handleBlur"
+             :disabled="disabled"
       />
       <span class="form-text text-muted" v-show="errorMessage || meta.valid">{{ errorMessage }}</span>
     </div>
