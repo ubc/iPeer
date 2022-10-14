@@ -73,17 +73,17 @@ class HomeRequestComponent extends CakeObject
     $work = $this->params['url']['work'] ?? null;
     switch($work) {
       case 'current':
-        // $this->EventsRequest->processCollectionRequest($this->method, $evals['upcoming'], $userId, $this->params);
-        $current = $this->JsonHandler->formatEvents($events, $userId);
-        $this->RestResponseHandler->toJson('Current Work To Do', 200, $current);
+        $current = $this->JsonHandler->formatEvents($events['upcoming'], $userId);
+//        var_dump(is_array($current)); die();
+//        $this->RestResponseHandler->toJson('Current Work To Do', 200, $current);
+        http_response_code(200);
+        echo json_encode(['data' => $current]);
         break;
       case 'completed':
-        // $this->EventsRequest->processCollectionRequest($this->method, array_merge($evals['submitted'], $evals['expired']), $userId, $this->params);
-        $completed = $this->JsonHandler->formatEvents($events, $userId);
+        $completed = $this->JsonHandler->formatEvents(array_merge($events['submitted'], $events['expired']), $userId);
         $this->RestResponseHandler->toJson('Closed or Completed Work', 200, $completed);
         break;
       default:
-        // $this->EventsRequest->processCollectionRequest($this->method, $evals, $userId, $this->params);
         $current = $this->JsonHandler->formatEvents($events['upcoming'], $userId);
         $completed = $this->JsonHandler->formatEvents(array_merge($events['submitted'], $events['expired']), $userId);
         $this->RestResponseHandler->toJson('Events', 200, [

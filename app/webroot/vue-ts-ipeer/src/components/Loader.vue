@@ -1,5 +1,12 @@
+<script lang="ts" setup>
+
+defineProps<{
+  height: string
+}>()
+</script>
+
 <template>
-  <div class="spinner-wrapper">
+  <div :style="{height: height}" class="spinner-wrapper">
     <div class="spin"></div>
   </div>
 </template>

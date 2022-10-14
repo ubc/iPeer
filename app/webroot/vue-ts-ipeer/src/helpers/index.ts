@@ -1,7 +1,6 @@
 import { differenceInHours, differenceInSeconds, format } from 'date-fns'
-import {map, filter, isEmpty, forEach} from 'lodash'
+import { map, filter, isEmpty, forEach } from 'lodash'
 import { enCA } from 'date-fns/locale'
-import {bool} from "yup";
 
 interface Entry {
   event: Event
@@ -18,7 +17,7 @@ interface Event {
 interface Sort {
   key: string
   column: string
-  by: string
+  direction: string
 }
 interface Paginate {
   page: number
@@ -125,22 +124,6 @@ export const filterEntries = (entries: Entry[], _filter: Filter): object[] | boo
   return newEntries
 }
 
-export const paginateEntries2222 = (entries: Event[], start: number, end: number) => {
-  if(!isEmpty(entries)) {
-    // @ts-ignore
-    return entries.slice(Number(start), Number(end))
-  }
-  return
-}
-
-export const paginateEntries222 = (entries: Event[], paginate: Paginate) => {
-  if(!isEmpty(entries)) {
-    // @ts-ignore
-    return entries.slice(Number(paginate.offset), Number(paginate.limit))
-  }
-  return
-}
-
 export const paginateEntries = (entries: Event[], offset: number, end: number) => {
   if(!isEmpty(entries)) {
     // @ts-ignore
@@ -150,14 +133,15 @@ export const paginateEntries = (entries: Event[], offset: number, end: number) =
 }
 
 // @ts-ignore
-// export const compareBy = (arr: object[], sort: Sort): object[] => {
+// export const sortEntries = (arr: object[], sort: Sort): object[] => {
+//   console.log({arr, sort})
 //   if(arr && sort) {
-//     const { key, column, by } = sort
-//     if(by === 'asc') {
+//     const { key, column, direction } = sort
+//     if(direction === 'asc') {
 //       // @ts-ignore
 //       return arr.sort((a, b) => a[key][column].localeCompare(b[key][column]))
 //     }
-//     if(by === 'desc') {
+//     if(direction === 'desc') {
 //       // @ts-ignore
 //       return arr.sort((a, b) => b[key][column].localeCompare(a[key][column]))
 //     }

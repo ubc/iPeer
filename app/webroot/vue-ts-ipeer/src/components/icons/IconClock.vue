@@ -1,5 +1,5 @@
 <template>
-  <svg class="w-4 h-4" id="emoji" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+  <svg id="emoji" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
     <g id="line">
       <path fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" d="M36,12.6326"/>
       <path fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" d="M36,19.0725"/>

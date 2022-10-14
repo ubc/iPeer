@@ -9,17 +9,6 @@ export interface User {
   email: string | null
 }
 
-export interface Evaluation {
-  event: Event
-  group: Group
-  group_event: GroupEvent
-  rubric_id: string
-  user_id: string
-  evaluatee_count: string
-  member_ids: string[]
-  submission: Submission
-}
-
 export interface Event {
   id: string
   title: string
@@ -42,6 +31,17 @@ export interface Event {
   is_result_released: boolean,
   is_ended: boolean,
   due_in: string
+}
+
+export interface Evaluation {
+  event: Event
+  group: Group
+  group_event: GroupEvent
+  rubric_id: string
+  user_id: string
+  evaluatee_count: string
+  member_ids: string[]
+  submission: Submission
 }
 
 export interface Course {

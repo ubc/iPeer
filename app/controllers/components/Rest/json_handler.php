@@ -59,8 +59,10 @@ class JsonHandlerComponent extends CakeObject
       isset($row['Penalty']) && !empty($row['Penalty']) ? $tmp['penalties'] = $row['Penalty'] : null;
       isset($row['late']) ? $tmp['late'] = $row['late'] : null;
       isset($row['percent_penalty']) ? $tmp['percent_penalty'] = $row['percent_penalty'] : null;
-      $data[] = $tmp;
+      array_push($data, $tmp);
+      // $data[] = $tmp;
     }
+//    var_dump(is_array($data)); die();
     return $data;
   }
 
