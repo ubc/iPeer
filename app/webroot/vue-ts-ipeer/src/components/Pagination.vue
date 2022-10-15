@@ -25,7 +25,7 @@ const paginate = toRef(props, 'paginate')
       of {{ paginate.total }}
     </div>
     <div class="paginate text-slate-700">
-      <ul class="flex">
+      <ul class="flex space-x-1.5">
         <li>
           <button :class="`paginate ${paginate.page === 1 ? 'disabled' : ''}`"
               :disabled="paginate.page === 1"

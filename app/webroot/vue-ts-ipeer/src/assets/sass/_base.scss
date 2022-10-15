@@ -24,6 +24,18 @@ p {
   font-size: 1em;
   line-height: 1.4em;
 }
+button {
+  padding: 0.3em 0.5em;
+}
+
+a:link, a:visited, a:hover, input[type="submit"], button {
+  color: #1049b1;
+  text-decoration: none;
+}
+
+a:hover, a:hover *, input[type="submit"]:hover, button:hover {
+  color: green !important;
+}
 
 thead tr th {
   @apply font-serif bg-pink-100;

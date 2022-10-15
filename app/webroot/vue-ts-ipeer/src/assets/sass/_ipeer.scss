@@ -1,0 +1,113 @@
+.containerOuter {
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  padding: 2em;
+  background: white;
+  box-shadow: 0 0 25px rgba(85, 85, 85, 0.28);
+  min-width: 540px;
+}
+.pagewidth {
+  /* 780px is Wide enough for someone with a 800px device to
+   * view the whole app without horizontal scrolling. I assume
+   * most people's computers are at least 1024x768. However
+   * many smartphones have at least a 800x480 display now,
+   * so we shouldn't use a higher min width.
+   * */
+  min-width: 780px;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0.5em;
+}
+
+/* BANNER */
+.banner {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-bottom: none;
+  background-color: #fff;
+}
+
+#bannerLarge {
+  height: 40px;
+  margin: -2em;
+  padding: 2em 1em;
+  background: #eee;
+}
+
+#customLogo {
+  float: right;
+  margin-right: 1em;
+}
+
+#bannerLogoImgLeft {
+  padding-right: 0.5em;
+}
+
+#bannerLogoImgRight {
+  height: 40px;
+}
+
+#ipeerLogo {
+  float: left;
+  margin-left: 1em;
+}
+
+#bannerLogoText {
+  font-size: 1em;
+  font-weight: 200;
+  font-style: italic;
+}
+
+#ipeerI {
+  font-size: 32px;
+}
+
+#ipeerText {
+  font-size: 36px;
+}
+
+a#home, a#home:hover, a#home:active {
+  text-decoration: none;
+  color: black;
+  background-color: transparent;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* FOOTER */
+#footer {
+  font-size: 0.72em;
+  padding-top: 0.5em;
+  color: #333;
+  text-align: center;
+  margin-bottom: 2rem;
+}

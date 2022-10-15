@@ -27,7 +27,7 @@ const dynamicClass = computed(() => {
 <template>
   <div class="navigation-wrapper">
     <router-link custom v-slot="{ navigate, isActive }" :to="{ name: routeName }">
-      <div @click="navigate" :class="dynamicClass">{{ displayName }}</div>
+      <a href="javascript:" @click="navigate" :class="dynamicClass">{{ displayName }}</a>
     </router-link>
   </div>
 </template>

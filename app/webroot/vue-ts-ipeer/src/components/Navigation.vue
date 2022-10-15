@@ -2,7 +2,7 @@
 import {computed, toRef} from 'vue'
 import { useRoute, useRouter, useLink } from 'vue-router'
 import NavigationItem from '@/components/NavigationItem.vue'
-import {User} from "@/types/typings";
+import type { User } from "@/types/typings";
 // REFERENCES
 const props = defineProps<{
   user: object

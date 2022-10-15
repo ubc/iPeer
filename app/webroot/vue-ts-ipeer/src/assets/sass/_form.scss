@@ -42,6 +42,7 @@
     @apply rounded;
     @apply outline-none;
     @apply m-0;
+    @apply border border-gray-100;
     transition: border-color 0.3s ease-in-out, color 0.3s ease-in-out,
     background-color 0.3s ease-in-out;
 

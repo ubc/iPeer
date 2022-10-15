@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 
 import App from '../App.vue'
+import Banner from '../components/Banner.vue'
 import Navigation from '../components/Navigation.vue'
 import Dashboard from '../pages/Dashboard.vue'
 
@@ -13,6 +14,7 @@ const router = createRouter({
       name: 'app',
       components: {
         default: App,
+        banner: Banner,
         navigation: Navigation,
       },
       children: [

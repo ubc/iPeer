@@ -2,15 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-// @import "reset";
+@import "reset";
 @import "base";
 @import "animation";
+@import "ipeer";
 @import "navigation";
 @import "button";
 @import "table";
 @import "form";
 
 @layer components {
+  body {
+    @apply bg-pink-50;
+  }
   #webapp {}
   section {
     @apply mb-1;

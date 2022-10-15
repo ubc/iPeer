@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prod": "npx vite --mode production",
-    "stag": "npx vite --mode staging",
-    "build": "vue-tsc && vite build",
+    "prod": "npx vite --noEmit --mode production",
+    "stag": "npx vite --noEmit --mode staging",
+    "build": "vue-tsc --noEmit && vite build",
+    "watch": "vite build --watch --mode development",
     "preview": "vite preview"
   },
   "dependencies": {

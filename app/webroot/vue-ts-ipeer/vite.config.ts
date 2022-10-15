@@ -7,17 +7,18 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [vue()],
     build: {
-      emptyOutDir: false,
-      outDir: '../vue/',
+      outDir: '../vue/webroot',
+      sourcemap: true,
+      emptyOutDir: true,
       manifest: true,
       rollupOptions: {
         input: {
           main: './src/main.ts'
         },
         output: {
-          entryFileNames: '',
-          chunkFileNames: '',
-          assetFileNames: ''
+          entryFileNames: 'js/vue/[name].js', // default '[name].[hash].js',
+          chunkFileNames: 'js/vue/[name].js', // default '[name].[hash].js',
+          assetFileNames: 'css/vue/[name].[ext]', // default '[name].[hash].[ext]'
         }
       }
     },

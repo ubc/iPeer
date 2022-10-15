@@ -5,7 +5,7 @@
     "composite": true,
     "types": ["node"],
     "strict": true,
-    "module": "commonjs",
+    "module": "es2022", // "commonjs",
     "jsx": "preserve",
     "esModuleInterop": true,
     "sourceMap": true,
