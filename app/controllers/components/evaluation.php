@@ -296,6 +296,9 @@ class EvaluationComponent extends CakeObject
         
         // assuming all are in the same order and same size
         $evaluatees = $params['form']['memberIDs'];
+        if(is_string($evaluatees)) {
+          $evaluatees = explode(',', $evaluatees);
+        }
         $points = $params['form']['points'];
         $comments = $params['form']['comments'];
         $evaluator = $params['data']['Evaluation']['evaluator_id'];

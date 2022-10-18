@@ -72,14 +72,12 @@ class JsonHandlerComponent extends CakeObject
    */
   public function formatSimpleEvaluation(array $data): void
   {
-    $json['template']   = 'SimpleEvaluation';
-    $json               = $this->getEventData($data);
-    $json['questions']  = $this->getSimpleEvaluationQuestions($data['questions']);
-    $json['submission'] = $this->getSimpleEvaluationSubmission($data['submission'], $data['evaluation']);
-    // NOTE:: Specific to Simple Evaluation
-    $json['remaining']  = $data['remaining'];
-    $json['template']   = 'SimpleEvaluation';
-    
+    $json                         = $this->getEventData($data);
+    $json['template']             = 'SimpleEvaluation';
+    $json['review']               = $this->getSimpleEvaluationSettings($data['questions']);
+    $json['review']['data']       = [];
+    $json['review']['response']   = $this->getSimpleEvaluationSubmission($data['submission'], $data['evaluation']);
+    $json['review']['remaining']  = $data['remaining'];
     $this->RestResponseHandler->toJson('SimpleEvaluation', 200, $json);
     exit;
   }
@@ -90,13 +88,15 @@ class JsonHandlerComponent extends CakeObject
    */
   public function formatRubricEvaluation(array $data): void
   {
-    $json['template']   = 'RubricEvaluation';
     $json               = $this->getEventData($data);
-    isset($data['questions']) ? $json['questions']  = $this->getRubricEvaluationQuestions($data['questions']) : null;
-    isset($data['groupMembers']) ? $json['submission'] = $this->getRubricEvaluationSubmission($data['submission'], $data['groupMembers']) : null;
-    // NOTE:: Specific to Rubric Evaluation
-    isset($data['rubricId']) ? $json['rubric_id'] = $data['rubricId'] : null;
+    $json['rubric_id']  = $data['rubricId'];
     $json['template']   = 'RubricEvaluation';
+    $json['review']     = [
+      'settings'    => $this->getRubricEvaluationSettings($data['questions']) ?? null,
+      'data'        => $this->getRubricEvaluationData($data['questions']) ?? null,
+      'response'    => isset($data['groupMembers']) ? $this->getRubricEvaluationSubmission($data['submission'], $data['groupMembers']) : null,
+      // 'remaining'   => ''
+    ];
     
     $this->RestResponseHandler->toJson('RubricEvaluation', 200, $json);
     exit;
@@ -130,17 +130,41 @@ class JsonHandlerComponent extends CakeObject
   
   
   // NOTE:: PRIVATE HELPER METHODS
-  private function isSubmitted(string $eventId, string $groupId, string $userId): string
+  private function isSubmitted(string $eventId, string $groupId, string $userId)
   {
     $submission = $this->controller->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, $userId);
-    return $submission['EvaluationSubmission']['submitted'] ?? '';
+    return $submission['EvaluationSubmission']['submitted'] ?? null;
+  }
+  
+  private function getEventData($data): array
+  {
+    $output = [
+      'id'                      => $data['event']['Event']['id'],
+      'title'                   => $data['event']['Event']['title'],
+      'description'             => $data['event']['Event']['description'],
+      'event_template_type_id'  => $data['event']['Event']['event_template_type_id'],
+      'template_id'             => $data['event']['Event']['template_id'],
+      'self_eval'               => $data['event']['Event']['self_eval'],
+      'com_req'                 => $data['event']['Event']['com_req'],
+      'due_date'                => $data['event']['Event']['due_date'],
+      'group_event_id'          => $data['event']['GroupEvent']['id'],
+      'group'                   => [
+        'id' => $data['event']['Group']['id'],
+        'name' => $data['event']['Group']['group_name'],
+      ],
+      'course'                  => $this->getCourseById($data['event']['Event']['course_id']),
+      'members'                 => $this->getGroupMembers($data['groupMembers']),
+      'penalty_final'           => $data['penaltyFinal']['Penalty'],
+      'status'                  => $this->isSubmitted($data['event']['Event']['id'], $data['event']['Group']['id'], $data['userId']),
+    ];
+    return $output;
   }
   
   /**
    * @param array $data
    * @return array
    */
-  private function getEventData(array $data): array
+  private function getCustomEventData(array $data): array
   {
     if(empty($data)) return $data;
     
@@ -211,7 +235,7 @@ class JsonHandlerComponent extends CakeObject
   // Simple
   private function getSimpleEvaluationSubmission(array $submission, array $evaluation): array
   {
-    if(empty($submission['EvaluationSubmission']) || empty($evaluation)) return ['points' => [], 'comments' => []];
+    if(empty($submission['EvaluationSubmission']) || empty($evaluation)) return []; // 'points' => [], 'comments' => []
     $data = [];
     $data['id'] = $submission['EvaluationSubmission']['id'];
     $data['submitter_id'] = $submission['EvaluationSubmission']['submitter_id'];
@@ -231,7 +255,7 @@ class JsonHandlerComponent extends CakeObject
     return $data;
   }
   
-  private function getSimpleEvaluationQuestions($questions): array
+  private function getSimpleEvaluationSettings($questions): array
   {
     if(empty($questions)) return [];
     return [
@@ -245,19 +269,25 @@ class JsonHandlerComponent extends CakeObject
   }
   
   // Rubrics
-  private function getRubricEvaluationQuestions(array $questions): array
+  private function getRubricEvaluationSettings(array $questions): array
   {
     if (empty($questions)) return $questions;
-    return ['rubric' => [
-        'id'              => $questions['Rubric']['id'],
-        'name'            => $questions['Rubric']['name'],
-        'zero_mark'       => $questions['Rubric']['zero_mark'],
-        'view_mode'       => $questions['Rubric']['view_mode'],
-        'template'        => $questions['Rubric']['template'],
-        'availability'    => $questions['Rubric']['availability'],
-        'lom_max'         => $questions['Rubric']['lom_max'],
-        'criteria'        => $questions['Rubric']['criteria'],
-      ],
+    return [
+      'id' => $questions['Rubric']['id'],
+      'name' => $questions['Rubric']['name'],
+      'zero_mark' => $questions['Rubric']['zero_mark'],
+      'view_mode' => $questions['Rubric']['view_mode'],
+      'template' => $questions['Rubric']['template'],
+      'availability' => $questions['Rubric']['availability'],
+      'lom_max' => $questions['Rubric']['lom_max'],
+      'criteria' => $questions['Rubric']['criteria'],
+    ];
+  }
+  
+  private function getRubricEvaluationData(array $questions): array
+  {
+    if (empty($questions)) return $questions;
+    return [
       'rubrics_criteria'  => $this->getRubricEvaluationCriteria($questions['RubricsCriteria']),
       'rubrics_lom'       => $questions['RubricsLom']
     ];
@@ -315,7 +345,7 @@ class JsonHandlerComponent extends CakeObject
     
           'details'             => $this->getRubricEvaluationDetail($member['User']['Evaluation']['EvaluationRubricDetail'])
         ];
-        $data['response'][] = $tmp;
+        $data['data'][] = $tmp;
       }
       
     };

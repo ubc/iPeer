@@ -1,7 +1,10 @@
 <script lang="ts" setup>
-import { ref, reactive, computed, onMounted } from 'vue';
+import {ref, reactive, computed, onMounted, defineAsyncComponent} from 'vue';
 import { useRoute } from 'vue-router'
 import useFetch from '@/composables/useFetch'
+//
+import Debugger from '@/components/Debugger.vue'
+//
 import Loader from '@/components/Loader.vue'
 import PageTitle from '@/components/PageTitle.vue'
 import SectionTitle from '@/components/SectionTitle.vue'
@@ -17,9 +20,15 @@ import {
   IconWritingHand,
   IconThinkingFace
 } from '@/components/icons'
-//
-import type { Evaluation } from '@/types/typings'
+
+import EvaluationForm from "@/student/views/EvaluationForm.vue";
+
+const EvaluationMakePage = defineAsyncComponent(() => import('@/student/views/EvaluationMakePage.vue'))
+const EvaluationEditPage = defineAsyncComponent(() => import('@/student/views/EvaluationEditPage.vue'))
+
+import type { Evaluation, User } from '@/types/typings'
 interface Props {
+  currentUser: User
   event_id: string
   group_id: string
   pageTitle: string
@@ -34,13 +43,18 @@ const group_id          = ref(route.params.group_id)
 const status            = ref<string>('')
 const message           = ref<object | null>(null)
 const form              = reactive<unknown>({})
-const evaluation        = reactive<Evaluation>({})
+const evaluation        = reactive<Evaluation | null>({})
 // COMPUTED
-const submission        = computed(() => {
-  if(evaluation?.submission) {
-    return evaluation?.submission
+const evaluationPage = computed(() => {
+  // Check if evaluation is started
+  switch (useRoute().name) {
+    case 'evaluation.make':
+      return defineAsyncComponent(() => import('@/student/views/EvaluationMakePage.vue'))
+    case 'evaluation.edit':
+      return defineAsyncComponent(() => import('@/student/views/EvaluationEditPage.vue'))
+    default:
+      return
   }
-  return { points: [], comments: [] }
 })
 // METHODS
 // WATCH
@@ -48,12 +62,13 @@ const submission        = computed(() => {
 onMounted(async () => {
   try {
     status.value = 'PENDING'
-    const response = await useFetch(
+    const response: Promise<Evaluation | unknown> = await useFetch(
         `evaluations/makeEvaluation/${event_id.value}/${group_id.value}`,
         {method: 'GET', timeout: 300})
-    Object.assign(evaluation, response.data)
+    console.log({response})
+    Object.assign(evaluation, response?.data)
   } catch (err) {
-    message.value = {text: err.messge, type: 'error'}
+    message.value = {text: err?.messge, type: 'error'}
   } finally {
     status.value = 'READY'
   }
@@ -61,31 +76,34 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="">
+  <div class="evaluation-index">
     <template v-if="status === 'PENDING'">
       <Loader />
     </template>
 
     <template v-else>
-      <PageTitle :title="evaluation?.event?.title">
+      <PageTitle :title="evaluation?.title">
         <ViewHeading
-            :due-date="evaluation?.event?.due_date"
-            :penalties="evaluation?.penalties"
-            :group-name="evaluation?.group?.group_name"
+            :due-date="evaluation?.due_date"
+            :penalty="evaluation?.penalty_final"
+            :group-name="evaluation?.group?.name"
             :course-title="evaluation?.course?.title"
             :icon="{src: IconTwoUsers, size: '6rem'}"
         />
       </PageTitle>
 
       <SectionTitle title="About This Peer Review">
-        <InstructorSays v-if="evaluation?.event?.description" :description="evaluation?.event?.description" />
+        <InstructorSays v-if="evaluation?.description" :description="evaluation?.description" />
         <ConsiderPoints />
       </SectionTitle>
 
       <SectionTitle title="Your Response" />
       <SectionSubtitle subtitle="Evaluate your group" :icon="{src: IconWritingHand, size: '3.75rem'}" />
 
-      <pre class="debug">{{ evaluation?.template }}</pre>
+      <Debugger :title="`EvaluationIndex::Route`" :data="useRoute()" />
+      <Debugger :title="`EvaluationIndex::${evaluation?.template}`" :state="evaluation" />
+
+      <router-view :currentUser="currentUser" :evaluation="evaluation"></router-view>
     </template>
 
   </div>

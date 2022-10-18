@@ -99,15 +99,14 @@
     @apply mt-12 mb-4;
   }
 
-  a.button.default,
-  a.button.submit {
+  .button {
 
     &.btn {
       &-sm {
         @apply py-0 px-1;
       }
       &-md {
-        @apply py-1 px-2;
+        @apply py-1.5 px-4;
       }
       &-lg {
         @apply py-2 px-4;
@@ -122,6 +121,9 @@
 
     &.with-icon {
       @apply flex justify-center items-center space-x-2;
+      svg {
+        @apply -ml-[0.5rem];
+      }
     }
   }
 
@@ -133,6 +135,12 @@
       @apply ml-1;
     }
 
+  }
+
+  .quote {
+    @apply text-slate-500 font-light tracking-wider;
+    &::before {content: ' " '; @apply text-xl font-serif;}
+    &::after {content: ' " '; @apply text-xl font-serif;}
   }
 }
 

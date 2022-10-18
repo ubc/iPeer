@@ -27,13 +27,39 @@ export interface Event {
   result_release_date_end: string
   record_status: string
   is_submitted: string
-  is_released: boolean,
-  is_result_released: boolean,
-  is_ended: boolean,
+  is_released: boolean
+  is_result_released: boolean
+  is_ended: boolean
   due_in: string
 }
 
 export interface Evaluation {
+  id: string
+  title: string
+  description: string
+  event_template_type_id: string
+  template_id: string
+  self_eval: string
+  com_req: string
+  auto_release: string
+  enable_details: string
+  due_date: string
+  release_date_begin: string
+  release_date_end: string
+  result_release_date_begin: string
+  result_release_date_end: string
+  group: Group
+  course: Course
+  penalty_final: Penalty
+  members: Member[]
+  template: string
+  group_event_id: string
+  status: string | null
+  questions: object
+  review: object
+}
+
+export interface __Evaluation {
   event: Event
   group: Group
   group_event: GroupEvent
@@ -53,9 +79,16 @@ export interface Course {
 
 export interface Group {
   id: string
-  group_num: string
-  group_name: string
+  num: string
+  name: string
   member_count: string
+}
+
+export interface Member {
+  id: string
+  first_name: string
+  last_name: string
+  role_name: string
 }
 
 export interface GroupEvent {

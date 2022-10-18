@@ -17,6 +17,7 @@ const router = createRouter({
         banner: Banner,
         navigation: Navigation,
       },
+      meta: { requireAuth: true },
       children: [
         {
           path: '',
@@ -36,7 +37,7 @@ const router = createRouter({
           path: '/evaluations',
           name: 'evaluation.index',
           component: () => import('../pages/EvaluationIndex.vue'),
-          //redirect: { name: 'dashboard' },
+          redirect: { name: 'dashboard' },
           children: [
             {
               path: 'make/:event_id/:group_id',
@@ -58,6 +59,7 @@ const router = createRouter({
           path: '/submissions',
           name: 'submission.index',
           component: () => import('../pages/SubmissionIndex.vue'),
+          redirect: { name: 'dashboard' },
           children: [
             {
               path: 'view/:event_id/:group_id',

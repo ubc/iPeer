@@ -382,4 +382,4 @@ foreach ($keys as $key) {
     }
   }
 }
-Configure::write('debug', 0);
+//Configure::write('debug', 0);

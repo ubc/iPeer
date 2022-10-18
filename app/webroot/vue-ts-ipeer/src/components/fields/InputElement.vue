@@ -1,21 +1,31 @@
-<script lang="ts" setup>
-import { ref, reactive, watch, computed, onMounted } from 'vue';
-// REFERENCES
-const emit = defineEmits<{
-  (e: 'update:modelValue', option: string): void
-}>()
+<script setup lang="ts">
+import { toRef } from 'vue'
+import { useField } from 'vee-validate'
+
 const props = defineProps<{
-  type: string
+  type?: string | 'text'
+  value?: string | ''
   name: string
-  modelValue: string | number
-}>()
-// DATA
-// COMPUTED
-// METHODS
-// WATCH
-// LIFECYCLE
+  placeholder?: string | ''
+  disabled?: boolean | false
+}>();
+
+const name = toRef(props, 'name');
+
+const { value: inputValue, errorMessage, handleBlur, handleChange, meta } = useField(name, undefined, {
+  initialValue: props.value,
+});
 </script>
 
 <template>
-  <input :type="type" :name="name" :value="modelValue" @input="$emit('update:modelValue', $event)" />
+  <input class="form-input"
+         :name="name"
+         :id="name"
+         :type="type"
+         :value="inputValue"
+         :placeholder="placeholder"
+         @input="handleChange"
+         @blur="handleBlur"
+         :disabled="disabled"
+  />
 </template>

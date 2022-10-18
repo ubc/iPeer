@@ -4,7 +4,7 @@ import { computed } from 'vue'
 
 interface Props {
   dueDate?: string
-  penalties?: string
+  penalty?: object
   groupName?: string
   courseTitle?: string
   icon?: object
@@ -21,12 +21,12 @@ const due_date = computed(() => props.dueDate ? longDateFormat(props.dueDate) : 
       <div class="flex flex-col text-sm leading-5 text-slate-700 font-normal">
         <span class="space-x-2">
           <span class="font-medium">Due:</span>
-          <span class="font-normal" v-if="due_date">{{ due_date }}</span>
+          <span class="font-normal" v-if="props.dueDate">{{ due_date }}</span>
           <span class="font-normal" v-else>N/A</span>
         </span>
         <span class="space-x-2 ">
           <span class="font-medium">Late Policy:</span>
-          <span class="font-normal" v-if="penalties?.length">Submit up to {{ penalties[penalties.length - 1]['days_late'] }} day(s) late, with {{ penalties[penalties.length - 1]['percent_penalty'] }}% deducted from your mark.</span>
+          <span class="font-normal" v-if="props.penalty">Submit up to {{ penalty.days_late }} day(s) late, with {{ penalty.percent_penalty }}% deducted from your mark.</span>
           <span class="font-normal" v-else>N/A</span>
         </span>
       </div>

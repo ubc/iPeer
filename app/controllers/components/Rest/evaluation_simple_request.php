@@ -51,32 +51,42 @@ class EvaluationSimpleRequestComponent extends CakeObject
   }
   
   public function processResourceRequest($method, $eventId, $groupId, $studentId=null)
-  {
+  { // GET, POST, PUT, PATCH, and DELETE
     $event = $this->Event->getEventByIdGroupId($eventId, $groupId);
     switch ($method) {
       case 'GET':
         $this->get($event, $groupId, $studentId);
         break;
-      case 'POST':
-        if($this->params['form']['action'] === 'Save') {
-          $this->set($event, $groupId, $studentId, '0');
-        }
-        elseif($this->params['form']['action'] === 'Submit') {
-          $this->set($event, $groupId, $studentId, '1');
-        }
-        elseif($this->params['form']['action'] === 'Auto') {
-          $this->set($event, $groupId, $studentId, '0');
-        }
+      case 'POST': // Submit Peer Review
+        //$this->pre_r($method);$this->pre_r($this->params); die();
+        $this->set($event, $groupId, $studentId, '1');
+        break;
+        //if($this->params['form']['action'] === 'Submit') {
+        //  $this->set($event, $groupId, $studentId, '1');
+        //}
+        //if($this->params['form']['action'] === 'Save') {
+        //  $this->set($event, $groupId, $studentId, '0');
+        //}
+        //elseif($this->params['form']['action'] === 'Auto') {
+        //  $this->set($event, $groupId, $studentId, '0');
+        //}
+      case 'PUT': // Save Draft
+        // $this->pre_r($method);$this->pre_r($this->params); die();
+        $this->set($event, $groupId, $studentId, '0');
+        break;
+      case 'PATCH': // Auto Save
+        // $this->pre_r($method);$this->pre_r($this->params); die();
+        // $this->set($event, $groupId, $studentId, '0');
         break;
       default:
         http_response_code(405);
-        header('Allow, GET, POST');
+        header('Allow, GET, POST, PUT');
         break;
     }
   }
   
   public function processCollectionRequest($method)
-  {
+  { // GET, POST, PUT, PATCH, and DELETE
     switch ($method) {
       case 'GET':
         $this->list();

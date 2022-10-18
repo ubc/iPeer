@@ -24,9 +24,9 @@ function onDebug() {debug.value = !debug.value}
     </div>
     <hr/>
     <div class="flex justify-evenly space-x-4" v-show="debug">
-      <pre v-if="state" class="debug code flex-1">{{ JSON.stringify(state, null, 2) }}</pre>
-      <pre v-if="form" class="debug code flex-1">{{ JSON.stringify(form, null, 2) }}</pre>
-      <pre v-if="data" class="debug code flex-1">{{ JSON.stringify(data, null, 2) }}</pre>
+      <pre v-if="state" class="debug code flex-1 break-normal break-words break-all overflow-x">{{ JSON.stringify(state, null, 2) }}</pre>
+      <pre v-if="form" class="debug code flex-1 break-normal break-words break-all overflow-x">{{ JSON.stringify(form, null, 2) }}</pre>
+      <pre v-if="data" class="debug code flex-1 break-normal break-words break-all overflow-x">{{ JSON.stringify(data, null, 2) }}</pre>
     </div>
   </div>
 </template>

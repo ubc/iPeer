@@ -9,6 +9,7 @@ export default function useFetch(url: string, options: {method?: string, timeout
       }
       break
     case 'POST':
+    case 'PUT':
       headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' // 'Content-Type': 'application/json'
