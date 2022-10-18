@@ -215,13 +215,13 @@ class EvaluationTestCase extends CakeTestCase
         $this->assertEqual($result[$userId][0]['EvaluationRubricDetail'][0]['evaluation_rubric_id'], 1);
         $this->assertEqual($result[$userId][0]['EvaluationRubricDetail'][0]['grade'], 5.00);
 
-        // Tests for non-existent events and users - arbitrary value of 1000 used
+        // Tests for non-existent events and users
         // Method should return a false if either are empty
-        $result = $this->EvaluationComponentTest->getStudentViewRubricResultDetailReview(1000, $userId);
+        $result = $this->EvaluationComponentTest->getStudentViewRubricResultDetailReview(array(), $userId);
         $this->assertFalse($result);
-        $result = $this->EvaluationComponentTest->getStudentViewRubricResultDetailReview($event, 1000);
+        $result = $this->EvaluationComponentTest->getStudentViewRubricResultDetailReview($event, array());
         $this->assertFalse($result);
-        $result = $this->EvaluationComponentTest->getStudentViewRubricResultDetailReview(1000, 1000);
+        $result = $this->EvaluationComponentTest->getStudentViewRubricResultDetailReview(array(), array());
         $this->assertFalse($result);
     }
 
@@ -534,10 +534,10 @@ class EvaluationTestCase extends CakeTestCase
         $this->assertEqual($eval, $expected);
 
         // Null test cases
-        $eval = $this->EvaluationComponentTest->getStudentViewMixevalResultDetailReview(null, 1);
-        $this->assertFalse(!empty($eval));
-        $eval = $this->EvaluationComponentTest->getStudentViewMixevalResultDetailReview(1, null);
-        $this->assertFalse(!empty($eval));
+        $eval = $this->EvaluationComponentTest->getStudentViewMixevalResultDetailReview(null, $userId);
+        $this->assertTrue(empty($eval));
+        $eval = $this->EvaluationComponentTest->getStudentViewMixevalResultDetailReview($event, null);
+        $this->assertTrue(empty($eval));
     }
     
     function testFormatMixevalEvaluationResultsMatrix()

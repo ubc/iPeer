@@ -25,6 +25,7 @@ class GroupsMembers extends AppModel
      */
     function insertMembers($id=null, $data=null)
     {
+        if (empty($data)) return null;
         for ($i=1; $i<=$data['member_count']; $i++) {
             $tmp = array( 'group_id'=>$id, 'user_id'=>$data['member'.$i] );
             $this->save($tmp);
@@ -43,6 +44,7 @@ class GroupsMembers extends AppModel
 
     function updateMembers($id=null, $data=null)
     {
+        if (empty($data)) return null;
         //get old userid's
         $tmp = $this->getMembers($id);
 

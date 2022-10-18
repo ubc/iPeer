@@ -293,6 +293,7 @@ class Debugger extends CakeObject {
 		}
 
 		$helpCode = null;
+		$helpID = null;
 		if (!empty($_this->helpPath) && preg_match('/.*\[([0-9]+)\]$/', $description, $codes)) {
 			if (isset($codes[1])) {
 				$helpID = $codes[1];

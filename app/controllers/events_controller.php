@@ -507,9 +507,11 @@ class EventsController extends AppController
         $emailTemp = $this->EmailSchedule->find('first', array(
             'conditions' => array('EmailSchedule.sent' => 0, 'EmailSchedule.event_id' => $eventId)
         ));
-        $this->set('emailId', $emailTemp['EmailSchedule']['content']);
+        if ($emailTemp) {
+            $this->set('emailId', $emailTemp['EmailSchedule']['content']);
+            $this->set('reminder_enabled', $this->SysParameter->get('email.reminder_enabled', true));
+        }
         $event = $this->Event->getEventById($eventId);
-        $this->set('reminder_enabled', $this->SysParameter->get('email.reminder_enabled', true));
 
         if (!empty($this->data) && array_key_exists('formLoaded', $this->data)) {
             if (!array_key_exists('formLoaded', $this->data)) {

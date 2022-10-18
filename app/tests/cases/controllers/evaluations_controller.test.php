@@ -99,7 +99,7 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
         $this->assertEqual($result['event']['GroupEvent']['id'], 1);
         $this->assertEqual($result['event']['Group']['id'], 1);
         $message = $this->controller->Session->read('Message.flash');
-        $this->assertEqual($message['message'], '');
+        $this->assertNull($message);
     }
 
     function testMakeEvaluationRubricForStudent()
@@ -124,7 +124,7 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
         $this->assertEqual($result['event']['GroupEvent']['id'], 3);
         $this->assertEqual($result['event']['Group']['id'], 1);
         $message = $this->controller->Session->read('Message.flash');
-        $this->assertEqual($message['message'], '');
+        $this->assertNull($message);
     }
 
     function testMakeEvaluationMixevalForStudent()
@@ -141,14 +141,14 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
         $this->assertEqual(count($result['groupMembers']), 2);
         $this->assertEqual(count($result['groupMembers']), 2);
         $this->assertEqual($result['mixeval']['Mixeval']['id'], 1);
-        $this->assertEqual(count($result['penalty']), 0);
+        $this->assertFalse($result['penalty']);
         $this->assertEqual(Set::extract($result['penalty'], '/Penalty/id'), array());
         $this->assertEqual($result['penaltyDays'], 0);
         $this->assertEqual($result['event']['Event']['id'], 3);
         $this->assertEqual($result['event']['GroupEvent']['id'], 5);
         $this->assertEqual($result['event']['Group']['id'], 1);
         $message = $this->controller->Session->read('Message.flash');
-        $this->assertEqual($message['message'], '');
+        $this->assertNull($message);
     }
 
     function testMakeEvaluationSurveyForStudent()
@@ -172,6 +172,6 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
         $this->assertEqual(count($result['questions'][1]['ResponseOptions']), 
             2);
         $message = $this->controller->Session->read('Message.flash');
-        $this->assertEqual($message['message'], '');
+        $this->assertNull($message);
     }
 }

@@ -145,7 +145,7 @@ class CaliperHooks {
         } elseif($event_obj['event_template_type_id'] == $Mixeval::TEMPLATE_TYPE_ID) {
             $results = $Mixeval->find('first', array(
                 'conditions' => array('Mixeval.id' => $event_obj['template_id']),
-                'contain' => array('MixevalQuestion', 'MixevalQuestion.MixevalQuestionDesc'),
+                'contain' => array('MixevalQuestion', 'MixevalQuestion.MixevalQuestionDesc', 'MixevalQuestion.MixevalQuestionType'),
                 'recursive' => 2,
             ));
 
@@ -1052,7 +1052,7 @@ class CaliperHooks {
 
         $results = $Mixeval->find('first', array(
             'conditions' => array('Mixeval.id' => $event_obj['template_id']),
-            'contain' => array('MixevalQuestion', 'MixevalQuestion.MixevalQuestionDesc'),
+            'contain' => array('MixevalQuestion', 'MixevalQuestion.MixevalQuestionDesc', 'MixevalQuestion.MixevalQuestionType'),
             'recursive' => 2,
         ));
         $groupMembers = $User->getEventGroupMembersNoTutors($groupId, $event_obj['self_eval'], $evaluator);
@@ -1146,7 +1146,7 @@ class CaliperHooks {
         //save info in data before deletion
         $model->data['caliper_delete'] = $model->find('first', array(
             'conditions' => array('Mixeval.id' => $model->id),
-            'contain' => array('MixevalQuestion', 'MixevalQuestion.MixevalQuestionDesc'),
+            'contain' => array('MixevalQuestion', 'MixevalQuestion.MixevalQuestionDesc', 'MixevalQuestion.MixevalQuestionType'),
             'recursive' => 2,
         ));
 
@@ -1187,7 +1187,7 @@ class CaliperHooks {
 
         $results = $Mixeval->find('first', array(
             'conditions' => array('Mixeval.id' => $mixeval_id),
-            'contain' => array('MixevalQuestion', 'MixevalQuestion.MixevalQuestionDesc'),
+            'contain' => array('MixevalQuestion', 'MixevalQuestion.MixevalQuestionDesc', 'MixevalQuestion.MixevalQuestionType'),
             'recursive' => 2,
         ));
 
@@ -1213,7 +1213,7 @@ class CaliperHooks {
 
         $results = $Mixeval->find('first', array(
             'conditions' => array('Mixeval.id' => $mixeval_id),
-            'contain' => array('MixevalQuestion', 'MixevalQuestion.MixevalQuestionDesc'),
+            'contain' => array('MixevalQuestion', 'MixevalQuestion.MixevalQuestionDesc', 'MixevalQuestion.MixevalQuestionType'),
             'recursive' => 2,
         ));
         foreach($results['MixevalQuestion'] as $question) {

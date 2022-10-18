@@ -46,11 +46,11 @@ class PenaltyTestCase extends CakeTestCase
 
         // id = null
         $ret = $this->Penalty->getPenaltyById(null);
-        $this->assertEqual($ret['Penalty']['percent_penalty'], null);
+        $this->assertFalse($ret);
 
         // invalid id
         $ret = $this->Penalty->getPenaltyById(999);
-        $this->assertEqual($ret['Penalty']['percent_penalty'], null);
+        $this->assertFalse($ret);
     }
 
     function testGetPenaltyByEventId()
@@ -67,11 +67,11 @@ class PenaltyTestCase extends CakeTestCase
 
         // id = null
         $ret = $this->Penalty->getPenaltyByEventId(null);
-        $this->assertEqual($ret, array());
+        $this->assertFalse($ret);
 
         // invalid id
         $ret = $this->Penalty->getPenaltyByEventId(999);
-        $this->assertEqual($ret, array());
+        $this->assertFalse($ret);
     }
 
     function testGetPenaltyFinal()

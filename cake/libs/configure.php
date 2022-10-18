@@ -42,7 +42,7 @@ class Configure extends CakeObject {
  * @return Configure instance
  * @access public
  */
-	function &getInstance($boot = true) {
+	static function &getInstance($boot = true) {
 		static $instance = array();
 		if (!$instance) {
 			if (!class_exists('Set')) {

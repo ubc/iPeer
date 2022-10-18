@@ -67,11 +67,11 @@ class UserTestCase extends CakeTestCase {
         //Testing invalid inputs; all tests should return NULL
         //invalid username input
         $invalidUsername = $this->User->getByUserName('fadslkfjasdkljf');
-        $this->assertEqual($invalidUsername['username'], $empty);
+        $this->assertFalse($invalidUsername);
 
         //null input
         $nullInput = $this->User->getByUserName(null);
-        $this->assertEqual($nullInput['username'], $empty);
+        $this->assertFalse($nullInput);
     }
 
     function testGetEnrolledStudent() {

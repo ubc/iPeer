@@ -468,7 +468,8 @@ class User extends AppModel
      * */
     public function getRoleName($id) {
         $user = $this->findById($id);
-        return $user['Role'][0]['name'];
+        if ($user) return $user['Role'][0]['name'];
+        return null;
     }
 
     /**
@@ -480,7 +481,8 @@ class User extends AppModel
      * */
     public function getRoleId($id) {
         $user = $this->findById($id);
-        return $user['Role'][0]['id'];
+        if ($user) return $user['Role'][0]['id'];
+        return null;
     }
 
     /**
@@ -1022,6 +1024,7 @@ class User extends AppModel
     function getEventGroupMembersNoTutors($groupId, $selfEval, $userId)
     {
         $group = $this->Group->findById($groupId);
+        if (!$group) return null;
 
         $conditions['Group.id'] = $groupId;
         $conditions['Enrolment.id'] = $group['Group']['course_id'];

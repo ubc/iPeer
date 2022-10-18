@@ -58,7 +58,8 @@ class Penalty extends AppModel
             'order' => array('Penalty.days_late'),
             'contain' => false,
         ));
-        return $penalties;
+        if ($penalties) return $penalties;
+        return null;
     }
 
 

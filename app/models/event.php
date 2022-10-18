@@ -630,8 +630,8 @@ class Event extends AppModel
             'conditions' => array('Event.id' => $id),
             'fields' => array('Event.event_template_type_id')
         ));
-
-        return $event['Event']['event_template_type_id'];
+        if ($event) return $event['Event']['event_template_type_id'];
+        return null;
     }
 
 
@@ -677,7 +677,8 @@ class Event extends AppModel
             'conditions' => array('Event.id' => $id),
             'fields' => array('Event.title')
         ));
-        return $event['Event']['title'];
+        if ($event) return $event['Event']['title'];
+        return null;
     }
 
     /**

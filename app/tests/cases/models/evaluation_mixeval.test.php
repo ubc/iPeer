@@ -72,12 +72,14 @@ class EvaluationMixevalTestCase extends CakeTestCase
         $this->assertEqual($result[1]['EvaluationMixeval']['grp_event_id'], 5);
         $this->assertEqual($result[1]['EvaluationMixeval']['score'], 2.40);
         // Test invalid inputs
-        $invalidInputs = $this->EvaluationMixeval->getResultsByEvaluatee(2, 323, array(323));
-        $invalidInputs1 = $this->EvaluationMixeval->getResultsByEvaluatee(232, 1, array(1));
-        $nullInput = $this->EvaluationMixeval->getResultsByEvaluatee(null, null, null);
+        $invalidInputs = $this->EvaluationMixeval->getResultsByEvaluatee(999, 6, array(5, 7));
         $this->assertTrue(empty($invalidInputs));
-        $this->assertTrue(empty($invalidInputs1));
-        $this->assertTrue(empty($nullInputs));
+        $invalidInputs = $this->EvaluationMixeval->getResultsByEvaluatee(5, 999, array(5, 7));
+        $this->assertTrue(empty($invalidInputs));
+        $invalidInputs = $this->EvaluationMixeval->getResultsByEvaluatee(5, 6, array(999));
+        $this->assertTrue(empty($invalidInputs));
+        $invalidInputs = $this->EvaluationMixeval->getResultsByEvaluatee(null, null, null);
+        $this->assertTrue(empty($invalidInputs));
     }
 
     function testGetResultsDetailByEvaluatee()

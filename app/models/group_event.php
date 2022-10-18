@@ -418,7 +418,8 @@ class GroupEvent extends AppModel
             'conditions' => array('GroupEvent.event_id' => $eventId, 'GroupEvent.group_id' => $groupId),
             'fields' => array('GroupEvent.id')
         ));
-        return $returning['GroupEvent']['id'];
+        if ($returning) return $returning['GroupEvent']['id'];
+        return null;
     }
 
     /**

@@ -1213,13 +1213,14 @@ class EvaluationComponent extends CakeObject
      */
     function getStudentViewMixevalResultDetailReview ($event, $userId)
     {
+        if (!$event || !$userId) return array();
         $userPOS = 0;
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
         $this->EvaluationMixevalDetail   = ClassRegistry::init('EvaluationMixevalDetail');
         $this->User = ClassRegistry::init('User');
         $evalResult = array();
         $this->User->id = $userId;
-        if ($event['GroupEvent']['id'] && $userId) {
+        if ($event['GroupEvent']['id']) {
             $mixevalResult = $this->EvaluationMixeval->getResultsByEvaluator($event['GroupEvent']['id'], $userId);
             $evalResult[$userId] = $mixevalResult;
             foreach ($mixevalResult as $row) {
@@ -1466,6 +1467,7 @@ class EvaluationComponent extends CakeObject
 
         // Get all required data from each table for every question
         $survey = $this->Survey->getSurveyWithQuestionsById($surveyId);
+        if (!$survey) return false;
         $questions = $survey['Question'];
         $conditions = array('event_id' => $eventId);
         if (!empty($userIds)) {

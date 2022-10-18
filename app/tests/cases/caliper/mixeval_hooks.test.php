@@ -79,7 +79,7 @@ class CaliperMixevalHooksTest extends CaliperAuthTestCase
         $this->Mixeval->id = 1;
         $results = $this->Mixeval->find('first', array(
             'conditions' => array('id' => 1),
-            'contain' => array('MixevalQuestion', 'MixevalQuestion.MixevalQuestionDesc'),
+            'contain' => array('MixevalQuestion', 'MixevalQuestion.MixevalQuestionDesc', 'MixevalQuestion.MixevalQuestionType'),
             'recursive' => 2,
         ));
         $this->mixeval = $results['Mixeval'];

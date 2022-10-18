@@ -86,7 +86,9 @@ class EvaluationMixeval extends EvaluationResponseBase
         $this->GroupEvent = ClassRegistry::init('GroupEvent');
         $this->Event = ClassRegistry::init('Event');
         $grpEvent = $this->GroupEvent->findById($grpEventId);
+        if (!$grpEvent) return null;
         $event = $this->Event->findById($grpEvent['GroupEvent']['event_id']);
+        if (!$event) return null;
         $conditions = array('grp_event_id' => $grpEventId, 'evaluatee' => $evaluatee, 'evaluator' => $include);
         if (!$event['Event']['self_eval']) {
             $not = array('evaluator != evaluatee');
