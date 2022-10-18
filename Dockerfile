@@ -1,4 +1,4 @@
-FROM php:7.2-fpm
+FROM php:7.4-fpm
 
 RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests  -y \
         libpng-dev \
@@ -12,9 +12,9 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
     && ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so \
     && docker-php-ext-install -j$(nproc) xml gd ldap mysqli pdo_mysql \
     && pecl install timezonedb xdebug\
-    && docker-php-ext-enable timezonedb xdebug\
-    && curl https://getcomposer.org/download/1.8.4/composer.phar -o /usr/local/bin/composer \
-    && chmod +x /usr/local/bin/composer
+    && docker-php-ext-enable timezonedb xdebug
+
+COPY --from=composer:2.4 /usr/bin/composer /usr/local/bin/composer
 
 COPY docker/php.ini /usr/local/etc/php/
 COPY . /var/www/html
