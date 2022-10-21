@@ -108,7 +108,7 @@ if ($db_config->default['driver'] === 'mysqli') {
     }
 
     // create session table if needed
-    if (Configure::read('Session.save') === 'database' && !table_exists($conn, 'cake_session')) {
+    if (Configure::read('Session.save') === 'database' && !table_exists($conn, 'cake_sessions')) {
         mysqli_query($conn, '
             CREATE TABLE `cake_sessions` (
             `id` varchar(255) NOT NULL,
