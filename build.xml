@@ -27,7 +27,7 @@
     </target>
 
     <target name="build"
-        depends="prepare,lint,phploc,pdepend,phpmd,phpcs,phpcpd,phpdoc,test,phpcb"/>
+        depends="prepare,lint,phploc,pdepend,phpmd,phpcs,phpcpd,test,phpcb"/>
 
     <!-- remove phpdoc dependency for now.  phpdoc 2.9 is not working with php7 -->
     <target name="build-ci"
@@ -165,6 +165,7 @@
         </phpcpd>
     </target>
 
+    <!-- phpdocumentor left here for reference, but not used -->
     <target name="phpdoc"
         description="Generate API documentation using PHPDocumentor">
         <phpdoc2 destdir="${project.basedir}/build/api" template="responsive-twig">

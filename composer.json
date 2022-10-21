@@ -17,8 +17,7 @@
     "phpmd/phpmd" : "@stable",
     "squizlabs/php_codesniffer": "2.*",
     "sebastian/phpcpd": "*",
-    "jms/serializer": "1.7.*",
-    "phpdocumentor/phpdocumentor": "^2.9"
+    "jms/serializer": "1.7.*"
   },
   "scripts": {
       "post-install-cmd": [
@@ -30,7 +29,7 @@
   },
   "config": {
       "platform": {
-          "php": "7.4"
+          "php": "8.0"
       }
   }
 }
