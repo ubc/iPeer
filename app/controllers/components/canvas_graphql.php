@@ -15,7 +15,7 @@ App::import('Vendor', 'Httpful', array('file' => 'nategood'.DS.'httpful'.DS.'boo
  */
 class CanvasGraphQlComponent extends CanvasApiComponent
 {
-    protected $graphQlPath;
+    protected $graphQlPath = '/api/graphql';
 
     /**
      * overriden constructor to initialize private variables
@@ -27,7 +27,6 @@ class CanvasGraphQlComponent extends CanvasApiComponent
     public function __construct($userId)
     {
         parent::__construct($userId);
-        $this->graphQlPath = '/api/graphql';
     }
 
     /**

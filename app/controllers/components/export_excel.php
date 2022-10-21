@@ -1,6 +1,4 @@
 <?php
-App::import('Vendor', 'PHPExcel', array('file' => 'excel/PHPExcel.php'));
-App::import('Vendor', 'PHPExcelWriter', array('file' => 'excel/PHPExcel/Writer/Excel5.php'));
 
 /**
  * ExportExcelComponent
@@ -15,7 +13,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
 {
     public $sheet;
     public $rowls;
-    public $alphaNumeric;
+    public $alphaNumeric = array();
     public $cursor = array();
     public $components = array('ExportHelper2');
     public $EvaluationSubmission, $EvaluationSimple, $EvaluationRubric, $User, $GroupsMembers, $GroupEvent, $EvaluationMixeval, $MixevalQuestion, $Event, $Group;
@@ -29,9 +27,8 @@ Class ExportExcelComponent extends ExportBaseNewComponent
      */
     function __construct()
     {
-        $this->xls = new PHPExcel();
+        $this->xls = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $this->sheet = $this->xls->getActiveSheet();
-        $this->alphaNumeric = array();
         foreach (range('A', 'Z') as $letters) {
             array_push($this->alphaNumeric, $letters);
         }
@@ -59,8 +56,7 @@ Class ExportExcelComponent extends ExportBaseNewComponent
         header("Content-type: application/vnd.ms-excel");
         header('Content-Disposition: attachment;filename='.$fileName.".xls");
         header('Cache-Control: max-age=0');
-        $objWriter = new PHPExcel_Writer_Excel5($this->xls);
-        $objWriter->setTempDir(TMP);
+        $objWriter = new \PhpOffice\PhpSpreadsheet\Writer\Xls($this->xls);
         $objWriter->save('php://output');
     }
 

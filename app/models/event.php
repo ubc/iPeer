@@ -983,9 +983,9 @@ class Event extends AppModel
         $exportData[] = $csvHeader; // add header to csv
         foreach($events as $value) {
             unset($value['Event']['id']); // id comes by default, so needs to be removed
-            
+
             $groups = "";
-            
+
             if($value['Event']['event_template_type_id'] == $Survey::TEMPLATE_TYPE_ID) {
                 // remove release dates if a survey (sometimes have all zero dates)
                 $value['Event']['result_release_date_begin'] = "";
@@ -1004,7 +1004,7 @@ class Event extends AppModel
                     $groups = implode(';',Set::classicExtract($value['Group'],'{n}.group_name'));
                 }
             }
-            
+
             $value['Event'][] = $groups; // add group to row
             $exportData[] = $value['Event']; // add current event row
         }
@@ -1070,9 +1070,9 @@ class Event extends AppModel
         foreach($events as $event) {
             $eventData = array();
             $i = 0;
-            
+
             $isSurvey = false;
-            
+
             // format csv row into proper key/value pairs
             foreach(Event::$importColumns as $description => $column) {
                 if($isSurvey && $i>Event::$importSurveyCutoff) {
@@ -1086,16 +1086,16 @@ class Event extends AppModel
                 $eventData[$column] = $event[$i];
                 $i += 1;
             }
-            
+
             if(!empty($event[$i+1])) {
                 return 'Event on row ' . $csvRow . ' has too many columns';
             }
-            
+
             // DO NOT RESET $i, it will later determine the index of the groups info
-            
+
             // add course id info
             $eventData['course_id'] = $courseId;
-            
+
             //convert DateTime String to standard format (some programs like excel change date foramts while editing)
             $event_date_fields = array('due_date', 'release_date_begin', 'release_date_end', 'result_release_date_begin', 'result_release_date_end');
             foreach ($event_date_fields as $eventDate) {
@@ -1108,10 +1108,10 @@ class Event extends AppModel
             }
             // tell the model we are working with the current event (we later use model data validation)
             $this->create($eventData);
-            
+
             // template for error message
             $eventErrorPreamble = 'Event "' . $eventData['title'] . '" (on row ' . $csvRow . '), has ';
-            
+
             // model based validation
             // takes care of dates and checks for non-empty fields
             if (!$this->validates()) {
@@ -1120,13 +1120,13 @@ class Event extends AppModel
                 // extract the first error from the validation errors array
                 return $eventErrorPreamble . 'an invalid field: "' . array_search(key($this->validationErrors), Event::$importColumns) . '": ' . $value;
             }
-            
+
             // date validation
             // users may forget to change the dates after exporting
             if (strtotime('NOW') > strtotime($eventData['release_date_end'])) {
                 return $eventErrorPreamble . 'a closing date in the past. Please check that you have updated the dates for the new session/term';
             }
-            
+
             // do a switch based on event_template_type_id; catch invalid types
             // in each switch case, check if template exists and the user has permissions to access it
             $templateId = $eventData['template_id'];
@@ -1182,12 +1182,12 @@ class Event extends AppModel
                         return $eventErrorPreamble . "an invalid template type \"" . $eventData['event_template_type_id'] .  "\"";
                 }
             }
-             
+
             // validate the groups and then format the data correctly
             $groupsData = array();
             // $i is from the loop that mapped columns to db keys
             // $i now has the array index of the group column 
-            
+
             // if (there is a column for groups)
             if(!empty($event[$i])) {
                 if($event[$i]=="*") { // add all the groups
@@ -1205,7 +1205,7 @@ class Event extends AppModel
                     }
                 }
             }
-            
+
             // Surveys cannot have groups - report an error
             if(!empty($groupsData) && $templateType == $SurveyId) {
                 return $eventErrorPreamble . "groups, which are not allowed for a survey.";
@@ -1224,10 +1224,10 @@ class Event extends AppModel
             if($eventData['enable_details']!=="0") {
                 $eventData['enable_details'] = 1;
             }
-            
+
             // add this event to the validated events
             $validatedEvents[] = array( 'Event' => $eventData , 'Group' => array ( 'Group' => $groupsData ));
-            
+
             $csvRow += 1; // we will now parse the new row in the csv ($csvRow used for error reporting)
         }
         

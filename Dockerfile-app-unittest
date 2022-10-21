@@ -12,13 +12,12 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
     && rm -rf /var/lib/apt/lists/* \
     && ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so \
     && ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so \
-    && docker-php-ext-install -j$(nproc) xml gd ldap mysqli pdo_mysql intl \
+    && docker-php-ext-install -j$(nproc) xml gd ldap mysqli pdo_mysql intl zip \
     && pecl install timezonedb \
     && docker-php-ext-enable timezonedb \
     && pecl install xdebug \
     && docker-php-ext-enable xdebug \
-    && pecl install -f oauth-2.0.7 \
-    && pecl install -f zip
+    && pecl install -f oauth-2.0.7
 
 COPY docker/php.ini /usr/local/etc/php/
 COPY . /var/www/html

@@ -22,8 +22,8 @@ class CanvasApiComponent extends CakeObject
 
     protected $SysParameter;
     protected $userId;
-    protected $provider;
-    protected $apiPath;
+    protected $provider = 'canvas';
+    protected $apiPath = '/api/v1';
 
     /**
      * overriden constructor to initialize private variables
@@ -36,8 +36,6 @@ class CanvasApiComponent extends CakeObject
     {
         parent::__construct();
         $this->userId = $userId;
-        $this->provider = 'canvas';
-        $this->apiPath = '/api/v1';
         $this->SysParameter = ClassRegistry::init('SysParameter');
         $this->UserOauth = ClassRegistry::init('UserOauth');
 
