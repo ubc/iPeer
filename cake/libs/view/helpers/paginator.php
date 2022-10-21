@@ -95,7 +95,7 @@ class PaginatorHelper extends AppHelper {
 
 		App::import('Helper', $ajaxProvider);
 		$classname = $ajaxProvider . 'Helper';
-		if (!is_callable(array($classname, 'link'))) {
+		if (!method_exists($classname, 'link')) {
 			trigger_error(sprintf(__('%s does not implement a link() method, it is incompatible with PaginatorHelper', true), $classname), E_USER_WARNING);
 		}
 	}
@@ -468,7 +468,11 @@ class PaginatorHelper extends AppHelper {
 			$model = null;
 		}
 		$paging = $this->params($model);
-		return $page <= $paging['pageCount'];
+		if (isset($paging['pageCount'])) {
+			return $page <= $paging['pageCount'];
+		}
+
+		return false;
 	}
 
 /**
@@ -641,7 +645,7 @@ class PaginatorHelper extends AppHelper {
 
 			if ($first && $start > 1) {
 				$offset = ($start <= (int)$first) ? $start - 1 : $first;
-				if ($offset < $start - 1) {
+				if ($offset === 'first' || $offset < $start - 1) {
 					$out .= $this->first($offset, array('tag' => $tag, 'separator' => $separator));
 				} else {
 					$out .= $this->first($offset, array('tag' => $tag, 'after' => $separator, 'separator' => $separator));
@@ -674,7 +678,7 @@ class PaginatorHelper extends AppHelper {
 
 			if ($last && $end < $params['pageCount']) {
 				$offset = ($params['pageCount'] < $end + (int)$last) ? $params['pageCount'] - $end : $last;
-				if ($offset <= $last && $params['pageCount'] - $end > $offset) {
+				if ($offset === 'last' || ($offset <= $last && $params['pageCount'] - $end > $offset)) {
 					$out .= $this->last($offset, array('tag' => $tag, 'separator' => $separator));
 				} else {
 					$out .= $this->last($offset, array('tag' => $tag, 'before' => $separator, 'separator' => $separator));
@@ -791,7 +795,10 @@ class PaginatorHelper extends AppHelper {
 		unset($options['tag'], $options['before'], $options['model'], $options['separator']);
 
 		$out = '';
-		$lower = $params['pageCount'] - $last + 1;
+		$lower = $params['pageCount'] - 1;
+		if (is_int($last)) {
+			$lower = $params['pageCount'] - $last + 1;
+		}
 
 		if (is_int($last) && $params['page'] < $lower) {
 			if ($before === null) {

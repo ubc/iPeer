@@ -145,7 +145,7 @@ class CakeObject {
  * @return boolean Success of log write
  * @access public
  */
-	function log($msg, $type = LOG_ERROR) {
+    static function log($msg, $type = LOG_ERROR) {
 		if (!class_exists('CakeLog')) {
 			require LIBS . 'cake_log.php';
 		}
@@ -215,7 +215,7 @@ class CakeObject {
  * @access protected
  * @todo add examples to manual
  */
-	function _persist($name, $return = null, &$object, $type = null) {
+	function _persist($name, $return = null, &$object = null, $type = null) {
 		$file = CACHE . 'persistent' . DS . strtolower($name) . '.php';
 		if ($return === null) {
 			if (!file_exists($file)) {
@@ -225,7 +225,7 @@ class CakeObject {
 			}
 		}
 
-		if (!file_exists($file)) {
+		if (!file_exists($file) && $object !== null) {
 			$this->_savePersistent($name, $object);
 			return false;
 		} else {

@@ -115,10 +115,14 @@ class DboPostgres extends DboSource {
 		$conn  = "host='{$config['host']}' port='{$config['port']}' dbname='{$config['database']}' ";
 		$conn .= "user='{$config['login']}' password='{$config['password']}'";
 
-		if (!$config['persistent']) {
-			$this->connection = pg_connect($conn, PGSQL_CONNECT_FORCE_NEW);
-		} else {
-			$this->connection = pg_pconnect($conn);
+		try {
+			if (!$config['persistent']) {
+				$this->connection = pg_connect($conn, PGSQL_CONNECT_FORCE_NEW);
+			} else {
+				$this->connection = pg_pconnect($conn);
+			}
+		} catch (mysqli_sql_exception $e) {
+			return false;
 		}
 		$this->connected = false;
 
@@ -172,7 +176,7 @@ class DboPostgres extends DboSource {
  *
  * @return array Array of tablenames in the database
  */
-	function listSources() {
+	function listSources($data = null) {
 		$cache = parent::listSources();
 
 		if ($cache != null) {
@@ -348,7 +352,7 @@ class DboPostgres extends DboSource {
  *
  * @return integer Number of affected rows
  */
-	function lastAffected() {
+	function lastAffected($source = null) {
 		return ($this->_result) ? pg_affected_rows($this->_result) : false;
 	}
 
@@ -358,8 +362,19 @@ class DboPostgres extends DboSource {
  *
  * @return integer Number of rows in resultset
  */
-	function lastNumRows() {
+	function lastNumRows($source = null) {
 		return ($this->_result) ? pg_num_rows($this->_result) : false;
+	}
+
+	/**
+	 * Returns the ID generated from the previous INSERT operation.
+	 *
+	 * @param string $source Name of the database table
+	 * @return integer
+	 */
+	function lastInsertId($source = null)
+	{
+		return $this->lastInsertX($source, 'id');
 	}
 
 /**
@@ -369,7 +384,7 @@ class DboPostgres extends DboSource {
  * @param string $field Name of the ID database field. Defaults to "id"
  * @return integer
  */
-	function lastInsertId($source, $field = 'id') {
+	function lastInsertX($source, $field = 'id') {
 		$seq = $this->getSequence($source, $field);
 		$data = $this->fetchRow("SELECT currval('{$seq}') as max");
 		return $data[0]['max'];

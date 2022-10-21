@@ -62,7 +62,7 @@ class CakeLog {
  * @return void
  * @static
  */
-	function &getInstance() {
+	static function &getInstance() {
 		static $instance = array();
 		if (!isset($instance[0])) {
 			$instance[0] = new CakeLog();
@@ -96,7 +96,7 @@ class CakeLog {
  * @return boolean success of configuration.
  * @static
  */
-	function config($key, $config) {
+	static function config($key, $config) {
 		if (empty($config['engine'])) {
 			trigger_error(__('Missing logger classname', true), E_USER_WARNING);
 			return false;
@@ -133,7 +133,7 @@ class CakeLog {
 			trigger_error(sprintf(__('Could not load logger class %s', true), $loggerName), E_USER_WARNING);
 			return false;
 		}
-		if (!is_callable(array($loggerName, 'write'))) {
+		if (!method_exists($loggerName, 'write')) {
 			trigger_error(
 				sprintf(__('logger class %s does not implement a write method.', true), $loggerName),
 				E_USER_WARNING
@@ -150,7 +150,7 @@ class CakeLog {
  * @access public
  * @static
  */
-	function configured() {
+	static function configured() {
 		$self =& CakeLog::getInstance();
 		return array_keys($self->_streams);
 	}
@@ -164,7 +164,7 @@ class CakeLog {
  * @access public
  * @static
  */
-	function drop($streamName) {
+	static function drop($streamName) {
 		$self =& CakeLog::getInstance();
 		unset($self->_streams[$streamName]);
 	}
@@ -208,7 +208,7 @@ class CakeLog {
  * @access public
  * @static
  */
-	function write($type, $message) {
+	static function write($type, $message) {
 		if (!defined('LOG_ERROR')) {
 			define('LOG_ERROR', 2);
 		}
@@ -252,7 +252,7 @@ class CakeLog {
  * @param array $context Context
  * @return void
  */
-	function handleError($code, $description, $file = null, $line = null, $context = null) {
+	static function handleError($code, $description, $file = null, $line = null, $context = null) {
 		if ($code === 2048 || $code === 8192 || error_reporting() === 0) {
 			return;
 		}

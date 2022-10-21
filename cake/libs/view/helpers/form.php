@@ -428,7 +428,7 @@ class FormHelper extends AppHelper {
 			serialize($fields) .
 			Configure::read('Security.salt')
 		);
-		$locked = implode(array_keys($locked), '|');
+		$locked = implode('|', array_keys($locked));
 
 		$out = $this->hidden('_Token.fields', array(
 			'value' => urlencode($fields . ':' . $locked),
@@ -1377,7 +1377,7 @@ class FormHelper extends AppHelper {
 			) . $after;
 		} elseif (preg_match('/\.(jpg|jpe|jpeg|gif|png|ico)$/', $caption)) {
 			unset($options['type']);
-			if ($caption{0} !== '/') {
+			if ($caption[0] !== '/') {
 				$url = $this->webroot(IMAGES_URL . $caption);
 			} else {
 				$caption = trim($caption, '/');
@@ -1868,7 +1868,7 @@ class FormHelper extends AppHelper {
 					$time = explode(':', $days[1]);
 
 					if (($time[0] > 12) && $timeFormat == '12') {
-						$time[0] = $time[0] - 12;
+						$time[0] = (int)$time[0] - 12;
 						$meridian = 'pm';
 					} elseif ($time[0] == '12' && $timeFormat == '12') {
 						$meridian = 'pm';

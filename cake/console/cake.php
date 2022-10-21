@@ -157,10 +157,18 @@ class ShellDispatcher {
 			define('PHP5', (PHP_VERSION >= 5));
 			define('DS', DIRECTORY_SEPARATOR);
 			define('CAKE_CORE_INCLUDE_PATH', dirname(dirname(dirname(__FILE__))));
-			define('CORE_PATH', CAKE_CORE_INCLUDE_PATH . DS);
 			define('DISABLE_DEFAULT_ERROR_HANDLING', false);
 			define('CAKEPHP_SHELL', true);
 		}
+
+		if (!defined('CORE_PATH')) {
+			if (function_exists('ini_set') && ini_set('include_path', CAKE_CORE_INCLUDE_PATH . PATH_SEPARATOR . ini_get('include_path'))) {
+				define('CORE_PATH', null);
+			} else {
+				define('CORE_PATH', CAKE_CORE_INCLUDE_PATH . DS);
+			}
+		}
+		
 		require_once(CORE_PATH . 'cake' . DS . 'basics.php');
 	}
 
@@ -363,8 +371,8 @@ class ShellDispatcher {
 			$methods = array_diff(get_class_methods('Shell'), array('help'));
 		}
 		$methods = array_diff(get_class_methods($Shell), $methods);
-		$added = in_array(strtolower($arg), array_map('strtolower', $methods));
-		$private = $arg[0] == '_' && method_exists($Shell, $arg);
+		$added = !is_null($arg) && in_array(strtolower($arg), array_map('strtolower', $methods));
+		$private = isset($arg[0]) && $arg[0] == '_' && method_exists($Shell, $arg);
 
 		if (!$private) {
 			if ($added) {
@@ -503,7 +511,7 @@ class ShellDispatcher {
 		if (isset($params['working'])) {
 			$params['working'] = trim($params['working']);
 		}
-		if (!empty($params['working']) && (!isset($this->args[0]) || isset($this->args[0]) && $this->args[0]{0} !== '.')) {
+		if (!empty($params['working']) && (!isset($this->args[0]) || isset($this->args[0]) && $this->args[0][0] !== '.')) {
 			if (empty($this->params['app']) && $params['working'] != $params['root']) {
 				$params['root'] = dirname($params['working']);
 				$params['app'] = basename($params['working']);
@@ -541,12 +549,12 @@ class ShellDispatcher {
 		$count = count($params);
 		for ($i = 0; $i < $count; $i++) {
 			if (isset($params[$i])) {
-				if ($params[$i]{0} === '-') {
+				if ($params[$i][0] === '-') {
 					$key = substr($params[$i], 1);
 					$this->params[$key] = true;
 					unset($params[$i]);
 					if (isset($params[++$i])) {
-						if ($params[$i]{0} !== '-') {
+						if ($params[$i][0] !== '-') {
 							$this->params[$key] = str_replace('"', '', $params[$i]);
 							unset($params[$i]);
 						} else {
@@ -632,7 +640,7 @@ class ShellDispatcher {
 
 			foreach ($shellList as $shell => $types) {
 				sort($types);
-				$shellList[$shell] = str_pad($shell . ' [' . implode ($types, ', ') . ']', $width / $columns);
+				$shellList[$shell] = str_pad($shell . ' [' . implode(', ', $types) . ']', $width / $columns);
 			}
 			$out = array_chunk($shellList, $rows);
 			for ($i = 0; $i < $rows; $i++) {

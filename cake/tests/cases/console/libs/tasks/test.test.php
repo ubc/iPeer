@@ -261,7 +261,7 @@ class TestTaskTest extends CakeTestCase {
  * @return void
  * @access public
  */
-	function startTest() {
+	function startTest($method) {
 		$this->Dispatcher = new TestTestTaskMockShellDispatcher();
 		$this->Dispatcher->shellPaths = App::path('shells');
 		$this->Task = new MockTestTask($this->Dispatcher);
@@ -276,7 +276,7 @@ class TestTaskTest extends CakeTestCase {
  * @return void
  * @access public
  */
-	function endTest() {
+	function endTest($method) {
 		ClassRegistry::flush();
 		App::build();
 	}
@@ -315,21 +315,6 @@ class TestTaskTest extends CakeTestCase {
 		$result = $this->Task->getTestableMethods('TestTaskArticle');
 		$expected = array('dosomething', 'dosomethingelse');
 		$this->assertEqual(array_map('strtolower', $result), $expected);
-	}
-
-/**
- * test that the generation of fixtures works correctly.
- *
- * @return void
- * @access public
- */
-	function testFixtureArrayGenerationFromModel() {
-		$subject = ClassRegistry::init('TestTaskArticle');
-		$result = $this->Task->generateFixtureList($subject);
-		$expected = array('plugin.test_task.test_task_comment', 'app.articles_tags',
-			'app.test_task_article', 'app.test_task_tag');
-
-		$this->assertEqual(sort($result), sort($expected));
 	}
 
 /**
@@ -573,11 +558,11 @@ class TestTaskTest extends CakeTestCase {
 		), true);
 
 		$this->Task->plugin = 'TestPlugin';
-		$path = $testApp . 'test_plugin' . DS . 'tests' . DS . 'cases' . DS . 'helpers' . DS . 'other_helper.test.php';
+		$path = $testApp . 'test_plugin' . DS . 'tests' . DS . 'cases' . DS . 'helpers' . DS . 'plugged_helper.test.php';
 		$this->Task->setReturnValueAt(0, 'in', 5); //helper
 		$this->Task->setReturnValueAt(1, 'in', 1); //OtherHelper
 		$this->Task->expectAt(0, 'createFile', array($path, '*'));
-		$this->Task->expectAt(9, 'out', array('1. OtherHelper'));
+		$this->Task->expectAt(9, 'out', array('1. PluggedHelper'));
 		$this->Task->execute();
 	}
 

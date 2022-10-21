@@ -130,18 +130,48 @@ class XmlNode extends CakeObject {
 	}
 
 /**
- * Adds a namespace to the current node
+ * Removes a namespace from the current node
  *
  * @param string $prefix The namespace prefix
- * @param string $url The namespace DTD URL
  * @return void
  */
 	function removeNamespace($prefix) {
-		if (Xml::removeGlobalNs($prefix)) {
+		if ($this->removeGlobalNs($prefix)) {
 			return true;
 		}
 		return false;
 	}
+
+/**
+ * Removes a namespace added in addNs()
+ *
+ * @param  string  $name The namespace name or URI
+ * @access public
+ */
+function removeGlobalNs($name)
+{
+	$_this = &XmlManager::getInstance();
+	if (isset($_this->namespaces[$name])) {
+		unset($_this->namespaces[$name]);
+		if (isset($this)) {
+			unset($this->namespaces[$name]);
+		}
+		return true;
+	} elseif (in_array($name, $_this->namespaces)) {
+		$keys = array_keys($_this->namespaces);
+		$count = count($keys);
+		for ($i = 0; $i < $count; $i++) {
+			if ($_this->namespaces[$keys[$i]] == $name) {
+				unset($_this->namespaces[$keys[$i]]);
+				if (isset($this)) {
+					unset($this->namespaces[$keys[$i]]);
+				}
+				return true;
+			}
+		}
+	}
+	return false;
+}
 
 /**
  * Creates an XmlNode object that can be appended to this document or a node in it
@@ -1082,7 +1112,7 @@ class Xml extends XmlNode {
  * @return string String representation
  * @access public
  */
-	function toString($options = array()) {
+	function toString($options = array(), $depth = 0) {
 		if (is_bool($options)) {
 			$options = array('header' => $options);
 		}
@@ -1140,7 +1170,7 @@ class Xml extends XmlNode {
  * @access public
  * @static
  */
-	function addGlobalNs($name, $url = null) {
+	static function addGlobalNs($name, $url = null) {
 		$_this =& XmlManager::getInstance();
 		if ($ns = Xml::resolveNamespace($name, $url)) {
 			$_this->namespaces = array_merge($_this->namespaces, $ns);
@@ -1156,7 +1186,7 @@ class Xml extends XmlNode {
  * @param  string  $url
  * @return array
  */
-	function resolveNamespace($name, $url) {
+	static function resolveNamespace($name, $url) {
 		$_this =& XmlManager::getInstance();
 		if ($url == null && isset($_this->defaultNamespaceMap[$name])) {
 			$url = $_this->defaultNamespaceMap[$name];
@@ -1178,7 +1208,7 @@ class Xml extends XmlNode {
  * @access public
  * @static
  */
-	function addGlobalNamespace($name, $url = null) {
+	static function addGlobalNamespace($name, $url = null) {
 		return Xml::addGlobalNs($name, $url);
 	}
 
@@ -1187,13 +1217,14 @@ class Xml extends XmlNode {
  *
  * @param  string  $name The namespace name or URI
  * @access public
- * @static
  */
 	function removeGlobalNs($name) {
 		$_this =& XmlManager::getInstance();
 		if (isset($_this->namespaces[$name])) {
 			unset($_this->namespaces[$name]);
-			unset($this->namespaces[$name]);
+			if (isset($this)) {
+				unset($this->namespaces[$name]);
+			}
 			return true;
 		} elseif (in_array($name, $_this->namespaces)) {
 			$keys = array_keys($_this->namespaces);
@@ -1201,7 +1232,9 @@ class Xml extends XmlNode {
 			for ($i = 0; $i < $count; $i++) {
 				if ($_this->namespaces[$keys[$i]] == $name) {
 					unset($_this->namespaces[$keys[$i]]);
-					unset($this->namespaces[$keys[$i]]);
+					if (isset($this)) {
+						unset($this->namespaces[$keys[$i]]);
+					}
 					return true;
 				}
 			}
@@ -1213,10 +1246,9 @@ class Xml extends XmlNode {
  * Alias to Xml::removeNs
  *
  * @access public
- * @static
  */
 	function removeGlobalNamespace($name) {
-		return Xml::removeGlobalNs($name);
+		return $this->removeGlobalNs($name);
 	}
 
 /**
@@ -1227,7 +1259,7 @@ class Xml extends XmlNode {
  * @access public
  * @static
  */
-	function options($options = array()) {
+	static function options($options = array()) {
 		$_this =& XmlManager::getInstance();
 		$_this->options = array_merge($_this->options, $options);
 		return $_this->options;
@@ -1365,7 +1397,7 @@ class XmlTextNode extends XmlNode {
  * @return boolean False - not supported
  * @todo make convertEntities work without mb support, convert entities to number entities
  */
-	function append() {
+	function &append(&$child, $options = array()) {
 		return false;
 	}
 
@@ -1449,7 +1481,7 @@ class XmlManager {
  * @return object
  * @access public
  */
-	function &getInstance() {
+	static function &getInstance() {
 		static $instance = array();
 
 		if (!$instance) {

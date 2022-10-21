@@ -906,7 +906,7 @@ class Model extends Overloadable {
 							$data[$val] = sprintf('%02d', $data[$val]);
 						}
 					}
-					if (!isset($data[$val]) || isset($data[$val]) && (empty($data[$val]) || $data[$val][0] === '-')) {
+					if (!isset($data[$val]) || isset($data[$val]) && (empty($data[$val]) || (isset($data[$val][0]) && $data[$val][0] === '-'))) {
 						return null;
 					}
 					if (isset($data[$val]) && !empty($data[$val])) {
@@ -1223,10 +1223,9 @@ class Model extends Overloadable {
 		$defaults = array('validate' => true, 'fieldList' => array(), 'callbacks' => true);
 		$_whitelist = $this->whitelist;
 		$fields = array();
-		$callbacks = true;
 
 		if (!is_array($validate)) {
-			$options = array_merge($defaults, compact('validate', 'fieldList', 'callbacks'));
+			$options = array_merge($defaults, compact('validate', 'fieldList'));
 		} else {
 			$options = array_merge($defaults, $validate);
 		}
@@ -1378,7 +1377,7 @@ class Model extends Overloadable {
 			if (!empty($this->data)) {
 				$success = Set::merge($success, $this->data);
 			}
-			$this->data = false;
+			$this->data = array();
 			$this->_clearCache();
 			$this->validationErrors = array();
 		}
@@ -1617,7 +1616,7 @@ class Model extends Overloadable {
 						if ($options['atomic']) {
 							$validates = $validates && $currentValidates;
 						} else {
-							$validates = true;
+							$validates = $currentValidates;
 						}
 					} else {
 						$validating = false;
@@ -1625,7 +1624,7 @@ class Model extends Overloadable {
 					}
 
 					if (!$options['atomic']) {
-						$return[] = $currentValidates;
+						$return[] = $validates;
 					} elseif (!$validates && !$validating) {
 						break;
 					}

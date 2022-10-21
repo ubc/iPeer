@@ -131,7 +131,7 @@ class SchemaShellTest extends CakeTestCase {
  * @return void
  * @access public
  */
-	function startTest() {
+	function startTest($method) {
 		$this->Dispatcher = new TestSchemaShellMockShellDispatcher();
 		$this->Shell = new MockSchemaShell($this->Dispatcher);
 		$this->Shell->Dispatch =& $this->Dispatcher;
@@ -143,7 +143,7 @@ class SchemaShellTest extends CakeTestCase {
  * @return void
  * @access public
  */
-	function endTest() {
+	function endTest($method) {
 		ClassRegistry::flush();
 	}
 
