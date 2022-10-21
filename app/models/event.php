@@ -348,8 +348,8 @@ class Event extends AppModel
 
         // parse group member id
         for ($i=0; $i<strlen($tmp); $i++) {
-            if ($tmp{$i} != ":" ) {
-                $num = $num.$tmp{$i};
+            if ($tmp[$i] != ":" ) {
+                $num = $num.$tmp[$i];
             } else {
                 $member_count++;
                 $data['data']['Event']['group'.$member_count] = $num;

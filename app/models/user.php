@@ -1145,7 +1145,7 @@ class User extends AppModel
      * @access public
      * @return void
      * */
-    function getInstance($user = null)
+    static function getInstance($user = null)
     {
         static $instance = array();
 
@@ -1169,7 +1169,7 @@ class User extends AppModel
      * @access public
      * @return void
      * */
-    function store($user)
+    static function store($user)
     {
         if (empty($user)) {
             return false;
@@ -1186,7 +1186,7 @@ class User extends AppModel
      * @access public
      * @return void
      * */
-    function get($path)
+    static function get($path)
     {
         $_user = User::getInstance();
         $path = str_replace('.', '/', $path);
@@ -1214,7 +1214,7 @@ class User extends AppModel
      * @access public
      * @return bool if user is logged in
      * */
-    function isLoggedIn()
+    static function isLoggedIn()
     {
         return self::getInstance() !== null;
     }

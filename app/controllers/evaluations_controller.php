@@ -2148,8 +2148,9 @@ class EvaluationsController extends AppController
 
             $students[$pos]['Member']['full_name'] = $name['full_name'];
             $students[$pos]['Member']['student_no'] = $name['student_no'];
+            $students[$pos]['users']['submitted'] = false;
 
-            if (isset($evalSubmission)) {
+            if ($evalSubmission) {
                 $students[$pos]['users']['submitted'] = $evalSubmission['EvaluationSubmission']['submitted'];
                 $students[$pos]['users']['date_submitted'] = $evalSubmission['EvaluationSubmission']['date_submitted'];
                 $students[$pos]['users']['due_date'] = $event['Event']['due_date'];
