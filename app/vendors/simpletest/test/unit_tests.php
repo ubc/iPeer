@@ -1,5 +1,5 @@
 <?php
-// $Id$
+// $Id: unit_tests.php 1661 2008-02-26 21:04:31Z pp11 $
 require_once(dirname(__FILE__) . '/../autorun.php');
 require_once(dirname(__FILE__) . '/../unit_tester.php');
 require_once(dirname(__FILE__) . '/../shell_tester.php');
@@ -8,9 +8,11 @@ require_once(dirname(__FILE__) . '/../web_tester.php');
 require_once(dirname(__FILE__) . '/../extensions/pear_test_case.php');
 require_once(dirname(__FILE__) . '/../extensions/phpunit_test_case.php');
 
-class UnitTests extends TestSuite {
-    function UnitTests() {
-        $this->TestSuite('Unit tests');
+class UnitTests extends TestSuite
+{
+    public function __construct()
+    {
+        parent::__construct('Unit tests');
         $path = dirname(__FILE__);
         $this->addFile($path . '/errors_test.php');
         if (version_compare(phpversion(), '5') >= 0) {
@@ -52,4 +54,3 @@ class UnitTests extends TestSuite {
         $this->addFile($path . '/../extensions/testdox/test.php');
     }
 }
-?>

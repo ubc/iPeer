@@ -3,7 +3,7 @@
  *  Base include file for SimpleTest.
  *  @package    SimpleTest
  *  @subpackage WebTester
- *  @version    $Id$
+ *  @version    $Id: form.php 1672 2008-03-02 04:47:34Z edwardzyang $
  */
     
 /**#@+
@@ -19,24 +19,26 @@ require_once(dirname(__FILE__) . '/selector.php');
  *    @package SimpleTest
  *    @subpackage WebTester
  */
-class SimpleForm {
-    var $_method;
-    var $_action;
-    var $_encoding;
-    var $_default_target;
-    var $_id;
-    var $_buttons;
-    var $_images;
-    var $_widgets;
-    var $_radios;
-    var $_checkboxes;
+class SimpleForm
+{
+    public $_method;
+    public $_action;
+    public $_encoding;
+    public $_default_target;
+    public $_id;
+    public $_buttons;
+    public $_images;
+    public $_widgets;
+    public $_radios;
+    public $_checkboxes;
     
     /**
      *    Starts with no held controls/widgets.
      *    @param SimpleTag $tag        Form tag to read.
      *    @param SimplePage $page      Holding page.
      */
-    function SimpleForm($tag, &$page) {
+    public function __construct($tag, &$page)
+    {
         $this->_method = $tag->getAttribute('method');
         $this->_action = $this->_createAction($tag->getAttribute('action'), $page);
         $this->_encoding = $this->_setEncodingClass($tag);
@@ -55,7 +57,8 @@ class SimpleForm {
      *    @return string               Packet class.
      *    @access private
      */
-    function _setEncodingClass($tag) {
+    public function _setEncodingClass($tag)
+    {
         if (strtolower($tag->getAttribute('method')) == 'post') {
             if (strtolower($tag->getAttribute('enctype')) == 'multipart/form-data') {
                 return 'SimpleMultipartEncoding';
@@ -70,7 +73,8 @@ class SimpleForm {
      *    @param string $frame        Name of frame.
      *    @access public
      */
-    function setDefaultTarget($frame) {
+    public function setDefaultTarget($frame)
+    {
         $this->_default_target = $frame;
     }
     
@@ -79,7 +83,8 @@ class SimpleForm {
      *    @return string           Either get or post.
      *    @access public
      */
-    function getMethod() {
+    public function getMethod()
+    {
         return ($this->_method ? strtolower($this->_method) : 'get');
     }
     
@@ -90,11 +95,13 @@ class SimpleForm {
      *    @param SimpleUrl $base   Page location.
      *    @return SimpleUrl        Absolute form target.
      */
-    function _createAction($action, &$page) {
+    public function _createAction($action, &$page)
+    {
         if (($action === '') || ($action === false)) {
             return $page->expandUrl($page->getUrl());
         }
-        return $page->expandUrl(new SimpleUrl($action));;
+        return $page->expandUrl(new SimpleUrl($action));
+        ;
     }
     
     /**
@@ -102,7 +109,8 @@ class SimpleForm {
      *    @return SimpleUrl           URL target.
      *    @access public
      */
-    function getAction() {
+    public function getAction()
+    {
         $url = $this->_action;
         if ($this->_default_target && ! $url->getTarget()) {
             $url->setTarget($this->_default_target);
@@ -116,7 +124,8 @@ class SimpleForm {
      *    @return SimpleFormEncoding    Request to submit.
      *    @access private
      */
-    function _encode() {
+    public function _encode()
+    {
         $class = $this->_encoding;
         $encoding = new $class();
         for ($i = 0, $count = count($this->_widgets); $i < $count; $i++) {
@@ -130,7 +139,8 @@ class SimpleForm {
      *    @return string           Unique tag ID.
      *    @access public
      */
-    function getId() {
+    public function getId()
+    {
         return $this->_id;
     }
     
@@ -139,7 +149,8 @@ class SimpleForm {
      *    @param SimpleWidget $tag        Input tag to add.
      *    @access public
      */
-    function addWidget(&$tag) {
+    public function addWidget(&$tag)
+    {
         if (strtolower($tag->getAttribute('type')) == 'submit') {
             $this->_buttons[] = &$tag;
         } elseif (strtolower($tag->getAttribute('type')) == 'image') {
@@ -155,7 +166,8 @@ class SimpleForm {
      *    @param SimpleWidget $tag   Incoming form control.
      *    @access private
      */
-    function _setWidget(&$tag) {
+    public function _setWidget(&$tag)
+    {
         if (strtolower($tag->getAttribute('type')) == 'radio') {
             $this->_addRadioButton($tag);
         } elseif (strtolower($tag->getAttribute('type')) == 'checkbox') {
@@ -170,7 +182,8 @@ class SimpleForm {
      *    @param SimpleRadioButtonTag $tag   Incoming form control.
      *    @access private
      */
-    function _addRadioButton(&$tag) {
+    public function _addRadioButton(&$tag)
+    {
         if (! isset($this->_radios[$tag->getName()])) {
             $this->_widgets[] = new SimpleRadioGroup();
             $this->_radios[$tag->getName()] = count($this->_widgets) - 1;
@@ -183,7 +196,8 @@ class SimpleForm {
      *    @param SimpleCheckboxTag $tag   Incoming form control.
      *    @access private
      */
-    function _addCheckbox(&$tag) {
+    public function _addCheckbox(&$tag)
+    {
         if (! isset($this->_checkboxes[$tag->getName()])) {
             $this->_widgets[] = &$tag;
             $this->_checkboxes[$tag->getName()] = count($this->_widgets) - 1;
@@ -205,7 +219,8 @@ class SimpleForm {
      *                                      if not set.
      *    @access public
      */
-    function getValue($selector) {
+    public function getValue($selector)
+    {
         for ($i = 0, $count = count($this->_widgets); $i < $count; $i++) {
             if ($selector->isMatch($this->_widgets[$i])) {
                 return $this->_widgets[$i]->getValue();
@@ -228,7 +243,8 @@ class SimpleForm {
      *                                      present, nothing will be set.
      *    @access public
      */
-    function setField($selector, $value, $position=false) {
+    public function setField($selector, $value, $position=false)
+    {
         $success = false;
         $_position = 0;
         for ($i = 0, $count = count($this->_widgets); $i < $count; $i++) {
@@ -250,7 +266,8 @@ class SimpleForm {
      *    @param SimpleSelector $selector   Criteria to apply.
      *    @access public
      */
-    function attachLabelBySelector($selector, $label) {
+    public function attachLabelBySelector($selector, $label)
+    {
         for ($i = 0, $count = count($this->_widgets); $i < $count; $i++) {
             if ($selector->isMatch($this->_widgets[$i])) {
                 if (method_exists($this->_widgets[$i], 'setLabel')) {
@@ -267,7 +284,8 @@ class SimpleForm {
      *    @return boolean                   True if present.
      *    @access public
      */
-    function hasSubmit($selector) {
+    public function hasSubmit($selector)
+    {
         foreach ($this->_buttons as $button) {
             if ($selector->isMatch($button)) {
                 return true;
@@ -282,7 +300,8 @@ class SimpleForm {
      *    @return boolean                   True if present.
      *    @access public
      */
-    function hasImage($selector) {
+    public function hasImage($selector)
+    {
         foreach ($this->_images as $image) {
             if ($selector->isMatch($image)) {
                 return true;
@@ -300,7 +319,8 @@ class SimpleForm {
      *                                      in the form.
      *    @access public
      */
-    function submitButton($selector, $additional = false) {
+    public function submitButton($selector, $additional = false)
+    {
         $additional = $additional ? $additional : array();
         foreach ($this->_buttons as $button) {
             if ($selector->isMatch($button)) {
@@ -309,7 +329,7 @@ class SimpleForm {
                 if ($additional) {
                     $encoding->merge($additional);
                 }
-                return $encoding;           
+                return $encoding;
             }
         }
         return false;
@@ -326,7 +346,8 @@ class SimpleForm {
      *                                      form.
      *    @access public
      */
-    function submitImage($selector, $x, $y, $additional = false) {
+    public function submitImage($selector, $x, $y, $additional = false)
+    {
         $additional = $additional ? $additional : array();
         foreach ($this->_images as $image) {
             if ($selector->isMatch($image)) {
@@ -335,7 +356,7 @@ class SimpleForm {
                 if ($additional) {
                     $encoding->merge($additional);
                 }
-                return $encoding;           
+                return $encoding;
             }
         }
         return false;
@@ -348,8 +369,8 @@ class SimpleForm {
      *    @return hash           Submitted values.
      *    @access public
      */
-    function submit() {
+    public function submit()
+    {
         return $this->_encode();
     }
 }
-?>
