@@ -5,13 +5,13 @@
     "composite": true,
     "types": ["node"],
     "strict": true,
-    "module": "es2022", // "commonjs",
+    "module": "es2022", // "es2022", // "commonjs",
     "jsx": "preserve",
     "esModuleInterop": true,
     "sourceMap": true,
     "allowJs": true,
     "lib": [
-      "es5",
+      "es2022",   //  "es2017",  // "es5",
       "dom"
     ],
     "rootDir": "src",

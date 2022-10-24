@@ -4,7 +4,7 @@
   padding: 2em;
   background: white;
   box-shadow: 0 0 25px rgba(85, 85, 85, 0.28);
-  min-width: 540px;
+  //min-width: 540px;
 }
 .pagewidth {
   /* 780px is Wide enough for someone with a 800px device to
@@ -13,7 +13,8 @@
    * many smartphones have at least a 800x480 display now,
    * so we shouldn't use a higher min width.
    * */
-  min-width: 780px;
+
+  //min-width: 780px;
   max-width: 1000px;
   margin-left: auto;
   margin-right: auto;

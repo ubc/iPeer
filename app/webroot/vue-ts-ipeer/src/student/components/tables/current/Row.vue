@@ -66,7 +66,9 @@ const props = defineProps<{
     </td>
     <td>
       <div class="flex">
-        <router-link :class="`button btn-lg ${row?.event?.is_submitted==='0' ? 'default' : 'submit'} flex-1 text-center`" :to="{ name: `evaluation.${row?.event?.is_submitted==='0' ? 'edit' : 'make'}`, params: { event_id: row?.event?.id, group_id: row?.group?.id } }">
+        <router-link
+            :class="`button ${row?.event?.is_submitted==='0' ? 'default' : 'submit'} flex-1 text-center`"
+            :to="{ name: 'evaluation.make', params: { event_id: row?.event?.id, group_id: row?.group?.id } }">
           {{ row?.event?.is_submitted==='0' ? 'Continue Eval.' : 'Evaluate Peers' }}
         </router-link>
       </div>

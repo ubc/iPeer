@@ -21,8 +21,6 @@ import {
   IconThinkingFace
 } from '@/components/icons'
 
-import EvaluationForm from "@/student/views/EvaluationForm.vue";
-
 const EvaluationMakePage = defineAsyncComponent(() => import('@/student/views/EvaluationMakePage.vue'))
 const EvaluationEditPage = defineAsyncComponent(() => import('@/student/views/EvaluationEditPage.vue'))
 
@@ -42,8 +40,7 @@ const event_id          = ref(route.params.event_id)
 const group_id          = ref(route.params.group_id)
 const status            = ref<string>('')
 const message           = ref<object | null>(null)
-const form              = reactive<unknown>({})
-const evaluation        = reactive<Evaluation | null>({})
+const evaluation        = reactive<Evaluation | any>({})
 // COMPUTED
 const evaluationPage = computed(() => {
   // Check if evaluation is started
@@ -57,22 +54,32 @@ const evaluationPage = computed(() => {
   }
 })
 // METHODS
-// WATCH
-// LIFECYCLE
-onMounted(async () => {
+async function fetchEvaluation() {
   try {
     status.value = 'PENDING'
     const response: Promise<Evaluation | unknown> = await useFetch(
         `evaluations/makeEvaluation/${event_id.value}/${group_id.value}`,
-        {method: 'GET', timeout: 300})
-    console.log({response})
+        {method: 'GET', timeout: 0})
     Object.assign(evaluation, response?.data)
   } catch (err) {
     message.value = {text: err?.messge, type: 'error'}
   } finally {
     status.value = 'READY'
   }
-})
+}
+async function reFetchEvaluation() {
+  try {
+    const response: Promise<Evaluation | unknown> = await useFetch(
+        `evaluations/makeEvaluation/${event_id.value}/${group_id.value}`,
+        {method: 'GET', timeout: 0})
+    Object.assign(evaluation, response?.data)
+  } catch (err) {
+    message.value = {text: err?.messge, type: 'error'}
+  }
+}
+// WATCH
+// LIFECYCLE
+onMounted(async () => await fetchEvaluation())
 </script>
 
 <template>
@@ -100,10 +107,15 @@ onMounted(async () => {
       <SectionTitle title="Your Response" />
       <SectionSubtitle subtitle="Evaluate your group" :icon="{src: IconWritingHand, size: '3.75rem'}" />
 
-      <Debugger :title="`EvaluationIndex::Route`" :data="useRoute()" />
-      <Debugger :title="`EvaluationIndex::${evaluation?.template}`" :state="evaluation" />
+      <Debugger :title="`EvaluationIndex::${evaluation?.template}`" :state="evaluation" :form="initialState" :data="evaluation?.review" />
 
-      <router-view :currentUser="currentUser" :evaluation="evaluation"></router-view>
+      <Suspense>
+        <router-view
+            :currentUser="currentUser"
+            :evaluation="evaluation"
+            @fetch:evaluation="fetchEvaluation">
+        </router-view>
+      </Suspense>
     </template>
 
   </div>

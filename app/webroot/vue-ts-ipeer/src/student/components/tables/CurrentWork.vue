@@ -30,7 +30,7 @@ interface IHttpResponse {
 }
 const Row = defineAsyncComponent({
   loader: () => import('@/student/components/tables/current/Row.vue'),
-  LoadingComponent: 'Loading...',
+  LoadingComponent: '<div>Loading...</div>',
   suspensible: false,
   delay: 2000
 })
@@ -74,7 +74,7 @@ onMounted(async () => {
   try {
     loading.value = true
     const eventsResponse: Promise<IHttpResponse | any> = await useFetch('/home?work=current', {method: 'GET', timeout: 300})
-    entries.value = eventsResponse.data
+    entries.value = eventsResponse?.data
   } catch (err: Error | any) {
     error.value = {text: err.message, type: 'error'};
   } finally {

@@ -78,6 +78,7 @@ class JsonHandlerComponent extends CakeObject
     $json['review']['data']       = [];
     $json['review']['response']   = $this->getSimpleEvaluationSubmission($data['submission'], $data['evaluation']);
     $json['review']['remaining']  = $data['remaining'];
+    
     $this->RestResponseHandler->toJson('SimpleEvaluation', 200, $json);
     exit;
   }
@@ -88,15 +89,12 @@ class JsonHandlerComponent extends CakeObject
    */
   public function formatRubricEvaluation(array $data): void
   {
-    $json               = $this->getEventData($data);
-    $json['rubric_id']  = $data['rubricId'];
-    $json['template']   = 'RubricEvaluation';
-    $json['review']     = [
-      'settings'    => $this->getRubricEvaluationSettings($data['questions']) ?? null,
-      'data'        => $this->getRubricEvaluationData($data['questions']) ?? null,
-      'response'    => isset($data['groupMembers']) ? $this->getRubricEvaluationSubmission($data['submission'], $data['groupMembers']) : null,
-      // 'remaining'   => ''
-    ];
+    $json                         = $this->getEventData($data);
+    $json['template']             = 'RubricEvaluation';
+    $json['rubric_id']            = $data['rubricId'];
+    $json['review']               = $this->getRubricEvaluationSettings($data['questions']) ?? null;
+    $json['review']['data']       = $this->getRubricEvaluationData($data['questions']) ?? null;
+    $json['review']['response']   = isset($data['groupMembers']) ? $this->getRubricEvaluationSubmission($data['submission'], $data['groupMembers']) : null;
     
     $this->RestResponseHandler->toJson('RubricEvaluation', 200, $json);
     exit;
@@ -241,16 +239,16 @@ class JsonHandlerComponent extends CakeObject
     $data['submitter_id'] = $submission['EvaluationSubmission']['submitter_id'];
     $data['submitted'] = $submission['EvaluationSubmission']['submitted'];
     $data['date_submitted'] = $submission['EvaluationSubmission']['date_submitted'];
-    $data['points'] = [];
-    $data['comments'] = [];
-    /***/
+    //$data['points'] = [];
+    //$data['comments'] = [];
+    $data['data'] = [];
     foreach ($evaluation as $value) {
       $tmp = [];
       $tmp['score'] = $value['EvaluationSimple']['score'];
       $tmp['comment'] = $value['EvaluationSimple']['comment'];
-  
-      $data['points'][] = $tmp['score'];
-      $data['comments'][] = $tmp['comment'];
+      
+      $data['data']['points'][] = $tmp['score'];
+      $data['data']['comments'][] = $tmp['comment'];
     };
     return $data;
   }

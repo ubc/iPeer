@@ -1,140 +1,122 @@
 <script lang="ts" setup>
 import { ref, unref, toRef, reactive, watch, computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router'
-import { useForm } from 'vee-validate'
-import { map } from 'lodash'
+import { useRoute, useRouter } from 'vue-router'
+import { isEmpty, map } from 'lodash'
 
+import TakeNote from '@/student/components/TakeNote.vue'
 import EvaluationForm from '@/student/views/EvaluationForm.vue'
 import PeerSimpleRangeQuestion from '@/student/views/questions/PeerSimpleRangeQuestion.vue'
 import PeerSimpleCommentQuestion from '@/student/views/questions/PeerSimpleCommentQuestion.vue'
+import { InputText } from '@/components/fields'
 
-
-// import PeerRangeQuestion from "@/student/views/questions/PeerRangeQuestion.vue";
-// import PeerCommentQuestion from "@/student/views/questions/PeerCommentQuestion.vue";
-import InputElement from '@/components/fields/InputElement.vue'
-import VFormInput from '@/components/fields/VFormInput.vue'
-import VFormText from '@/components/fields/VFormText.vue'
-import TakeNote from "@/student/components/TakeNote.vue";
-
-
-import type { Evaluation, User } from '@/types/typings'
-interface SimpleEvaluation {
-  id: string
-  submitter_id: string
-  submitted: string
-  date_submitted: string
-  points: string[]
-  comments: string[]
-}
-interface Form {
-  points: string[]
-  comments: string[]
-}
+import type { Evaluation, EvaluationReviewResponse, User } from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
-  // (e: 'update:modelValue', option: string): void
-  // (e: 'update:comments', option: string): void
+  (e: 'fetch:evaluation'): void
 }>()
 const props = defineProps<{
-  action: string
-  _method: string
   currentUser: User
   evaluation: Evaluation
 }>()
 const route = useRoute()
-
+const router = useRouter()
 // DATA
-const settings = reactive({
-  questions: [
-    {
-      id: '1',
-      title: 'Please rate each peer\'s relative contribution.',
-      description: 'points:: some description'
-    },
-    {
-      id: '2',
-      title: 'Please provide overall comments about each peer.',
-      description: 'comments:: some description'
-    }
-  ]
+const evaluation_form = ref()
+const evaluation    = toRef(props, 'evaluation')
+let form            = reactive({
+  event_id: computed(() => evaluation.value?.id),
+  group_id: computed(() => evaluation.value?.group?.id),
+  course_id: computed(() => evaluation.value?.course?.id),
+  group_event_id: computed(() => evaluation.value?.group_event_id),
+  rubric_id: computed(() => evaluation.value?.rubric_id),
+  user_id: computed(() => props.currentUser?.id),
+  evaluatee_count: computed(() => evaluation.value?.members?.length),
+  member_ids: computed<string[]>(() => map(evaluation.value?.members, member => member.id))
 })
-const evaluation = toRef<any>(props, 'evaluation')
-const params = reactive<any>({
-  event_id: computed<string | number>(() => evaluation.value?.id),
-  group_id: computed<string | number>(() => evaluation.value?.group?.id),
-  course_id: computed<string | number>(() => evaluation.value?.course?.id),
-  user_id: computed<string | number>(() => props.currentUser?.id),
-  evaluatee_count: computed<string | number>(() => evaluation.value?.members?.length),
-  member_ids: computed<string | number>(() => map(evaluation.value?.members, member => member.id)),
-})
-const form2 = computed<SimpleEvaluation>(() => {
-  if(evaluation.value?.review?.response.length) {
-    return evaluation.value?.review?.response
+const initialState  = computed<EvaluationReviewResponse | any>(() => {
+  if(evaluation.value?.review?.response && !isEmpty(evaluation.value?.review?.response)) {
+    return unref(evaluation.value?.review?.response)
   } else {
     return {
-      points: [],
-      comments: []
+      submitter_id: evaluation.value?.id,
+      submitted: null,
+      date_submitted: '',
+      data: {
+        points: [],
+        comments: []
+      }
     }
   }
 })
-
-const form = computed<SimpleEvaluation>(() => {
-  if(evaluation.value?.review?.response && Object.keys(evaluation.value?.review?.response).length) {
-    return unref(props.evaluation?.review?.response)
-  }
-  return {
-    points: [],
-    comments: []
+const questions = reactive({
+  points: {
+    title: '1. Please rate each peer\'s relative contribution.',
+    description: 'Section description'
+  },
+  comments: {
+    title: '2. Please provide overall comments about each peer.',
+    description: 'Section description'
   }
 })
-
-// const form = toRef<any>(props, 'response')
-const { handleSubmit, errors, values } = useForm({
-  initialValues: form.value
-})
-
 // COMPUTED
-const response = computed(() => props.evaluation?.review?.response)
-
 const isDisabled = computed(() => {
   if(route.path === 'submissions') {
     return true
   }
-  return false
+  return false // will be determined by the evaluation settings
   // return new Date().toLocaleDateString('en-CA', {}) >= new Date(props.evaluation?.due_date).toLocaleDateString('en-CA', {})
 })
 // METHODS
-
-// function onInvalidSubmit({ values, errors, results }: any) {
-//   console.log(values); // current form values
-//   console.log(errors); // a map of field names and their first error message
-//   console.log(results); // a detailed map of field names and their validation results
-// }
-
-// const onChange = handleChange(values => {
-//   alert(JSON.stringify(values, null, 2))
-// })
-
-
-
-// function updateSliderPoints({target, key, value}) {
-//   // console.log(student_scores.value, target, key, value)
-//
-//   student_slider.value[key] = parseInt(value)
-//   slider_sum.value += value - student_slider.value[key]
-//
-//   // student_scores.value.push(value)
-// }
-
-
-
 // WATCH
-
 // LIFECYCLE
-
 </script>
 
 <template>
+  <EvaluationForm
+      @submit="onSubmit"
+      :initial-state="initialState"
+      :evaluation="props.evaluation"
+      v-slot="{ onSave, errors, values, isSubmitting, evaluationRef }"
+  >
+    <slot name="header">
+      <InputText type="hidden" name="event_id" :value="props.evaluation?.id" />
+      <InputText type="hidden" name="group_id" :value="props.evaluation?.group?.id" />
+      <InputText type="hidden" name="course_id" :value="props.evaluation?.course?.id" />
+      <InputText type="hidden" name="data[Evaluation][evaluator_id]" :value="props.currentUser?.id" />
+      <InputText type="hidden" name="evaluateeCount" :value="props.evaluation?.members?.length" />
+      <InputText type="hidden" name="memberIDs[]" v-for="(m,i) of form?.member_ids" :key="i" :value="m" />
+    </slot>
+
+    <slot name="main">
+      <!---->
+      <PeerSimpleRangeQuestion
+          :members="evaluation?.members"
+          :remaining="evaluation?.remaining"
+          :initialState="initialState"
+          :name="`points`"
+          :question="questions.points.title"
+          :description="questions.points.description"
+          :disabled="isDisabled"
+      />
+
+      <PeerSimpleCommentQuestion
+          :members="evaluation?.members"
+          :initialState="initialState"
+          :name="'comments'"
+          :disabled="isDisabled"
+          :question="questions.comments.title"
+          :description="questions.comments.description"
+      />
+    </slot>
+
+    <slot name="footer"></slot>
+
+    <slot name="cta" :on-save="onSave" :is-submitting="isSubmitting" :values="values"></slot>
+
+  </EvaluationForm>
+</template>
+
+<!--
   <EvaluationForm ref="evaluation_form" :currentUser="currentUser" :evaluation="evaluation" :form="form">
     <template v-slot:header>
       <InputElement type="hidden" name="action" :value="props.action" />
@@ -148,7 +130,7 @@ const isDisabled = computed(() => {
       <InputElement type="hidden" name="memberIDs" :value="params?.member_ids" />
     </template>
 
-    <!--<template v-slot:main="{ params, form }">-->
+    < !--<template v-slot:main="{ params, form }">-- >
     <template v-slot:main>
 
       <PeerSimpleRangeQuestion
@@ -159,11 +141,8 @@ const isDisabled = computed(() => {
           description="just a points section description"
           :disabled="isDisabled"
       />
+
       <div class="temp text-left">
-<!--        <div class="text-xs text-red-500">total_points: {{ total_points }}</div>-->
-<!--        <div class="text-xs text-red-500">slider_sum: {{ slider_sum }}</div>-->
-<!--        <div class="text-xs text-red-500">student_slider: {{ student_slider }}</div>-->
-<!--        <div class="text-xs text-red-500">student_scores: {{ student_scores }}</div>-->
         <div class="text-xs text-blue-500">remaining: {{ props.evaluation?.review?.remaining }}</div>
         <div class="text-xs text-blue-500">form.points: {{ form.points }}</div>
         <div class="text-xs text-blue-500">values.points: {{ values.points }}</div>
@@ -197,18 +176,17 @@ const isDisabled = computed(() => {
 
 
 
-<!--<template>-->
-<!--  <div class="simple-valuation-template">-->
-    <!--
+< !--<template>-- >
+< !--  <div class="simple-valuation-template">-- >
+    < !--
     <EvaluationForm
         :params="params"
         :form="form"
         :currentUser="props.currentUser"
         :evaluation="props.evaluation"
-    >-->
-<!--      // PARAMS GOES HERE-->
-<!--      <pre class="text-xs text-gray-500">&#45;&#45;{{ form }}&#45;&#45;</pre>-->
-  <!--
+    >-- >
+
+  < !--
   <PeerRangeQuestion
       question="1. Please rate each peer's relative contribution."
       title="Relative Contribution"
@@ -219,9 +197,9 @@ const isDisabled = computed(() => {
       :min="0"
       :max="100"
       :disabled="isDisabled"
-      />-->
+      />-- >
 
-    <!--
-    </EvaluationForm>-->
-<!--  </div>-->
-<!--</template>-->
+    < !--
+    </EvaluationForm>-- >
+< !--  </div>-- >
+</template>-->

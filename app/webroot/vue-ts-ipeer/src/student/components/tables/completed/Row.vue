@@ -47,11 +47,11 @@ const props = defineProps<{
       <div class="flex" style="min-width: 157.5px">
         <router-link
             v-if="row?.event?.is_submitted === '1' && row?.event?.is_result_released"
-            :class="`button ${true ? 'submit' : ''} flex-1 text-center btn-lg`"
+            :class="`button ${true ? 'submit' : ''} flex-1 text-center`"
             :to="{ name: 'submission.view', params: { event_id: row?.event?.id, group_id: row?.group?.id } }" >See Reviews of Me</router-link>
         <router-link
             v-if="row?.event?.is_submitted === '1' && !row?.event?.is_result_released"
-            :class="`button ${true ? 'submit' : ''} flex-1 text-center btn-lg`"
+            :class="`button ${true ? 'submit' : ''} flex-1 text-center`"
             :to="{ name: 'evaluation.edit', params: { event_id: row?.event?.id, group_id: row?.group?.id } }" >Edit My Response</router-link>
         <span v-if="
             row?.event?.is_ended &&

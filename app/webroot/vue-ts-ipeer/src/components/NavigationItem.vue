@@ -31,21 +31,3 @@ const dynamicClass = computed(() => {
     </router-link>
   </div>
 </template>
-
-<style lang="scss">
-.navigation-wrapper {
-  @apply w-auto;
-
-  &__link {
-    @apply cursor-pointer;
-  }
-  &__link,
-  &__link--active {
-    @apply flex justify-center items-center h-[2rem] px-2;
-  }
-  &__link--active {
-    border-bottom: 2px solid goldenrod;
-    @apply cursor-default;
-  }
-}
-</style>

@@ -33,43 +33,6 @@ export interface Event {
   due_in: string
 }
 
-export interface Evaluation {
-  id: string
-  title: string
-  description: string
-  event_template_type_id: string
-  template_id: string
-  self_eval: string
-  com_req: string
-  auto_release: string
-  enable_details: string
-  due_date: string
-  release_date_begin: string
-  release_date_end: string
-  result_release_date_begin: string
-  result_release_date_end: string
-  group: Group
-  course: Course
-  penalty_final: Penalty
-  members: Member[]
-  template: string
-  group_event_id: string
-  status: string | null
-  questions: object
-  review: object
-}
-
-export interface __Evaluation {
-  event: Event
-  group: Group
-  group_event: GroupEvent
-  rubric_id: string
-  user_id: string
-  evaluatee_count: string
-  member_ids: string[]
-  submission: Submission
-}
-
 export interface Course {
   id: string
   course: string
@@ -102,27 +65,153 @@ export interface Penalty {
   percent_penalty: string
 }
 
-export interface Submission {
+
+
+
+
+
+export interface Evaluation {
   id: string
-  date_submitted: string
-  response: Response[]
-  submitted: string
+  title: string
+  description: string
+  event_template_type_id: string
+  template_id: string
+  self_eval: string
+  com_req: string
+  auto_release: string
+  enable_details: string
+  due_date: string
+  release_date_begin: string
+  release_date_end: string
+  result_release_date_begin: string
+  result_release_date_end: string
+  group: Group
+  course: Course
+  penalty_final: Penalty
+  members: Member[]
+  rubric_id: string
+  template: string
+  group_event_id: string
+  status: string | null
+  questions: object
+  review: EvaluationReview
+}
+
+/**
+"review": {
+  "id": "1",
+  "name": "Module 1 Project Evaluation",
+  "availability": "public",
+
+  "description": "",
+  "point_per_member": "100",
+  "status": "A",
+  "data": {},
+  "response": {
+    "id": "1",
+    "submitter_id": "7",
+    "submitted": "0",
+    "date_submitted": "2022-09-02 22:28:52",
+    "points": ["100","100"],
+    "comments": []
+  }
+}*/
+export interface EvaluationReview {
+  id: string
+  name: string
+  availability: string
+
+  // Rubric
+  zero_mark?: string
+  view_mode?: string
+  template?: string
+  lom_max?: string
+  criteria?: string
+
+  // Simple
+  description?: string
+  point_per_member?: string
+  status?: string
+
+  // Mixed
+  //
+  data: SimpleEvaluationReviewData & RubricEvaluationReviewData & MixedEvaluationReviewData
+  response: EvaluationReviewResponse
+}
+
+/** SimpleEvaluationReviewData */
+export interface SimpleEvaluationReviewData {
+  points?: string[]
+  comments?: string[]
+}
+
+/** RubricEvaluationReviewData */
+export interface RubricEvaluationReviewData {
+  rubrics_criteria: RubricEvaluationReviewDataCriteria[],
+  rubrics_lom: RubricEvaluationReviewDataLom[],
+}
+export interface RubricEvaluationReviewDataCriteria {
+  id: string
+  rubric_id: string
+  criteria_num: string
+  criteria: string
+  multiplier: string
+  show_marks: string
+  rubrics_criteria_comment: [
+    {
+      id: string
+      criteria_id: string
+      rubrics_loms_id: string
+      criteria_comment: string
+    }
+  ]
+}
+export interface RubricEvaluationReviewDataLom {
+  id: string
+  rubric_id: string
+  lom_num: string
+  lom_comment: string
+}
+
+/** MixedEvaluationReviewData */
+export interface MixedEvaluationReviewData {}
+
+
+/**
+ * Evaluation Review Response
+ */
+export interface EvaluationReviewResponse {
+  id: string
   submitter_id: string
+  submitted: string
+  date_submitted: string
+  data: SimpleReviewResponseData | RubricReviewResponseData[] | MixedReviewResponseData
+}
+/** */
+export interface EvaluationReviewResponseData {}
+/** SimpleReviewResponseData specifics */
+export interface SimpleReviewResponseData {
+  points?: string[]
+  comments?: string[]
 }
 
-export interface Response {
+/** RubricReviewResponseData specifics */
+export interface RubricReviewResponseData {
   id: string
-  comment: string
-  details: Detail[]
-  evaluatee: string
   evaluator: string
+  evaluatee: string
+  comment: string
   score: string
+  details: RubricReviewResponseDataDetail[]
 }
-
-export interface Detail {
-  criteria_comment: string
-  criteria_number: string
+export interface RubricReviewResponseDataDetail {
   id: string
+  criteria_number: string
+  criteria_comment: string
   selected_lom: string
 }
 
+/** MixedReviewResponseData specifics */
+export interface MixedReviewResponseData {
+
+}

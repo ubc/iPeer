@@ -2,6 +2,7 @@
 import {computed, toRef} from 'vue'
 import { useRoute, useRouter, useLink } from 'vue-router'
 import NavigationItem from '@/components/NavigationItem.vue'
+
 import type { User } from "@/types/typings";
 // REFERENCES
 const props = defineProps<{
@@ -9,7 +10,7 @@ const props = defineProps<{
   routeTitle: string
 }>()
 const emit = defineEmits<{
-  // (e: 'updateModelValue', option: string): void
+  // (e: 'update:modelValue', option: string): void
 }>()
 // DATA
 // COMPUTED
@@ -26,7 +27,7 @@ function toggleNavDropdown() {console.log('[Todo] Navigation Dropdown List')}
 </script>
 
 <template>
-  <nav class=" flex justify-between items-center bg-slate-50 mx-auto mt-4 mb-8 px-4 py-0 border shadow-md">
+  <nav class="navigation flex justify-between items-center bg-slate-50 mx-auto mt-4 mb-8 px-4 py-0 border shadow-md">
     <div class="flex items-center space-x-2 text-sm text-slate-700 leading-relaxed tracking-wide space-x-4">
       <NavigationItem class="py-1" route-name="dashboard" display-name="Dashboard"></NavigationItem>
       <NavigationItem v-if="currentRouteTitle" class="text-gold-500 font-medium active" :route-name="null" :display-name="currentRouteTitle"></NavigationItem>
@@ -40,16 +41,3 @@ function toggleNavDropdown() {console.log('[Todo] Navigation Dropdown List')}
     </div>
   </nav>
 </template>
-
-<style lang="scss" scoped>
-.active {
-  border-bottom-style: solid;
-  @apply flex items-center space-x-8;
-  @apply space-x-4;
-}
-.active::before {
-  content: " > ";
-  @apply mr-4;
-  @apply text-slate-700;
-}
-</style>

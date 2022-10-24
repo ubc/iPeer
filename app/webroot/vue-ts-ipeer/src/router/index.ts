@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router
 
 import App from '../App.vue'
 import Banner from '../components/Banner.vue'
+import Footer from '../components/Footer.vue'
 import Navigation from '../components/Navigation.vue'
 import Dashboard from '../pages/Dashboard.vue'
 
@@ -16,6 +17,7 @@ const router = createRouter({
         default: App,
         banner: Banner,
         navigation: Navigation,
+        footer: Footer,
       },
       meta: { requireAuth: true },
       children: [

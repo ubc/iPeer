@@ -42,4 +42,7 @@ onMounted(async () => await getUserProfile())
   <template v-else-if="currentUser?.role_id === '1'" :currentUser="currentUser" @update:profile="getUserProfile">
     <div class="admin">SuperAdminLayout</div>
   </template>
+  <router-view name="footer" v-slot="{ Component, pageTitle }" >
+    <component :is="Component" />
+  </router-view>
 </template>

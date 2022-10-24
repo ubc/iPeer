@@ -9,7 +9,7 @@ import Loader from '@/components/Loader.vue'
 import PageTitle from '@/components/PageTitle.vue'
 import SectionTitle from '@/components/SectionTitle.vue'
 import SectionSubtitle from '@/components/SectionSubtitle.vue'
-import VInputField from '@/components/fields/VInputField.vue'
+import { InputText } from '@/components/fields'
 import { IconUser, IconKey, IconSpinner } from '@/components/icons'
 
 import type { User } from '@/types/typings'
@@ -18,10 +18,10 @@ const emit              = defineEmits<{
   (e: 'update:profile'): void
 }>()
 const props = defineProps<{
-  user: User
+  currentUser: User
 }>()
 
-const currentUser              = toRef(props, 'user')
+const currentUser              = toRef(props, 'currentUser')
 const { meta, values, errors, handleSubmit, isSubmitting }  = useForm({
   // initialValues: currentUser.value
 });
@@ -97,8 +97,8 @@ const { value: confirm_password } = useField(
 <template>
   <PageTitle title="Edit Profile" />
   <form @submit="onSubmit" novalidate class="flex flex-col">
-    <div style="display:none;"><VInputField type="hidden" name="_action" value="save" /></div>
-    <div style="display:none;"><VInputField type="hidden" name="_method" value="PUT" /></div>
+    <div style="display:none;"><InputText type="hidden" name="_action" value="save" /></div>
+    <div style="display:none;"><InputText type="hidden" name="_method" value="PUT" /></div>
 
     <div class="form-section">
       <SectionTitle title="Your Account" class="mt-8" />
@@ -106,12 +106,12 @@ const { value: confirm_password } = useField(
         <p class="text-sm leading-relaxed text-slate-900 mx-4">Your first name and last name are shown to peers when they review you but not when they read reviews from you. No one other than your instructor and teaching assistants will know what you share about peers in iPeer.</p>
       </SectionSubtitle>
 
-      <section class="mt-6 mb-4">
-        <VInputField type="text" name="data[User][username]" label="Username" v-model="username" :disabled="true" readonly="readonly" />
-        <VInputField type="text" name="data[User][first_name]" label="First name" v-model="first_name" />
-        <VInputField type="text" name="data[User][last_name]" label="Last name" v-model="last_name" />
-        <VInputField type="text" name="data[User][email]" label="Email" v-model="email" />
-        <VInputField type="text" name="data[User][student_no]" label="Student number" v-model="student_no" :disabled="true" readonly="readonly" />
+      <section class="mt-6 mb-4 md:space-y-5">
+        <InputText type="text" name="data[User][username]" label="Username" v-model="username" :disabled="true" readonly="readonly" />
+        <InputText type="text" name="data[User][first_name]" label="First name" v-model="first_name" />
+        <InputText type="text" name="data[User][last_name]" label="Last name" v-model="last_name" />
+        <InputText type="text" name="data[User][email]" label="Email" v-model="email" />
+        <InputText type="text" name="data[User][student_no]" label="Student number" v-model="student_no" :disabled="true" readonly="readonly" />
       </section>
     </div>
 
@@ -121,10 +121,10 @@ const { value: confirm_password } = useField(
         <p class="text-sm leading-relaxed text-slate-900 mx-4">Enter this information if you'd like to change your password. You can save updates to your account without changing your password.</p>
       </SectionSubtitle>
 
-      <section class="mt-6 mb-4">
-        <VInputField type="password" name="data[User][old_password]" label="Old password" v-model="old_password" />
-        <VInputField type="password" name="data[User][temp_password]" label="New password" v-model="temp_password" />
-        <VInputField type="password" name="data[User][confirm_password]" label="Confirm new password" v-model="confirm_password" />
+      <section class="mt-6 mb-4 md:space-y-5">
+        <InputText type="password" name="data[User][old_password]" label="Old password" v-model="old_password" />
+        <InputText type="password" name="data[User][temp_password]" label="New password" v-model="temp_password" />
+        <InputText type="password" name="data[User][confirm_password]" label="Confirm new password" v-model="confirm_password" />
       </section>
     </div>
 

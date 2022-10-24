@@ -1,9 +1,50 @@
+.block-slider {
+  @apply flex flex-col py-1 mx-2;
+  @apply border border-gray-200;
+  border-style: solid;
+  @apply my-2 mx-auto;
+  @apply py-2 px-4;
+  @apply bg-gray-50;
+}
 .form {
+
+  &-range {
+    @apply relative;
+
+    &-inline {
+      >span {
+        @apply w-12;
+        @apply text-slate-500;
+      }
+      >input {
+
+      }
+    }
+    &-label {
+      @apply text-sm text-center text-slate-700 leading-3 mb-4 mx-auto;
+    }
+    .tick {
+      @apply w-full bottom-6 absolute;
+      &::after {
+        content: "|";
+        position: absolute;
+        transform: translate(-50%,-50%);
+        opacity: 0.7;
+        @apply text-gray-500;
+      }
+    }
+
+    &-input {
+      //@apply appearance-none;
+      @apply h-2 flex-1 bg-blue-100;
+      @apply mx-8;
+    }
+  }
   // text, textarea and select
   &-group {
     @apply relative w-[90%] mx-[5%] md:w-full md:mx-0;
     @apply flex-col md:flex-row flex items-center;
-    @apply mb-0 md:mb-5;
+    // @apply mb-0 md:mb-5;
 
     &.has-error input {
       // @apply text-xs;
@@ -18,7 +59,7 @@
   }
 
   &-control {
-    @apply relative w-full;
+    @apply relative w-full; // md:max-w-[300px];
     @apply flex;
     @apply mb-4 md:mb-0;
   }
@@ -34,9 +75,22 @@
   }
 
   &-input {
-    @apply block w-full md:max-w-[300px];
-    //@apply w-full;
-    @apply flex-1;
+    @apply block;
+    // @apply flex-1;
+    @apply text-xs text-gray-700;
+    @apply font-light tracking-wider;
+    @apply leading-6;
+    @apply bg-gray-50;
+    @apply py-1.5 px-3;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    @apply rounded;
+    @apply outline-none;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  }
+  &-input2 {
+    @apply block;
+    @apply flex-auto;
     @apply py-3 px-2;
     @apply bg-gray-50;
     @apply rounded;
@@ -53,21 +107,73 @@
 
   &-text {
     @apply absolute w-full;
-    @apply -bottom-4 left-0.5; //bottom: calc(-1.5 * 1em);
-    @apply text-red-700 text-xs;
+    @apply -bottom-9 left-0; //bottom: calc(-1.5 * 1em);
+    @apply text-red-700 text-xs text-left;
     @apply m-0;
-  }
+    @apply mb-5 ml-1;
 
-  .text-muted {
-    @apply text-slate-500;
+    &.text-muted {
+      @apply opacity-60;
+    }
   }
 
   // checkbox and radio
   &-check {
+    //@apply flex flex-col justify-center items-center;
 
-    &-input {}
+    &-inline {
+      @apply inline-block;
+      @apply mr-8;
+      @apply space-x-2;
+    }
 
-    &-label {}
+    &-input {
+      //@apply appearance-none;
+      @apply h-4 w-4 border border-gray-400 bg-gray-50;
+      border-style: solid;
+      //@apply checked:bg-blue-600 checked:border-blue-600;
+      @apply focus:outline-none transition duration-200 align-top;
+      @apply bg-no-repeat bg-center bg-contain float-left;
+      @apply cursor-pointer;
+    }
+
+  }
+  &-radio {
+    //@apply flex flex-col justify-center items-center;
+
+    &-inline {
+      @apply inline-block;
+      @apply mr-4;
+    }
+
+    &-input {
+      @apply appearance-none;
+      @apply rounded-full h-4 w-4 border border-gray-400 bg-gray-50;
+      border-style: solid;
+      @apply checked:bg-blue-600 checked:border-blue-600;
+      @apply focus:outline-none transition duration-200 align-top;
+      @apply bg-no-repeat bg-center bg-contain float-left;
+      @apply cursor-pointer;
+
+      &:checked[type="radio"] {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%22-4 -4 8 8%22%3E%3Ccircle r=%222%22 fill=%22%23fff%22/%3E%3C/svg%3E");
+      }
+
+      &:disabled {
+        pointer-events: none;
+        filter: none;
+        opacity: .5;
+      }
+
+      &-error {
+        @apply bg-red-50;
+        @apply border-red-400;
+      }
+    }
+
+    &-label {
+      @apply inline-block text-gray-800 opacity-50;
+    }
 
   }
 

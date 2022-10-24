@@ -1,0 +1,283 @@
+{
+  "src/main.ts": {
+    "file": "js/vue/main.js",
+    "src": "src/main.ts",
+    "isEntry": true,
+    "dynamicImports": [
+      "src/pages/EventsIndex.vue",
+      "src/pages/EvaluationIndex.vue",
+      "src/student/views/EvaluationMakePage.vue",
+      "src/student/views/EvaluationEditPage.vue",
+      "src/pages/SubmissionIndex.vue",
+      "src/student/views/SubmissionViewPage.vue",
+      "src/pages/UsersIndex.vue",
+      "src/student/views/UserProfile.vue",
+      "src/pages/NotFound.vue"
+    ],
+    "css": [
+      "css/vue/main.css"
+    ]
+  },
+  "src/pages/EventsIndex.vue": {
+    "file": "js/vue/EventsIndex.js",
+    "src": "src/pages/EventsIndex.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.ts",
+      "_sweetalert.min.js",
+      "_lodash.js",
+      "_index.js",
+      "_autosize.esm.js",
+      "_SectionTitle.js",
+      "_SectionSubtitle.js",
+      "__commonjsHelpers.js"
+    ],
+    "dynamicImports": [
+      "src/student/components/tables/current/Row.vue",
+      "src/student/components/tables/completed/Row.vue"
+    ]
+  },
+  "_sweetalert.min.js": {
+    "file": "js/vue/sweetalert.min.js",
+    "imports": [
+      "__commonjsHelpers.js"
+    ]
+  },
+  "_index.js": {
+    "file": "js/vue/index.js",
+    "imports": [
+      "src/main.ts",
+      "_lodash.js"
+    ]
+  },
+  "_SectionTitle.js": {
+    "file": "js/vue/SectionTitle.js",
+    "imports": [
+      "src/main.ts"
+    ]
+  },
+  "_SectionSubtitle.js": {
+    "file": "js/vue/SectionSubtitle.js",
+    "imports": [
+      "src/main.ts"
+    ]
+  },
+  "__commonjsHelpers.js": {
+    "file": "js/vue/_commonjsHelpers.js"
+  },
+  "_lodash.js": {
+    "file": "js/vue/lodash.js",
+    "imports": [
+      "__commonjsHelpers.js"
+    ]
+  },
+  "_autosize.esm.js": {
+    "file": "js/vue/autosize.esm.js"
+  },
+  "src/pages/EvaluationIndex.vue": {
+    "file": "js/vue/EvaluationIndex.js",
+    "src": "src/pages/EvaluationIndex.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.ts",
+      "_Debugger.js",
+      "_index.js",
+      "_SectionTitle.js",
+      "_SectionSubtitle.js",
+      "_ViewHeading.js",
+      "_lodash.js",
+      "_sweetalert.min.js",
+      "__commonjsHelpers.js"
+    ],
+    "dynamicImports": [
+      "src/student/views/EvaluationMakePage.vue",
+      "src/student/views/EvaluationEditPage.vue"
+    ]
+  },
+  "_Debugger.js": {
+    "file": "js/vue/Debugger.js",
+    "imports": [
+      "src/main.ts"
+    ],
+    "css": [
+      "css/vue/Debugger.css"
+    ]
+  },
+  "_ViewHeading.js": {
+    "file": "js/vue/ViewHeading.js",
+    "imports": [
+      "src/main.ts",
+      "_index.js"
+    ]
+  },
+  "src/student/views/EvaluationMakePage.vue": {
+    "file": "js/vue/EvaluationMakePage.js",
+    "src": "src/student/views/EvaluationMakePage.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.ts",
+      "_dynamic-import-helper.js"
+    ],
+    "dynamicImports": [
+      "src/student/views/templates/MixedEvaluation.vue",
+      "src/student/views/templates/RubricEvaluation.vue",
+      "src/student/views/templates/SimpleEvaluation.vue"
+    ]
+  },
+  "_dynamic-import-helper.js": {
+    "file": "js/vue/dynamic-import-helper.js"
+  },
+  "src/student/views/EvaluationEditPage.vue": {
+    "file": "js/vue/EvaluationEditPage.js",
+    "src": "src/student/views/EvaluationEditPage.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.ts",
+      "_dynamic-import-helper.js"
+    ],
+    "dynamicImports": [
+      "src/student/views/templates/MixedEvaluation.vue",
+      "src/student/views/templates/RubricEvaluation.vue",
+      "src/student/views/templates/SimpleEvaluation.vue"
+    ]
+  },
+  "src/pages/SubmissionIndex.vue": {
+    "file": "js/vue/SubmissionIndex.js",
+    "src": "src/pages/SubmissionIndex.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.ts",
+      "_index.js",
+      "_ViewHeading.js",
+      "_lodash.js",
+      "__commonjsHelpers.js"
+    ]
+  },
+  "src/student/views/SubmissionViewPage.vue": {
+    "file": "js/vue/SubmissionViewPage.js",
+    "src": "src/student/views/SubmissionViewPage.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.ts"
+    ]
+  },
+  "src/pages/UsersIndex.vue": {
+    "file": "js/vue/UsersIndex.js",
+    "src": "src/pages/UsersIndex.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.ts"
+    ]
+  },
+  "src/student/views/UserProfile.vue": {
+    "file": "js/vue/UserProfile.js",
+    "src": "src/student/views/UserProfile.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.ts",
+      "_index2.js",
+      "_sweetalert.min.js",
+      "_SectionTitle.js",
+      "_SectionSubtitle.js",
+      "__commonjsHelpers.js"
+    ]
+  },
+  "_index2.js": {
+    "file": "js/vue/index2.js",
+    "imports": [
+      "__commonjsHelpers.js"
+    ]
+  },
+  "src/pages/NotFound.vue": {
+    "file": "js/vue/NotFound.js",
+    "src": "src/pages/NotFound.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.ts"
+    ]
+  },
+  "src/student/components/tables/current/Row.vue": {
+    "file": "js/vue/Row.js",
+    "src": "src/student/components/tables/current/Row.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.ts",
+      "_index.js",
+      "_IconClock.js",
+      "_lodash.js",
+      "__commonjsHelpers.js"
+    ]
+  },
+  "_IconClock.js": {
+    "file": "js/vue/IconClock.js",
+    "imports": [
+      "src/main.ts"
+    ]
+  },
+  "src/student/components/tables/completed/Row.vue": {
+    "file": "js/vue/Row2.js",
+    "src": "src/student/components/tables/completed/Row.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.ts",
+      "_index.js",
+      "_IconClock.js",
+      "_lodash.js",
+      "__commonjsHelpers.js"
+    ]
+  },
+  "src/student/views/templates/MixedEvaluation.vue": {
+    "file": "js/vue/MixedEvaluation.js",
+    "src": "src/student/views/templates/MixedEvaluation.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.ts"
+    ]
+  },
+  "src/student/views/templates/RubricEvaluation.vue": {
+    "file": "js/vue/RubricEvaluation.js",
+    "src": "src/student/views/templates/RubricEvaluation.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.ts",
+      "_lodash.js",
+      "_index2.js",
+      "_Debugger.js",
+      "_InputElement.js",
+      "__commonjsHelpers.js",
+      "_sweetalert.min.js"
+    ]
+  },
+  "_InputElement.js": {
+    "file": "js/vue/InputElement.js",
+    "imports": [
+      "src/main.ts",
+      "_lodash.js",
+      "_Debugger.js",
+      "_sweetalert.min.js"
+    ]
+  },
+  "src/student/views/templates/SimpleEvaluation.vue": {
+    "file": "js/vue/SimpleEvaluation.js",
+    "src": "src/student/views/templates/SimpleEvaluation.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.ts",
+      "_lodash.js",
+      "_InputElement.js",
+      "_autosize.esm.js",
+      "_SectionSubtitle.js",
+      "__commonjsHelpers.js",
+      "_Debugger.js",
+      "_sweetalert.min.js"
+    ]
+  },
+  "Debugger.css": {
+    "file": "css/vue/Debugger.css",
+    "src": "Debugger.css"
+  },
+  "src/main.css": {
+    "file": "css/vue/main.css",
+    "src": "src/main.css"
+  }
+}

@@ -148,3 +148,23 @@ export const paginateEntries = (entries: Event[], offset: number, end: number) =
 //   }
 // }
 
+export function jsonToFormData (json){
+  const FORM_DATA = new FormData();
+  if(!json) return FORM_DATA;
+  try{
+    json = JSON.parse(json);
+  }catch{}
+  if(typeof json != 'object'||Array.isArray(json)) return FORM_DATA;
+  for(let key in json) {
+    let value = json[key];
+    if(Array.isArray(value)){
+      value.forEach((v)=>{
+        FORM_DATA.append(key+"[]", v);
+      });
+    }
+    else
+      FORM_DATA.append(key, typeof json[key] == 'object' ? JSON.stringify(json[key]) : json[key]);
+  }
+
+  return FORM_DATA;
+}

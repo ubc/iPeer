@@ -19,15 +19,13 @@ const error             = ref<object | null>(null)
 </script>
 
 <template>
-  <div class="layout">
-    <router-view name="banner" v-slot="{ Component, pageTitle }" >
-      <component :is="Component" />
-    </router-view>
-    <router-view name="navigation" v-slot="{ Component, pageTitle }" >
-      <component :is="Component" :currentUser="currentUser" :page-title="pageTitle" :key="user" />
-    </router-view>
-    <router-view class="content" v-slot="{ Component }">
-      <component :is="Component" :currentUser="currentUser" @update:profile="$emit('update:profile')" />
-    </router-view>
-  </div>
+  <router-view name="banner" v-slot="{ Component, pageTitle }" >
+    <component :is="Component" />
+  </router-view>
+  <router-view name="navigation" v-slot="{ Component, pageTitle }" >
+    <component :is="Component" :currentUser="currentUser" :page-title="pageTitle" :key="user" />
+  </router-view>
+  <router-view class="content" v-slot="{ Component }">
+    <component :is="Component" :currentUser="currentUser" @update:profile="$emit('update:profile')" />
+  </router-view>
 </template>

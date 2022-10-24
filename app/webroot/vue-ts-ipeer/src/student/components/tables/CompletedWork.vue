@@ -8,7 +8,7 @@ import { Table } from '@/student/components/tables/datatable'
 import Pagination from '@/components/Pagination.vue'
 import Loader from "@/components/Loader.vue";
 import Error from '@/components/Error.vue'
-import { SelectField, InputField } from '@/components/fields'
+import { InputCheck, SelectOption } from '@/components/fields'
 
 import type { User } from '@/types/typings'
 
@@ -18,7 +18,6 @@ const Row = defineAsyncComponent({
   suspensible: false,
   delay: 2000
 })
-
 // REFERENCES
 const emit = defineEmits<{
   // (e: 'update:modelValue', option: string): void
@@ -113,7 +112,7 @@ onMounted(async () => {
 <template>
   <div class="completed-work mx-4 my-8">
     <Error v-if="error" class="completed error" :error="error" />
-    <div class="flex flex-col space-y-2 my-4">
+    <div class="flex flex-col my-4 space-y-6">
       <div class="timeframe flex flex-col items-center md:flex-row md:space-x-12">
         <div class="label">Timeframe:</div>
         <SelectField :default="filter.timeframe" :options="options" :name="'timeframe'" @change:select="updateData" />
@@ -121,8 +120,8 @@ onMounted(async () => {
       <div class="limit flex flex-col items-center md:flex-row md:space-x-16">
         <div class="label">Limit To:</div>
         <div class="flex items-center space-x-4">
-          <InputField class="text-sm" type="checkbox" name="limit" value="can_edit" label="Work I can still edit" @change:input="updateData" />
-          <InputField class="text-sm" type="checkbox" name="limit" value="can_view" label="Peer reviews of me I can see" @change:input="updateData" />
+          <InputCheck class="text-sm" name="limit" value="can_edit" label="Work I can still edit" @change:input="updateData" />
+          <InputCheck class="text-sm" name="limit" value="can_view" label="Peer reviews of me I can see" @change:input="updateData" />
         </div>
       </div>
     </div>

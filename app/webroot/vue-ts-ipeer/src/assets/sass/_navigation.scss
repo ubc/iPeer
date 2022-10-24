@@ -1,0 +1,37 @@
+
+
+//@layer components {
+
+  .navigation {
+
+    .active {
+      border-bottom-style: solid;
+      @apply flex items-center space-x-8;
+      @apply space-x-4;
+    }
+    .active::before {
+      content: " > ";
+      @apply mr-1;
+      @apply text-slate-700;
+    }
+
+    &-wrapper {
+      @apply w-auto;
+
+      &__link {
+        @apply cursor-pointer;
+      }
+
+      &__link,
+      &__link--active {
+        @apply flex justify-center items-center h-[2rem] px-2;
+      }
+
+      &__link--active {
+        border-bottom-style: solid;
+        @apply border border-b-2 border-gold-500 -mb-1;
+        @apply cursor-default;
+      }
+    }
+  }
+//}
