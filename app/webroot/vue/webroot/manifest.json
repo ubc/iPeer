@@ -24,11 +24,8 @@
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_sweetalert.min.js",
-      "_lodash.js",
+      "_autosize.esm.js",
       "_index.js",
-      "_CustomVeeField.js",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
       "_SectionTitle.js",
       "_SectionSubtitle.js",
       "__commonjsHelpers.js"
@@ -38,8 +35,8 @@
       "src/student/components/tables/completed/Row.vue"
     ]
   },
-  "_sweetalert.min.js": {
-    "file": "js/vue/sweetalert.min.js",
+  "_autosize.esm.js": {
+    "file": "js/vue/autosize.esm.js",
     "imports": [
       "__commonjsHelpers.js"
     ]
@@ -48,7 +45,7 @@
     "file": "js/vue/index.js",
     "imports": [
       "src/main.ts",
-      "_lodash.js"
+      "__commonjsHelpers.js"
     ]
   },
   "_SectionTitle.js": {
@@ -66,51 +63,21 @@
   "__commonjsHelpers.js": {
     "file": "js/vue/_commonjsHelpers.js"
   },
-  "_lodash.js": {
-    "file": "js/vue/lodash.js",
-    "imports": [
-      "__commonjsHelpers.js"
-    ]
-  },
-  "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js": {
-    "file": "js/vue/InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
-    "css": [
-      "css/vue/InputText.css"
-    ]
-  },
-  "_CustomVeeField.js": {
-    "file": "js/vue/CustomVeeField.js",
-    "imports": [
-      "src/main.ts",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js"
-    ]
-  },
   "src/pages/EvaluationIndex.vue": {
     "file": "js/vue/EvaluationIndex.js",
     "src": "src/pages/EvaluationIndex.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_Debugger.js",
       "_index.js",
       "_SectionTitle.js",
       "_SectionSubtitle.js",
       "_ViewHeading.js",
-      "_lodash.js",
       "__commonjsHelpers.js"
     ],
     "dynamicImports": [
       "src/student/views/EvaluationMakePage.vue",
       "src/student/views/EvaluationEditPage.vue"
-    ]
-  },
-  "_Debugger.js": {
-    "file": "js/vue/Debugger.js",
-    "imports": [
-      "src/main.ts"
-    ],
-    "css": [
-      "css/vue/Debugger.css"
     ]
   },
   "_ViewHeading.js": {
@@ -126,20 +93,8 @@
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_TakeNote.js",
       "_IconSpinner.js",
-      "_SectionSubtitle.js"
-    ],
-    "dynamicImports": [
-      "src/student/views/templates/MixedEvaluation.vue",
-      "src/student/views/templates/RubricEvaluation.vue",
-      "src/student/views/templates/SimpleEvaluation.vue"
-    ]
-  },
-  "_TakeNote.js": {
-    "file": "js/vue/TakeNote.js",
-    "imports": [
-      "src/main.ts",
+      "_TakeNote.js",
       "_SectionSubtitle.js"
     ]
   },
@@ -149,20 +104,22 @@
       "src/main.ts"
     ]
   },
+  "_TakeNote.js": {
+    "file": "js/vue/TakeNote.js",
+    "imports": [
+      "src/main.ts",
+      "_SectionSubtitle.js"
+    ]
+  },
   "src/student/views/EvaluationEditPage.vue": {
     "file": "js/vue/EvaluationEditPage.js",
     "src": "src/student/views/EvaluationEditPage.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_TakeNote.js",
       "_IconSpinner.js",
+      "_TakeNote.js",
       "_SectionSubtitle.js"
-    ],
-    "dynamicImports": [
-      "src/student/views/templates/MixedEvaluation.vue",
-      "src/student/views/templates/RubricEvaluation.vue",
-      "src/student/views/templates/SimpleEvaluation.vue"
     ]
   },
   "src/pages/SubmissionIndex.vue": {
@@ -173,7 +130,6 @@
       "src/main.ts",
       "_index.js",
       "_ViewHeading.js",
-      "_lodash.js",
       "__commonjsHelpers.js"
     ]
   },
@@ -199,27 +155,11 @@
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_array.js",
-      "_sweetalert.min.js",
+      "__commonjsHelpers.js",
+      "_autosize.esm.js",
       "_SectionTitle.js",
       "_SectionSubtitle.js",
-      "_InputText.js",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
-      "_IconSpinner.js",
-      "__commonjsHelpers.js"
-    ]
-  },
-  "_array.js": {
-    "file": "js/vue/array.js",
-    "imports": [
-      "__commonjsHelpers.js"
-    ]
-  },
-  "_InputText.js": {
-    "file": "js/vue/InputText.js",
-    "imports": [
-      "src/main.ts",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js"
+      "_IconSpinner.js"
     ]
   },
   "src/pages/NotFound.vue": {
@@ -238,7 +178,6 @@
       "src/main.ts",
       "_index.js",
       "_IconClock.js",
-      "_lodash.js",
       "__commonjsHelpers.js"
     ]
   },
@@ -256,206 +195,8 @@
       "src/main.ts",
       "_index.js",
       "_IconClock.js",
-      "_lodash.js",
       "__commonjsHelpers.js"
     ]
-  },
-  "src/student/views/templates/MixedEvaluation.vue": {
-    "file": "js/vue/MixedEvaluation.js",
-    "src": "src/student/views/templates/MixedEvaluation.vue",
-    "isDynamicEntry": true,
-    "imports": [
-      "src/main.ts",
-      "_lodash.js",
-      "_array.js",
-      "_SectionSubtitle.js",
-      "_EvaluationForm.js",
-      "__commonjsHelpers.js",
-      "_sweetalert.min.js",
-      "_Debugger.js"
-    ],
-    "dynamicImports": [
-      "src/student/views/questions/PeerMixedLikertQuestion.vue",
-      "src/student/views/questions/PeerMixedRangeQuestion.vue",
-      "src/student/views/questions/PeerMixedCommentQuestion.vue",
-      "src/student/views/questions/PeerMixedSentenceQuestion.vue",
-      "src/student/views/questions/PeerMixedParagraphQuestion.vue",
-      "src/student/views/questions/SelfMixedLikertQuestion.vue",
-      "src/student/views/questions/SelfMixedSentenceQuestion.vue",
-      "src/student/views/questions/SelfMixedParagraphQuestion.vue"
-    ]
-  },
-  "_EvaluationForm.js": {
-    "file": "js/vue/EvaluationForm.js",
-    "imports": [
-      "src/main.ts",
-      "_sweetalert.min.js",
-      "_lodash.js",
-      "_Debugger.js"
-    ]
-  },
-  "src/student/views/templates/RubricEvaluation.vue": {
-    "file": "js/vue/RubricEvaluation.js",
-    "src": "src/student/views/templates/RubricEvaluation.vue",
-    "isDynamicEntry": true,
-    "imports": [
-      "src/main.ts",
-      "_sweetalert.min.js",
-      "_lodash.js",
-      "_EvaluationForm.js",
-      "_rules.js",
-      "_UserCard.js",
-      "_InputText.js",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
-      "_TextArea.js",
-      "__commonjsHelpers.js",
-      "_Debugger.js",
-      "_array.js"
-    ]
-  },
-  "_rules.js": {
-    "file": "js/vue/rules.js",
-    "imports": [
-      "_array.js"
-    ]
-  },
-  "_UserCard.js": {
-    "file": "js/vue/UserCard.js",
-    "imports": [
-      "src/main.ts"
-    ]
-  },
-  "_TextArea.js": {
-    "file": "js/vue/TextArea.js",
-    "imports": [
-      "src/main.ts",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js"
-    ]
-  },
-  "src/student/views/templates/SimpleEvaluation.vue": {
-    "file": "js/vue/SimpleEvaluation.js",
-    "src": "src/student/views/templates/SimpleEvaluation.vue",
-    "isDynamicEntry": true,
-    "imports": [
-      "src/main.ts",
-      "_lodash.js",
-      "_EvaluationForm.js",
-      "_UserCard.js",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
-      "_rules.js",
-      "_TextArea.js",
-      "_InputText.js",
-      "__commonjsHelpers.js",
-      "_sweetalert.min.js",
-      "_Debugger.js",
-      "_array.js"
-    ]
-  },
-  "src/student/views/questions/PeerMixedLikertQuestion.vue": {
-    "file": "js/vue/PeerMixedLikertQuestion.js",
-    "src": "src/student/views/questions/PeerMixedLikertQuestion.vue",
-    "isDynamicEntry": true,
-    "imports": [
-      "src/main.ts",
-      "_rules.js",
-      "_CustomVeeField.js",
-      "_UserCard.js",
-      "_InputText.js",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
-      "_array.js",
-      "__commonjsHelpers.js"
-    ]
-  },
-  "src/student/views/questions/PeerMixedRangeQuestion.vue": {
-    "file": "js/vue/PeerMixedRangeQuestion.js",
-    "src": "src/student/views/questions/PeerMixedRangeQuestion.vue",
-    "isDynamicEntry": true,
-    "imports": [
-      "src/main.ts"
-    ]
-  },
-  "src/student/views/questions/PeerMixedCommentQuestion.vue": {
-    "file": "js/vue/PeerMixedCommentQuestion.js",
-    "src": "src/student/views/questions/PeerMixedCommentQuestion.vue",
-    "isDynamicEntry": true,
-    "imports": [
-      "src/main.ts"
-    ]
-  },
-  "src/student/views/questions/PeerMixedSentenceQuestion.vue": {
-    "file": "js/vue/PeerMixedSentenceQuestion.js",
-    "src": "src/student/views/questions/PeerMixedSentenceQuestion.vue",
-    "isDynamicEntry": true,
-    "imports": [
-      "src/main.ts",
-      "_rules.js",
-      "_CustomVeeField.js",
-      "_UserCard.js",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
-      "_array.js",
-      "__commonjsHelpers.js"
-    ]
-  },
-  "src/student/views/questions/PeerMixedParagraphQuestion.vue": {
-    "file": "js/vue/PeerMixedParagraphQuestion.js",
-    "src": "src/student/views/questions/PeerMixedParagraphQuestion.vue",
-    "isDynamicEntry": true,
-    "imports": [
-      "src/main.ts",
-      "_rules.js",
-      "_CustomVeeField.js",
-      "_UserCard.js",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
-      "_array.js",
-      "__commonjsHelpers.js"
-    ]
-  },
-  "src/student/views/questions/SelfMixedLikertQuestion.vue": {
-    "file": "js/vue/SelfMixedLikertQuestion.js",
-    "src": "src/student/views/questions/SelfMixedLikertQuestion.vue",
-    "isDynamicEntry": true,
-    "imports": [
-      "src/main.ts",
-      "_rules.js",
-      "_CustomVeeField.js",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
-      "_array.js",
-      "__commonjsHelpers.js"
-    ]
-  },
-  "src/student/views/questions/SelfMixedSentenceQuestion.vue": {
-    "file": "js/vue/SelfMixedSentenceQuestion.js",
-    "src": "src/student/views/questions/SelfMixedSentenceQuestion.vue",
-    "isDynamicEntry": true,
-    "imports": [
-      "src/main.ts",
-      "_rules.js",
-      "_CustomVeeField.js",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
-      "_array.js",
-      "__commonjsHelpers.js"
-    ]
-  },
-  "src/student/views/questions/SelfMixedParagraphQuestion.vue": {
-    "file": "js/vue/SelfMixedParagraphQuestion.js",
-    "src": "src/student/views/questions/SelfMixedParagraphQuestion.vue",
-    "isDynamicEntry": true,
-    "imports": [
-      "src/main.ts",
-      "_rules.js",
-      "_CustomVeeField.js",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
-      "_array.js",
-      "__commonjsHelpers.js"
-    ]
-  },
-  "InputText.css": {
-    "file": "css/vue/InputText.css",
-    "src": "InputText.css"
-  },
-  "Debugger.css": {
-    "file": "css/vue/Debugger.css",
-    "src": "Debugger.css"
   },
   "src/main.css": {
     "file": "css/vue/main.css",

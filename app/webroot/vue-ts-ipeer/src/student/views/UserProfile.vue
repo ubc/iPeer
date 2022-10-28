@@ -9,19 +9,19 @@ import Loader from '@/components/Loader.vue'
 import PageTitle from '@/components/PageTitle.vue'
 import SectionTitle from '@/components/SectionTitle.vue'
 import SectionSubtitle from '@/components/SectionSubtitle.vue'
-import { InputText } from '@/components/fields'
+import { CustomInputField } from '@/components/fields'
 import { IconUser, IconKey, IconSpinner } from '@/components/icons'
 
 import type { User } from '@/types/typings'
 // REFERENCES
-const emit              = defineEmits<{
+const emit = defineEmits<{
   (e: 'update:profile'): void
 }>()
 const props = defineProps<{
   currentUser: User
 }>()
 
-const currentUser              = toRef(props, 'currentUser')
+const currentUser = toRef(props, 'currentUser')
 const { meta, values, errors, handleSubmit, isSubmitting }  = useForm({
   // initialValues: currentUser.value
 });
@@ -97,8 +97,8 @@ const { value: confirm_password } = useField(
 <template>
   <PageTitle title="Edit Profile" />
   <form @submit="onSubmit" novalidate class="flex flex-col">
-    <div style="display:none;"><InputText type="hidden" name="_action" value="save" /></div>
-    <div style="display:none;"><InputText type="hidden" name="_method" value="PUT" /></div>
+    <div style="display:none;"><CustomInputField type="hidden" name="_action" value="save" /></div>
+    <div style="display:none;"><CustomInputField type="hidden" name="_method" value="PUT" /></div>
 
     <div class="form-section">
       <SectionTitle title="Your Account" class="mt-8" />
@@ -107,11 +107,11 @@ const { value: confirm_password } = useField(
       </SectionSubtitle>
 
       <section class="mt-6 mb-4 md:space-y-5">
-        <InputText type="text" name="data[User][username]" label="Username" v-model="username" :disabled="true" readonly="readonly" />
-        <InputText type="text" name="data[User][first_name]" label="First name" v-model="first_name" />
-        <InputText type="text" name="data[User][last_name]" label="Last name" v-model="last_name" />
-        <InputText type="text" name="data[User][email]" label="Email" v-model="email" />
-        <InputText type="text" name="data[User][student_no]" label="Student number" v-model="student_no" :disabled="true" readonly="readonly" />
+        <CustomInputField type="text" name="data[User][username]" label="Username" v-model="username" :disabled="true" readonly="readonly" />
+        <CustomInputField type="text" name="data[User][first_name]" label="First name" v-model="first_name" />
+        <CustomInputField type="text" name="data[User][last_name]" label="Last name" v-model="last_name" />
+        <CustomInputField type="text" name="data[User][email]" label="Email" v-model="email" />
+        <CustomInputField type="text" name="data[User][student_no]" label="Student number" v-model="student_no" :disabled="true" readonly="readonly" />
       </section>
     </div>
 
@@ -122,9 +122,9 @@ const { value: confirm_password } = useField(
       </SectionSubtitle>
 
       <section class="mt-6 mb-4 md:space-y-5">
-        <InputText type="password" name="data[User][old_password]" label="Old password" v-model="old_password" />
-        <InputText type="password" name="data[User][temp_password]" label="New password" v-model="temp_password" />
-        <InputText type="password" name="data[User][confirm_password]" label="Confirm new password" v-model="confirm_password" />
+        <CustomInputField type="password" name="data[User][old_password]" label="Old password" v-model="old_password" />
+        <CustomInputField type="password" name="data[User][temp_password]" label="New password" v-model="temp_password" />
+        <CustomInputField type="password" name="data[User][confirm_password]" label="Confirm new password" v-model="confirm_password" />
       </section>
     </div>
 

@@ -2,7 +2,6 @@
 import {ref, reactive, watch, computed, onMounted, toRef, onBeforeUnmount} from 'vue';
 import { useField, ErrorMessage } from 'vee-validate'
 import autosize from 'autosize'
-import {Props} from "@/components/fields/InputRange.vue";
 
 // REFERENCES
 const emit = defineEmits<{
