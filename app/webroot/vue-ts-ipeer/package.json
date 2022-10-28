@@ -6,12 +6,13 @@
   "scripts": {
     "dev": "vite",
     "prod": "npx vite --noEmit --mode production",
-    "stag": "npx vite --noEmit --mode staging",
+    "stag": "npx vite --mode staging",
     "build": "vue-tsc --noEmit && vite build",
     "watch": "vite build --watch --mode development",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/yup": "^0.32.0",
     "autosize": "^5.0.1",
     "axios": "^1.1.2",
     "date-fns": "^2.29.3",

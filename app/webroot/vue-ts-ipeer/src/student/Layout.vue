@@ -3,7 +3,7 @@ import { ref, toRef } from 'vue'
 import type { User } from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
-  (e: 'update:profile'): void
+  (e: 'update:profile', options: any): void
 }>()
 const props = defineProps<{
   currentUser: User
@@ -23,9 +23,9 @@ const error             = ref<object | null>(null)
     <component :is="Component" />
   </router-view>
   <router-view name="navigation" v-slot="{ Component, pageTitle }" >
-    <component :is="Component" :currentUser="currentUser" :page-title="pageTitle" :key="user" />
+    <component :is="Component" :currentUser="props.currentUser" :page-title="pageTitle" /><!-- :key="props.currentUser" -->
   </router-view>
-  <router-view class="content" v-slot="{ Component }">
-    <component :is="Component" :currentUser="currentUser" @update:profile="$emit('update:profile')" />
+  <router-view class="content" v-slot="{ Component, pageTitle }">
+    <component :is="Component" :currentUser="props.currentUser" :page-title="pageTitle" @update:profile="$emit('update:profile')" />
   </router-view>
 </template>

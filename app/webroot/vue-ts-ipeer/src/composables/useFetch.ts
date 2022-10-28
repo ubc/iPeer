@@ -1,4 +1,7 @@
-export default function useFetch(url: string, options: {method?: string, timeout?: number, body?: HTMLFormElement}) {
+
+const BASE_URL = import.meta.env.MODE !== 'production' ? import.meta.env.VITE_STAG_URL : import.meta.env.VITE_PROD_URL
+
+export default function useFetch(PATH: string, options: {method?: string, timeout?: number, body?: HTMLFormElement}) {
   let body = {}
   let headers = {}
   switch (options.method) {
@@ -19,7 +22,7 @@ export default function useFetch(url: string, options: {method?: string, timeout
 
   return new Promise(async (resolve, reject) => {
     try {
-      const fetchResponse = await fetch(url, {
+      const fetchResponse = await fetch(BASE_URL+PATH, {
         method: options.method,
         headers: headers,
         // @ts-ignore

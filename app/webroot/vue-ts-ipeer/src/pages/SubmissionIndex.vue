@@ -26,7 +26,7 @@ onMounted(async () => {
   try {
     status.value = 'PENDING'
     const response = await useFetch(
-        `evaluations/makeEvaluation/${event_id.value}/${group_id.value}`,
+        `/evaluations/getSubmission/${event_id.value}/${group_id.value}`,
         {method: 'GET', timeout: 300}
     )
     Object.assign(submission, response.data)

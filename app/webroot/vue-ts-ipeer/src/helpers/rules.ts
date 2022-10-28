@@ -1,6 +1,14 @@
+import { string } from 'yup'
 
 
+export const validateLikert = string().required().nullable()
+export const validateSentence = string().required().min(10).nullable()
+export const validateParagraph = string().required().min(20).nullable()
 
+
+export function requiredTextRules(value: string) {
+  return string().required().min(2)
+}
 export function validateText(value: string) {
   // if the field is empty
   if (!value) {

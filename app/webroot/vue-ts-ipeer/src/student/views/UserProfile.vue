@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { toRef } from 'vue'
 import { useField, useForm } from 'vee-validate'
-import * as Yup from 'yup'
+import { string } from 'yup'
 import swal from 'sweetalert'
 import useFetch from '@/composables/useFetch'
 
@@ -39,7 +39,7 @@ const onSubmit = handleSubmit(async (values) => {
   }
   try {
     const response = await useFetch(
-        `${import.meta.env.VITE_BASE_URL}/users/editProfile/${currentUser.value?.id}`,
+        `/users/editProfile/${currentUser.value?.id}`,
         {
           method: 'POST',
           timeout: 300,
@@ -54,37 +54,37 @@ const onSubmit = handleSubmit(async (values) => {
 
 }, onInvalidSubmit);
 
-const { value: username } = useField('data[User][username]', Yup.string().trim().required().min(2).label('Username'), {
+const { value: username } = useField('data[User][username]', string().trim().required().min(2).label('Username'), {
   initialValue: currentUser.value['username']
 })
-const { value: first_name } = useField('data[User][first_name]', Yup.string().trim().required().min(2).label('First name'), {
+const { value: first_name } = useField('data[User][first_name]', string().trim().required().min(2).label('First name'), {
   initialValue: currentUser.value['first_name']
 })
-const { value: last_name } = useField('data[User][last_name]', Yup.string().trim().required().min(2).label('Last name'), {
+const { value: last_name } = useField('data[User][last_name]', string().trim().required().min(2).label('Last name'), {
   initialValue: currentUser.value['last_name']
 })
-const { value: email } = useField('data[User][email]', Yup.string().required().trim().email().label('Email'), {
+const { value: email } = useField('data[User][email]', string().required().trim().email().label('Email'), {
   initialValue: currentUser.value['email']
 })
-const { value: student_no } = useField('data[User][student_no]', Yup.string().trim().required().min(2).label('Student number'), {
+const { value: student_no } = useField('data[User][student_no]', string().trim().required().min(2).label('Student number'), {
   initialValue: currentUser.value['student_no']
 })
 const { value: old_password } = useField(
     'data[User][old_password]',
-    Yup.string()
+    string()
         .trim(),
     {initialValue: ''}
 )
 const { value: temp_password } = useField(
     'data[User][temp_password]',
-    Yup.string()
+    string()
         .trim()
         .label('New password'),
     {initialValue: ''}
 )
 const { value: confirm_password } = useField(
     'data[User][confirm_password]',
-    Yup.string()
+    string()
         .trim()
         .test('passwords-match', 'New Passwords do not match', function(value) {
           return parent['data[User][temp_password]']['value'] === value;

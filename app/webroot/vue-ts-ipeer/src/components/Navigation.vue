@@ -3,22 +3,19 @@ import {computed, toRef} from 'vue'
 import { useRoute, useRouter, useLink } from 'vue-router'
 import NavigationItem from '@/components/NavigationItem.vue'
 
-import type { User } from "@/types/typings";
+import type { User } from '@/types/typings'
 // REFERENCES
 const props = defineProps<{
   currentUser: User
-  routeTitle: string
-}>()
-const emit = defineEmits<{
-  // (e: 'update:modelValue', option: string): void
+  routeTitle?: string
 }>()
 // DATA
 // COMPUTED
 const currentRouteName  = computed(() => {
-  return useRoute().name;
+  return useRoute().name || ''
 })
 const currentRouteTitle = computed(() => {
-  return useRoute().meta.routeTitle
+  return useRoute().meta.routeTitle || ''
 })
 // METHODS
 function toggleNavDropdown() {console.log('[Todo] Navigation Dropdown List')}

@@ -1,26 +1,23 @@
 <script lang="ts" setup>
-import {ref, toRef, unref, reactive, watch, computed, onMounted, watchEffect} from 'vue';
+import {ref, toRef, unref, reactive, computed,} from 'vue';
 import { useRoute, useRouter } from 'vue-router'
-import { useForm } from "vee-validate";
-import swal from 'sweetalert'
-import { find, forEach, isEmpty, map } from 'lodash'
-import useFetch from '@/composables/useFetch'
-import { jsonToFormData } from "@/helpers";
+import { isEmpty, map } from 'lodash'
 
+import { CustomHiddenField } from '@/components/fields'
 import UserCard from '@/student/components/UserCard.vue'
 import EvaluationForm from '@/student/views/EvaluationForm.vue'
 import PeerRubricLikertQuestion from '@/student/views/questions/PeerRubricLikertQuestion.vue'
 import PeerRubricCommentQuestion from '@/student/views/questions/PeerRubricCommentQuestion.vue'
 import PeerRubricGeneralCommentQuestion from '@/student/views/questions/PeerRubricGeneralCommentQuestion.vue'
-import { InputText } from '@/components/fields'
 
-import type {Evaluation, EvaluationReviewResponse, User} from '@/types/typings'
+import type {Evaluation, RubricResponse, User} from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
   // (e: 'fetch:evaluation', option: object): void
   (e: 'fetch:evaluation'): void
 }>()
 const props = defineProps<{
+  members: User[]
   currentUser: User
   evaluation: Evaluation
 }>()
@@ -40,7 +37,7 @@ let form          = reactive({
   evaluatee_count: computed(() => evaluation.value?.members?.length),
   member_ids: computed<string[]>(() => map(evaluation.value?.members, member => member.id))
 })
-const initialState = computed<EvaluationReviewResponse|any>(() => {
+const initialState = computed<RubricResponse|any>(() => {
   if(evaluation.value?.review?.response && !isEmpty(evaluation.value?.review?.response)) {
     return unref(evaluation.value?.review?.response)
   } else {
@@ -80,14 +77,14 @@ function setInitialState() {
       v-slot="{ onSave, errors, values, isSubmitting, evaluationRef }"
   >
     <slot name="header">
-      <InputText type="hidden" name="event_id" :value="form?.event_id" />
-      <InputText type="hidden" name="group_id" :value="form?.group_id" />
-      <InputText type="hidden" name="group_event_id" :value="form?.group_event_id" />
-      <InputText type="hidden" name="course_id" :value="form?.course_id" />
-      <InputText type="hidden" name="rubric_id" :value="form?.rubric_id" />
-      <InputText type="hidden" name="data[Evaluation][evaluator_id]" :value="form?.user_id" />
-      <InputText type="hidden" name="evaluateeCount" :value="form?.evaluatee_count" />
-      <InputText type="hidden" v-for="(m,i) of form?.member_ids" :key="i" name="memberIDs[]" :value="m" />
+      <CustomHiddenField type="hidden" name="event_id" :value="form?.event_id" />
+      <CustomHiddenField type="hidden" name="group_id" :value="form?.group_id" />
+      <CustomHiddenField type="hidden" name="group_event_id" :value="form?.group_event_id" />
+      <CustomHiddenField type="hidden" name="course_id" :value="form?.course_id" />
+      <CustomHiddenField type="hidden" name="rubric_id" :value="form?.rubric_id" />
+      <CustomHiddenField type="hidden" name="data[Evaluation][evaluator_id]" :value="form?.user_id" />
+      <CustomHiddenField type="hidden" name="evaluateeCount" :value="form?.evaluatee_count" />
+      <CustomHiddenField type="hidden" v-for="(m,i) of form?.member_ids" :key="i" name="memberIDs[]" :value="m" />
     </slot>
 
     <slot name="main">
@@ -126,65 +123,3 @@ function setInitialState() {
 
   </EvaluationForm>
 </template>
-
-
-<!--
-
-  <EvaluationForm ref="evaluation_form" :currentUser="currentUser" :evaluation="evaluation" :form="form" :data="'props.evaluation'">
-    <template v-slot:header>
-      <InputElement type="hidden" name="action" :value="props.action" />
-      <InputElement type="hidden" name="_method" :value="props._method" />
-
-      <input type="hidden" name="event_id" :value="params?.event_id" />
-      <input type="hidden" name="group_id" :value="params?.group_id" />
-      <input type="hidden" name="course_id" :value="params?.course_id" />
-      <input type="hidden" name="group_event_id" :value="params?.group_event_id" />
-      <input type="hidden" name="rubric_id" :value="params?.rubric_id" />
-      <input type="hidden" name="data[Evaluation][evaluator_id]" :value="params?.user_id" />
-      <input type="hidden" name="evaluateeCount" :value="params?.evaluatee_count" />
-      <input type="hidden" name="memberIDs" :value="params?.member_ids" />
-    </template>
-
-    <template v-slot:main>
-      <Debugger title="RubricEvaluationTemplate" :state="props.currentUser" :form="form.data" :data="props.evaluation" />
-
-      <div class="datatable"
-           v-for="(rubric_criteria, criteriaIdx) of props.evaluation?.review?.data?.rubrics_criteria" :key="rubric_criteria.id">
-        <div v-if="rubric_criteria.criteria" class="question">{{ rubric_criteria.id }}. {{ rubric_criteria.criteria }}</div>
-        <div class="description text-sm text-slate-700 mx-4 mb-2"></div>
-
-        <PeerRubricLikertQuestion
-            :members="props.evaluation?.members"
-            :rubrics_lom="props.evaluation?.review?.data?.rubrics_lom"
-            :rubric_criteria="rubric_criteria"
-            :form="form"
-            :criteriaIdx="criteriaIdx"
-        />
-
-        <PeerRubricCommentQuestion
-            :members="props.evaluation?.members"
-            :rubric_criteria="rubric_criteria"
-            :form="form"
-            :criteriaIdx="criteriaIdx"
-        />
-      </div>
-
-      <PeerRubricGeneralCommentQuestion
-          :members="props.evaluation?.members"
-          :form="form"
-          :index="props.evaluation?.review?.data?.rubrics_criteria?.length+1"
-      />
-
-    </template>
-
-    <template v-slot:footer>
-      <TakeNote />
-    </template>
-
-    <template v-slot:action="{ onSave }">
-      <slot name="cta" :on-save="onSave"></slot>
-    </template>
-
-  </EvaluationForm>
-
--->

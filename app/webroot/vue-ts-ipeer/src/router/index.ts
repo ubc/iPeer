@@ -31,7 +31,8 @@ const router = createRouter({
             {
               path: '',
               name: 'events',
-              component: () => import('../pages/EventsIndex.vue')
+              component: () => import('../pages/EventsIndex.vue'),
+              //meta: {routeTitle: 'Dashboard'},
             }
           ]
         },
@@ -82,7 +83,8 @@ const router = createRouter({
               path: 'profile/edit',
               name: 'user.profile',
               props: true,
-              component: () => import('../student/views/UserProfile.vue')
+              component: () => import('../student/views/UserProfile.vue'),
+              //meta: {routeTitle: 'User Profile'},
             }
           ]
         },
@@ -91,7 +93,8 @@ const router = createRouter({
     {
       path: '/:pathMatch(.*)*',
       name: 'notfound',
-      component: () => import('../pages/NotFound.vue')
+      component: () => import('../pages/NotFound.vue'),
+      //meta: {routeTitle: 'Not Found'},
     },
   ]
 })

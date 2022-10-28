@@ -1,0 +1,2 @@
+import{d as t,A as n,c as p,m as u,o as a,_ as i}from"./main.js";const l={class:"users"},c=t({__name:"UsersIndex",props:{user:{type:null,required:!0}},emits:["update:profile"],setup(s,{emit:d}){return(r,e)=>{const o=n("router-view");return a(),p("div",l,[u(o,{user:s.user,"onUpdate:profile":e[0]||(e[0]=_=>r.$emit("update:profile"))},null,8,["user"])])}}}),f=i(c,[["__file","/Users/josephkh/Workspace/iPeer/app/webroot/vue-ts-ipeer/src/pages/UsersIndex.vue"]]);export{f as default};
+//# sourceMappingURL=UsersIndex.js.map

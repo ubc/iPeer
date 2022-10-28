@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { ref, reactive, watch, computed, onMounted } from 'vue';
 import { isEmpty, find, map, filter } from 'lodash'
+import CustomRadioField from '@/components/fields/CustomRadioField.vue'
+import CustomHiddenField from '@/components/fields/CustomHiddenField.vue'
 import { validateRadio } from '@/helpers/rules'
-
 import UserCard from '@/student/components/UserCard.vue'
-import { InputText, InputRadio } from '@/components/fields'
 
 import type {
   EvaluationReviewResponse,
@@ -56,29 +56,39 @@ function handleSelectedLomClick(event: {target: string, key: string, value: stri
     <thead>
     <tr>
       <th style="width: 20%">
-        <div class="">
-          <div class="text-sm leading-4 font-serif font-medium">{{ props.rubric_criteria?.criteria }}</div>
-          <small v-if="parseInt(props.rubric_criteria.show_marks)" class="text-sm font-normal">({{ props.rubric_criteria?.multiplier }} marks)</small>
+        <div class="text-center leading-4">
+          <div class="text-sm font-normal leading-4 mb-1">{{ props.rubric_criteria?.criteria }}</div>
+          <div v-if="parseInt(props.rubric_criteria.show_marks)" class="text-sm font-thin">({{ props.rubric_criteria?.multiplier }} marks)</div>
         </div>
       </th>
       <th :style="'width: '+ 80/props.rubrics_lom.length +'%'"
-          v-for="(criteria_lom, criteria_lomIdx) of props.rubrics_lom"
-          :key="criteria_lom.id" >
-        <div class="flex flex-col text-center">
-          <div class="flex-1 font-medium">{{ criteria_lom.lom_comment }}</div>
-          <small class="flex-1 text-sm font-normal">
-            {{ props.rubric_criteria?.rubrics_criteria_comment[criteria_lomIdx]['criteria_comment'] }}
-          </small>
+          v-for="(criteria_lom, criteria_lomIdx) of props.rubrics_lom" :key="criteria_lom.id">
+        <div class="text-center leading-4">
+          <div class="font-normal">{{ criteria_lom.lom_comment }}</div>
+          <div class="text-sm font-thin">{{ props.rubric_criteria?.rubrics_criteria_comment[criteria_lomIdx]['criteria_comment'] }}</div>
         </div>
       </th>
     </tr>
     </thead>
     <tbody>
     <template v-for="(member, member_idx) of props.members" :key="member.id">
-    <InputText type="hidden" :name="`selected_lom_${member.id}_${rubric_criteria.id}`" :value="getCriteriaDetail('criteria_num', member.id, rubric_criteria?.criteria_num)?.selected_lom??''" />
+    <CustomHiddenField
+        :name="`selected_lom_${member.id}_${rubric_criteria.id}`"
+        :value="getCriteriaDetail('criteria_num', member.id, rubric_criteria?.criteria_num)?.selected_lom??''" />
     <tr>
       <td><UserCard :member="member" /></td>
       <td v-for="(rubric_lom, rubric_lom_idx) of props.rubrics_lom" :key="rubric_lom.id">
+        <CustomRadioField
+            ref="selected_lom"
+            :member_id="member.id"
+            :criteria_num="props.rubric_criteria?.criteria_num"
+            :name="`${member.id}criteria_points_${rubric_criteria.id}`"
+            :value="rubric_lom.lom_num"
+            :rules="validateRadio"
+            :checked="getCriteriaDetail('criteria_num', member.id, rubric_criteria?.criteria_num)?.selected_lom"
+            @click="handleSelectedLomClick({target: rubric_criteria.id, key: member.id, value: $event.target.value})"
+        /><!-- :rules="question.required ? validateLikert : null" -->
+        <!--
         <InputRadio class="flex justify-center" ref="selected_lom"
             :member_id="member.id"
             :criteria_num="props.rubric_criteria?.criteria_num"
@@ -87,7 +97,7 @@ function handleSelectedLomClick(event: {target: string, key: string, value: stri
             :rules="validateRadio"
             :checked="parseInt(rubric_lom.lom_num) === parseInt(getCriteriaDetail('criteria_num', member.id, rubric_criteria?.criteria_num)?.selected_lom)"
             @click="handleSelectedLomClick({target: rubric_criteria.id, key: member.id, value: $event.target.value})"
-        />
+        />-->
       </td>
     </tr>
     </template>

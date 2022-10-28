@@ -1,11 +1,8 @@
 <script lang="ts" setup>
 import { ref, toRef, reactive, watch, computed, onMounted } from 'vue'
-import { validateText } from '@/helpers/rules'
-
+import { validateParagraph } from '@/helpers/rules'
 import UserCard from "@/student/components/UserCard.vue";
-import TextElement from "@/components/fields/experimental/TextElement.vue";
-
-import TextArea from '@/components/fields/TextArea.vue'
+import CustomTextField from '@/components/fields/CustomTextField.vue'
 
 import type { EvaluationReviewResponse, User } from '@/types/typings'
 // REFERENCES
@@ -37,32 +34,30 @@ const props = defineProps<{
     <table class="standardtable">
       <thead>
       <tr>
-        <th><div class="">Peer</div></th>
-        <th><div class="">Comments</div></th>
+        <th style="width: 20%">
+          <div class="text-center leading-4">
+            <div class="font-normal">Peer</div>
+            <div class="text-sm font-thin"></div>
+          </div>
+        </th>
+        <th style="width: 80%;">
+          <div class="text-center leading-4">
+            <div class="font-normal">Comments</div>
+            <div class="text-sm font-thin"></div>
+          </div>
+        </th>
       </tr>
       </thead>
       <tbody>
       <tr v-for="(member, memberIdx) of props.members" :key="member.id">
         <td style="width: 20%"><UserCard :member="member" /></td>
         <td style="width: 80%">
-          <TextArea class="flex-1"
+          <CustomTextField class="flex-1"
               :label="label"
               :name="`${name}[${memberIdx}]`"
-              :rules="validateText"
-          />
-<!--     :value="initialState?.data[memberIdx]"     -->
-<!--              :id="`${member.id}comments[${props.criteriaIdx}]`"-->
-<!--              -->
-<!--              :name="`${member.id}comments[${props.criteriaIdx}]`"-->
-<!--              :value="find(find(props.initialState?.data, { evaluatee: member.id })['details'], { criteria_number: props.rubric_criteria.criteria_num })['criteria_comment']"-->
-          <!--
-          <TextElement
-              :label="label"
-              :value="props.form[name][memberIdx]"
-              :name="`${name}[${memberIdx}]`"
-              :placeholder="placeholder"
+              :rules="validateParagraph"
               :disabled="props.disabled"
-          />-->
+          /><!-- :rules="question.required ? validateParagraph : null" -->
         </td>
       </tr>
       </tbody>

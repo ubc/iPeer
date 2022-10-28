@@ -1,7 +1,6 @@
 import { createApp } from 'vue'
 import { configure } from 'vee-validate'
 import App from './App.vue'
-// @ts-ignore
 import router from './router'
 
 import './assets/sass/main.scss'

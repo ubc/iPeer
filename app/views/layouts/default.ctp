@@ -8,23 +8,16 @@
   <meta http-equiv="Content-type" content="text/html;charset=UTF-8"/>
   <meta http-equiv="Content-Language" content="en"/>
   <link rel="shortcut icon" href="/img/favicon.png" type="image/png"/>
-    
     <?php if ($isLoggedIn && $loggedInUserRole == '5'): ?>
-        <?php //echo $this->Html->css('ipeer'); ?>
         <?php if (Configure::read('debug')): ?>
-      <script type="module" src="http://localhost:5173/@vite/client"></script>
-      <script type="module" src="http://localhost:5173/src/main.ts"></script>
+            <script type="module" src="http://localhost:5173/@vite/client"></script>
+            <script type="module" src="http://localhost:5173/src/main.ts"></script>
+        <?php else: ?>
+            <?php echo $this->Html->css('vue/main.css', TRUE); ?>
+            <script type="module" src="/js/vue/index.js"></script>
+        <?php endif; ?>
     <?php else: ?>
-        <?php echo $this->Html->css('vue/main.css', TRUE); ?>
-        <?php //echo $this->Html->script('vue/index.js', TRUE); ?>
-
-      <!--<link rel="stylesheet" href="http://localhost:8080/css/vue/main.css">-->
-      <script type="module" src="http://localhost:8080/js/vue/index.js"></script>
-      <!---->
-        <?php // echo $this->Html->script('http://localhost:8080/vue/assets/js/index.js', TRUE); ?>
-    <?php endif; ?>
-    <?php else: ?>
-        <?php
+    <?php
         // CSS files
         echo $html->css('datepicker');
         echo $html->css('jquery.dataTables');
@@ -40,23 +33,23 @@
         echo $html->script('https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js');
         echo $html->script('jquery.dataTables.min');
         echo $html->script('fnGetHiddenNodes');
-        ?>
+    ?>
       <script type='text/javascript'>
         jQuery.noConflict(); // prevent conflicts with prototype
       </script>
     <?php
-    echo $html->script('prototype');
-    echo $html->script('ipeer');
-    echo $html->script('showhide');
-    // AJAX Include Files
-    echo $html->script('scriptaculous');
-    echo $html->script('zebra_tables');
-    // Validation Include Files
-    echo $html->script('validate');
-    echo $html->script('submitvalidate');
-    
-    // Custom View Include Files
-    echo $scripts_for_layout;
+        echo $html->script('prototype');
+        echo $html->script('ipeer');
+        echo $html->script('showhide');
+        // AJAX Include Files
+        echo $html->script('scriptaculous');
+        echo $html->script('zebra_tables');
+        // Validation Include Files
+        echo $html->script('validate');
+        echo $html->script('submitvalidate');
+        
+        // Custom View Include Files
+        echo $scripts_for_layout;
     ?>
     
     <?php if (!empty($trackingId) && !empty($trackingId['SysParameter']['parameter_value'])): ?>
@@ -71,25 +64,16 @@
         }
 
         gtag('js', new Date());
-
         gtag('config', '<?php echo $trackingId['SysParameter']['parameter_value']; ?>');
       </script>>
     <?php endif; ?>
     <?php endif; ?>
 </head>
 <body>
-<?php if ($isLoggedIn && $loggedInUserRole == '5'): ?>
-    <div id="webapp" class="layout containerOuter pagewidth"></div>
-    
-    <?php //echo $this->Session->flash(); ?>
-    <?php //echo $this->Session->flash('auth'); ?>
-    <?php //echo $this->Session->flash('good'); ?>
-    <?php //echo $this->element('global/navigation', array()); ?>
-    <?php //echo $content_for_layout; ?>
 
-  <!--    <div class="containerOuter pagewidth">-->
-  <!--      --><?php //echo $this->Html->css('ipeer'); echo $content_for_layout; ?><!-- for testing purposes -->
-  <!--    </div>-->
+<?php if ($isLoggedIn && $loggedInUserRole == '5'): ?>
+  <div id="webapp" class="layout containerOuter pagewidth"></div>
+    <?php //echo $this->Html->css('ipeer'); echo $content_for_layout;  ?>
 <?php else: ?>
   <div class="containerOuter pagewidth">
     <!-- BANNER -->
@@ -116,9 +100,8 @@
     <?php echo $this->element('global/footer'); ?>
 <?php endif; ?>
 
-
 <!-- DEBUG -->
-<?php // echo $this->element('global/debug'); ?>
+<?php //echo $this->element('global/debug'); ?>
 
 <?php echo $this->Js->writeBuffer(); // Write cached scripts?>
 </body>

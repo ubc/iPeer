@@ -7,7 +7,67 @@
   @apply bg-gray-50;
 }
 .form {
+  &-group {
+    @apply relative w-[90%] mx-[5%] md:w-full md:mx-0;
+    @apply flex-col md:flex-row flex items-center;
+    // @apply mb-0 md:mb-5;
+  }
 
+  &-control {
+    @apply relative w-full;
+    // md:max-w-[300px];
+    @apply flex;
+    @apply mb-4 md:mb-0;
+  }
+
+  &-label {
+    @apply block w-full md:max-w-[200px];
+    @apply text-sm text-left md:text-right;
+    @apply font-normal;
+    @apply md:mr-4;
+    &::after {
+      content: ":";
+    }
+  }
+
+  &-field {
+    @apply block;
+    // @apply flex-1;
+    @apply text-xs text-gray-700;
+    @apply font-light tracking-wider;
+    @apply leading-6;
+    @apply bg-gray-50;
+    @apply py-1.5 px-3;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    @apply rounded;
+    @apply outline-none;
+    transition: border-color 0.3s ease-in-out, color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+
+    &:focus {
+      @apply border border-gray-500;
+    }
+  }
+
+  &-input {
+    @apply block;
+    // @apply flex-1;
+    @apply text-xs text-gray-700;
+    @apply font-light tracking-wider;
+    @apply leading-6;
+    @apply bg-gray-50;
+    @apply py-1.5 px-3;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    @apply rounded;
+    @apply outline-none;
+    transition: border-color 0.3s ease-in-out, color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+
+    &:focus {
+      @apply border border-gray-500;
+    }
+  }
+  // slider
   &-range {
     @apply relative;
 
@@ -40,142 +100,136 @@
       @apply mx-8;
     }
   }
-  // text, textarea and select
-  &-group {
-    @apply relative w-[90%] mx-[5%] md:w-full md:mx-0;
-    @apply flex-col md:flex-row flex items-center;
-    // @apply mb-0 md:mb-5;
-
-    &.has-error input {
-      // @apply text-xs;
-      @apply text-red-500;
-      @apply bg-red-50;
-    }
-
-    &.has-error input:focus,
-    &.has-error .help-message {
-      @apply text-red-500;
-    }
-  }
-
-  &-control {
-    @apply relative w-full; // md:max-w-[300px];
-    @apply flex;
-    @apply mb-4 md:mb-0;
-  }
-
-  &-label {
-    @apply block w-full md:max-w-[200px];
-    @apply text-sm text-left md:text-right;
-    @apply font-normal;
-    @apply md:mr-4;
-    &::after {
-      content: ":";
-    }
-  }
-
-  &-input {
-    @apply block;
-    // @apply flex-1;
-    @apply text-xs text-gray-700;
-    @apply font-light tracking-wider;
-    @apply leading-6;
-    @apply bg-gray-50;
-    @apply py-1.5 px-3;
-    background-clip: padding-box;
-    border: 1px solid #ced4da;
-    @apply rounded;
-    @apply outline-none;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-  }
-  &-input2 {
-    @apply block;
-    @apply flex-auto;
-    @apply py-3 px-2;
-    @apply bg-gray-50;
-    @apply rounded;
-    @apply outline-none;
-    @apply m-0;
-    @apply border border-gray-100;
-    transition: border-color 0.3s ease-in-out, color 0.3s ease-in-out,
-    background-color 0.3s ease-in-out;
-
-    input:focus {
-      @apply border border-gray-500;
-    }
-  }
-
-  &-text {
-    @apply absolute w-full;
-    @apply -bottom-9 left-0; //bottom: calc(-1.5 * 1em);
-    @apply text-red-700 text-xs text-left;
-    @apply m-0;
-    @apply mb-5 ml-1;
-
-    &.text-muted {
-      @apply opacity-60;
-    }
-  }
-
-  // checkbox and radio
+  // checkbox and radio button
   &-check {
-    //@apply flex flex-col justify-center items-center;
+    &.centered {
+      @apply flex flex-col justify-center items-center;
+    }
+    &-label {
 
+    }
+    &-input {
+      width: 1em;
+      height: 1em;
+      margin-top: .25em;
+      @apply appearance-none;
+      @apply h-4 w-4 border-2 border-gray-400 bg-gray-50;
+      @apply checked:bg-gray-50 checked:border-blue-600 checked:border-4;
+      // border-style: solid;
+      border: 1px solid rgba(0,0,0,.25);
+      @apply focus:outline-none transition duration-200 align-top;
+      @apply bg-no-repeat bg-center bg-contain float-left;
+      @apply cursor-pointer;
+    }
+    &-input[type="checkbox"] {
+      border-radius: .25em;
+    }
+    &-input[type="radio"] {
+      border-radius: 50%;
+    }
+    &-input:disabled {
+      pointer-events: none;
+      filter: none;
+      opacity: .5;
+    }
+    &:checked {
+      @apply bg-pink-500;
+      @apply border-red-800;
+      &[type="checkbox"] {
+        @apply bg-teal-500;
+      }
+      &[type="radio"] {
+        @apply bg-teal-500;
+      }
+    }
     &-inline {
       @apply inline-block;
       @apply mr-8;
       @apply space-x-2;
     }
 
-    &-input {
-      //@apply appearance-none;
-      @apply h-4 w-4 border border-gray-400 bg-gray-50;
-      border-style: solid;
-      //@apply checked:bg-blue-600 checked:border-blue-600;
-      @apply focus:outline-none transition duration-200 align-top;
-      @apply bg-no-repeat bg-center bg-contain float-left;
-      @apply cursor-pointer;
-    }
-
   }
-  &-radio {
-    //@apply flex flex-col justify-center items-center;
-
-    &-inline {
-      @apply inline-block;
-      @apply mr-4;
-    }
-
+  // select and options dropdown
+  &-select {
+    &-label {}
     &-input {
-      @apply appearance-none;
-      @apply rounded-full h-4 w-4 border border-gray-400 bg-gray-50;
-      border-style: solid;
-      @apply checked:bg-blue-600 checked:border-blue-600;
-      @apply focus:outline-none transition duration-200 align-top;
-      @apply bg-no-repeat bg-center bg-contain float-left;
-      @apply cursor-pointer;
+      @apply block;
+      @apply w-full;
+      @apply py-1.5 pr-10 pl-3;
+      -moz-padding-start: calc(0.75rem - 3px);
+      @apply text-sm;
+      @apply font-normal;
+      @apply leading-5;
+      @apply text-slate-600;
+      @apply bg-white;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right .75rem center;
+      background-size: 16px 12px;
+      border: 1px solid #ced4da;
+      @apply rounded;
+      transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
 
-      &:checked[type="radio"] {
-        background-image: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%22-4 -4 8 8%22%3E%3Ccircle r=%222%22 fill=%22%23fff%22/%3E%3C/svg%3E");
+      &-sm {
+        @apply py-1 pl-2;
+        @apply text-sm;
       }
-
+      &-lg {
+        @apply py-2 pl-4;
+        @apply text-base;
+      }
       &:disabled {
-        pointer-events: none;
-        filter: none;
-        opacity: .5;
-      }
-
-      &-error {
-        @apply bg-red-50;
-        @apply border-red-400;
+        @apply text-[#212529];
+        @apply bg-[#e9ecef];
+        @apply border-[#ced4da];
       }
     }
-
-    &-label {
-      @apply inline-block text-gray-800 opacity-50;
-    }
-
   }
+  // input[type=text]/[type=email]/[type=password], textarea and error message
+  &-text {
+    @apply w-full inline-block;
+    @apply text-red-700 text-xs text-left;
+    @apply m-0;
+    @apply ml-1;
+    &.text-muted {
+      @apply opacity-60;
+    }
+    &-label {}
+    &-input {
+      @apply block;
+      @apply flex-1;
+      @apply text-sm text-gray-700;
+      @apply font-light tracking-wider;
+      @apply leading-6;
+      @apply bg-gray-50;
+      @apply py-1.5 px-3;
+      @apply rounded;
+      @apply outline-none;
+      background-clip: padding-box;
+      border: 1px solid #ced4da;
+      transition: border-color 0.3s ease-in-out, color 0.3s ease-in-out, background-color 0.3s ease-in-out;
 
+      &:focus {
+        @apply border border-gray-500;
+      }
+    }
+  }
 }
 
+
+.has-error {
+
+  input,
+  textarea {
+    @apply text-red-500;
+    @apply bg-red-50;
+
+    &:focus,
+    &.help-message {
+      @apply text-red-500;
+    }
+  }
+}

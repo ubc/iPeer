@@ -1,9 +1,13 @@
 import { fileURLToPath, URL } from 'node:url'
 
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ command, mode }) => {
+  // Load env file based on `mode` in the current working directory.
+  // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
+  const env = loadEnv(mode, process.cwd(), '')
+  console.log('APP_ENV',env.APP_ENV)
   return {
     plugins: [vue()],
     build: {
@@ -29,7 +33,8 @@ export default defineConfig(({ mode }) => {
       }
     },
     server: {
-      host: true,
+      // host: true,
+      host: env.APP_ENV,
     },
   }
 })

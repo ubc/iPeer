@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import {ref, reactive, computed, onMounted, defineAsyncComponent} from 'vue';
 import { useRoute } from 'vue-router'
+import { findIndex } from 'lodash'
 import useFetch from '@/composables/useFetch'
-//
-import Debugger from '@/components/Debugger.vue'
 //
 import Loader from '@/components/Loader.vue'
 import PageTitle from '@/components/PageTitle.vue'
@@ -27,9 +26,9 @@ const EvaluationEditPage = defineAsyncComponent(() => import('@/student/views/Ev
 import type { Evaluation, User } from '@/types/typings'
 interface Props {
   currentUser: User
-  event_id: string
-  group_id: string
-  pageTitle: string
+  event_id?: string
+  group_id?: string
+  pageTitle?: string
 }
 // REFERENCES
 const emit              = defineEmits<{}>()
@@ -40,7 +39,8 @@ const event_id          = ref(route.params.event_id)
 const group_id          = ref(route.params.group_id)
 const status            = ref<string>('')
 const message           = ref<object | null>(null)
-const evaluation        = reactive<Evaluation | any>({})
+let evaluation          = reactive<Evaluation | any>({})
+const members           = ref<User[]>([])
 // COMPUTED
 const evaluationPage = computed(() => {
   // Check if evaluation is started
@@ -58,9 +58,11 @@ async function fetchEvaluation() {
   try {
     status.value = 'PENDING'
     const response: Promise<Evaluation | unknown> = await useFetch(
-        `evaluations/makeEvaluation/${event_id.value}/${group_id.value}`,
+        `/evaluations/makeEvaluation/${event_id.value}/${group_id.value}`,
         {method: 'GET', timeout: 0})
-    Object.assign(evaluation, response?.data)
+    await Object.assign(evaluation, response?.data)
+    // members.value = [...updateMembersCollection(response?.data?.members, props.currentUser)]
+    members.value = updateMembersCollection(response?.data?.members, props.currentUser)
   } catch (err) {
     message.value = {text: err?.messge, type: 'error'}
   } finally {
@@ -70,11 +72,22 @@ async function fetchEvaluation() {
 async function reFetchEvaluation() {
   try {
     const response: Promise<Evaluation | unknown> = await useFetch(
-        `evaluations/makeEvaluation/${event_id.value}/${group_id.value}`,
+        `/evaluations/makeEvaluation/${event_id.value}/${group_id.value}`,
         {method: 'GET', timeout: 0})
     Object.assign(evaluation, response?.data)
   } catch (err) {
     message.value = {text: err?.messge, type: 'error'}
+  }
+}
+
+function updateMembersCollection(users, user) {
+  let tmp = [...users]
+  const index = findIndex(tmp, { id: user.id})
+  if (index === -1) {
+    return users
+  } else {
+    const spliced = tmp.splice(index, 1)
+    return [...tmp, {...spliced[0], first_name: 'Yourself', last_name: ''}]
   }
 }
 // WATCH
@@ -107,11 +120,10 @@ onMounted(async () => await fetchEvaluation())
       <SectionTitle title="Your Response" />
       <SectionSubtitle subtitle="Evaluate your group" :icon="{src: IconWritingHand, size: '3.75rem'}" />
 
-      <Debugger :title="`EvaluationIndex::${evaluation?.template}`" :state="evaluation" :form="initialState" :data="evaluation?.review" />
-
       <Suspense>
         <router-view
             :currentUser="currentUser"
+            :members="members"
             :evaluation="evaluation"
             @fetch:evaluation="fetchEvaluation">
         </router-view>

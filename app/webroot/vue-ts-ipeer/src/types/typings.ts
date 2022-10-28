@@ -54,10 +54,6 @@ export interface Member {
   role_name: string
 }
 
-export interface GroupEvent {
-  id: string
-}
-
 export interface Penalty {
   id: string
   event_id: string
@@ -66,10 +62,9 @@ export interface Penalty {
 }
 
 
-
-
-
-
+/**
+ * Evaluation review and response
+ */
 export interface Evaluation {
   id: string
   title: string
@@ -94,28 +89,10 @@ export interface Evaluation {
   group_event_id: string
   status: string | null
   questions: object
-  review: EvaluationReview
+  review?: MixedReview & SimpleReview & RubricReview & EvaluationReview
+  response?: MixedResponse & SimpleResponse & RubricResponse
 }
 
-/**
-"review": {
-  "id": "1",
-  "name": "Module 1 Project Evaluation",
-  "availability": "public",
-
-  "description": "",
-  "point_per_member": "100",
-  "status": "A",
-  "data": {},
-  "response": {
-    "id": "1",
-    "submitter_id": "7",
-    "submitted": "0",
-    "date_submitted": "2022-09-02 22:28:52",
-    "points": ["100","100"],
-    "comments": []
-  }
-}*/
 export interface EvaluationReview {
   id: string
   name: string
@@ -135,8 +112,8 @@ export interface EvaluationReview {
 
   // Mixed
   //
-  data: SimpleEvaluationReviewData & RubricEvaluationReviewData & MixedEvaluationReviewData
-  response: EvaluationReviewResponse
+  data: SimpleEvaluationReviewData & RubricEvaluationReviewData
+  response?: EvaluationReviewResponse
 }
 
 /** SimpleEvaluationReviewData */
@@ -173,9 +150,6 @@ export interface RubricEvaluationReviewDataLom {
   lom_comment: string
 }
 
-/** MixedEvaluationReviewData */
-export interface MixedEvaluationReviewData {}
-
 
 /**
  * Evaluation Review Response
@@ -185,7 +159,7 @@ export interface EvaluationReviewResponse {
   submitter_id: string
   submitted: string
   date_submitted: string
-  data: SimpleReviewResponseData | RubricReviewResponseData[] | MixedReviewResponseData
+  data: SimpleReviewResponseData | RubricReviewResponseData[]
 }
 /** */
 export interface EvaluationReviewResponseData {}
@@ -211,7 +185,160 @@ export interface RubricReviewResponseDataDetail {
   selected_lom: string
 }
 
-/** MixedReviewResponseData specifics */
-export interface MixedReviewResponseData {
 
+/**
+ * refactored
+ */
+/** SimpleReview/Data/Detail specifics */
+export interface SimpleReview {
+  id: string
+  name: string
+  availability: string
+  description?: string
+  point_per_member?: string
+  status?: string
+  data: SimpleReviewData[]
+}
+export interface SimpleReviewData {}
+export interface SimpleReviewDataDetail {}
+/** SimpleResponse/Data/Detail specifics */
+export interface SimpleResponse {
+  id: string
+  submitter_id: string
+  submitted: string
+  date_submitted: string
+  data: SimpleResponseData[]
+}
+export interface SimpleResponseData {
+  details: SimpleResponseDataDetail
+}
+export interface SimpleResponseDataDetail {
+  points?: string[]
+  comments?: string[]
+}
+
+
+
+/** RubricReview/Data/Detail specifics */
+export interface RubricReview {
+  id: string
+  name: string
+  availability: string
+  zero_mark?: string
+  view_mode?: string
+  template?: string
+  lom_max?: string
+  criteria?: string
+  data: RubricReviewData[]
+}
+export interface RubricReviewData {
+  rubrics_criteria: RubricReviewDataCriteria[],
+  rubrics_lom: RubricReviewDataLom[],
+}
+export interface RubricReviewDataCriteria {
+  id: string
+  rubric_id: string
+  criteria_num: string
+  criteria: string
+  multiplier: string
+  show_marks: string
+  rubrics_criteria_comment: [
+    {
+      id: string
+      criteria_id: string
+      rubrics_loms_id: string
+      criteria_comment: string
+    }
+  ]
+}
+export interface RubricReviewDataLom {
+  id: string
+  rubric_id: string
+  lom_num: string
+  lom_comment: string
+}
+/** RubricResponse/Data/Detail specifics */
+export interface RubricResponse {
+  id: string
+  submitter_id: string
+  submitted: string
+  date_submitted: string
+  data: RubricResponseData[]
+}
+export interface RubricResponseData {
+  id: string
+  evaluator: string
+  evaluatee: string
+  comment: string
+  score: string
+  details: RubricResponseDataDetail[]
+}
+export interface RubricResponseDataDetail {
+  id: string
+  criteria_number: string
+  criteria_comment: string
+  selected_lom: string
+}
+
+
+
+/** MixedReview/Data/Lom specifics */
+export interface MixedReview {
+  id: string
+  name: string
+  availability: string
+  peer_question: string
+  self_eval: string
+  total_question: string
+  total_marks: string
+  zero_mark: string
+  data: MixedReviewData[]
+}
+export interface MixedReviewData {
+  id: string
+  type: string
+  title: string
+  instructions: string
+  mixeval_id: string
+  mixeval_question_type_id: string
+  multiplier: string
+  question_num: string
+  scale_level: string
+  self_eval: boolean,
+  show_marks: string
+  required: boolean,
+  loms: MixedReviewDataLom[]
+}
+export interface MixedReviewDataLom {
+  id: string
+  question_id: string
+  scale_level: string
+  descriptor: string
+}
+/** MixedResponse/Data/Detail specifics */
+export interface MixedResponse {
+  id: string
+  submitter_id: string
+  submitted: string
+  date_submitted: string
+  data: MixedResponseData[]
+}
+export interface MixedResponseData {
+  id: string
+  evaluator: string
+  evaluatee: string
+  score: string
+  comment_release: string
+  grade_release: string
+  details: MixedResponseDataDetail[]
+}
+export interface MixedResponseDataDetail {
+  id: string
+  evaluation_mixeval_id: string
+  question_number: string
+  question_comment: string|null,
+  selected_lom: string
+  grade: string
+  comment_release: string
+  record_status: string
 }

@@ -11,6 +11,10 @@
 @import "table";
 @import "form";
 
+.debugger {
+  //display: none;
+}
+
 @layer components {
   body {
     @apply bg-pink-50;

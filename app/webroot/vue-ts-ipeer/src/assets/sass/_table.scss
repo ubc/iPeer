@@ -9,6 +9,7 @@
 
 .standardtable th {
   @apply font-sans;
+  @apply h-8;
   padding: 0.4em 0.1em;
   background-color: #ececec;
   font-weight: 600;
@@ -24,7 +25,9 @@
   //background-color: #f9f9f9;
   text-align: center;
 }
-
+.standardtable td.has-error {
+  @apply bg-red-50;
+}
 .standardtable tr th:first-child,
 .standardtable tr td:first-child {
   border-left: none;
@@ -67,4 +70,12 @@ table.standardtable thead th {
 }
 table.standardtable tbody td {
   @apply py-2 px-4;
+  @apply relative;
+
+  label.form-check.has-error {
+    @apply absolute bottom-0 left-0 top-0 right-0;
+    @apply flex justify-center items-center;
+    @apply w-auto h-auto;
+    @apply bg-red-50;
+  }
 }

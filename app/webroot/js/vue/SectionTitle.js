@@ -1,0 +1,2 @@
+import{d as s,c as o,a as r,t as c,f as i,o as n,_ as a}from"./main.js";const l={class:"block"},p={class:"section-title"},_=s({__name:"SectionTitle",props:{title:{type:String,required:!0},icon:{type:Object,required:!0}},setup(e){return(t,d)=>(n(),o("div",l,[r("h2",p,c(e.title),1),i(t.$slots,"default")]))}}),f=a(_,[["__file","/Users/josephkh/Workspace/iPeer/app/webroot/vue-ts-ipeer/src/components/SectionTitle.vue"]]);export{f as S};
+//# sourceMappingURL=SectionTitle.js.map

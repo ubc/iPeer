@@ -4,11 +4,12 @@ import { isEmpty } from 'lodash'
 import useFetch from '@/composables/useFetch'
 import { compareEntries, filterEntries, paginateEntries, unique } from '@/helpers'
 
-import { Table } from '@/student/components/tables/datatable'
-import Pagination from '@/components/Pagination.vue'
-import Loader from "@/components/Loader.vue";
 import Error from '@/components/Error.vue'
-import { InputCheck, SelectOption } from '@/components/fields'
+import Loader from '@/components/Loader.vue'
+import Pagination from '@/components/Pagination.vue'
+import LimitTo from '@/student/components/LimitTo.vue'
+import TimeFrame from '@/student/components/TimeFrame.vue'
+import { Table } from '@/student/components/tables/datatable'
 
 import type { User } from '@/types/typings'
 
@@ -44,8 +45,19 @@ const sort = reactive({
 const filter = reactive({
   timeframe: 'all',
   limit: [],
-  search: '', // TODO:: would be part od the admin/instructor list
+  search: '', // TODO:: would be part of the admin/instructor list
 })
+const limit_options = reactive([
+  {
+    name: 'limit',
+    value: 'can_edit',
+    label: 'Work I can still edit',
+  },{
+    name: 'limit',
+    value: 'can_view',
+    label: 'Peer reviews of me I can see',
+  }
+])
 // COMPUTED
 const filteredEntries = computed(() => {
   let newEntries = entries.value || []
@@ -113,17 +125,8 @@ onMounted(async () => {
   <div class="completed-work mx-4 my-8">
     <Error v-if="error" class="completed error" :error="error" />
     <div class="flex flex-col my-4 space-y-6">
-      <div class="timeframe flex flex-col items-center md:flex-row md:space-x-12">
-        <div class="label">Timeframe:</div>
-        <SelectField :default="filter.timeframe" :options="options" :name="'timeframe'" @change:select="updateData" />
-      </div>
-      <div class="limit flex flex-col items-center md:flex-row md:space-x-16">
-        <div class="label">Limit To:</div>
-        <div class="flex items-center space-x-4">
-          <InputCheck class="text-sm" name="limit" value="can_edit" label="Work I can still edit" @change:input="updateData" />
-          <InputCheck class="text-sm" name="limit" value="can_view" label="Peer reviews of me I can see" @change:input="updateData" />
-        </div>
-      </div>
+      <TimeFrame :default="filter.timeframe" :options="options" :name="'timeframe'" @update:event="updateData" />
+      <LimitTo label="Limit To:" :options="limit_options" @update:event="updateData" />
     </div>
     <Table :error="error" :columns="columns" @update:sort="emitSortBy">
       <tr v-if="loading">

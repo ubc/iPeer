@@ -1,11 +1,9 @@
 <script lang="ts" setup>
-import { ref, reactive, watch, computed, onMounted } from 'vue';
+import { ref } from 'vue';
 import { find, map, filter } from 'lodash'
-
 import UserCard from '@/student/components/UserCard.vue'
-import { InputText, TextArea } from '@/components/fields'
-import { validateText } from '@/helpers/rules'
-
+import CustomTextField from '@/components/fields/CustomTextField.vue'
+import { validateParagraph } from '@/helpers/rules'
 import type {EvaluationReviewResponse, RubricEvaluationReviewDataCriteria, User} from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
@@ -57,12 +55,12 @@ function getCriteriaDetail(target: string, key: string, value?: string) {
         <td style="width: 20%"><UserCard :member="member" /></td>
         <td style="width: 80%">
           <div class="flex flex-col">
-            <TextArea class="flex-1"
+            <CustomTextField class="flex-1"
                 :id="`${member.id}comments[${rubric_criteria?.id}]`"
                 :name="`${member.id}comments[${props.rubric_criteria_idx}]`"
                 :value="getCriteriaDetail('criteria_comment', member.id, rubric_criteria?.criteria_num)['criteria_comment']"
-                :rules="validateText"
-            />
+                :rules="validateParagraph"
+            /><!-- :rules="question.required ? validateParagraph : null" -->
           </div>
         </td>
       </tr>

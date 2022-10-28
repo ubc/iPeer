@@ -2,17 +2,14 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
-import swal from 'sweetalert'
 import useFetch from '@/composables/useFetch'
+import swal from 'sweetalert'
+import Debugger from "@/components/Debugger.vue";
 
-import { jsonToFormData } from '@/helpers'
-import Debugger from '@/components/Debugger.vue'
-
-import type {Evaluation, EvaluationReviewResponse} from '@/types/typings'
-
+import type {Evaluation, MixedResponse, RubricResponse, SimpleResponse} from '@/types/typings'
 interface Props {
-  initialState: EvaluationReviewResponse
   evaluation: Evaluation
+  initialState: SimpleResponse | RubricResponse | MixedResponse
 }
 // REFERENCES
 const emit = defineEmits<{
@@ -58,7 +55,6 @@ const onSubmit = handleSubmit(async () => {
   }
 }, onInvalidateSubmit)
 
-
 async function onSave() {
   try {
     const formData = new FormData(evaluation_form.value)
@@ -72,6 +68,9 @@ async function onSave() {
       timeout: 300,
       body: searchParams
     })
+    // if(response.status === 200) {
+    //   await router.push({ name: 'dashboard' })
+    // }
     await swal({text: response.message, icon: response.statusText})
   } catch (err) {
     await swal({text: 'something went wrong...', icon: 'error'})
@@ -83,7 +82,10 @@ async function onSave() {
 
 <template>
   <form @submit.prevent="onSubmit" ref="evaluation_form" id="evaluation_form" class="evaluation-form">
-    <slot :evaluation-ref="evaluationRef" :onSave="onSave" :isSubmitting="isSubmitting" :errors="errors" :values="values" />
+    <slot :evaluation-ref="evaluation_form" :onSave="onSave" :is-submitting="isSubmitting" :errors="errors" :values="values" :form-meta="meta" />
   </form>
-  <Debugger class="text-sm" :state="values" />
+  <Debugger title="InitialState" :state="props.initialState.data" />
+  <Debugger title="Evaluation" :state="evaluation" />
+  <Debugger title="Review" :state="evaluation?.review" />
+  <Debugger title="Response" :state="evaluation?.response" />
 </template>

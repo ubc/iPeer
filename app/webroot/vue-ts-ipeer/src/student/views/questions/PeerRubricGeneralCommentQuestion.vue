@@ -1,23 +1,19 @@
 <script lang="ts" setup>
-import { ref, reactive, watch, computed, onMounted } from 'vue';
-import { isEmpty, find } from 'lodash'
-import { validateText } from '@/helpers/rules'
-
+import { ref, reactive } from 'vue';
+import { find } from 'lodash'
+import CustomTextField from '@/components/fields/CustomTextField.vue'
+import { validateParagraph } from '@/helpers/rules'
 import UserCard from '@/student/components/UserCard.vue'
-
 import type { EvaluationReviewResponse, User } from '@/types/typings'
-import TextArea from '@/components/fields/TextArea.vue'
-
 // REFERENCES
 const emit = defineEmits<{
   // (e: 'update:modelValue', option: string): void
 }>()
 const props = defineProps<{
-  index: string | number
+  index: string|number
   members: User[]
   initialState: EvaluationReviewResponse
 }>()
-
 // DATA
 const settings = reactive({
   question: {
@@ -30,7 +26,9 @@ const settings = reactive({
 // WATCH
 // LIFECYCLE
 function getGeneralComment(target: string, memberId: string) {
-  return find(props.initialState.data, { evaluatee: memberId})[target]
+  if(props.initialState?.data) {
+    return find(props.initialState?.data, { evaluatee: memberId})[target]
+  }
 }
 </script>
 
@@ -61,12 +59,12 @@ function getGeneralComment(target: string, memberId: string) {
         <td><UserCard :member="member" /></td>
         <td>
           <div class="flex flex-col">
-            <TextArea
+            <CustomTextField
                 class="flex-1"
                 :name="`${member.id}gen_comment`"
                 :value="getGeneralComment('comment', member.id)"
-                :rules="validateText"
-            />
+                :rules="validateParagraph"
+            /><!-- :rules="question.required ? validateParagraph : null" -->
           </div>
         </td>
       </tr>

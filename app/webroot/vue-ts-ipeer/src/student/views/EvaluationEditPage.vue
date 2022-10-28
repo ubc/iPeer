@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import {ref, reactive, watch, computed, onMounted, defineAsyncComponent} from 'vue';
+import { toRef, computed, onMounted, defineAsyncComponent} from 'vue';
 import { useRoute, useRouter } from 'vue-router'
 
-import TakeNote from '@/student/components/TakeNote.vue'
 import IconSpinner from '@/components/icons/IconSpinner.vue'
+import TakeNote from '@/student/components/TakeNote.vue'
 
 import type {Evaluation, User} from '@/types/typings'
 // REFERENCES
@@ -12,17 +12,22 @@ const emit = defineEmits<{
   (e: 'fetch:evaluation'): void
 }>()
 const props = defineProps<{
+  members: User[]
   currentUser: User
   evaluation: Evaluation
 }>()
 const route = useRoute()
 const router = useRouter()
 // DATA
+const members     = toRef(props, 'members')
+const currentUser = toRef(props, 'currentUser')
+const evaluation  = toRef(props, 'evaluation')
 // COMPUTED
 const template = computed(() => {
-  if(props.evaluation?.template) {
+  if(evaluation.value?.template) {
     return defineAsyncComponent({
-      loader: () => import(`@/student/views/templates/${props.evaluation?.template}.vue`),
+      // loader: () => import(`@/student/component/templates/${evaluation.value?.template}.vue`),
+      loader: () => import('./templates/'+ evaluation.value?.template +'.vue'),
       loadingComponent: `<div class="w-full h-128 bg-gold-100">L O A D I N G...</div>`
     })
   }
@@ -31,7 +36,7 @@ const template = computed(() => {
 // WATCH
 // LIFECYCLE
 onMounted(() => {
-  if(props.evaluation?.status === null || props.evaluation?.status == '0') {
+  if(evaluation.value?.status === null || evaluation.value?.status == '0') {
     router.push({ name: 'evaluation.make' })
   } else {
     router.push({ name: 'evaluation.edit' })
@@ -43,8 +48,9 @@ onMounted(() => {
   <div class="evaluation-edit-page">
     <component
         :is="template"
-        :evaluation="props.evaluation"
-        :currentUser="props.currentUser"
+        :members="members"
+        :evaluation="evaluation"
+        :currentUser="currentUser"
         @fetch:evaluation="$emit('fetch:evaluation')"
     >
       <template v-slot:header></template>
@@ -58,10 +64,9 @@ onMounted(() => {
             </svg>
             <span>Back</span>
           </router-link>
-          <button type="button" class="button submit" @click="onSave">{{ 'Save Changes' }}</button>
-          <button type="submit" v-if="props.evaluation?.review?.response?.submitted !== '1'" class="button submit flex items-center">
+          <button type="submit" class="button submit flex items-center">
             <IconSpinner v-if="isSubmitting" />
-            <span>Submit Peer Review</span>
+            <span>{{ 'Save Changes' }}</span>
           </button>
         </div>
       </template>
