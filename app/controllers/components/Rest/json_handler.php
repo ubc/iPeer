@@ -15,6 +15,7 @@ class JsonHandlerComponent extends CakeObject
     
     /**
      * @param array $result
+     * @param string|null $userId
      * @return array
      */
     public function formatEvents(array $result, string $userId = null): array
@@ -61,9 +62,7 @@ class JsonHandlerComponent extends CakeObject
             isset($row['late']) ? $tmp['late'] = $row['late'] : null;
             isset($row['percent_penalty']) ? $tmp['percent_penalty'] = $row['percent_penalty'] : null;
             array_push($data, $tmp);
-            // $data[] = $tmp;
         }
-//    var_dump(is_array($data)); die();
         return $data;
     }
     
@@ -74,11 +73,14 @@ class JsonHandlerComponent extends CakeObject
     public function formatSimpleEvaluation(array $data): void
     {
         $json = $this->getEventData($data);
+        // other
         $json['template'] = 'SimpleEvaluation';
+        $json['member_count'] = $data['evaluateeCount'];
+        $json['member_ids'] = $data['memberIDs'];
         $json['review'] = $this->getSimpleEvaluationSettings($data['questions']);
-        $json['review']['data'] = [];
-        $json['review']['response'] = $this->getSimpleEvaluationSubmission($data['submission'], $data['evaluation']);
         $json['review']['remaining'] = $data['remaining'];
+        $json['review']['data'] = [];
+        $json['response'] = $this->getSimpleEvaluationSubmission($data['submission'], $data['evaluation']);
         
         $this->RestResponseHandler->toJson('SimpleEvaluation', 200, $json);
         exit;
@@ -91,21 +93,37 @@ class JsonHandlerComponent extends CakeObject
     public function formatRubricEvaluation(array $data): void
     {
         $json = $this->getEventData($data);
+        // other
         $json['template'] = 'RubricEvaluation';
+        $json['member_count'] = $data['evaluateeCount'];
         $json['rubric_id'] = $data['rubricId'];
+        $json['all_done'] = $data['allDone'];
+        $json['gen_com_req'] = $data['comReq']; // general comment section
+        $json['member_ids'] = $data['memberIDs'];
+        // questions/answers
         $json['review'] = $this->getRubricEvaluationSettings($data['questions']) ?? null;
         $json['review']['data'] = $this->getRubricEvaluationData($data['questions']) ?? null;
-        $json['review']['response'] = isset($data['groupMembers']) ? $this->getRubricEvaluationSubmission($data['submission'], $data['groupMembers']) : null;
+        $json['response'] = isset($data['groupMembers']) ? $this->getRubricEvaluationSubmission($data['submission'], $data['groupMembers']) : null;
         
         $this->RestResponseHandler->toJson('RubricEvaluation', 200, $json);
         exit;
     }
     
-    
+    /**
+     * @param array $data
+     * @return void
+     */
     public function formatMixedEvaluation(array $data): void
     {
+        //var_dump($data); die();
         $json = $this->getEventData($data);
+        // other
         $json['template'] = 'MixedEvaluation';
+        $json['member_count'] = $data['memberCount'];
+        $json['enrol'] = $data['enrol'];
+        $json['self'] = $data['self'];
+        // $json['member_ids'] = $data['memberIDs'];
+        // questions/answers
         $json['review'] = [
             'id' => $data['mixeval']['Mixeval']['id'],
             'availability' => $data['mixeval']['Mixeval']['availability'],
@@ -118,36 +136,9 @@ class JsonHandlerComponent extends CakeObject
         ];
         $json['review']['data'] = $this->getMixedEvaluationQuestions($data['questions']);
         $json['response'] = $this->getMixedEvaluationSubmission($data['submission'], $data['groupMembers']);
-        // other
-        $json['enrol'] = $data['enrol'];
-        $json['member_count'] = $data['memberCount'];
-        
-        $this->RestResponseHandler->toJson('RubricEvaluation', 200, $json);
-        exit;
-        
-        /**
-        $json = $this->getEventData($data);
-        isset($data['questions']) ? $json['questions'] = $this->getMixedEvaluationQuestions($data['questions']) : null;  // $data['questions'];
-        $json['submission'] = $this->getMixedEvaluationSubmission($data['submission'], $data['groupMembers']);
-        
-        $json['enrol'] = $data['enrol'];
-        // $json['self']         = $data['self'];
-        $json['settings'] = [
-            'id' => $data['mixeval']['Mixeval']['id'],
-            'availability' => $data['mixeval']['Mixeval']['availability'],
-            'name' => $data['mixeval']['Mixeval']['name'],
-            'peer_question' => $data['mixeval']['Mixeval']['peer_question'],
-            'self_eval' => $data['mixeval']['Mixeval']['self_eval'],
-            'total_question' => $data['mixeval']['Mixeval']['total_question'],
-            'total_marks' => $data['mixeval']['Mixeval']['total_marks'],
-            'zero_mark' => $data['mixeval']['Mixeval']['zero_mark']
-        ];
-        $json['member_count'] = $data['memberCount'];
-        $json['template'] = 'MixedEvaluation';
-        
+    
         $this->RestResponseHandler->toJson('MixedEvaluation', 200, $json);
         exit;
-        */
     }
     
     
@@ -176,7 +167,7 @@ class JsonHandlerComponent extends CakeObject
             ],
             'course' => $this->getCourseById($data['event']['Event']['course_id']),
             'members' => $this->getGroupMembers($data['groupMembers']),
-            'penalty_final' => $data['penaltyFinal']['Penalty'],
+            'penalty' => $data['penaltyFinal']['Penalty'],
             'status' => $this->isSubmitted($data['event']['Event']['id'], $data['event']['Group']['id'], $data['userId']),
         ];
         return $output;
@@ -358,14 +349,12 @@ class JsonHandlerComponent extends CakeObject
                     'evaluatee' => $member['User']['Evaluation']['EvaluationRubric']['evaluatee'],
                     'comment' => $member['User']['Evaluation']['EvaluationRubric']['comment'],
                     'score' => $member['User']['Evaluation']['EvaluationRubric']['score'],
-                    //'comment_release'   => $member['User']['Evaluation']['EvaluationRubric']['comment_release'],
-                    //'grade_release'     => $member['User']['Evaluation']['EvaluationRubric']['grade_release'],
-                    //'grp_event_id'      => $member['User']['Evaluation']['EvaluationRubric']['grp_event_id'],
-                    //'event_id'          => $member['User']['Evaluation']['EvaluationRubric']['event_id'],
-                    //'record_status'     => $member['User']['Evaluation']['EvaluationRubric']['record_status'],
-                    //'creator_id'        => $member['User']['Evaluation']['EvaluationRubric']['creator_id'],
-                    
-                    'details' => $this->getRubricEvaluationDetail($member['User']['Evaluation']['EvaluationRubricDetail'])
+                    'comment_release'   => $member['User']['Evaluation']['EvaluationRubric']['comment_release'],
+                    'grade_release'     => $member['User']['Evaluation']['EvaluationRubric']['grade_release'],
+                    'grp_event_id'      => $member['User']['Evaluation']['EvaluationRubric']['grp_event_id'],
+                    'event_id'          => $member['User']['Evaluation']['EvaluationRubric']['event_id'],
+                    'record_status'     => $member['User']['Evaluation']['EvaluationRubric']['record_status'],
+                    'details'           => $this->getRubricEvaluationDetail($member['User']['Evaluation']['EvaluationRubricDetail'])
                 ];
                 $data['data'][] = $tmp;
             }
@@ -445,16 +434,9 @@ class JsonHandlerComponent extends CakeObject
                     'score' => $member['User']['Evaluation']['EvaluationMixeval']['score'],
                     'comment_release'   => $member['User']['Evaluation']['EvaluationMixeval']['comment_release'],
                     'grade_release'     => $member['User']['Evaluation']['EvaluationMixeval']['grade_release'],
-                    //'grp_event_id'      => $member['User']['Evaluation']['EvaluationMixeval']['grp_event_id'],
-                    //'event_id'          => $member['User']['Evaluation']['EvaluationMixeval']['event_id'],
-                    //'record_status'     => $member['User']['Evaluation']['EvaluationMixeval']['record_status'],
-                    //'creator_id'        => $member['User']['Evaluation']['EvaluationMixeval']['creator_id'],
-                    //'updater_id'        => $member['User']['Evaluation']['EvaluationMixeval']['updater_id'],
-                    //'created'           => $member['User']['Evaluation']['EvaluationMixeval']['created'],
-                    //'modified'          => $member['User']['Evaluation']['EvaluationMixeval']['modified'],
-                    //'creator'           => $member['User']['Evaluation']['EvaluationMixeval']['creator'],
-                    //'updater'           => $member['User']['Evaluation']['EvaluationMixeval']['updater'],
-                    
+                    'grp_event_id'      => $member['User']['Evaluation']['EvaluationMixeval']['grp_event_id'],
+                    'event_id'          => $member['User']['Evaluation']['EvaluationMixeval']['event_id'],
+                    'record_status'     => $member['User']['Evaluation']['EvaluationMixeval']['record_status'],
                     'details' => $this->getMixedEvaluationDetail($member['User']['Evaluation']['EvaluationMixevalDetail'])
                 ];
                 $output['data'][] = $tmp;

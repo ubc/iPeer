@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {ref, reactive, watch, computed, onMounted, toRef, onBeforeUnmount} from 'vue';
+import { ref, toRef, onMounted, onBeforeUnmount } from 'vue'
 import { useField, ErrorMessage } from 'vee-validate'
 import autosize from 'autosize'
 
@@ -44,22 +44,23 @@ onBeforeUnmount(() => autosize.destroy(elementRef.value))
 </script>
 
 <template>
-  <label class="flex flex-col" :class="{ 'has-error': !!errorMessage, success: meta.valid }">
-    <span v-if="label">{{ label }}</span>
-    <textarea
-      ref="elementRef"
-      class="form-text-input"
-      style="resize: none; clear: right;padding: 0.3em 0.5em;"
-      :id="name"
-      :name="name"
-      :value="inputValue"
-      :disabled="disabled"
-      @change="$emit('update:event', $event)"
-      @input="handleChange"
-      @blur="handleBlur"
-      v-on="validationListeners"
-      v-bind="$attrs"
-    ></textarea>
-    <ErrorMessage class="form-text text-muted" v-if="props.type !== 'radio'" :name="name" />
-  </label>
+  <div class="form-group my-2">
+    <label class="form-label" v-if="label">{{ label }}</label>
+    <div class="form-control">
+      <textarea class="form-textarea" :class="{ 'has-error': !!errorMessage, success: meta.valid }"
+        ref="elementRef"
+        style="resize: none; clear: right;padding: 0.3em 0.5em;"
+        :id="name"
+        :name="name"
+        :value="inputValue"
+        :disabled="disabled"
+        @change="$emit('update:event', $event)"
+        @input="handleChange"
+        @blur="handleBlur"
+        v-on="validationListeners"
+        v-bind="$attrs"
+      ></textarea>
+      <ErrorMessage class="form-text text-muted" v-if="props.type !== 'radio'" :name="name" />
+    </div>
+  </div>
 </template>

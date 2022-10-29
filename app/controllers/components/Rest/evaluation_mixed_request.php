@@ -197,9 +197,10 @@ class EvaluationMixedRequestComponent extends CakeObject
     
     private function set(array $event, string $groupId, $studentId = null, string $method)
     {
-        $data = $this->params['data'];      // REMOVE:: $data = $this->data['data'];
-//        $this->pre_r($data);die();
-        unset($this->params['data']);       // REMOVE:: unset($this->data['data']);
+        if(!isset($this->params['data'])) return;
+        
+        $data = $this->params['data'];
+        unset($this->params['data']);
         $mixeval = $this->Mixeval->findById($data['data']['template_id']);
         $groupEventId = $data['data']['grp_event_id'];
         $evaluator = empty($studentId) ? $data['data']['submitter_id'] : $studentId;
@@ -208,7 +209,7 @@ class EvaluationMixedRequestComponent extends CakeObject
     
         // check peer evaluation questions
         if ($mixeval['Mixeval']['peer_question'] > 0) {
-            foreach ($data as $userId => $eval) { // REMOVE:: foreach ($this->data as $userId => $eval) {
+            foreach ($data as $userId => $eval) {
                 if (!isset($eval['Evaluation'])) {
                     continue; // only has self-evaluation so skip
                 }
@@ -225,8 +226,7 @@ class EvaluationMixedRequestComponent extends CakeObject
                 if (!$this->Evaluation->saveMixevalEvaluation($eval)) {
                     $failures[] = $userId;
                 }
-                $evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee(
-                    $groupEventId, $evaluator, $evaluatee);
+                $evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee($groupEventId, $evaluator, $evaluatee);
                 $evaluation = !empty($evalMixeval['EvaluationMixevalDetail']) ? $evalMixeval['EvaluationMixevalDetail'] : null;
                 $details = Set::combine($evaluation, '{n}.question_number', '{n}');
                 foreach ($mixeval['MixevalQuestion'] as $ques) {
@@ -238,12 +238,12 @@ class EvaluationMixedRequestComponent extends CakeObject
         }
         // check self evaluation questions
         // second condition to exclude tutors
-        if ($mixeval['Mixeval']['self_eval'] > 0 && isset($this->data[$evaluator]['Self-Evaluation'])) {
+        if ($mixeval['Mixeval']['self_eval'] > 0 && isset($data[$evaluator]['Self-Evaluation'])) {
             $evaluatee = empty($studentId) ? User::get('id') : $studentId;
-            $eventId = $this->data[$evaluatee]['Self-Evaluation']['event_id'];
-            $groupId = $this->data[$evaluatee]['Self-Evaluation']['group_id'];
-            $this->data[$evaluatee]['Evaluation'] = $this->data[$evaluatee]['Self-Evaluation'];
-            if (!$this->Evaluation->saveMixevalEvaluation($this->data[$evaluatee])) {
+            $eventId = $data[$evaluatee]['Self-Evaluation']['event_id'];
+            $groupId = $data[$evaluatee]['Self-Evaluation']['group_id'];
+            $data[$evaluatee]['Evaluation'] = $data[$evaluatee]['Self-Evaluation'];
+            if (!$this->Evaluation->saveMixevalEvaluation($data[$evaluatee])) {
                 $failures[] = $evaluatee;
             }
             $evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee(
@@ -269,8 +269,6 @@ class EvaluationMixedRequestComponent extends CakeObject
                     $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
                     if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
                         $this->RestResponseHandler->toJson('Error: Unable to submit the evaluation. Please try again.', 404);
-                        
-                        // REMOVE:: $this->Session->setFlash(__('Error: Unable to submit the evaluation. Please try again.', true));
                     }
                 }
                 CaliperHooks::submit_mixeval($eventId, $evaluator, $groupEventId, $groupId);
@@ -289,167 +287,21 @@ class EvaluationMixedRequestComponent extends CakeObject
                     $groupEvent['GroupEvent']['marked'] = 'to review';
                     if (!$this->GroupEvent->save($groupEvent)) {
                         $this->RestResponseHandler->toJson('Error', 404);
-                        // REMOVE:: $this->Session->setFlash(__('Error', true));
                     } else {
                         $this->RestResponseHandler->toJson('Your Evaluation was submitted successfully.', 200);
-                        // REMOVE:: $this->Session->setFlash(__('Your Evaluation was submitted successfully.', true), 'good');
-                        // REMOVE:: $this->redirect('/home');
                     }
                 } else {
                     $this->RestResponseHandler->toJson('Your Evaluation was submitted successfully.', 200);
-    
-                    // REMOVE:: $this->Session->setFlash(__('Your Evaluation was submitted successfully.', true), 'good');
-                    // REMOVE:: $this->redirect('/home');
                 }
             } else {
                 // Supposed to go here
                 $this->RestResponseHandler->toJson('Your answers have been saved. Please answer all the required questions before it can be considered submitted.', 200);
-    
-                // REMOVE:: $this->Session->setFlash(__('Your answers have been saved. Please answer all the required questions before it can be considered submitted.', true));
             }
         } else {
             $failures = $this->User->getFullNames($failures);
             $failures = join(' and ', array_filter(array_merge(array(join(
                 ', ', array_slice($failures, 0, -1))), array_slice($failures, -1))));
             $this->RestResponseHandler->toJson('It was unsuccessful to save evaluation(s) for '.$failures, 404);
-    
-            // REMOVE:: $this->Session->setFlash(__('Error: It was unsuccessful to save evaluation(s) for ', true).$failures);
-        }
-        // $this->redirect('/evaluations/makeEvaluation/'.$eventId.'/'.$groupId);
-    }
-    
-    
-    
-    
-    
-    private function set_OLD(array $event, string $groupId, $studentId = null, string $method)
-    {
-        $data = $this->params['data'];
-        unset($this->params['data']);
-        $mixeval = $this->Mixeval->findById($data['data']['template_id']);
-        $groupEventId = $data['data']['grp_event_id'];
-        $evaluator = empty($studentId) ? $data['data']['submitter_id'] : null;
-        $required = true;
-        $failures = [];
-        
-        // check peer evaluation questions
-        if ($mixeval['Mixeval']['peer_question'] > 0) {
-            foreach ($data as $userId => $eval) {
-                if (!isset($eval['Evaluation'])) {
-                    continue; // only has self-evaluation so skip
-                }
-                if (!empty($studentId)) {
-                    $eval['Evaluation']['evaluator_id'] = null;
-                }
-                $eventId = $eval['Evaluation']['event_id'];
-                $groupId = $eval['Evaluation']['group_id'];
-                $evaluatee = $eval['Evaluation']['evaluatee_id'];
-                
-                if (!$this->Evaluation->saveMixevalEvaluation($eval, '0')) {
-                    $failures[] = $userId;
-                }
-                $evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee(
-                    $groupEventId, $evaluator, $evaluatee);
-                $evaluation = !empty($evalMixeval['EvaluationMixevalDetail']) ? $evalMixeval['EvaluationMixevalDetail'] : null;
-                $details = Set::combine($evaluation, '{n}.question_number', '{n}');
-                foreach ($mixeval['MixevalQuestion'] as $ques) {
-                    if ($ques['required'] && !$ques['self_eval'] && !isset($details[$ques['question_num']])) {
-                        $required = false;
-                    }
-                }
-            }
-        }
-        // check self evaluation questions
-        // second condition to exclude tutors
-        if ($mixeval['Mixeval']['self_eval'] > 0) {
-            $evaluatee = empty($studentId) ? User::get('id') : $studentId;
-            $eventId = $data[$evaluatee]['Self-Evaluation']['event_id'];
-            $groupId = $data[$evaluatee]['Self-Evaluation']['group_id'];
-            $data[$evaluatee]['Evaluation'] = $data[$evaluatee]['Self-Evaluation'];
-            if (!$this->Evaluation->saveMixevalEvaluation($data[$evaluatee])) {
-                $failures[] = $evaluatee;
-            }
-            $evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee(
-                $groupEventId, $evaluator, $evaluatee);
-            $evaluation = !empty($evalMixeval['EvaluationMixevalDetail']) ? $evalMixeval['EvaluationMixevalDetail'] : null;
-            $details = Set::combine($evaluation, '{n}.question_number', '{n}');
-            foreach ($mixeval['MixevalQuestion'] as $ques) {
-                if ($ques['required'] && $ques['self_eval'] && !isset($details[$ques['question_num']])) {
-                    $required = false;
-                }
-            }
-        }
-        // success
-        if (empty($failures)) {
-            if ($required) {
-                $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
-                if($method === 'POST') {
-                    if (empty($evaluationSubmission)) {
-                        $this->EvaluationSubmission->id = null;
-                        $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
-                        $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
-                        $evaluationSubmission['EvaluationSubmission']['submitter_id'] = empty($studentId) ? $evaluator : null;
-                        $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
-                        $evaluationSubmission['EvaluationSubmission']['submitted'] = '1';
-                        if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
-                            $this->RestResponseHandler->toJson('Error: Unable to save the evaluation. Please try again.', 404);
-                        }
-                    } else {
-                        //$updateEvaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
-                        $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
-                        $evaluationSubmission['EvaluationSubmission']['submitted'] = '1';
-                        if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
-                            $this->RestResponseHandler->toJson('Error: Unable to submit the evaluation. Please try again.', 404);
-                        }
-                    }
-                }
-                elseif($method === 'PUT' || $method === 'PATCH') {
-                
-                }
-                CaliperHooks::submit_mixeval($eventId, $evaluator, $groupEventId, $groupId);
-                // NOTE:: if (Tutor is added in group) the evaluators count will include the TA as part of the team. !!!
-                // TODO:: Create a method to return members without tutor Also to consider the $selfEval = $this->event['Event']['self_eval']
-                // $evaluators = $this->GroupsMembers->findAllByGroupIdNoTutor($groupId, $selfEval, $evaluator)
-                $evaluators = $this->GroupsMembers->findAllByGroupId($groupId);
-                $evaluators = Set::extract('/GroupsMembers/user_id', $evaluators);
-                $memberCompletedNo = $this->EvaluationSubmission->find('count', [
-                    'conditions' => [
-                        'grp_event_id' => $groupEventId,
-                        'submitter_id' => $evaluators,
-                        'submitted' => 1 // this line will ensure the evaluation is submitted
-                    ]
-                ]);
-                $evaluators = count($evaluators);
-                //Check to see if all members are completed this evaluation
-                if ($memberCompletedNo == $evaluators) {
-                    $this->GroupEvent->id = $groupEventId;
-                    $groupEvent['GroupEvent']['marked'] = 'to review';
-                    if (!$this->GroupEvent->save($groupEvent)) {
-                        $this->RestResponseHandler->toJson('Error', 404);
-                    } else {
-                        if ($submitted) {
-                            $this->RestResponseHandler->toJson('Your Evaluation was submitted successfully.', 200);
-                        } else {
-                            $this->RestResponseHandler->toJson('Your Evaluation was saved successfully.', 200);
-                        }
-                    }
-                } else {
-                    if ($submitted) {
-                        $this->RestResponseHandler->toJson('Your Evaluation was submitted successfully.', 200);
-                    } else {
-                        $this->RestResponseHandler->toJson('Your Evaluation was saved successfully.', 200);
-                    }
-                }
-            } else {
-                // Supposed to go here
-                $this->RestResponseHandler->toJson('Your answers have been saved. Please answer all the required questions before it can be considered submitted.', 200);
-            }
-        } else {
-            $failures = $this->User->getFullNames($failures);
-            $failures = join(' and ', array_filter(array_merge(array(join(
-                ', ', array_slice($failures, 0, -1))), array_slice($failures, -1))));
-            $this->RestResponseHandler->toJson('Error: It was unsuccessful to save evaluation(s) for ' . $failures, 404);
         }
     }
-    
 }

@@ -52,12 +52,12 @@ const props = defineProps<{
       <tr v-for="(member, memberIdx) of props.members" :key="member.id">
         <td style="width: 20%"><UserCard :member="member" /></td>
         <td style="width: 80%">
-          <CustomTextField class="flex-1"
+          <CustomTextField
               :label="label"
               :name="`${name}[${memberIdx}]`"
               :rules="validateParagraph"
               :disabled="props.disabled"
-          /><!-- :rules="question.required ? validateParagraph : null" -->
+          /><!-- TBD:: :rules="question.required ? validateParagraph : null" -->
         </td>
       </tr>
       </tbody>

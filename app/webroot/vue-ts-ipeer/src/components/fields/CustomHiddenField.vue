@@ -1,13 +1,14 @@
 <script lang="ts" setup>
-import { toRefs } from 'vue';
+import { toRef } from 'vue';
 import { useField } from 'vee-validate';
 
 const props = defineProps<{
   name: string,
   value: string,
+  modelValue: string|number
 }>();
 
-const { name } = toRefs(props);
+const name = toRef(props, 'name');
 const { checked, handleChange } = useField(name, undefined, {
   type: 'hidden',
   checkedValue: props.value,
@@ -15,5 +16,5 @@ const { checked, handleChange } = useField(name, undefined, {
 </script>
 
 <template>
-  <input type="hidden" :name="name" :value="value" />
+  <input type="hidden" :name="name" :value="props.value" :checked="checked" />
 </template>

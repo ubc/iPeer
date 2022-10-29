@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
+import { cloneDeep, debounce } from 'lodash'
 import useFetch from '@/composables/useFetch'
 import swal from 'sweetalert'
 import Debugger from "@/components/Debugger.vue";
@@ -22,6 +23,8 @@ const { values, errors, meta, handleSubmit, isSubmitting } = useForm({
   initialValues: props.initialState?.data,
 })
 // DATA
+const mode            = ref(import.meta.env.MODE === 'development')
+const debug           = ref(false)
 const evaluation_form = ref()
 // COMPUTED
 // METHODS
@@ -77,15 +80,40 @@ async function onSave() {
   }
 }
 // WATCH
+watch(() => cloneDeep(props.initialState), debounce(async (current, previous) => {
+  try {
+    const formData = new FormData(evaluation_form.value)
+    formData.append('_method', 'PUT')
+    const searchParams = new URLSearchParams()
+    for (const pair of formData) {
+      searchParams.append(pair[0], pair[1])
+    }
+    const response = await useFetch(`/evaluations/makeEvaluation/${props.evaluation?.id}/${props.evaluation?.group?.id}`, {
+      method: 'POST',
+      timeout: 300,
+      body: searchParams
+    })
+    // TODO:: add notification component to replace swal
+    console.table(response.message, 'auto-saved every 5000ms!', )
+  } catch (err) {
+    // TODO:: add notification component to replace swal
+    console.warn('auto-save error.', err.message)
+  }
+}, 5000), { deep: true })
 // LIFECYCLE
 </script>
 
 <template>
-  <form @submit.prevent="onSubmit" ref="evaluation_form" id="evaluation_form" class="evaluation-form">
+  <form novalidate @submit.prevent="onSubmit" id="evaluation_form" class="evaluation-form" ref="evaluation_form">
     <slot :evaluation-ref="evaluation_form" :onSave="onSave" :is-submitting="isSubmitting" :errors="errors" :values="values" :form-meta="meta" />
   </form>
-  <Debugger title="InitialState" :state="props.initialState.data" />
-  <Debugger title="Evaluation" :state="evaluation" />
-  <Debugger title="Review" :state="evaluation?.review" />
-  <Debugger title="Response" :state="evaluation?.response" />
+
+  <button v-if="mode" class="debugger button default" @click="debug=!debug">{{ debug ? 'Hide' : 'Show'}} Debugger</button>
+  <div v-if="debug">
+    <Debugger title="Form Values/Errors" :state="values" :form="errors" />
+    <Debugger title="InitialState" :state="props.initialState" />
+    <Debugger title="Evaluation" :state="evaluation" />
+    <Debugger title="Review" :state="evaluation?.review" />
+    <Debugger title="Response" :state="evaluation?.response" />
+  </div>
 </template>

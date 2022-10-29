@@ -8,18 +8,23 @@ const emit = defineEmits<{
   (e: 'update:modelValue', option: string): void
 }>()
 const props = defineProps<{
+  currentUser: User,
   evaluation: Evaluation,
   question: MixedReviewData,
-  currentUser: User,
-  initialState: MixedResponse,
+  initialState: MixedResponse
 }>()
 
 // DATA
 // COMPUTED
 const selfQuestion = computed(() => {
-  return defineAsyncComponent(() => import('../../questions/SelfMixed'+ props.question?.type +'Question.vue'))
+  if(props.question?.type) {
+    return defineAsyncComponent({
+      loader: () => import(`../../questions/SelfMixed${props.question?.type}Question.vue`),
+      loadingComponent: `<div class="w-full h-128 bg-gold-100">L O A D I N G...</div>`
+    })
+  }
 })
-/** _backup
+/** _backup for computing selfQuestion above
 const selfQuestion = computed(() => {
   switch (props.question?.type) {
     case 'Likert':

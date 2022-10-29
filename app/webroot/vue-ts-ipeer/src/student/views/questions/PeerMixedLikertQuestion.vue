@@ -29,15 +29,15 @@ function calcGradeAndRoundUp(multiplier: string, loms_count: number, zero_mark: 
   return `(${grade} mark${grade > 1 ? 's' : ''})`
 }
 // checked: find(find(props.initialState?.data, { evaluatee: member.id }).details, { question_number: question.question_num}).selected_lom
-function getResponseDetails(member_id:string, question_num:string) {
-  if(props.initialState?.data || !isEmpty(props.initialState?.data)) {
-    const response = find(props.initialState?.data, { evaluatee: member_id })
+function getResponseDetails(member_id:string, question_num:string): string|number {
+  if(initialState.value?.data || !isEmpty(initialState.value?.data)) {
+    const response = find(initialState.value?.data, { evaluatee: member_id })
     if(response?.details) {
       const question = find(response.details, { question_number: question_num })
       return question?.selected_lom
     }
   }
-  return ''
+  return 0
 }
 // WATCH
 // LIFECYCLE
@@ -70,16 +70,22 @@ function getResponseDetails(member_id:string, question_num:string) {
       <tr v-for="(member, memberIdx) of members" :key="member.id">
         <CustomHiddenField
             :name="'data['+member.id+'][EvaluationMixeval]['+question.question_num+'][selected_lom]'"
-            :value="find(find(props.initialState?.data, { evaluatee: member.id }).details, { question_number: question.question_num}).selected_lom"
-        />
+            :value="getResponseDetails(member.id, question.question_num)" />
         <td><UserCard :member="member" /></td>
         <td style="text-align: center" v-for="lom of question.loms" :key="lom.id" :class="{'has-error': !!error}">
           <CustomRadioField
               :name="'data['+member.id+'][EvaluationMixeval]['+question.question_num+'][grade]'"
               :value="lom.scale_level"
-              :checked="getResponseDetails(member.id, question.question_num)"
-              @change="$emit('update:initialState', {member_id: member.id, question_num: question.question_num, event: {key: 'selected_lom', value: $event.target.value}})"
               :rules="question.required ? validateLikert : null"
+              :checked="getResponseDetails(member.id, question.question_num)"
+              @change="$emit('update:initialState', {
+                member_id: member.id,
+                question_num: question.question_num,
+                event: {
+                  key: 'selected_lom',
+                  value: $event.target.value
+                }
+              })"
           />
         </td>
       </tr>

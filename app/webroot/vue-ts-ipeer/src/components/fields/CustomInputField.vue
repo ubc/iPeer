@@ -36,21 +36,22 @@ const validationListeners = {
 </script>
 
 <template>
-  <label class="flex flex-col" :class="{ 'has-error': !!errorMessage, success: meta.valid }">
-    <span v-if="label">{{ label }}</span>
-    <input
-      class="form-text-input"
-      type="text"
-      :id="name"
-      :name="name"
-      :value="inputValue"
-      :disabled="props.disabled"
-      @change="$emit('update:event', $event)"
-      @input="handleChange"
-      @blur="handleBlur"
-      v-on="validationListeners"
-      v-bind="$attrs"
-    />
-    <ErrorMessage class="form-text text-muted" v-if="props.type !== 'radio'" :name="name" />
-  </label>
+  <div class="form-group my-2">
+    <label class="form-label" v-if="label">{{ label }}</label>
+    <div class="form-control">
+      <input class="form-input" :class="{ 'has-error': !!errorMessage, success: meta.valid }"
+        type="text"
+        :id="name"
+        :name="name"
+        :value="inputValue"
+        :disabled="props.disabled"
+        @change="$emit('update:event', $event)"
+        @input="handleChange"
+        @blur="handleBlur"
+        v-on="validationListeners"
+        v-bind="$attrs"
+      />
+      <ErrorMessage class="form-text text-muted" v-if="props.type !== 'radio'" :name="name" />
+    </div>
+  </div>
 </template>

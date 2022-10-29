@@ -106,7 +106,7 @@ function distributeDecimalRemainder() {
             :label="'A fair amount'"
             :name="`percent[${memberIdx}]`"
             :value="student_slider[memberIdx]"
-            :response="response?.data.points"
+            :response="response?.data?.points"
             :points="response?.data && response?.data?.points ? response?.data?.points[memberIdx] : ''"
             :placeholder="placeholder"
             :disabled="props.disabled"

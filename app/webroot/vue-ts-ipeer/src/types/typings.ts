@@ -80,15 +80,26 @@ export interface Evaluation {
   release_date_end: string
   result_release_date_begin: string
   result_release_date_end: string
+  //
   group: Group
   course: Course
-  penalty_final: Penalty
+  penalty: Penalty // rename to penalty
   members: Member[]
-  rubric_id: string
+  // New to all templates
   template: string
   group_event_id: string
   status: string | null
-  questions: object
+  // Simple
+  // Rubric
+  rubric_id: string
+  gen_com_req: string // general comment section
+  all_done: string
+  enrol?: string
+  self?: string
+  member_ids?: string
+  member_count?: string
+  // Mixed
+  //
   review?: MixedReview & SimpleReview & RubricReview & EvaluationReview
   response?: MixedResponse & SimpleResponse & RubricResponse
 }
@@ -271,6 +282,11 @@ export interface RubricResponseData {
   evaluatee: string
   comment: string
   score: string
+  comment_release: string
+  grade_release: string
+  grp_event_id: string
+  event_id: string
+  record_status: string
   details: RubricResponseDataDetail[]
 }
 export interface RubricResponseDataDetail {
@@ -330,6 +346,9 @@ export interface MixedResponseData {
   score: string
   comment_release: string
   grade_release: string
+  grp_event_id: string
+  event_id: string
+  record_status: string
   details: MixedResponseDataDetail[]
 }
 export interface MixedResponseDataDetail {

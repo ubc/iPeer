@@ -22,9 +22,9 @@ const question = toRef(props, 'question')
 const initialState = toRef(props, 'initialState')
 // COMPUTED
 // METHODS
-function getResponseDetails(member_id:string, question_num:string) {
-  if(props.initialState?.data || !isEmpty(props.initialState?.data)) {
-    const response = find(props.initialState?.data, { evaluatee: member_id })
+function getResponseDetails(member_id:string, question_num:string): string {
+  if(initialState.value?.data || !isEmpty(initialState.value?.data)) {
+    const response = find(initialState.value?.data, { evaluatee: member_id })
     if(response?.details) {
       const question = find(response.details, { question_number: question_num })
       return question?.question_comment
@@ -61,11 +61,19 @@ function getResponseDetails(member_id:string, question_num:string) {
       <tr v-for="member of members" :key="member.id">
         <td><UserCard :member="member" /></td>
         <td>
+          <!-- TODO:: fire the ['update:initialState'] every 300~500 ms -->
           <CustomTextField
-              :name="`data[${member.id}][EvaluationMixeval][${question.question_num}][question_comment]`"
-              :value="getResponseDetails(member.id, question.question_num)"
-              :rules="question.required ? validateParagraph : null"
-              @input="$emit('update:initialState', {member_id: member.id, question_num: question.question_num, event: {key: 'selected_lom', value: $event.target.value}})"
+            :name="`data[${member.id}][EvaluationMixeval][${question.question_num}][question_comment]`"
+            :value="getResponseDetails(member.id, question.question_num)"
+            :rules="question.required ? validateParagraph : null"
+            @input="$emit('update:initialState', {
+              member_id: member.id,
+              question_num: question.question_num,
+              event: {
+                key: 'question_comment',
+                value: $event.target.value
+              }
+            })"
           />
         </td>
       </tr>

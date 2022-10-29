@@ -1,19 +1,20 @@
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
 import { find } from 'lodash'
-import CustomTextField from '@/components/fields/CustomTextField.vue'
 import { validateParagraph } from '@/helpers/rules'
+import CustomTextField from '@/components/fields/CustomTextField.vue'
 import UserCard from '@/student/components/UserCard.vue'
-import type { EvaluationReviewResponse, User } from '@/types/typings'
-// REFERENCES
-const emit = defineEmits<{
-  // (e: 'update:modelValue', option: string): void
-}>()
-const props = defineProps<{
+import type { User, RubricResponse} from '@/types/typings'
+interface Props {
   index: string|number
   members: User[]
-  initialState: EvaluationReviewResponse
+  initialState: RubricResponse
+}
+// REFERENCES
+const emit = defineEmits<{
+  (e: 'update:initialState', option: object): void
 }>()
+const props = defineProps<Props>()
 // DATA
 const settings = reactive({
   question: {
@@ -25,9 +26,13 @@ const settings = reactive({
 // METHODS
 // WATCH
 // LIFECYCLE
-function getGeneralComment(target: string, memberId: string) {
-  if(props.initialState?.data) {
-    return find(props.initialState?.data, { evaluatee: memberId})[target]
+function getGeneralComment(target: string, key: string) {
+  const state = props.initialState
+  if(state) {
+    const detail = find(state?.data, { evaluatee: key})
+    if(detail) {
+      return detail[target]
+    }
   }
 }
 </script>
@@ -60,11 +65,18 @@ function getGeneralComment(target: string, memberId: string) {
         <td>
           <div class="flex flex-col">
             <CustomTextField
-                class="flex-1"
                 :name="`${member.id}gen_comment`"
                 :value="getGeneralComment('comment', member.id)"
                 :rules="validateParagraph"
-            /><!-- :rules="question.required ? validateParagraph : null" -->
+                @input="$emit('update:initialState', {
+                  member_id: member.id,
+                  criteria_num: '',
+                  event: {
+                    key: 'comment',
+                    value: $event.target.value
+                  }
+                })"
+            /><!-- TBD:: :rules="question.required ? validateParagraph : null" -->
           </div>
         </td>
       </tr>

@@ -1,26 +1,8 @@
-<script lang="ts" setup="">
-import { ref, reactive, watch, computed, onMounted } from 'vue';
-
+<script lang="ts" setup>
 import PageTitle from '@/components/PageTitle.vue'
-
-// REFERENCES
-const emit = defineEmits<{
-  // (e: 'updateModelValue', option: string): void
-}>()
 const props = defineProps<{
  page: object
 }>()
-
-// DATA
-
-// COMPUTED
-
-// METHODS
-
-// WATCH
-
-// LIFECYCLE
-
 </script>
 
 <template>

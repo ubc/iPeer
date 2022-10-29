@@ -48,8 +48,7 @@ class EvaluationRubricRequestComponent extends CakeObject
     }
     
     public function processResourceRequest($method, $eventId, $groupId, $studentId = null)
-    { // GET, POST, PUT, PATCH, and DELETE
-        //$this->pre_r($method);$this->pre_r($this->params); die();
+    {
         $event = $this->Event->getEventByIdGroupId($eventId, $groupId);
         switch ($method) {
             case 'GET':
@@ -59,6 +58,7 @@ class EvaluationRubricRequestComponent extends CakeObject
                 $this->set($event, $groupId, $studentId, $method);
                 break;
             case 'PUT': // Save Draft
+                //$this->pre_r($method);$this->pre_r($this->params); die();
                 $this->set($event, $groupId, $studentId, $method);
                 break;
             case 'PATCH': // maybe Auto Save

@@ -18,9 +18,14 @@ const props = defineProps<{
 // DATA
 // COMPUTED
 const peerQuestion = computed(() => {
-  return defineAsyncComponent(() => import('../../questions/PeerMixed'+ props.question?.type +'Question.vue'))
+  if(props.question?.type) {
+    return defineAsyncComponent({
+      loader: () => import(`../../questions/PeerMixed${props.question?.type}Question.vue`),
+      loadingComponent: `<div class="w-full h-128 bg-gold-100">L O A D I N G...</div>`
+    })
+  }
 })
-/** _backup for the computed peerQuestion above
+/** _backup for computing peerQuestion above
 const peerQuestion = computed(() => {
   switch (props.question?.type) {
     case 'Likert':
@@ -44,12 +49,12 @@ const peerQuestion = computed(() => {
 
 <template>
   <component
-      v-if="props.question"
-      :is="peerQuestion"
-      :question="props.question"
-      :evaluation="props.evaluation"
-      :members="props.members"
-      :initial-state="props.initialState"
-      @update:initialState="$emit('update:initialState', $event)"
+    v-if="props.question"
+    :is="peerQuestion"
+    :question="props.question"
+    :evaluation="props.evaluation"
+    :members="props.members"
+    :initial-state="props.initialState"
+    @update:initialState="$emit('update:initialState', $event)"
   />
 </template>

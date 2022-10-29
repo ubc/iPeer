@@ -107,11 +107,11 @@ const { value: confirm_password } = useField(
       </SectionSubtitle>
 
       <section class="mt-6 mb-4 md:space-y-5">
-        <CustomInputField type="text" name="data[User][username]" label="Username" v-model="username" :disabled="true" readonly="readonly" />
-        <CustomInputField type="text" name="data[User][first_name]" label="First name" v-model="first_name" />
-        <CustomInputField type="text" name="data[User][last_name]" label="Last name" v-model="last_name" />
-        <CustomInputField type="text" name="data[User][email]" label="Email" v-model="email" />
-        <CustomInputField type="text" name="data[User][student_no]" label="Student number" v-model="student_no" :disabled="true" readonly="readonly" />
+        <CustomInputField class="profile" type="text" name="data[User][username]" label="Username" v-model="username" :disabled="true" readonly="readonly" />
+        <CustomInputField class="profile" type="text" name="data[User][first_name]" label="First name" v-model="first_name" />
+        <CustomInputField class="profile" type="text" name="data[User][last_name]" label="Last name" v-model="last_name" />
+        <CustomInputField class="profile" type="text" name="data[User][email]" label="Email" v-model="email" />
+        <CustomInputField class="profile" type="text" name="data[User][student_no]" label="Student number" v-model="student_no" :disabled="true" readonly="readonly" />
       </section>
     </div>
 
@@ -122,9 +122,9 @@ const { value: confirm_password } = useField(
       </SectionSubtitle>
 
       <section class="mt-6 mb-4 md:space-y-5">
-        <CustomInputField type="password" name="data[User][old_password]" label="Old password" v-model="old_password" />
-        <CustomInputField type="password" name="data[User][temp_password]" label="New password" v-model="temp_password" />
-        <CustomInputField type="password" name="data[User][confirm_password]" label="Confirm new password" v-model="confirm_password" />
+        <CustomInputField class="profile" type="password" name="data[User][old_password]" label="Old password" v-model="old_password" />
+        <CustomInputField class="profile" type="password" name="data[User][temp_password]" label="New password" v-model="temp_password" />
+        <CustomInputField class="profile" type="password" name="data[User][confirm_password]" label="Confirm new password" v-model="confirm_password" />
       </section>
     </div>
 

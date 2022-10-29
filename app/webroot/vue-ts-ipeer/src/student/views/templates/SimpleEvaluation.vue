@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, unref, toRef, reactive, watch, computed, onMounted } from 'vue';
+import { ref, unref, toRef, reactive, watch, computed, onBeforeMount } from 'vue';
 import { useRoute, useRouter } from 'vue-router'
 import { isEmpty, map } from 'lodash'
 
@@ -9,7 +9,7 @@ import PeerSimpleRangeQuestion from '@/student/views/questions/PeerSimpleRangeQu
 import PeerSimpleCommentQuestion from '@/student/views/questions/PeerSimpleCommentQuestion.vue'
 import { CustomHiddenField } from '@/components/fields'
 
-import type { Evaluation, EvaluationReviewResponse, User } from '@/types/typings'
+import type { User, Evaluation, SimpleResponse } from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
   (e: 'fetch:evaluation'): void
@@ -34,9 +34,10 @@ let form              = reactive({
   evaluatee_count: computed(() => evaluation.value?.members?.length),
   member_ids: computed<string[]>(() => map(evaluation.value?.members, member => member.id))
 })
-const initialState    = computed<EvaluationReviewResponse | any>(() => {
-  if(evaluation.value?.review?.response && !isEmpty(evaluation.value?.review?.response)) {
-    return unref(evaluation.value?.review?.response)
+/**
+const initialState    = computed<SimpleResponse | any>(() => {
+  if(evaluation.value?.response && !isEmpty(evaluation.value?.response)) {
+    return unref(evaluation.value?.response)
   } else {
     return {
       submitter_id: evaluation.value?.id,
@@ -48,7 +49,22 @@ const initialState    = computed<EvaluationReviewResponse | any>(() => {
       }
     }
   }
-})
+})*/
+const initialState      = ref<SimpleResponse|any>({})
+function getInitialState() {
+  return {
+    id: '',
+    submitter_id: evaluation.value?.id,
+    submitted: null,
+    date_submitted: '',
+    data: {
+      points: [],
+      comments: []
+    }
+  }
+}
+function setInitialState() {}
+
 const questions = reactive({
   points: {
     title: '1. Please rate each peer\'s relative contribution.',
@@ -64,12 +80,19 @@ const isDisabled = computed(() => {
   if(route.path === 'submissions') {
     return true
   }
-  return false // will be determined by the evaluation settings
+  return false // TODO:: determined by the evaluation settings
   // return new Date().toLocaleDateString('en-CA', {}) >= new Date(props.evaluation?.due_date).toLocaleDateString('en-CA', {})
 })
 // METHODS
 // WATCH
 // LIFECYCLE
+onBeforeMount(() => {
+  if(evaluation.value?.response && !isEmpty(evaluation.value?.response)) {
+    initialState.value = Object.assign(getInitialState(), unref(evaluation.value?.response))
+  } else {
+    initialState.value = getInitialState()
+  }
+})
 </script>
 
 <template>
@@ -89,7 +112,6 @@ const isDisabled = computed(() => {
     </slot>
 
     <slot name="main">
-      <!---->
       <PeerSimpleRangeQuestion
           :members="evaluation?.members"
           :remaining="evaluation?.remaining"
@@ -99,7 +121,6 @@ const isDisabled = computed(() => {
           :description="questions.points.description"
           :disabled="isDisabled"
       />
-
       <PeerSimpleCommentQuestion
           :members="evaluation?.members"
           :initialState="initialState"

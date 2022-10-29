@@ -1,20 +1,25 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { find, map, filter } from 'lodash'
+import { validateParagraph } from '@/helpers/rules'
 import UserCard from '@/student/components/UserCard.vue'
 import CustomTextField from '@/components/fields/CustomTextField.vue'
-import { validateParagraph } from '@/helpers/rules'
-import type {EvaluationReviewResponse, RubricEvaluationReviewDataCriteria, User} from '@/types/typings'
+import type {
+  User,
+  RubricResponse,
+  RubricReviewDataCriteria,
+} from '@/types/typings'
+interface Props {
+  members: User[]
+  initialState: RubricResponse
+  rubric_criteria_idx: string|number
+  rubric_criteria: RubricReviewDataCriteria
+}
 // REFERENCES
 const emit = defineEmits<{
-  // (e: 'update:modelValue', option: string): void
+  (e: 'update:initialState', option: object): void
 }>()
-const props = defineProps<{
-  rubric_criteria_idx: string|number
-  members: User[]
-  initialState: EvaluationReviewResponse
-  rubric_criteria: RubricEvaluationReviewDataCriteria
-}>()
+const props = defineProps<Props>()
 // DATA
 // COMPUTED
 // METHODS
@@ -55,16 +60,23 @@ function getCriteriaDetail(target: string, key: string, value?: string) {
         <td style="width: 20%"><UserCard :member="member" /></td>
         <td style="width: 80%">
           <div class="flex flex-col">
-            <CustomTextField class="flex-1"
+            <CustomTextField
                 :id="`${member.id}comments[${rubric_criteria?.id}]`"
                 :name="`${member.id}comments[${props.rubric_criteria_idx}]`"
                 :value="getCriteriaDetail('criteria_comment', member.id, rubric_criteria?.criteria_num)['criteria_comment']"
                 :rules="validateParagraph"
-            /><!-- :rules="question.required ? validateParagraph : null" -->
+                @input="$emit('update:initialState', {
+                  member_id: member.id,
+                  criteria_num: rubric_criteria?.criteria_num,
+                  event: {
+                    key: 'criteria_comment',
+                    value: $event.target.value
+                  }
+                })"
+            /><!-- TBD:: :rules="question.required ? validateParagraph : null" -->
           </div>
         </td>
       </tr>
     </tbody>
   </table>
-
 </template>

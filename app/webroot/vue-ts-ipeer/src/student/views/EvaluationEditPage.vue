@@ -26,8 +26,7 @@ const evaluation  = toRef(props, 'evaluation')
 const template = computed(() => {
   if(evaluation.value?.template) {
     return defineAsyncComponent({
-      // loader: () => import(`@/student/component/templates/${evaluation.value?.template}.vue`),
-      loader: () => import('./templates/'+ evaluation.value?.template +'.vue'),
+      loader: () => import(`@/student/views/templates/${evaluation.value?.template}.vue`),
       loadingComponent: `<div class="w-full h-128 bg-gold-100">L O A D I N G...</div>`
     })
   }

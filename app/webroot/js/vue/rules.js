@@ -1,2 +1,2 @@
-import{c as r}from"./array.js";const a=r().required().min(2),t=r().required().min(10),n=r().required().min(20);function d(e){return e?!0:"This field is required"}function s(e){return e?!0:"This field is required"}export{d as a,a as b,t as c,n as d,s as v};
+import{c as e}from"./index2.js";const i=e().required().nullable(),t=e().required().min(10).nullable(),l=e().required().min(20).nullable();function n(a){return a?!0:"This field is required"}export{l as a,i as b,t as c,n as v};
 //# sourceMappingURL=rules.js.map

@@ -1,18 +1,17 @@
 <script lang="ts" setup>
-import {ref, unref, toRef, reactive, watchEffect, computed, onMounted, defineAsyncComponent, onBeforeMount} from 'vue';
+import {ref, unref, toRef, reactive, computed, onBeforeMount} from 'vue';
 import { useRoute, useRouter } from 'vue-router'
 import { isEmpty, map, find, filter, findIndex } from 'lodash'
-import { array, object, string, number } from 'yup'
 
+import EvaluationForm from '@/student/views/EvaluationForm.vue'
+import PeerQuestions from '@/student/views/templates/renderer/MixedEvaluationPeerQuestions.vue'
+import SelfQuestions from '@/student/views/templates/renderer/MixedEvaluationSelfQuestions.vue'
 import CustomHiddenField from "@/components/fields/CustomHiddenField.vue";
 import { IconThoughtBubble } from '@/components/icons'
 import TakeNote from '@/student/components/TakeNote.vue'
 import SectionSubtitle from '@/components/SectionSubtitle.vue'
-import EvaluationForm from '@/student/views/EvaluationForm.vue'
-import PeerQuestions from '@/student/views/templates/renderer/MixedEvaluationPeerQuestions.vue'
-import SelfQuestions from '@/student/views/templates/renderer/MixedEvaluationSelfQuestions.vue'
 
-import type { User, Evaluation, MixedReviewData, MixedResponse } from '@/types/typings'
+import type {User, Evaluation, MixedReviewData, MixedResponse, MixedResponseData, MixedResponseDataDetail} from '@/types/typings'
 
 // REFERENCES
 const emit = defineEmits<{
@@ -25,11 +24,10 @@ const props = defineProps<{
 }>()
 const route = useRoute()
 const router = useRouter()
-
 // DATA
-const members           = toRef(props, 'members')
-const evaluation        = toRef(props, 'evaluation')
 const evaluation_form   = ref(null)
+const members           = toRef<User[]|any>(props, 'members')
+const evaluation        = toRef<Evaluation|any>(props, 'evaluation')
 const form              = reactive({
   event_id: computed(() => evaluation.value?.id),
   group_id: computed(() => evaluation.value?.group?.id),
@@ -41,21 +39,25 @@ const form              = reactive({
   evaluatee_count: computed(() => evaluation.value?.members?.length),
   member_ids: computed<string[]>(() => map(evaluation.value?.members, member => member.id))
 })
-const initialState      = ref({})
+const initialState      = ref<MixedResponseData|any>({})
 // COMPUTED
 const peer_questions = computed(() => filter(evaluation.value?.review?.data, { self_eval: false }))
 const self_questions = computed(() => filter(evaluation.value?.review?.data, { self_eval: true }))
 // METHODS
 function getInitialState() {
-  return map(props.evaluation?.members, (member: User) => {
-    return {
-      evaluator: props.currentUser.id,
-      evaluatee: member.id,
-      score: '',
-      comment_release: '',
-      grade_release: '',
-      details: map(evaluation.value?.review?.data, (response: MixedReviewData) => {
-        if(response?.self_eval === false) {
+  return {
+    id: '',
+    submitter_id: evaluation.value?.id,
+    submitted: null,
+    date_submitted: '',
+    data: map(props.evaluation?.members, (member: User) => {
+      return {
+        evaluator: props.currentUser.id,
+        evaluatee: member.id,
+        score: '',
+        comment_release: '',
+        grade_release: '',
+        details: map(evaluation.value?.review?.data, (response: MixedResponseDataDetail) => {
           return {
             evaluation_mixeval_id: '',
             question_number: response?.question_num,
@@ -65,13 +67,35 @@ function getInitialState() {
             comment_release: '0',
             record_status: 'A',
           }
+        })??[]
+      }
+    })
+  }
+
+    /**
+  return map(props.evaluation?.members, (member: User) => {
+    return {
+      evaluator: props.currentUser.id,
+      evaluatee: member.id,
+      score: '',
+      comment_release: '',
+      grade_release: '',
+      details: map(evaluation.value?.review?.data, (response: MixedReviewData) => {
+        return {
+          evaluation_mixeval_id: '',
+          question_number: response?.question_num,
+          question_comment: null,
+          selected_lom: null,
+          grade: '',
+          comment_release: '0',
+          record_status: 'A',
         }
-      }).filter(x=>x)
+      })??[]
     }
-  })
+  })*/
 }
-/** Dynamically update question values based on keys */
 function setInitialState(data: {member_id: string, question_num: string, event: { key: string, value: string }}): void {
+  /** Dynamically update question state */
   const review = evaluation.value?.review
   const question = find(review?.data, { question_num: data.question_num })
   const response = !isEmpty(initialState.value) ? initialState.value?.data : {}
@@ -79,10 +103,12 @@ function setInitialState(data: {member_id: string, question_num: string, event: 
   const details = find(response, { evaluatee: data.member_id}).details
   const detail = find(details, { question_number: data.question_num })
 
-  const precision = Math.pow(10, 1)
-  const grade = parseInt(question?.multiplier) / (question?.loms.length - parseInt(review?.zero_mark)) * parseInt(data.event.value)
-
-  if(data.event.key === 'selected_lom') {
+  // TODO:: use spreader to mutate
+  // TODO:: in progress auto-save while editing
+  // console.log(JSON.stringify(detail, null, 2))
+  if(data?.event?.key === 'selected_lom') {
+    const precision = Math.pow(10, 1)
+    const grade = parseInt(question?.multiplier) / (question?.loms.length - parseInt(review?.zero_mark)) * parseInt(data.event.value)
     Object.assign(detail, {
       [data.event.key]: data.event.value,
       grade: Math.floor(grade * precision) / precision,
@@ -92,37 +118,26 @@ function setInitialState(data: {member_id: string, question_num: string, event: 
       [data.event.key]: data.event.value
     })
   } else return
-  // console.log(JSON.stringify(detail, null, 2))
-}
-function __setInitialState(event: {member_id: string, question_num: string, value: string}): void {
-  const review = evaluation.value?.review
-  const question = find(review?.data, { question_num: event.question_num })
-  const response = initialState.value?.data
-
-  const details = find(response, { evaluatee: event.member_id}).details
-  const detail = find(details, { question_number: event.question_num })
-
-  const precision = Math.pow(10, 1)
-  const grade = parseInt(question?.multiplier) / (question?.loms.length - parseInt(review?.zero_mark)) * parseInt(event.value)
-
-  Object.assign(detail, {
-    selected_lom: event.value,
-    grade: Math.floor(grade * precision) / precision,
-  })
-  console.log(JSON.stringify(detail, null, 2))
 }
 // WATCH
 // LIFECYCLE
 onBeforeMount(() => {
+  /** [If New response] Generate a response state based on review object shape */
+  /** NOTE:: If the self-eval gets enabled after the evaluation is already initiated the self-eval won't get added
+   * and will through an error exception for the current user NOT being updated (could a bug or feature) */
   if(evaluation.value?.response && !isEmpty(evaluation.value?.response)) {
-    initialState.value = unref(evaluation.value?.response)
+    initialState.value = Object.assign(getInitialState(), unref(evaluation.value?.response))
   } else {
+    initialState.value = getInitialState()
+
+    /** Experimental
     initialState.value = {
+      id: '',
       submitter_id: props.currentUser.id,
       submitted: null,
       date_submitted: '',
       data: getInitialState()
-    }
+    }*/
   }
 })
 </script>
@@ -150,11 +165,11 @@ onBeforeMount(() => {
         </template>
       </template>
       <template v-if="parseInt(evaluation?.self_eval) && parseInt(evaluation?.review?.self_eval) > 0">
-        <CustomHiddenField :name="`data[${form.user_id}][SelfEvaluation][evaluatee_id]`" :value="form.user_id" />
-        <CustomHiddenField :name="`data[${form.user_id}][SelfEvaluation][evaluator_id]`" :value="form.user_id" />
-        <CustomHiddenField :name="`data[${form.user_id}][SelfEvaluation][event_id]`" :value="form.event_id" />
-        <CustomHiddenField :name="`data[${form.user_id}][SelfEvaluation][group_event_id]`" :value="form.group_event_id" />
-        <CustomHiddenField :name="`data[${form.user_id}][SelfEvaluation][group_id]`" :value="form.group_id" />
+        <CustomHiddenField :name="`data[${form.user_id}][Self-Evaluation][evaluatee_id]`" :value="form.user_id" />
+        <CustomHiddenField :name="`data[${form.user_id}][Self-Evaluation][evaluator_id]`" :value="form.user_id" />
+        <CustomHiddenField :name="`data[${form.user_id}][Self-Evaluation][event_id]`" :value="form.event_id" />
+        <CustomHiddenField :name="`data[${form.user_id}][Self-Evaluation][group_event_id]`" :value="form.group_event_id" />
+        <CustomHiddenField :name="`data[${form.user_id}][Self-Evaluation][group_id]`" :value="form.group_id" />
       </template>
     </slot>
 

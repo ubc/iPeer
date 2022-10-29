@@ -27,8 +27,7 @@
       "_sweetalert.min.js",
       "_lodash.js",
       "_index.js",
-      "_CustomVeeField.js",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
+      "_autosize.esm.js",
       "_SectionTitle.js",
       "_SectionSubtitle.js",
       "__commonjsHelpers.js"
@@ -72,18 +71,8 @@
       "__commonjsHelpers.js"
     ]
   },
-  "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js": {
-    "file": "js/vue/InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
-    "css": [
-      "css/vue/InputText.css"
-    ]
-  },
-  "_CustomVeeField.js": {
-    "file": "js/vue/CustomVeeField.js",
-    "imports": [
-      "src/main.ts",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js"
-    ]
+  "_autosize.esm.js": {
+    "file": "js/vue/autosize.esm.js"
   },
   "src/pages/EvaluationIndex.vue": {
     "file": "js/vue/EvaluationIndex.js",
@@ -91,26 +80,16 @@
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_Debugger.js",
+      "_lodash.js",
       "_index.js",
       "_SectionTitle.js",
       "_SectionSubtitle.js",
       "_ViewHeading.js",
-      "_lodash.js",
       "__commonjsHelpers.js"
     ],
     "dynamicImports": [
       "src/student/views/EvaluationMakePage.vue",
       "src/student/views/EvaluationEditPage.vue"
-    ]
-  },
-  "_Debugger.js": {
-    "file": "js/vue/Debugger.js",
-    "imports": [
-      "src/main.ts"
-    ],
-    "css": [
-      "css/vue/Debugger.css"
     ]
   },
   "_ViewHeading.js": {
@@ -199,27 +178,26 @@
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_array.js",
+      "_index2.js",
       "_sweetalert.min.js",
       "_SectionTitle.js",
       "_SectionSubtitle.js",
-      "_InputText.js",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
+      "_autosize.esm.js",
+      "_CustomInputField.js",
       "_IconSpinner.js",
       "__commonjsHelpers.js"
     ]
   },
-  "_array.js": {
-    "file": "js/vue/array.js",
+  "_index2.js": {
+    "file": "js/vue/index2.js",
     "imports": [
       "__commonjsHelpers.js"
     ]
   },
-  "_InputText.js": {
-    "file": "js/vue/InputText.js",
+  "_CustomInputField.js": {
+    "file": "js/vue/CustomInputField.js",
     "imports": [
-      "src/main.ts",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js"
+      "src/main.ts"
     ]
   },
   "src/pages/NotFound.vue": {
@@ -267,31 +245,32 @@
     "imports": [
       "src/main.ts",
       "_lodash.js",
-      "_array.js",
-      "_SectionSubtitle.js",
       "_EvaluationForm.js",
+      "_TakeNote.js",
+      "_SectionSubtitle.js",
       "__commonjsHelpers.js",
-      "_sweetalert.min.js",
-      "_Debugger.js"
+      "_sweetalert.min.js"
     ],
     "dynamicImports": [
-      "src/student/views/questions/PeerMixedLikertQuestion.vue",
-      "src/student/views/questions/PeerMixedRangeQuestion.vue",
       "src/student/views/questions/PeerMixedCommentQuestion.vue",
-      "src/student/views/questions/PeerMixedSentenceQuestion.vue",
+      "src/student/views/questions/PeerMixedLikertQuestion.vue",
       "src/student/views/questions/PeerMixedParagraphQuestion.vue",
+      "src/student/views/questions/PeerMixedRangeQuestion.vue",
+      "src/student/views/questions/PeerMixedSentenceQuestion.vue",
       "src/student/views/questions/SelfMixedLikertQuestion.vue",
-      "src/student/views/questions/SelfMixedSentenceQuestion.vue",
-      "src/student/views/questions/SelfMixedParagraphQuestion.vue"
+      "src/student/views/questions/SelfMixedParagraphQuestion.vue",
+      "src/student/views/questions/SelfMixedSentenceQuestion.vue"
     ]
   },
   "_EvaluationForm.js": {
     "file": "js/vue/EvaluationForm.js",
     "imports": [
       "src/main.ts",
-      "_sweetalert.min.js",
       "_lodash.js",
-      "_Debugger.js"
+      "_sweetalert.min.js"
+    ],
+    "css": [
+      "css/vue/EvaluationForm.css"
     ]
   },
   "src/student/views/templates/RubricEvaluation.vue": {
@@ -300,23 +279,28 @@
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_sweetalert.min.js",
       "_lodash.js",
+      "_autosize.esm.js",
       "_EvaluationForm.js",
       "_rules.js",
+      "_CustomRadioField.js",
       "_UserCard.js",
-      "_InputText.js",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
-      "_TextArea.js",
+      "_CustomTextField.js",
       "__commonjsHelpers.js",
-      "_Debugger.js",
-      "_array.js"
+      "_sweetalert.min.js",
+      "_index2.js"
     ]
   },
   "_rules.js": {
     "file": "js/vue/rules.js",
     "imports": [
-      "_array.js"
+      "_index2.js"
+    ]
+  },
+  "_CustomRadioField.js": {
+    "file": "js/vue/CustomRadioField.js",
+    "imports": [
+      "src/main.ts"
     ]
   },
   "_UserCard.js": {
@@ -325,11 +309,11 @@
       "src/main.ts"
     ]
   },
-  "_TextArea.js": {
-    "file": "js/vue/TextArea.js",
+  "_CustomTextField.js": {
+    "file": "js/vue/CustomTextField.js",
     "imports": [
       "src/main.ts",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js"
+      "_autosize.esm.js"
     ]
   },
   "src/student/views/templates/SimpleEvaluation.vue": {
@@ -341,14 +325,20 @@
       "_lodash.js",
       "_EvaluationForm.js",
       "_UserCard.js",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
+      "_autosize.esm.js",
       "_rules.js",
-      "_TextArea.js",
-      "_InputText.js",
+      "_CustomTextField.js",
       "__commonjsHelpers.js",
       "_sweetalert.min.js",
-      "_Debugger.js",
-      "_array.js"
+      "_index2.js"
+    ]
+  },
+  "src/student/views/questions/PeerMixedCommentQuestion.vue": {
+    "file": "js/vue/PeerMixedCommentQuestion.js",
+    "src": "src/student/views/questions/PeerMixedCommentQuestion.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.ts"
     ]
   },
   "src/student/views/questions/PeerMixedLikertQuestion.vue": {
@@ -357,26 +347,34 @@
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
+      "_lodash.js",
       "_rules.js",
-      "_CustomVeeField.js",
       "_UserCard.js",
-      "_InputText.js",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
-      "_array.js",
-      "__commonjsHelpers.js"
+      "_EvaluationForm.js",
+      "_CustomRadioField.js",
+      "__commonjsHelpers.js",
+      "_index2.js",
+      "_sweetalert.min.js"
+    ]
+  },
+  "src/student/views/questions/PeerMixedParagraphQuestion.vue": {
+    "file": "js/vue/PeerMixedParagraphQuestion.js",
+    "src": "src/student/views/questions/PeerMixedParagraphQuestion.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.ts",
+      "_lodash.js",
+      "_rules.js",
+      "_CustomTextField.js",
+      "_UserCard.js",
+      "__commonjsHelpers.js",
+      "_index2.js",
+      "_autosize.esm.js"
     ]
   },
   "src/student/views/questions/PeerMixedRangeQuestion.vue": {
     "file": "js/vue/PeerMixedRangeQuestion.js",
     "src": "src/student/views/questions/PeerMixedRangeQuestion.vue",
-    "isDynamicEntry": true,
-    "imports": [
-      "src/main.ts"
-    ]
-  },
-  "src/student/views/questions/PeerMixedCommentQuestion.vue": {
-    "file": "js/vue/PeerMixedCommentQuestion.js",
-    "src": "src/student/views/questions/PeerMixedCommentQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts"
@@ -388,26 +386,12 @@
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
+      "_lodash.js",
       "_rules.js",
-      "_CustomVeeField.js",
+      "_CustomInputField.js",
       "_UserCard.js",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
-      "_array.js",
-      "__commonjsHelpers.js"
-    ]
-  },
-  "src/student/views/questions/PeerMixedParagraphQuestion.vue": {
-    "file": "js/vue/PeerMixedParagraphQuestion.js",
-    "src": "src/student/views/questions/PeerMixedParagraphQuestion.vue",
-    "isDynamicEntry": true,
-    "imports": [
-      "src/main.ts",
-      "_rules.js",
-      "_CustomVeeField.js",
-      "_UserCard.js",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
-      "_array.js",
-      "__commonjsHelpers.js"
+      "__commonjsHelpers.js",
+      "_index2.js"
     ]
   },
   "src/student/views/questions/SelfMixedLikertQuestion.vue": {
@@ -417,9 +401,26 @@
     "imports": [
       "src/main.ts",
       "_rules.js",
-      "_CustomVeeField.js",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
-      "_array.js",
+      "_autosize.esm.js",
+      "_CustomRadioField.js",
+      "_EvaluationForm.js",
+      "_lodash.js",
+      "_index2.js",
+      "__commonjsHelpers.js",
+      "_sweetalert.min.js"
+    ]
+  },
+  "src/student/views/questions/SelfMixedParagraphQuestion.vue": {
+    "file": "js/vue/SelfMixedParagraphQuestion.js",
+    "src": "src/student/views/questions/SelfMixedParagraphQuestion.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.ts",
+      "_rules.js",
+      "_CustomTextField.js",
+      "_autosize.esm.js",
+      "_lodash.js",
+      "_index2.js",
       "__commonjsHelpers.js"
     ]
   },
@@ -430,32 +431,16 @@
     "imports": [
       "src/main.ts",
       "_rules.js",
-      "_CustomVeeField.js",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
-      "_array.js",
+      "_autosize.esm.js",
+      "_CustomInputField.js",
+      "_lodash.js",
+      "_index2.js",
       "__commonjsHelpers.js"
     ]
   },
-  "src/student/views/questions/SelfMixedParagraphQuestion.vue": {
-    "file": "js/vue/SelfMixedParagraphQuestion.js",
-    "src": "src/student/views/questions/SelfMixedParagraphQuestion.vue",
-    "isDynamicEntry": true,
-    "imports": [
-      "src/main.ts",
-      "_rules.js",
-      "_CustomVeeField.js",
-      "_InputText.vue_vue_type_style_index_0_scoped_360a2797_lang.js",
-      "_array.js",
-      "__commonjsHelpers.js"
-    ]
-  },
-  "Debugger.css": {
-    "file": "css/vue/Debugger.css",
-    "src": "Debugger.css"
-  },
-  "InputText.css": {
-    "file": "css/vue/InputText.css",
-    "src": "InputText.css"
+  "EvaluationForm.css": {
+    "file": "css/vue/EvaluationForm.css",
+    "src": "EvaluationForm.css"
   },
   "src/main.css": {
     "file": "css/vue/main.css",
