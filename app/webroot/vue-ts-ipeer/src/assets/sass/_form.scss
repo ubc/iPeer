@@ -252,16 +252,15 @@
 }
 
 
-.has-error {
 
-  input,
-  textarea {
+
+input.has-error,
+textarea.has-error {
+  @apply text-red-500;
+  @apply bg-red-50;
+
+  &:focus,
+  &.help-message {
     @apply text-red-500;
-    @apply bg-red-50;
-
-    &:focus,
-    &.help-message {
-      @apply text-red-500;
-    }
   }
 }

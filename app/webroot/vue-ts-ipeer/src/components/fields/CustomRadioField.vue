@@ -20,11 +20,10 @@ const value = toRef(props, 'value');
 // COMPUTED
 const { checked, handleChange, errorMessage, handleBlur, meta } = useField(name, props.rules, {
   type: 'radio',
-  initialValue: value,
-  checkedValue: props.checked,
+  checkedValue: props.value,
   uncheckedValue: null,
   validateOnValueUpdate: true
-})//
+})
 const validationListeners = {
   blur: handleChange,
   change: handleChange,
