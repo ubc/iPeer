@@ -39,10 +39,7 @@ const { value: inputValue, errorMessage, handleBlur, handleChange, meta } = useF
   validateOnValueUpdate: true
 });
 // DATA
-const needle = computed<number>(() => {
-  // return calc(95% - inputValue.value+'px')
-  return inputValue.value
-})
+const needle = computed<number|string>(() => Number(inputValue.value)) // return calc(0% + inputValue.value+'px')
 const validationListeners = {
   blur: handleChange,
   change: handleChange,

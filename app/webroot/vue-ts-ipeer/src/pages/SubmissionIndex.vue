@@ -10,7 +10,9 @@ import { IconTwoUsers } from '@/components/icons'
 import type { IUser, IEvaluation } from '@/types/typings'
 // REFERENCES
 const emit              = defineEmits<{}>()
-const props             = defineProps<{}>()
+const props             = defineProps<{
+  currentUser: IUser
+}>()
 const route             = useRoute()
 // DATA
 const event_id          = ref(route.params.event_id)
@@ -58,13 +60,14 @@ onMounted(async () => {
           :icon="{src: IconTwoUsers, size: '6rem'}"
       />
     </PageTitle>
+
     <Suspense>
       <router-view
           class="tab-pane fade show active"
           id="response"
           role="tabpanel"
           aria-labelledby="response-tab"
-          :currentUser="currentUser"
+          :current-user="currentUser"
           :members="members"
           :evaluation="evaluation"
           :reviews="reviews"

@@ -48,6 +48,7 @@ function getInitialState() {
     }
   }
 }
+// points: [map(props.evaluation?.members, (member) => props.evaluation?.simple?.point_per_member)],
 function setInitialState() {}
 const questions = reactive({
   points: {

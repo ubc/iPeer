@@ -114,8 +114,8 @@ watch(() => cloneDeep(props.initialState), debounce(async (current, previous) =>
   <div v-if="debug">
     <Debugger title="Form Values/Errors" :state="values" :form="errors" />
     <Debugger title="InitialState" :state="props.initialState" />
-    <Debugger title="Evaluation" :state="evaluation" />
-    <Debugger title="Review" :state="evaluation?.evaluation" />
-    <Debugger title="Response" :state="evaluation?.response" />
+    <Debugger title="Evaluation" :state="props.evaluation" />
+    <Debugger title="Simple/Rubric/Mixed" :state="props.evaluation?.simple || props.evaluation?.rubric || props.evaluation?.mixed" />
+    <Debugger title="Response" :state="props.evaluation?.response" />
   </div>
 </template>

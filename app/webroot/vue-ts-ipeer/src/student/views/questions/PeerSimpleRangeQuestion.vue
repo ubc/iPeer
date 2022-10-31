@@ -102,7 +102,7 @@ function distributeDecimalRemainder() {
               :text="['Less', 'More']"
               :label="'A fair amount'"
               :name="`percent[${memberIdx}]`"
-              :value="student_slider[memberIdx]"
+              :value="response?.data?.points[memberIdx]"
               :response="response?.data?.points"
               :points="response?.data && response?.data?.points ? response?.data?.points[memberIdx] : ''"
               :placeholder="placeholder"
@@ -112,6 +112,10 @@ function distributeDecimalRemainder() {
               :showScore="showScore"
               @update:input="updateStudentSlider({target:name, key:memberIdx, value: $event.target.value})"
           />
+          <!--
+          :max="props.remaining"
+          :value="student_slider[memberIdx]"
+          -->
           <div v-if="showScore" class="text-sm text-red-400">{{ response?.data && response?.data?.points ? response?.data?.points[memberIdx] : '' }}</div>
         </td>
       </tr>

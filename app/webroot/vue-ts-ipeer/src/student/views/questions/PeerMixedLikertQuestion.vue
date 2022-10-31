@@ -34,7 +34,7 @@ function getResponseDetails(member_id:string, question_num:string): string|numbe
     const response = find(initialState.value?.data, { evaluatee: member_id })
     if(response?.details) {
       const question = find(response.details, { question_number: question_num })
-      return question?.selected_lom
+      return question ? question?.selected_lom : ''
     }
   }
   return 0
@@ -67,28 +67,35 @@ function getResponseDetails(member_id:string, question_num:string): string|numbe
       </tr>
       </thead>
       <tbody>
-      <tr v-for="(member, memberIdx) of members" :key="member.id">
-        <CustomHiddenField
-            :name="'data['+member.id+'][EvaluationMixeval]['+question.question_num+'][selected_lom]'"
-            :value="getResponseDetails(member.id, question.question_num)" />
-        <td><UserCard :member="member" /></td>
-        <td style="text-align: center" v-for="lom of question.loms" :key="lom.id" :class="{'has-error': !!error}">
-          <CustomRadioField
-              :name="'data['+member.id+'][EvaluationMixeval]['+question.question_num+'][grade]'"
-              :value="lom.scale_level"
-              :rules="question.required ? validateLikert : null"
-              :checked="getResponseDetails(member.id, question.question_num)"
-              @change="$emit('update:initialState', {
-                member_id: member.id,
-                question_num: question.question_num,
-                event: {
-                  key: 'selected_lom',
-                  value: $event.target.value
-                }
-              })"
-          />
-        </td>
-      </tr>
+      <template v-if="new Date(props.evaluation?.due_date) >= new Date()">
+        <tr>
+          <td :colspan="question?.loms?.length+1"><div class="text-sm text-center text-slate-500 py-2">Not Available.</div></td>
+        </tr>
+      </template>
+      <template v-else>
+        <tr v-for="(member, memberIdx) of members" :key="member.id">
+          <CustomHiddenField
+              :name="'data['+member.id+'][EvaluationMixeval]['+question.question_num+'][selected_lom]'"
+              :value="getResponseDetails(member.id, question.question_num)" />
+          <td><UserCard :member="member" /></td>
+          <td style="text-align: center" v-for="lom of question.loms" :key="lom.id" :class="{'has-error': !!error}">
+            <CustomRadioField
+                :name="'data['+member.id+'][EvaluationMixeval]['+question.question_num+'][grade]'"
+                :value="lom.scale_level"
+                :rules="question.required ? validateLikert : null"
+                :checked="getResponseDetails(member.id, question.question_num)"
+                @change="$emit('update:initialState', {
+                  member_id: member.id,
+                  question_num: question.question_num,
+                  event: {
+                    key: 'selected_lom',
+                    value: $event.target.value
+                  }
+                })"
+            />
+          </td>
+        </tr>
+      </template>
       </tbody>
     </table>
   </div>

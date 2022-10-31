@@ -5,9 +5,10 @@ import SectionTitle from '@/components/SectionTitle.vue'
 import SectionSubtitle from '@/components/SectionSubtitle.vue'
 import { IconNewspaper } from '@/components/icons'
 
-import type { IEvaluation } from '@/types/typings'
+import type {IEvaluation, IUser} from '@/types/typings'
 interface Props {
   evaluation: IEvaluation
+  currentUser: IUser
   disabled?: boolean
 }
 // REFERENCES
@@ -43,7 +44,7 @@ const template = computed(() => {
       :is="template"
       :members="props.members"
       :evaluation="props.evaluation"
-      :currentUser="props.currentUser"
+      :current-user="props.currentUser"
       :disabled="props.disabled"
       @fetch:evaluation="$emit('fetch:evaluation')"
   ></component>

@@ -65,7 +65,7 @@ const isDisabled = computed(() => {
           :is="template"
           :members="props.members"
           :evaluation="props.evaluation"
-          :currentUser="props.currentUser"
+          :current-user="props.currentUser"
           :disabled="isDisabled"
           @fetch:evaluation="$emit('fetch:evaluation')"
       ></component>

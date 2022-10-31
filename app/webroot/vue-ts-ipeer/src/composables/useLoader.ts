@@ -16,10 +16,3 @@ import { ref, reactive } from 'vue'
 //     setLoading
 //   }
 // }
-
-
-
-
-// @john not sure about the iPeer Import User from Canvas functionality. Can you confirm if
-//   "Existing students in the iPeer course will be removed and a fresh roster is imported from Canvas"
-//   will affect the current evaluation?

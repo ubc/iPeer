@@ -1,2 +1,2 @@
-import{d as e,o as s,c as t,_ as o}from"./main.js";const n={class:""},i=e({__name:"PeerMixedRangeQuestion",emits:["update:modelValue"],setup(r,{emit:a}){return(c,_)=>(s(),t("div",n,"PeerMixedRangeQuestion"))}}),u=o(i,[["__file","/Users/josephkh/Workspace/iPeer/app/webroot/vue-ts-ipeer/src/student/views/questions/PeerMixedRangeQuestion.vue"]]);export{u as default};
+import{d as e,o as t,c as o}from"./main.js";const n={class:""},_=e({__name:"PeerMixedRangeQuestion",emits:["update:modelValue"],setup(s,{emit:a}){return(c,i)=>(t(),o("div",n,"PeerMixedRangeQuestion"))}});export{_ as default};
 //# sourceMappingURL=PeerMixedRangeQuestion.js.map

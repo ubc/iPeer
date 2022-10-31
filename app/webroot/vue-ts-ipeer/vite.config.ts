@@ -20,9 +20,9 @@ export default defineConfig(({ command, mode }) => {
           main: './src/main.ts'
         },
         output: {
-          entryFileNames: 'js/vue/[name].js', // default '[name].[hash].js',
-          chunkFileNames: 'js/vue/[name].js', // default '[name].[hash].js',
-          assetFileNames: 'css/vue/[name].[ext]', // default '[name].[hash].[ext]'
+          entryFileNames: 'js/vue/[name].js',         // 'js/vue/[name].[hash].js',
+          chunkFileNames: 'js/vue/[name].js',         // 'js/vue/[name].[hash].js',
+          assetFileNames: 'css/vue/[name].[ext]'      // 'js/vue/[name].[hash].[ext]'
         }
       }
     },
@@ -33,8 +33,8 @@ export default defineConfig(({ command, mode }) => {
       }
     },
     server: {
-      // host: true,
-      host: env.APP_ENV,
+      host: true,
+      // host: env.APP_ENV,
     },
   }
 })

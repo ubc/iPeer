@@ -1,2 +1,2 @@
-import{d as o,G as t,c as s,p as n,F as r,a,o as c,_}from"./main.js";const p=a("h1",null,"NotFound",-1),u=o({__name:"NotFound",setup(d){return(l,i)=>{const e=t("router-view");return c(),s(r,null,[p,n(e)],64)}}}),f=_(u,[["__file","/Users/josephkh/Workspace/iPeer/app/webroot/vue-ts-ipeer/src/pages/NotFound.vue"]]);export{f as default};
+import{d as o,c as t,p as n,F as a,a as r,o as s,H as c}from"./main.js";const _=r("h1",null,"NotFound",-1),d=o({__name:"NotFound",setup(p){return(u,l)=>{const e=c("router-view");return s(),t(a,null,[_,n(e)],64)}}});export{d as default};
 //# sourceMappingURL=NotFound.js.map

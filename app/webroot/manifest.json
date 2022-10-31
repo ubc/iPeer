@@ -24,23 +24,16 @@
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_sweetalert.min.js",
       "_lodash.js",
       "_index.js",
       "_autosize.esm.js",
-      "_SectionTitle.js",
-      "_SectionSubtitle.js",
+      "_SectionTitle.vue_vue_type_script_setup_true_lang.js",
+      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
       "__commonjsHelpers.js"
     ],
     "dynamicImports": [
       "src/student/components/tables/current/Row.vue",
       "src/student/components/tables/completed/Row.vue"
-    ]
-  },
-  "_sweetalert.min.js": {
-    "file": "js/vue/sweetalert.min.js",
-    "imports": [
-      "__commonjsHelpers.js"
     ]
   },
   "_index.js": {
@@ -50,26 +43,26 @@
       "_lodash.js"
     ]
   },
-  "_SectionTitle.js": {
-    "file": "js/vue/SectionTitle.js",
+  "_SectionTitle.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/vue/SectionTitle.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts"
     ]
   },
-  "_SectionSubtitle.js": {
-    "file": "js/vue/SectionSubtitle.js",
+  "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/vue/SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts"
     ]
-  },
-  "__commonjsHelpers.js": {
-    "file": "js/vue/_commonjsHelpers.js"
   },
   "_lodash.js": {
     "file": "js/vue/lodash.js",
     "imports": [
       "__commonjsHelpers.js"
     ]
+  },
+  "__commonjsHelpers.js": {
+    "file": "js/vue/_commonjsHelpers.js"
   },
   "_autosize.esm.js": {
     "file": "js/vue/autosize.esm.js"
@@ -82,9 +75,10 @@
       "src/main.ts",
       "_lodash.js",
       "_index.js",
-      "_SectionTitle.js",
-      "_SectionSubtitle.js",
-      "_ViewHeading.js",
+      "_SectionTitle.vue_vue_type_script_setup_true_lang.js",
+      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
+      "_ViewHeading.vue_vue_type_script_setup_true_lang.js",
+      "_IconWritingHand.js",
       "__commonjsHelpers.js"
     ],
     "dynamicImports": [
@@ -92,11 +86,17 @@
       "src/student/views/EvaluationEditPage.vue"
     ]
   },
-  "_ViewHeading.js": {
-    "file": "js/vue/ViewHeading.js",
+  "_ViewHeading.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/vue/ViewHeading.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts",
       "_index.js"
+    ]
+  },
+  "_IconWritingHand.js": {
+    "file": "js/vue/IconWritingHand.js",
+    "imports": [
+      "src/main.ts"
     ]
   },
   "src/student/views/EvaluationMakePage.vue": {
@@ -105,9 +105,10 @@
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_TakeNote.js",
+      "_dynamic-import-helper.js",
       "_IconSpinner.js",
-      "_SectionSubtitle.js"
+      "_TakeNote.vue_vue_type_script_setup_true_lang.js",
+      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js"
     ],
     "dynamicImports": [
       "src/student/views/templates/MixedEvaluation.vue",
@@ -115,16 +116,19 @@
       "src/student/views/templates/SimpleEvaluation.vue"
     ]
   },
-  "_TakeNote.js": {
-    "file": "js/vue/TakeNote.js",
-    "imports": [
-      "src/main.ts",
-      "_SectionSubtitle.js"
-    ]
+  "_dynamic-import-helper.js": {
+    "file": "js/vue/dynamic-import-helper.js"
   },
   "_IconSpinner.js": {
     "file": "js/vue/IconSpinner.js",
     "imports": [
+      "src/main.ts"
+    ]
+  },
+  "_TakeNote.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/vue/TakeNote.vue_vue_type_script_setup_true_lang.js",
+    "imports": [
+      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
       "src/main.ts"
     ]
   },
@@ -134,9 +138,10 @@
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_TakeNote.js",
+      "_dynamic-import-helper.js",
       "_IconSpinner.js",
-      "_SectionSubtitle.js"
+      "_TakeNote.vue_vue_type_script_setup_true_lang.js",
+      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js"
     ],
     "dynamicImports": [
       "src/student/views/templates/MixedEvaluation.vue",
@@ -151,7 +156,7 @@
     "imports": [
       "src/main.ts",
       "_index.js",
-      "_ViewHeading.js",
+      "_ViewHeading.vue_vue_type_script_setup_true_lang.js",
       "_lodash.js",
       "__commonjsHelpers.js"
     ]
@@ -161,7 +166,12 @@
     "src": "src/student/views/SubmissionViewPage.vue",
     "isDynamicEntry": true,
     "imports": [
-      "src/main.ts"
+      "src/main.ts",
+      "_dynamic-import-helper.js"
+    ],
+    "dynamicImports": [
+      "src/student/views/SubmissionResponse.vue",
+      "src/student/views/SubmissionReviews.vue"
     ]
   },
   "src/pages/UsersIndex.vue": {
@@ -180,10 +190,10 @@
       "src/main.ts",
       "_index2.js",
       "_sweetalert.min.js",
-      "_SectionTitle.js",
-      "_SectionSubtitle.js",
+      "_SectionTitle.vue_vue_type_script_setup_true_lang.js",
+      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
       "_autosize.esm.js",
-      "_CustomInputField.js",
+      "_CustomInputField.vue_vue_type_script_setup_true_lang.js",
       "_IconSpinner.js",
       "__commonjsHelpers.js"
     ]
@@ -194,8 +204,14 @@
       "__commonjsHelpers.js"
     ]
   },
-  "_CustomInputField.js": {
-    "file": "js/vue/CustomInputField.js",
+  "_sweetalert.min.js": {
+    "file": "js/vue/sweetalert.min.js",
+    "imports": [
+      "__commonjsHelpers.js"
+    ]
+  },
+  "_CustomInputField.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/vue/CustomInputField.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts"
     ]
@@ -213,9 +229,9 @@
     "src": "src/student/components/tables/current/Row.vue",
     "isDynamicEntry": true,
     "imports": [
-      "src/main.ts",
       "_index.js",
       "_IconClock.js",
+      "src/main.ts",
       "_lodash.js",
       "__commonjsHelpers.js"
     ]
@@ -231,9 +247,9 @@
     "src": "src/student/components/tables/completed/Row.vue",
     "isDynamicEntry": true,
     "imports": [
-      "src/main.ts",
       "_index.js",
       "_IconClock.js",
+      "src/main.ts",
       "_lodash.js",
       "__commonjsHelpers.js"
     ]
@@ -245,9 +261,9 @@
     "imports": [
       "src/main.ts",
       "_lodash.js",
-      "_EvaluationForm.js",
-      "_TakeNote.js",
-      "_SectionSubtitle.js",
+      "_EvaluationForm.vue_vue_type_script_setup_true_lang.js",
+      "_dynamic-import-helper.js",
+      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
       "__commonjsHelpers.js",
       "_sweetalert.min.js"
     ],
@@ -262,8 +278,8 @@
       "src/student/views/questions/SelfMixedSentenceQuestion.vue"
     ]
   },
-  "_EvaluationForm.js": {
-    "file": "js/vue/EvaluationForm.js",
+  "_EvaluationForm.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/vue/EvaluationForm.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts",
       "_lodash.js",
@@ -281,11 +297,11 @@
       "src/main.ts",
       "_lodash.js",
       "_autosize.esm.js",
-      "_EvaluationForm.js",
+      "_EvaluationForm.vue_vue_type_script_setup_true_lang.js",
       "_rules.js",
-      "_CustomRadioField.js",
-      "_UserCard.js",
-      "_CustomTextField.js",
+      "_CustomRadioField.vue_vue_type_script_setup_true_lang.js",
+      "_UserCard.vue_vue_type_script_setup_true_lang.js",
+      "_CustomTextField.vue_vue_type_script_setup_true_lang.js",
       "__commonjsHelpers.js",
       "_sweetalert.min.js",
       "_index2.js"
@@ -297,20 +313,20 @@
       "_index2.js"
     ]
   },
-  "_CustomRadioField.js": {
-    "file": "js/vue/CustomRadioField.js",
+  "_CustomRadioField.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/vue/CustomRadioField.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts"
     ]
   },
-  "_UserCard.js": {
-    "file": "js/vue/UserCard.js",
+  "_UserCard.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/vue/UserCard.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts"
     ]
   },
-  "_CustomTextField.js": {
-    "file": "js/vue/CustomTextField.js",
+  "_CustomTextField.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/vue/CustomTextField.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts",
       "_autosize.esm.js"
@@ -323,14 +339,41 @@
     "imports": [
       "src/main.ts",
       "_lodash.js",
-      "_EvaluationForm.js",
-      "_UserCard.js",
+      "_EvaluationForm.vue_vue_type_script_setup_true_lang.js",
+      "_UserCard.vue_vue_type_script_setup_true_lang.js",
       "_autosize.esm.js",
       "_rules.js",
-      "_CustomTextField.js",
+      "_CustomTextField.vue_vue_type_script_setup_true_lang.js",
       "__commonjsHelpers.js",
       "_sweetalert.min.js",
       "_index2.js"
+    ]
+  },
+  "src/student/views/SubmissionResponse.vue": {
+    "file": "js/vue/SubmissionResponse.js",
+    "src": "src/student/views/SubmissionResponse.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "src/main.ts",
+      "_dynamic-import-helper.js",
+      "_SectionTitle.vue_vue_type_script_setup_true_lang.js",
+      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
+      "_IconWritingHand.js"
+    ],
+    "dynamicImports": [
+      "src/student/views/templates/MixedEvaluation.vue",
+      "src/student/views/templates/RubricEvaluation.vue",
+      "src/student/views/templates/SimpleEvaluation.vue"
+    ]
+  },
+  "src/student/views/SubmissionReviews.vue": {
+    "file": "js/vue/SubmissionReviews.js",
+    "src": "src/student/views/SubmissionReviews.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_SectionTitle.vue_vue_type_script_setup_true_lang.js",
+      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
+      "src/main.ts"
     ]
   },
   "src/student/views/questions/PeerMixedCommentQuestion.vue": {
@@ -346,12 +389,12 @@
     "src": "src/student/views/questions/PeerMixedLikertQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
-      "src/main.ts",
       "_lodash.js",
       "_rules.js",
-      "_UserCard.js",
-      "_EvaluationForm.js",
-      "_CustomRadioField.js",
+      "_UserCard.vue_vue_type_script_setup_true_lang.js",
+      "_EvaluationForm.vue_vue_type_script_setup_true_lang.js",
+      "_CustomRadioField.vue_vue_type_script_setup_true_lang.js",
+      "src/main.ts",
       "__commonjsHelpers.js",
       "_index2.js",
       "_sweetalert.min.js"
@@ -362,11 +405,11 @@
     "src": "src/student/views/questions/PeerMixedParagraphQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
-      "src/main.ts",
       "_lodash.js",
       "_rules.js",
-      "_CustomTextField.js",
-      "_UserCard.js",
+      "_CustomTextField.vue_vue_type_script_setup_true_lang.js",
+      "_UserCard.vue_vue_type_script_setup_true_lang.js",
+      "src/main.ts",
       "__commonjsHelpers.js",
       "_index2.js",
       "_autosize.esm.js"
@@ -385,11 +428,11 @@
     "src": "src/student/views/questions/PeerMixedSentenceQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
-      "src/main.ts",
       "_lodash.js",
       "_rules.js",
-      "_CustomInputField.js",
-      "_UserCard.js",
+      "_CustomInputField.vue_vue_type_script_setup_true_lang.js",
+      "_UserCard.vue_vue_type_script_setup_true_lang.js",
+      "src/main.ts",
       "__commonjsHelpers.js",
       "_index2.js"
     ]
@@ -399,12 +442,12 @@
     "src": "src/student/views/questions/SelfMixedLikertQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
-      "src/main.ts",
       "_rules.js",
       "_autosize.esm.js",
-      "_CustomRadioField.js",
-      "_EvaluationForm.js",
+      "_CustomRadioField.vue_vue_type_script_setup_true_lang.js",
+      "_EvaluationForm.vue_vue_type_script_setup_true_lang.js",
       "_lodash.js",
+      "src/main.ts",
       "_index2.js",
       "__commonjsHelpers.js",
       "_sweetalert.min.js"
@@ -415,11 +458,11 @@
     "src": "src/student/views/questions/SelfMixedParagraphQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
-      "src/main.ts",
       "_rules.js",
-      "_CustomTextField.js",
+      "_CustomTextField.vue_vue_type_script_setup_true_lang.js",
       "_autosize.esm.js",
       "_lodash.js",
+      "src/main.ts",
       "_index2.js",
       "__commonjsHelpers.js"
     ]
@@ -429,11 +472,11 @@
     "src": "src/student/views/questions/SelfMixedSentenceQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
-      "src/main.ts",
       "_rules.js",
       "_autosize.esm.js",
-      "_CustomInputField.js",
+      "_CustomInputField.vue_vue_type_script_setup_true_lang.js",
       "_lodash.js",
+      "src/main.ts",
       "_index2.js",
       "__commonjsHelpers.js"
     ]

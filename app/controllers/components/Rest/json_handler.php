@@ -161,6 +161,10 @@ class JsonHandlerComponent extends CakeObject
             'self_eval' => $data['event']['Event']['self_eval'],
             'com_req' => $data['event']['Event']['com_req'],
             'due_date' => $data['event']['Event']['due_date'],
+            'release_date_begin' => $data['event']['Event']['release_date_begin'],
+            'release_date_end' => $data['event']['Event']['release_date_end'],
+            'result_release_date_begin' => $data['event']['Event']['result_release_date_begin'],
+            'result_release_date_end' => $data['event']['Event']['result_release_date_end'],
             'group_event_id' => $data['event']['GroupEvent']['id'],
             'group' => [
                 'id' => $data['event']['Group']['id'],
