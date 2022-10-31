@@ -7,10 +7,10 @@ import useFetch from '@/composables/useFetch'
 import swal from 'sweetalert'
 import Debugger from "@/components/Debugger.vue";
 
-import type {Evaluation, MixedResponse, RubricResponse, SimpleResponse} from '@/types/typings'
+import type {IEvaluation, IMixedResponse, IRubricResponse, ISimpleResponse} from '@/types/typings'
 interface Props {
-  evaluation: Evaluation
-  initialState: SimpleResponse | RubricResponse | MixedResponse
+  evaluation: IEvaluation
+  initialState: ISimpleResponse | IRubricResponse | IMixedResponse
 }
 // REFERENCES
 const emit = defineEmits<{
@@ -59,6 +59,8 @@ const onSubmit = handleSubmit(async () => {
 }, onInvalidateSubmit)
 
 async function onSave() {
+  console.log({'event_id': props.evaluation?.id})
+  console.log({'group_id': props.evaluation?.group?.id})
   try {
     const formData = new FormData(evaluation_form.value)
     formData.append('_method', 'PUT')
@@ -113,7 +115,7 @@ watch(() => cloneDeep(props.initialState), debounce(async (current, previous) =>
     <Debugger title="Form Values/Errors" :state="values" :form="errors" />
     <Debugger title="InitialState" :state="props.initialState" />
     <Debugger title="Evaluation" :state="evaluation" />
-    <Debugger title="Review" :state="evaluation?.review" />
+    <Debugger title="Review" :state="evaluation?.evaluation" />
     <Debugger title="Response" :state="evaluation?.response" />
   </div>
 </template>

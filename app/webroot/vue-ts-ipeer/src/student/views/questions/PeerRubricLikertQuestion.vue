@@ -1,21 +1,17 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { isEmpty, find, map, filter } from 'lodash'
+import { find, filter } from 'lodash'
 import { validateRadio } from '@/helpers/rules'
 import CustomRadioField from '@/components/fields/CustomRadioField.vue'
 import CustomHiddenField from '@/components/fields/CustomHiddenField.vue'
 import UserCard from '@/student/components/UserCard.vue'
-import type {
-  User,
-  RubricResponse,
-  RubricReviewDataLom,
-  RubricReviewDataCriteria,
-} from '@/types/typings'
+import type { IUser, IRubricResponse, IRubricEvaluationDataLom, IRubricEvaluationDataCriteria } from '@/types/typings'
 interface Props {
-  members: User[]
-  initialState: RubricResponse
-  rubric_criteria: RubricReviewDataCriteria
-  rubrics_lom: RubricReviewDataLom[]
+  members: IUser[]
+  initialState: IRubricResponse
+  rubric_criteria: IRubricEvaluationDataCriteria
+  rubrics_lom: IRubricEvaluationDataLom[]
+  disabled?: boolean
 }
 // REFERENCES
 const emit = defineEmits<{
@@ -40,10 +36,14 @@ function getCriteriaDetail(target: string, key: string, value?: string) {
   return ''
 }
 function handleSelectedLomClick(event: {target: string, key: string, value: string}) {
-  const form = document.forms[0];
-  const name = `selected_lom_${event.key}_${event.target}`
-  const selectElement: HTMLFormElement | any = form.querySelector(`input[name=${name}]`)
-  selectElement.setAttribute('value', event.value)
+  // TODO:: Refactor the following to NOT have an event lister in the outer div
+  // TEMP
+  if(!props.disabled) {
+    const form = document.forms[0];
+    const name = `selected_lom_${event.key}_${event.target}`
+    const selectElement: HTMLFormElement|any = form.querySelector(`input[name=${name}]`)
+    selectElement.setAttribute('value', event.value)
+  }
 }
 // WATCH
 // LIFECYCLE
@@ -59,7 +59,7 @@ function handleSelectedLomClick(event: {target: string, key: string, value: stri
           <div v-if="parseInt(props.rubric_criteria?.show_marks)" class="text-sm font-thin">({{ props.rubric_criteria?.multiplier }} marks)</div>
         </div>
       </th>
-      <th :style="'width: '+ 80/props.rubrics_lom.length +'%'"
+      <th :style="'width: '+ 80/props.rubrics_lom?.length +'%'"
           v-for="(criteria_lom, criteria_lomIdx) of props.rubrics_lom" :key="criteria_lom.id">
         <div class="text-center leading-4">
           <div class="font-normal">{{ criteria_lom.lom_comment }}</div>
@@ -70,7 +70,7 @@ function handleSelectedLomClick(event: {target: string, key: string, value: stri
     </thead>
     <tbody>
     <template v-for="(member, member_idx) of props.members" :key="member.id">
-    <CustomHiddenField
+    <CustomHiddenField v-if="!disabled"
         :name="`selected_lom_${member.id}_${rubric_criteria?.id}`"
         :value="getCriteriaDetail('criteria_num', member.id, rubric_criteria?.criteria_num)?.selected_lom??''" />
     <tr>
@@ -84,6 +84,7 @@ function handleSelectedLomClick(event: {target: string, key: string, value: stri
           :value="rubric_lom.lom_num"
           :rules="validateRadio"
           :checked="getCriteriaDetail('criteria_num', member.id, rubric_criteria?.criteria_num)?.selected_lom"
+          :disabled="props.disabled"
           @click="handleSelectedLomClick({target: rubric_criteria?.id, key: member.id, value: $event.target.value})"
           @input="$emit('update:initialState', {
             member_id: member.id,

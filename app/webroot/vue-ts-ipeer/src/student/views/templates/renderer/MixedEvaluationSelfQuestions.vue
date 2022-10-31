@@ -1,17 +1,17 @@
 <script lang="ts" setup>
 import { ref, reactive, watch, computed, onMounted, watchEffect, defineAsyncComponent } from 'vue'
 
-import type {Evaluation, MixedResponse, MixedReviewData, User} from '@/types/typings'
+import type { IUser, IEvaluation, IMixedResponse, IMixedEvaluationData } from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
   (e: 'update:initialState', option: object): void
   (e: 'update:modelValue', option: string): void
 }>()
 const props = defineProps<{
-  currentUser: User,
-  evaluation: Evaluation,
-  question: MixedReviewData,
-  initialState: MixedResponse
+  currentUser: IUser,
+  evaluation: IEvaluation,
+  question: IMixedEvaluationData,
+  initialState: IMixedResponse
 }>()
 
 // DATA

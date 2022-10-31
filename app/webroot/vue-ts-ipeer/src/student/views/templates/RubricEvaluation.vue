@@ -10,22 +10,34 @@ import PeerRubricLikertQuestion from '@/student/views/questions/PeerRubricLikert
 import PeerRubricCommentQuestion from '@/student/views/questions/PeerRubricCommentQuestion.vue'
 import PeerRubricGeneralCommentQuestion from '@/student/views/questions/PeerRubricGeneralCommentQuestion.vue'
 
-import type { User, Evaluation, RubricResponse, RubricResponseData, RubricResponseDataDetail } from '@/types/typings'
+import type {
+  IUser,
+  IEvaluation,
+  IRubricEvaluation,
+  IRubricEvaluationData,
+  IRubricEvaluationDataLom,
+  IRubricEvaluationDataCriteria,
+  IRubricResponse,
+  IRubricResponseData,
+  IRubricResponseDataDetail,
+} from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
   (e: 'fetch:evaluation'): void
 }>()
 const props = defineProps<{
-  members: User[]
-  currentUser: User
-  evaluation: Evaluation
+  members: IUser[]
+  currentUser: IUser
+  evaluation: IEvaluation
+  disabled?: boolean
 }>()
 const route = useRoute()
 const router = useRouter()
 // DATA
+const disabled = ref(route.name === 'submission.view' ? true : false)
 const evaluation_form   = ref(null)
-const members           = toRef<User[]|any>(props, 'members')
-const evaluation        = toRef<Evaluation|any>(props, 'evaluation')
+const members           = toRef(props, 'members')
+const evaluation        = toRef(props, 'evaluation')
 /** TBD:: not sure if I want to have the form populating the hidden input fields values !! */
 let form                = reactive({
   event_id: computed(() => evaluation.value?.id),
@@ -37,45 +49,27 @@ let form                = reactive({
   evaluatee_count: computed(() => evaluation.value?.members?.length),
   member_ids: computed<string[]>(() => map(evaluation.value?.members, member => member.id))
 })
-const initialState      = ref<RubricResponse|any>({})
+const initialState      = ref<IRubricResponse|any>({})
 function getInitialState() {
   return {
     id: '',
-    submitter_id: props.currentUser.id,
+    submitter_id: props.currentUser?.id,
     submitted: null,
     date_submitted: '',
-    data: map(props.evaluation?.members, (member: User) => {
-      return {
-        evaluator: props.currentUser.id,
-        evaluatee: member.id,
+    data: map(props.evaluation?.members, (member: IUser) => ({
+        evaluator: props.currentUser?.id,
+        evaluatee: member?.id,
         comment: '',
         score: '',
-        details: map(evaluation.value?.review?.data?.rubrics_criteria, (criteria: RubricResponseDataDetail) => {
-          return {
-            criteria_number: criteria.criteria_num,
-            criteria_comment: '',
-            selected_lom: ''
-          }
-        })
-      }
-    })
-  }
-  /**
-  return map(props.evaluation?.members, (member, memberIdx) => {
-    return {
-      evaluator: props.currentUser.id,
-      evaluatee: member.id,
-      comment: '',
-      score: '',
-      details: map(evaluation.value?.review?.data?.rubrics_criteria, (criteria, criteriaIdx) => {
-        return {
-          criteria_number: criteria.criteria_num,
+        // details: map(evaluation.value?.rubric?.data, (criteria) => { // HINT
+        details: map(evaluation.value?.rubric?.data?.rubrics_criteria, (criteria) => ({
+          criteria_number: criteria?.criteria_num,
           criteria_comment: '',
           selected_lom: ''
-        }
+        }))
       })
-    }
-  })*/
+    )
+  }
 }
 function setInitialState(data: {member_id: string, criteria_num: string, event: { key: string, value: string }}): void {
   /** Dynamically update question */
@@ -98,20 +92,12 @@ function setInitialState(data: {member_id: string, criteria_num: string, event: 
 // METHODS
 // WATCH
 // LIFECYCLE
-onBeforeMount(() => {
-  /** [If New response] Generate a response state based on review object shape */
+onBeforeMount( () => {
+  const currentState = getInitialState()
   if(evaluation.value?.response && !isEmpty(evaluation.value.response)) {
-    initialState.value = Object.assign(getInitialState(), unref(evaluation.value?.response))
+    initialState.value = Object.assign(currentState, unref(evaluation.value?.response))
   } else {
-    initialState.value = getInitialState()
-    /** Experimental
-    initialState.value = {
-      id: '',
-      submitter_id: props.currentUser.id,
-      submitted: null,
-      date_submitted: '',
-      data: getInitialState()
-    }*/
+    initialState.value = currentState
   }
 })
 </script>
@@ -136,7 +122,7 @@ onBeforeMount(() => {
 
     <slot name="main">
       <div class="datatable"
-           v-for="(rubric_criteria, criteriaIdx) of props.evaluation?.review?.data?.rubrics_criteria" :key="rubric_criteria.id">
+           v-for="(rubric_criteria, criteriaIdx) of props.evaluation?.rubric?.data?.rubrics_criteria" :key="rubric_criteria.id">
         <div v-if="rubric_criteria.criteria" class="question">{{ rubric_criteria.id }}. {{ rubric_criteria.criteria }}</div>
         <div class="description text-sm text-slate-700 mx-4 mb-2"></div>
 
@@ -144,7 +130,8 @@ onBeforeMount(() => {
             :members="props.evaluation?.members"
             :initial-state="initialState"
             :rubric_criteria="rubric_criteria"
-            :rubrics_lom="props.evaluation?.review?.data?.rubrics_lom"
+            :rubrics_lom="props.evaluation?.rubric?.data?.rubrics_lom"
+            :disabled="props.disabled"
             @update:initialState="setInitialState"
         />
 
@@ -154,15 +141,17 @@ onBeforeMount(() => {
             :initial-state="initialState"
             :rubric_criteria_idx="criteriaIdx"
             :rubric_criteria="rubric_criteria"
+            :disabled="props.disabled"
             @update:initialState="setInitialState"
         />
       </div>
 
       <PeerRubricGeneralCommentQuestion
-          :index="props.evaluation?.review?.data?.rubrics_criteria?.length+1"
+          :index="props.evaluation?.rubric?.data?.rubrics_criteria?.length+1"
           :members="props.evaluation?.members"
           :initial-state="initialState"
           :rubric_criteria_idx="criteriaIdx"
+          :disabled="props.disabled"
           @update:initialState="setInitialState"
       />
     </slot>

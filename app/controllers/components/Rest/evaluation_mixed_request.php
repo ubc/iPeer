@@ -195,9 +195,10 @@ class EvaluationMixedRequestComponent extends CakeObject
         $this->JsonHandler->formatMixedEvaluation($dataToJson);
     }
     
-    private function set(array $event, string $groupId, $studentId = null, string $method)
+    private function set(array $event, string $groupId, $studentId=null, string $method)
     {
         if(!isset($this->params['data'])) return;
+        $eventId = $event['Event']['id'];
         
         $data = $this->params['data'];
         unset($this->params['data']);
@@ -206,7 +207,7 @@ class EvaluationMixedRequestComponent extends CakeObject
         $evaluator = empty($studentId) ? $data['data']['submitter_id'] : $studentId;
         $required = true;
         $failures = array();
-    
+        
         // check peer evaluation questions
         if ($mixeval['Mixeval']['peer_question'] > 0) {
             foreach ($data as $userId => $eval) {
@@ -225,7 +226,9 @@ class EvaluationMixedRequestComponent extends CakeObject
                 }*/
                 if (!$this->Evaluation->saveMixevalEvaluation($eval)) {
                     $failures[] = $userId;
+                    exit; // NOTE
                 }
+                
                 $evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee($groupEventId, $evaluator, $evaluatee);
                 $evaluation = !empty($evalMixeval['EvaluationMixevalDetail']) ? $evalMixeval['EvaluationMixevalDetail'] : null;
                 $details = Set::combine($evaluation, '{n}.question_number', '{n}');
@@ -234,6 +237,42 @@ class EvaluationMixedRequestComponent extends CakeObject
                         $required = false;
                     }
                 }
+                /** NOTE:: New */
+                $this->processEvaluationSubmission($eventId, $groupEventId, $evaluator, $method);
+                /**
+                $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
+                if($method === 'POST') {
+                    if (empty($evaluationSubmission)) {
+                        $this->EvaluationSubmission->id = null;
+                        $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
+                        $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
+                        $evaluationSubmission['EvaluationSubmission']['submitter_id'] = empty($studentId) ? $evaluator : $studentId;
+                        $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
+                        $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
+                        if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
+                            $this->RestResponseHandler->toJson('Error: Unable to submit the evaluation. Please try again.', 404);
+                        }
+                    } else {
+                        $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
+                        if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
+                            $this->RestResponseHandler->toJson('Error: Unable to submit the evaluation. Please try again.', 404);
+                        }
+                    }
+                }
+                elseif($method === 'PUT' || $method === 'PATCH') {
+                    if (empty($evaluationSubmission)) {
+                        $this->EvaluationSubmission->id = null;
+                        $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
+                        $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
+                        $evaluationSubmission['EvaluationSubmission']['submitter_id'] = empty($studentId) ? $evaluator : $studentId;
+                        $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
+                        $evaluationSubmission['EvaluationSubmission']['submitted'] = 0;
+                        if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
+                            $this->RestResponseHandler->toJson('Error: Unable to submit the evaluation. Please try again.', 404);
+                        }
+                    }
+                }
+                */
             }
         }
         // check self evaluation questions
@@ -245,7 +284,9 @@ class EvaluationMixedRequestComponent extends CakeObject
             $data[$evaluatee]['Evaluation'] = $data[$evaluatee]['Self-Evaluation'];
             if (!$this->Evaluation->saveMixevalEvaluation($data[$evaluatee])) {
                 $failures[] = $evaluatee;
+                exit; // NOTE
             }
+            
             $evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee(
                 $groupEventId, $evaluator, $evaluatee);
             $evaluation = !empty($evalMixeval['EvaluationMixevalDetail']) ? $evalMixeval['EvaluationMixevalDetail'] : null;
@@ -255,10 +296,14 @@ class EvaluationMixedRequestComponent extends CakeObject
                     $required = false;
                 }
             }
+    
+            // NOTE:: New
+            $this->processEvaluationSubmission($eventId, $groupEventId, $evaluator, $method);
         }
         // success
         if (empty($failures)) {
             if ($required) {
+                /** ORG
                 $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
                 if (empty($evaluationSubmission)) {
                     $this->EvaluationSubmission->id = null;
@@ -271,6 +316,9 @@ class EvaluationMixedRequestComponent extends CakeObject
                         $this->RestResponseHandler->toJson('Error: Unable to submit the evaluation. Please try again.', 404);
                     }
                 }
+                */
+                // NOTE:: New
+                $this->processEvaluationSubmission($eventId, $groupEventId, $evaluator, $method);
                 CaliperHooks::submit_mixeval($eventId, $evaluator, $groupEventId, $groupId);
             
                 //checks if all members in the group have submitted the number of
@@ -302,6 +350,47 @@ class EvaluationMixedRequestComponent extends CakeObject
             $failures = join(' and ', array_filter(array_merge(array(join(
                 ', ', array_slice($failures, 0, -1))), array_slice($failures, -1))));
             $this->RestResponseHandler->toJson('It was unsuccessful to save evaluation(s) for '.$failures, 404);
+        }
+    }
+    
+    
+    /**
+     * processEvaluationSubmission
+     */
+    private function processEvaluationSubmission(string $eventId, string $groupEventId, string $evaluator, string $method): void
+    {
+        $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
+    
+        if($method === 'POST') {
+            if (empty($evaluationSubmission)) {
+                $this->EvaluationSubmission->id = null;
+                $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
+                $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
+                $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
+                $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
+                $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
+                if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
+                    $this->RestResponseHandler->toJson('Error: Unable to submit the evaluation. Please try again.', 404);
+                }
+            } else {
+                $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
+                if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
+                    $this->RestResponseHandler->toJson('Error: Unable to submit the evaluation. Please try again.', 404);
+                }
+            }
+        }
+        elseif($method === 'PUT' || $method === 'PATCH') {
+            if (empty($evaluationSubmission)) {
+                $this->EvaluationSubmission->id = null;
+                $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
+                $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
+                $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
+                $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
+                $evaluationSubmission['EvaluationSubmission']['submitted'] = 0;
+                if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
+                    $this->RestResponseHandler->toJson('Error: Unable to submit the evaluation. Please try again.', 404);
+                }
+            }
         }
     }
 }

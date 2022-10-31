@@ -5,16 +5,16 @@ import { validateLikert } from '@/helpers/rules'
 import UserCard from '@/student/components/UserCard.vue'
 import CustomHiddenField from '@/components/fields/CustomHiddenField.vue'
 import CustomRadioField from '@/components/fields/CustomRadioField.vue'
-import type { Evaluation, MixedResponse, MixedReviewData, User } from '@/types/typings'
+import type { IUser, IEvaluation, IMixedResponse, IMixedReviewData } from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
   (e: 'update:initialState', value: object): void
 }>()
 const props = defineProps<{
-  members: User[],
-  evaluation: Evaluation
-  question: MixedReviewData,
-  initialState: MixedResponse,
+  members: IUser[],
+  evaluation: IEvaluation
+  question: IMixedReviewData,
+  initialState: IMixedResponse,
 }>()
 // DATA
 const members = toRef(props, 'members')
@@ -60,7 +60,7 @@ function getResponseDetails(member_id:string, question_num:string): string|numbe
           <div class="text-center leading-4">
             <div class="font-normal">{{ lom.descriptor }}</div>
             <div class="text-sm font-thin" v-if="parseInt(props.question?.show_marks)">
-              {{ calcGradeAndRoundUp(question?.multiplier, question?.loms.length, evaluation?.review?.zero_mark, lom?.scale_level) }}
+              {{ calcGradeAndRoundUp(question?.multiplier, question?.loms.length, evaluation?.mixed?.zero_mark, lom?.scale_level) }}
             </div>
           </div>
         </th>

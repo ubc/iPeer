@@ -1,21 +1,25 @@
 <script lang="ts" setup>
-import { ref, reactive } from 'vue';
+import {ref, reactive} from 'vue'
+import { useRoute } from 'vue-router'
 import { find } from 'lodash'
 import { validateParagraph } from '@/helpers/rules'
 import CustomTextField from '@/components/fields/CustomTextField.vue'
 import UserCard from '@/student/components/UserCard.vue'
-import type { User, RubricResponse} from '@/types/typings'
+import type { IUser, IRubricResponse} from '@/types/typings'
 interface Props {
   index: string|number
-  members: User[]
-  initialState: RubricResponse
+  members: IUser[]
+  initialState: IRubricResponse
+  disabled?: boolean
 }
 // REFERENCES
 const emit = defineEmits<{
   (e: 'update:initialState', option: object): void
 }>()
 const props = defineProps<Props>()
+const route = useRoute()
 // DATA
+const disabled = ref(route.name === 'submission.view' ? true : false)
 const settings = reactive({
   question: {
     title: 'Please provide overall comments about each peer.',
@@ -63,21 +67,20 @@ function getGeneralComment(target: string, key: string) {
       <tr v-for="(member, memberIdx) of props.members" :key="member.id">
         <td><UserCard :member="member" /></td>
         <td>
-          <div class="flex flex-col">
-            <CustomTextField
-                :name="`${member.id}gen_comment`"
-                :value="getGeneralComment('comment', member.id)"
-                :rules="validateParagraph"
-                @input="$emit('update:initialState', {
-                  member_id: member.id,
-                  criteria_num: '',
-                  event: {
-                    key: 'comment',
-                    value: $event.target.value
-                  }
-                })"
-            /><!-- TBD:: :rules="question.required ? validateParagraph : null" -->
-          </div>
+          <CustomTextField
+              :name="`${member.id}gen_comment`"
+              :value="getGeneralComment('comment', member.id)"
+              :rules="validateParagraph"
+              :disabled="props.disabled"
+              @input="$emit('update:initialState', {
+                member_id: member.id,
+                criteria_num: '',
+                event: {
+                  key: 'comment',
+                  value: $event.target.value
+                }
+              })"
+          /><!-- TBD:: :rules="question.required ? validateParagraph : null" -->
         </td>
       </tr>
       </tbody>

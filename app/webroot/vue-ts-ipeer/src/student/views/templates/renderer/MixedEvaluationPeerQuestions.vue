@@ -1,18 +1,18 @@
 <script lang="ts" setup>
 import { computed, defineAsyncComponent } from 'vue'
 
-import type {Evaluation, MixedResponse, MixedReviewData, User} from '@/types/typings'
+import type { IUser, IEvaluation, IMixedResponse, IMixedEvaluationData } from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
   (e: 'update:initialState', option: object): void
   (e: 'update:modelValue', option: string): void
 }>()
 const props = defineProps<{
-  members: User[],
-  currentUser: User,
-  evaluation: Evaluation,
-  question: MixedReviewData,
-  initialState: MixedResponse
+  members: IUser[],
+  currentUser: IUser,
+  evaluation: IEvaluation,
+  question: IMixedEvaluationData,
+  initialState: IMixedResponse
 }>()
 
 // DATA

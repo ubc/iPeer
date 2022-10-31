@@ -1,25 +1,24 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { find, map, filter } from 'lodash'
 import { validateParagraph } from '@/helpers/rules'
 import UserCard from '@/student/components/UserCard.vue'
 import CustomTextField from '@/components/fields/CustomTextField.vue'
-import type {
-  User,
-  RubricResponse,
-  RubricReviewDataCriteria,
-} from '@/types/typings'
+import type { IUser, IRubricResponse, IRubricEvaluationDataCriteria } from '@/types/typings'
 interface Props {
-  members: User[]
-  initialState: RubricResponse
+  members: IUser[]
+  initialState: IRubricResponse
   rubric_criteria_idx: string|number
-  rubric_criteria: RubricReviewDataCriteria
+  rubric_criteria: IRubricEvaluationDataCriteria
+  disabled?: boolean
 }
 // REFERENCES
 const emit = defineEmits<{
   (e: 'update:initialState', option: object): void
 }>()
 const props = defineProps<Props>()
+const route = useRoute()
 // DATA
 // COMPUTED
 // METHODS
@@ -65,6 +64,7 @@ function getCriteriaDetail(target: string, key: string, value?: string) {
                 :name="`${member.id}comments[${props.rubric_criteria_idx}]`"
                 :value="getCriteriaDetail('criteria_comment', member.id, rubric_criteria?.criteria_num)['criteria_comment']"
                 :rules="validateParagraph"
+                :disabled="props.disabled"
                 @input="$emit('update:initialState', {
                   member_id: member.id,
                   criteria_num: rubric_criteria?.criteria_num,

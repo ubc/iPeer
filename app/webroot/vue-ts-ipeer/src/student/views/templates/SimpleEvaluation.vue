@@ -9,22 +9,23 @@ import PeerSimpleRangeQuestion from '@/student/views/questions/PeerSimpleRangeQu
 import PeerSimpleCommentQuestion from '@/student/views/questions/PeerSimpleCommentQuestion.vue'
 import { CustomHiddenField } from '@/components/fields'
 
-import type { User, Evaluation, SimpleResponse } from '@/types/typings'
+import type { IUser, IEvaluation, ISimpleEvaluation, ISimpleEvaluationData, ISimpleResponse, ISimpleResponseData } from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
   (e: 'fetch:evaluation'): void
 }>()
 const props = defineProps<{
-  members: User[]
-  currentUser: User
-  evaluation: Evaluation
+  members: IUser[]
+  currentUser: IUser
+  evaluation: IEvaluation
+  disabled: boolean
 }>()
 const route = useRoute()
 const router = useRouter()
 // DATA
 const evaluation_form = ref()
 const evaluation      = toRef(props, 'evaluation')
-let form              = reactive({
+const form              = reactive({
   event_id: computed(() => evaluation.value?.id),
   group_id: computed(() => evaluation.value?.group?.id),
   course_id: computed(() => evaluation.value?.course?.id),
@@ -34,27 +35,11 @@ let form              = reactive({
   evaluatee_count: computed(() => evaluation.value?.members?.length),
   member_ids: computed<string[]>(() => map(evaluation.value?.members, member => member.id))
 })
-/**
-const initialState    = computed<SimpleResponse | any>(() => {
-  if(evaluation.value?.response && !isEmpty(evaluation.value?.response)) {
-    return unref(evaluation.value?.response)
-  } else {
-    return {
-      submitter_id: evaluation.value?.id,
-      submitted: null,
-      date_submitted: '',
-      data: {
-        points: [],
-        comments: []
-      }
-    }
-  }
-})*/
-const initialState      = ref<SimpleResponse|any>({})
+const initialState      = ref<ISimpleResponse|any>({})
 function getInitialState() {
   return {
     id: '',
-    submitter_id: evaluation.value?.id,
+    submitter_id: props.currentUser?.id,
     submitted: null,
     date_submitted: '',
     data: {
@@ -64,33 +49,33 @@ function getInitialState() {
   }
 }
 function setInitialState() {}
-
 const questions = reactive({
   points: {
     title: '1. Please rate each peer\'s relative contribution.',
-    description: 'Section description'
+    description: ''
   },
   comments: {
     title: '2. Please provide overall comments about each peer.',
-    description: 'Section description'
+    description: ''
   }
 })
 // COMPUTED
-const isDisabled = computed(() => {
-  if(route.path === 'submissions') {
-    return true
-  }
-  return false // TODO:: determined by the evaluation settings
-  // return new Date().toLocaleDateString('en-CA', {}) >= new Date(props.evaluation?.due_date).toLocaleDateString('en-CA', {})
-})
+// const isDisabled = computed(() => {
+//   if(route.path === 'submissions') {
+//     return true
+//   }
+//   return false // TODO:: determined by the evaluation settings
+//   // return new Date().toLocaleDateString('en-CA', {}) >= new Date(props.evaluation?.due_date).toLocaleDateString('en-CA', {})
+// })
 // METHODS
 // WATCH
 // LIFECYCLE
 onBeforeMount(() => {
+  const currentState = getInitialState()
   if(evaluation.value?.response && !isEmpty(evaluation.value?.response)) {
-    initialState.value = Object.assign(getInitialState(), unref(evaluation.value?.response))
+    initialState.value = Object.assign(currentState, unref(evaluation.value?.response))
   } else {
-    initialState.value = getInitialState()
+    initialState.value = currentState
   }
 })
 </script>
@@ -99,35 +84,37 @@ onBeforeMount(() => {
   <EvaluationForm
       @submit="onSubmit"
       :initial-state="initialState"
-      :evaluation="props.evaluation"
+      :evaluation="evaluation"
       v-slot="{ onSave, errors, values, isSubmitting, evaluationRef }"
   >
     <slot name="header">
-      <CustomHiddenField type="hidden" name="event_id" :value="props.evaluation?.id" />
-      <CustomHiddenField type="hidden" name="group_id" :value="props.evaluation?.group?.id" />
-      <CustomHiddenField type="hidden" name="course_id" :value="props.evaluation?.course?.id" />
-      <CustomHiddenField type="hidden" name="data[Evaluation][evaluator_id]" :value="props.currentUser?.id" />
-      <CustomHiddenField type="hidden" name="evaluateeCount" :value="props.evaluation?.members?.length" />
+      <CustomHiddenField type="hidden" name="event_id" :value="evaluation?.id" />
+      <CustomHiddenField type="hidden" name="group_id" :value="evaluation?.group?.id" />
+      <CustomHiddenField type="hidden" name="course_id" :value="evaluation?.course?.id" />
+      <CustomHiddenField type="hidden" name="data[Evaluation][evaluator_id]" :value="currentUser?.id" />
+      <CustomHiddenField type="hidden" name="evaluateeCount" :value="evaluation?.members?.length" />
       <CustomHiddenField type="hidden" name="memberIDs[]" v-for="(m,i) of form?.member_ids" :key="i" :value="m" />
     </slot>
 
     <slot name="main">
+      <!---->
       <PeerSimpleRangeQuestion
           :members="evaluation?.members"
-          :remaining="evaluation?.remaining"
+          :remaining="evaluation?.simple?.remaining"
+          :point_per_member="evaluation?.simple?.point_per_member"
           :initialState="initialState"
           :name="`points`"
           :question="questions.points.title"
           :description="questions.points.description"
-          :disabled="isDisabled"
+          :disabled="disabled"
       />
       <PeerSimpleCommentQuestion
           :members="evaluation?.members"
           :initialState="initialState"
           :name="'comments'"
-          :disabled="isDisabled"
           :question="questions.comments.title"
           :description="questions.comments.description"
+          :disabled="disabled"
       />
     </slot>
 

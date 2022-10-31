@@ -54,7 +54,6 @@
   &-input {
     @apply flex-1;
   }
-
   &-text {
     @apply absolute left-0 -bottom-4;
 
@@ -62,34 +61,58 @@
 
     }
   }
-}
+  &-check {
+    &.centered {
+      @apply flex flex-col justify-center items-center;
+    }
+    &-label {
 
+    }
+    &-input {
+      width: 1em;
+      height: 1em;
+      margin-top: .25em;
+      @apply appearance-none;
+      @apply h-4 w-4 border-2 border-gray-400 bg-gray-50;
+      @apply checked:bg-gray-50 checked:border-blue-600 checked:border-4;
+      // border-style: solid;
+      border: 1px solid rgba(0,0,0,.25);
+      @apply focus:outline-none transition duration-200 align-top;
+      @apply bg-no-repeat bg-center bg-contain float-left;
+      @apply cursor-pointer;
+    }
+    &-input[type="checkbox"] {
+      border-radius: .25em;
+    }
+    &-input[type="radio"] {
+      border-radius: 50%;
+    }
+    &-input:disabled {
+      pointer-events: none;
+      filter: none;
+      opacity: .5;
 
+      &:checked {
+        @apply border-gray-400;
+      }
+    }
+    &:checked {
+      @apply bg-pink-500;
+      @apply border-red-800;
+      &[type="checkbox"] {
+        @apply bg-teal-500;
+      }
+      &[type="radio"] {
+        @apply bg-teal-500;
+      }
+    }
+    &-inline {
+      @apply inline-block;
+      @apply mr-8;
+      @apply space-x-2;
+    }
 
-
-
-
-
-
-
-
-
-.form {
-  /**
-  &-group {
-    @apply relative w-[90%] mx-[5%] md:w-full md:mx-0;
-    @apply flex-col md:flex-row flex items-center;
-    // @apply mb-0 md:mb-5;
-  }*/
-  /**
-  &-control {
-    @apply relative w-full;
-    // md:max-w-[300px];
-    @apply flex;
-    @apply mb-4 md:mb-0;
-  }*/
-
-  // slider
+  }
   &-range {
     @apply relative;
 
@@ -122,56 +145,6 @@
       @apply mx-8;
     }
   }
-  // checkbox and radio button
-  &-check {
-    &.centered {
-      @apply flex flex-col justify-center items-center;
-    }
-    &-label {
-
-    }
-    &-input {
-      width: 1em;
-      height: 1em;
-      margin-top: .25em;
-      @apply appearance-none;
-      @apply h-4 w-4 border-2 border-gray-400 bg-gray-50;
-      @apply checked:bg-gray-50 checked:border-blue-600 checked:border-4;
-      // border-style: solid;
-      border: 1px solid rgba(0,0,0,.25);
-      @apply focus:outline-none transition duration-200 align-top;
-      @apply bg-no-repeat bg-center bg-contain float-left;
-      @apply cursor-pointer;
-    }
-    &-input[type="checkbox"] {
-      border-radius: .25em;
-    }
-    &-input[type="radio"] {
-      border-radius: 50%;
-    }
-    &-input:disabled {
-      pointer-events: none;
-      filter: none;
-      opacity: .5;
-    }
-    &:checked {
-      @apply bg-pink-500;
-      @apply border-red-800;
-      &[type="checkbox"] {
-        @apply bg-teal-500;
-      }
-      &[type="radio"] {
-        @apply bg-teal-500;
-      }
-    }
-    &-inline {
-      @apply inline-block;
-      @apply mr-8;
-      @apply space-x-2;
-    }
-
-  }
-  // select and options dropdown
   &-select {
     &-label {}
     &-input {
@@ -210,49 +183,28 @@
       }
     }
   }
-  // input[type=text]/[type=email]/[type=password], textarea and error message
+  // form-text style used by validating errorMessage on inputs
   &-text {
     @apply block;
-    //@apply flex flex-col;
     @apply text-red-700 text-xs text-left;
     @apply m-0;
     @apply ml-1;
     &.text-muted {
       @apply opacity-60;
     }
-    //&-group {
-    //  @apply relative;
-    //  @apply flex flex-col;
-    //  @apply md:flex-row md:justify-start md:items-center;
-    //  @apply mb-2 md:mb-0;
-    //
-    //  .form-text-label {
-    //    @apply w-full inline-block md:max-w-[200px] align-top;
-    //    @apply text-sm text-left md:text-right;
-    //    @apply font-medium;
-    //    @apply mx-4 mb-1 md:mb-0 md:mr-4;
-    //    &::after {
-    //      content: ":";
-    //    }
-    //  }
-    //  div {
-    //    @apply flex-1;
-    //  }
-    //  .form-text-input {
-    //    @apply flex-1;//  md:w-[360px]
-    //    @apply mx-4 md:mx-0;
-    //  }
-    //  .form-text {
-    //    @apply block;
-    //    @apply absolute sm:left-3 -bottom-2 md:left-auto md:-bottom-4;
-    //  }
-    //}
-
+  }
+  &-muted {
+    @apply block;
+    @apply text-sm text-slate-700;
+    @apply font-light tracking-wider;
+    @apply leading-6;
+    //@apply bg-gray-50;
+    @apply py-1.5 px-3;
+    @apply rounded;
+    @apply outline-none;
+    background-clip: padding-box;
   }
 }
-
-
-
 
 input.has-error,
 textarea.has-error {

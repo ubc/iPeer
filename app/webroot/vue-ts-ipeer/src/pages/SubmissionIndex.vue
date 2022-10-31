@@ -4,10 +4,10 @@ import { useRoute } from 'vue-router'
 import useFetch from '@/composables/useFetch'
 import Loader from '@/components/Loader.vue'
 import PageTitle from '@/components/PageTitle.vue'
-import SectionTitle from '@/components/SectionTitle.vue'
-import SectionSubtitle from '@/components/SectionSubtitle.vue'
 import ViewHeading from '@/student/components/ViewHeading.vue'
 import { IconTwoUsers } from '@/components/icons'
+
+import type { IUser, IEvaluation } from '@/types/typings'
 // REFERENCES
 const emit              = defineEmits<{}>()
 const props             = defineProps<{}>()
@@ -15,47 +15,61 @@ const route             = useRoute()
 // DATA
 const event_id          = ref(route.params.event_id)
 const group_id          = ref(route.params.group_id)
-const status            = ref()
-const message           = ref()
-const submission        = reactive({})
+const status            = ref<string>('')
+const message           = ref<object|null>(null)
+const reviews           = reactive({'id': 'work in progress'})
+let evaluation          = reactive<IEvaluation|any>({})
+const members           = ref<IUser[]>([])
 // COMPUTED
 // METHODS
-// WATCH
-// LIFECYCLE
-onMounted(async () => {
+async function fetchEvaluation() {
   try {
     status.value = 'PENDING'
-    const response = await useFetch(
-        `/evaluations/getSubmission/${event_id.value}/${group_id.value}`,
-        {method: 'GET', timeout: 300}
-    )
-    Object.assign(submission, response.data)
+    const response: Promise<IEvaluation | unknown> = await useFetch(
+        `/evaluations/makeEvaluation/${event_id.value}/${group_id.value}`,
+        {method: 'GET', timeout: 0})
+    await Object.assign(evaluation, response?.data)
   } catch (err) {
-    message.value = {text: err.messge, type: 'error'}
+    message.value = {text: err, type: 'error'}
   } finally {
     status.value = 'READY'
   }
+}
+// WATCH
+// LIFECYCLE
+onMounted(async () => {
+  await fetchEvaluation()
+  console.log({'evaluation': evaluation})
 })
 </script>
 
 <template>
-  <div class="">
-    <template v-if="status === 'PENDING'">
-      <Loader />
-    </template>
+  <template v-if="status === 'PENDING'">
+    <Loader />
+  </template>
 
-    <template v-else>
-      <PageTitle :title="submission?.event?.title">
-        <ViewHeading
-          :due-date="submission?.event?.due_date"
-          :penalties="submission?.penalties"
-          :group-name="submission?.group?.group_name"
-          :course-title="submission?.course?.title"
-          :icon="{src: submission, size: '6rem'}"
-        />
-      </PageTitle>
-      <pre class="debug">Submission::Info {{ event_id }}/{{ group_id }}</pre>
-    </template>
-
-  </div>
+  <template v-else>
+    <PageTitle :title="evaluation?.title">
+      <ViewHeading
+          :due-date="evaluation?.due_date"
+          :penalties="evaluation?.penalty"
+          :group-name="evaluation?.group?.name"
+          :course-title="evaluation?.course?.title"
+          :icon="{src: IconTwoUsers, size: '6rem'}"
+      />
+    </PageTitle>
+    <Suspense>
+      <router-view
+          class="tab-pane fade show active"
+          id="response"
+          role="tabpanel"
+          aria-labelledby="response-tab"
+          :currentUser="currentUser"
+          :members="members"
+          :evaluation="evaluation"
+          :reviews="reviews"
+          @fetch:evaluation="fetchEvaluation">
+      </router-view>
+    </Suspense>
+  </template>
 </template>

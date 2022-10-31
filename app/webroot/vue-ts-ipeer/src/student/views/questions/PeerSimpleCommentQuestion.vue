@@ -4,18 +4,18 @@ import { validateParagraph } from '@/helpers/rules'
 import UserCard from "@/student/components/UserCard.vue";
 import CustomTextField from '@/components/fields/CustomTextField.vue'
 
-import type { EvaluationReviewResponse, User } from '@/types/typings'
+import type { User, ISimpleEvaluation } from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
   // (e: 'update:modelValue', option: string): void
   // (e: 'update:comments', option: string): void
 }>()
 const props = defineProps<{
-  members: User[]
-  initialState: EvaluationReviewResponse
+  members: IUser[]
+  initialState: ISimpleEvaluation
+  question?: string
   name: string
   label?: string
-  question?: string
   description?: string
   placeholder?: string
   disabled?: boolean | false

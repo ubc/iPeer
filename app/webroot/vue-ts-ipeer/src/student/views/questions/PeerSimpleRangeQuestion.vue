@@ -1,30 +1,29 @@
 <script lang="ts" setup>
-import {ref, reactive, watch, computed, onMounted, toRef, onBeforeMount} from 'vue';
-import {findIndex, forEach, map, reduce} from "lodash";
-
+import {ref, reactive, watch, computed, onMounted, toRef, onBeforeMount} from 'vue'
+import { findIndex, forEach, map, reduce } from 'lodash'
 import UserCard from '@/student/components/UserCard.vue'
 import { CustomRangeField } from '@/components/fields'
-
-import type { EvaluationReviewResponse, User } from '@/types/typings'
+import type { ISimpleEvaluation, ISimpleResponse, ISimpleReview, User } from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
   // (e: 'update:modelValue', option: string): void
 }>()
 const props = defineProps<{
   members: User[]
-  initialState: EvaluationReviewResponse
-  remaining: string | number
+  initialState: ISimpleResponse
+  remaining: number
+  point_per_member: string
   name: string
   label?: string
   question?: string
   description?: string
   placeholder?: string
-  disabled?: boolean | false
+  disabled?: boolean|false
 }>();
 // DATA
 const showScore       = ref(false)
 const response        = toRef(props, 'initialState')
-const total_points    = ref(props.remaining ?? props.members.length * 100)
+const total_points    = ref(props.remaining ?? props.members.length * props.point_per_member) // 100
 const student_slider  = ref([])
 const slider_sum      = ref(0)
 const student_scores  = ref([])
@@ -32,10 +31,8 @@ const student_scores  = ref([])
 // METHODS
 function updateStudentSlider(event: {target:string, key:string, value: string}) {
   const {target, key, value} = event;
-
   const oldValue = student_slider.value[key]
   slider_sum.value += parseInt(value) - oldValue
-
   if (slider_sum.value <= 0){
     student_scores.value = map(student_scores.value, () => total_points.value / student_scores.value.length)
   } else {
@@ -90,7 +87,7 @@ function distributeDecimalRemainder() {
         </th>
         <th style="width: 80%">
           <div class="text-center leading-4">
-            <div class="font-normal">Relative Contribution</div>
+            <div class="font-normal">Relative C<span  @click="showScore = !showScore">o</span>ntribution</div>
             <div class="text-sm font-thin"></div>
           </div>
         </th>
@@ -98,20 +95,23 @@ function distributeDecimalRemainder() {
       </thead>
       <tbody>
       <tr v-for="(member, memberIdx) of props.members" :key="member.id">
-        <td style="width: 20%"><UserCard :member="member" @click="showScore = !showScore" /></td>
+        <td style="width: 20%"><UserCard :member="member" /></td>
         <td style="width: 80%">
-        <input type="hidden" :name="`${name}[${memberIdx}]`" :value="response?.data && response?.data[name] ? response?.data[name][memberIdx] : ''" />
-        <CustomRangeField
-            :text="['Less', 'More']"
-            :label="'A fair amount'"
-            :name="`percent[${memberIdx}]`"
-            :value="student_slider[memberIdx]"
-            :response="response?.data?.points"
-            :points="response?.data && response?.data?.points ? response?.data?.points[memberIdx] : ''"
-            :placeholder="placeholder"
-            :disabled="props.disabled"
-            @update:input="updateStudentSlider({target:name, key:memberIdx, value: $event.target.value})"
-        />
+          <input type="hidden" :name="`${name}[${memberIdx}]`" :value="response?.data && response?.data[name] ? response?.data[name][memberIdx] : ''" />
+          <CustomRangeField
+              :text="['Less', 'More']"
+              :label="'A fair amount'"
+              :name="`percent[${memberIdx}]`"
+              :value="student_slider[memberIdx]"
+              :response="response?.data?.points"
+              :points="response?.data && response?.data?.points ? response?.data?.points[memberIdx] : ''"
+              :placeholder="placeholder"
+              :disabled="props.disabled"
+              :remaining="remaining"
+              :point_per_member="point_per_member"
+              :showScore="showScore"
+              @update:input="updateStudentSlider({target:name, key:memberIdx, value: $event.target.value})"
+          />
           <div v-if="showScore" class="text-sm text-red-400">{{ response?.data && response?.data?.points ? response?.data?.points[memberIdx] : '' }}</div>
         </td>
       </tr>

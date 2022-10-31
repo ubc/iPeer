@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { toRefs } from 'vue';
+import {computed, toRefs} from 'vue';
 import { useField } from 'vee-validate'
 
 export interface Props {
@@ -15,6 +15,9 @@ export interface Props {
   step?: string | number
   max?: string | number
   text?: string[]
+  showScore: boolean
+  remaining: number
+  point_per_member: string
 }
 
 // REFERENCES
@@ -36,6 +39,10 @@ const { value: inputValue, errorMessage, handleBlur, handleChange, meta } = useF
   validateOnValueUpdate: true
 });
 // DATA
+const needle = computed<number>(() => {
+  // return calc(95% - inputValue.value+'px')
+  return inputValue.value
+})
 const validationListeners = {
   blur: handleChange,
   change: handleChange,
@@ -65,6 +72,32 @@ const validationListeners = {
     <div v-if="props.text" class="flex justify-between items-center">
       <div v-if="props.text[0]" class="min text-sm text-slate-500 font-normal">{{ props.text[0] }}</div>
       <div v-if="props.text[1]" class="max text-sm text-slate-500 font-normal">{{ props.text[1] }}</div>
+    </div>
+  </div>
+
+  <div v-if="props.showScore" class="range-review extended">
+    <!--  SlickRangeSlider  -->
+  </div>
+
+  <div v-if="props.showScore" class="range-review extended">
+    <!--  HeatGradientRangeSlider  -->
+    <div class="heat-gradient mx-12">
+      <div class="gradient">
+        <!--<div class="needle" :data-value="needle" :style="`left: calc(100% - 2.25px - ${needle}%)`">{{ needle }}</div>-->
+        <div class="needle" :data-value="needle" :style="`left: calc(0% + ${needle}% - 2.25px)`"></div>
+      </div>
+      <div class="axis">
+        <span class="">1</span>
+        <span class="">2</span>
+        <span class="">3</span>
+        <span class="">4</span>
+        <span class="">5</span>
+        <span class="">6</span>
+        <span class="">7</span>
+        <span class="">8</span>
+        <span class="">9</span>
+        <span class="active">10</span>
+      </div>
     </div>
   </div>
 </template>

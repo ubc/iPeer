@@ -3,11 +3,6 @@ import { ref, toRef, onMounted, onBeforeUnmount } from 'vue'
 import { useField, ErrorMessage } from 'vee-validate'
 import autosize from 'autosize'
 
-// REFERENCES
-const emit = defineEmits<{
-  (e: 'update:modelValue', option: string): void
-  (e: 'update:event', option: string): void
-}>()
 interface Props {
   label?: string
   name: string
@@ -17,6 +12,11 @@ interface Props {
   default?: string
   disabled?: boolean
 }
+// REFERENCES
+const emit = defineEmits<{
+  (e: 'update:modelValue', option: string): void
+  (e: 'update:event', option: string): void
+}>()
 const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   rules: undefined
@@ -47,18 +47,18 @@ onBeforeUnmount(() => autosize.destroy(elementRef.value))
   <div class="form-group my-2">
     <label class="form-label" v-if="label">{{ label }}</label>
     <div class="form-control">
-      <textarea class="form-textarea" :class="{ 'has-error': !!errorMessage, success: meta.valid }"
+      <textarea :class="{'has-error': !!errorMessage, success: meta.valid, 'form-textarea': !props.disabled, 'form-muted': props.disabled}"
         ref="elementRef"
         style="resize: none; clear: right;padding: 0.3em 0.5em;"
         :id="name"
         :name="name"
         :value="inputValue"
-        :disabled="disabled"
         @change="$emit('update:event', $event)"
         @input="handleChange"
         @blur="handleBlur"
         v-on="validationListeners"
         v-bind="$attrs"
+        :disabled="props.disabled"
       ></textarea>
       <ErrorMessage class="form-text text-muted" v-if="props.type !== 'radio'" :name="name" />
     </div>

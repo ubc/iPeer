@@ -1,0 +1,57 @@
+.range-review.extended {
+  @apply flex;
+  @apply bg-pink-50;
+
+  .heat-gradient {
+    margin-top: .5rem;
+
+    .gradient {
+      height: 15px;
+      //width: 100%;
+      background-image: linear-gradient(to right, #eb0002,#00b800);
+      border-radius: 7.5px;
+      position: relative;
+    }
+    .needle {
+      position: absolute;
+      width: 4.5px;
+      background: #ccc;
+      border-radius: 5px;
+      height: 30px;
+      top: -7.5px;
+    }
+    //.needle[data-value="10"] {
+    //  left: calc(95% - 2.25px);
+    //}
+
+    /* datalist */
+    .axis {
+      display: flex;
+      justify-content: space-between;
+      color: #767676;
+
+      > span {
+        width: 10%;
+        max-width: 10%;
+        flex-basis: 10%;
+        text-align: center;
+        &.active {
+          //color: #333;
+          @apply text-slate-900;
+        }
+      }
+    }
+  }
+}
+
+
+
+.heat-gradient {
+  @apply w-full;
+  @apply flex-1;
+
+  .axis>span {
+    // color: #767676;
+    @apply text-slate-300;
+  }
+}

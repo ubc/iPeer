@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { reactive } from 'vue'
 import PageHeading from '@/components/PageHeading.vue'
 import { IconCollaboratorCircle } from '@/components/icons'
+import type {IUser} from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{}>()
 const props = defineProps<{
-  currentUser: object
+  currentUser: IUser
 }>()
 // DATA
 const settings = reactive({

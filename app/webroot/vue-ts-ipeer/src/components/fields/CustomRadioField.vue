@@ -1,29 +1,36 @@
 <script lang="ts" setup>
 import { toRef } from 'vue';
 import { useField } from 'vee-validate'
+
+interface Props {
+  modelValue: null
+  name: string
+  value?: string
+  label?: string
+  checked?: string|number|boolean
+  rules?: string
+  disabled?: boolean
+}
 // REFERENCES
 const emit = defineEmits<{
   (e: 'update:modelValue', option: string): void
 }>()
-const props = defineProps<{
-  modelValue: string | number | null
-  label?: string
-  name: string
-  value?: string
-  checked?: string|number|boolean
-  rules?: string
-}>()
+const props = withDefaults(defineProps<Props>(), {
+  disabled: false,
+  rules: undefined
+})
 
 // DATA
 const name = toRef(props, 'name');
-const value = toRef(props, 'value');
 // COMPUTED
 const { checked, handleChange, errorMessage, handleBlur, meta } = useField(name, props.rules, {
   type: 'radio',
   checkedValue: props.value,
-  uncheckedValue: null,
   validateOnValueUpdate: true
 })
+// select/unselect the input
+handleChange(props.value)
+//
 const validationListeners = {
   blur: handleChange,
   change: handleChange,
@@ -42,10 +49,11 @@ const validationListeners = {
         :id="name"
         :name="name"
         :value="props.value"
-        :checked="parseInt(props.checked) === parseInt(props.value)"
+        :checked="Number(props.checked) === Number(props.value)"
         :data-value="props.checked"
         :data-error="errorMessage"
-        @input="handleChange(value)"
+        :disabled="props.disabled"
+        @input="handleChange"
         @blur="handleBlur"
     />
     <span class="form-check-label text-sm" v-if="label">{{ label }}</span>

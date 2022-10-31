@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-  import type { User } from '@/types/typings'
+  import type { IUser } from '@/types/typings'
   const emit = defineEmits<{
     (e: 'update:profile'): void
   }>()
   const props = defineProps<{
-    currentUser: User
+    currentUser: IUser
   }>()
 </script>
 

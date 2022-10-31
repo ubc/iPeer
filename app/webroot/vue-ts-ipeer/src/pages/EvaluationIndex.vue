@@ -20,9 +20,9 @@ import {
 } from '@/components/icons'
 const EvaluationMakePage = defineAsyncComponent(() => import('@/student/views/EvaluationMakePage.vue'))
 const EvaluationEditPage = defineAsyncComponent(() => import('@/student/views/EvaluationEditPage.vue'))
-import type { Evaluation, User } from '@/types/typings'
+import type { IEvaluation, IUser } from '@/types/typings'
 interface Props {
-  currentUser: User
+  currentUser: IUser
   event_id?: string
   group_id?: string
   pageTitle?: string
@@ -36,8 +36,8 @@ const event_id          = ref(route.params.event_id)
 const group_id          = ref(route.params.group_id)
 const status            = ref<string>('')
 const message           = ref<object | null>(null)
-let evaluation          = reactive<Evaluation | any>({})
-const members           = ref<User[]>([])
+let evaluation          = reactive<IEvaluation | any>({})
+const members           = ref<IUser[]>([])
 // COMPUTED
 const evaluationPage = computed(() => {
   // Check if evaluation is started
@@ -54,23 +54,22 @@ const evaluationPage = computed(() => {
 async function fetchEvaluation() {
   try {
     status.value = 'PENDING'
-    const response: Promise<Evaluation | unknown> = await useFetch(
+    const response: Promise<IEvaluation | unknown> = await useFetch(
         `/evaluations/makeEvaluation/${event_id.value}/${group_id.value}`,
         {method: 'GET', timeout: 0})
     await Object.assign(evaluation, response?.data)
-    // members.value = [...updateMembersCollection(response?.data?.members, props.currentUser)]
-    members.value = updateMembersCollection(response?.data?.members, props.currentUser)
+    members.value = updateMembersCollection(response?.data?.members)
   } catch (err) {
-    message.value = {text: err?.messge, type: 'error'}
+    message.value = {text: err, type: 'error'}
   } finally {
     status.value = 'READY'
   }
 }
-function updateMembersCollection(users, user) {
-  let tmp = [...users]
-  const index = findIndex(tmp, { id: user.id})
+function updateMembersCollection(_members:User[]) {
+  let tmp = [..._members]
+  const index = findIndex(tmp, { id: props.currentUser?.id})
   if (index === -1) {
-    return users
+    return _members
   } else {
     const spliced = tmp.splice(index, 1)
     return [...tmp, {...spliced[0], first_name: 'Yourself', last_name: ''}]
