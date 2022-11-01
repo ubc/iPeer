@@ -2,7 +2,7 @@
 //============================================================+
 // File name   : example_016.php
 // Begin       : 2008-03-04
-// Last Update : 2010-10-19
+// Last Update : 2013-05-14
 //
 // Description : Example 016 for TCPDF class
 //               Document Encryption / Security
@@ -12,9 +12,6 @@
 // (c) Copyright:
 //               Nicola Asuni
 //               Tecnick.com LTD
-//               Manor Coach House, Church Hill
-//               Aldershot, Hants, GU12 4RQ
-//               UK
 //               www.tecnick.com
 //               info@tecnick.com
 //============================================================+
@@ -27,8 +24,8 @@
  * @since 2008-03-04
  */
 
-require_once('../config/lang/eng.php');
-require_once('../tcpdf.php');
+// Include the main TCPDF library (search for installation path).
+require_once('tcpdf_include.php');
 
 // create new PDF document
 $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
@@ -65,50 +62,53 @@ $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8',
 
 */
 
-$pdf->SetProtection($permissions=array('print', 'copy'), $user_pass='', $owner_pass=null, $mode=0, $pubkeys=null);
+$pdf->setProtection(array('print', 'copy'), '', null, 0, null);
 
 // Example with public-key
 // To open the document you need to install the private key (tcpdf.p12) on the Acrobat Reader. The password is: 1234
-//$pdf->SetProtection($permissions=array('print', 'copy'), $user_pass='', $owner_pass=null, $mode=1, $pubkeys=array(array('c' => 'file://../tcpdf.crt', 'p' => array('print'))));
+//$pdf->setProtection($permissions=array('print', 'copy'), $user_pass='', $owner_pass=null, $mode=1, $pubkeys=array(array('c' => 'file://../config/cert/tcpdf.crt', 'p' => array('print'))));
 
 // *********************************************************
 
 
 // set document information
-$pdf->SetCreator(PDF_CREATOR);
-$pdf->SetAuthor('Nicola Asuni');
-$pdf->SetTitle('TCPDF Example 016');
-$pdf->SetSubject('TCPDF Tutorial');
-$pdf->SetKeywords('TCPDF, PDF, example, test, guide');
+$pdf->setCreator(PDF_CREATOR);
+$pdf->setAuthor('Nicola Asuni');
+$pdf->setTitle('TCPDF Example 016');
+$pdf->setSubject('TCPDF Tutorial');
+$pdf->setKeywords('TCPDF, PDF, example, test, guide');
 
 // set default header data
-$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE.' 016', PDF_HEADER_STRING);
+$pdf->setHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE.' 016', PDF_HEADER_STRING);
 
 // set header and footer fonts
 $pdf->setHeaderFont(Array('helvetica', '', PDF_FONT_SIZE_MAIN));
 $pdf->setFooterFont(Array('helvetica', '', PDF_FONT_SIZE_DATA));
 
 // set default monospaced font
-$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+$pdf->setDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 
-//set margins
-$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+// set margins
+$pdf->setMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+$pdf->setHeaderMargin(PDF_MARGIN_HEADER);
+$pdf->setFooterMargin(PDF_MARGIN_FOOTER);
 
-//set auto page breaks
-$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+// set auto page breaks
+$pdf->setAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 
-//set image scale factor
+// set image scale factor
 $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
 
-//set some language-dependent strings
-$pdf->setLanguageArray($l);
+// set some language-dependent strings (optional)
+if (@file_exists(dirname(__FILE__).'/lang/eng.php')) {
+	require_once(dirname(__FILE__).'/lang/eng.php');
+	$pdf->setLanguageArray($l);
+}
 
 // ---------------------------------------------------------
 
 // set font
-$pdf->SetFont('times', '', 16);
+$pdf->setFont('times', '', 16);
 
 // add a page
 $pdf->AddPage();
@@ -127,7 +127,7 @@ $pdf->Write(0, $txt, '', 0, 'L', true, 0, false, false, 0);
 // ---------------------------------------------------------
 
 //Close and output PDF document
-$pdf->Output('example_016.pdf', 'I');
+$pdf->Output('example_016.pdf', 'D');
 
 //============================================================+
 // END OF FILE

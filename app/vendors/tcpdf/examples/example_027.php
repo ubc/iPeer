@@ -2,7 +2,7 @@
 //============================================================+
 // File name   : example_027.php
 // Begin       : 2008-03-04
-// Last Update : 2011-09-22
+// Last Update : 2013-05-14
 //
 // Description : Example 027 for TCPDF class
 //               1D Barcodes
@@ -12,9 +12,6 @@
 // (c) Copyright:
 //               Nicola Asuni
 //               Tecnick.com LTD
-//               Manor Coach House, Church Hill
-//               Aldershot, Hants, GU12 4RQ
-//               UK
 //               www.tecnick.com
 //               info@tecnick.com
 //============================================================+
@@ -27,42 +24,45 @@
  * @since 2008-03-04
  */
 
-require_once('../config/lang/eng.php');
-require_once('../tcpdf.php');
+// Include the main TCPDF library (search for installation path).
+require_once('tcpdf_include.php');
 
 // create new PDF document
 $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
 // set document information
-$pdf->SetCreator(PDF_CREATOR);
-$pdf->SetAuthor('Nicola Asuni');
-$pdf->SetTitle('TCPDF Example 027');
-$pdf->SetSubject('TCPDF Tutorial');
-$pdf->SetKeywords('TCPDF, PDF, example, test, guide');
+$pdf->setCreator(PDF_CREATOR);
+$pdf->setAuthor('Nicola Asuni');
+$pdf->setTitle('TCPDF Example 027');
+$pdf->setSubject('TCPDF Tutorial');
+$pdf->setKeywords('TCPDF, PDF, example, test, guide');
 
 // set default header data
-$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE.' 027', PDF_HEADER_STRING);
+$pdf->setHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE.' 027', PDF_HEADER_STRING);
 
 // set header and footer fonts
 $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
 $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
 
 // set default monospaced font
-$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+$pdf->setDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 
-//set margins
-$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+// set margins
+$pdf->setMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+$pdf->setHeaderMargin(PDF_MARGIN_HEADER);
+$pdf->setFooterMargin(PDF_MARGIN_FOOTER);
 
-//set auto page breaks
-$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+// set auto page breaks
+$pdf->setAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 
-//set image scale factor
+// set image scale factor
 $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
 
-//set some language-dependent strings
-$pdf->setLanguageArray($l);
+// set some language-dependent strings (optional)
+if (@file_exists(dirname(__FILE__).'/lang/eng.php')) {
+	require_once(dirname(__FILE__).'/lang/eng.php');
+	$pdf->setLanguageArray($l);
+}
 
 // ---------------------------------------------------------
 
@@ -70,19 +70,19 @@ $pdf->setLanguageArray($l);
 $pdf->setBarcode(date('Y-m-d H:i:s'));
 
 // set font
-$pdf->SetFont('helvetica', '', 11);
+$pdf->setFont('helvetica', '', 11);
 
 // add a page
 $pdf->AddPage();
 
 // print a message
-$txt = "You can also export 1D barcodes in other formats (PNG, SVG, HTML). Check the source code documentation of TCPDFBarcode class for further information.";
+$txt = "You can also export 1D barcodes in other formats (PNG, SVG, HTML). Check the examples inside the barcodes directory.\n";
 $pdf->MultiCell(70, 50, $txt, 0, 'J', false, 1, 125, 30, true, 0, false, true, 0, 'T', false);
-$pdf->SetY(30);
+$pdf->setY(30);
 
 // -----------------------------------------------------------------------------
 
-$pdf->SetFont('helvetica', '', 10);
+$pdf->setFont('helvetica', '', 10);
 
 // define barcode style
 $style = array(
@@ -209,14 +209,14 @@ $pdf->write1DBarcode('04210000526', 'UPCE', '', '', '', 18, 0.4, $style, 'N');
 // add a page ----------
 $pdf->AddPage();
 
-// 5-Digits UPC-Based Extention
-$pdf->Cell(0, 0, '5-Digits UPC-Based Extention', 0, 1);
+// 5-Digits UPC-Based Extension
+$pdf->Cell(0, 0, '5-Digits UPC-Based Extension', 0, 1);
 $pdf->write1DBarcode('51234', 'EAN5', '', '', '', 18, 0.4, $style, 'N');
 
 $pdf->Ln();
 
-// 2-Digits UPC-Based Extention
-$pdf->Cell(0, 0, '2-Digits UPC-Based Extention', 0, 1);
+// 2-Digits UPC-Based Extension
+$pdf->Cell(0, 0, '2-Digits UPC-Based Extension', 0, 1);
 $pdf->write1DBarcode('34', 'EAN2', '', '', '', 18, 0.4, $style, 'N');
 
 $pdf->Ln();
@@ -405,7 +405,7 @@ $style = array(
 
 // CODE 39 EXTENDED + CHECKSUM
 $pdf->Cell(0, 0, 'CODE 39 EXTENDED + CHECKSUM', 0, 1);
-$pdf->SetLineStyle(array('width' => 1, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(255, 0, 0)));
+$pdf->setLineStyle(array('width' => 1, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(255, 0, 0)));
 $pdf->write1DBarcode('CODE 39 E+', 'C39E+', '', '', 120, 25, 0.4, $style, 'N');
 
 // ---------------------------------------------------------
