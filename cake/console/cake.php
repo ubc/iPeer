@@ -20,6 +20,9 @@
  * @since         CakePHP(tm) v 1.2.0.5012
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
+// autoload composer installed libraries
+require realpath(dirname(__FILE__) . '/../../vendor/autoload.php');
+
 if (!defined('E_DEPRECATED')) {
 	define('E_DEPRECATED', 8192);
 }

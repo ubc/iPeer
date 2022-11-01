@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * TODO: Appears to be unused, check if can be removed.
  * ExportExcelComponent
  *
  * @uses ExportBaseNewComponent

@@ -191,11 +191,11 @@ class EventsControllerTest extends ExtendedAuthTestCase {
                 'Group' => array(1,2)
             ),
         );
-        $this->controller->expectOnce('redirect', array('index/1'));
         $this->testAction(
             '/events/add/1',
             array('fixturize' => true, 'data' => $data, 'method' => 'post')
         );
+        $this->controller->expectOnce('redirect', array('index/1'));
         $model = ClassRegistry::init('Event');
         $event = $model->find('first', array( 'conditions' => array('title' => 'new evaluation'), 'contain' => array('Group', 'GroupEvent', 'EvaluationSubmission')));
         unset($data['Event']['SimpleEvaluation'], $data['Event']['email_schedule'], $data['Event']['EmailTemplate']);
@@ -241,11 +241,11 @@ class EventsControllerTest extends ExtendedAuthTestCase {
                 'Group' => array(1,2)
             ),
         );
-        $this->controller->expectOnce('redirect', array('/home'));
         $this->testAction(
             '/events/add/1',
             array('fixturize' => true, 'data' => $data, 'method' => 'post')
         );
+        $this->controller->expectOnce('redirect', array('/home'));
         $model = ClassRegistry::init('Event');
         $event = $model->find('first', array( 'conditions' => array('title' => 'new evaluation'), 'contain' => array('Group', 'GroupEvent', 'EvaluationSubmission')));
         $this->assertFalse($event);
@@ -293,11 +293,11 @@ class EventsControllerTest extends ExtendedAuthTestCase {
                 'Group' => array(1,2)
             ),
         );
-        $this->controller->expectOnce('redirect', array('index/1'));
         $this->testAction(
             '/events/edit/8',
             array('fixturize' => true, 'data' => $data, 'method' => 'post')
         );
+        $this->controller->expectOnce('redirect', array('index/1'));
 
         $message = $this->controller->Session->read('Message.flash');
         $this->assertEqual($message['message'], 'Edit event successful!');
@@ -349,11 +349,11 @@ class EventsControllerTest extends ExtendedAuthTestCase {
                 'Group' => array(1,2)
             ),
         );
-        $this->controller->expectOnce('redirect', array('index'));
         $this->testAction(
             '/events/edit/8',
             array('fixturize' => true, 'data' => $data, 'method' => 'post')
         );
+        $this->controller->expectOnce('redirect', array('index'));
         $model = ClassRegistry::init('Event');
         $event = $model->find('first', array( 'conditions' => array('id' => $data['Event']['id']), 'contain' => array('Group', 'GroupEvent', 'EvaluationSubmission')));
         // data should not be changed
@@ -374,11 +374,11 @@ class EventsControllerTest extends ExtendedAuthTestCase {
     }
 
     function testDelete() {
-        $this->controller->expectOnce('redirect', array('index/1'));
         $this->testAction(
             '/events/delete/1',
             array('fixturize' => true, 'method' => 'get')
         );
+        $this->controller->expectOnce('redirect', array('index/1'));
 
         $model = ClassRegistry::init('Event');
         $found = $model->find('first', array( 'conditions' => array('id' => 1), 'contain' => false));
@@ -397,11 +397,11 @@ class EventsControllerTest extends ExtendedAuthTestCase {
             )
         );
 
-        $this->controller->expectOnce('redirect', array('/home'));
         $this->testAction(
             '/events/delete/1',
             array('fixturize' => true, 'method' => 'get')
         );
+        $this->controller->expectOnce('redirect', array('/home'));
 
         $model = ClassRegistry::init('Event');
         $found = $model->find('first', array( 'conditions' => array('id' => 1), 'contain' => false));

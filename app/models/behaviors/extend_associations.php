@@ -177,7 +177,7 @@ class ExtendAssociationsBehavior extends ModelBehavior
             foreach ($model->{$type} as $assoc => $assocData) {
                 // if the assoc is NOT in the exceptions list then
                 // add it to the list of models to be unbound.
-                if (@!in_array($assoc, $exceptions[$type])) {
+                if (!empty($exceptions[$type]) && @!in_array($assoc, $exceptions[$type])) {
                     $unbind[$type][] = $assoc;
                 }
             }

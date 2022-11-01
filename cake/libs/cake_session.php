@@ -482,6 +482,11 @@ class CakeSession extends CakeObject {
  * @access private
  */
 	function __initSession() {
+	    // PHP 7.2+ has more strict session management. It generates 'Headers already sent'
+        // warnings when use ini_set()
+	    if (PHP_SAPI === 'cli') {
+	        return;
+        }
 		$iniSet = function_exists('ini_set');
 		if ($iniSet && env('HTTPS')) {
 			ini_set('session.cookie_secure', 1);
@@ -675,7 +680,7 @@ class CakeSession extends CakeObject {
 			if (session_id() != ''|| isset($_COOKIE[session_name()])) {
 				setcookie(Configure::read('Session.cookie'), '', time() - 42000, $this->path);
 			}
-			session_regenerate_id(true);
+			@session_regenerate_id(true);
 			if (PHP_VERSION < 5.1) {
 				$sessionPath = session_save_path();
 				if (empty($sessionPath)) {

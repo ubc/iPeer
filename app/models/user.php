@@ -599,7 +599,7 @@ class User extends AppModel
      * @access public
      * @return $user logged in user
      * */
-    function getCurrentLoggedInUser()
+    static function getCurrentLoggedInUser()
     {
         App::import('Component', 'Session');
         $Session = new SessionComponent();
@@ -1255,7 +1255,7 @@ class User extends AppModel
      * @access public
      * @return array list of courses
      */
-    function getMyDepartmentsCourseList($findType = 'list')
+    static function getMyDepartmentsCourseList($findType = 'list')
     {
         $userFaculty = Classregistry::init('UserFaculty');
         $department = Classregistry::init('Department');

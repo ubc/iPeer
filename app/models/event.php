@@ -988,8 +988,8 @@ class Event extends AppModel
 
             if($value['Event']['event_template_type_id'] == $Survey::TEMPLATE_TYPE_ID) {
                 // remove release dates if a survey (sometimes have all zero dates)
-                $value['Event']['result_release_date_begin'] = "";
-                $value['Event']['result_release_date_end'] = "";
+                $value['Event']['result_release_date_begin'] = null;
+                $value['Event']['result_release_date_end'] = null;
                 // remove booleans 
                 $value['Event']['self_eval'] = "";
                 $value['Event']['com_req'] = "";
@@ -1099,11 +1099,14 @@ class Event extends AppModel
             //convert DateTime String to standard format (some programs like excel change date foramts while editing)
             $event_date_fields = array('due_date', 'release_date_begin', 'release_date_end', 'result_release_date_begin', 'result_release_date_end');
             foreach ($event_date_fields as $eventDate) {
-                if (is_string($eventData[$eventDate])) {
+                if (!empty($eventData[$eventDate]) && is_string($eventData[$eventDate])) {
                     $timeStamp = strtotime($eventData[$eventDate]);
                     if($timeStamp) {
                         $eventData[$eventDate] = date("Y-m-d H:i:s", $timeStamp);
                     }
+                }
+                else {
+                    $eventData[$eventDate] = null;
                 }
             }
             // tell the model we are working with the current event (we later use model data validation)
@@ -1226,7 +1229,8 @@ class Event extends AppModel
             }
 
             // add this event to the validated events
-            $validatedEvents[] = array( 'Event' => $eventData , 'Group' => array ( 'Group' => $groupsData ));
+            #$validatedEvents[] = array( 'Event' => $eventData , 'Group' => array ( 'Group' => $groupsData ));
+            $validatedEvents[] = array( 'Event' => $eventData , 'Group' => $groupsData );
 
             $csvRow += 1; // we will now parse the new row in the csv ($csvRow used for error reporting)
         }

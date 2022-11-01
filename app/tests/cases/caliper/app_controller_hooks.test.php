@@ -84,6 +84,9 @@ class CaliperAppControllerHooksTest extends CaliperAuthTestCase
     function test_app_controller_before_render()
     {
         $this->setupSession('/home/index');
+        // new cakephp console testsuite lib defines FULL_BASE_URL as
+        // 'http://cakephp.org' so our absolute paths now include that as the
+        // router puts this base url in when FULL_BASE_URL is defined
         $expected_event = array(
             'type' => 'NavigationEvent',
             'profile' => 'ReadingProfile',
@@ -95,8 +98,8 @@ class CaliperAppControllerHooksTest extends CaliperAuthTestCase
             'extensions' => array(
                 'relativePath' => '',
                 'queryString' => '',
-                'absolutePath' => '',
-                'absoluteUrl' => '/',
+                'absolutePath' => 'http://cakephp.org/',
+                'absoluteUrl' => 'http://cakephp.org/',
             )
         );
 

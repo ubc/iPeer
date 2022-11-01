@@ -845,8 +845,7 @@ class GroupsController extends AppController
         $lines = array_map("unserialize", array_unique(array_map("serialize", $lines)));
 
         // pre-process the lines in the file first
-        $filter = 'return (count(array_filter($user)) != 2);';
-        $invalid = array_filter($lines, create_function('$user', $filter));
+        $invalid = array_filter($lines, function ($user) { return (count(array_filter($user)) != 2); });
         $valid = array_diff_key($lines, $invalid);
         $users = Set::combine($valid, '{n}.'.IMPORT_GROUP_IDENTIFIER, '', '{n}.'.IMPORT_GROUP_GROUP_NAME);
         $names = array_unique(Set::extract($valid, '{n}.'.IMPORT_GROUP_GROUP_NAME));

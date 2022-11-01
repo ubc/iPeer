@@ -205,8 +205,12 @@ class FileUploadComponent extends CakeObject{
       return false;
     }
 
-    $up_dir = $this->options['forceWebroot'] ? WWW_ROOT . $this->options['uploadDir'] : $this->options['uploadDir'];
-    $target_path = $up_dir . DS . $name;
+    // if we've already got an absolute path, use as is
+    $target_path = $name;
+    if (substr($name, 0, 1) != '/') {
+        $up_dir = $this->options['forceWebroot'] ? WWW_ROOT . $this->options['uploadDir'] : $this->options['uploadDir'];
+        $target_path = $up_dir . DS . $name;
+    }
 
     //delete main image -- $name
     if(@unlink($target_path)){

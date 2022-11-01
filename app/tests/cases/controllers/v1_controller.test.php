@@ -99,15 +99,9 @@ class V1ControllerTest extends CakeTestCase {
      * helper function to get test cases running in cli on Jenkins
      **/
     private function _getURL($path) {
-        $url = Router::url($path, true);
-        // check if we're running the tests from the command line, if so,
-        // we have to manually construct a proper URL
-        if (substr($url,0,4) != "http") {
-            // read the server from environment var first
-            // so that this can be configured from outside
-            if (!($server = getenv('SERVER_TEST'))) {
-                $server = 'http://localhost:2000';
-            }
+        // tests running from the command line can override the server root
+        if (getenv('SERVER_TEST')) {
+            $server = getenv('SERVER_TEST');
             // since the Router isn't handling relative URLs for us, make sure
             // to convert the path to an absolute URL
             if (substr($path,0,1) != '/') {
@@ -115,7 +109,7 @@ class V1ControllerTest extends CakeTestCase {
             }
             return $server.$path;
         }
-        return $url;
+        return Router::url($path, true);
     }
 
     public function testCheckRequiredParams() {
@@ -170,7 +164,6 @@ class V1ControllerTest extends CakeTestCase {
 
         // No errors thrown
         $result = $this->_oauthReq($url);
-        print_r($result);
         $this->assertEqual('', $result);
         // The client key couldn't be found in the db
         $original = $this->clientKey;
@@ -228,6 +221,8 @@ class V1ControllerTest extends CakeTestCase {
         $expected = array();
 
         foreach ($users as $user) {
+            // skip inactive 'soft-deleted' users
+            if ($user['record_status'] != 'A') continue;
             $tmp = array();
             $role = array();
             $tmp['id'] = $user['id'];
@@ -238,7 +233,8 @@ class V1ControllerTest extends CakeTestCase {
                     'fields' => array('role_id')
                 )
             );
-            $tmp['role_id'] = $role['RolesUser']['role_id'];
+            $tmp['role_id'] = null;
+            if ($role) $tmp['role_id'] = $role['RolesUser']['role_id'];
             $tmp['username'] = $user['username'];
             $tmp['last_name'] = $user['last_name'];
             $tmp['first_name'] = $user['first_name'];
