@@ -24,7 +24,7 @@ class UsersController extends AppController
         'EvaluationSubmission', 'EmailSchedule', 'RolesUser'
     );
     public $components = array('Session', 'AjaxList', 'RequestHandler',
-        'Email', 'FileUpload.FileUpload', 'PasswordGenerator', 'UsersRequest');
+        'Email', 'FileUpload.FileUpload', 'PasswordGenerator', 'UsersRequest'); // , 'Auth'
   
     // NOTE::
     public $body    = [];
@@ -54,7 +54,8 @@ class UsersController extends AppController
     function beforeFilter()
     {
         parent::beforeFilter();
-
+        // allowedActions
+        // $this->Auth->allow('me');
         $this->set('title_for_layout', __('Users',true));
 
         $allowTypes = array(
@@ -245,7 +246,63 @@ class UsersController extends AppController
         $this->set('can_import_user', User::hasPermission('functions/user/import'));
         $this->set('can_merge_users', User::hasPermission('controllers/users/merge'));
     }
-
+    
+    function me() {
+        //$this->layout = false;
+        $this->layout = 'ajax';
+        $this->autoRender = false;
+    
+        $id = $this->Auth->user('id');
+    
+        if ($this->RequestHandler->accepts('json')) {
+            if ($this->RequestHandler->isGet()) {
+                $user = $this->User->find('first', array('conditions' => array('User.id' => $id, 'User.record_status' => 'A')));
+                /**$user = $this->User->find(
+                    'first', array(
+                        'conditions' => array(
+                            'User.id' => $id,
+                            'User.record_status' => 'A'
+                        ),
+                        'fields' => array(
+                            'id'            => 'id',
+                            'role_id'       => 'role_id',
+                            'username'      => 'username',
+                            'email'         => 'email',
+                            'last_name'     => 'last_name',
+                            'first_name'    => 'first_name'
+                        )
+                    )
+                );*/
+                //var_dump($user); die();
+                //$role = $this->RolesUser->find('first', array('conditions' => array('user_id' => $decode['id']), 'fields' => 'role_id'));
+                if (!empty($user)) {
+                    $data = array(
+                        'id'            => $user['User']['id'],
+                        'role_id'       => $user['Role']['0']['id'],
+                        'username'      => $user['User']['username'],
+                        'email'         => $user['User']['email'],
+                        'last_name'     => $user['User']['last_name'],
+                        'first_name'    => $user['User']['first_name']
+                    );
+                    http_response_code(200);
+                    echo json_encode($data);
+                }
+            }
+        }
+        /**
+        echo json_encode([
+            "id" => "7",
+            "role_id" => "5",
+            "username" => "redshirt0003",
+            "first_name" => "Matt",
+            "last_name" => "Student",
+            "student_no" => "98985481",
+            "title" => "null",
+            "email" => "matt.student@ubc.ca"
+        ]);
+        */
+    }
+    
     /**
      * Display a list of users enrolled in a given course.
      *
@@ -407,7 +464,8 @@ class UsersController extends AppController
                 $this->redirect($this->referer());
             }
         }
-
+    
+        var_dump($this->data);die();
         $this->set('title_for_layout', __('View User', true));
         $this->set('user', $this->data);
     }

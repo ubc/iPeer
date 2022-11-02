@@ -49,6 +49,7 @@ if (IS_INSTALLED) {
   Router::connect('/install/*', array('controller' => 'install'));
   // Connect default index page to the home controller
   Router::connect('/', array('controller' => 'home', 'action' => 'index'));
+  // Router::connect('/users/me', array('controller' => 'users', 'action' => 'me'));
   // Connect static pages to the pages controller
   Router::connect('/pages/*', array('controller' => 'pages',
     'action' => 'display'));

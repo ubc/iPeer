@@ -1,6 +1,6 @@
 {
   "src/main.ts": {
-    "file": "js/vue/main.js",
+    "file": "js/webapp/main.js",
     "src": "src/main.ts",
     "isEntry": true,
     "dynamicImports": [
@@ -15,17 +15,17 @@
       "src/pages/NotFound.vue"
     ],
     "css": [
-      "css/vue/main.css"
+      "css/webapp/main.css"
     ]
   },
   "src/pages/EventsIndex.vue": {
-    "file": "js/vue/EventsIndex.js",
+    "file": "js/webapp/EventsIndex.js",
     "src": "src/pages/EventsIndex.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
       "_lodash.js",
-      "_index.js",
+      "_Loader.vue_vue_type_script_setup_true_lang.js",
       "_autosize.esm.js",
       "_SectionTitle.vue_vue_type_script_setup_true_lang.js",
       "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
@@ -36,45 +36,45 @@
       "src/student/components/tables/completed/Row.vue"
     ]
   },
-  "_index.js": {
-    "file": "js/vue/index.js",
+  "_Loader.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/webapp/Loader.vue_vue_type_script_setup_true_lang.js",
     "imports": [
-      "src/main.ts",
-      "_lodash.js"
+      "_lodash.js",
+      "src/main.ts"
     ]
   },
   "_SectionTitle.vue_vue_type_script_setup_true_lang.js": {
-    "file": "js/vue/SectionTitle.vue_vue_type_script_setup_true_lang.js",
+    "file": "js/webapp/SectionTitle.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts"
     ]
   },
   "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js": {
-    "file": "js/vue/SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
+    "file": "js/webapp/SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts"
     ]
   },
   "_lodash.js": {
-    "file": "js/vue/lodash.js",
+    "file": "js/webapp/lodash.js",
     "imports": [
       "__commonjsHelpers.js"
     ]
   },
   "__commonjsHelpers.js": {
-    "file": "js/vue/_commonjsHelpers.js"
+    "file": "js/webapp/_commonjsHelpers.js"
   },
   "_autosize.esm.js": {
-    "file": "js/vue/autosize.esm.js"
+    "file": "js/webapp/autosize.esm.js"
   },
   "src/pages/EvaluationIndex.vue": {
-    "file": "js/vue/EvaluationIndex.js",
+    "file": "js/webapp/EvaluationIndex.js",
     "src": "src/pages/EvaluationIndex.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
       "_lodash.js",
-      "_index.js",
+      "_Loader.vue_vue_type_script_setup_true_lang.js",
       "_SectionTitle.vue_vue_type_script_setup_true_lang.js",
       "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
       "_ViewHeading.vue_vue_type_script_setup_true_lang.js",
@@ -87,20 +87,20 @@
     ]
   },
   "_ViewHeading.vue_vue_type_script_setup_true_lang.js": {
-    "file": "js/vue/ViewHeading.vue_vue_type_script_setup_true_lang.js",
+    "file": "js/webapp/ViewHeading.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts",
-      "_index.js"
+      "_Loader.vue_vue_type_script_setup_true_lang.js"
     ]
   },
   "_IconWritingHand.js": {
-    "file": "js/vue/IconWritingHand.js",
+    "file": "js/webapp/IconWritingHand.js",
     "imports": [
       "src/main.ts"
     ]
   },
   "src/student/views/EvaluationMakePage.vue": {
-    "file": "js/vue/EvaluationMakePage.js",
+    "file": "js/webapp/EvaluationMakePage.js",
     "src": "src/student/views/EvaluationMakePage.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -117,23 +117,23 @@
     ]
   },
   "_dynamic-import-helper.js": {
-    "file": "js/vue/dynamic-import-helper.js"
+    "file": "js/webapp/dynamic-import-helper.js"
   },
   "_IconSpinner.js": {
-    "file": "js/vue/IconSpinner.js",
+    "file": "js/webapp/IconSpinner.js",
     "imports": [
       "src/main.ts"
     ]
   },
   "_TakeNote.vue_vue_type_script_setup_true_lang.js": {
-    "file": "js/vue/TakeNote.vue_vue_type_script_setup_true_lang.js",
+    "file": "js/webapp/TakeNote.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
       "src/main.ts"
     ]
   },
   "src/student/views/EvaluationEditPage.vue": {
-    "file": "js/vue/EvaluationEditPage.js",
+    "file": "js/webapp/EvaluationEditPage.js",
     "src": "src/student/views/EvaluationEditPage.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -150,19 +150,19 @@
     ]
   },
   "src/pages/SubmissionIndex.vue": {
-    "file": "js/vue/SubmissionIndex.js",
+    "file": "js/webapp/SubmissionIndex.js",
     "src": "src/pages/SubmissionIndex.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_index.js",
+      "_Loader.vue_vue_type_script_setup_true_lang.js",
       "_ViewHeading.vue_vue_type_script_setup_true_lang.js",
       "_lodash.js",
       "__commonjsHelpers.js"
     ]
   },
   "src/student/views/SubmissionViewPage.vue": {
-    "file": "js/vue/SubmissionViewPage.js",
+    "file": "js/webapp/SubmissionViewPage.js",
     "src": "src/student/views/SubmissionViewPage.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -175,7 +175,7 @@
     ]
   },
   "src/pages/UsersIndex.vue": {
-    "file": "js/vue/UsersIndex.js",
+    "file": "js/webapp/UsersIndex.js",
     "src": "src/pages/UsersIndex.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -183,13 +183,12 @@
     ]
   },
   "src/student/views/UserProfile.vue": {
-    "file": "js/vue/UserProfile.js",
+    "file": "js/webapp/UserProfile.js",
     "src": "src/student/views/UserProfile.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_index2.js",
-      "_sweetalert.min.js",
+      "_index.js",
       "_SectionTitle.vue_vue_type_script_setup_true_lang.js",
       "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
       "_autosize.esm.js",
@@ -198,26 +197,20 @@
       "__commonjsHelpers.js"
     ]
   },
-  "_index2.js": {
-    "file": "js/vue/index2.js",
-    "imports": [
-      "__commonjsHelpers.js"
-    ]
-  },
-  "_sweetalert.min.js": {
-    "file": "js/vue/sweetalert.min.js",
+  "_index.js": {
+    "file": "js/webapp/index.js",
     "imports": [
       "__commonjsHelpers.js"
     ]
   },
   "_CustomInputField.vue_vue_type_script_setup_true_lang.js": {
-    "file": "js/vue/CustomInputField.vue_vue_type_script_setup_true_lang.js",
+    "file": "js/webapp/CustomInputField.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts"
     ]
   },
   "src/pages/NotFound.vue": {
-    "file": "js/vue/NotFound.js",
+    "file": "js/webapp/NotFound.js",
     "src": "src/pages/NotFound.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -225,11 +218,11 @@
     ]
   },
   "src/student/components/tables/current/Row.vue": {
-    "file": "js/vue/Row.js",
+    "file": "js/webapp/Row.js",
     "src": "src/student/components/tables/current/Row.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_index.js",
+      "_Loader.vue_vue_type_script_setup_true_lang.js",
       "_IconClock.js",
       "src/main.ts",
       "_lodash.js",
@@ -237,17 +230,17 @@
     ]
   },
   "_IconClock.js": {
-    "file": "js/vue/IconClock.js",
+    "file": "js/webapp/IconClock.js",
     "imports": [
       "src/main.ts"
     ]
   },
   "src/student/components/tables/completed/Row.vue": {
-    "file": "js/vue/Row2.js",
+    "file": "js/webapp/Row2.js",
     "src": "src/student/components/tables/completed/Row.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_index.js",
+      "_Loader.vue_vue_type_script_setup_true_lang.js",
       "_IconClock.js",
       "src/main.ts",
       "_lodash.js",
@@ -255,7 +248,7 @@
     ]
   },
   "src/student/views/templates/MixedEvaluation.vue": {
-    "file": "js/vue/MixedEvaluation.js",
+    "file": "js/webapp/MixedEvaluation.js",
     "src": "src/student/views/templates/MixedEvaluation.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -264,8 +257,7 @@
       "_EvaluationForm.vue_vue_type_script_setup_true_lang.js",
       "_dynamic-import-helper.js",
       "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
-      "__commonjsHelpers.js",
-      "_sweetalert.min.js"
+      "__commonjsHelpers.js"
     ],
     "dynamicImports": [
       "src/student/views/questions/PeerMixedCommentQuestion.vue",
@@ -279,18 +271,17 @@
     ]
   },
   "_EvaluationForm.vue_vue_type_script_setup_true_lang.js": {
-    "file": "js/vue/EvaluationForm.vue_vue_type_script_setup_true_lang.js",
+    "file": "js/webapp/EvaluationForm.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts",
-      "_lodash.js",
-      "_sweetalert.min.js"
+      "_lodash.js"
     ],
     "css": [
-      "css/vue/EvaluationForm.css"
+      "css/webapp/EvaluationForm.css"
     ]
   },
   "src/student/views/templates/RubricEvaluation.vue": {
-    "file": "js/vue/RubricEvaluation.js",
+    "file": "js/webapp/RubricEvaluation.js",
     "src": "src/student/views/templates/RubricEvaluation.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -303,37 +294,36 @@
       "_UserCard.vue_vue_type_script_setup_true_lang.js",
       "_CustomTextField.vue_vue_type_script_setup_true_lang.js",
       "__commonjsHelpers.js",
-      "_sweetalert.min.js",
-      "_index2.js"
+      "_index.js"
     ]
   },
   "_rules.js": {
-    "file": "js/vue/rules.js",
+    "file": "js/webapp/rules.js",
     "imports": [
-      "_index2.js"
+      "_index.js"
     ]
   },
   "_CustomRadioField.vue_vue_type_script_setup_true_lang.js": {
-    "file": "js/vue/CustomRadioField.vue_vue_type_script_setup_true_lang.js",
+    "file": "js/webapp/CustomRadioField.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts"
     ]
   },
   "_UserCard.vue_vue_type_script_setup_true_lang.js": {
-    "file": "js/vue/UserCard.vue_vue_type_script_setup_true_lang.js",
+    "file": "js/webapp/UserCard.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts"
     ]
   },
   "_CustomTextField.vue_vue_type_script_setup_true_lang.js": {
-    "file": "js/vue/CustomTextField.vue_vue_type_script_setup_true_lang.js",
+    "file": "js/webapp/CustomTextField.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts",
       "_autosize.esm.js"
     ]
   },
   "src/student/views/templates/SimpleEvaluation.vue": {
-    "file": "js/vue/SimpleEvaluation.js",
+    "file": "js/webapp/SimpleEvaluation.js",
     "src": "src/student/views/templates/SimpleEvaluation.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -345,12 +335,14 @@
       "_rules.js",
       "_CustomTextField.vue_vue_type_script_setup_true_lang.js",
       "__commonjsHelpers.js",
-      "_sweetalert.min.js",
-      "_index2.js"
+      "_index.js"
+    ],
+    "css": [
+      "css/webapp/SimpleEvaluation.css"
     ]
   },
   "src/student/views/SubmissionResponse.vue": {
-    "file": "js/vue/SubmissionResponse.js",
+    "file": "js/webapp/SubmissionResponse.js",
     "src": "src/student/views/SubmissionResponse.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -367,7 +359,7 @@
     ]
   },
   "src/student/views/SubmissionReviews.vue": {
-    "file": "js/vue/SubmissionReviews.js",
+    "file": "js/webapp/SubmissionReviews.js",
     "src": "src/student/views/SubmissionReviews.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -377,7 +369,7 @@
     ]
   },
   "src/student/views/questions/PeerMixedCommentQuestion.vue": {
-    "file": "js/vue/PeerMixedCommentQuestion.js",
+    "file": "js/webapp/PeerMixedCommentQuestion.js",
     "src": "src/student/views/questions/PeerMixedCommentQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -385,7 +377,7 @@
     ]
   },
   "src/student/views/questions/PeerMixedLikertQuestion.vue": {
-    "file": "js/vue/PeerMixedLikertQuestion.js",
+    "file": "js/webapp/PeerMixedLikertQuestion.js",
     "src": "src/student/views/questions/PeerMixedLikertQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -396,12 +388,11 @@
       "_CustomRadioField.vue_vue_type_script_setup_true_lang.js",
       "src/main.ts",
       "__commonjsHelpers.js",
-      "_index2.js",
-      "_sweetalert.min.js"
+      "_index.js"
     ]
   },
   "src/student/views/questions/PeerMixedParagraphQuestion.vue": {
-    "file": "js/vue/PeerMixedParagraphQuestion.js",
+    "file": "js/webapp/PeerMixedParagraphQuestion.js",
     "src": "src/student/views/questions/PeerMixedParagraphQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -411,12 +402,12 @@
       "_UserCard.vue_vue_type_script_setup_true_lang.js",
       "src/main.ts",
       "__commonjsHelpers.js",
-      "_index2.js",
+      "_index.js",
       "_autosize.esm.js"
     ]
   },
   "src/student/views/questions/PeerMixedRangeQuestion.vue": {
-    "file": "js/vue/PeerMixedRangeQuestion.js",
+    "file": "js/webapp/PeerMixedRangeQuestion.js",
     "src": "src/student/views/questions/PeerMixedRangeQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -424,7 +415,7 @@
     ]
   },
   "src/student/views/questions/PeerMixedSentenceQuestion.vue": {
-    "file": "js/vue/PeerMixedSentenceQuestion.js",
+    "file": "js/webapp/PeerMixedSentenceQuestion.js",
     "src": "src/student/views/questions/PeerMixedSentenceQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -434,11 +425,11 @@
       "_UserCard.vue_vue_type_script_setup_true_lang.js",
       "src/main.ts",
       "__commonjsHelpers.js",
-      "_index2.js"
+      "_index.js"
     ]
   },
   "src/student/views/questions/SelfMixedLikertQuestion.vue": {
-    "file": "js/vue/SelfMixedLikertQuestion.js",
+    "file": "js/webapp/SelfMixedLikertQuestion.js",
     "src": "src/student/views/questions/SelfMixedLikertQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -448,13 +439,12 @@
       "_EvaluationForm.vue_vue_type_script_setup_true_lang.js",
       "_lodash.js",
       "src/main.ts",
-      "_index2.js",
-      "__commonjsHelpers.js",
-      "_sweetalert.min.js"
+      "_index.js",
+      "__commonjsHelpers.js"
     ]
   },
   "src/student/views/questions/SelfMixedParagraphQuestion.vue": {
-    "file": "js/vue/SelfMixedParagraphQuestion.js",
+    "file": "js/webapp/SelfMixedParagraphQuestion.js",
     "src": "src/student/views/questions/SelfMixedParagraphQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -463,12 +453,12 @@
       "_autosize.esm.js",
       "_lodash.js",
       "src/main.ts",
-      "_index2.js",
+      "_index.js",
       "__commonjsHelpers.js"
     ]
   },
   "src/student/views/questions/SelfMixedSentenceQuestion.vue": {
-    "file": "js/vue/SelfMixedSentenceQuestion.js",
+    "file": "js/webapp/SelfMixedSentenceQuestion.js",
     "src": "src/student/views/questions/SelfMixedSentenceQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -477,16 +467,20 @@
       "_CustomInputField.vue_vue_type_script_setup_true_lang.js",
       "_lodash.js",
       "src/main.ts",
-      "_index2.js",
+      "_index.js",
       "__commonjsHelpers.js"
     ]
   },
   "EvaluationForm.css": {
-    "file": "css/vue/EvaluationForm.css",
+    "file": "css/webapp/EvaluationForm.css",
     "src": "EvaluationForm.css"
   },
+  "src/student/views/templates/SimpleEvaluation.css": {
+    "file": "css/webapp/SimpleEvaluation.css",
+    "src": "src/student/views/templates/SimpleEvaluation.css"
+  },
   "src/main.css": {
-    "file": "css/vue/main.css",
+    "file": "css/webapp/main.css",
     "src": "src/main.css"
   }
 }

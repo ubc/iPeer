@@ -382,4 +382,5 @@ foreach ($keys as $key) {
     }
   }
 }
-//Configure::write('debug', 0);
+// ['development', 'staging', 'production']
+Configure::write('development', true);

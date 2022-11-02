@@ -32,4 +32,11 @@ RUN set -ex \
     && sed -i -e "s/;request_terminate_timeout\s*=[^\n]*/request_terminate_timeout = 300/g" /usr/local/etc/php-fpm.conf \
     && php-fpm --test
 
+#FROM node:16 as build-stage
+#WORKDIR ./var/www/html/app/webapp
+#COPY package*.json ./var/www/html/app/webapp
+#RUN npm install
+#COPY . .
+#RUN npm run build
+
 CMD ["/docker-entrypoint-php-fpm.sh"]

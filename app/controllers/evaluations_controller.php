@@ -63,7 +63,8 @@ class EvaluationsController extends AppController
   
         // NOTE::
         if (!$this->RequestHandler->isGet()) {
-          $this->body = (array) json_decode(trim(file_get_contents('php://input'), true));
+          // $this->body = (array) json_decode(trim(file_get_contents('php://input'), true));
+          $this->body = trim(file_get_contents('php://input'), true);
         }
     }
 

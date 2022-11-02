@@ -9,12 +9,12 @@
   <meta http-equiv="Content-Language" content="en"/>
   <link rel="shortcut icon" href="/img/favicon.png" type="image/png"/>
     <?php if ($isLoggedIn && $loggedInUserRole == '5'): ?>
-        <?php if (Configure::read('debug')): ?>
+        <?php if (Configure::read('development')): ?>
             <script type="module" src="http://localhost:5173/@vite/client"></script>
             <script type="module" src="http://localhost:5173/src/main.ts"></script>
         <?php else: ?>
-            <?php echo $this->Html->css('vue/main.css', TRUE); ?>
-            <script type="module" src="/js/vue/index.js"></script>
+            <?php echo $this->Html->css('webapp/main.css', TRUE); ?>
+            <script type="module" src="js/webapp/index.js"></script>
         <?php endif; ?>
     <?php else: ?>
     <?php
@@ -73,7 +73,6 @@
 
 <?php if ($isLoggedIn && $loggedInUserRole == '5'): ?>
   <div id="webapp" class="layout containerOuter pagewidth"></div>
-    <?php //echo $this->Html->css('ipeer'); echo $content_for_layout;  ?>
 <?php else: ?>
   <div class="containerOuter pagewidth">
     <!-- BANNER -->
@@ -101,7 +100,7 @@
 <?php endif; ?>
 
 <!-- DEBUG -->
-<?php //echo $this->element('global/debug'); ?>
+<?php // echo $this->element('global/debug'); ?>
 
 <?php echo $this->Js->writeBuffer(); // Write cached scripts?>
 </body>
