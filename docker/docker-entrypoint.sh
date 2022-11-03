@@ -1,14 +1,17 @@
-#!/bin/bash
+#!/bin/sh
 
-set -eo pipefail
+# hacks to allow php-fpm child process to write to log files that redirected to stderr
+# similar to https://github.com/moby/moby/issues/6880#issuecomment-344114520
+chown www-data:www-data /var/www/html/app/tmp/logs
+for f in /var/www/html/app/tmp/logs/api.log \
+    /var/www/html/app/tmp/logs/debug.log \
+    /var/www/html/app/tmp/logs/error.log \
+    /var/www/html/app/tmp/logs/login.log
+do
+    rm -f $f
+    mkfifo -m 600 $f
+    chown www-data:www-data $f
+    cat <> $f 1>&2 &
+done
 
-config=/etc/nginx/conf.d/default.conf
-NGINX_FASTCGI_PASS=${NGINX_FASTCGI_PASS:-localhost:9000}
-
-if [ "${1:0:1}" = '-'  ]; then
-    set -- nginx "$@"
-fi
-
-sed -Ei "s/NGINX_FASTCGI_PASS/$NGINX_FASTCGI_PASS/" $config
-
-exec "$@"
+php-fpm

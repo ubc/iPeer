@@ -35,4 +35,4 @@ playground-temp
 temp
 TODOs.md
 .eslintcache
-.env
+#.env
