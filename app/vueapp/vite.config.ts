@@ -20,9 +20,9 @@ export default defineConfig(({ command, mode }) => {
           main: './src/main.ts'
         },
         output: {
-          entryFileNames: development ? 'js/vueapp/[name].js' : 'js/vueapp/[name].[hash].js',
-          chunkFileNames: development ? 'js/vueapp/[name].js' : 'js/vueapp/[name].[hash].js',
-          assetFileNames: development ? 'css/vueapp/[name].[ext]' : 'css/vueapp/[name].[hash].[ext]'
+          entryFileNames: development ? 'js/assets/[name].js' : 'js/assets/[name].[hash].js',
+          chunkFileNames: development ? 'js/assets/[name].js' : 'js/assets/[name].[hash].js',
+          assetFileNames: development ? 'css/assets/[name].[ext]' : 'css/assets/[name].[hash].[ext]'
         }
       }
     },

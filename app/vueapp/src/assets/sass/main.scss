@@ -15,6 +15,7 @@
 
 .debugger {
   display: none;
+  @apply hidden;
 }
 
 @layer components {
