@@ -41,17 +41,6 @@ services:
       #- XDEBUG_CONFIG=client_host=host.docker.internal client_port=9000 log=/tmp/xdebug.log
     depends_on:
       - db
-  node:
-    container_name: ipeer_vueapp
-    build:
-      context: .
-      target: node
-    depends_on:
-      - app
-    volumes:
-      - ./app/webroot:/var/www/html
-      - ./node_modules:/var/www/html/node_modules
-    tty: true
   worker: &worker
     <<: *app
     container_name: ipeer_worker

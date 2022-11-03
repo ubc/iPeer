@@ -9,15 +9,9 @@
   <meta http-equiv="Content-Language" content="en"/>
   <link rel="shortcut icon" href="/img/favicon.png" type="image/png"/>
     <?php if ($isLoggedIn && $loggedInUserRole == '5'): ?>
-        <?php if (Configure::read('development')): ?>
-            <script type="module" src="http://localhost:5173/@vite/client"></script>
-            <script type="module" src="http://localhost:5173/src/main.ts"></script>
-        <?php else: ?>
-            <?php echo $this->Html->css('webapp/main.css', TRUE); ?>
-            <script type="module" src="js/webapp/index.js"></script>
-        <?php endif; ?>
+        <?php // temp and will be removed... ?>
     <?php else: ?>
-    <?php
+        <?php
         // CSS files
         echo $html->css('datepicker');
         echo $html->css('jquery.dataTables');
@@ -33,7 +27,7 @@
         echo $html->script('https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js');
         echo $html->script('jquery.dataTables.min');
         echo $html->script('fnGetHiddenNodes');
-    ?>
+        ?>
       <script type='text/javascript'>
         jQuery.noConflict(); // prevent conflicts with prototype
       </script>
@@ -70,32 +64,32 @@
     <?php endif; ?>
 </head>
 <body>
-
 <?php if ($isLoggedIn && $loggedInUserRole == '5'): ?>
-  <div id="webapp" class="layout containerOuter pagewidth"></div>
+    <div id="webapp" class="layout containerOuter pagewidth"></div>
+    <?php echo $this->element('global/assets'); ?>
 <?php else: ?>
-  <div class="containerOuter pagewidth">
-    <!-- BANNER -->
-      <?php echo $this->element('global/banner', array('customLogo' => $customLogo)); ?>
-    <!-- NAVIGATION -->
-      <?php echo $this->element('global/navigation', array()); ?>
-    <!-- CONTENT -->
-    <!-- TITLE BAR -->
-    <h1 class='title'>
-        <?php if (isset($breadcrumb)): ?>
-            <?php echo $breadcrumb->render($html); ?>
-        <?php else: ?>
-            <?php echo $title_for_layout; ?>
-        <?php endif; ?>
-    </h1>
-    <!-- ERRORS -->
-      <?php echo $this->Session->flash(); ?>
-      <?php echo $this->Session->flash('auth'); ?>
-      <?php echo $this->Session->flash('good'); ?>
-    <!-- ACTUAL PAGE -->
-      <?php echo $content_for_layout; ?>
-  </div>
-  <!-- FOOTER -->
+    <div class="containerOuter pagewidth">
+        <!-- BANNER -->
+        <?php echo $this->element('global/banner', array('customLogo' => $customLogo)); ?>
+        <!-- NAVIGATION -->
+        <?php echo $this->element('global/navigation', array()); ?>
+        <!-- CONTENT -->
+        <!-- TITLE BAR -->
+        <h1 class='title'>
+            <?php if (isset($breadcrumb)): ?>
+                <?php echo $breadcrumb->render($html); ?>
+            <?php else: ?>
+                <?php echo $title_for_layout; ?>
+            <?php endif; ?>
+        </h1>
+        <!-- ERRORS -->
+        <?php echo $this->Session->flash(); ?>
+        <?php echo $this->Session->flash('auth'); ?>
+        <?php echo $this->Session->flash('good'); ?>
+        <!-- ACTUAL PAGE -->
+        <?php echo $content_for_layout; ?>
+    </div>
+    <!-- FOOTER -->
     <?php echo $this->element('global/footer'); ?>
 <?php endif; ?>
 
