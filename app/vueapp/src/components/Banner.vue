@@ -12,7 +12,7 @@ const props = defineProps<{}>()
 <template>
   <div id="bannerLarge" class="banner">
     <div id="ipeerLogo">
-      <router-link id="home" :to="{ name: 'dashboard' }">
+      <router-link id="home" :to="{ name: 'student.events' }">
         <img :src="'../img/layout/ipeer_logo.png'" id="bannerLogoImgLeft" alt="logo"><span id="ipeerI">i</span><span
           id="ipeerText">Peer</span> <span id="bannerLogoText">3.4.10 with TeamMaker</span>
       </router-link>

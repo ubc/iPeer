@@ -1,9 +1,11 @@
 import { createApp } from 'vue'
 import { configure } from 'vee-validate'
-import App from './App.vue'
 import router from './router'
-
+import api from '@/services/api'
+import App from './App.vue'
 import './assets/sass/main.scss'
+
+api.init()
 
 configure({
   generateMessage: context => {

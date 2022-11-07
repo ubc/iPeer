@@ -382,4 +382,4 @@ foreach ($keys as $key) {
     }
   }
 }
-Configure::write('development', false);
+Configure::write('development', true);

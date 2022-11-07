@@ -5,15 +5,15 @@ import { useRoute, useRouter } from 'vue-router'
 import IconSpinner from '@/components/icons/IconSpinner.vue'
 import TakeNote from '@/student/components/TakeNote.vue'
 
-import type { Evaluation, User } from '@/types/typings'
+import type { IUser, IEvaluation } from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
   (e: 'fetch:evaluation'): void
 }>()
 const props = defineProps<{
-  members: User[]
-  currentUser: User
-  evaluation: Evaluation
+  members: IUser[]
+  currentUser: IUser
+  evaluation: IEvaluation
 }>()
 const route = useRoute()
 const router = useRouter()

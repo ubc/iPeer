@@ -1,48 +1,51 @@
 import {createRouter, createWebHashHistory} from 'vue-router'
-import App from '../App.vue'
-import Banner from '../components/Banner.vue'
-import Footer from '../components/Footer.vue'
-import Navigation from '../components/Navigation.vue'
-import Notifications from '../components/notification/Notifications.vue'
-import UserDashboard from '@/pages/UserDashboard.vue'
+import Banner from '@/components/Banner.vue'
+import Navigation from '@/components/Navigation.vue'
+import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import Footer from '@/components/Footer.vue'
+import ToastMessage from '@/components/messages/Messages.vue'
+import FlashMessage from '@/components/messages/Flash.vue'
+import { IconCollaboratorCircle } from '@/components/icons'
 
 // history: createWebHistory(import.meta.env.BASE_URL),
 const router = createRouter({
   history: createWebHashHistory(),
+  linkActiveClass: 'current',
   routes: [
     {
       path: '/',
       name: 'app',
-      // meta: { requiresAuth: true },
+      // meta: { requiresAuth: true, is_student: true },
       components: {
-        default: App,
+        default: DefaultLayout,
         banner: Banner,
         navigation: Navigation,
-        notification: Notifications,
+        toast: ToastMessage,
         footer: Footer,
       },
       children: [
         {
           path: '',
-          name: 'dashboard',
-          // alias: '/home',
-          // meta: { requiresAuth: true, is_student: true },
-          component: UserDashboard,
-          redirect: { name: 'events' },
-          children: [
-            {
-              path: '',
-              name: 'events',
-              component: () => import('../pages/EventsIndex.vue'),
-              //meta: {routeTitle: ''},
+          name: 'student.events',
+          component: () => import('../pages/EventsIndex.vue'),
+          //meta: {routeTitle: ''},
+          props: {
+            settings: {
+              title: 'iPeer Dashboard',
+              description: '<b class="font-medium">Welcome to iPeer!</b> This application lets you review your team members’ contributions to group projects and assignments. Your feedback helps you reflect on teamwork and express your point-of-view. It also helps instructors understand how well groups work together and how much each group member contributes.',
+              icon: {
+                src: IconCollaboratorCircle,
+                size: '',
+                position: 'left'
+              }
             }
-          ]
+          }
         },
         {
           path: '/evaluations',
           name: 'evaluation.index',
           component: () => import('../pages/EvaluationIndex.vue'),
-          redirect: {name: 'dashboard'},
+          redirect: {name: 'student.events'},
           children: [
             {
               path: 'make/:event_id/:group_id',
@@ -64,14 +67,18 @@ const router = createRouter({
           path: '/submissions',
           name: 'submission.index',
           component: () => import('../pages/SubmissionIndex.vue'),
-          redirect: {name: 'dashboard'},
+          redirect: {name: 'student.events'},
           children: [
             {
               path: 'view/:event_id/:group_id',
               name: 'submission.view',
               component: () => import('../student/views/SubmissionViewPage.vue'),
               meta: {routeTitle: 'View Results'},
-              props: true
+              props: {
+                settings: {
+                  title: '__View Results'
+                }
+              },
             }
           ]
         },
@@ -79,24 +86,36 @@ const router = createRouter({
           path: '/users',
           name: 'user.index',
           props: true,
-          component: () => import('../pages/UsersIndex.vue'),
+          component:  () => import('../pages/UsersIndex.vue'),
+          redirect: {name: 'student.events'},
           children: [
             {
               path: 'profile/edit',
               name: 'user.profile',
-              props: true,
-              component: () => import('../student/views/UserProfile.vue'),
-              meta: {routeTitle: 'User Profile'},
+              meta: {routeTitle: 'Edit Profile'},
+              props: {
+                default: {
+                  settings: {title: 'Edit Profile'}
+                }
+              },
+              components: {
+                default: () => import('../student/views/UserProfile.vue'),
+                flash: FlashMessage,
+              },
             }
           ]
-        },
+        }
       ]
     },
     {
       path: '/:pathMatch(.*)*',
       name: 'notfound',
       component: () => import('../pages/NotFound.vue'),
-      //meta: {routeTitle: 'Not Found'},
+      props: {
+        settings: {
+          title: 'Page Not Found'
+        }
+      }
     },
   ]
 })

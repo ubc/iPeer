@@ -26,7 +26,7 @@ function toggleNavDropdown() {console.log('[Todo] Navigation Dropdown List')}
 <template>
   <nav class="navigation flex justify-between items-center bg-slate-50 mx-auto mt-4 mb-8 px-4 py-0 border shadow-md">
     <div class="flex items-center space-x-2 text-sm text-slate-700 leading-relaxed tracking-wide space-x-4">
-      <NavigationItem class="py-1" route-name="dashboard" display-name="Dashboard"></NavigationItem>
+      <NavigationItem class="py-1" route-name="student.events" display-name="Dashboard"></NavigationItem>
       <NavigationItem v-if="currentRouteTitle" class="text-gold-500 font-medium active" :route-name="null" :display-name="currentRouteTitle"></NavigationItem>
     </div>
 

@@ -15,7 +15,7 @@ const emit = defineEmits<{
 }>()
 const props = defineProps<Props>()
 // DATA
-const selected = computed(() => props.default ? props.default : props.options.length > 0 ? props.options[0] : null)
+const selected = computed(() => props.default ? props.default : props.options?.length > 0 ? props.options[0] : null)
 // COMPUTED
 // METHODS
 // WATCH

@@ -331,3 +331,17 @@ export interface IMixedResponseDataDetail {
 export interface IMixedReview {}
 export interface IMixedReviewData {}
 export interface IMixedReviewDetail {}
+
+
+/**
+ * Page Layout
+ */
+export interface IPageHeading {
+  title: string
+  description: string
+  icon: {
+    src: string
+    size: string
+    position: string
+  }
+}

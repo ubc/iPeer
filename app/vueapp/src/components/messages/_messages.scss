@@ -1,0 +1,113 @@
+.messages {
+  @apply w-[360px];
+  @apply fixed;
+  @apply top-4;
+  @apply right-4;
+  @apply text-sm;
+  @apply p-0 m-0;
+  @apply z-10;
+}
+.flash {
+  @apply relative;
+  @apply text-sm;
+  @apply py-3 px-5;
+  @apply mb-4;
+  @apply border-solid border border-transparent;
+  @apply rounded;
+  &-wrapper {
+    @apply w-full flex justify-between items-start;
+  }
+}
+.toast {
+  @apply relative mb-4 border border-transparent rounded shadow;
+  animation: SlideRight 0.4s;
+  animation-fill-mode: forwards;
+  &.show {
+    animation: SlideLeft 0.4s;
+    animation-fill-mode: forwards;
+  }
+  &-wrapper {
+    @apply w-[320px] pt-3 px-5 pb-4;
+  }
+  .status-bar {
+    @apply w-full;
+    @apply h-[0.25rem];
+    @apply bg-red-500;
+    @apply overflow-hidden;
+    @apply rounded-b-md;
+  }
+}
+
+.toast, .flash {
+  &-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    div {
+      color: #155724;
+    }
+  }
+  &-danger, &-error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+  }
+  &-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+  }
+  &-dismissible {
+    .close {
+      @apply text-black text-2xl font-semibold leading-3 opacity-50 hover:opacity-60 leading-4;
+      &:not(:disabled):not(.disabled) {
+        @apply cursor-pointer;
+      }
+    }
+  }
+}
+
+.fade {
+  @apply opacity-0;
+  transition: opacity .15s linear;
+
+  &.show {
+    @apply opacity-100;
+  }
+}
+// Slide in from the left
+@keyframes SlideLeft {
+  0% {@apply ml-[120%]}
+  100% {@apply ml-0}
+}
+
+@keyframes SlideRight {
+  0% {@apply ml-0}
+  100% {@apply ml-[120%]}
+}
+
+
+
+
+
+
+
+//
+//  // bootstrap colors
+//  &-success {
+//    color: #155724;
+//    background-color: #d4edda;
+//    border-color: #c3e6cb;
+//  }
+//  &-error {
+//    color: #721c24;
+//    background-color: #f8d7da;
+//    border-color: #f5c6cb;
+//  }
+//  &-warning {
+//    color: #856404;
+//    background-color: #fff3cd;
+//    border-color: #ffeeba;
+//  }
+//
+//}

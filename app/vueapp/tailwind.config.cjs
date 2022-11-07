@@ -44,6 +44,7 @@ module.exports = {
           500: 'steelblue'
         },
         'gold': {
+          gold: '#ffe484',
           100: 'rgb(251,217,93)', // '#fbd95d'
           200: 'rgb(250,211,68)', // '#fad344'
           300: 'rgb(250,206,43)', // '#face2b'
@@ -61,10 +62,14 @@ module.exports = {
           400: '',
           500: '#8c629f',
           600: '',
-          700: '',
+          700: '#563d7c',
           800: '',
           900: '#3f3cbb',
         },
+        success: '#d4edda',
+        error: '#f8d7da',
+        warning: '#fff3cd',
+        info: '#d1ecf1',
       },
     },
   },

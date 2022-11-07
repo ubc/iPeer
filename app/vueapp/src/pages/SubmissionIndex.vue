@@ -3,7 +3,7 @@ import { ref, reactive, watch, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router'
 import useFetch from '@/composables/useFetch'
 import Loader from '@/components/Loader.vue'
-import PageTitle from '@/components/PageTitle.vue'
+import PageHeading from '@/components/PageHeading.vue'
 import ViewHeading from '@/student/components/ViewHeading.vue'
 import { IconTwoUsers } from '@/components/icons'
 
@@ -50,7 +50,7 @@ onMounted(async () => {
   </template>
 
   <template v-else>
-    <PageTitle :title="evaluation?.title">
+    <PageHeading :title="evaluation?.title">
       <ViewHeading
           :due-date="evaluation?.due_date"
           :penalties="evaluation?.penalty"
@@ -58,7 +58,7 @@ onMounted(async () => {
           :course-title="evaluation?.course?.title"
           :icon="{src: IconTwoUsers, size: '6rem'}"
       />
-    </PageTitle>
+    </PageHeading>
 
     <Suspense>
       <router-view

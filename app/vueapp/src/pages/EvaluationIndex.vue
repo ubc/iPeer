@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router'
 import { findIndex } from 'lodash'
 import useFetch from '@/composables/useFetch'
 import Loader from '@/components/Loader.vue'
-import PageTitle from '@/components/PageTitle.vue'
+import PageHeading from '@/components/PageHeading.vue'
 import SectionTitle from '@/components/SectionTitle.vue'
 import SectionSubtitle from '@/components/SectionSubtitle.vue'
 import ViewHeading from '@/student/components/ViewHeading.vue'
@@ -21,6 +21,7 @@ import {
 const EvaluationMakePage = defineAsyncComponent(() => import('@/student/views/EvaluationMakePage.vue'))
 const EvaluationEditPage = defineAsyncComponent(() => import('@/student/views/EvaluationEditPage.vue'))
 import type { IEvaluation, IUser } from '@/types/typings'
+
 interface Props {
   currentUser: IUser
   event_id?: string
@@ -87,7 +88,7 @@ onMounted(async () => await fetchEvaluation())
     </template>
 
     <template v-else>
-      <PageTitle :title="evaluation?.title">
+      <PageHeading :title="evaluation?.title">
         <ViewHeading
             :due-date="evaluation?.due_date"
             :penalty="evaluation?.penalty"
@@ -95,7 +96,7 @@ onMounted(async () => await fetchEvaluation())
             :course-title="evaluation?.course?.title"
             :icon="{src: IconTwoUsers, size: '6rem'}"
         />
-      </PageTitle>
+      </PageHeading>
 
       <SectionTitle title="About This Peer Review">
         <InstructorSays v-if="evaluation?.description" :description="evaluation?.description" />

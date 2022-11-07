@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { cloneDeep, debounce } from 'lodash'
 import useFetch from '@/composables/useFetch'
-import Debugger from "@/components/Debugger.vue";
 
 import type {IEvaluation, IMixedResponse, IRubricResponse, ISimpleResponse} from '@/types/typings'
 interface Props {
@@ -22,13 +21,11 @@ const { values, errors, meta, handleSubmit, isSubmitting } = useForm({
   initialValues: props.initialState?.data,
 })
 // DATA
-const mode            = ref(import.meta.env.MODE === 'development')
-const debug           = ref(false)
 const evaluation_form = ref()
 const message         = ref({})
 // COMPUTED
 // METHODS
-function onInvalidateSubmit({ errors }) {
+function onInvalidateSubmit({ errors }: any) {
   const fieldName = Object.keys(errors)[0]
   const fieldElement = document.getElementById(fieldName)
   fieldElement?.focus?.()
@@ -105,13 +102,4 @@ watch(() => cloneDeep(props.initialState), debounce(async (current, previous) =>
   <form novalidate @submit.prevent="onSubmit" id="evaluation_form" class="evaluation-form" ref="evaluation_form">
     <slot :evaluation-ref="evaluation_form" :onSave="onSave" :is-submitting="isSubmitting" :errors="errors" :values="values" :form-meta="meta" :message="message" />
   </form>
-
-  <button v-if="mode" class="debugger button default" @click="debug=!debug">{{ debug ? 'Hide' : 'Show'}} Debugger</button>
-  <div v-if="debug">
-    <Debugger title="Form Values/Errors" :state="values" :form="errors" />
-    <Debugger title="InitialState" :state="props.initialState" />
-    <Debugger title="Evaluation" :state="props.evaluation" />
-    <Debugger title="Simple/Rubric/Mixed" :state="props.evaluation?.simple || props.evaluation?.rubric || props.evaluation?.mixed" />
-    <Debugger title="Response" :state="props.evaluation?.response" />
-  </div>
 </template>

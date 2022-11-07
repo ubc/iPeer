@@ -1,15 +1,30 @@
 import { string } from 'yup'
+import {isEmpty} from 'lodash'
 
+// Evaluation Validation
+export const validateLikert = string().required().trim().nullable()
+export const validateSentence = string().required().min(10).trim().nullable()
+export const validateParagraph = string().required().min(20).trim().nullable()
 
-export const validateLikert = string().required().nullable()
-export const validateSentence = string().required().min(10).nullable()
-export const validateParagraph = string().required().min(20).nullable()
+// UserProfile Validation
+export const validateProfileTextInput = string().required().min(2).trim().nullable()
+export const validateProfileEmailInput = string().required().email().trim().nullable()
+// UserProfile Password Validation
+export const validateProfileOldPasswordInput = string().trim()
+export const validateProfileNewPasswordInput = string().trim()
+export const validateProfileConfirmPasswordInput = string().trim()
+  .test('passwords-match', 'New Passwords do not match', (value) => {
+    // @ts-ignore
+    const parentValue = parent['data[User][temp_password]']['value'].toString()
+    if(isEmpty(parentValue)) return true
+    return parentValue === value;
+})
 
-
-export function requiredTextRules(value: string) {
+// misc.
+export const requiredTextRules = (value: string) => {
   return string().required().min(2)
 }
-export function validateText(value: string) {
+export const validateText = (value: string) => {
   // if the field is empty
   if (!value) {
     //this.isEager = true;
@@ -17,8 +32,7 @@ export function validateText(value: string) {
   }
   return true
 }
-
-export function validateRadio(value: string) {
+export const validateRadio = (value: string) => {
   // if the field is empty
   if (!value) {
     //this.isEager = true;
@@ -26,8 +40,7 @@ export function validateRadio(value: string) {
   }
   return true
 }
-
-export function validateCheck(value: string) {
+export const validateCheck = (value: string) => {
   // if the field is empty
   if (!value) {
     //this.isEager = true;
@@ -35,8 +48,7 @@ export function validateCheck(value: string) {
   }
   return true
 }
-
-export function validateEmail(value: string) {
+export const validateEmail = (value: string) => {
   // if the field is empty
   if (!value) {
     //this.isEager = true;

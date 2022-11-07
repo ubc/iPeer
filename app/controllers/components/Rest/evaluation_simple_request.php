@@ -1,8 +1,6 @@
 <?php
 App::import('Lib', 'caliper');
 
-use caliper\CaliperHooks;
-
 class EvaluationSimpleRequestComponent extends CakeObject
 {
     public $Sanitize;
@@ -54,18 +52,16 @@ class EvaluationSimpleRequestComponent extends CakeObject
     }
     
     public function processResourceRequest($method, $eventId, $groupId, $studentId = null)
-    { // GET, POST, PUT, PATCH, and DELETE
-        //$this->pre_r($method);$this->pre_r($this->params); die();
+    {
         $event = $this->Event->getEventByIdGroupId($eventId, $groupId);
         switch ($method) {
-            case 'GET':
+            case 'GET': // Read
                 $this->get($event, $groupId, $studentId);
                 break;
             case 'POST': // Submit Peer Review
                 $this->set($event, $groupId, $studentId, $method);
                 break;
             case 'PUT': // Save Draft
-                // $this->pre_r($this->params); die();
                 $this->set($event, $groupId, $studentId, $method);
                 break;
             case 'PATCH': // Auto Save
@@ -246,8 +242,8 @@ class EvaluationSimpleRequestComponent extends CakeObject
         if ($this->Evaluation->saveSimpleEvaluation($this->params, $groupEvent, $evaluationSubmission)) {
             // CaliperHooks::submit_simple_evaluation($eventId, $evaluator, $groupEvent['GroupEvent']['id'], $groupId);
             // $this->RestResponseHandler->toJson('Your Evaluation was submitted successfully.', 200);
-    
-            $msg=[];
+            
+            $msg = [];
             if ($method === 'POST') {
                 if (empty($evaluationSubmission)) {
                     $this->EvaluationSubmission->id = null;
@@ -269,8 +265,7 @@ class EvaluationSimpleRequestComponent extends CakeObject
                     }
                     $msg[] = __('submitted.', true);
                 }
-            }
-            elseif($method === 'PUT' || $method === 'PATCH') {
+            } elseif ($method === 'PUT' || $method === 'PATCH') {
                 if (empty($evaluationSubmission)) {
                     $this->EvaluationSubmission->id = null;
                     $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
@@ -292,7 +287,7 @@ class EvaluationSimpleRequestComponent extends CakeObject
                 }
             }
             
-            $this->RestResponseHandler->toJson('Your evaluation has been '.implode($msg), 200);
+            $this->RestResponseHandler->toJson('Your evaluation has been ' . implode($msg), 200);
             
         } else {
             // $this->validateErrors($this->Event);

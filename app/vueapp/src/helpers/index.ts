@@ -93,7 +93,7 @@ export const filterEntries = (entries: Entry[], _filter: Filter): object[] | boo
     filter(newEntries, (entry) => {
       if (!entry.hasOwnProperty('course')) return 0;
       // @ts-ignore
-      if (entry.course.term.includes(_filter.timeframe)) {
+      if (entry?.course?.term?.includes(_filter?.timeframe)) {
         // @ts-ignore
         _entries.push(entry);
       }

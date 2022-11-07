@@ -19,6 +19,7 @@
     "autosize": "^5.0.1",
     "axios": "^1.1.2",
     "date-fns": "^2.29.3",
+    "js-cookie": "^3.0.1",
     "lodash": "^4.17.21",
     "uuid": "^9.0.0",
     "vee-validate": "^4.6.10",
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "@types/autosize": "^4.0.1",
+    "@types/js-cookie": "^3.0.2",
     "@types/lodash": "^4.14.186",
     "@types/node": "^18.8.3",
     "@types/uuid": "^8.3.4",

@@ -1,15 +1,17 @@
 <script lang="ts" setup>
-import PageTitle from '@/components/PageTitle.vue'
+import type { IPageHeading } from '@/types/typings'
 const props = defineProps<{
- page: object
+ settings: IPageHeading
 }>()
 </script>
 
 <template>
-  <PageTitle :title="page.title">
-    <div class="flex items-center space-x-4 my-4">
-      <component :is="page.icon.src" class="w-64" />
-      <p v-html="page.description"></p>
+  <div class="page-heading">
+    <h1 v-if="props.settings?.title" class="page-title">{{ props.settings?.title }}</h1>
+    <div v-if="props.settings?.description || props.settings?.icon" :class="`flex items-center space-x-4 my-4 ${props.settings?.icon?.position}`">
+      <component :is="props.settings?.icon.src" class="w-64" />
+      <p v-html="props.settings?.description"></p>
+      <slot></slot>
     </div>
-  </PageTitle>
+  </div>
 </template>
