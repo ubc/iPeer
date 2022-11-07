@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import { ref, reactive, watch, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router'
-import useFetch from '@/composables/useFetch'
+import api from '@/services/api'
 import Loader from '@/components/Loader.vue'
 import PageHeading from '@/components/PageHeading.vue'
 import ViewHeading from '@/student/components/ViewHeading.vue'
 import { IconTwoUsers } from '@/components/icons'
 
 import type { IUser, IEvaluation } from '@/types/typings'
+
 // REFERENCES
 const emit              = defineEmits<{}>()
 const props             = defineProps<{
@@ -25,14 +26,14 @@ const members           = ref<IUser[]>([])
 // COMPUTED
 // METHODS
 async function fetchEvaluation() {
+  status.value = 'PENDING'
   try {
-    status.value = 'PENDING'
-    const response: Promise<IEvaluation | unknown> = await useFetch(
-        `/evaluations/makeEvaluation/${event_id.value}/${group_id.value}`,
-        {method: 'GET', timeout: 0})
-    await Object.assign(evaluation, response?.data)
+    const response: Promise<unknown> = await api.get('/evaluations/makeEvaluation', `${event_id.value}/${group_id.value}`)
+    if(response.status === 200 && response.statusText === 'OK') {
+      await Object.assign(evaluation, response?.data?.data)
+    }
   } catch (err) {
-    message.value = {text: err, type: 'error'}
+    message.value = {text: err.message, status: err.statusCode, type: 'error'}
   } finally {
     status.value = 'READY'
   }

@@ -5,16 +5,15 @@ import { useRoute, useRouter } from 'vue-router'
 import IconSpinner from '@/components/icons/IconSpinner.vue'
 import TakeNote from '@/student/components/TakeNote.vue'
 
-import type {Evaluation, User} from '@/types/typings'
+import type {IEvaluation, IUser} from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
-  // (e: 'update:modelValue', option: string): void
   (e: 'fetch:evaluation'): void
 }>()
 const props = defineProps<{
-  members: User[]
-  currentUser: User
-  evaluation: Evaluation
+  members: IUser[]
+  currentUser: IUser
+  evaluation: IEvaluation
 }>()
 const route = useRoute()
 const router = useRouter()
@@ -24,11 +23,24 @@ const currentUser = toRef(props, 'currentUser')
 const evaluation  = toRef(props, 'evaluation')
 // COMPUTED
 const template = computed(() => {
-  if(evaluation.value?.template) {
-    return defineAsyncComponent({
-      loader: () => import(`@/student/views/templates/${evaluation.value?.template}.vue`),
-      loadingComponent: `<div class="w-full h-128 bg-gold-100">L O A D I N G...</div>`
-    })
+  switch (evaluation.value?.template) {
+    case 'SimpleEvaluation':
+      return defineAsyncComponent({
+        loader: () => import('@/student/views/templates/SimpleEvaluation.vue'),
+        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+      })
+    case 'RubricEvaluation':
+      return defineAsyncComponent({
+        loader: () => import('@/student/views/templates/RubricEvaluation.vue'),
+        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+      })
+    case 'MixedEvaluation':
+      return defineAsyncComponent({
+        loader: () => import('@/student/views/templates/MixedEvaluation.vue'),
+        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+      })
+    default:
+      break
   }
 })
 // METHODS

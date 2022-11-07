@@ -23,11 +23,19 @@ const group_id    = ref(route.params?.group_id)
 const currentTab  = ref('Response')
 // COMPUTED
 const template = computed(() => {
-  if(currentTab.value) {
-    return defineAsyncComponent({
-      loader: () => import(`@/student/views/Submission${currentTab.value}.vue`),
-      loadingComponent: `<div class="w-full h-128 bg-gold-100">L O A D I N G...</div>`
-    })
+  switch (currentTab.value) {
+    case 'Response':
+      return defineAsyncComponent({
+        loader: () => import('@/student/views/SubmissionResponse.vue'),
+        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+      })
+    case 'Reviews':
+      return defineAsyncComponent({
+        loader: () => import('@/student/views/SubmissionReviews.vue'),
+        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+      })
+    default:
+      break
   }
 })
 const isDisabled = computed(() => {

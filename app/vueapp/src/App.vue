@@ -33,10 +33,6 @@ async function getUserProfile(): Promise<void> {
 function updateProfile(option) {
   currentUser.value = option
 }
-// async function setMessage(event) {
-//   // message.value?.push({text: event.message, status: event.status, type: event.statusText})
-//   message.value = {text: event.message, status: event.status, type: event.statusText}
-// }
 // WATCH
 // LIFECYCLE
 onBeforeMount(async () => await getUserProfile())

@@ -67,7 +67,8 @@ function getGeneralComment(target: string, key: string) {
       <tr v-for="(member, memberIdx) of props.members" :key="member.id">
         <td><UserCard :member="member" /></td>
         <td>
-          <CustomTextField
+          <div v-if="props.disabled" class="quotes text-sm text-slate-700 font-light tracking-wider" v-html="getGeneralComment('comment', member.id)" />
+          <CustomTextField v-else
               :name="`${member.id}gen_comment`"
               :value="getGeneralComment('comment', member.id)"
               :rules="validateParagraph"

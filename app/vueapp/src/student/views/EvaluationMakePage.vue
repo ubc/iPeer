@@ -23,6 +23,28 @@ const currentUser = toRef(props, 'currentUser')
 const evaluation  = toRef(props, 'evaluation')
 // COMPUTED
 const template = computed(() => {
+  switch (evaluation.value?.template) {
+    case 'SimpleEvaluation':
+      return defineAsyncComponent({
+        loader: () => import('@/student/views/templates/SimpleEvaluation.vue'),
+        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+      })
+    case 'RubricEvaluation':
+      return defineAsyncComponent({
+        loader: () => import('@/student/views/templates/RubricEvaluation.vue'),
+        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+      })
+    case 'MixedEvaluation':
+      return defineAsyncComponent({
+        loader: () => import('@/student/views/templates/MixedEvaluation.vue'),
+        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+      })
+    default:
+      break
+  }
+})
+/** Uncaught (in promise) TypeError: error loading dynamically imported module
+ const template = computed(() => {
   if(evaluation.value?.template) {
     return defineAsyncComponent({
       loader: () => import(`@/student/views/templates/${evaluation.value?.template}.vue`),
@@ -30,6 +52,7 @@ const template = computed(() => {
     })
   }
 })
+*/
 // METHODS
 // WATCH
 // LIFECYCLE
@@ -57,7 +80,6 @@ onMounted(() => {
       <template v-slot:cta="{ onSave, isSubmitting }">
         <div class="cta">
           <button type="button" class="button default flex items-center" @click="onSave">
-            <!--<IconSpinner v-if="isSubmitting" />-->
             <span>Save Draft</span>
           </button>
           <button type="submit" class="button submit flex items-center">

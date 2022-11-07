@@ -2,7 +2,7 @@
 import {ref, reactive, computed, onMounted, defineAsyncComponent} from 'vue';
 import { useRoute } from 'vue-router'
 import { findIndex } from 'lodash'
-import useFetch from '@/composables/useFetch'
+import api from '@/services/api'
 import Loader from '@/components/Loader.vue'
 import PageHeading from '@/components/PageHeading.vue'
 import SectionTitle from '@/components/SectionTitle.vue'
@@ -53,15 +53,15 @@ const evaluationPage = computed(() => {
 })
 // METHODS
 async function fetchEvaluation() {
+  status.value = 'PENDING'
   try {
-    status.value = 'PENDING'
-    const response: Promise<IEvaluation | unknown> = await useFetch(
-        `/evaluations/makeEvaluation/${event_id.value}/${group_id.value}`,
-        {method: 'GET', timeout: 0})
-    await Object.assign(evaluation, response?.data)
-    members.value = updateMembersCollection(response?.data?.members)
+    const response: Promise<unknown> = await api.get('/evaluations/makeEvaluation', `${event_id.value}/${group_id.value}`)
+    if(response.status === 200 && response.statusText === 'OK') {
+      await Object.assign(evaluation, response?.data?.data)
+      members.value = updateMembersCollection(response?.data?.data?.members)
+    }
   } catch (err) {
-    message.value = {text: err, type: 'error'}
+    message.value = {text: err.message, status: err.statusCode, type: 'error'}
   } finally {
     status.value = 'READY'
   }

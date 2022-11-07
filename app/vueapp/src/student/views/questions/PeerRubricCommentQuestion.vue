@@ -59,7 +59,8 @@ function getCriteriaDetail(target: string, key: string, value?: string) {
         <td style="width: 20%"><UserCard :member="member" /></td>
         <td style="width: 80%">
           <div class="flex flex-col">
-            <CustomTextField
+            <div v-if="props.disabled" class="quotes text-sm text-slate-700 font-light tracking-wider" v-html="getCriteriaDetail('criteria_comment', member.id, rubric_criteria?.criteria_num)['criteria_comment']" />
+            <CustomTextField v-else
                 :id="`${member.id}comments[${rubric_criteria?.id}]`"
                 :name="`${member.id}comments[${props.rubric_criteria_idx}]`"
                 :value="getCriteriaDetail('criteria_comment', member.id, rubric_criteria?.criteria_num)['criteria_comment']"

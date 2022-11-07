@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {ref, reactive, watch, computed, onMounted, defineAsyncComponent} from 'vue';
+import {computed, defineAsyncComponent} from 'vue'
 
 import SectionTitle from '@/components/SectionTitle.vue'
 import SectionSubtitle from '@/components/SectionSubtitle.vue'
@@ -24,18 +24,20 @@ const template = computed(() => {
     case 'SimpleEvaluation':
       return defineAsyncComponent({
         loader: () => import('@/student/views/templates/reviews/SimpleEvaluation.vue'),
-        loadingComponent: `<div class="w-full h-128 bg-gold-100">L O A D I N G...</div>`
+        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
       })
     case 'RubricEvaluation':
       return defineAsyncComponent({
         loader: () => import('@/student/views/templates/reviews/RubricEvaluation.vue'),
-        loadingComponent: `<div class="w-full h-128 bg-gold-100">L O A D I N G...</div>`
+        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
       })
     case 'MixedEvaluation':
       return defineAsyncComponent({
         loader: () => import('@/student/views/templates/reviews/MixedEvaluation.vue'),
-        loadingComponent: `<div class="w-full h-128 bg-gold-100">L O A D I N G...</div>`
+        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
       })
+    default:
+      break
   }
 })
 // METHODS

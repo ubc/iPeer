@@ -1,13 +1,9 @@
 <script lang="ts" setup>
-import {ref, reactive, watch, computed, onMounted, defineAsyncComponent} from 'vue';
-
+import { computed, defineAsyncComponent} from 'vue'
 import SectionTitle from '@/components/SectionTitle.vue'
 import SectionSubtitle from '@/components/SectionSubtitle.vue'
 import { IconWritingHand } from '@/components/icons'
-
 import type {IEvaluation, IUser} from '@/types/typings'
-import TakeBreak from "@/student/components/TakeBreak.vue";
-
 interface Props {
   evaluation: IEvaluation
   currentUser: IUser
@@ -22,25 +18,43 @@ const props = defineProps<Props>()
 // DATA
 // COMPUTED
 const template = computed(() => {
+  switch (props.evaluation?.template) {
+    case 'SimpleEvaluation':
+      return defineAsyncComponent({
+        loader: () => import('@/student/views/templates/SimpleEvaluation.vue'),
+        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+      })
+    case 'RubricEvaluation':
+      return defineAsyncComponent({
+        loader: () => import('@/student/views/templates/RubricEvaluation.vue'),
+        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+      })
+    case 'MixedEvaluation':
+      return defineAsyncComponent({
+        loader: () => import('@/student/views/templates/MixedEvaluation.vue'),
+        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+      })
+    default:
+      break
+  }
+})
+/**
+const template = computed(() => {
   if(props.evaluation?.template) {
     return defineAsyncComponent({
       loader: () => import(`@/student/views/templates/${props.evaluation?.template}.vue`),
       loadingComponent: `<div class="w-full h-128 bg-gold-100">L O A D I N G...</div>`
     })
   }
-})
+})*/
 // METHODS
-
 // WATCH
-
 // LIFECYCLE
-
 </script>
 
 <template>
   <SectionTitle title="Your Response" />
   <SectionSubtitle subtitle="Evaluate your group" :icon="{src: IconWritingHand, size: '3.75rem'}" />
-
   <component
       :is="template"
       :members="props.members"
@@ -49,10 +63,4 @@ const template = computed(() => {
       :disabled="props.disabled"
       @fetch:evaluation="$emit('fetch:evaluation')"
   ></component>
-
-  <TakeBreak />
 </template>
-
-<style lang="scss" scoped>
-
-</style>
