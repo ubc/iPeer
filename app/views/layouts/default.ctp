@@ -45,19 +45,15 @@
         // Custom View Include Files
         echo $scripts_for_layout;
     ?>
-    
+
     <?php if (!empty($trackingId) && !empty($trackingId['SysParameter']['parameter_value'])): ?>
       <!-- Global site tag (gtag.js) - Google Analytics -->
-      <script async
-              src="https://www.googletagmanager.com/gtag/js?id=<?php echo $trackingId['SysParameter']['parameter_value']; ?>"></script>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo $trackingId['SysParameter']['parameter_value']; ?>"></script>
       <script>
         window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-          dataLayer.push(arguments);
-        }
-
+        function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
+
         gtag('config', '<?php echo $trackingId['SysParameter']['parameter_value']; ?>');
       </script>>
     <?php endif; ?>
