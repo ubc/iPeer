@@ -1,15 +1,14 @@
 <script lang="ts" setup>
 import { ref, computed, defineAsyncComponent} from 'vue'
 import { useRoute } from 'vue-router'
-
+import LoadingComponent from '@/components/LoadingComponent.vue'
+import ErrorComponent from '@/components/ErrorComponent.vue'
 import SubmissionResponse from "@/student/views/SubmissionResponse.vue";
 import SubmissionReviews from "@/student/views/SubmissionReviews.vue";
 
 import type {IUser, IEvaluation, ISimpleReview, IRubricReview, IMixedReview} from '@/types/typings'
 // REFERENCES
-const emit = defineEmits<{
-  // (e: 'updateModelValue', option: string): void
-}>()
+const emit = defineEmits<{}>()
 const props = defineProps<{
   currentUser: IUser
   members: IUser[]
@@ -27,12 +26,14 @@ const template = computed(() => {
     case 'Response':
       return defineAsyncComponent({
         loader: () => import('@/student/views/SubmissionResponse.vue'),
-        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+        loadingComponent: LoadingComponent /* shows while loading */,
+        errorComponent: ErrorComponent /* shows if there's an error */,
       })
     case 'Reviews':
       return defineAsyncComponent({
         loader: () => import('@/student/views/SubmissionReviews.vue'),
-        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+        loadingComponent: LoadingComponent /* shows while loading */,
+        errorComponent: ErrorComponent /* shows if there's an error */,
       })
     default:
       break

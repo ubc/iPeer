@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import {computed, defineAsyncComponent} from 'vue'
-
+import LoadingComponent from '@/components/LoadingComponent.vue'
+import ErrorComponent from '@/components/ErrorComponent.vue'
 import SectionTitle from '@/components/SectionTitle.vue'
 import SectionSubtitle from '@/components/SectionSubtitle.vue'
 import { IconNewspaper } from '@/components/icons'
-import TakeBreak from "@/student/components/TakeBreak.vue";
+import TakeBreak from '@/student/components/TakeBreak.vue'
 
 import type {IEvaluation, IUser} from '@/types/typings'
 interface Props {
@@ -24,17 +25,20 @@ const template = computed(() => {
     case 'SimpleEvaluation':
       return defineAsyncComponent({
         loader: () => import('@/student/views/templates/reviews/SimpleEvaluation.vue'),
-        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+        loadingComponent: LoadingComponent /* shows while loading */,
+        errorComponent: ErrorComponent /* shows if there's an error */,
       })
     case 'RubricEvaluation':
       return defineAsyncComponent({
         loader: () => import('@/student/views/templates/reviews/RubricEvaluation.vue'),
-        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+        loadingComponent: LoadingComponent /* shows while loading */,
+        errorComponent: ErrorComponent /* shows if there's an error */,
       })
     case 'MixedEvaluation':
       return defineAsyncComponent({
         loader: () => import('@/student/views/templates/reviews/MixedEvaluation.vue'),
-        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+        loadingComponent: LoadingComponent /* shows while loading */,
+        errorComponent: ErrorComponent /* shows if there's an error */,
       })
     default:
       break

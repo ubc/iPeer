@@ -2,16 +2,16 @@
 import { ref, toRef } from 'vue'
 import { validateLikert } from '@/helpers/rules'
 import { CustomHiddenField, CustomRadioField } from '@/components/fields'
-import type { Evaluation, User } from '@/types/typings'
+import type { IEvaluation, IUser } from '@/types/typings'
 import {find, isEmpty} from "lodash";
 // REFERENCES
 const emit = defineEmits<{
   (e: 'update:initialState', value: object): void
 }>()
 const props = defineProps<{
-  evaluation: Evaluation,
+  evaluation: IEvaluation,
   question: object,
-  currentUser: User,
+  currentUser: IUser,
   initialState: object,
 }>()
 // DATA

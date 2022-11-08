@@ -2,6 +2,7 @@
 import {ref, reactive, watch, computed, onMounted, toRef, onBeforeMount} from 'vue'
 import { findIndex, forEach, map, reduce } from 'lodash'
 import UserCard from '@/student/components/UserCard.vue'
+import AutoSpinner from '@/components/AutoSpinner.vue'
 import { CustomRangeField } from '@/components/fields'
 import type { ISimpleEvaluation, ISimpleResponse, ISimpleReview, User } from '@/types/typings'
 // REFERENCES
@@ -19,6 +20,7 @@ const props = defineProps<{
   description?: string
   placeholder?: string
   disabled?: boolean|false
+  autosave?: boolean
 }>();
 // DATA
 const showScore       = ref(false)
@@ -73,7 +75,9 @@ function distributeDecimalRemainder() {
 
 <template>
   <div class="datatable">
-    <div v-if="props.question" class="question">{{ props.question }}</div>
+    <div v-if="props.question" class="question">
+      <AutoSpinner :text="props.question" :autosave="props.autosave" />
+    </div>
     <div v-if="props.description" class="description text-sm mx-4 mb-2">{{ props.description }}</div>
 
     <table class="standardtable">
@@ -99,6 +103,7 @@ function distributeDecimalRemainder() {
         <td style="width: 80%">
           <input type="hidden" :name="`${name}[${memberIdx}]`" :value="response?.data && response?.data[name] ? response?.data[name][memberIdx] : ''" />
           <CustomRangeField
+              :max="props.remaining"
               :text="['Less', 'More']"
               :label="'A fair amount'"
               :name="`percent[${memberIdx}]`"
@@ -107,16 +112,16 @@ function distributeDecimalRemainder() {
               :points="response?.data && response?.data?.points ? response?.data?.points[memberIdx] : ''"
               :placeholder="placeholder"
               :disabled="props.disabled"
-              :remaining="remaining"
-              :point_per_member="point_per_member"
-              :showScore="showScore"
+              :remaining="props.remaining"
+              :point_per_member="props.point_per_member"
               @update:input="updateStudentSlider({target:name, key:memberIdx, value: $event.target.value})"
           />
           <!--
           :max="props.remaining"
           :value="student_slider[memberIdx]"
+          :value="response?.data?.points[memberIdx]"
           -->
-          <div v-if="showScore" class="text-sm text-red-400">{{ response?.data && response?.data?.points ? response?.data?.points[memberIdx] : '' }}</div>
+          <div v-if="showScore" class="text-xs text-red-400">{{ response?.data && response?.data?.points ? response?.data?.points[memberIdx] : '' }}</div>
         </td>
       </tr>
       </tbody>

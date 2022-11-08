@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { onBeforeMount, ref } from 'vue'
 import type { Ref } from 'vue'
+import { useRouter } from 'vue-router'
 import api from '@/services/api'
 import type {IUser} from '@/types/typings'
 // REFERENCES
@@ -8,29 +9,33 @@ const emit = defineEmits<{}>()
 const props = defineProps<{
   pageTitle?: string
 }>()
+const router = useRouter()
 // DATA
 const initialized   = ref(false);
 const currentUser   = ref<IUser|null>(null)
-const message       = ref([])
+const message       = ref<object|null>(null)
 const loading       = ref(false)
 // COMPUTED
 // METHODS
 async function getUserProfile(): Promise<void> {
   loading.value = true
   try {
-    let response = await api.get('/users/editProfile', '', {},  {})
+    const response = await api.get('/users/editProfile', '')
     if(response.status === 200 && response.statusText === 'OK') {
       currentUser.value = response.data
       initialized.value = true
+    } else {
+      await router.push({name: 'user.login'})
     }
-  } catch (err) {
-    message.value?.push({text: err.response.message, status: err.response.status, type: 'error'})
+  } catch (err: any) {
+    message.value = { text: err.statusText, status: err.status, type: 'error' }
+
   } finally {
     loading.value = false
   }
 }
 
-function updateProfile(option) {
+function updateProfile(option: IUser) {
   currentUser.value = option
 }
 // WATCH

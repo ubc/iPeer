@@ -1,33 +1,36 @@
 <script lang="ts" setup>
 import { ref, shallowRef, reactive, computed, onMounted, defineAsyncComponent } from 'vue'
 import { isEmpty } from 'lodash'
-import useFetch from '@/composables/useFetch'
+import api from '@/services/api'
 import { compareEntries } from '@/helpers'
 import { Table } from '@/student/components/tables/datatable'
 import Loader from "@/components/Loader.vue";
-import Error from '@/components/Error.vue'
-import type { IUser, IEvent, ICourse, IGroup, IPenalty } from '@/types/typings'
-interface IEventProps {
-  event: IEvent
-  course: ICourse
-  group: IGroup
-  penalties: IPenalty[]
-  late: boolean
-  percent_penalty: string
-}
-interface ICurrentWork {
-  current: IEventProps[]
-}
-interface ICompletedWork {
-  completed: IEventProps[]
-}
-interface IData {
-  current: ICurrentWork
-  completed: ICompletedWork
-}
-interface IHttpResponse {
-  data: IData
-}
+import ErrorComponent from '@/components/ErrorComponent.vue'
+
+import type { IUser, IEvent } from '@/types/typings'
+// import type { IUser, IEvent, ICourse, IGroup, IPenalty } from '@/types/typings'
+// interface IEventProps {
+//   event: IEvent
+//   course: ICourse
+//   group: IGroup
+//   penalties: IPenalty[]
+//   late: boolean
+//   percent_penalty: string
+// }
+// interface ICurrentWork {
+//   current: IEventProps[]
+// }
+// interface ICompletedWork {
+//   completed: IEventProps[]
+// }
+// interface IData {
+//   current: ICurrentWork
+//   completed: ICompletedWork
+// }
+// interface IHttpResponse {
+//   data: IData
+// }
+
 const Row = defineAsyncComponent({
   loader: () => import('@/student/components/tables/current/Row.vue'),
   LoadingComponent: '<div>Loading...</div>',
@@ -35,9 +38,7 @@ const Row = defineAsyncComponent({
   delay: 2000
 })
 // REFERENCES
-const emit = defineEmits<{
-  // (e: 'updateModelValue', option: string): void
-}>()
+const emit = defineEmits<{}>()
 const props = defineProps<{
   currentUser: IUser
 }>()
@@ -71,12 +72,16 @@ function emitSortBy(event) {
 // WATCH
 // LIFECYCLE
 onMounted(async () => {
+  loading.value = true
   try {
-    loading.value = true
-    const eventsResponse: Promise<IHttpResponse | any> = await useFetch('/home?work=current', {method: 'GET', timeout: 300})
-    entries.value = eventsResponse?.data
+    const response: Promise<unknown> = await api.get('/home', '?work=current')
+    if(response.status === 200 && response.statusText === 'OK') {
+      entries.value = response?.data?.data
+    } else {
+      error.value = {text: response?.data?.message, type: 'error'}
+    }
   } catch (err: Error | any) {
-    error.value = {text: err.message, type: 'error'};
+    error.value = {text: err?.message, type: 'error'};
   } finally {
     loading.value = false
   }
@@ -85,7 +90,7 @@ onMounted(async () => {
 
 <template>
   <div class="current-work mx-4 my-8">
-    <Error v-if="error" class="current error" :error="error" />
+    <ErrorComponent v-if="error" class="current error" :error="error" />
     <Table :error="error" :columns="columns" @update:sort="emitSortBy">
       <tr v-if="loading">
         <td :colspan="columns.length"><Loader height="200px" /></td>

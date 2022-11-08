@@ -5,15 +5,15 @@ import { FieldArray } from 'vee-validate'
 import { validateSentence } from '@/helpers/rules'
 import CustomInputField from '@/components/fields/CustomInputField.vue'
 import UserCard from '@/student/components/UserCard.vue'
-import type {MixedResponse, MixedReviewData, User} from "@/types/typings";
+import type { IMixedResponse, IMixedReviewData, IUser} from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
   (e: 'update:form', value: object): void
 }>()
 const props = defineProps<{
-  question: MixedReviewData,
-  members: User[],
-  initialState: MixedResponse,
+  question: IMixedReviewData,
+  members: IUser[],
+  initialState: IMixedResponse,
 }>()
 
 // DATA
@@ -22,7 +22,7 @@ const question = toRef(props, 'question')
 const initialState = toRef(props, 'initialState')
 // COMPUTED
 // METHODS
-function getResponseDetails(member_id:string, question_num:string): string {
+function getResponseDetails(member_id:string, question_num:string): string|any {
   if(initialState.value?.data || !isEmpty(initialState.value?.data)) {
     const response = find(initialState.value?.data, { evaluatee: member_id })
     if(response?.details) {

@@ -29,10 +29,7 @@ function onErrorCaptured(event: any) {
 
 <template>
   <div class="events to layout">
-    <!-- TODO:: to be added to notification component-->
-    <!-- <div v-if="error" class="events error">{{ JSON.stringify(error, null, 2) }}</div>-->
     <PageHeading :settings="props.settings" />
-
     <section class="current-work">
       <SectionTitle title="Current Work To Do" />
       <SectionSubtitle subtitle="Do the work assigned to you" :icon="{src: IconCheckedBox, size: '3.5rem'}">
@@ -48,7 +45,6 @@ function onErrorCaptured(event: any) {
         </template>
       </Suspense>
     </section>
-
     <section class="completed-work">
       <SectionTitle title="Closed or Completed Work"></SectionTitle>
       <SectionSubtitle subtitle="See past work and reviews of your teamwork" :icon="{src: IconNotepad, size: '3.25rem'}">

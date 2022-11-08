@@ -111,7 +111,8 @@ onBeforeMount(() => {
       @submit="onSubmit"
       :initial-state="initialState"
       :evaluation="props.evaluation"
-      v-slot="{ onSave, errors, values, isSubmitting, evaluationRef, formMeta }"
+      v-slot="{ onSave, errors, values, isSubmitting, evaluationRef, formMeta, message, autosave }"
+      @set:message="$emit('set:message', message)"
   >
     <slot name="header">
       <CustomHiddenField name="data[data][submitter_id]" :value="form.user_id" />
@@ -145,6 +146,7 @@ onBeforeMount(() => {
           :evaluation="evaluation"
           :initial-state="initialState"
           :current-user="props.currentUser"
+          :autosave="autosave"
           @update:initialState="setInitialState"
       />
 
@@ -161,6 +163,7 @@ onBeforeMount(() => {
               :evaluation="evaluation"
               :initial-state="initialState"
               :current-user="props.currentUser"
+              :autosave="autosave"
               @update:initialState="setInitialState"
           />
         </div>

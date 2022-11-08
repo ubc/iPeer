@@ -39,6 +39,7 @@ function deleteMessage(msgId) {
 }
 // WATCH
 watch(() => props.message, (current, previous) => {
+  if(isEmpty(current)) return
   messages.value.push({id: uuidv4(), text: current.message, status: current.status, type: current.statusText})
 }, { deep: true })
 // LIFECYCLE

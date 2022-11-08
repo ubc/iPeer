@@ -61,13 +61,6 @@ const questions = reactive({
   }
 })
 // COMPUTED
-// const isDisabled = computed(() => {
-//   if(route.path === 'submissions') {
-//     return true
-//   }
-//   return false // TODO:: determined by the evaluation settings
-//   // return new Date().toLocaleDateString('en-CA', {}) >= new Date(props.evaluation?.due_date).toLocaleDateString('en-CA', {})
-// })
 // METHODS
 // WATCH
 // LIFECYCLE
@@ -86,7 +79,8 @@ onBeforeMount(() => {
       @submit="onSubmit"
       :initial-state="initialState"
       :evaluation="evaluation"
-      v-slot="{ onSave, errors, values, isSubmitting, evaluationRef, message }"
+      v-slot="{ onSave, errors, values, isSubmitting, evaluationRef, message, autosave }"
+      @set:message="$emit('set:message', message)"
   >
     <slot name="header">
       <CustomHiddenField type="hidden" name="event_id" :value="evaluation?.id" />
@@ -98,8 +92,6 @@ onBeforeMount(() => {
     </slot>
 
     <slot name="main">
-      <div v-if="message && Object.keys(message).length>0" :class="`notification ${message?.type}`">{{ message?.message }}</div>
-      <!---->
       <PeerSimpleRangeQuestion
           :members="evaluation?.members"
           :remaining="evaluation?.simple?.remaining"
@@ -109,6 +101,7 @@ onBeforeMount(() => {
           :question="questions.points.title"
           :description="questions.points.description"
           :disabled="disabled"
+          :autosave="autosave"
       />
       <PeerSimpleCommentQuestion
           :members="evaluation?.members"
@@ -117,6 +110,7 @@ onBeforeMount(() => {
           :question="questions.comments.title"
           :description="questions.comments.description"
           :disabled="disabled"
+          :autosave="autosave"
       />
     </slot>
 

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, reactive, watch, computed, onMounted } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useRoute } from 'vue-router'
 import api from '@/services/api'
 import Loader from '@/components/Loader.vue'

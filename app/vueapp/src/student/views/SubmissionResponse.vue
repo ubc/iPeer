@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import { computed, defineAsyncComponent} from 'vue'
+import LoadingComponent from '@/components/LoadingComponent.vue'
+import ErrorComponent from '@/components/ErrorComponent.vue'
 import SectionTitle from '@/components/SectionTitle.vue'
 import SectionSubtitle from '@/components/SectionSubtitle.vue'
 import { IconWritingHand } from '@/components/icons'
@@ -22,17 +24,20 @@ const template = computed(() => {
     case 'SimpleEvaluation':
       return defineAsyncComponent({
         loader: () => import('@/student/views/templates/SimpleEvaluation.vue'),
-        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+        loadingComponent: LoadingComponent /* shows while loading */,
+        errorComponent: ErrorComponent /* shows if there's an error */,
       })
     case 'RubricEvaluation':
       return defineAsyncComponent({
         loader: () => import('@/student/views/templates/RubricEvaluation.vue'),
-        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+        loadingComponent: LoadingComponent /* shows while loading */,
+        errorComponent: ErrorComponent /* shows if there's an error */,
       })
     case 'MixedEvaluation':
       return defineAsyncComponent({
         loader: () => import('@/student/views/templates/MixedEvaluation.vue'),
-        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+        loadingComponent: LoadingComponent /* shows while loading */,
+        errorComponent: ErrorComponent /* shows if there's an error */,
       })
     default:
       break

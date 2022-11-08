@@ -29,14 +29,16 @@ interface Props {
   pageTitle?: string
 }
 // REFERENCES
-const emit              = defineEmits<{}>()
+const emit              = defineEmits<{
+  (e: 'set:message', option: object): void
+}>()
 const props             = defineProps<Props>()
 const route             = useRoute()
 // DATA
 const event_id          = ref(route.params.event_id)
 const group_id          = ref(route.params.group_id)
 const status            = ref<string>('')
-const message           = ref<object | null>(null)
+const message           = ref<object|null>(null)
 let evaluation          = reactive<IEvaluation | any>({})
 const members           = ref<IUser[]>([])
 // COMPUTED
@@ -44,11 +46,17 @@ const evaluationPage = computed(() => {
   // Check if evaluation is started
   switch (useRoute().name) {
     case 'evaluation.make':
-      return defineAsyncComponent(() => import('@/student/views/EvaluationMakePage.vue'))
+      return defineAsyncComponent({
+        loader: () => import('@/student/views/EvaluationMakePage.vue'),
+        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+      })
     case 'evaluation.edit':
-      return defineAsyncComponent(() => import('@/student/views/EvaluationEditPage.vue'))
+      return defineAsyncComponent({
+        loader: () => import('@/student/views/EvaluationEditPage.vue'),
+        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+      })
     default:
-      return
+      break
   }
 })
 // METHODS
@@ -76,6 +84,10 @@ function updateMembersCollection(_members:User[]) {
     return [...tmp, {...spliced[0], first_name: 'Yourself', last_name: ''}]
   }
 }
+function setMessage(event) {
+  message.value = event
+  emit('set:message', event)
+}
 // WATCH
 // LIFECYCLE
 onMounted(async () => await fetchEvaluation())
@@ -88,7 +100,12 @@ onMounted(async () => await fetchEvaluation())
     </template>
 
     <template v-else>
-      <PageHeading :title="evaluation?.title">
+
+      <router-view name="flash" v-slot="{ Component }" >
+        <component :is="Component" :flash="message" />
+      </router-view>
+
+      <PageHeading :settings="{ title: evaluation?.title }">
         <ViewHeading
             :due-date="evaluation?.due_date"
             :penalty="evaluation?.penalty"
@@ -111,6 +128,7 @@ onMounted(async () => await fetchEvaluation())
             :currentUser="currentUser"
             :members="members"
             :evaluation="evaluation"
+            @set:message="setMessage"
             @fetch:evaluation="fetchEvaluation">
         </router-view>
       </Suspense>

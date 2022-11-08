@@ -15,6 +15,7 @@ const props = defineProps<{
   evaluation: IEvaluation
   question: IMixedReviewData,
   initialState: IMixedResponse,
+  autosave?: object
 }>()
 // DATA
 const members = toRef(props, 'members')

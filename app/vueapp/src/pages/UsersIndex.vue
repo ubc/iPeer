@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import {ref, toRef} from 'vue'
+  import { ref, watchEffect } from 'vue'
   import PageHeading from '@/components/PageHeading.vue'
-  import {IPageHeading, IUser} from '@/types/typings'
+  import type {IPageHeading, IUser} from '@/types/typings'
+  import { isEmpty } from 'lodash'
   // REFERENCES
   const emit = defineEmits<{
     (e: 'set:message', option: object): void
     (e: 'update:profile', option: object): void
-    (e: 'update:initialState', option: object): void
   }>()
   const props = defineProps<{
     currentUser: IUser
@@ -17,7 +17,7 @@ import {ref, toRef} from 'vue'
   const message       = ref<object|null>(null)
   // COMPUTED
   // METHODS
-  function setMessage(event) {
+  function setMessage(event: object) {
     message.value = event
     emit('set:message', event)
   }

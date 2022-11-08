@@ -25,19 +25,21 @@ function toggleNavDropdown() {console.log('[Todo] Navigation Dropdown List')}
 
 <template>
   <nav class="navigation flex justify-between items-center bg-slate-50 mx-auto mt-4 mb-8 px-4 py-0 border shadow-md">
-    <div class="flex items-center space-x-2 text-sm text-slate-700 leading-relaxed tracking-wide space-x-4">
-      <NavigationItem class="py-1" route-name="student.events" display-name="Dashboard"></NavigationItem>
-      <NavigationItem v-if="currentRouteTitle" class="text-gold-500 font-medium active" :route-name="null" :display-name="currentRouteTitle"></NavigationItem>
-    </div>
-
-    <div class="flex items-center text-sm text-slate-700 leading-relaxed tracking-wide space-x-2">
-      <a class="mr-4" href="/logout">Logout</a>
-      <div v-if="currentUser" class="flex items-center text-sm text-slate-700 leading-relaxed tracking-wide space-x-2 ">
-        <router-link class="py-1 px-0" :to="{ name: 'user.profile' }">{{ currentUser?.first_name }} {{ currentUser?.last_name }}</router-link>
-        <svg @click="toggleNavDropdown" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-        </svg>
+    <template v-if="props.currentUser">
+      <div class="flex items-center space-x-2 text-sm text-slate-700 leading-relaxed tracking-wide space-x-4">
+        <NavigationItem class="py-1" route-name="student.events" display-name="Dashboard"></NavigationItem>
+        <NavigationItem v-if="currentRouteTitle" class="text-gold-500 font-medium active" :route-name="null" :display-name="currentRouteTitle"></NavigationItem>
       </div>
-    </div>
+
+      <div class="flex items-center text-sm text-slate-700 leading-relaxed tracking-wide space-x-2">
+        <a class="mr-4" href="/logout">Logout</a>
+        <div v-if="currentUser" class="flex items-center text-sm text-slate-700 leading-relaxed tracking-wide space-x-2 ">
+          <router-link class="py-1 px-0" :to="{ name: 'user.profile' }">{{ currentUser?.first_name }} {{ currentUser?.last_name }}</router-link>
+          <svg @click="toggleNavDropdown" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
+      </div>
+    </template>
   </nav>
 </template>

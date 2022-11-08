@@ -25,7 +25,6 @@ const props = defineProps<{
   settings?: IPageHeading
 }>()
 // DATA
-const user          = toRefs(props, 'currentUser')
 const error         = ref([])
 const loading       = ref(false)
 </script>

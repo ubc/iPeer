@@ -1,12 +1,11 @@
 <script lang="ts" setup>
-import { ref, reactive, watch, computed, onMounted } from 'vue';
-
 // REFERENCES
+
+import type {IUser} from "@/types/typings";
 const emit = defineEmits<{
-  // (e: 'updateModelValue', option: string): void
 }>()
 const props = defineProps<{
- //...
+  currentUser: IUser
 }>()
 // DATA
 // COMPUTED
@@ -16,5 +15,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div class="">SimpleEvaluationReviews</div>
+  <main class="auth-layout">
+    <router-view :current-user="props.currentUser" />
+  </main>
 </template>

@@ -1,11 +1,14 @@
 import {createRouter, createWebHashHistory} from 'vue-router'
+import api from '@/services/api'
 import Banner from '@/components/Banner.vue'
 import Navigation from '@/components/Navigation.vue'
+import AuthLayout from '@/layouts/AuthLayout.vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import Footer from '@/components/Footer.vue'
 import ToastMessage from '@/components/messages/Messages.vue'
 import FlashMessage from '@/components/messages/Flash.vue'
 import { IconCollaboratorCircle } from '@/components/icons'
+import Cookies from "js-cookie";
 
 // history: createWebHistory(import.meta.env.BASE_URL),
 const router = createRouter({
@@ -15,7 +18,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'app',
-      // meta: { requiresAuth: true, is_student: true },
+      // meta: { requiresAuth: true },
       components: {
         default: DefaultLayout,
         banner: Banner,
@@ -28,7 +31,7 @@ const router = createRouter({
           path: '',
           name: 'student.events',
           component: () => import('../pages/EventsIndex.vue'),
-          //meta: {routeTitle: ''},
+          // meta: { requiresAuth: true, is_student: true },
           props: {
             settings: {
               title: 'iPeer Dashboard',
@@ -44,22 +47,37 @@ const router = createRouter({
         {
           path: '/evaluations',
           name: 'evaluation.index',
+          props: true,
           component: () => import('../pages/EvaluationIndex.vue'),
           redirect: {name: 'student.events'},
           children: [
             {
               path: 'make/:event_id/:group_id',
               name: 'evaluation.make',
-              component: () => import('../student/views/EvaluationMakePage.vue'),
               meta: {routeTitle: 'Evaluate Peers'},
-              props: true
+              props: {
+                default: {
+                  settings: {title: 'Evaluate Peers'}
+                }
+              },
+              components: {
+                default: () => import('../student/views/EvaluationMakePage.vue'),
+                flash: FlashMessage,
+              },
             },
             {
               path: 'edit/:event_id/:group_id',
               name: 'evaluation.edit',
-              component: () => import('../student/views/EvaluationEditPage.vue'),
               meta: {routeTitle: 'Edit My Response'},
-              props: true
+              props: {
+                default: {
+                  settings: {title: 'Edit My Response'}
+                }
+              },
+              components: {
+                default: () => import('../student/views/EvaluationEditPage.vue'),
+                flash: FlashMessage,
+              },
             },
           ]
         },
@@ -72,13 +90,13 @@ const router = createRouter({
             {
               path: 'view/:event_id/:group_id',
               name: 'submission.view',
-              component: () => import('../student/views/SubmissionViewPage.vue'),
-              meta: {routeTitle: 'View Results'},
               props: {
                 settings: {
-                  title: '__View Results'
+                  title: 'View Results'
                 }
               },
+              meta: {routeTitle: 'View Results'},
+              component: () => import('../student/views/SubmissionViewPage.vue'),
             }
           ]
         },
@@ -108,16 +126,59 @@ const router = createRouter({
       ]
     },
     {
+      path: '/',
+      name: 'auth',
+      // meta: { requiresAuth: false },
+      props: true,
+      components: {
+        default: AuthLayout,
+        banner: Banner,
+        navigation: Navigation,
+        footer: Footer,
+      },
+      children: [
+        {
+          path: 'signin',
+          name: 'user.login',
+          props: {
+            default: {
+              settings: {
+                title: 'Login'
+              }
+            }
+          },
+          components: {
+            default: () => import('@/pages/Login.vue'),
+            flash: FlashMessage
+          }
+        },
+        {
+          path: 'signup',
+          name: 'user.register',
+          props: {
+            default: {
+              settings: {
+                title: 'Register'
+              }
+            }
+          },
+          components: {
+            default: () => import('@/pages/Login.vue'),
+            flash: FlashMessage
+          }
+        }
+      ]
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'notfound',
       component: () => import('../pages/NotFound.vue'),
-      props: {
-        settings: {
-          title: 'Page Not Found'
-        }
-      }
-    },
+      props: true
+    }
   ]
 })
+
+// TODO:: capture cakePHP redirect to login page to implement in vueJS
+// router.beforeEach(async (to, from, next) => {})
 
 export default router

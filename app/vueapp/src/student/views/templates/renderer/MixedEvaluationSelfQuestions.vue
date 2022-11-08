@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref, reactive, watch, computed, onMounted, watchEffect, defineAsyncComponent } from 'vue'
-
+import LoadingComponent from '@/components/LoadingComponent.vue'
+import ErrorComponent from '@/components/ErrorComponent.vue'
 import type { IUser, IEvaluation, IMixedResponse, IMixedEvaluationData } from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
@@ -12,31 +13,35 @@ const props = defineProps<{
   evaluation: IEvaluation,
   question: IMixedEvaluationData,
   initialState: IMixedResponse
+  autosave?: object
 }>()
 
 // DATA
 // COMPUTED
 const selfQuestion = computed(() => {
-  if(props.question?.type) {
-    return defineAsyncComponent({
-      loader: () => import(`../../questions/SelfMixed${props.question?.type}Question.vue`),
-      loadingComponent: `<div class="w-full h-128 bg-gold-100">L O A D I N G...</div>`
-    })
-  }
-})
-/** _backup for computing selfQuestion above
-const selfQuestion = computed(() => {
   switch (props.question?.type) {
     case 'Likert':
-      return  defineAsyncComponent(() => import('@/student/views/questions/SelfMixedLikertQuestion.vue'))
+      return defineAsyncComponent({
+        loader: () => import('@/student/views/questions/SelfMixedLikertQuestion.vue'),
+        loadingComponent: LoadingComponent /* shows while loading */,
+        errorComponent: ErrorComponent /* shows if there's an error */,
+      })
     case 'Sentence':
-      return  defineAsyncComponent(() => import('@/student/views/questions/SelfMixedSentenceQuestion.vue'))
+      return defineAsyncComponent({
+        loader: () => import('@/student/views/questions/SelfMixedSentenceQuestion.vue'),
+        loadingComponent: LoadingComponent /* shows while loading */,
+        errorComponent: ErrorComponent /* shows if there's an error */,
+      })
     case 'Paragraph':
-      return  defineAsyncComponent(() => import('@/student/views/questions/SelfMixedParagraphQuestion.vue'))
+      return defineAsyncComponent({
+        loader: () => import('@/student/views/questions/SelfMixedParagraphQuestion.vue'),
+        loadingComponent: LoadingComponent /* shows while loading */,
+        errorComponent: ErrorComponent /* shows if there's an error */,
+      })
     default:
       break
   }
-})*/
+})
 // METHODS
 // WATCH
 // LIFECYCLE

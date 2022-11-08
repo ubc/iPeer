@@ -10,23 +10,16 @@ interface Props {
   currentUser: IUser
   disabled?: boolean
 }
-
 // REFERENCES
 const emit = defineEmits<{
   // (e: 'fetch:evaluation', option: string): void
 }>()
 const props = defineProps<Props>()
-
 // DATA
-
 // COMPUTED
-
 // METHODS
-
 // WATCH
-
 // LIFECYCLE
-
 </script>
 
 <template>

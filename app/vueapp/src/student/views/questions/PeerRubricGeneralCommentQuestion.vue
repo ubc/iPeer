@@ -30,7 +30,7 @@ const settings = reactive({
 // METHODS
 // WATCH
 // LIFECYCLE
-function getGeneralComment(target: string, key: string) {
+function getGeneralComment(target: string, key: string): string|any {
   const state = props.initialState
   if(state) {
     const detail = find(state?.data, { evaluatee: key})
@@ -81,7 +81,7 @@ function getGeneralComment(target: string, key: string) {
                   value: $event.target.value
                 }
               })"
-          /><!-- TBD:: :rules="question.required ? validateParagraph : null" -->
+          />
         </td>
       </tr>
       </tbody>

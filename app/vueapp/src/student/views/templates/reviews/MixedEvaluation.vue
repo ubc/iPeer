@@ -8,17 +8,11 @@ const emit = defineEmits<{
 const props = defineProps<{
  //...
 }>()
-
 // DATA
-
 // COMPUTED
-
 // METHODS
-
 // WATCH
-
 // LIFECYCLE
-
 </script>
 
 <template>

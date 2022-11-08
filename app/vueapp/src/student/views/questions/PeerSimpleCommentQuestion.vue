@@ -1,15 +1,13 @@
 <script lang="ts" setup>
 import { ref, toRef, reactive, watch, computed, onMounted } from 'vue'
 import { validateParagraph } from '@/helpers/rules'
-import UserCard from "@/student/components/UserCard.vue";
+import UserCard from '@/student/components/UserCard.vue'
+import AutoSpinner from '@/components/AutoSpinner.vue'
 import CustomTextField from '@/components/fields/CustomTextField.vue'
 
-import type { User, ISimpleEvaluation } from '@/types/typings'
+import type { IUser, ISimpleEvaluation } from '@/types/typings'
 // REFERENCES
-const emit = defineEmits<{
-  // (e: 'update:modelValue', option: string): void
-  // (e: 'update:comments', option: string): void
-}>()
+const emit = defineEmits<{}>()
 const props = defineProps<{
   members: IUser[]
   initialState: ISimpleEvaluation
@@ -19,6 +17,7 @@ const props = defineProps<{
   description?: string
   placeholder?: string
   disabled?: boolean | false
+  autosave?: boolean
 }>();
 // DATA
 // COMPUTED
@@ -29,7 +28,7 @@ const props = defineProps<{
 
 <template>
   <div class="datatable" id="PeerSimpleRangeQuestion">
-    <div v-if="props.question" class="question">{{ props.question }}</div>
+    <div v-if="props.question" class="question"><AutoSpinner :text="props.question" :autosave="props.autosave" /></div>
     <div v-if="props.description" class="description text-sm mx-4 mb-2">{{ props.description }}</div>
     <table class="standardtable">
       <thead>

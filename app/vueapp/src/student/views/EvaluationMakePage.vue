@@ -1,19 +1,21 @@
 <script lang="ts" setup>
 import { toRef, computed, onMounted, defineAsyncComponent} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-
+import LoadingComponent from '@/components/LoadingComponent.vue'
+import ErrorComponent from '@/components/ErrorComponent.vue'
 import IconSpinner from '@/components/icons/IconSpinner.vue'
 import TakeNote from '@/student/components/TakeNote.vue'
-
 import type { IUser, IEvaluation } from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
   (e: 'fetch:evaluation'): void
+  (e: 'set:message', option: object): void
 }>()
 const props = defineProps<{
   members: IUser[]
   currentUser: IUser
   evaluation: IEvaluation
+  settings: object
 }>()
 const route = useRoute()
 const router = useRouter()
@@ -27,32 +29,25 @@ const template = computed(() => {
     case 'SimpleEvaluation':
       return defineAsyncComponent({
         loader: () => import('@/student/views/templates/SimpleEvaluation.vue'),
-        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+        loadingComponent: LoadingComponent /* shows while loading */,
+        errorComponent: ErrorComponent /* shows if there's an error */,
       })
     case 'RubricEvaluation':
       return defineAsyncComponent({
         loader: () => import('@/student/views/templates/RubricEvaluation.vue'),
-        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+        loadingComponent: LoadingComponent /* shows while loading */,
+        errorComponent: ErrorComponent /* shows if there's an error */,
       })
     case 'MixedEvaluation':
       return defineAsyncComponent({
         loader: () => import('@/student/views/templates/MixedEvaluation.vue'),
-        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
+        loadingComponent: LoadingComponent /* shows while loading */,
+        errorComponent: ErrorComponent /* shows if there's an error */,
       })
     default:
       break
   }
 })
-/** Uncaught (in promise) TypeError: error loading dynamically imported module
- const template = computed(() => {
-  if(evaluation.value?.template) {
-    return defineAsyncComponent({
-      loader: () => import(`@/student/views/templates/${evaluation.value?.template}.vue`),
-      loadingComponent: `<div class="w-full h-128 bg-gold-100">L O A D I N G...</div>`
-    })
-  }
-})
-*/
 // METHODS
 // WATCH
 // LIFECYCLE
@@ -72,6 +67,7 @@ onMounted(() => {
       :members="members"
       :evaluation="evaluation"
       :currentUser="currentUser"
+      @set:message="$emit('set:message', $event)"
       @fetch:evaluation="$emit('fetch:evaluation')"
     >
       <template v-slot:header></template>

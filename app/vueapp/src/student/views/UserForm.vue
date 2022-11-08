@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import {ref, toRef, toRefs, watch} from 'vue'
+import {ref, toRef, watch} from 'vue'
+import {useRouter} from 'vue-router'
 import { useForm } from 'vee-validate'
 import api from '@/services/api'
-import type {IUser} from "@/types/typings";
+import type {IUser} from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
   (e: 'set:message', option: object): void
@@ -14,7 +15,7 @@ const props = defineProps<{
 // DATA
 const form    = toRef(props, 'initialState')
 const userRef = ref(null)
-const message = ref(null)
+const message = ref<object|null>(null)
 // COMPUTED
 const { values, errors, meta, handleSubmit, isSubmitting } = useForm({
   initialValues: form.value,
@@ -38,14 +39,16 @@ const onSubmit = handleSubmit(async (values) => {
       const user = await api.get('/users/editProfile', props.initialState?.id)
       await emit('update:profile', user.data)
     } else {
-      message.value = response.data
+      // message.value = response.data
+      // No response data available for this request
+      await useRouter().push({ name: 'user.login' })
     }
-  } catch (err) {
-    message.value = err.response.data
+  } catch (err: any) {
+    message.value = {text: err.response.statusText, status: err.response.status, type: 'error'}
   }
 }, onInvalidateSubmit)
 // WATCH
-watch(message, (event) => {
+watch(message, (event: object) => {
   emit('set:message', event)
 }, { deep: true })
 // LIFECYCLE

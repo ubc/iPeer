@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import CustomSelectField from '@/components/fields/CustomSelectField.vue'
 
 interface Props {
@@ -24,8 +24,8 @@ const selected = computed(() => props.default ? props.default : props.options?.l
 
 <template>
   <div class="timeframe flex flex-col items-center md:flex-row md:space-x-12">
-    <div class="label">Timeframe:</div>
-    <CustomSelectField :default="props.default" :name="props.name" @update:event="$emit('update:event', $event)">
+    <div class="label">Timeframe: </div>
+    <CustomSelectField :disabled="props.options?.length===0" :default="props.default" :name="props.name" @update:event="$emit('update:event', $event)">
       <option v-for="(option, index) of props.options" :key="index" :value="option" :selected="option===selected">{{ option }}</option>
     </CustomSelectField>
   </div>

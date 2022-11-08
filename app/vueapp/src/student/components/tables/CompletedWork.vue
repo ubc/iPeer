@@ -4,7 +4,7 @@ import { isEmpty } from 'lodash'
 import useFetch from '@/composables/useFetch'
 import { compareEntries, filterEntries, paginateEntries, unique } from '@/helpers'
 
-import Error from '@/components/Error.vue'
+import ErrorComponent from '@/components/ErrorComponent.vue'
 import Loader from '@/components/Loader.vue'
 import Pagination from '@/components/Pagination.vue'
 import LimitTo from '@/student/components/LimitTo.vue'
@@ -12,6 +12,7 @@ import TimeFrame from '@/student/components/TimeFrame.vue'
 import { Table } from '@/student/components/tables/datatable'
 
 import type { User } from '@/types/typings'
+import api from "@/services/api";
 
 const Row = defineAsyncComponent({
   loader: () => import('@/student/components/tables/completed/Row.vue'),
@@ -69,7 +70,7 @@ const filteredEntries = computed(() => {
   }
   return newEntries
 })
-const options   = computed(() => unique(entries.value, 'course', 'term').sort((a,b) => a.localeCompare(b)))
+const options   = computed(() => unique(entries.value, 'course', 'term').sort((a,b) => a.localeCompare(b)).filter(x=>x))
 const paginate  = reactive({
   page: 1,
   limit: 5,
@@ -109,10 +110,14 @@ watch([ sort, filter, paginate ], () => {
 }, { deep: true })
 // LIFECYCLE
 onMounted(async () => {
+  loading.value = true
   try {
-    loading.value = true
-    const eventsResponse: Promise<IHttpResponse | any> = await useFetch('/home?work=completed', {method: 'GET', timeout: 300})
-    entries.value = eventsResponse.data
+    const response: Promise<unknown> = await api.get('/home', '?work=completed')
+    if(response.status === 200 && response.statusText === 'OK') {
+      entries.value = response.data?.data
+    } else {
+      error.value = {text: response?.data?.message, type: 'error'}
+    }
   } catch (err: Error | any) {
     error.value = {text: err.message, type: 'error'};
   } finally {
@@ -123,7 +128,7 @@ onMounted(async () => {
 
 <template>
   <div class="completed-work mx-4 my-8">
-    <Error v-if="error" class="completed error" :error="error" />
+    <ErrorComponent v-if="error" class="completed error" :error="error" />
     <div class="flex flex-col my-4 space-y-6">
       <TimeFrame :default="filter.timeframe" :options="options" :name="'timeframe'" @update:event="updateData" />
       <LimitTo label="Limit To:" :options="limit_options" @update:event="updateData" />

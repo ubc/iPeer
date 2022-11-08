@@ -107,7 +107,8 @@ onBeforeMount( () => {
       @submit="onSubmit"
       :initial-state="initialState"
       :evaluation="props.evaluation"
-      v-slot="{ onSave, errors, values, isSubmitting, evaluationRef }"
+      v-slot="{ onSave, errors, values, isSubmitting, evaluationRef, message, autosave }"
+      @set:message="$emit('set:message', message)"
   >
     <slot name="header">
       <CustomHiddenField type="hidden" name="event_id" :value="form?.event_id" />
@@ -132,6 +133,7 @@ onBeforeMount( () => {
             :rubric_criteria="rubric_criteria"
             :rubrics_lom="props.evaluation?.rubric?.data?.rubrics_lom"
             :disabled="props.disabled"
+            :autosave="autosave"
             @update:initialState="setInitialState"
         />
 
@@ -142,6 +144,7 @@ onBeforeMount( () => {
             :rubric_criteria_idx="criteriaIdx"
             :rubric_criteria="rubric_criteria"
             :disabled="props.disabled"
+            :autosave="autosave"
             @update:initialState="setInitialState"
         />
       </div>
