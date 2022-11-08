@@ -1,0 +1,1 @@
+{"version":3,"file":"LoadingComponent.js","sources":["../../../vueapp/src/components/LoadingComponent.vue"],"sourcesContent":["<template>\n  <div class=\"w-full h-128 flex justify-center items-center bg-gray-50\">L O A D I N G...</div>\n</template>"],"names":["_cache"],"mappings":"yIAC8FA,EAAA"}

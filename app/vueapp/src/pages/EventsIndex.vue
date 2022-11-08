@@ -1,28 +1,23 @@
 <script lang="ts" setup>
-import {ref, reactive, watch, computed, onMounted, defineAsyncComponent, onErrorCaptured, toRef} from 'vue'
-import useFetch from '@/composables/useFetch'
-import CurrentWork from '@/student/components/tables/CurrentWork.vue'
-import CompletedWork from '@/student/components/tables/CompletedWork.vue'
+import {ref} from 'vue'
 import Loader from '@/components/Loader.vue'
-import Error from '@/components/Error.vue'
 import PageHeading from '@/components/PageHeading.vue'
 import SectionTitle from '@/components/SectionTitle.vue'
 import SectionSubtitle from '@/components/SectionSubtitle.vue'
 import {IconNotepad, IconCheckedBox} from '@/components/icons'
+import CurrentWork from '@/student/components/tables/CurrentWork.vue'
+import CompletedWork from '@/student/components/tables/CompletedWork.vue'
 import type { IUser, IPageHeading } from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{}>()
 const props = defineProps<{
   currentUser: IUser
-  settings: IPageSetting
+  settings: IPageHeading
 }>()
 // DATA
 const error = ref<object | null>(null)
 // COMPUTED
 // METHODS
-function onErrorCaptured(event: any) {
-  error.value = event
-}
 // WATCH
 // LIFECYCLE
 </script>
@@ -38,7 +33,7 @@ function onErrorCaptured(event: any) {
 
       <Suspense>
         <template #default>
-          <CurrentWork :current-user="currentUser" />
+          <CurrentWork :current-user="props.currentUser" />
         </template>
         <template #fallback>
           <Loader />
@@ -53,7 +48,7 @@ function onErrorCaptured(event: any) {
 
       <Suspense>
         <template #default>
-          <CompletedWork :current-user="currentUser" />
+          <CompletedWork :current-user="props.currentUser" />
         </template>
         <template #fallback>
           <Loader />
