@@ -411,7 +411,7 @@ class Toolkit
         return $summary + $group;
     }
 
-    function getUpcomingTableArray($html, $events) {
+    static function getUpcomingTableArray($html, $events) {
         $ret = array();
         foreach ($events as $event) {
             $tmp = array();
@@ -443,7 +443,7 @@ class Toolkit
         return $ret;
     }
 
-    function getNonUpcomingTableArray($html, $events) {
+    static function getNonUpcomingTableArray($html, $events) {
         $ret = array();
         foreach ($events as $event) {
             $tmp = array();

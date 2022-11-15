@@ -749,7 +749,9 @@ class EvaluationsController extends AppController
             //Get the target event submission
             $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['id'],
                 $evaluator);
-            $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
+            if ($evaluationSubmission) {
+                $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
+            }
 
             if ($this->Evaluation->saveSimpleEvaluation($this->params, $groupEvent, $evaluationSubmission)) {
                 CaliperHooks::submit_simple_evaluation($eventId, $evaluator, $groupEvent['GroupEvent']['id'], $groupId);
@@ -1144,7 +1146,6 @@ class EvaluationsController extends AppController
         //Get the target event submission
         $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
         if (empty($evaluationSubmission)) {
-            $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
             $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
             $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
             $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;

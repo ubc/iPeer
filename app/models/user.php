@@ -1240,7 +1240,7 @@ class User extends AppModel
      * @access public
      * @return array list of courses
      * */
-    function getMyCourseList()
+    static function getMyCourseList()
     {
         $model = Classregistry::init('Course');
 
@@ -1273,7 +1273,7 @@ class User extends AppModel
      * @access public
      * @return list of course ids
      */
-    function getAccessibleCourses()
+    static function getAccessibleCourses()
     {
         if (User::hasPermission('functions/user/admin')) {
             return array_keys(User::getMyDepartmentsCourseList('list'));

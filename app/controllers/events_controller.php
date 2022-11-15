@@ -507,9 +507,9 @@ class EventsController extends AppController
         $emailTemp = $this->EmailSchedule->find('first', array(
             'conditions' => array('EmailSchedule.sent' => 0, 'EmailSchedule.event_id' => $eventId)
         ));
+        $this->set('reminder_enabled', $this->SysParameter->get('email.reminder_enabled', true));
         if ($emailTemp) {
             $this->set('emailId', $emailTemp['EmailSchedule']['content']);
-            $this->set('reminder_enabled', $this->SysParameter->get('email.reminder_enabled', true));
         }
         $event = $this->Event->getEventById($eventId);
 
@@ -904,7 +904,10 @@ class EventsController extends AppController
     {
         $ret = array();
         foreach($data as $key => $value) {
-            $ret[$key] = is_array($value) ? $this->_multiMap($value) : trim($value);
+            if (is_numeric($value)) $ret[$key] = $value;
+            elseif (is_array($value)) $ret[$key] = $this->_multiMap($value);
+            elseif (empty($value)) $ret[$key] = null;
+            else $ret[$key] = trim($value);
         }
         return $ret;
     }

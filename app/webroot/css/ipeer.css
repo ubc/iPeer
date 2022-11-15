@@ -170,7 +170,6 @@ input[type="text"], input[type="file"], input[type="password"], textarea, select
     margin: 0 auto;
     margin-top: 1em;
     min-width: 6em;
-    height: 2em;
     font-weight: 600;
     display: block;
 }
@@ -390,14 +389,6 @@ a#home, a#home:hover, a#home:active {
     padding: 7px 0.8em;
     float: right;
     border-bottom: solid 3px #fff;
-}
-
-.instructions {
-    border: solid 1px #ccc;
-    padding: 1em 1em 0.5em;
-    background: #fafafa;
-    border-radius: 5px;
-    box-shadow: 0 0 5px rgba(85, 85, 85, 0.28) inset;
 }
 
 /* CONTENT CONTAINER */
@@ -2082,7 +2073,7 @@ table.content-table {
     margin: 0 auto 0 auto;
 }
 
-.add-button, .delete-button, .edit-button, .merge-button, .export-excel-button, .compare-button, .instruction-icon, .canvas-button,
+.add-button, .delete-button, .edit-button, .merge-button, .export-excel-button, .compare-button, .canvas-button,
 .button, input[type="submit"], input[type="button"], button {
     background-color: #e6e6e6;
     padding: 5px 5px 5px 25px;
@@ -2126,7 +2117,6 @@ input[type="submit"], button.submit {
 .merge-button:hover,
 .export-excel-button:hover,
 .compare-button:hover,
-.instruction-icon:hover,
 .canvas-button:hover,
 .button:hover,
 input[type="submit"]:hover,
@@ -2296,8 +2286,23 @@ textarea.question-title-textarea, textarea.question-descriptor {
     text-align: center;
 }
 
+table.standardtable td.instructions-cell {
+    text-align: left;
+    padding: 1em 1.5em;
+    font-size: 1.1em;
+}
+
+table.standardtable td.instructions-cell .instruction-icon {
+    padding: 5px 5px 5px 25px;
+    background-position: 5px 10px;
+    background-repeat: no-repeat;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
 ul.instructions {
-    margin: 1em 0 1em 2em;
+    margin: 0.5em 1em;
+    padding: 0.5em;
 }
 
 ul.instructions li {

@@ -27,7 +27,7 @@ echo $html->div("help-text",
 echo $form->input('zero_mark');
 echo $html->div("help-text", 
     __('Start marks from zero for all Likert questions.', true));
-$check = ($this->data['Mixeval']['self_eval'] > 0) ? true : false;
+$check = (isset($this->data['Mixeval']) && $this->data['Mixeval']['self_eval'] > 0) ? true : false;
 echo $form->input('self_eval', 
     array('type' => 'checkbox', 'id' => 'self_eval', 'label' => __('Self-Evaluation', true),
     'checked' => $check));

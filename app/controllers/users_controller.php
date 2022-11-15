@@ -1301,7 +1301,7 @@ class UsersController extends AppController
                 foreach ($errors as $error){
                     if (is_array($error)) {
                         foreach ($error as $error_detail) {
-                            $error_message .= '<li>' . $error_detail . '</li>';
+                            $error_message .= '<li>' . print_r($error_detail, true) . '</li>';
                         }
                     }
                     else {
@@ -1321,10 +1321,12 @@ class UsersController extends AppController
             }
 
             // enrol the users in the selected course
-            $insertedIds = array_merge(
-                $insertedIds,
-                Set::extract('/User/id', $result['updated_users']));
-            $this->Course->enrolStudents($insertedIds, $this->data['Course']['Course']);
+            if ($result) {
+                $insertedIds = array_merge(
+                    $insertedIds,
+                    Set::extract('/User/id', $result['updated_users']));
+                $this->Course->enrolStudents($insertedIds, $this->data['Course']['Course']);
+            }
 
             if (!isset($resultInstructors['failed_users'])) {
                 $resultInstructors['failed_users'] = array();

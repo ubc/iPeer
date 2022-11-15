@@ -108,7 +108,7 @@ jQuery( document ).ready(function() {
         <td colspan="3"><?php echo $event['Event']['description'] ?></td>
     </tr>
     <tr>
-        <td colspan="4" style="text-align: left;">
+        <td colspan="4" class="instructions-cell">
             <span class="instruction-icon"><?php __(' Instructions')?>:</span>
             <ul class="instructions">
             <li><?php __('Click <font color ="#FF6666"><i>EACH</i></font> of your peer\'s name to rate their performance.')?></li>
@@ -120,7 +120,7 @@ jQuery( document ).ready(function() {
             <li><?php echo __('The evaluation can be repeatedly submitted until ', true).$releaseEnd.'.'?></li>
             </ul>
 
-            <div style="text-align:left; margin-left:3em;"><a href="#" onClick="javascript:$('penalty').toggle();return false;">( <?php __('Show/Hide late penalty policy')?> )</a></div>
+            <div><a href="#" onClick="javascript:$('penalty').toggle();return false;">( <?php __('Show/Hide late penalty policy')?> )</a></div>
             <div id ="penalty" style ="border:1px solid red; margin: 0.5em 0 0 3em; width: 450px; padding:0.5em; color:darkred; display:none">
                 <?php if (!empty($penalty)) {
                     $notFirst = false;

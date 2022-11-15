@@ -186,6 +186,7 @@ class Penalty extends AppModel
         if ($now >= $end) {
             $noSubmissions = array_diff($memberIds, Set::extract($submissions, '/EvaluationSubmission/submitter_id'));
             foreach ($noSubmissions as $userId) {
+                if (!isset($penalty['Penalty'])) continue;
                 $userPenalty[$userId] = $penalty['Penalty']['percent_penalty'];
             }
         }
@@ -226,6 +227,7 @@ class Penalty extends AppModel
                 
             }
         }
-        return $scorePenalty['Penalty']['percent_penalty'];
+        if ($scorePenalty) return $scorePenalty['Penalty']['percent_penalty'];
+        return $scorePenalty;
     }
 }

@@ -11,6 +11,7 @@ if ($canvasEnabled) {
         // new course creation based on canvas
         echo $form->hidden('Course.canvas_id');
     } else if (!empty($this->data['Course']) && !empty($this->data['Course']['id'])) {
+        $canvasId = isset($this->data['Course']['canvas_id']) ? $this->data['Course']['canvas_id'] : '';
         // edit existing course
         // canvas courses
         $cCourse = $form->input(
@@ -20,7 +21,7 @@ if ($canvasEnabled) {
                 'id' => 'canvas_id',
                 'label' => __('Linked with <br/>Canvas course', true),
                 'options' => $canvasCourses,
-                'default' => $this->data['Course']['canvas_id'],
+                'default' => $canvasId,
                 'div' => array( 'style' => 'padding-bottom: 10px;' )
             )
         );
@@ -122,22 +123,25 @@ echo $form->end(); ?>
 </div>
 
 <script type="text/javascript">
-<?php if ($canvasEnabled) { ?>
+<?php
+if ($canvasEnabled) { 
+    $canvasId = isset($this->data['Course']['canvas_id']) ? $this->data['Course']['canvas_id'] : '';
+?>
 // add the empty option
-jQuery('#canvas_id').prepend('<option value="" <?php echo empty($this->data['Course']['canvas_id'])? 'selected="selected"' : '' ?>></option>');
+jQuery('#canvas_id').prepend('<option value="" <?php echo empty($canvasId)? 'selected="selected"' : '' ?>></option>');
 // select the empty option if no linked canvas course
-if (jQuery('#canvas_id option[value="<?php echo $this->data['Course']['canvas_id'] ?>"]').length == 0) {
+if (jQuery('#canvas_id option[value="<?php echo $canvasId ?>"]').length == 0) {
     jQuery('#canvas_id').val('');
 }
 // warn user if there is already a linked canvas course and they are changing it
 else if (jQuery('#canvas_id').val() != '') {
-    var prevCanvasId = '<?php echo $this->data['Course']['canvas_id'] ?>';
+    var prevCanvasId = '<?php echo $canvasId ?>';
     jQuery('#canvas_id').focus(function() {
         prevCanvasId = jQuery(this).val();
     }).change(function(){
         jQuery(this).blur();
-        if (jQuery(this).val() != '<?php echo $this->data['Course']['canvas_id'] ?>' &&
-            prevCanvasId == '<?php echo $this->data['Course']['canvas_id'] ?>' &&
+        if (jQuery(this).val() != '<?php echo $canvasId ?>' &&
+            prevCanvasId == '<?php echo $canvasId ?>' &&
             !confirm('If you change the associated Canvas course, all the data about this association might be erased. Are you sure you want to continue?')) {
             jQuery(this).val(prevCanvasId);
             return false;

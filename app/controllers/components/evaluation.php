@@ -695,7 +695,7 @@ class EvaluationComponent extends CakeObject
 
                 $selectedLom = $form['selected_lom_'.$targetEvaluatee.'_'.$i];
                 $evalRubricDetail = $this->EvaluationRubricDetail->getByEvalRubricIdCritera($evalRubricId, $i);
-                if (isset($evalRubricDetail)) {
+                if ($evalRubricDetail) {
                     $this->EvaluationRubricDetail->id=$evalRubricDetail['EvaluationRubricDetail']['id'] ;
                 }
                 $evalRubricDetail['EvaluationRubricDetail']['evaluation_rubric_id'] = $evalRubricId;
