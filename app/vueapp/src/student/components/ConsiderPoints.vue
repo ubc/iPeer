@@ -12,7 +12,7 @@ const section = {
       {
         id: 1,
         icon: IconNumberOne,
-        title: 'You have expertise to share',
+        title: 'You have expertise to share.',
         description: 'Only you know what it felt for you to work as part of this team. You don\'t need to be an expert in evaluating teamwork to share what you experienced.'
       },
       {
@@ -34,14 +34,14 @@ const section = {
 
 <template>
   <SectionSubtitle :subtitle="section.subtitle.name" :icon="section.subtitle.icon">
-    <p class="text-sm leading-relaxed text-slate-900 font-normal mx-2" v-html="section.subtitle.description"></p>
+    <h5 class="text-base font-medium leading-relaxed mx-2" v-html="section.subtitle.description"></h5>
     <ul class="grid grid-cols-1 gap-x-1 gap-y-2 md:gap-x-6 md:gap-y-10 md:grid-cols-3 my-4 mx-2">
       <li class="relative flex flex-row-reverse" v-for="point of section?.subtitle?.points" :key="point.id">
         <div class="peer group ml-2 mt-2 flex-auto">
-          <h4 class="text-xl leading-5 xl:leading-relaxed text-slate-900 font-normal tracking-wide font-serif mb-2">{{ point.title }}</h4>
-          <p class="text-sm leading-5 text-slate-900 font-normal" v-html="point.description"></p>
+          <h4 class="text-xl leading-5 xl:leading-relaxed font-normal tracking-wide font-serif mb-2">{{ point.title }}</h4>
+          <p class="text-sm leading-5 font-normal" v-html="point.description"></p>
         </div>
-        <div class="flex-none w-14 h-14 bg-white flex items-center justify-center overflow-hidden">
+        <div class="flex-none w-14 h-14 flex items-center justify-center overflow-hidden">
           <component :is="point.icon"></component>
         </div>
       </li>

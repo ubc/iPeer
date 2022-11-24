@@ -8,7 +8,7 @@ interface Props {
   name: string
   value?: null
   modelValue?: null
-  rules?: string|object
+  rules?: string|object|any
   default?: string
   disabled?: boolean
 }
@@ -60,7 +60,7 @@ onBeforeUnmount(() => autosize.destroy(elementRef.value))
         v-bind="$attrs"
         :disabled="props.disabled"
       ></textarea>
-      <ErrorMessage class="form-text text-muted" v-if="props.type !== 'radio'" :name="name" />
+      <ErrorMessage class="form-text text-muted" :name="name" />
     </div>
   </div>
 </template>

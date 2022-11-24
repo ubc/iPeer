@@ -17,7 +17,6 @@ const props = defineProps<{
   description?: string
   placeholder?: string
   disabled?: boolean | false
-  autosave?: boolean
 }>();
 // DATA
 // COMPUTED
@@ -28,9 +27,12 @@ const props = defineProps<{
 
 <template>
   <div class="datatable" id="PeerSimpleRangeQuestion">
-    <div v-if="props.question" class="question"><AutoSpinner :text="props.question" :autosave="props.autosave" /></div>
+    <div v-if="props.question" class="question relative">
+      {{ props.question }} <AutoSpinner :text="props.question" class="absolute right-0 top-4" />
+    </div>
     <div v-if="props.description" class="description text-sm mx-4 mb-2">{{ props.description }}</div>
-    <table class="standardtable">
+
+    <table class="standardtable center no-v-line">
       <thead>
       <tr>
         <th style="width: 20%">

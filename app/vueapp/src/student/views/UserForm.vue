@@ -1,24 +1,20 @@
 <script lang="ts" setup>
-import {ref, toRef, watch} from 'vue'
-import {useRouter} from 'vue-router'
+import { ref } from 'vue'
 import { useForm } from 'vee-validate'
-import api from '@/services/api'
-import type {IUser} from '@/types/typings'
-// REFERENCES
-const emit = defineEmits<{
-  (e: 'set:message', option: object): void
-  (e: 'update:profile', option: object): void
-}>()
-const props = defineProps<{
+import { useAuthStore } from '@/stores/auth'
+import type { IUser } from '@/types/typings'
+interface Props {
   initialState: IUser
-}>()
+}
+// REFERENCES
+const emit    = defineEmits<{}>()
+const props   = defineProps<Props>()
+const auth    = useAuthStore()
 // DATA
-const form    = toRef(props, 'initialState')
 const userRef = ref(null)
-const message = ref<object|null>(null)
 // COMPUTED
 const { values, errors, meta, handleSubmit, isSubmitting } = useForm({
-  initialValues: form.value,
+  initialValues: props.initialState
 })
 // METHODS
 function onInvalidateSubmit({ values, errors, results }: any) {
@@ -27,35 +23,24 @@ function onInvalidateSubmit({ values, errors, results }: any) {
   fieldElement?.focus?.()
   fieldElement?.scrollIntoView({ behavior: 'smooth' })
 }
-const onSubmit = handleSubmit(async (values) => {
+const onSubmit = handleSubmit(async (values: unknown) => {
   const profileSearchParams: any = new URLSearchParams()
   for (const pair of Object.entries(values)) {
-    profileSearchParams.append(pair[0], pair[1])
-  }
-  try {
-    const response = await api.post('/users/editProfile', props.initialState?.id, profileSearchParams)
-    if(response.status === 200 && response.statusText === 'OK') {
-      message.value = response.data
-      const user = await api.get('/users/editProfile', props.initialState?.id)
-      await emit('update:profile', user.data)
+    if(pair[1] === undefined) {
+      profileSearchParams.append(pair[0], '')
     } else {
-      // message.value = response.data
-      // No response data available for this request
-      await useRouter().push({ name: 'user.login' })
+      profileSearchParams.append(pair[0], pair[1])
     }
-  } catch (err: any) {
-    message.value = {text: err.response.statusText, status: err.response.status, type: 'error'}
   }
+  await auth.updateCurrentUser(props.initialState?.id, profileSearchParams)
+
 }, onInvalidateSubmit)
 // WATCH
-watch(message, (event: object) => {
-  emit('set:message', event)
-}, { deep: true })
 // LIFECYCLE
 </script>
 
 <template>
   <form novalidate @submit.prevent="onSubmit" id="user_form" class="user-form" ref="user_form">
-    <slot :values="values" :errors="errors" :meta="meta" :isSubmitting="isSubmitting" :message="message" />
+    <slot :values="values" :errors="errors" :meta="meta" :isSubmitting="isSubmitting" />
   </form>
 </template>

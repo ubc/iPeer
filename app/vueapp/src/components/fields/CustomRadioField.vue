@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { toRef } from 'vue';
+import { toRef } from 'vue'
 import { useField } from 'vee-validate'
 
 interface Props {
@@ -19,18 +19,15 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   rules: undefined
 })
-
 // DATA
-const name = toRef(props, 'name');
+const name = toRef(props, 'name')
 // COMPUTED
 const { checked, handleChange, errorMessage, handleBlur, meta } = useField(name, props.rules, {
   type: 'radio',
-  checkedValue: props.value,
-  validateOnValueUpdate: true
+  // initialValue: props.value, // will disable the validation on the radio buttons
+  checkedValue: props.checked, // without checkedValue the validation will not work on the Likert ::TODO::
+  validateOnValueUpdate: false
 })
-// select/unselect the input
-handleChange(props.value)
-//
 const validationListeners = {
   blur: handleChange,
   change: handleChange,
@@ -50,11 +47,10 @@ const validationListeners = {
         :name="name"
         :value="props.value"
         :checked="Number(props.checked) === Number(props.value)"
-        :data-value="props.checked"
-        :data-error="errorMessage"
         :disabled="props.disabled"
         @input="handleChange"
         @blur="handleBlur"
+        v-on="validationListeners"
     />
     <span class="form-check-label text-sm" v-if="label">{{ label }}</span>
     <span class="visually-hidden form-text text-muted" v-if="label" :name="name">{{ errorMessage }}</span>

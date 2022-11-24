@@ -1,10 +1,11 @@
-import { createApp } from 'vue'
+import { createApp, markRaw } from 'vue'
+import { createPinia } from 'pinia'
 import { configure } from 'vee-validate'
 import router from './router'
-import api from '@/services/api'
 import App from './App.vue'
 import './assets/sass/main.scss'
 
+import api from '@/services/api'
 api.init()
 
 configure({
@@ -16,9 +17,15 @@ configure({
   validateOnInput: true,
   validateOnModelUpdate: true
 })
-
+const pinia = createPinia()
+pinia.use(({ store }) => {
+  store.router = markRaw(router)
+})
 const web = createApp(App)
+
+web.use(pinia)
 web.use(router)
+
 router.isReady().then(() => {
   web.mount('#webapp')
 })

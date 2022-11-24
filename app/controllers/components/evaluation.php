@@ -1003,7 +1003,7 @@ class EvaluationComponent extends CakeObject
         // validate
         $data = $params['EvaluationMixeval'];
         $questions = $this->MixevalQuestion->findAllByMixevalId($event['Event']['template_id']);
-        foreach ($questions as $ques) {
+        foreach($questions as $ques) {
             $num = $ques['MixevalQuestion']['question_num'];
             $multiplier = $ques['MixevalQuestion']['multiplier'];
             $zero_mark = $mixeval['Mixeval']['zero_mark'];
@@ -1025,8 +1025,8 @@ class EvaluationComponent extends CakeObject
                         // upgraded from pre 3.1, scale_levels are set to 0. So use $key as level, scale_level starts from 1
                         $lom = $key + 1;
                     }
-                    $valid_loms[] = $lom;
-                    $valid_grades[] = $multiplier * (($lom - $zero_mark) / ($scale - $zero_mark));
+                    $valid_loms[]=$lom;
+                    $valid_grades[]=$multiplier * (($lom - $zero_mark) / ($scale - $zero_mark));
                 }
                 if (!in_array($data[$num]['selected_lom'], $valid_loms)) {
                     return false;
@@ -1039,7 +1039,7 @@ class EvaluationComponent extends CakeObject
         $evalMixeval = $this->EvaluationMixeval->getEvalMixevalByGrpEventIdEvaluatorEvaluatee(
             $groupEventId, $evaluator, $evaluatee);
         if (empty($evalMixeval)) {
-            //Save the master Evaluation Mixeval record if empty
+            //Save the master Evalution Mixeval record if empty
             $this->EvaluationMixeval->id = null;
             $evalMixeval['EvaluationMixeval']['evaluator'] = $evaluator;
             $evalMixeval['EvaluationMixeval']['evaluatee'] = $evaluatee;

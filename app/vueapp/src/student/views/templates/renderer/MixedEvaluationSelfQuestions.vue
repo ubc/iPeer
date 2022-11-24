@@ -1,7 +1,5 @@
 <script lang="ts" setup>
 import { ref, reactive, watch, computed, onMounted, watchEffect, defineAsyncComponent } from 'vue'
-import LoadingComponent from '@/components/LoadingComponent.vue'
-import ErrorComponent from '@/components/ErrorComponent.vue'
 import type { IUser, IEvaluation, IMixedResponse, IMixedEvaluationData } from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
@@ -21,23 +19,11 @@ const props = defineProps<{
 const selfQuestion = computed(() => {
   switch (props.question?.type) {
     case 'Likert':
-      return defineAsyncComponent({
-        loader: () => import('@/student/views/questions/SelfMixedLikertQuestion.vue'),
-        loadingComponent: LoadingComponent /* shows while loading */,
-        errorComponent: ErrorComponent /* shows if there's an error */,
-      })
+      return defineAsyncComponent(() => import('@/student/views/questions/SelfMixedLikertQuestion.vue'))
     case 'Sentence':
-      return defineAsyncComponent({
-        loader: () => import('@/student/views/questions/SelfMixedSentenceQuestion.vue'),
-        loadingComponent: LoadingComponent /* shows while loading */,
-        errorComponent: ErrorComponent /* shows if there's an error */,
-      })
+      return defineAsyncComponent(() => import('@/student/views/questions/SelfMixedSentenceQuestion.vue'))
     case 'Paragraph':
-      return defineAsyncComponent({
-        loader: () => import('@/student/views/questions/SelfMixedParagraphQuestion.vue'),
-        loadingComponent: LoadingComponent /* shows while loading */,
-        errorComponent: ErrorComponent /* shows if there's an error */,
-      })
+      return defineAsyncComponent(() => import('@/student/views/questions/SelfMixedParagraphQuestion.vue'))
     default:
       break
   }

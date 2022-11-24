@@ -12,6 +12,7 @@ const props = defineProps<{
   value?: string
   modelValue?: string | number
   rules?: string
+  disabled?: boolean
 }>()
 
 // DATA
@@ -41,6 +42,7 @@ const validationListeners = {
         :name="name"
         :value="modelValue"
         :data-value="value"
+        :disabled="props.disabled"
         @change="$emit('update:event', $event)"
         @input="handleChange"
         @blur="handleBlur"

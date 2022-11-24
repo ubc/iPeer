@@ -1,0 +1,213 @@
+
+@layer components {
+  .badge {
+    // @apply bg-purple-100 text-purple-800 text-sm font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-purple-200 dark:text-purple-900;
+
+    &.due {
+      .due {
+        &-tomorrow {
+          @apply inline-block text-sm text-gold-600 font-normal;
+        }
+
+        &-date {
+          //@apply inline-block flex-col font-light;
+          @apply flex justify-start items-center space-x-2 font-light;
+          //@apply flex justify-start items-start space-x-2;
+
+          svg.icon {
+            @apply flex-none w-6 h-6;
+            @apply fill-gray-200;
+          }
+
+          .text {
+            @apply text-sm text-gray-700 dark:text-gray-400 leading-4;
+          }
+        }
+        &-over {
+          @apply inline-block text-xs text-gray-900 dark:text-gray-200 bg-gold-200 dark:bg-gold-900 font-normal pt-0.5 pb-0 px-2;
+        }
+      }
+    }
+  }
+  .page {
+    &-heading {
+      b, strong {
+        @apply font-medium;
+      }
+      p {}
+    }
+    &-subtitle {
+      @apply text-xl leading-relaxed;
+    }
+  }
+
+  .work {
+    .event-title {
+      @apply text-sm leading-5 font-medium tracking-wide;
+    }
+    .group-name {
+      @apply text-sm text-gray-700 dark:text-gray-400 leading-4 font-normal tracking-wide;
+    }
+  }
+  .your-status {
+    @apply flex items-center space-x-1 text-sm;
+    >.icon {
+      @apply w-5 h-5;
+    }
+    >.text {
+      &.completed {
+        @apply text-blue-800 dark:text-blue-200;
+        &::after {
+          content: "\bb";
+          @apply ml-1.5;
+        }
+      }
+      &.not-done {
+        @apply text-gray-500 dark:text-gray-200;
+      }
+    }
+  }
+  .course-course {
+    .course {
+      @apply text-sm font-normal;
+    }
+    .term {
+      @apply text-sm text-gray-700 dark:text-gray-400 leading-4 font-normal tracking-wide;
+    }
+  }
+  .action {
+    @apply flex flex-col;
+    @apply min-w-[157.5px];
+
+    >.text {
+      @apply text-xs text-gray-700 leading-4 font-normal tracking-wide;
+    }
+  }
+
+
+
+  .no-content-found {
+    @apply flex justify-center items-center p-8;
+  }
+  .quote {
+    @apply text-left font-light leading-5 tracking-wider;
+
+    &::before,
+    &::after {
+      content: ' " ';
+      @apply font-serif;
+    }
+  }
+
+  .form {
+    &-section {
+      @apply mt-8;
+
+      .your {
+        &-account, &-password {
+          @apply mt-6 mb-4 md:space-y-5;
+
+          .profile {
+            .form-input {
+              @apply md:max-w-[350px];
+            }
+          }
+        }
+      }
+
+      p {
+        @apply my-4;
+        @apply leading-relaxed mx-4;
+      }
+    }
+  }
+
+  .likert.response, .likert.review {
+    @apply flex justify-center items-center space-x-2;
+    .input {
+
+    }
+  }
+  .sentence.response, .paragraph.response,
+  .sentence.review, .paragraph.review {
+    @apply flex flex-col text-left space-y-2;
+
+    .text {
+      @apply text-sm text-left;
+    }
+  }
+
+  .block {
+    &-slider {
+      @apply flex flex-col py-1 mx-2;
+      border-style: solid;
+      @apply my-2 mx-auto;
+      @apply py-2 px-4 rounded;
+      //@apply border border-gray-300 dark:border-gray-600;
+      //@apply bg-gray-50 dark:bg-transparent;
+
+      //@apply text-gray-300 dark:text-gray-600;
+      @apply border border-gray-300 dark:border-gray-600;
+      @apply bg-gray-50 dark:bg-gray-700;
+
+      input {
+        //@apply w-full h-2 bg-gray-200 dark:text-gray-500 rounded-lg cursor-pointer dark:bg-gray-700; //  appearance-none
+      }
+
+      .tick {
+        @apply w-full;
+        @apply bottom-11;
+        @apply absolute;
+        &::after {
+          content: "|";
+          position: absolute;
+          transform: translate(-50%, 0%);
+          @apply text-gray-300 dark:text-gray-600;
+          @apply z-10;
+        }
+      }
+      .min, .max {
+        @apply text-sm text-gray-400 font-normal;
+      }
+
+      .form {
+        &-range {
+          @apply relative;
+          @apply z-50;
+        }
+
+        span {
+
+        }
+      }
+      .range {
+        @apply w-full flex justify-center items-center;
+        &-label {
+          @apply text-xs;
+          @apply w-16;
+          @apply text-gray-400;
+        }
+
+        &.thin {
+          @apply w-auto bg-gray-300 dark:bg-gray-700 rounded-lg h-1 mb-6 mx-8 cursor-pointer; //  appearance-none
+          &:disabled {
+            @apply cursor-not-allowed;
+            @apply bg-gray-200 dark:bg-gray-600 rounded-lg h-1 mb-6 mx-8 appearance-none;
+            @apply bg-gray-500;
+          }
+        }
+      }
+
+    }
+  }
+}
+
+
+
+
+
+#footer {
+  a {
+    font-size: 100%;
+  }
+}

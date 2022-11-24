@@ -1,23 +1,18 @@
 <script lang="ts" setup>
 import { toRef, computed, onMounted, defineAsyncComponent} from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import LoadingComponent from '@/components/LoadingComponent.vue'
-import ErrorComponent from '@/components/ErrorComponent.vue'
+import { useRouter } from 'vue-router'
 import IconSpinner from '@/components/icons/IconSpinner.vue'
 import TakeNote from '@/student/components/TakeNote.vue'
+
 import type { IUser, IEvaluation } from '@/types/typings'
 // REFERENCES
-const emit = defineEmits<{
-  (e: 'fetch:evaluation'): void
-  (e: 'set:message', option: object): void
-}>()
+const emit  = defineEmits<{}>()
 const props = defineProps<{
   members: IUser[]
   currentUser: IUser
   evaluation: IEvaluation
   settings: object
 }>()
-const route = useRoute()
 const router = useRouter()
 // DATA
 const members     = toRef(props, 'members')
@@ -25,25 +20,13 @@ const currentUser = toRef(props, 'currentUser')
 const evaluation  = toRef(props, 'evaluation')
 // COMPUTED
 const template = computed(() => {
-  switch (evaluation.value?.template) {
-    case 'SimpleEvaluation':
-      return defineAsyncComponent({
-        loader: () => import('@/student/views/templates/SimpleEvaluation.vue'),
-        loadingComponent: LoadingComponent /* shows while loading */,
-        errorComponent: ErrorComponent /* shows if there's an error */,
-      })
-    case 'RubricEvaluation':
-      return defineAsyncComponent({
-        loader: () => import('@/student/views/templates/RubricEvaluation.vue'),
-        loadingComponent: LoadingComponent /* shows while loading */,
-        errorComponent: ErrorComponent /* shows if there's an error */,
-      })
-    case 'MixedEvaluation':
-      return defineAsyncComponent({
-        loader: () => import('@/student/views/templates/MixedEvaluation.vue'),
-        loadingComponent: LoadingComponent /* shows while loading */,
-        errorComponent: ErrorComponent /* shows if there's an error */,
-      })
+  switch (evaluation.value?.event_template_type_id) {
+    case '1':
+      return defineAsyncComponent(() => import('@/student/views/templates/SimpleEvaluation.vue'))
+    case '2':
+      return defineAsyncComponent(() => import('@/student/views/templates/RubricEvaluation.vue'))
+    case '4':
+      return defineAsyncComponent(() => import('@/student/views/templates/MixedEvaluation.vue'))
     default:
       break
   }
@@ -52,11 +35,34 @@ const template = computed(() => {
 // WATCH
 // LIFECYCLE
 onMounted(() => {
-  if(evaluation.value?.status === '1') {
-    router.push({ name: 'evaluation.edit' })
+  console.log({'evaluation': evaluation.value})
+  /**
+  if(evaluation.value?.is_released) {
+    if(evaluation.value?.is_result_released) {
+      router.push({ name: 'submission.view' })
+    } else {
+      if(evaluation.value?.status === '1') {
+        router.push({ name: 'evaluation.edit' })
+      } else {
+        router.push({ name: 'evaluation.make' })
+      }
+    }
   } else {
-    router.push({ name: 'evaluation.make' })
-  }
+    router.push({ name: 'not.found' })
+  }*/
+
+  /**
+  if(evaluation.value?.is_released && evaluation.value?.is_result_released) {
+    router.push({ name: 'submission.view' })
+  } else if(evaluation.value?.is_released) {
+    if(evaluation.value?.status === '1') {
+      router.push({ name: 'evaluation.edit' })
+    } else {
+      router.push({ name: 'evaluation.make' })
+    }
+  } else {
+    router.push({ name: 'not.found' })
+  }*/
 })
 </script>
 
@@ -67,8 +73,6 @@ onMounted(() => {
       :members="members"
       :evaluation="evaluation"
       :currentUser="currentUser"
-      @set:message="$emit('set:message', $event)"
-      @fetch:evaluation="$emit('fetch:evaluation')"
     >
       <template v-slot:header></template>
       <template v-slot:main></template>

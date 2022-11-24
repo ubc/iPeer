@@ -1,16 +1,13 @@
 <script lang="ts" setup>
 import {ref, reactive, watch, computed, onMounted, toRef, onBeforeMount} from 'vue'
-import { findIndex, forEach, map, reduce } from 'lodash'
+import { isEmpty, findIndex, forEach, map, reduce } from 'lodash'
 import UserCard from '@/student/components/UserCard.vue'
 import AutoSpinner from '@/components/AutoSpinner.vue'
 import { CustomRangeField } from '@/components/fields'
-import type { ISimpleEvaluation, ISimpleResponse, ISimpleReview, User } from '@/types/typings'
-// REFERENCES
-const emit = defineEmits<{
-  // (e: 'update:modelValue', option: string): void
-}>()
-const props = defineProps<{
-  members: User[]
+
+import type { ISimpleEvaluation, ISimpleResponse, ISimpleReview, IUser } from '@/types/typings'
+interface Props {
+  members: IUser[]
   initialState: ISimpleResponse
   remaining: number
   point_per_member: string
@@ -20,8 +17,10 @@ const props = defineProps<{
   description?: string
   placeholder?: string
   disabled?: boolean|false
-  autosave?: boolean
-}>();
+}
+// REFERENCES
+const emit  = defineEmits<{}>()
+const props = defineProps<Props>();
 // DATA
 const showScore       = ref(false)
 const response        = toRef(props, 'initialState')
@@ -30,6 +29,13 @@ const student_slider  = ref([])
 const slider_sum      = ref(0)
 const student_scores  = ref([])
 // COMPUTED
+function calculatedValue(memberIdx: number): number {
+  if(!isEmpty(response.value?.data?.points && response.value?.data?.points[memberIdx])) {
+    return Number((response.value?.data?.points[memberIdx]/props.remaining)*100)
+  } else {
+    return 50
+  }
+}
 // METHODS
 function updateStudentSlider(event: {target:string, key:string, value: string}) {
   const {target, key, value} = event;
@@ -75,12 +81,12 @@ function distributeDecimalRemainder() {
 
 <template>
   <div class="datatable">
-    <div v-if="props.question" class="question">
-      <AutoSpinner :text="props.question" :autosave="props.autosave" />
+    <div v-if="props.question" class="question relative">
+      {{ props.question }} <AutoSpinner :text="props.question" class="absolute right-0 top-4" />
     </div>
     <div v-if="props.description" class="description text-sm mx-4 mb-2">{{ props.description }}</div>
 
-    <table class="standardtable">
+    <table class="standardtable center no-v-line">
       <thead>
       <tr>
         <th style="width: 20%">
@@ -103,11 +109,12 @@ function distributeDecimalRemainder() {
         <td style="width: 80%">
           <input type="hidden" :name="`${name}[${memberIdx}]`" :value="response?.data && response?.data[name] ? response?.data[name][memberIdx] : ''" />
           <CustomRangeField
-              :max="props.remaining"
+              :ticks="2"
+              :max="100"
               :text="['Less', 'More']"
-              :label="'A fair amount'"
+              :label="'An average amount'"
               :name="`percent[${memberIdx}]`"
-              :value="response?.data?.points[memberIdx]"
+              :value="calculatedValue(memberIdx)"
               :response="response?.data?.points"
               :points="response?.data && response?.data?.points ? response?.data?.points[memberIdx] : ''"
               :placeholder="placeholder"
@@ -116,11 +123,6 @@ function distributeDecimalRemainder() {
               :point_per_member="props.point_per_member"
               @update:input="updateStudentSlider({target:name, key:memberIdx, value: $event.target.value})"
           />
-          <!--
-          :max="props.remaining"
-          :value="student_slider[memberIdx]"
-          :value="response?.data?.points[memberIdx]"
-          -->
           <div v-if="showScore" class="text-xs text-red-400">{{ response?.data && response?.data?.points ? response?.data?.points[memberIdx] : '' }}</div>
         </td>
       </tr>

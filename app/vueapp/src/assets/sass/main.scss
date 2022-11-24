@@ -6,19 +6,25 @@
 @import "base";
 @import "animation";
 @import "ipeer";
+@import "custom";
 @import "navigation";
 @import "button";
 @import "table";
 @import "form";
 @import "tabs";
 @import "range_slider";
+@import "transition";
 
-.debugger {
-  display: none;
-  @apply hidden;
-}
 @layer components {
-  body {}
+  .debugger {
+    //display: none;
+    //@apply hidden;
+  }
+  .theme {
+    svg {
+      @apply hidden;
+    }
+  }
   #webapp {}
   section {
     @apply mb-1;
@@ -42,7 +48,7 @@
   }
   .page {
     &-container {
-      @apply bg-white;
+      // @apply bg-white;
       @apply p-8;
       @apply border border-[#ccc];
       @apply rounded-[10px];
@@ -88,69 +94,10 @@
     }
   }
 
-  .datatable {
-    @apply flex flex-col;
-    @apply mt-4 mb-8;
-
-    table {
-      @apply flex-1;
-      @apply md:mx-4;
-      @apply w-auto;
-
-      thead th {
-        @apply font-serif;
-        @apply text-center;
-      }
-    }
-  }
-
   .cta {
     @apply flex justify-center items-center space-x-4;
     @apply mt-12 mb-4;
   }
 
-  .button {
 
-    &.btn {
-      &-sm {
-        @apply py-0 px-1;
-      }
-      &-md {
-        @apply py-1.5 px-4;
-      }
-      &-lg {
-        @apply py-2 px-4;
-      }
-      &-xl {
-        @apply py-3 px-6;
-      }
-      &-2xl {
-        @apply py-4 px-8;
-      }
-    }
-
-    &.with-icon {
-      @apply flex justify-center items-center space-x-2;
-      svg {
-        @apply -ml-[0.5rem];
-      }
-    }
-  }
-
-  .completed {
-    @apply text-blue-500;
-
-    &::after {
-      content: "\bb";
-      @apply ml-1;
-    }
-
-  }
-
-  .quote {
-    @apply text-slate-500 font-light tracking-wider;
-    &::before {content: ' " '; @apply text-xl font-serif;}
-    &::after {content: ' " '; @apply text-xl font-serif;}
-  }
 }
-

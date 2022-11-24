@@ -1,9 +1,13 @@
 <script lang="ts" setup>
-import {ref, reactive, computed, onMounted, defineAsyncComponent} from 'vue';
-import { useRoute } from 'vue-router'
+import {ref, computed, onMounted, defineAsyncComponent, reactive} from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { findIndex } from 'lodash'
+import { useStore } from '@/stores/main'
+import { useAuthStore } from '@/stores/auth'
+import { useEvaluationStore } from '@/stores/evaluation'
 import api from '@/services/api'
 import Loader from '@/components/Loader.vue'
+import { NotAvailable } from '@/components/messages'
 import PageHeading from '@/components/PageHeading.vue'
 import SectionTitle from '@/components/SectionTitle.vue'
 import SectionSubtitle from '@/components/SectionSubtitle.vue'
@@ -18,48 +22,63 @@ import {
   IconWritingHand,
   IconThinkingFace
 } from '@/components/icons'
-const EvaluationMakePage = defineAsyncComponent(() => import('@/student/views/EvaluationMakePage.vue'))
-const EvaluationEditPage = defineAsyncComponent(() => import('@/student/views/EvaluationEditPage.vue'))
-import type { IEvaluation, IUser } from '@/types/typings'
 
+import type { IEvaluation, IUser } from '@/types/typings'
 interface Props {
-  currentUser: IUser
-  event_id?: string
-  group_id?: string
-  pageTitle?: string
+  // currentUser: IUser
+  // event_id?: string
+  // group_id?: string
+  // pageTitle?: string
 }
 // REFERENCES
-const emit              = defineEmits<{
-  (e: 'set:message', option: object): void
-}>()
+const emit              = defineEmits<{}>()
 const props             = defineProps<Props>()
 const route             = useRoute()
+const router            = useRouter()
+const store             = useStore()
+const authStore         = useAuthStore()
+const evaluationStore   = useEvaluationStore()
 // DATA
 const event_id          = ref(route.params.event_id)
 const group_id          = ref(route.params.group_id)
 const status            = ref<string>('')
-const message           = ref<object|null>(null)
-let evaluation          = reactive<IEvaluation | any>({})
-const members           = ref<IUser[]>([])
+const state             = reactive({
+  loading: computed(() => evaluationStore.loading),
+  error: computed(() => evaluationStore.error),
+  hasError: computed(() => evaluationStore.hasError),
+  evaluation: computed(() => evaluationStore.evaluation),
+  members: computed(() => evaluationStore.getGroupMembers),
+})
+// const message           = ref<object|null>(null)
+// let evaluation          = reactive<IEvaluation | any>({})
+// const members           = ref<IUser[]>([])
 // COMPUTED
+const currentUser = computed(() => authStore.getCurrentUser)
+const notification = computed(() => store.getNotification)
+// const error       = computed(() => store.isError)
+// const loading     = computed(() => store.isLoading)
+// const members     = computed(() => evaluationStore.getMembers)
+// const evaluation  = computed(() => evaluationStore.getEvaluation)
+
 const evaluationPage = computed(() => {
-  // Check if evaluation is started
-  switch (useRoute().name) {
-    case 'evaluation.make':
-      return defineAsyncComponent({
-        loader: () => import('@/student/views/EvaluationMakePage.vue'),
-        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
-      })
-    case 'evaluation.edit':
-      return defineAsyncComponent({
-        loader: () => import('@/student/views/EvaluationEditPage.vue'),
-        loadingComponent: `<div class="w-full h-128 flex justify-center items-center bg-gray-50">L O A D I N G...</div>`
-      })
-    default:
-      break
+  // Check if evaluation started
+  if(state.evaluation?.is_released) {
+
+    switch (route.name) {
+      case 'evaluation.make':
+        return defineAsyncComponent(() => import('@/student/views/EvaluationMakePage.vue'))
+      case 'evaluation.edit':
+        return defineAsyncComponent(() => import('@/student/views/EvaluationEditPage.vue'))
+      default:
+        break
+    }
+
+  } else {
+    router.push({ name: 'student.events' })
   }
 })
 // METHODS
+/** REMOVE
 async function fetchEvaluation() {
   status.value = 'PENDING'
   try {
@@ -73,7 +92,8 @@ async function fetchEvaluation() {
   } finally {
     status.value = 'READY'
   }
-}
+}*/
+/**
 function updateMembersCollection(_members:User[]) {
   let tmp = [..._members]
   const index = findIndex(tmp, { id: props.currentUser?.id})
@@ -84,54 +104,55 @@ function updateMembersCollection(_members:User[]) {
     return [...tmp, {...spliced[0], first_name: 'Yourself', last_name: ''}]
   }
 }
-function setMessage(event) {
-  message.value = event
-  emit('set:message', event)
-}
+*/
+// function setMessage(event) {
+//   message.value = event
+//   emit('set:message', event)
+// }
 // WATCH
 // LIFECYCLE
-onMounted(async () => await fetchEvaluation())
+// onMounted(async () => await fetchEvaluation())
+onMounted(async () => await evaluationStore.fetchEvaluation(event_id.value, group_id.value))
 </script>
 
 <template>
   <div class="evaluation-index">
-    <template v-if="status === 'PENDING'">
+    <template v-if="state.loading">
       <Loader />
     </template>
 
-    <template v-else>
+    <template v-else-if="!state.loading && state.hasError">
+      <NotAvailable status="online" :data="{ title: 'evaluation not available', message: 'evaluation message goes here.' }" />
+    </template>
 
+    <template v-else-if="!state.loading && !state.hasError && state.evaluation">
       <router-view name="flash" v-slot="{ Component }" >
-        <component :is="Component" :flash="message" />
+        <component :is="Component" :notification="notification" />
       </router-view>
 
-      <PageHeading :settings="{ title: evaluation?.title }">
+      <PageHeading :settings="{ title: state.evaluation?.title }">
         <ViewHeading
-            :due-date="evaluation?.due_date"
-            :penalty="evaluation?.penalty"
-            :group-name="evaluation?.group?.name"
-            :course-title="evaluation?.course?.title"
+            :due-date="state.evaluation?.due_date"
+            :penalty="state.evaluation?.penalty"
+            :group="state.evaluation?.group"
+            :course="state.evaluation?.course"
             :icon="{src: IconTwoUsers, size: '6rem'}"
         />
       </PageHeading>
 
       <SectionTitle title="About This Peer Review">
-        <InstructorSays v-if="evaluation?.description" :description="evaluation?.description" />
+        <InstructorSays v-if="state.evaluation?.description" :description="state.evaluation?.description" />
         <ConsiderPoints />
       </SectionTitle>
 
       <SectionTitle title="Your Response" />
       <SectionSubtitle subtitle="Evaluate your group" :icon="{src: IconWritingHand, size: '3.75rem'}" />
 
-      <Suspense>
-        <router-view
-            :currentUser="currentUser"
-            :members="members"
-            :evaluation="evaluation"
-            @set:message="setMessage"
-            @fetch:evaluation="fetchEvaluation">
-        </router-view>
-      </Suspense>
+      <router-view
+          :current-user="currentUser"
+          :members="state.members"
+          :evaluation="state.evaluation"
+      ></router-view>
     </template>
 
   </div>

@@ -18,13 +18,14 @@ const props = defineProps<{
   members: IUser[]
   currentUser: IUser
   evaluation: IEvaluation
-  disabled: boolean
+  isDisabled: boolean
 }>()
 const route = useRoute()
 const router = useRouter()
 // DATA
-const evaluation_form = ref()
-const evaluation      = toRef(props, 'evaluation')
+const evaluation_form   = ref()
+const members           = toRef(props, 'members')
+const evaluation        = toRef(props, 'evaluation')
 const form              = reactive({
   event_id: computed(() => evaluation.value?.id),
   group_id: computed(() => evaluation.value?.group?.id),
@@ -32,8 +33,8 @@ const form              = reactive({
   group_event_id: computed(() => evaluation.value?.group_event_id),
   rubric_id: computed(() => evaluation.value?.rubric_id),
   user_id: computed(() => props.currentUser?.id),
-  evaluatee_count: computed(() => evaluation.value?.members?.length),
-  member_ids: computed<string[]>(() => map(evaluation.value?.members, member => member.id))
+  evaluatee_count: computed(() => members.value?.length),
+  member_ids: computed<string[]|any>(() => map(members.value, member => member.id))
 })
 const initialState      = ref<ISimpleResponse|any>({})
 function getInitialState() {
@@ -48,7 +49,7 @@ function getInitialState() {
     }
   }
 }
-// points: [map(props.evaluation?.members, (member) => props.evaluation?.simple?.point_per_member)],
+// points: [map(members.value, (member) => evaluation.value?.simple?.point_per_member)],
 function setInitialState() {}
 const questions = reactive({
   points: {
@@ -79,7 +80,7 @@ onBeforeMount(() => {
       @submit="onSubmit"
       :initial-state="initialState"
       :evaluation="evaluation"
-      v-slot="{ onSave, errors, values, isSubmitting, evaluationRef, message, autosave }"
+      v-slot="{ onSave, errors, values, isSubmitting, evaluationRef, message }"
       @set:message="$emit('set:message', message)"
   >
     <slot name="header">
@@ -87,30 +88,28 @@ onBeforeMount(() => {
       <CustomHiddenField type="hidden" name="group_id" :value="evaluation?.group?.id" />
       <CustomHiddenField type="hidden" name="course_id" :value="evaluation?.course?.id" />
       <CustomHiddenField type="hidden" name="data[Evaluation][evaluator_id]" :value="currentUser?.id" />
-      <CustomHiddenField type="hidden" name="evaluateeCount" :value="evaluation?.members?.length" />
+      <CustomHiddenField type="hidden" name="evaluateeCount" :value="members?.length" />
       <CustomHiddenField type="hidden" name="memberIDs[]" v-for="(m,i) of form?.member_ids" :key="i" :value="m" />
     </slot>
 
     <slot name="main">
       <PeerSimpleRangeQuestion
-          :members="evaluation?.members"
+          :members="members"
           :remaining="evaluation?.simple?.remaining"
           :point_per_member="evaluation?.simple?.point_per_member"
           :initialState="initialState"
           :name="`points`"
           :question="questions.points.title"
           :description="questions.points.description"
-          :disabled="disabled"
-          :autosave="autosave"
+          :disabled="isDisabled"
       />
       <PeerSimpleCommentQuestion
-          :members="evaluation?.members"
+          :members="members"
           :initialState="initialState"
           :name="'comments'"
           :question="questions.comments.title"
           :description="questions.comments.description"
-          :disabled="disabled"
-          :autosave="autosave"
+          :disabled="isDisabled"
       />
     </slot>
 

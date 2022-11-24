@@ -1,3 +1,85 @@
+button, a {
+  @apply cursor-pointer;
+  @apply text-sm;
+
+  &.default {
+    @apply px-4 py-2 rounded;
+    background: #e7e7e7;
+    border: 1px solid #636363;
+    color: #636363;
+    // @apply focus:outline-none focus:ring-0;
+  }
+  &.primary, &.submit {
+    @apply px-4 py-2 rounded;
+    background: #e7d3f1;
+    border: 1px solid #632b7d;
+    color: #632b7d;
+    font-weight: normal;
+    //@apply
+    // @apply focus:outline-none focus:ring-0;
+  }
+  &.secondary {
+    //@apply
+  }
+
+  &:disabled {
+    @apply cursor-not-allowed;
+    @apply opacity-50;
+  }
+
+  &.paginate {
+    @apply w-[2rem] h-[2rem];
+    @apply rounded;
+    background: #e7e7e7;
+    border: 1px solid #636363;
+    color: #636363;
+
+    &.active {
+      background: #e7d3f1;
+      border: 1px solid #632b7d;
+      color: #632b7d;
+    }
+  }
+}
+
+a, button {
+  &.btn {
+    &-sm {
+      @apply inline-block px-4 py-1.5;
+      @apply font-medium text-xs leading-tight;
+      @apply rounded shadow-md;
+      @apply focus:ring-0;
+      @apply transition duration-150 ease-in-out;
+    }
+    &-md {
+      @apply inline-block px-6 py-2.5;
+      @apply font-medium text-sm leading-tight;
+      @apply rounded shadow-md;
+      @apply focus:ring-0;
+      @apply transition duration-150 ease-in-out;
+    }
+    &-lg {
+      @apply inline-block px-7 py-3;
+      @apply font-medium text-base leading-snug;
+      @apply rounded shadow-md;
+      @apply focus:ring-0;
+      @apply transition duration-150 ease-in-out;
+    }
+  }
+  &.with-icon {
+    @apply flex justify-center items-center space-x-2;
+    svg {
+      @apply -ml-[0.5rem];
+    }
+  }
+
+}
+
+
+
+
+
+/*
 a.button, a.submit { text-align: center; }
 button.disabled, button:disabled {
   background: inherit !important;
@@ -29,30 +111,32 @@ a.paginate.disabled, button.paginate.disabled { cursor: not-allowed; }
   border-color: #adadad;
   text-decoration: none;
 }
+*/
 
-input[type="submit"], input[type="button"], button, .button, a.button, a.submit {
-  padding: 5px 10px;
-  background: #e7e7e7; /* For browsers that do not support gradients */
-  background: -webkit-linear-gradient(left top, #e7e7e7, #c1c1c1); /* For Safari 5.1 to 6.0 */
-  background: -o-linear-gradient(bottom right, #e7e7e7, #c1c1c1); /* For Opera 11.1 to 12.0 */
-  background: -moz-linear-gradient(bottom right, #e7e7e7, #c1c1c1); /* For Firefox 3.6 to 15 */
-  background: linear-gradient(to bottom right, #e7e7e7, #c1c1c1); /* Standard syntax */
-  border-color: #636363;
-  color: #636363;
-}
+//input[type="submit"], input[type="button"], button, .button, a.button, a.submit {
+//  padding: 5px 10px;
+//  background: #e7e7e7; /* For browsers that do not support gradients */
+//  background: -webkit-linear-gradient(left top, #e7e7e7, #c1c1c1); /* For Safari 5.1 to 6.0 */
+//  background: -o-linear-gradient(bottom right, #e7e7e7, #c1c1c1); /* For Opera 11.1 to 12.0 */
+//  background: -moz-linear-gradient(bottom right, #e7e7e7, #c1c1c1); /* For Firefox 3.6 to 15 */
+//  background: linear-gradient(to bottom right, #e7e7e7, #c1c1c1); /* Standard syntax */
+//  border-color: #636363;
+//  color: #636363;
+//}
 
-input[type="submit"], button.submit, a.submit {
-  padding: 5px 10px;
-  background: #e7d3f1; /* For browsers that do not support gradients */
-  background: -webkit-linear-gradient(left top, #e7d3f1, #c19bd4); /* For Safari 5.1 to 6.0 */
-  background: -o-linear-gradient(bottom right, #e7d3f1, #c19bd4); /* For Opera 11.1 to 12.0 */
-  background: -moz-linear-gradient(bottom right, #e7d3f1, #c19bd4); /* For Firefox 3.6 to 15 */
-  background: linear-gradient(to bottom right, #e7d3f1, #c19bd4); /* Standard syntax */
-  border-color: #632b7d;
-  color: #632b7d;
-  font-weight: normal;
-}
+//input[type="submit"], button.submit, a.submit {
+//  padding: 5px 10px;
+//  background: #e7d3f1; /* For browsers that do not support gradients */
+//  background: -webkit-linear-gradient(left top, #e7d3f1, #c19bd4); /* For Safari 5.1 to 6.0 */
+//  background: -o-linear-gradient(bottom right, #e7d3f1, #c19bd4); /* For Opera 11.1 to 12.0 */
+//  background: -moz-linear-gradient(bottom right, #e7d3f1, #c19bd4); /* For Firefox 3.6 to 15 */
+//  background: linear-gradient(to bottom right, #e7d3f1, #c19bd4); /* Standard syntax */
+//  border-color: #632b7d;
+//  color: #632b7d;
+//  font-weight: normal;
+//}
 
+/*
 .button:hover,
 input[type="submit"]:hover, input[type="button"]:hover,
 a.submit:hover, a.button:hover,
@@ -63,16 +147,17 @@ a.paginate.active, button.paginate.active {
   box-shadow: 0 0 5px #decc7c;
   color: #5f5415 !important;
 }
+*/
 
-.button:hover,
-input[type="submit"]:hover,
-input[type="button"]:hover,
-a.submit:hover, a.button:hover,
-button:hover,
-a.paginate.active, button.paginate.active {
-  background: #fbf9ea; /* For browsers that do not support gradients */
-  background: -webkit-linear-gradient(left top, #fbf9ea, #f8e988); /* For Safari 5.1 to 6.0 */
-  background: -o-linear-gradient(bottom right, #fbf9ea, #f8e988); /* For Opera 11.1 to 12.0 */
-  background: -moz-linear-gradient(bottom right, #fbf9ea, #f8e988); /* For Firefox 3.6 to 15 */
-  background: linear-gradient(to bottom right, #fbf9ea, #f8e988); /* Standard syntax */
-}
+//.button:hover,
+//input[type="submit"]:hover,
+//input[type="button"]:hover,
+//a.submit:hover, a.button:hover,
+//button:hover,
+//a.paginate.active, button.paginate.active {
+//  background: #fbf9ea; /* For browsers that do not support gradients */
+//  background: -webkit-linear-gradient(left top, #fbf9ea, #f8e988); /* For Safari 5.1 to 6.0 */
+//  background: -o-linear-gradient(bottom right, #fbf9ea, #f8e988); /* For Opera 11.1 to 12.0 */
+//  background: -moz-linear-gradient(bottom right, #fbf9ea, #f8e988); /* For Firefox 3.6 to 15 */
+//  background: linear-gradient(to bottom right, #fbf9ea, #f8e988); /* Standard syntax */
+//}

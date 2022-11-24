@@ -11,15 +11,6 @@ class RestResponseHandlerComponent extends CakeObject
     $this->settings = $settings;
   }
   
-  public function withStatus($status) {
-    return http_response_code($status);
-  }
-  
-  public function withStringBody($body) {
-    return json_encode(['data' => $body]);
-  }
-  
-  
   public function toJson(string $message, int $status, array $body=[]): void
   {
     http_response_code($status);

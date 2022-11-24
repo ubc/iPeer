@@ -1,57 +1,35 @@
 <script lang="ts" setup>
 import { computed, defineAsyncComponent} from 'vue'
-import LoadingComponent from '@/components/LoadingComponent.vue'
-import ErrorComponent from '@/components/ErrorComponent.vue'
+import Loader from '@/components/Loader.vue'
 import SectionTitle from '@/components/SectionTitle.vue'
 import SectionSubtitle from '@/components/SectionSubtitle.vue'
 import { IconWritingHand } from '@/components/icons'
-import type {IEvaluation, IUser} from '@/types/typings'
+import type { IUser, IReview } from '@/types/typings'
+
 interface Props {
-  evaluation: IEvaluation
   currentUser: IUser
-  disabled?: boolean
+  members: IUser[]
+  reviews: IReview
+  isDisabled?: boolean
 }
 // REFERENCES
-const emit = defineEmits<{
-  // (e: 'updateModelValue', option: string): void
-}>()
-const props = defineProps<Props>()
+const emit        = defineEmits<{}>()
+const props       = defineProps<Props>()
 
 // DATA
 // COMPUTED
-const template = computed(() => {
-  switch (props.evaluation?.template) {
-    case 'SimpleEvaluation':
-      return defineAsyncComponent({
-        loader: () => import('@/student/views/templates/SimpleEvaluation.vue'),
-        loadingComponent: LoadingComponent /* shows while loading */,
-        errorComponent: ErrorComponent /* shows if there's an error */,
-      })
-    case 'RubricEvaluation':
-      return defineAsyncComponent({
-        loader: () => import('@/student/views/templates/RubricEvaluation.vue'),
-        loadingComponent: LoadingComponent /* shows while loading */,
-        errorComponent: ErrorComponent /* shows if there's an error */,
-      })
-    case 'MixedEvaluation':
-      return defineAsyncComponent({
-        loader: () => import('@/student/views/templates/MixedEvaluation.vue'),
-        loadingComponent: LoadingComponent /* shows while loading */,
-        errorComponent: ErrorComponent /* shows if there's an error */,
-      })
+const template    = computed(() => {
+  switch (props.reviews?.event?.event_template_type_id) {
+    case '1':
+      return defineAsyncComponent(() => import('@/student/views/submission/response/SimpleEvaluation.vue'))
+    case '2':
+      return defineAsyncComponent(() => import('@/student/views/submission/response/RubricEvaluation.vue'))
+    case '4':
+      return defineAsyncComponent(() => import('@/student/views/submission/response/MixedEvaluation.vue'))
     default:
       break
   }
 })
-/**
-const template = computed(() => {
-  if(props.evaluation?.template) {
-    return defineAsyncComponent({
-      loader: () => import(`@/student/views/templates/${props.evaluation?.template}.vue`),
-      loadingComponent: `<div class="w-full h-128 bg-gold-100">L O A D I N G...</div>`
-    })
-  }
-})*/
 // METHODS
 // WATCH
 // LIFECYCLE
@@ -60,12 +38,20 @@ const template = computed(() => {
 <template>
   <SectionTitle title="Your Response" />
   <SectionSubtitle subtitle="Evaluate your group" :icon="{src: IconWritingHand, size: '3.75rem'}" />
-  <component
-      :is="template"
-      :members="props.members"
-      :evaluation="props.evaluation"
-      :current-user="props.currentUser"
-      :disabled="props.disabled"
-      @fetch:evaluation="$emit('fetch:evaluation')"
-  ></component>
+  <Suspense>
+    <template #default>
+      <Transition name="fade" :duration="{ enter: 500, leave: 800 }">
+        <component
+            :is="template"
+            :current-user="props.currentUser"
+            :members="props.members"
+            :reviews="props.reviews"
+            :is-disabled="props.isDisabled"
+        ></component>
+      </Transition>
+    </template>
+    <template #fallback>
+      <Loader height="200px" />
+    </template>
+  </Suspense>
 </template>

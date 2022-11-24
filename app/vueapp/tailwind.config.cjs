@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 const colors = require('tailwindcss/colors')
 module.exports = {
+  darkMode: 'class',
   corePlugins: {
     preflight: false,
   },
@@ -13,7 +14,7 @@ module.exports = {
       xs: '480px',
       sm: '640px',
       md: '768px',
-      lg: '976px',
+      lg: '1000px',
       xl: '1024px'
     },
     fontFamily: {
@@ -21,6 +22,9 @@ module.exports = {
       sans: ['Helvetica Neue, Helvetica, Arial, sans-serif'],
     },
     extend: {
+      // range: {
+      //   sm: ''
+      // },
       colors: {
         transparent: 'transparent',
         current: 'currentColor',
@@ -56,15 +60,16 @@ module.exports = {
           900: 'rgb(136,108,3)', // '#886c03'
         },
         'purple': {
-          100: '',
-          200: '',
-          300: '',
-          400: '',
+          50: 'rgb(250, 249, 251)',
+          100: 'rgb(241, 236, 243)',
+          200: 'rgb(223, 211, 228)',
+          300: 'rgb(204, 185, 212)',
+          400: 'rgb(185, 160, 197)',
           500: '#8c629f',
-          600: '',
-          700: '#563d7c',
-          800: '',
-          900: '#3f3cbb',
+          600: 'rgb(117, 81, 133)',
+          700: 'rgb(106, 74, 120)',
+          800: 'rgb(95, 66, 108)',
+          900: 'rgb(83, 58, 95)',
         },
         success: '#d4edda',
         error: '#f8d7da',

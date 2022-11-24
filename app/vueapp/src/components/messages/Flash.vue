@@ -1,22 +1,20 @@
 <script lang="ts" setup>
-import { isEmpty } from 'lodash'
+import { useStore } from '@/stores/main'
+import type { INotification } from '@/types/typings'
+interface Props { notification: INotification }
 // REFERENCES
-const props = defineProps<{
-  flash: object|null
-}>()
-const emit = defineEmits<{}>()
-// DATA
-// COMPUTED
-// METHODS
-// WATCH
-// LIFECYCLE
+const emit  = defineEmits<{}>()
+const props = defineProps<Props>()
+const store = useStore()
 </script>
 
 <template>
-  <div v-if="!isEmpty(flash)" :class="`flash flash-${flash?.statusText} flash-dismissible fade show`">
-    <div :class="`flash-wrapper flash-${flash?.statusText}`">
-      <span :class="`flex-1`">{{ flash?.message }}</span>
-      <span class="close" @click="flash = null">&times;</span>
+  <Transition name="fade" mode="out-in">
+    <div v-if="props.notification?.id" :class="`flash flash-${props.notification?.type} flash-dismissible fade show`">
+      <div :class="`flash-wrapper flash-${props.notification?.type}`">
+        <span :class="`flex-1`">{{ props.notification?.message }}</span>
+        <span class="close" @click="store.delNotification(props.notification.id)">&times;</span>
+      </div>
     </div>
-  </div>
+  </Transition>
 </template>

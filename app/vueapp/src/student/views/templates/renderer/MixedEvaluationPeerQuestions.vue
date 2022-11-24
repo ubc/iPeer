@@ -1,7 +1,5 @@
 <script lang="ts" setup>
 import { computed, defineAsyncComponent } from 'vue'
-import LoadingComponent from '@/components/LoadingComponent.vue'
-import ErrorComponent from '@/components/ErrorComponent.vue'
 import type { IUser, IEvaluation, IMixedResponse, IMixedEvaluationData } from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
@@ -21,35 +19,15 @@ const props = defineProps<{
 const peerQuestion = computed(() => {
   switch (props.question?.type) {
     case 'Likert':
-      return defineAsyncComponent({
-        loader: () => import('@/student/views/questions/PeerMixedLikertQuestion.vue'),
-        loadingComponent: LoadingComponent /* shows while loading */,
-        errorComponent: ErrorComponent /* shows if there's an error */,
-      })
+      return defineAsyncComponent(() => import('@/student/views/questions/PeerMixedLikertQuestion.vue'))
     case 'Range':
-      return defineAsyncComponent({
-        loader: () => import('@/student/views/questions/PeerMixedRangeQuestion.vue'),
-        loadingComponent: LoadingComponent /* shows while loading */,
-        errorComponent: ErrorComponent /* shows if there's an error */,
-      })
+      return defineAsyncComponent(() => import('@/student/views/questions/PeerMixedRangeQuestion.vue'))
     case 'Comment':
-      return defineAsyncComponent({
-        loader: () => import('@/student/views/questions/PeerMixedCommentQuestion.vue'),
-        loadingComponent: LoadingComponent /* shows while loading */,
-        errorComponent: ErrorComponent /* shows if there's an error */,
-      })
+      return defineAsyncComponent(() => import('@/student/views/questions/PeerMixedCommentQuestion.vue'))
     case 'Sentence':
-      return defineAsyncComponent({
-        loader: () => import('@/student/views/questions/PeerMixedSentenceQuestion.vue'),
-        loadingComponent: LoadingComponent /* shows while loading */,
-        errorComponent: ErrorComponent /* shows if there's an error */,
-      })
+      return defineAsyncComponent(() => import('@/student/views/questions/PeerMixedSentenceQuestion.vue'))
     case 'Paragraph':
-      return defineAsyncComponent({
-        loader: () => import('@/student/views/questions/PeerMixedParagraphQuestion.vue'),
-        loadingComponent: LoadingComponent /* shows while loading */,
-        errorComponent: ErrorComponent /* shows if there's an error */,
-      })
+      return defineAsyncComponent(() => import('@/student/views/questions/PeerMixedParagraphQuestion.vue'))
     default:
       break
   }

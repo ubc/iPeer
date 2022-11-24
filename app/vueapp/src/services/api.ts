@@ -1,11 +1,7 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { useRouter } from 'vue-router'
-
 const cookies = Cookies.get('IPEER')
-// if(!cookies) {
-//   api.logout()
-// }
 
 export default {
   init() {
@@ -19,14 +15,7 @@ export default {
     return axios.get(`${resource}/${params}`)
   },
   // @ts-ignore
-  post(resource: string, params?: string|null, data: HTMLFormElement, config?: {withCredentials: true}) {
+  post(resource: string, params?: string|null, data?: HTMLFormElement, config?: {withCredentials: true}) {
     return axios.post(`${resource}/${params}`, data, config)
-  },
-  // logout
-  logout() {
-    Cookies.remove('IPEER')
-    useRouter().push({name: 'user.login'}).then(r => {
-      console.log({r})
-    })
   }
 }

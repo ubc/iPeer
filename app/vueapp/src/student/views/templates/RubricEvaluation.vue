@@ -29,12 +29,11 @@ const props = defineProps<{
   members: IUser[]
   currentUser: IUser
   evaluation: IEvaluation
-  disabled?: boolean
+  isDisabled?: boolean
 }>()
 const route = useRoute()
 const router = useRouter()
 // DATA
-const disabled = ref(route.name === 'submission.view' ? true : false)
 const evaluation_form   = ref(null)
 const members           = toRef(props, 'members')
 const evaluation        = toRef(props, 'evaluation')
@@ -46,8 +45,8 @@ let form                = reactive({
   group_event_id: computed(() => evaluation.value?.group_event_id),
   rubric_id: computed(() => evaluation.value?.rubric_id),
   user_id: computed(() => props.currentUser?.id),
-  evaluatee_count: computed(() => evaluation.value?.members?.length),
-  member_ids: computed<string[]>(() => map(evaluation.value?.members, member => member.id))
+  evaluatee_count: computed(() => members.value?.length),
+  member_ids: computed<string[]>(() => map(members.value, member => member.id))
 })
 const initialState      = ref<IRubricResponse|any>({})
 function getInitialState() {
@@ -56,7 +55,7 @@ function getInitialState() {
     submitter_id: props.currentUser?.id,
     submitted: null,
     date_submitted: '',
-    data: map(props.evaluation?.members, (member: IUser) => ({
+    data: map(members.value, (member: IUser) => ({
         evaluator: props.currentUser?.id,
         evaluatee: member?.id,
         comment: '',
@@ -106,7 +105,7 @@ onBeforeMount( () => {
   <EvaluationForm
       @submit="onSubmit"
       :initial-state="initialState"
-      :evaluation="props.evaluation"
+      :evaluation="evaluation"
       v-slot="{ onSave, errors, values, isSubmitting, evaluationRef, message, autosave }"
       @set:message="$emit('set:message', message)"
   >
@@ -123,38 +122,38 @@ onBeforeMount( () => {
 
     <slot name="main">
       <div class="datatable"
-           v-for="(rubric_criteria, criteriaIdx) of props.evaluation?.rubric?.data?.rubrics_criteria" :key="rubric_criteria.id">
+           v-for="(rubric_criteria, criteriaIdx) of evaluation?.rubric?.data?.rubrics_criteria" :key="rubric_criteria.id">
         <div v-if="rubric_criteria.criteria" class="question">{{ rubric_criteria.id }}. {{ rubric_criteria.criteria }}</div>
         <div class="description text-sm text-slate-700 mx-4 mb-2"></div>
 
         <PeerRubricLikertQuestion
-            :members="props.evaluation?.members"
+            :members="members"
             :initial-state="initialState"
             :rubric_criteria="rubric_criteria"
-            :rubrics_lom="props.evaluation?.rubric?.data?.rubrics_lom"
-            :disabled="props.disabled"
+            :rubrics_lom="evaluation?.rubric?.data?.rubrics_lom"
+            :disabled="props.isDisabled"
             :autosave="autosave"
             @update:initialState="setInitialState"
         />
 
         <PeerRubricCommentQuestion
-            v-show="parseInt(props.evaluation?.com_req)"
-            :members="props.evaluation?.members"
+            v-show="parseInt(evaluation?.com_req)"
+            :members="members"
             :initial-state="initialState"
             :rubric_criteria_idx="criteriaIdx"
             :rubric_criteria="rubric_criteria"
-            :disabled="props.disabled"
+            :disabled="props.isDisabled"
             :autosave="autosave"
             @update:initialState="setInitialState"
         />
       </div>
 
       <PeerRubricGeneralCommentQuestion
-          :index="props.evaluation?.rubric?.data?.rubrics_criteria?.length+1"
-          :members="props.evaluation?.members"
+          :index="evaluation?.rubric?.data?.rubrics_criteria?.length+1"
+          :members="members"
           :initial-state="initialState"
           :rubric_criteria_idx="criteriaIdx"
-          :disabled="props.disabled"
+          :disabled="props.isDisabled"
           @update:initialState="setInitialState"
       />
     </slot>

@@ -1,30 +1,23 @@
+import { reactive } from 'vue'
 import { differenceInHours, differenceInSeconds, format } from 'date-fns'
-import { map, filter, isEmpty, forEach } from 'lodash'
+import { isEmpty, find, map, filter, reduce, isObject, isArray, isNumber, forEach } from 'lodash'
 import { enCA } from 'date-fns/locale'
 
-interface Entry {
-  event: Event
-  course: object
-  group: object
-  penalties: object[]
-}
-interface Event {
-  is_ended: boolean
-  is_released: boolean
-  is_result_released: boolean
-  is_submitted: string
-}
-interface Sort {
+export const localDateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
+
+import type { IEvent } from '@/types/typings'
+
+interface ISort {
   key: string
   column: string
   direction: string
 }
-interface Paginate {
+interface IPaginate {
   page: number
   offset: number
   limit: number
 }
-interface Filter {
+interface IFilter {
   timeframe: string
   limit: string[]
   search: string
@@ -34,27 +27,32 @@ export const sleep = async (time: number) => await new Promise(resolve => setTim
 
 export const Statuses = {Loading: 'LOADING', Ready: 'READY', Empty: 'EMPTY', Error: 'ERROR'}
 
-export const longDateFormat = (date: string | Date): string => {
+export const longDateFormat = (date: string | Date): string | Date => {
+  if(isEmpty(date)) return <string>date
   return format(new Date(date), 'EE, MMM d, yyyy @ h:mm aaaa', { locale: enCA })
 }
 
-export const shortDateFormat = (date: string | Date): string => {
+export const shortDateFormat = (date: string | Date): string | Date => {
+  if(isEmpty(date)) return <string>date
   return format(new Date(date), 'MMM d, yyyy', { locale: enCA })
 }
 
 export const isOverDue = (date: string | Date): boolean => {
-  const due_date = new Date(date)
-  return differenceInSeconds(due_date, new Date()) > 24*60*60
+  if(isEmpty(date)) return false
+  return differenceInSeconds(new Date(date), new Date()) > 24*60*60
 }
 
 export const isDueTomorrow = (date: string | Date): boolean => {
-  const due_date = new Date(date)
-  return differenceInSeconds(due_date, new Date()) <= 24*60*60
+  if(isEmpty(date)) return false
+  return differenceInSeconds(new Date(date), new Date()) <= 24*60*60
 }
 
-export const unique = (entries: object[], object_key: string, column_key: string):string[] => {
-  // @ts-ignore
-  return [...new Set(map(entries, entry => entry[object_key]).map(obj => obj[column_key]))]
+export const unique = (entries: object[], object_key: string, column_key: string):object[] => {
+  if(!isEmpty(entries) && !isEmpty(entries[0])) {
+    // @ts-ignore
+    return [...new Set(map(entries, entry => entry[object_key]).map(obj => obj[column_key]))]
+  }
+  return entries
 }
 
 export const compareEntries = (key: string, column: string, direction = 'asc') => {
@@ -84,7 +82,7 @@ export const compareEntries = (key: string, column: string, direction = 'asc') =
   };
 }
 
-export const filterEntries = (entries: Entry[], _filter: Filter): object[] | boolean[] => {
+export const filterEntries = (entries: IEvent[]|object[]|boolean[], _filter: IFilter): object[] | boolean[] => {
 
   let newEntries: object[] | boolean[] = entries
 
@@ -104,7 +102,7 @@ export const filterEntries = (entries: Entry[], _filter: Filter): object[] | boo
   if(!isEmpty(_filter.limit)) {
     let filtered_entries: object[] | boolean[] = []
     // @ts-ignore
-    filter(newEntries, (entry: Entry) => {
+    filter(newEntries, (entry: IEvent|any) => {
       if (!entry.hasOwnProperty('event')) return 0;
       if (entry?.event?.is_submitted === '1') {
         forEach(_filter.limit, (item) => {
@@ -168,3 +166,61 @@ export function jsonToFormData (json){
 
   return FORM_DATA;
 }
+
+
+
+/**
+ * useReview
+ * experimental
+ */
+export const review = reactive({
+  data: [] as any,
+  peer(arr: object[]) {
+    if(isEmpty(arr)) return this;
+    // @ts-ignore
+    this.data = map(arr, review => review)
+    return this;
+  },
+  self: function(arr: object[], userId: string) {
+    if(isEmpty(arr)) return this;
+    // @ts-ignore
+    this.data = filter(arr, { evaluatee: userId })
+    return this;
+  },
+  where: function(value?: string) {
+    if(isEmpty(value) || isEmpty(this.data)) return this;
+    // @ts-ignore
+    this.data = map(this.data, review => {
+      return find(review.details, {criteria_number: value})
+    })
+    return this;
+  },
+  find: function(value?: string|number|Date) {
+    if(isEmpty(value) || isEmpty(this.data)) return this;
+    // @ts-ignore
+    if(Array.isArray(this.data)) {
+      // @ts-ignore
+      this.data = this.data[0][value];
+    } else {
+      // @ts-ignore
+      this.data = this.data[value];
+    }
+    return this;
+  },
+  findAll: function (value: string) {
+    if(isEmpty(value) || isEmpty(this.data)) return this;
+    // TODO:: return object[]
+    // this.data = chunk // maybe??
+    return this;
+  },
+  reduce: function (value: string, average?: string) {
+    if(isEmpty(value) || isEmpty(this.data)) return this;
+    this.data = reduce(map(this.data, d => d[value]), (acc, val) => {
+      return (acc + Number(val) / (average ? this.data.length : 1))
+    }, 0)
+    return this;
+  },
+  result: function() {
+    return this.data
+  },
+})

@@ -61,9 +61,9 @@ function handleSelectedLomClick(event: {target: string, key: string, value: stri
       </th>
       <th :style="'width: '+ 80/props.rubrics_lom?.length +'%'"
           v-for="(criteria_lom, criteria_lomIdx) of props.rubrics_lom" :key="criteria_lom.id">
-        <div class="text-center leading-4">
-          <div class="font-normal">{{ criteria_lom.lom_comment }}</div>
-          <div class="text-sm font-thin">{{ props.rubric_criteria?.rubrics_criteria_comment[criteria_lomIdx]['criteria_comment'] }}</div>
+        <div class="text-center space-x-1">
+          <div class="text-base text-slate-900 font-normal">{{ criteria_lom.lom_comment }}</div>
+          <div class="text-sm text-slate-600 font-thin leading-3">{{ props.rubric_criteria?.rubrics_criteria_comment[criteria_lomIdx]['criteria_comment'] }}</div>
         </div>
       </th>
     </tr>

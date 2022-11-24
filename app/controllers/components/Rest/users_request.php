@@ -5,27 +5,23 @@ class UsersRequestComponent extends CakeObject
 {
     public $Sanitize;
     public $uses = [];
-    public $components = ['Session', 'RequestHandler', 'Evaluation', 'JsonHandler', 'RestResponseHandler'];
-    
-    /**
-     * @var bool|object
-     */
-    private $User;
+    public $components = ['Session', 'RequestHandler', 'Evaluation', 'JsonHandler', 'JsonResponse'];
     
     public $controller;
     public $settings;
     public $params;
+    public $data;
     
     public function initialize($controller, $settings)
     {
         $this->controller = $controller;
         $this->settings = $settings;
         $this->params = $controller->params;
+        $this->data = $controller->data;
     }
     
     public function __construct()
     {
-        $this->User = ClassRegistry::init('User');
         parent::__construct();
     }
     
@@ -43,7 +39,7 @@ class UsersRequestComponent extends CakeObject
                 $this->get($userId);
                 break;
             case 'PUT': // Update
-                $this->set($userId, $method);
+                $this->set($userId);
                 break;
             default:
                 http_response_code(405);
@@ -56,14 +52,13 @@ class UsersRequestComponent extends CakeObject
     {
         switch ($method) {
             case 'GET':
-                $this->list($method);
+                $this->list();
                 break;
             case 'POST':
                 $this->create();
                 break;
             case 'DELETE':
-                http_response_code(200);
-                echo json_encode(['message' => 'TBD']);
+                $this->JsonResponse->withMessage('TBD')->withStatus(200);
                 break;
             default:
                 http_response_code(405);
@@ -75,109 +70,118 @@ class UsersRequestComponent extends CakeObject
     /** private */
     private function list(): void
     {
-        http_response_code(200);
-        echo json_encode(['process_collection' => []]);
+        $this->JsonResponse->withMessage('process collection request::list')->withStatus(200);
     }
-    
     
     private function create(): void
     {
-        http_response_code(200);
-        echo json_encode(['message' => 'processCollectionRequest::create']);
+        $this->JsonResponse->withMessage('process collection request::create')->withStatus(200);
     }
-    
     
     private function get($userId): void
     {
-        $user = $this->User->read(null, $userId);
-        if (empty($user)) exit;
+        $user = $this->controller->User->read(null, $userId);
+        if (!isset($user)) exit;
         $profile = [
-            'id' => $user['User']['id'],
-            'role_id' => $user['Role'][0]['id'],
-            'username' => $user['User']['username'],
-            'first_name' => $user['User']['first_name'],
-            'last_name' => $user['User']['last_name'],
-            'student_no' => $user['User']['student_no'],
-            'title' => $user['User']['title'],
-            'email' => $user['User']['email'],
-            // 'role_name' => $user['Role'][0]['name']
+            'id'            => $user['User']['id'],
+            'role_id'       => $user['Role'][0]['id'],
+            'username'      => $user['User']['username'],
+            'first_name'    => $user['User']['first_name'],
+            'last_name'     => $user['User']['last_name'],
+            'student_no'    => $user['User']['student_no'],
+            'title'         => $user['User']['title'],
+            'email'         => $user['User']['email'],
         ];
-        //$submission = $user['Submission'];
-        
-        http_response_code(200);
-        echo json_encode($profile);
+        $this->JsonResponse->setContent($profile)->withStatus(200);
     }
-    
     
     private function set($userId): void
     {
-        $data = $this->params['data'];
-        if (!empty($data)) {
-            $data['User']['id'] = $userId;
-            
-            if (!empty($data['User']['temp_password']) && $data['User']['temp_password'] !== 'undefined') {
-                $user = $this->User->findUserByidWithFields($userId, array('password'));
-                if (md5($data['User']['old_password']) == $user['password']) {
-                    if ($data['User']['temp_password'] == $data['User']['confirm_password']) {
-                        $data['User']['password'] = md5($data['User']['temp_password']);
+        // No security checks here, since we're editing the logged-in user
+        $id = $this->controller->Auth->user('id');
+    
+        if (!empty($this->data)) {
+            $this->data['User']['id'] = $id;
+            // $this->pre_r($this->data['User']);die();
+            if (!empty($this->data['User']['temp_password'])) {
+                $user = $this->controller->User->findUserByidWithFields($id, array('password'));
+                if (md5($this->data['User']['old_password']) === $user['password']) {
+                    if ($this->data['User']['temp_password'] === $this->data['User']['confirm_password']) {
+                        $this->data['User']['password'] = md5($this->data['User']['temp_password']);
                     } else {
-                        $this->RestResponseHandler->toJson('New passwords do not match', 404);
+                        $this->JsonResponse->withMessage('New passwords do not match')->withStatus(404);
+                        return;
                     }
                 } else {
-                    $this->RestResponseHandler->toJson('Old password is incorrect', 404);
+                    $this->JsonResponse->withMessage('Old password is incorrect')->withStatus(404);
+                    return;
                 }
             } else {
-                unset($data['User']['temp_password']);
-                unset($data['User']['old_password']);
-                unset($data['User']['confirm_password']);
+                unset($this->data['User']['temp_password']);
             }
-            
-            if ($this->processForm($data)) {
-                $this->setSessionData($data['User']);
-                $this->RestResponseHandler->toJson('Your Profile Has Been Updated Successfully.', 200);
-            }
-        }
-    }
-    
-    private function processForm($data): bool
-    {
-        if (!empty($data)) {
-            // NOTE:: LOOK
-            // $this->Output->filter($data);//always filter
-            // Save Data
-            if ($data = $this->User->save($data)) {
-                $data['User']['id'] = $this->User->id;
-            } else {
-                $validationErrors = $this->User->invalidFields();
-                $errorMsg = '';
-                foreach ($validationErrors as $error) {
-                    $errorMsg = $errorMsg . "\n" . $error;
-                }
-                $this->RestResponseHandler->toJson('Failed to save. ' . $errorMsg, 404);
-            }
-            
-            if (isset($data['OauthClient'])) {
-                if (!($this->OauthClient->saveAll($data['OauthClient']))) {
-                    $this->RestResponseHandler->toJson('Failed to save.', 404);
-                }
-            }
-            
-            if (isset($data['OauthToken'])) {
-                if (!($this->OauthToken->saveAll($data['OauthToken']))) {
-                    $this->RestResponseHandler->toJson('Failed to save.', 404);
-                }
+        
+            if ($this->__processForm()) {
+                $this->__setSessionData($this->data['User']);
+                $this->JsonResponse->withMessage('Your Profile Has Been Updated Successfully.')->withStatus(200);
+                return;
             }
         }
         
+        /** N/A */
+        if (in_array($this->controller->User->getRoleName($id), array("student", "tutor"))) {
+            $isStudent = true;
+        } else {
+            $isStudent = false;
+        }
+        $oAuthClient = $this->controller->OauthClient->find('all', array('conditions' => array('OauthClient.user_id' => $id)));
+        $oAuthToken = $this->controller->OauthToken->find('all', array('conditions' => array('OauthToken.user_id' => $id)));
+        
+        $enabled = array('0' => 'Disabled', '1' => 'Enabled');
+        $this->data = $this->controller->User->read(null, $id);
+        // $this->Output->br2nl($this->data);
+        
+        return;
+    }
+    
+    private function __processForm()
+    {
+        if (!empty($this->data)) {
+            // $this->Output->filter($this->data);//always filter
+            //Save Data
+            if ($this->data = $this->controller->User->save($this->data)) {
+                $this->data['User']['id'] = $this->controller->User->id;
+            } else {
+                $validationErrors = $this->controller->User->invalidFields();
+                $errorMsg = '';
+                foreach ($validationErrors as $error) {
+                    $errorMsg = $errorMsg."\n".$error;
+                }
+                $this->JsonResponse->withMessage('Failed to save. ' .$errorMsg )->withStatus(400);
+                return;
+            }
+            // not set (staging env)
+            if (isset($this->data['OauthClient'])) {
+                if (!($this->controller->OauthClient->saveAll($this->data['OauthClient']))) {
+                    $this->JsonResponse->withMessage('Failed to save. ')->withStatus(400);
+                    return;
+                }
+            }
+            // not set (staging env)
+            if (isset($this->data['OauthToken'])) {
+                if (!($this->controller->OauthToken->saveAll($this->data['OauthToken']))) {
+                    $this->JsonResponse->withMessage('Failed to save. ')->withStatus(200);
+                    return;
+                }
+            }
+        }
         return true;
     }
     
-    
-    private function setSessionData($userData): void
+    private function __setSessionData($userData): void
     {
         $this->Session->write('ipeerSession.id', $userData['id']);
         $this->Session->write('ipeerSession.username', $userData['username']);
-        $this->Session->write('ipeerSession.fullname', $userData['first_name'] . ' ' . $userData['last_name']);
+        $this->Session->write('ipeerSession.fullname', $userData['first_name'].' '.$userData['last_name']);
         $this->Session->write('ipeerSession.email', $userData['email']);
     }
 }

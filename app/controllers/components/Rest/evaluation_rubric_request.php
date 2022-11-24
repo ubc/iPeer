@@ -4,18 +4,8 @@ App::import('Lib', 'caliper');
 class EvaluationRubricRequestComponent extends CakeObject
 {
     public $Sanitize;
-    public $uses = [];  //['Evaluation','GroupEvent', 'GroupsMembers', 'Event', 'Rubric', 'Penalty', 'EvaluationSubmission'];
-    public $components = ['RequestHandler', 'Evaluation', 'JsonHandler', 'RestResponseHandler'];
-    
-    /**
-     * @var bool|object
-     */
-    private $Event;
-    private $Rubric;
-    private $Penalty;
-    private $GroupEvent;
-    private $GroupsMembers;
-    private $EvaluationSubmission;
+    public $uses = [];
+    public $components = ['RequestHandler', 'Evaluation', 'JsonHandler', 'JsonResponse'];
     
     public $controller;
     public $settings;
@@ -31,13 +21,6 @@ class EvaluationRubricRequestComponent extends CakeObject
     public function __construct()
     {
         parent::__construct();
-        
-        $this->Event = ClassRegistry::init('Event');
-        $this->Rubric = ClassRegistry::init('Rubric');
-        $this->Penalty = ClassRegistry::init('Penalty');
-        $this->GroupEvent = ClassRegistry::init('GroupEvent');
-        $this->GroupsMembers = ClassRegistry::init('GroupsMembers');
-        $this->EvaluationSubmission = ClassRegistry::init('EvaluationSubmission');
     }
     
     function pre_r($val)
@@ -49,7 +32,7 @@ class EvaluationRubricRequestComponent extends CakeObject
     
     public function processResourceRequest($method, $eventId, $groupId, $studentId = null)
     {
-        $event = $this->Event->getEventByIdGroupId($eventId, $groupId);
+        $event = $this->controller->Event->getEventByIdGroupId($eventId, $groupId);
         switch ($method) {
             case 'GET':
                 $this->get($event, $groupId, $studentId);
@@ -111,25 +94,25 @@ class EvaluationRubricRequestComponent extends CakeObject
         $rubricId = $event['Event']['template_id'];
         $courseId = $event['Event']['course_id'];
         
-        $groupEvents = $this->GroupEvent->findAllByEventId($eventId);
+        $groupEvents = $this->controller->GroupEvent->findAllByEventId($eventId);
         $groups = Set::extract('/GroupEvent/group_id', $groupEvents);
         
         // if group id provided does not match the group id the user belongs to or
         // template type is not rubric - they are redirected
         if (!is_numeric($groupId) || !in_array($groupId, $groups) ||
-            !$this->GroupsMembers->checkMembershipInGroup($groupId, empty($studentId) ? User::get('id') : $studentId)) {
-            $this->RestResponseHandler->toJson('Error: Invalid Id', 404);
+            !$this->controller->GroupsMembers->checkMembershipInGroup($groupId, empty($studentId) ? User::get('id') : $studentId)) {
+            $this->JsonResponse->withMessage('Error: Invalid Id')->withStatus(404);
         }
         
         // students can't submit outside of release date range
         if ($now < strtotime($event['Event']['release_date_begin']) || $now > strtotime($event['Event']['release_date_end'])) {
-            $this->RestResponseHandler->toJson('Error: Evaluation is unavailable', 404);
+            $this->JsonResponse->withMessage('Error: Evaluation is unavailable')->withStatus(404);
         }
         
         // Set up rubric evaluation viewData
-        $rubric = $this->Rubric->getRubricById($rubricId);
-        $rubricEvalViewData = $this->Rubric->compileViewData($rubric);
-        $rubricDetail = $this->Evaluation->loadRubricEvaluationDetail($event, $studentId);
+        $rubric = $this->controller->Rubric->getRubricById($rubricId);
+        $rubricEvalViewData = $this->controller->Rubric->compileViewData($rubric);
+        $rubricDetail = $this->controller->Evaluation->loadRubricEvaluationDetail($event, $studentId);
         
         $evaluated = 0; // # of group members evaluated
         $commentsNeeded = false;
@@ -158,16 +141,16 @@ class EvaluationRubricRequestComponent extends CakeObject
         $comReq = ($commentsNeeded && $event['Event']['com_req']); // part of the evaluation settings [set to false not required]
 
         // if($commentsNeeded && $event['Event']['com_req']) {
-        //   $this->RestResponseHandler->toJson('Comments are required.', 404);
+        //   $this->JsonResponse->withMessage('Comments are required.')->withStatus(404);
         // }
         
-        $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($event['GroupEvent']['id'], $userId);
+        $evaluationSubmission = $this->controller->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($event['GroupEvent']['id'], $userId);
         
         $dataToJson = [
             'event' => $event,
-            'penaltyFinal' => $this->Penalty->getPenaltyFinal($eventId),
-            'penaltyDays' => $this->Penalty->getPenaltyDays($eventId),
-            'penalty' => $this->Penalty->getPenaltyByEventId($eventId),
+            'penaltyFinal' => $this->controller->Penalty->getPenaltyFinal($eventId),
+            'penaltyDays' => $this->controller->Penalty->getPenaltyDays($eventId),
+            'penalty' => $this->controller->Penalty->getPenaltyByEventId($eventId),
             //
             'questions' => $rubric,
             'answers' => $rubricEvalViewData,
@@ -196,14 +179,14 @@ class EvaluationRubricRequestComponent extends CakeObject
         $evaluator = User::get('id')??null;
         
         if(!isset($eventId) || !isset($groupEventId) || !isset($evaluator)) {
-            $this->RestResponseHandler->toJson('Internal Error', 500);
+            $this->JsonResponse->withMessage('Internal Error')->withStatus(500);
             exit;
         }
     
-        $event = $this->Event->findById($eventId);
+        $event = $this->controller->Event->findById($eventId);
         // check if questions were answered
 //        if(isset($this->params['form']['5criteria_points_1'])) {
-//            $this->RestResponseHandler->toJson('Your evaluation was not saved. Please make sure the rubric questions are answered.', 404);
+//            $this->JsonResponse->withMessage('Your evaluation was not saved. Please make sure the rubric questions are answered.')->withStatus(404);
 //            return;
 //        }
         // Student View Mode
@@ -215,7 +198,7 @@ class EvaluationRubricRequestComponent extends CakeObject
             $suffix='';
             foreach ($this->params['form']['memberIDs'] as $userId) {
                 $msg=[];
-                if ($this->Evaluation->saveRubricEvaluation($userId, 0, $this->params)) {
+                if ($this->controller->Evaluation->saveRubricEvaluation($userId, 0, $this->params)) {
                     // check whether comments are given, if not, and it is required, send msg
                     $comments = $this->params['form'][$userId.'comments'];
                     $filter = array_filter(array_map('trim', $comments)); // filter out blank comments
@@ -223,49 +206,49 @@ class EvaluationRubricRequestComponent extends CakeObject
                         $msg[] = __('some comments are missing', true);
                     }
                     //
-                    $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, $evaluator);
+                    $evaluationSubmission = $this->controller->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, $evaluator);
                     //if (empty($evaluationSubmission)) {
                     //    $msg[] = __('you still have to submit the evaluation with the Submit Peer Review button', true);
                     //}
                     
                     if($method === 'POST') {
                         if (empty($evaluationSubmission)) {
-                            $this->EvaluationSubmission->id = null;
+                            $this->controller->EvaluationSubmission->id = null;
                             $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
                             $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
                             $evaluationSubmission['EvaluationSubmission']['submitter_id'] = empty($studentId) ? $evaluator : null;
                             $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
                             $evaluationSubmission['EvaluationSubmission']['submitted'] = '1';
-                            if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
-                                $this->RestResponseHandler->toJson('Error: Unable to save the evaluation. Please try again.', 404);
+                            if (!$this->controller->EvaluationSubmission->save($evaluationSubmission)) {
+                                $this->JsonResponse->withMessage('Error: Unable to save the evaluation. Please try again.')->withStatus(404);
                             }
                             $msg[] = __('Your evaluation has been submitted successfully', true);
                         } else {
-                            $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
+                            $this->controller->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
                             $evaluationSubmission['EvaluationSubmission']['submitted'] = '1';
-                            if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
-                                $this->RestResponseHandler->toJson('Error: Unable to submit the evaluation. Please try again.', 404);
+                            if (!$this->controller->EvaluationSubmission->save($evaluationSubmission)) {
+                                $this->JsonResponse->withMessage('Error: Unable to submit the evaluation. Please try again.')->withStatus(404);
                             }
                             $msg[] = __('Your evaluation has been submitted', true);
                         }
                     }
                     elseif($method === 'PUT' || $method === 'PATCH') {
                         if (empty($evaluationSubmission)) {
-                            $this->EvaluationSubmission->id = null;
+                            $this->controller->EvaluationSubmission->id = null;
                             $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
                             $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
                             $evaluationSubmission['EvaluationSubmission']['submitter_id'] = empty($studentId) ? $evaluator : null;
                             $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
                             $evaluationSubmission['EvaluationSubmission']['submitted'] = '0';
-                            if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
-                                $this->RestResponseHandler->toJson('Error: Unable to save the evaluation. Please try again.', 404);
+                            if (!$this->controller->EvaluationSubmission->save($evaluationSubmission)) {
+                                $this->JsonResponse->withMessage('Error: Unable to save the evaluation. Please try again.')->withStatus(404);
                             }
                             $msg[] = __('Your evaluation has been saved as draft.', true);
                             $msg[] = __('you still have to submit the evaluation with the Submit Peer Review button', true);
                         } else {
-                            $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
-                            if (!$this->EvaluationSubmission->save($evaluationSubmission)) {
-                                $this->RestResponseHandler->toJson('Error: Unable to submit the evaluation. Please try again.', 404);
+                            $this->controller->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
+                            if (!$this->controller->EvaluationSubmission->save($evaluationSubmission)) {
+                                $this->JsonResponse->withMessage('Error: Unable to submit the evaluation. Please try again.')->withStatus(404);
                             }
                              $msg[] = __('Your evaluation has been saved', true);
                         }
@@ -274,12 +257,12 @@ class EvaluationRubricRequestComponent extends CakeObject
                     // $suffix = empty($msg) ? '.' : ', but '.implode(' and ', $msg).'.';
                     $suffix = implode(' ', $msg).'.';
                 } else {
-                    $this->RestResponseHandler->toJson('Your evaluation was not saved', 404);
+                    $this->JsonResponse->withMessage('Your evaluation was not saved')->withStatus(404);
                     return;
                 }
             }
-            // $this->RestResponseHandler->toJson('Your evaluation has been '.$suffix, 200);
-            $this->RestResponseHandler->toJson( $suffix, 200 );
+            // $this->JsonResponse->withMessage('Your evaluation has been '.$suffix)->withStatus(200);
+            $this->JsonResponse->withMessage($suffix)->withStatus(200);
         }
         // Criteria View Mode
         elseif(isset($this->params['form']['criteriaIDs'])){
@@ -294,7 +277,7 @@ class EvaluationRubricRequestComponent extends CakeObject
             }
         
             $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
-            $groupMembers = $this->User->getEventGroupMembersNoTutors($groupId, $event['Event']['self_eval'], $evaluator);
+            $groupMembers = $this->controller->User->getEventGroupMembersNoTutors($groupId, $event['Event']['self_eval'], $evaluator);
         
             // Criteria will be null if the submitted section was 'General Comments'
             if ($targetCriteria != null) {
@@ -310,7 +293,7 @@ class EvaluationRubricRequestComponent extends CakeObject
     
                 $msg = [];
                 
-                if ($this->Evaluation->saveRubricEvaluation($targetEvaluatee, $viewMode, $this->params, $targetCriteria)) {
+                if ($this->controller->Evaluation->saveRubricEvaluation($targetEvaluatee, $viewMode, $this->params, $targetCriteria)) {
                     // check whether comments are given, if not and it is required, send msg
                     $comments = $this->params['form'][$targetEvaluatee.'comments']??'';
                     $filter = array_filter(array_map('trim', $comments)); // filter out blank comments
@@ -318,14 +301,14 @@ class EvaluationRubricRequestComponent extends CakeObject
                         $msg[] = __('some comments are missing', true);
                     }
                     //
-                    $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, $evaluator);
+                    $evaluationSubmission = $this->controller->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, $evaluator);
                     if (empty($evaluationSubmission)) {
                         $msg[] = __('you still have to submit the evaluation with the Submit button below', true);
                     }
                     $suffix = empty($msg) ? '.' : ', but '.implode(' and ', $msg).'.';
-                    $this->RestResponseHandler->toJson('_Your evaluation has been saved', 200);
+                    $this->JsonResponse->withMessage('Your evaluation has been saved')->withStatus(200);
                 } else {
-                    $this->RestResponseHandler->toJson('Your evaluation was not saved successfully', 200);
+                    $this->JsonResponse->withMessage('Your evaluation was not saved successfully')->withStatus(200);
                     break;
                 }
             }
@@ -343,7 +326,7 @@ class EvaluationRubricRequestComponent extends CakeObject
         //$this->pre_r($request); die();
         $eventId = $request['params']['form']['event_id'];
         $groupId = $request['params']['form']['group_id'];
-        $event = $this->Event->findById($eventId);
+        $event = $this->controller->Event->findById($eventId);
         
         // Student View Mode
         if (isset($request['params']['form']['memberIDs'])) {
@@ -352,12 +335,12 @@ class EvaluationRubricRequestComponent extends CakeObject
             
             $suffix = '';
             foreach ($memberIds as $targetEvaluatee) {
-                if ($this->Evaluation->saveRubricEvaluation($targetEvaluatee, 0, $request['params'])) {
+                if ($this->controller->Evaluation->saveRubricEvaluation($targetEvaluatee, 0, $request['params'])) {
                     // check whether comments are given, if not and it is required, send msg
                     $comments = $request['params']['form'][$targetEvaluatee . 'comments'];
                     $filter = array_filter(array_map('trim', $comments)); // filter out blank comments
                     $msg = array();
-                    $sub = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
+                    $sub = $this->controller->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
                     if ($event['Event']['com_req'] && (count($filter) < count($comments))) {
                         $msg[] = 'some comments are missing';
                     }
@@ -369,16 +352,15 @@ class EvaluationRubricRequestComponent extends CakeObject
                 } else {
                     //Found error
                     //Validate the error why the Event->save() method returned false
-                    // $this->validateErrors($this->Event);
-                    
-                    $this->RestResponseHandler->toJson('Your evaluation was not saved successfully', 500);
+                    // $this->validateErrors($this->controller->Event);
+                    $this->JsonResponse->withMessage('Your evaluation was not saved successfully')->withStatus(500);
                     return;
                 }
             }
-            $this->RestResponseHandler->toJson('Your evaluation has been saved' . $suffix, 200);
+            $this->JsonResponse->withMessage('Your evaluation has been saved' . $suffix)->withStatus(200);
         } // Criteria View Mode
         elseif (isset($request['params']['form']['criteriaIDs'])) {
-            $this->RestResponseHandler->toJson('Criteria View Mode', 200);
+            $this->JsonResponse->withMessage('Criteria View Mode')->withStatus(200);
             
             // find out the criteria submitted
             // general comments section should be given value of null
@@ -391,7 +373,7 @@ class EvaluationRubricRequestComponent extends CakeObject
             }
             
             $evaluator = $request['params']['data']['Evaluation']['evaluator_id'];
-            $groupMembers = $this->User->getEventGroupMembersNoTutors($groupId, $event['Event']['self_eval'], $evaluator);
+            $groupMembers = $this->controller->User->getEventGroupMembersNoTutors($groupId, $event['Event']['self_eval'], $evaluator);
             
             // Criteria will be null if the submitted section was 'General Comments'
             if ($targetCriteria != null) {
@@ -405,12 +387,12 @@ class EvaluationRubricRequestComponent extends CakeObject
             foreach ($groupMembers as $groupMember) {
                 $targetEvaluatee = $groupMember['User']['id'];
                 
-                if ($this->Evaluation->saveRubricEvaluation($targetEvaluatee, $viewMode, $request['params'], $targetCriteria)) {
+                if ($this->controller->Evaluation->saveRubricEvaluation($targetEvaluatee, $viewMode, $request['params'], $targetCriteria)) {
                     // check whether comments are given, if not and it is required, send msg
                     $comments = $request['params']['form'][$targetEvaluatee . 'comments'];
                     $filter = array_filter(array_map('trim', $comments)); // filter out blank comments
                     $msg = array();
-                    $sub = $this->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
+                    $sub = $this->controller->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, User::get('id'));
                     if ($event['Event']['com_req'] && (count($filter) < count($comments))) {
                         $msg[] = 'some comments are missing';
                     }
@@ -421,12 +403,12 @@ class EvaluationRubricRequestComponent extends CakeObject
                 } else {
                     //Found error
                     //Validate the error why the Event->save() method returned false
-                    // $this->validateErrors($this->Event);
-                    $this->RestResponseHandler->toJson('Your evaluation was not saved successfully', 500);
+                    // $this->validateErrors($this->controller->Event);
+                    $this->JsonResponse->withMessage('Your evaluation was not saved successfully')->withStatus(500);
                     break;
                 }
             }
-            $this->RestResponseHandler->toJson('Your evaluation has been saved' . $suffix, 200);
+            $this->JsonResponse->withMessage('Your evaluation has been saved' . $suffix)->withStatus(200);
             return;
         }
         

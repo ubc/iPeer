@@ -1,62 +1,15 @@
-
-export class User implements IUser {
-
-  email: string | null
-  first_name: string | null
-  id: string | null
-  last_name: string | null
-  private _role_id: string | null
-  student_no: string | null
-  title: string | null
-  username: string | null
-
-  constructor() {
-    this.email = ''
-    this.first_name = ''
-    this.id = ''
-    this.last_name = ''
-    this._role_id = ''
-    this.student_no = ''
-    this.title = ''
-    this.username = ''
-  }
-
-  get role_id(): string | null {
-    return this._role_id;
-  }
-
-  public getRequest(): void {
-
-  }
-  public setRequest(): void {
-
-  }
-
-  public notInTheInterface():void {}
-
-}
+import 'vue-router'
 
 export interface IUser {
   id: string|null
-  // role_id: string|null
+  role_id: string|null
   username: string|null
   first_name: string|null
   last_name: string|null
   student_no: string|null
   title: string|null
   email: string|null
-  getRequest(): void;
-  setRequest(): void;
-
-  get role_id(): string | null
 }
-
-const testVariable: User = new User()
-//testVariable.role_id
-//testVariable.username
-
-
-
 export interface IEvent {
   id: string
   title: string
@@ -80,35 +33,30 @@ export interface IEvent {
   is_ended: boolean
   due_in: string
 }
-
 export interface ICourse {
   id: string
   course: string
   title: string
   term: string
 }
-
 export interface IGroup {
   id: string
   num: string
   name: string
   member_count: string
 }
-
 export interface IMember {
   id: string
   first_name: string
   last_name: string
   role_name: string
 }
-
 export interface IPenalty {
   id: string
   event_id: string
   days_late: string
   percent_penalty: string
 }
-
 
 /**
  * Evaluation review and response
@@ -128,32 +76,24 @@ export interface IEvaluation {
   release_date_end: string
   result_release_date_begin: string
   result_release_date_end: string
-  //
   group: IGroup
   course: ICourse
-  penalty: IPenalty // rename to penalty
+  penalty: IPenalty
   members: IMember[]
-  // New to all templates
-  template: string // New
-  group_event_id: string // New
-  status: string | null // New
-  // Simple
+  group_event_id: string
+  status: string|null
   simple?: ISimpleEvaluation
-  // Rubric
   rubric?: IRubricEvaluation
-  rubric_id?: string // TBD
-  gen_com_req?: string // general comment section
-  all_done?: string // TBD
-  enrol?: string // TBD
-  member_ids?: string // TODO:: Make it generic
-  member_count?: string  // TODO:: Make it generic
-  // Mixed
   mixed?: IMixedEvaluation
-  // Response
   response?: IMixedResponse & ISimpleResponse & IRubricResponse
   reviews?: IMixedReview & ISimpleReview & IRubricReview
+  rubric_id?: string
+  gen_com_req?: string
+  all_done?: string
+  enrol?: string
+  member_ids?: string
+  member_count?: string
 }
-
 
 /** SimpleEvaluation/Data/Detail specifics */
 export interface ISimpleEvaluation {
@@ -255,6 +195,7 @@ export interface IRubricResponseDataDetail {
   selected_lom: string
 }
 /** RubricReviews specifics */
+/** RubricReviews specifics */
 export interface IRubricReview {}
 export interface IRubricReviewData {}
 export interface IRubricReviewDetail {}
@@ -334,8 +275,207 @@ export interface IMixedReviewDetail {}
 
 
 /**
+ * IReview
+ */
+export interface IReview {
+  event: IReviewEvent
+  group: IReviewGroup
+  course: IReviewCourse
+  simple?: IReviewSimple // IReviewQuestion
+  rubric?: IReviewRubric // IReviewQuestion
+  mixed?: IReviewMixed // IReviewQuestion
+  evaluator: IReviewEvaluation
+  evaluatee: IReviewEvaluation|IReviewSimpleEvaluatee
+  penalty: IPenalty
+  status: IReviewStatus
+}
+// TODO:: setup is required on the server
+interface IReviewSimpleEvaluatee {
+  scores: string[]
+  comments: string[]
+}
+export interface IReviewGroup {
+  id: string
+  name: string
+}
+// TODO:: setup is required on the server
+export interface IReviewCourse {
+  id: string
+  title: string
+}
+export interface IReviewEvent {
+  id: string
+  title: string
+  course_id: string
+  description: string
+  event_template_type_id: string
+  template_id: string
+  self_eval: string
+  com_req: string
+  auto_release: string
+  enable_details: string
+  due_date: string
+  release_date_begin: string
+  release_date_end: string
+  result_release_date_begin: string
+  result_release_date_end: string
+  record_status: string
+  creator_id: string
+  created: string
+  updater_id: string
+  modified: string
+  canvas_assignment_id: null
+  creator: string
+  updater: string
+  response_count: string
+  to_review_count: string
+  student_count: string
+  group_count: string
+  completed_count: string
+  is_released: boolean
+  is_result_released: boolean
+  is_ended: boolean
+  due_in: number
+}
+/** */
+export interface IReviewSimple {
+
+}
+/** */
+export interface IReviewRubric {
+  id: string
+  name: string
+  zero_mark: string
+  lom_max: string
+  criteria: string
+  view_mode: string
+  availability: string
+  template: string
+  creator_id: string
+  created: string
+  updater_id: string|null
+  modified: string
+  creator: string
+  updater: string|null
+  event_count: string
+  total_marks: string
+  criterias: IReviewRubricCriteria[]
+  loms: IReviewRubricLom[]
+}
+export interface IReviewRubricCriteria {
+  id: string
+  rubric_id: string
+  criteria_num: string
+  criteria: string
+  multiplier: string
+  show_marks: string
+}
+export interface IReviewRubricLom {
+  id: string
+  rubric_id: string
+  lom_num: string
+  lom_comment: string
+}
+/** */
+export interface IReviewMixed {
+  id: string
+  name: string
+  peer_question: string
+  self_eval: string
+  total_marks: string
+  total_question: string
+  zero_mark: string
+  availability: string
+  questions: [
+    {
+      id: string
+      title: string
+      instructions: string
+      question_num: string
+      required: string
+      self_eval: string
+      mixeval_id: string
+      mixeval_question_type_id: string
+      multiplier: string
+      scale_level: string
+      show_marks: string
+      type: string
+      desc: [
+        {
+          id: string
+          question_id: string
+          scale_level: string
+          descriptor: string
+        }
+      ]
+    }
+  ]
+}
+/** */
+export interface IReviewEvaluation {
+  id: string
+  evaluator: string
+  evaluatee: string
+  comment: string
+  score: string
+  comment_release: string
+  grade_release: string
+  grp_event_id: string
+  event_id: string
+  rubric_id: string
+  record_status: string
+  creator_id: string
+  created: string
+  updater_id: string
+  modified: string
+  creator: string
+  updater: string
+  details: IReviewEvaluationDetail[]
+}
+export interface IReviewEvaluationDetail {
+  id: string
+  evaluation_rubric_id: string
+  criteria_number: string
+  criteria_comment: string
+  selected_lom: string
+  grade: string
+  record_status: string
+  creator_id: string
+  created: string
+  updater_id: string
+  modified: string
+  creator: string
+  updater: string
+}
+
+
+interface IReviewStatus {
+  members_count: number
+  received_count: number
+  average_penalty: number
+  average_score: number
+  group_average: number
+  penalty: number
+  grade: boolean
+  comment: boolean
+}
+
+
+/**
  * Page Layout
  */
+declare module 'vue-router' {
+  interface RouteProps {
+    //...
+  }
+  interface RouteMeta {
+    breadcrumb?: string
+    title?: string
+    description?: string
+    src?: object
+  }
+}
+
 export interface IPageHeading {
   title: string
   description: string
@@ -344,4 +484,10 @@ export interface IPageHeading {
     size: string
     position: string
   }
+}
+export interface INotification {
+  id?: string|number
+  message: string
+  status?: number
+  type: string
 }

@@ -1,6 +1,46 @@
+.datatable {
+  @apply flex flex-col;
+  @apply relative px-8 py-4;
+
+  table {
+    //@apply flex-1;
+    //@apply md:mx-4;
+    @apply w-auto;
+
+    thead th {
+      //@apply font-serif;
+      //@apply text-center;
+      //@apply bg-[#eee] dark:bg-gray-800;
+    }
+    tbody {
+      //@apply bg-[#eee] dark:bg-gray-700;
+      //@apply border border-gray-200;
+      //@apply text-gray-900 dark:text-gray-50;
+    }
+  }
+
+
+
+
+
+  .question {
+    @apply -ml-4;
+    @apply text-lg font-serif;
+  }
+  .description {
+    @apply text-sm ml-5 mb-2 tracking-wider;
+  }
+  .standardtable {
+    @apply bg-gray-100;
+    @apply mx-1;
+  }
+}
 .standardtable {
   width: 100%;
-  border: solid 1px #ccc;
+  // border: solid 1px #ccc;
+  border-style: solid;
+  @apply bg-white dark:bg-gray-800;
+  @apply border border-gray-300 dark:border-gray-600;
   border-radius: 5px;
   border-collapse: separate;
   box-shadow: 0 0 25px rgba(85, 85, 85, 0.10);
@@ -8,22 +48,27 @@
 }
 
 .standardtable th {
-  @apply font-sans;
-  @apply h-8;
   padding: 0.4em 0.1em;
-  background-color: #ececec;
   font-weight: 600;
   font-size: 0.95em;
-  border-left: solid 1px #ddd;
-  border-bottom: solid 1px #ddd;
+  //border-left: solid 1px #ddd;
+  //border-bottom: solid 1px #ddd;
+  @apply font-sans;
+  @apply h-8;
+  @apply bg-[#ececec] dark:bg-gray-700;
+  @apply bg-[#eee] dark:bg-gray-700;
+  border-style: solid;
+  @apply border-l border-b border-gray-300 dark:border-gray-600;
 }
 
 .standardtable td {
-  border-left: solid 1px #e9e9e9;
-  border-bottom: solid 1px #e9e9e9;
-  padding: 0.4em 0.1em;
+  //border-left: solid 1px #e9e9e9;
+  //border-bottom: solid 1px #e9e9e9;
   //background-color: #f9f9f9;
-  text-align: center;
+  @apply py-[0.4em] px-[0.1em]; // padding: 0.4em 0.1em;
+  @apply text-center; // text-align: center;
+  border-style: solid;
+  @apply border-l border-b border-gray-300 dark:border-gray-600;
 }
 .standardtable td.has-error {
   @apply bg-red-50;
@@ -79,3 +124,14 @@ table.standardtable tbody td {
     @apply bg-red-50;
   }
 }
+
+.standardtable {
+  &.no-v-line {
+    td {
+      border-left: none;
+    }
+  }
+}
+
+
+

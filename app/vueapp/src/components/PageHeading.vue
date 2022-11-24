@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import type { IPageHeading } from '@/types/typings'
 const props = defineProps<{
- settings: IPageHeading
+  title?: string
+  settings: IPageHeading
 }>()
 </script>
 

@@ -1,40 +1,27 @@
 <script setup lang="ts">
-  import { ref, watchEffect } from 'vue'
+  import { computed } from 'vue'
+  import { useStore } from '@/stores/main'
   import PageHeading from '@/components/PageHeading.vue'
-  import type {IPageHeading, IUser} from '@/types/typings'
-  import { isEmpty } from 'lodash'
-  // REFERENCES
-  const emit = defineEmits<{
-    (e: 'set:message', option: object): void
-    (e: 'update:profile', option: object): void
-  }>()
-  const props = defineProps<{
-    currentUser: IUser
+  import type { IPageHeading } from '@/types/typings'
+  interface Props {
     settings?: IPageHeading
-  }>()
-  // DATA
-  // const currentUser   = toRef(props, 'currentUser')
-  const message       = ref<object|null>(null)
-  // COMPUTED
-  // METHODS
-  function setMessage(event: object) {
-    message.value = event
-    emit('set:message', event)
   }
+  // REFERENCES
+  const emit  = defineEmits<{}>()
+  const props = defineProps<Props>()
+  const store = useStore()
+  // DATA
+  // COMPUTED
+  const notification = computed(() => store.getNotification)
+  // METHODS
 </script>
 
 <template>
   <section class="users">
     <PageHeading v-if="props.settings" :settings="props.settings" />
-
     <router-view name="flash" v-slot="{ Component }" >
-      <component :is="Component" :flash="message" />
+      <component :is="Component" :notification="notification" />
     </router-view>
-
-    <router-view name="default"
-        :current-user="props.currentUser"
-        @set:message="setMessage"
-        @update:profile="$emit('update:profile', $event)"
-    ></router-view>
+    <router-view name="default"></router-view>
   </section>
 </template>

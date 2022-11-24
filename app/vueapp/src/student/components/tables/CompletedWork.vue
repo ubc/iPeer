@@ -1,43 +1,32 @@
 <script lang="ts" setup>
 import {ref, shallowRef, reactive, computed, onMounted, defineAsyncComponent, watch} from 'vue';
 import { isEmpty } from 'lodash'
-import useFetch from '@/composables/useFetch'
-import { compareEntries, filterEntries, paginateEntries, unique } from '@/helpers'
+import { useStore } from '@/stores/main'
+import { useEventsStore } from '@/stores/events'
+import { compareEntries, filterEntries, paginateEntries, unique, shortDateFormat } from '@/helpers'
 
-import ErrorComponent from '@/components/ErrorComponent.vue'
 import Loader from '@/components/Loader.vue'
-import Pagination from '@/components/Pagination.vue'
 import LimitTo from '@/student/components/LimitTo.vue'
 import TimeFrame from '@/student/components/TimeFrame.vue'
 import { Table } from '@/student/components/tables/datatable'
+import Pagination from '@/components/Pagination.vue'
+import { IconClock, IconTimesSolid, IconCheckSolid } from '@/components/icons'
 
-import type { User } from '@/types/typings'
-import api from "@/services/api";
-
-const Row = defineAsyncComponent({
-  loader: () => import('@/student/components/tables/completed/Row.vue'),
-  LoadingComponent: 'Loading...',
-  suspensible: false,
-  delay: 2000
-})
+import type { IUser, IEvent } from '@/types/typings'
+interface Props {currentUser?: IUser}
 // REFERENCES
-const emit = defineEmits<{
-  // (e: 'update:modelValue', option: string): void
-}>()
-const props = defineProps<{
- currentUser: User
-}>()
+const emit        = defineEmits<{}>()
+const props       = defineProps<Props>()
+const store       = useStore()
+const eventsStore = useEventsStore()
 // DATA
-const loading = ref<boolean>(false)
-const error   = ref<object | null>(null)
 const columns = shallowRef<object>([
-  {id: 1, key: 'event', value: 'title', name: 'Work', sortable: true, width: '30%'},
-  {id: 2, key: 'event', value: 'record_status', name: 'Your Status', sortable: true, width: '18%'},
+  {id: 1, key: 'event', value: 'title', name: 'Work', sortable: false, width: '30%'},
+  {id: 2, key: 'event', value: 'is_result_released', name: 'Your Status', sortable: true, width: '18%'}, // record_status
   {id: 3, key: 'course', value: 'course', name: 'Course', sortable: true, width: '17.5%'},
   {id: 4, key: 'event', value: 'due_date', name: 'Due', sortable: true, width: '17.5%'},
   {id: 5, key: 'action', value: '', name: 'Action', sortable: false, width: '17%'},
 ])
-const entries = ref<object[]>([])
 const sort = reactive({
   key: 'event',
   column: 'id',
@@ -60,18 +49,29 @@ const limit_options = shallowRef([
   }
 ])
 // COMPUTED
+const loading     = computed<boolean>(() => eventsStore.loading)
+const error       = computed<object|null>(() => eventsStore.error)
+const hasError    = computed<boolean>(() => eventsStore.hasError)
+const entries     = computed<IEvent[]>(() => eventsStore.getCompletedEvents)
+//
 const filteredEntries = computed(() => {
-  let newEntries = entries.value || []
-  if(!isEmpty(newEntries) && Array.isArray(newEntries)) { // newEntries instanceof Array
-    newEntries = newEntries?.sort(compareEntries(sort.key, sort.column, sort.direction))
-    newEntries = Object.entries(filter) ? filterEntries(newEntries, filter) : newEntries
-    newEntries = paginateEntries(newEntries, paginate.offset, paginate.end)
-    return newEntries
+  let newEntries: IEvent[] = entries.value || []
+  if (!isEmpty(newEntries) && Array.isArray(newEntries)) { // newEntries instanceof Array
+    newEntries = newEntries?.sort(compareEntries(sort.key, sort.column, sort.direction));
+    // newEntries = Object.entries(filter) ? filterEntries(newEntries, filter) : newEntries;
+    newEntries = filter ? filterEntries(newEntries, filter) : newEntries;
+    newEntries = paginateEntries(newEntries, paginate.offset, paginate.end);
+    return newEntries;
   }
-  return newEntries
+  return newEntries;
+}) as unknown as IEvent[]
+const options   = computed(() => {
+  if(entries.value) {
+    return unique(entries.value, 'course', 'term').sort((a,b) => a.localeCompare(b)).filter(x=>x)
+  }
+  return []
 })
-const options   = computed(() => unique(entries.value, 'course', 'term').sort((a,b) => a.localeCompare(b)).filter(x=>x))
-const paginate  = reactive({
+const paginate = reactive({
   page: 1,
   limit: 5,
   total: computed(() => entries.value?.length),
@@ -80,7 +80,7 @@ const paginate  = reactive({
   end: computed<number>(() => Number(paginate.offset) + Number(paginate.limit))
 })
 // METHODS
-function emitSortBy(event) {
+function emitSortBy(event: object) {
   Object.assign(sort, event)
 }
 function updateData(event: HTMLInputElement | any) {
@@ -109,43 +109,81 @@ watch([ sort, filter, paginate ], () => {
   filteredEntries.value
 }, { deep: true })
 // LIFECYCLE
-onMounted(async () => {
-  loading.value = true
-  try {
-    const response: Promise<unknown> = await api.get('/home', '?work=completed')
-    if(response.status === 200 && response.statusText === 'OK') {
-      entries.value = response.data?.data
-    } else {
-      error.value = {text: response?.data?.message, type: 'error'}
-    }
-  } catch (err: Error | any) {
-    error.value = {text: err.message, type: 'error'};
-  } finally {
-    loading.value = false
-  }
-})
 </script>
 
 <template>
   <div class="completed-work mx-4 my-8">
-    <ErrorComponent v-if="error" class="completed error" :error="error" />
     <div class="flex flex-col my-4 space-y-6">
       <TimeFrame :default="filter.timeframe" :options="options" :name="'timeframe'" @update:event="updateData" />
-      <LimitTo label="Limit To:" :options="limit_options" @update:event="updateData" />
+      <LimitTo label="Limit To:" :options="limit_options" @update:event="updateData" :disabled="isEmpty(entries)" />
     </div>
-    <Table :error="error" :columns="columns" @update:sort="emitSortBy">
+    <Table :error="error" :columns="columns" @update:sort="emitSortBy" class="no-v-line">
       <tr v-if="loading">
         <td :colspan="columns.length">
           <Loader height="200px" />
         </td>
       </tr>
-      <tr v-else-if="!loading && isEmpty(filteredEntries)">
+      <tr v-if="!loading && !error && isEmpty(filteredEntries)">
         <td :colspan="columns.length">
-          <div class="flex justify-center items-center p-8">No Content found!</div>
+          <div class="no-content-found">No Content found!</div>
         </td>
       </tr>
-      <template v-else-if="!loading && !isEmpty(filteredEntries)">
-        <Row v-for="(row, index) of filteredEntries" :key="`${index}_${row?.event?.id}`" :data-index="index" :row="row" />
+      <template v-else>
+        <tr v-for="(row, index) of filteredEntries" :key="`${index}_${row?.event?.id}`">
+          <td>
+            <div class="work">
+              <div class="event-title">{{ row?.event?.title }}</div>
+              <div class="group-name">{{ row?.group?.group_name }}</div>
+            </div>
+          </td>
+          <td>
+            <div class="your-status">
+              <component class="icon" :is="row?.event?.is_submitted === '1' && row?.event?.is_result_released ? IconCheckSolid : IconTimesSolid" />
+              <template v-if="row?.event?.is_submitted === '1' && row?.event?.is_result_released">
+                <router-link class="text completed" :to="{ name: 'submission.view', params: { event_id: row?.event?.id, group_id: row?.group?.id } }">
+                  Completed
+                </router-link>
+              </template>
+              <template v-else>
+                <span class="text not-done">Not Done</span>
+              </template>
+            </div>
+          </td>
+          <td>
+            <div class="course-course">
+              <div class="course">{{ row?.course?.course }}</div>
+              <div class="term" v-if="row?.course?.term">({{ row?.course?.term }})</div>
+            </div>
+          </td>
+          <td>
+            <div class="due-date">
+              <div class="date font-normal">
+                {{ shortDateFormat(row?.event?.due_date) }}
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="action">
+              <router-link
+                  v-if="row?.event?.is_released && row?.event?.is_result_released && !row?.event?.is_ended"
+                  :class="`button submit flex-1 text-center`"
+                  :to="{ name: 'submission.view', params: { event_id: row?.event?.id, group_id: row?.group?.id } }" >
+                See Reviews of Me
+              </router-link>
+              <router-link
+                  :class="`button submit flex-1 text-center`"
+                  v-if="row?.event?.is_released && !row?.event?.is_result_released && !row?.event?.is_ended"
+                  :to="{ name: 'submission.view', params: { event_id: row?.event?.id, group_id: row?.group?.id } }" >
+                Edit My Response
+              </router-link>
+              <span
+                  class="text"
+                  v-if="row?.event?.is_released && row?.event?.is_result_released && !row?.event?.is_ended && (new Date(row?.event?.result_release_date_begin).toLocaleDateString('en-CA') >= new Date().toLocaleDateString('en-CA'))">
+              Peers' reviews of you will be available starting {{ shortDateFormat(row?.event?.result_release_date_begin) }}
+            </span>
+            </div>
+          </td>
+        </tr>
       </template>
     </Table>
     <Pagination :paginate="paginate" />

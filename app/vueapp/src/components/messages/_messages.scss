@@ -1,4 +1,5 @@
-.messages {
+.messages,
+.notifications {
   @apply w-[360px];
   @apply fixed;
   @apply top-4;
@@ -18,7 +19,7 @@
     @apply w-full flex justify-between items-start;
   }
 }
-.toast {
+.toast, .notification {
   @apply relative mb-4 border border-transparent rounded shadow;
   animation: SlideRight 0.4s;
   animation-fill-mode: forwards;
@@ -32,13 +33,13 @@
   .status-bar {
     @apply w-full;
     @apply h-[0.25rem];
-    @apply bg-red-500;
+    @apply bg-gold-500;
     @apply overflow-hidden;
     @apply rounded-b-md;
   }
 }
 
-.toast, .flash {
+.toast, .notification, .flash {
   &-success {
     color: #155724;
     background-color: #d4edda;

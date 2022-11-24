@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import {ref, watch} from 'vue'
-import {useRouter} from 'vue-router'
+import { ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import api from '@/services/api'
-import {useForm} from 'vee-validate'
-import {cloneDeep, debounce} from 'lodash'
+import { useEvaluationStore } from '@/stores/evaluation'
+import { useForm } from 'vee-validate'
+import { cloneDeep, debounce } from 'lodash'
 import type {IEvaluation, IMixedResponse, IRubricResponse, ISimpleResponse} from '@/types/typings'
 
 interface Props {
@@ -22,6 +23,7 @@ const router = useRouter()
 const {values, errors, meta, handleSubmit, isSubmitting} = useForm({
   initialValues: props.initialState?.data,
 })
+const evaluationStore = useEvaluationStore()
 // DATA
 const evaluation_form = ref()
 const message = ref<object|null>(null)
@@ -43,58 +45,49 @@ const onSubmit = handleSubmit(async () => {
   for (const pair of formData) {
     searchParams.append(pair[0], pair[1])
   }
-  try {
-    const response = await api.post('/evaluations/makeEvaluation/', `${props.evaluation?.id}/${props.evaluation?.group?.id}`, searchParams)
-    if(response.status === 200 && response.statusText === 'OK') {
-      message.value = response.data
-      await router.push({name: 'student.events'})
-    } else {
-      message.value = {message: response.statusText, status: response.status, type: response.statusText}
-    }
-  } catch (err: any) {
-    message.value = {message: err.response.message, type: 'error'}
-  }
+  await evaluationStore.makeEvaluation(searchParams, props.evaluation?.id, props.evaluation?.group?.id)
 }, onInvalidateSubmit)
 
 async function onSave() {
-  message.value = null
-  try {
-    const formData = new FormData(evaluation_form.value)
-    formData.append('_method', 'PUT')
-    const searchParams = new URLSearchParams()
-    for (const pair of formData) {
-      searchParams.append(pair[0], pair[1])
-    }
-    const response = await api.post('/evaluations/makeEvaluation/', `${props.evaluation?.id}/${props.evaluation?.group?.id}`, searchParams)
-    if(response.status === 200 && response.statusText === 'OK') {
-      message.value = response.data
-    } else {
-      message.value = {text: response.statusText, status: response.status, type: response.statusText}
-    }
-  } catch (err: any) {
-    message.value = {text: 'something went wrong...', status: 500, type: 'error'}
+  const formData = new FormData(evaluation_form.value)
+  formData.append('_method', 'PUT')
+  const searchParams = new URLSearchParams()
+  for (const pair of formData) {
+    searchParams.append(pair[0], pair[1])
   }
+  await evaluationStore.editEvaluation(searchParams, props.evaluation?.id, props.evaluation?.group?.id)
 }
 
 // WATCH
 watch(() => cloneDeep(props.initialState), debounce(async (current, previous) => {
-  autosave.value = true
-  try {
-    const formData = new FormData(evaluation_form.value)
-    formData.append('_method', 'PUT')
-    const searchParams = new URLSearchParams()
-    for (const pair of formData) {
-      searchParams.append(pair[0], pair[1])
-    }
-    const response = await api.post('/evaluations/makeEvaluation/', `${props.evaluation?.id}/${props.evaluation?.group?.id}`, searchParams)
-    if(response.status === 200 && response.statusText === 'OK') {
-      autosave.value = false
-    }
-  } catch (err: any) {
-    message.value = { text: err.response.message, status: err.status, type: 'error' }
-  } finally {
-    autosave.value = false
+  const formData = new FormData(evaluation_form.value)
+  formData.append('_method', 'PUT')
+  const searchParams = new URLSearchParams()
+  for (const pair of formData) {
+    searchParams.append(pair[0], pair[1])
   }
+  await evaluationStore.autoSaveEvaluation(searchParams, props.evaluation?.id, props.evaluation?.group?.id)
+
+
+
+  // autosave.value = true
+  // try {
+  //   const formData = new FormData(evaluation_form.value)
+  //   formData.append('_method', 'PUT')
+  //   const searchParams = new URLSearchParams()
+  //   for (const pair of formData) {
+  //     searchParams.append(pair[0], pair[1])
+  //   }
+  //   const response = await api.post('/evaluations/makeEvaluation', `${props.evaluation?.id}/${props.evaluation?.group?.id}`, searchParams)
+  //   if(response.status === 200 && response.statusText === 'OK') {
+  //     autosave.value = false
+  //   }
+  // } catch (err: any) {
+  //   message.value = {text: 'something went wrong...', status: 500, type: 'error'}
+  //   // message.value = { text: err.response.data.message, status: err.response.status, type: 'error' }
+  // } finally {
+  //   autosave.value = false
+  // }
 }, 5000), {deep: true})
 watch(message, (event: object) => {
   emit('set:message', event)
@@ -105,6 +98,6 @@ watch(message, (event: object) => {
 <template>
   <form novalidate @submit.prevent="onSubmit" id="evaluation_form" class="evaluation-form" ref="evaluation_form">
     <slot :values="values" :errors="errors" :form-meta="meta"  :is-submitting="isSubmitting"
-         :message="message" :autosave="autosave" :onSave="onSave" :evaluation-ref="evaluation_form"/>
+         :message="message" :onSave="onSave" :evaluation-ref="evaluation_form"/>
   </form>
 </template>

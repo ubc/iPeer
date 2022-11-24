@@ -1,1 +1,0 @@
-import{d as o,c as n,a,t as c,g as l,o as i}from"./main.50a5d5e8.js";const r={class:"block"},p={class:"section-title"},m=o({__name:"SectionTitle",props:{title:null,icon:null},setup(t){const e=t;return(s,_)=>(i(),n("div",r,[a("h2",p,c(e.title),1),l(s.$slots,"default")]))}});export{m as _};

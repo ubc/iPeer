@@ -5,7 +5,7 @@ class JsonHandlerComponent extends CakeObject
 {
     public $controller;
     public $settings;
-    public $components = ['JsonHandler', 'RestResponseHandler'];
+    public $components = ['JsonHandler', 'JsonResponse', 'RestResponseHandler'];
     
     public function initialize($controller, $settings)
     {
@@ -73,8 +73,6 @@ class JsonHandlerComponent extends CakeObject
     public function formatSimpleEvaluation(array $data): void
     {
         $json = $this->getEventData($data);
-        // other
-        $json['template'] = 'SimpleEvaluation';
         $json['member_count'] = $data['evaluateeCount'];
         $json['member_ids'] = $data['memberIDs'];
         $json['simple'] = $this->getSimpleEvaluationSettings($data['questions']);
@@ -84,8 +82,9 @@ class JsonHandlerComponent extends CakeObject
             'comments'  => []
         ];
         $json['response'] = $this->getSimpleEvaluationSubmission($data['submission'], $data['evaluation']);
-        
-        $this->RestResponseHandler->toJson('SimpleEvaluation', 200, $json);
+        // $this->RestResponseHandler->toJson('SimpleEvaluation', 200, $json);
+    
+        $this->JsonResponse->setContent($json)->withStatus(200);
         exit;
     }
     
@@ -96,19 +95,17 @@ class JsonHandlerComponent extends CakeObject
     public function formatRubricEvaluation(array $data): void
     {
         $json = $this->getEventData($data);
-        // other
-        $json['template'] = 'RubricEvaluation';
         $json['member_count'] = $data['evaluateeCount'];
         $json['rubric_id'] = $data['rubricId'];
         $json['all_done'] = $data['allDone'];
         $json['gen_com_req'] = $data['comReq']; // general comment section
         $json['member_ids'] = $data['memberIDs'];
-        // questions/answers
         $json['rubric'] = $this->getRubricEvaluationSettings($data['questions']) ?? null;
         $json['rubric']['data'] = $this->getRubricEvaluationData($data['questions']) ?? null;
         $json['response'] = isset($data['groupMembers']) ? $this->getRubricEvaluationSubmission($data['submission'], $data['groupMembers']) : null;
-        
-        $this->RestResponseHandler->toJson('RubricEvaluation', 200, $json);
+        //$this->RestResponseHandler->toJson('RubricEvaluation', 200, $json);
+    
+        $this->JsonResponse->setContent($json)->withStatus(200);
         exit;
     }
     
@@ -119,12 +116,9 @@ class JsonHandlerComponent extends CakeObject
     public function formatMixedEvaluation(array $data): void
     {
         $json = $this->getEventData($data);
-        // other
-        $json['template'] = 'MixedEvaluation';
         $json['member_count'] = $data['memberCount'];
         $json['enrol'] = $data['enrol'];
-        // $json['member_ids'] = $data['memberIDs'];
-        // questions/answers
+        $json['member_ids'] = $data['memberIDs'];
         $json['mixed'] = [
             'id' => $data['mixeval']['Mixeval']['id'],
             'availability' => $data['mixeval']['Mixeval']['availability'],
@@ -137,8 +131,9 @@ class JsonHandlerComponent extends CakeObject
             'data' => $this->getMixedEvaluationQuestions($data['questions']),
         ];
         $json['response'] = $this->getMixedEvaluationSubmission($data['submission'], $data['groupMembers']);
+        //$this->RestResponseHandler->toJson('MixedEvaluation', 200, $json);
     
-        $this->RestResponseHandler->toJson('MixedEvaluation', 200, $json);
+        $this->JsonResponse->setContent($json)->withStatus(200);
         exit;
     }
     
@@ -160,6 +155,7 @@ class JsonHandlerComponent extends CakeObject
             'template_id' => $data['event']['Event']['template_id'],
             'self_eval' => $data['event']['Event']['self_eval'],
             'com_req' => $data['event']['Event']['com_req'],
+            'auto_release' => $data['event']['Event']['auto_release'],
             'due_date' => $data['event']['Event']['due_date'],
             'release_date_begin' => $data['event']['Event']['release_date_begin'],
             'release_date_end' => $data['event']['Event']['release_date_end'],
@@ -170,10 +166,13 @@ class JsonHandlerComponent extends CakeObject
                 'id' => $data['event']['Group']['id'],
                 'name' => $data['event']['Group']['group_name'],
             ],
-            'course' => $this->getCourseById($data['event']['Event']['course_id']),
-            'members' => $this->getGroupMembers($data['groupMembers']),
-            'penalty' => $data['penaltyFinal']['Penalty'],
-            'status' => $this->isSubmitted($data['event']['Event']['id'], $data['event']['Group']['id'], $data['userId']),
+            'course'                => $this->getCourseById($data['event']['Event']['course_id']),
+            'members'               => $this->getGroupMembers($data['groupMembers']),
+            'penalty'               => $data['penaltyFinal']['Penalty'],
+            'status'                => $this->isSubmitted($data['event']['Event']['id'], $data['event']['Group']['id'], $data['userId']),
+            'is_released'           => $data['event']['Event']['is_released'],
+            'is_result_released'    => $data['event']['Event']['is_result_released'],
+            'is_ended'              => $data['event']['Event']['is_ended']
         ];
         return $output;
     }
@@ -216,10 +215,16 @@ class JsonHandlerComponent extends CakeObject
     
     private function getCourseById(string $courseId): array
     {
-        return [
-            'id' => $courseId,
-            'title' => $this->controller->Course->getCourseName($courseId)
-        ];
+        if(!isset($courseId)) return [];
+        $course = $this->controller->Course->getCourseById($courseId);
+        if (isset($course)) {
+            return [
+                'id'        => $course['Course']['id'],
+                'course'    => $course['Course']['course'],
+                'title'     => $course['Course']['title'],
+            ];
+        }
+        return [];
     }
     
     private function getGroupMembers(array $group_members): array

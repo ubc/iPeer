@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import { toRef, computed, onMounted, defineAsyncComponent} from 'vue';
 import { useRoute, useRouter } from 'vue-router'
-import LoadingComponent from '@/components/LoadingComponent.vue'
-import ErrorComponent from '@/components/ErrorComponent.vue'
 import IconSpinner from '@/components/icons/IconSpinner.vue'
 import TakeNote from '@/student/components/TakeNote.vue'
 import type {IEvaluation, IUser} from '@/types/typings'
@@ -24,25 +22,13 @@ const currentUser = toRef(props, 'currentUser')
 const evaluation  = toRef(props, 'evaluation')
 // COMPUTED
 const template = computed(() => {
-  switch (evaluation.value?.template) {
-    case 'SimpleEvaluation':
-      return defineAsyncComponent({
-        loader: () => import('@/student/views/templates/SimpleEvaluation.vue'),
-        loadingComponent: LoadingComponent /* shows while loading */,
-        errorComponent: ErrorComponent /* shows if there's an error */,
-      })
-    case 'RubricEvaluation':
-      return defineAsyncComponent({
-        loader: () => import('@/student/views/templates/RubricEvaluation.vue'),
-        loadingComponent: LoadingComponent /* shows while loading */,
-        errorComponent: ErrorComponent /* shows if there's an error */,
-      })
-    case 'MixedEvaluation':
-      return defineAsyncComponent({
-        loader: () => import('@/student/views/templates/MixedEvaluation.vue'),
-        loadingComponent: LoadingComponent /* shows while loading */,
-        errorComponent: ErrorComponent /* shows if there's an error */,
-      })
+  switch (evaluation.value?.event_template_type_id) {
+    case '1':
+      return defineAsyncComponent(() => import('@/student/views/templates/SimpleEvaluation.vue'))
+    case '2':
+      return defineAsyncComponent(() => import('@/student/views/templates/RubricEvaluation.vue'))
+    case '4':
+      return defineAsyncComponent(() => import('@/student/views/templates/MixedEvaluation.vue'))
     default:
       break
   }
@@ -51,10 +37,14 @@ const template = computed(() => {
 // WATCH
 // LIFECYCLE
 onMounted(() => {
-  if(evaluation.value?.status === null || evaluation.value?.status == '0') {
-    router.push({ name: 'evaluation.make' })
+  if(evaluation.value?.is_result_released) {
+    router.push({ name: 'submission.view' })
   } else {
-    router.push({ name: 'evaluation.edit' })
+    if(evaluation.value?.status === null || evaluation.value?.status == '0') {
+      router.push({ name: 'evaluation.make' })
+    } else {
+      router.push({ name: 'evaluation.edit' })
+    }
   }
 })
 </script>

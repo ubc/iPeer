@@ -1,13 +1,15 @@
 <script lang="ts" setup>
 import CustomCheckField from '@/components/fields/CustomCheckField.vue'
+interface Props {
+  label?: string
+  options?: object[]
+  disabled?: boolean
+}
 // REFERENCES
 const emit = defineEmits<{
   (e: 'update:event', option: string): void
 }>()
-const props = defineProps<{
-  options?: object[]
-  label?: string
-}>()
+const props = defineProps<Props>()
 // DATA
 // COMPUTED
 // METHODS
@@ -25,6 +27,7 @@ const props = defineProps<{
           :name="option.name"
           :value="option.value"
           :label="option.label"
+          :disabled="props.disabled"
           @update:event="$emit('update:event', $event)"
       />
     </div>

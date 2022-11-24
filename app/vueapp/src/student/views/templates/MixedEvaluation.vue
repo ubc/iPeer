@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {ref, unref, toRef, reactive, computed, onBeforeMount} from 'vue';
+import {ref, unref, toRef, toRefs, reactive, computed, onBeforeMount} from 'vue';
 import { useRoute, useRouter } from 'vue-router'
 import {isEmpty, map, find, filter, findIndex, merge} from 'lodash'
 
@@ -11,12 +11,10 @@ import { IconThoughtBubble } from '@/components/icons'
 import TakeNote from '@/student/components/TakeNote.vue'
 import SectionSubtitle from '@/components/SectionSubtitle.vue'
 
-import type { IUser, IEvaluation, IMixedResponseData, IMixedResponseDataDetail } from '@/types/typings'
+import type { IUser, IEvaluation, IMixedEvaluationData, IMixedResponseData, IMixedResponseDataDetail } from '@/types/typings'
 
 // REFERENCES
-const emit = defineEmits<{
-  (e: 'fetch:evaluation'): void
-}>()
+const emit  = defineEmits<{}>()
 const props = defineProps<{
   members: IUser[]
   currentUser: IUser
@@ -25,19 +23,18 @@ const props = defineProps<{
 const route = useRoute()
 const router = useRouter()
 // DATA
-const evaluation_form   = ref(null)
 const members           = toRef(props, 'members')
 const evaluation        = toRef(props, 'evaluation')
-const form              = reactive({
+const form = reactive({
   event_id: computed(() => evaluation.value?.id),
   group_id: computed(() => evaluation.value?.group?.id),
   course_id: computed(() => evaluation.value?.course?.id),
   group_event_id: computed(() => evaluation.value?.group_event_id),
   template_id: computed(() => evaluation.value?.template_id),
-  member_count: computed(() => evaluation.value?.members?.length),
+  member_count: computed(() => members.value?.length),
   user_id: computed(() => props.currentUser?.id),
-  evaluatee_count: computed(() => evaluation.value?.members?.length),
-  member_ids: computed<string[]>(() => map(evaluation.value?.members, member => member.id))
+  evaluatee_count: computed(() => members.value?.length),
+  member_ids: computed(() => map(members.value, member => member.id))
 })
 const initialState      = ref<IMixedResponseData|any>({})
 // COMPUTED
@@ -50,7 +47,7 @@ function getInitialState() {
     submitter_id: evaluation.value?.id,
     submitted: null,
     date_submitted: '',
-    data: map(props.evaluation?.members, (member: IUser) => ({
+    data: map(members.value, (member: IUser) => ({
         evaluator: props.currentUser?.id,
         evaluatee: member.id,
         score: '',
@@ -110,9 +107,8 @@ onBeforeMount(() => {
   <EvaluationForm
       @submit="onSubmit"
       :initial-state="initialState"
-      :evaluation="props.evaluation"
-      v-slot="{ onSave, errors, values, isSubmitting, evaluationRef, formMeta, message, autosave }"
-      @set:message="$emit('set:message', message)"
+      :evaluation="evaluation"
+      v-slot="{ onSave, errors, values, isSubmitting, evaluationRef, formMeta, autosave }"
   >
     <slot name="header">
       <CustomHiddenField name="data[data][submitter_id]" :value="form.user_id" />
@@ -121,20 +117,13 @@ onBeforeMount(() => {
       <CustomHiddenField name="data[data][grp_event_id]" :value="form.group_event_id" />
       <CustomHiddenField name="data[data][members]" :value="form.member_count" />
       <template v-if="findIndex(evaluation?.mixed?.data, q => q.type === 'Likert') !== -1">
-        <template v-for="member of evaluation?.members" :key="member.id">
+        <template v-for="member of members" :key="member.id">
           <CustomHiddenField :name="`data[${member.id}][Evaluation][evaluatee_id]`" :value="member.id" />
           <CustomHiddenField :name="`data[${member.id}][Evaluation][evaluator_id]`" :value="form.user_id" />
           <CustomHiddenField :name="`data[${member.id}][Evaluation][event_id]`" :value="form.event_id" />
           <CustomHiddenField :name="`data[${member.id}][Evaluation][group_event_id]`" :value="form.group_event_id" />
           <CustomHiddenField :name="`data[${member.id}][Evaluation][group_id]`" :value="form.group_id" />
         </template>
-      </template>
-      <template v-if="parseInt(evaluation?.self_eval) && parseInt(evaluation?.mixed?.self_eval) > 0">
-        <CustomHiddenField :name="`data[${form.user_id}][Self-Evaluation][evaluatee_id]`" :value="form.user_id" />
-        <CustomHiddenField :name="`data[${form.user_id}][Self-Evaluation][evaluator_id]`" :value="form.user_id" />
-        <CustomHiddenField :name="`data[${form.user_id}][Self-Evaluation][event_id]`" :value="form.event_id" />
-        <CustomHiddenField :name="`data[${form.user_id}][Self-Evaluation][group_event_id]`" :value="form.group_event_id" />
-        <CustomHiddenField :name="`data[${form.user_id}][Self-Evaluation][group_id]`" :value="form.group_id" />
       </template>
     </slot>
 
@@ -155,6 +144,11 @@ onBeforeMount(() => {
           subtitle="Evaluate yourself"
           :icon="{src: IconThoughtBubble, size: '3rem'}"
       >
+        <CustomHiddenField :name="`data[${form.user_id}][Self-Evaluation][evaluatee_id]`" :value="form.user_id" />
+        <CustomHiddenField :name="`data[${form.user_id}][Self-Evaluation][evaluator_id]`" :value="form.user_id" />
+        <CustomHiddenField :name="`data[${form.user_id}][Self-Evaluation][event_id]`" :value="form.event_id" />
+        <CustomHiddenField :name="`data[${form.user_id}][Self-Evaluation][group_event_id]`" :value="form.group_event_id" />
+        <CustomHiddenField :name="`data[${form.user_id}][Self-Evaluation][group_id]`" :value="form.group_id" />
         <div class="self-evaluation my-8 space-y-8">
           <SelfQuestions
               v-for="(question, idx) of self_questions" :key="question.id"
