@@ -37,14 +37,14 @@ const props         = defineProps<Props>()
               <div class=""></div>
             </div>
           </th>
-          <th style="width: 60%">
+          <th style="width: 80%">
             <div class="">
               <div class="">{{ 'Relative Contribution' }}</div>
               <div class=""></div>
             </div>
           </th>
           <!--
-          <th style="width: 20%" class="hidden visually-hidden">
+          <th v-if="false" style="width: 20%" class="hidden visually-hidden">
             <div class="text-base font-medium leading-4 tracking-wide">
               <div class="">{{ 'Points' }}</div>
               <div class=""></div>
@@ -69,7 +69,7 @@ const props         = defineProps<Props>()
             />
           </td>
           <!--
-          <td class="hidden visually-hidden">
+          <td v-if="false" class="hidden visually-hidden">
             <div class="w-full h-full flex justify-center items-center text-sm">
               <span class="font-semibold mr-1">{{ props.reviews?.evaluator.find(review => review?.evaluatee === member?.id).score }}</span> points
             </div>

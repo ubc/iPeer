@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { ref, reactive, watch, computed, onMounted } from 'vue';
 import { isEmpty, find, map, filter, reduce, isObject, isArray, isNumber, forEach } from 'lodash'
-import { review } from '@/helpers'
 import PeerRubricLikertQuestion from '@/student/views/questions/PeerRubricLikertQuestion.vue'
 import PeerRubricCommentQuestion from '@/student/views/questions/PeerRubricCommentQuestion.vue'
 import PeerRubricGeneralCommentQuestion from '@/student/views/questions/PeerRubricGeneralCommentQuestion.vue'
@@ -28,13 +27,7 @@ const props         = defineProps<Props>()
   <div class="evaluation-response" v-if="!isEmpty(props.reviews) && props.reviews?.event?.is_released">
 
     <div class="datatable" v-for="criteria of props.reviews?.rubric?.criterias" :key="criteria.id">
-      <div class="question">
-        {{ criteria.criteria_num }}. {{ criteria.criteria }}
-        <span class="average-grade" v-if="!isEmpty(evaluatee) && criteria.multiplier">
-          — {{ review.peer(evaluatee).where(criteria.criteria_num).reduce('grade', 'average').result().toFixed(1) }} /
-          {{ criteria.multiplier }} marks
-        </span>
-      </div>
+      <div class="question">{{ criteria.criteria_num }}. {{ criteria.criteria }}</div>
 
       <table class="standardtable center no-v-line">
         <thead>
@@ -54,7 +47,7 @@ const props         = defineProps<Props>()
         </tr>
         </thead>
         <tbody>
-        <tr v-for="member of members" :key="member.id">
+        <tr v-for="member of props.members" :key="member.id">
           <td><UserCard :member="member" /></td>
           <td v-for="lom of props.reviews?.rubric?.loms" :key="lom.id">
             <ul class="likert response">

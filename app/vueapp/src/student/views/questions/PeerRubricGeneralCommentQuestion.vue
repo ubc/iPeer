@@ -43,22 +43,22 @@ function getGeneralComment(target: string, key: string): string|any {
 
 <template>
   <div class="datatable">
-    <div v-if="settings?.question?.title" class="question text-base text-slate-900 tracking-wide">{{ props.index }}. {{ settings.question.title }}</div>
-    <div v-if="settings?.question?.description" class="description text-sm text-slate-700 ml-5 mb-2 tracking-wider">{{ settings.question.description }}</div>
+    <div v-if="settings?.question?.title" class="question">{{ props.index }}. {{ settings.question.title }}</div>
+    <div v-if="settings?.question?.description" class="description">{{ settings.question.description }}</div>
 
-    <table class="standardtable leftalignedtable">
+    <table class="standardtable center no-v-line">
       <thead>
       <tr>
         <th style="width: 20%">
-          <div class="flex flex-col text-center">
-            <div class="leading-4 flex-1 font-medium">Peer</div>
-            <small class="text-sm leading-4 flex-1 font-normal"></small>
+          <div class="flex flex-col">
+            <div class="">Peer</div>
+            <small class="small"></small>
           </div>
         </th>
         <th style="width: 80%">
-          <div class="flex flex-col text-center">
-            <div class="flex-1 font-medium">General Comments</div>
-            <small class="flex-1 text-sm font-normal"></small>
+          <div class="flex flex-col">
+            <div class="">General Comments</div>
+            <small class="small"></small>
           </div>
         </th>
       </tr>
@@ -67,8 +67,7 @@ function getGeneralComment(target: string, key: string): string|any {
       <tr v-for="(member, memberIdx) of props.members" :key="member.id">
         <td><UserCard :member="member" /></td>
         <td>
-          <div v-if="props.disabled" class="quotes text-sm text-slate-700 font-light tracking-wider" v-html="getGeneralComment('comment', member.id)" />
-          <CustomTextField v-else
+          <CustomTextField
               :name="`${member.id}gen_comment`"
               :value="getGeneralComment('comment', member.id)"
               :rules="validateParagraph"

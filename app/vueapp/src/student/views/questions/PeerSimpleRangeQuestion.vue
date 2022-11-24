@@ -81,24 +81,22 @@ function distributeDecimalRemainder() {
 
 <template>
   <div class="datatable">
-    <div v-if="props.question" class="question relative">
-      {{ props.question }} <AutoSpinner :text="props.question" class="absolute right-0 top-4" />
-    </div>
-    <div v-if="props.description" class="description text-sm mx-4 mb-2">{{ props.description }}</div>
+    <div v-if="props.question" class="question relative">{{ props.question }} <AutoSpinner /></div>
+    <div v-if="props.description" class="description">{{ props.description }}</div>
 
     <table class="standardtable center no-v-line">
       <thead>
       <tr>
         <th style="width: 20%">
-          <div class="text-center leading-4">
-            <div class="font-normal">Peer</div>
-            <div class="text-sm font-thin"></div>
+          <div class="flex flex-col">
+            <div class="">Peer</div>
+            <small class="small"></small>
           </div>
         </th>
         <th style="width: 80%">
-          <div class="text-center leading-4">
-            <div class="font-normal">Relative C<span  @click="showScore = !showScore">o</span>ntribution</div>
-            <div class="text-sm font-thin"></div>
+          <div class="flex flex-col">
+            <div class="">Relative C<span  @click="showScore = !showScore">o</span>ntribution</div>
+            <small class="small"></small>
           </div>
         </th>
       </tr>

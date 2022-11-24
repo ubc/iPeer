@@ -50,20 +50,20 @@ function handleSelectedLomClick(event: {target: string, key: string, value: stri
 </script>
 
 <template>
-  <table class="standardtable leftalignedtable">
+  <table class="standardtable center no-v-line">
     <thead>
     <tr>
       <th style="width: 20%">
-        <div class="text-center leading-4">
-          <div class="text-sm font-normal leading-4 mb-1">{{ props.rubric_criteria?.criteria }}</div>
-          <div v-if="parseInt(props.rubric_criteria?.show_marks)" class="text-sm font-thin">({{ props.rubric_criteria?.multiplier }} marks)</div>
+        <div class="flex flex-col">
+          <div class="">{{ props.rubric_criteria?.criteria }}</div>
+          <small class="small" v-if="parseInt(props.rubric_criteria?.show_marks)">({{ props.rubric_criteria?.multiplier }} marks)</small>
         </div>
       </th>
       <th :style="'width: '+ 80/props.rubrics_lom?.length +'%'"
           v-for="(criteria_lom, criteria_lomIdx) of props.rubrics_lom" :key="criteria_lom.id">
-        <div class="text-center space-x-1">
-          <div class="text-base text-slate-900 font-normal">{{ criteria_lom.lom_comment }}</div>
-          <div class="text-sm text-slate-600 font-thin leading-3">{{ props.rubric_criteria?.rubrics_criteria_comment[criteria_lomIdx]['criteria_comment'] }}</div>
+        <div class="flex flex-col">
+          <div class="">{{ criteria_lom.lom_comment }}</div>
+          <small class="small">{{ props.rubric_criteria?.rubrics_criteria_comment[criteria_lomIdx]['criteria_comment'] }}</small>
         </div>
       </th>
     </tr>

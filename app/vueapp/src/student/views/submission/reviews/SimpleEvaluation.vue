@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref, reactive, watch, computed, onMounted } from 'vue'
+import { useReviewsStore } from '@/stores/reviews'
 import { NotAvailable } from '@/components/messages'
 import UserCard from '@/student/components/UserCard.vue'
 import { IconSquareInfo } from '@/components/icons'
@@ -10,40 +11,15 @@ interface Props {
   self: string
 }
 // REFERENCES
-const emit          = defineEmits<{}>()
-const props         = defineProps<Props>()
+const emit            = defineEmits<{}>()
+const props           = defineProps<Props>()
+const reviewsStore    = useReviewsStore()
 // DATA
 // COMPUTED
+const error     = computed(() => reviewsStore.error)
+const hasError  = computed(() => reviewsStore.hasError)
 // METHODS
 function getAdditionalComment(score: string|any) {
-  score = parseInt(score)
-  // console.log(typeof score)
-  // switch (score) {
-  //   case score >= 0 && score <= 10:
-  //     return '0-10'
-  //   case score > 10 && score <= 20:
-  //     return '11-20'
-  //   case score > 20 && score <= 30:
-  //     return '21-30'
-  //   case score > 30 && score <= 40:
-  //     return '31-40'
-  //   case score > 40 && score <= 50:
-  //     return '41-50'
-  //   case score > 50 && score <= 60:
-  //     return '51-60'
-  //   case score > 60 && score <= 70:
-  //     return '61-70'
-  //   case score > 70 && score <= 80:
-  //     return '71-80'
-  //   case score > 80 && score <= 90:
-  //     return '81-90'
-  //   case score > 90 && score <= 100:
-  //     return '91-100'
-  //   case score > 100:
-  //     return 'exceeded expectation'
-  //   default:
-  //     break
-  // }
   return '??'
 }
 // WATCH
@@ -51,17 +27,9 @@ function getAdditionalComment(score: string|any) {
 </script>
 
 <template>
-  <NotAvailable
-      v-if="!props.reviews?.event?.is_released"
-      release-status="online"
-      :release-info="error"
-  />
-  <div class="evaluation-reviews" v-if="props.reviews?.event?.is_released">
-    <NotAvailable
-        v-if="Object.keys(props.reviews?.evaluator).length===0"
-        release-status="custom"
-        :release-info="{title: 'Content Not Found', message: 'Your need to complete your evaluation.'}"
-    />
+  <NotAvailable v-if="!props.reviews?.event?.is_released" status="online" />
+  <NotAvailable v-if="hasError" :data="error" />
+  <div v-if="props.reviews?.event?.is_released && !hasError" class="evaluation-reviews">
     <div class="datatable" v-if="Object.keys(props.reviews?.evaluator).length>0">
       <div class="question">{{ '1' }}. {{ 'Please rate each peer\'s relative contribution.' }}</div>
       <table class="standardtable center no-v-line bg-gray-100">
@@ -73,18 +41,19 @@ function getAdditionalComment(score: string|any) {
               <div class=""></div>
             </div>
           </th>
-          <th style="width: 45%">
+          <th style="width: 80%">
             <div class="text-base font-medium leading-4 tracking-wide">
               <div class="">{{ 'Your Relative Contribution' }}</div>
               <div class=""></div>
             </div>
           </th>
-          <th style="width: 35%">
+          <!--
+          <th v-if="false" style="width: 35%">
             <div class="text-base font-medium leading-4 tracking-wide">
               <div class="">{{ 'Your Average Points' }}</div>
               <div class=""></div>
             </div>
-          </th>
+          </th>-->
         </tr>
         </thead>
         <tbody>
@@ -105,7 +74,8 @@ function getAdditionalComment(score: string|any) {
               </template>
             </ul>
           </td>
-          <td class="">
+          <!--
+          <td v-if="false" class="">
             <div class="text-sm py-3">
               <div class=""><span class="font-semibold tracking-wider">{{ props.reviews?.status?.average_score }}</span> points</div>
               <div class="flex items-start mt-2">
@@ -113,7 +83,7 @@ function getAdditionalComment(score: string|any) {
                 <div class="text-sm text-left font-light leading-4 tracking-wide">100 points is about what each peer would receive, if everyone agreed all team members contributed evenlly</div>
               </div>
             </div>
-          </td>
+          </td>-->
         </tr>
         </tbody>
       </table>

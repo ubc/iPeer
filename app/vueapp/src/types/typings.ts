@@ -290,7 +290,7 @@ export interface IReview {
   status: IReviewStatus
 }
 // TODO:: setup is required on the server
-interface IReviewSimpleEvaluatee {
+export interface IReviewSimpleEvaluatee {
   scores: string[]
   comments: string[]
 }

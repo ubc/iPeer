@@ -51,14 +51,24 @@
   padding: 0.4em 0.1em;
   font-weight: 600;
   font-size: 0.95em;
-  //border-left: solid 1px #ddd;
-  //border-bottom: solid 1px #ddd;
   @apply font-sans;
   @apply h-8;
   @apply bg-[#ececec] dark:bg-gray-700;
   @apply bg-[#eee] dark:bg-gray-700;
   border-style: solid;
   @apply border-l border-b border-gray-300 dark:border-gray-600;
+
+  > div {
+    div, :first-child {
+      @apply leading-3;
+      @apply text-base;
+    }
+    small, :last-child {
+      @apply text-sm opacity-90;
+      @apply leading-4;
+    }
+  }
+
 }
 
 .standardtable td {

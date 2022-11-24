@@ -1,9 +1,7 @@
 <script lang="ts" setup>
 import { ref, reactive, watch, computed, onMounted } from 'vue';
 // REFERENCES
-const props = defineProps<{
- //...
-}>()
+const props = defineProps<{}>()
 const emit = defineEmits<{
   (e: 'update:modelValue', option: string): void
 }>()

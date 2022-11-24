@@ -1,6 +1,6 @@
 {
   "src/main.ts": {
-    "file": "js/assets/main.386b2761.js",
+    "file": "js/assets/main.js",
     "src": "src/main.ts",
     "isEntry": true,
     "dynamicImports": [
@@ -16,102 +16,102 @@
       "src/pages/NotFound.vue"
     ],
     "css": [
-      "css/assets/main.0f311c45.css"
+      "css/assets/main.css"
     ]
   },
   "src/pages/EventsIndex.vue": {
-    "file": "js/assets/EventsIndex.0a467af5.js",
+    "file": "js/assets/EventsIndex.js",
     "src": "src/pages/EventsIndex.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_PageHeading.vue_vue_type_script_setup_true_lang.bf8bebc0.js",
-      "_SectionTitle.vue_vue_type_script_setup_true_lang.9cac9c28.js",
-      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.8282f4a6.js",
-      "_Loader.vue_vue_type_script_setup_true_lang.633438c3.js",
-      "_autosize.esm.7505a07e.js"
+      "_PageHeading.vue_vue_type_script_setup_true_lang.js",
+      "_SectionTitle.vue_vue_type_script_setup_true_lang.js",
+      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
+      "_Loader.vue_vue_type_script_setup_true_lang.js",
+      "_autosize.esm.js"
     ]
   },
-  "_PageHeading.vue_vue_type_script_setup_true_lang.bf8bebc0.js": {
-    "file": "js/assets/PageHeading.vue_vue_type_script_setup_true_lang.bf8bebc0.js",
+  "_PageHeading.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/assets/PageHeading.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts"
     ]
   },
-  "_SectionTitle.vue_vue_type_script_setup_true_lang.9cac9c28.js": {
-    "file": "js/assets/SectionTitle.vue_vue_type_script_setup_true_lang.9cac9c28.js",
+  "_SectionTitle.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/assets/SectionTitle.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts"
     ]
   },
-  "_SectionSubtitle.vue_vue_type_script_setup_true_lang.8282f4a6.js": {
-    "file": "js/assets/SectionSubtitle.vue_vue_type_script_setup_true_lang.8282f4a6.js",
+  "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/assets/SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts"
     ]
   },
-  "_Loader.vue_vue_type_script_setup_true_lang.633438c3.js": {
-    "file": "js/assets/Loader.vue_vue_type_script_setup_true_lang.633438c3.js",
+  "_Loader.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/assets/Loader.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts"
     ]
   },
-  "_autosize.esm.7505a07e.js": {
-    "file": "js/assets/autosize.esm.7505a07e.js"
+  "_autosize.esm.js": {
+    "file": "js/assets/autosize.esm.js"
   },
   "src/pages/EvaluationIndex.vue": {
-    "file": "js/assets/EvaluationIndex.8a8f48f8.js",
+    "file": "js/assets/EvaluationIndex.js",
     "src": "src/pages/EvaluationIndex.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_evaluation.22a24287.js",
-      "_Loader.vue_vue_type_script_setup_true_lang.633438c3.js",
-      "_NotAvailable.vue_vue_type_script_setup_true_lang.a02c381f.js",
-      "_PageHeading.vue_vue_type_script_setup_true_lang.bf8bebc0.js",
-      "_SectionTitle.vue_vue_type_script_setup_true_lang.9cac9c28.js",
-      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.8282f4a6.js",
-      "_ViewHeading.vue_vue_type_script_setup_true_lang.1793555d.js",
-      "_IconWritingHand.5556d51c.js"
+      "_evaluation.js",
+      "_Loader.vue_vue_type_script_setup_true_lang.js",
+      "_NotAvailable.vue_vue_type_script_setup_true_lang.js",
+      "_PageHeading.vue_vue_type_script_setup_true_lang.js",
+      "_SectionTitle.vue_vue_type_script_setup_true_lang.js",
+      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
+      "_ViewHeading.vue_vue_type_script_setup_true_lang.js",
+      "_IconWritingHand.js"
     ],
     "dynamicImports": [
       "src/student/views/EvaluationMakePage.vue",
       "src/student/views/EvaluationEditPage.vue"
     ]
   },
-  "_evaluation.22a24287.js": {
-    "file": "js/assets/evaluation.22a24287.js",
+  "_evaluation.js": {
+    "file": "js/assets/evaluation.js",
     "imports": [
       "src/main.ts"
     ]
   },
-  "_NotAvailable.vue_vue_type_script_setup_true_lang.a02c381f.js": {
-    "file": "js/assets/NotAvailable.vue_vue_type_script_setup_true_lang.a02c381f.js",
+  "_NotAvailable.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/assets/NotAvailable.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts"
     ]
   },
-  "_ViewHeading.vue_vue_type_script_setup_true_lang.1793555d.js": {
-    "file": "js/assets/ViewHeading.vue_vue_type_script_setup_true_lang.1793555d.js",
+  "_ViewHeading.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/assets/ViewHeading.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts"
     ]
   },
-  "_IconWritingHand.5556d51c.js": {
-    "file": "js/assets/IconWritingHand.5556d51c.js",
+  "_IconWritingHand.js": {
+    "file": "js/assets/IconWritingHand.js",
     "imports": [
       "src/main.ts"
     ]
   },
   "src/student/views/EvaluationMakePage.vue": {
-    "file": "js/assets/EvaluationMakePage.d628d31c.js",
+    "file": "js/assets/EvaluationMakePage.js",
     "src": "src/student/views/EvaluationMakePage.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_IconSpinner.c2b30cd6.js",
-      "_TakeNote.vue_vue_type_script_setup_true_lang.38ebe5cb.js",
-      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.8282f4a6.js"
+      "_IconSpinner.js",
+      "_TakeNote.vue_vue_type_script_setup_true_lang.js",
+      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js"
     ],
     "dynamicImports": [
       "src/student/views/templates/SimpleEvaluation.vue",
@@ -119,28 +119,28 @@
       "src/student/views/templates/MixedEvaluation.vue"
     ]
   },
-  "_IconSpinner.c2b30cd6.js": {
-    "file": "js/assets/IconSpinner.c2b30cd6.js",
+  "_IconSpinner.js": {
+    "file": "js/assets/IconSpinner.js",
     "imports": [
       "src/main.ts"
     ]
   },
-  "_TakeNote.vue_vue_type_script_setup_true_lang.38ebe5cb.js": {
-    "file": "js/assets/TakeNote.vue_vue_type_script_setup_true_lang.38ebe5cb.js",
+  "_TakeNote.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/assets/TakeNote.vue_vue_type_script_setup_true_lang.js",
     "imports": [
-      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.8282f4a6.js",
+      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
       "src/main.ts"
     ]
   },
   "src/student/views/EvaluationEditPage.vue": {
-    "file": "js/assets/EvaluationEditPage.44f6ce8e.js",
+    "file": "js/assets/EvaluationEditPage.js",
     "src": "src/student/views/EvaluationEditPage.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_IconSpinner.c2b30cd6.js",
-      "_TakeNote.vue_vue_type_script_setup_true_lang.38ebe5cb.js",
-      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.8282f4a6.js"
+      "_IconSpinner.js",
+      "_TakeNote.vue_vue_type_script_setup_true_lang.js",
+      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js"
     ],
     "dynamicImports": [
       "src/student/views/templates/SimpleEvaluation.vue",
@@ -149,19 +149,26 @@
     ]
   },
   "src/pages/SubmissionIndex.vue": {
-    "file": "js/assets/SubmissionIndex.1260f206.js",
+    "file": "js/assets/SubmissionIndex.js",
     "src": "src/pages/SubmissionIndex.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_Loader.vue_vue_type_script_setup_true_lang.633438c3.js",
-      "_PageHeading.vue_vue_type_script_setup_true_lang.bf8bebc0.js",
-      "_ViewHeading.vue_vue_type_script_setup_true_lang.1793555d.js",
-      "_NotAvailable.vue_vue_type_script_setup_true_lang.a02c381f.js"
+      "_reviews.js",
+      "_Loader.vue_vue_type_script_setup_true_lang.js",
+      "_PageHeading.vue_vue_type_script_setup_true_lang.js",
+      "_ViewHeading.vue_vue_type_script_setup_true_lang.js",
+      "_NotAvailable.vue_vue_type_script_setup_true_lang.js"
+    ]
+  },
+  "_reviews.js": {
+    "file": "js/assets/reviews.js",
+    "imports": [
+      "src/main.ts"
     ]
   },
   "src/student/views/SubmissionViewPage.vue": {
-    "file": "js/assets/SubmissionViewPage.3ce6046c.js",
+    "file": "js/assets/SubmissionViewPage.js",
     "src": "src/student/views/SubmissionViewPage.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -173,53 +180,53 @@
     ]
   },
   "src/pages/UsersIndex.vue": {
-    "file": "js/assets/UsersIndex.a34a3da0.js",
+    "file": "js/assets/UsersIndex.js",
     "src": "src/pages/UsersIndex.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_PageHeading.vue_vue_type_script_setup_true_lang.bf8bebc0.js"
+      "_PageHeading.vue_vue_type_script_setup_true_lang.js"
     ]
   },
   "src/student/views/UserProfile.vue": {
-    "file": "js/assets/UserProfile.4f0246e0.js",
+    "file": "js/assets/UserProfile.js",
     "src": "src/student/views/UserProfile.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_rules.dc1b156b.js",
-      "_PageHeading.vue_vue_type_script_setup_true_lang.bf8bebc0.js",
-      "_SectionTitle.vue_vue_type_script_setup_true_lang.9cac9c28.js",
-      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.8282f4a6.js",
-      "_IconSpinner.c2b30cd6.js",
-      "_autosize.esm.7505a07e.js",
-      "_CustomInputField.vue_vue_type_script_setup_true_lang.c8d13afb.js"
+      "_rules.js",
+      "_PageHeading.vue_vue_type_script_setup_true_lang.js",
+      "_SectionTitle.vue_vue_type_script_setup_true_lang.js",
+      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
+      "_IconSpinner.js",
+      "_autosize.esm.js",
+      "_CustomInputField.vue_vue_type_script_setup_true_lang.js"
     ]
   },
-  "_rules.dc1b156b.js": {
-    "file": "js/assets/rules.dc1b156b.js",
+  "_rules.js": {
+    "file": "js/assets/rules.js",
     "imports": [
       "src/main.ts"
     ]
   },
-  "_CustomInputField.vue_vue_type_script_setup_true_lang.c8d13afb.js": {
-    "file": "js/assets/CustomInputField.vue_vue_type_script_setup_true_lang.c8d13afb.js",
+  "_CustomInputField.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/assets/CustomInputField.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts"
     ]
   },
   "src/pages/Login.vue": {
-    "file": "js/assets/Login.44772ce9.js",
+    "file": "js/assets/Login.js",
     "src": "src/pages/Login.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_PageHeading.vue_vue_type_script_setup_true_lang.bf8bebc0.js",
-      "_Loader.vue_vue_type_script_setup_true_lang.633438c3.js",
+      "_PageHeading.vue_vue_type_script_setup_true_lang.js",
+      "_Loader.vue_vue_type_script_setup_true_lang.js",
       "src/main.ts"
     ]
   },
   "src/pages/NotFound.vue": {
-    "file": "js/assets/NotFound.32afbdd8.js",
+    "file": "js/assets/NotFound.js",
     "src": "src/pages/NotFound.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -227,79 +234,79 @@
     ]
   },
   "src/student/views/templates/SimpleEvaluation.vue": {
-    "file": "js/assets/SimpleEvaluation.65eed186.js",
+    "file": "js/assets/SimpleEvaluation.js",
     "src": "src/student/views/templates/SimpleEvaluation.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_EvaluationForm.vue_vue_type_script_setup_true_lang.2babf397.js",
-      "_UserCard.vue_vue_type_script_setup_true_lang.c748ae7e.js",
-      "_evaluation.22a24287.js",
-      "_autosize.esm.7505a07e.js",
-      "_CustomRangeField.vue_vue_type_script_setup_true_lang.1e9419e6.js",
-      "_rules.dc1b156b.js",
-      "_CustomTextField.vue_vue_type_script_setup_true_lang.4805027c.js"
+      "_EvaluationForm.vue_vue_type_script_setup_true_lang.js",
+      "_UserCard.vue_vue_type_script_setup_true_lang.js",
+      "_evaluation.js",
+      "_autosize.esm.js",
+      "_CustomRangeField.vue_vue_type_script_setup_true_lang.js",
+      "_rules.js",
+      "_CustomTextField.vue_vue_type_script_setup_true_lang.js"
     ],
     "css": [
-      "css/assets/SimpleEvaluation.18278f59.css"
+      "css/assets/SimpleEvaluation.css"
     ]
   },
-  "_EvaluationForm.vue_vue_type_script_setup_true_lang.2babf397.js": {
-    "file": "js/assets/EvaluationForm.vue_vue_type_script_setup_true_lang.2babf397.js",
+  "_EvaluationForm.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/assets/EvaluationForm.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts",
-      "_evaluation.22a24287.js"
+      "_evaluation.js"
     ]
   },
-  "_UserCard.vue_vue_type_script_setup_true_lang.c748ae7e.js": {
-    "file": "js/assets/UserCard.vue_vue_type_script_setup_true_lang.c748ae7e.js",
+  "_UserCard.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/assets/UserCard.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts"
     ]
   },
-  "_CustomRangeField.vue_vue_type_script_setup_true_lang.1e9419e6.js": {
-    "file": "js/assets/CustomRangeField.vue_vue_type_script_setup_true_lang.1e9419e6.js",
+  "_CustomRangeField.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/assets/CustomRangeField.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts"
     ]
   },
-  "_CustomTextField.vue_vue_type_script_setup_true_lang.4805027c.js": {
-    "file": "js/assets/CustomTextField.vue_vue_type_script_setup_true_lang.4805027c.js",
+  "_CustomTextField.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/assets/CustomTextField.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts",
-      "_autosize.esm.7505a07e.js"
+      "_autosize.esm.js"
     ]
   },
   "src/student/views/templates/RubricEvaluation.vue": {
-    "file": "js/assets/RubricEvaluation.7daf7ad4.js",
+    "file": "js/assets/RubricEvaluation.js",
     "src": "src/student/views/templates/RubricEvaluation.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_autosize.esm.7505a07e.js",
-      "_EvaluationForm.vue_vue_type_script_setup_true_lang.2babf397.js",
-      "_rules.dc1b156b.js",
-      "_CustomRadioField.vue_vue_type_script_setup_true_lang.fe611a6d.js",
-      "_UserCard.vue_vue_type_script_setup_true_lang.c748ae7e.js",
-      "_CustomTextField.vue_vue_type_script_setup_true_lang.4805027c.js",
-      "_evaluation.22a24287.js"
+      "_autosize.esm.js",
+      "_EvaluationForm.vue_vue_type_script_setup_true_lang.js",
+      "_rules.js",
+      "_CustomRadioField.vue_vue_type_script_setup_true_lang.js",
+      "_UserCard.vue_vue_type_script_setup_true_lang.js",
+      "_CustomTextField.vue_vue_type_script_setup_true_lang.js",
+      "_evaluation.js"
     ]
   },
-  "_CustomRadioField.vue_vue_type_script_setup_true_lang.fe611a6d.js": {
-    "file": "js/assets/CustomRadioField.vue_vue_type_script_setup_true_lang.fe611a6d.js",
+  "_CustomRadioField.vue_vue_type_script_setup_true_lang.js": {
+    "file": "js/assets/CustomRadioField.vue_vue_type_script_setup_true_lang.js",
     "imports": [
       "src/main.ts"
     ]
   },
   "src/student/views/templates/MixedEvaluation.vue": {
-    "file": "js/assets/MixedEvaluation.78a92a0c.js",
+    "file": "js/assets/MixedEvaluation.js",
     "src": "src/student/views/templates/MixedEvaluation.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_EvaluationForm.vue_vue_type_script_setup_true_lang.2babf397.js",
-      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.8282f4a6.js",
-      "_evaluation.22a24287.js"
+      "_EvaluationForm.vue_vue_type_script_setup_true_lang.js",
+      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
+      "_evaluation.js"
     ],
     "dynamicImports": [
       "src/student/views/questions/PeerMixedLikertQuestion.vue",
@@ -313,15 +320,15 @@
     ]
   },
   "src/student/views/SubmissionResponse.vue": {
-    "file": "js/assets/SubmissionResponse.2951b809.js",
+    "file": "js/assets/SubmissionResponse.js",
     "src": "src/student/views/SubmissionResponse.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_Loader.vue_vue_type_script_setup_true_lang.633438c3.js",
-      "_SectionTitle.vue_vue_type_script_setup_true_lang.9cac9c28.js",
-      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.8282f4a6.js",
-      "_IconWritingHand.5556d51c.js"
+      "_Loader.vue_vue_type_script_setup_true_lang.js",
+      "_SectionTitle.vue_vue_type_script_setup_true_lang.js",
+      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js",
+      "_IconWritingHand.js"
     ],
     "dynamicImports": [
       "src/student/views/submission/response/SimpleEvaluation.vue",
@@ -330,15 +337,15 @@
     ]
   },
   "src/student/views/SubmissionReviews.vue": {
-    "file": "js/assets/SubmissionReviews.2d21ac1f.js",
+    "file": "js/assets/SubmissionReviews.js",
     "src": "src/student/views/SubmissionReviews.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_Loader.vue_vue_type_script_setup_true_lang.633438c3.js",
-      "_NotAvailable.vue_vue_type_script_setup_true_lang.a02c381f.js",
-      "_SectionTitle.vue_vue_type_script_setup_true_lang.9cac9c28.js",
-      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.8282f4a6.js"
+      "_Loader.vue_vue_type_script_setup_true_lang.js",
+      "_NotAvailable.vue_vue_type_script_setup_true_lang.js",
+      "_SectionTitle.vue_vue_type_script_setup_true_lang.js",
+      "_SectionSubtitle.vue_vue_type_script_setup_true_lang.js"
     ],
     "dynamicImports": [
       "src/student/views/submission/reviews/SimpleEvaluation.vue",
@@ -347,20 +354,20 @@
     ]
   },
   "src/student/views/questions/PeerMixedLikertQuestion.vue": {
-    "file": "js/assets/PeerMixedLikertQuestion.9b65af9a.js",
+    "file": "js/assets/PeerMixedLikertQuestion.js",
     "src": "src/student/views/questions/PeerMixedLikertQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_rules.dc1b156b.js",
-      "_UserCard.vue_vue_type_script_setup_true_lang.c748ae7e.js",
-      "_EvaluationForm.vue_vue_type_script_setup_true_lang.2babf397.js",
-      "_CustomRadioField.vue_vue_type_script_setup_true_lang.fe611a6d.js",
-      "_evaluation.22a24287.js"
+      "_rules.js",
+      "_UserCard.vue_vue_type_script_setup_true_lang.js",
+      "_EvaluationForm.vue_vue_type_script_setup_true_lang.js",
+      "_CustomRadioField.vue_vue_type_script_setup_true_lang.js",
+      "_evaluation.js"
     ]
   },
   "src/student/views/questions/PeerMixedRangeQuestion.vue": {
-    "file": "js/assets/PeerMixedRangeQuestion.13eae8af.js",
+    "file": "js/assets/PeerMixedRangeQuestion.js",
     "src": "src/student/views/questions/PeerMixedRangeQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -368,7 +375,7 @@
     ]
   },
   "src/student/views/questions/PeerMixedCommentQuestion.vue": {
-    "file": "js/assets/PeerMixedCommentQuestion.c10722f8.js",
+    "file": "js/assets/PeerMixedCommentQuestion.js",
     "src": "src/student/views/questions/PeerMixedCommentQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
@@ -376,138 +383,139 @@
     ]
   },
   "src/student/views/questions/PeerMixedSentenceQuestion.vue": {
-    "file": "js/assets/PeerMixedSentenceQuestion.8b75d9f5.js",
+    "file": "js/assets/PeerMixedSentenceQuestion.js",
     "src": "src/student/views/questions/PeerMixedSentenceQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_rules.dc1b156b.js",
-      "_CustomInputField.vue_vue_type_script_setup_true_lang.c8d13afb.js",
-      "_UserCard.vue_vue_type_script_setup_true_lang.c748ae7e.js"
+      "_rules.js",
+      "_CustomInputField.vue_vue_type_script_setup_true_lang.js",
+      "_UserCard.vue_vue_type_script_setup_true_lang.js"
     ]
   },
   "src/student/views/questions/PeerMixedParagraphQuestion.vue": {
-    "file": "js/assets/PeerMixedParagraphQuestion.4326a2ea.js",
+    "file": "js/assets/PeerMixedParagraphQuestion.js",
     "src": "src/student/views/questions/PeerMixedParagraphQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_rules.dc1b156b.js",
-      "_CustomTextField.vue_vue_type_script_setup_true_lang.4805027c.js",
-      "_UserCard.vue_vue_type_script_setup_true_lang.c748ae7e.js",
-      "_autosize.esm.7505a07e.js"
+      "_rules.js",
+      "_CustomTextField.vue_vue_type_script_setup_true_lang.js",
+      "_UserCard.vue_vue_type_script_setup_true_lang.js",
+      "_autosize.esm.js"
     ]
   },
   "src/student/views/questions/SelfMixedLikertQuestion.vue": {
-    "file": "js/assets/SelfMixedLikertQuestion.74239f7a.js",
+    "file": "js/assets/SelfMixedLikertQuestion.js",
     "src": "src/student/views/questions/SelfMixedLikertQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_rules.dc1b156b.js",
-      "_autosize.esm.7505a07e.js",
-      "_CustomRadioField.vue_vue_type_script_setup_true_lang.fe611a6d.js",
-      "_EvaluationForm.vue_vue_type_script_setup_true_lang.2babf397.js",
+      "_rules.js",
+      "_autosize.esm.js",
+      "_CustomRadioField.vue_vue_type_script_setup_true_lang.js",
+      "_EvaluationForm.vue_vue_type_script_setup_true_lang.js",
       "src/main.ts",
-      "_evaluation.22a24287.js"
+      "_evaluation.js"
     ]
   },
   "src/student/views/questions/SelfMixedSentenceQuestion.vue": {
-    "file": "js/assets/SelfMixedSentenceQuestion.797d4d50.js",
+    "file": "js/assets/SelfMixedSentenceQuestion.js",
     "src": "src/student/views/questions/SelfMixedSentenceQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_rules.dc1b156b.js",
-      "_autosize.esm.7505a07e.js",
-      "_CustomInputField.vue_vue_type_script_setup_true_lang.c8d13afb.js",
+      "_rules.js",
+      "_autosize.esm.js",
+      "_CustomInputField.vue_vue_type_script_setup_true_lang.js",
       "src/main.ts"
     ]
   },
   "src/student/views/questions/SelfMixedParagraphQuestion.vue": {
-    "file": "js/assets/SelfMixedParagraphQuestion.357dc313.js",
+    "file": "js/assets/SelfMixedParagraphQuestion.js",
     "src": "src/student/views/questions/SelfMixedParagraphQuestion.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_rules.dc1b156b.js",
-      "_CustomTextField.vue_vue_type_script_setup_true_lang.4805027c.js",
-      "_autosize.esm.7505a07e.js",
+      "_rules.js",
+      "_CustomTextField.vue_vue_type_script_setup_true_lang.js",
+      "_autosize.esm.js",
       "src/main.ts"
     ]
   },
   "src/student/views/submission/response/SimpleEvaluation.vue": {
-    "file": "js/assets/SimpleEvaluation.846860c3.js",
+    "file": "js/assets/SimpleEvaluation2.js",
     "src": "src/student/views/submission/response/SimpleEvaluation.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_NotAvailable.vue_vue_type_script_setup_true_lang.a02c381f.js",
-      "_UserCard.vue_vue_type_script_setup_true_lang.c748ae7e.js",
-      "_CustomRangeField.vue_vue_type_script_setup_true_lang.1e9419e6.js"
+      "_NotAvailable.vue_vue_type_script_setup_true_lang.js",
+      "_UserCard.vue_vue_type_script_setup_true_lang.js",
+      "_CustomRangeField.vue_vue_type_script_setup_true_lang.js"
     ]
   },
   "src/student/views/submission/response/RubricEvaluation.vue": {
-    "file": "js/assets/RubricEvaluation.1c54f989.js",
+    "file": "js/assets/RubricEvaluation2.js",
     "src": "src/student/views/submission/response/RubricEvaluation.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_rules.dc1b156b.js",
-      "_UserCard.vue_vue_type_script_setup_true_lang.c748ae7e.js",
-      "_autosize.esm.7505a07e.js"
+      "_rules.js",
+      "_UserCard.vue_vue_type_script_setup_true_lang.js",
+      "_autosize.esm.js"
     ]
   },
   "src/student/views/submission/response/MixedEvaluation.vue": {
-    "file": "js/assets/MixedEvaluation.1ecc8b5e.js",
+    "file": "js/assets/MixedEvaluation2.js",
     "src": "src/student/views/submission/response/MixedEvaluation.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_UserCard.vue_vue_type_script_setup_true_lang.c748ae7e.js"
+      "_UserCard.vue_vue_type_script_setup_true_lang.js"
     ],
     "css": [
-      "css/assets/Debugger.593f553f.css"
+      "css/assets/Debugger.css"
     ]
   },
   "src/student/views/submission/reviews/SimpleEvaluation.vue": {
-    "file": "js/assets/SimpleEvaluation.6eb7c9e7.js",
+    "file": "js/assets/SimpleEvaluation3.js",
     "src": "src/student/views/submission/reviews/SimpleEvaluation.vue",
     "isDynamicEntry": true,
     "imports": [
+      "_reviews.js",
       "src/main.ts",
-      "_NotAvailable.vue_vue_type_script_setup_true_lang.a02c381f.js",
-      "_UserCard.vue_vue_type_script_setup_true_lang.c748ae7e.js"
+      "_NotAvailable.vue_vue_type_script_setup_true_lang.js",
+      "_UserCard.vue_vue_type_script_setup_true_lang.js"
     ]
   },
   "src/student/views/submission/reviews/RubricEvaluation.vue": {
-    "file": "js/assets/RubricEvaluation.2b9205b2.js",
+    "file": "js/assets/RubricEvaluation3.js",
     "src": "src/student/views/submission/reviews/RubricEvaluation.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_UserCard.vue_vue_type_script_setup_true_lang.c748ae7e.js"
+      "_UserCard.vue_vue_type_script_setup_true_lang.js"
     ]
   },
   "src/student/views/submission/reviews/MixedEvaluation.vue": {
-    "file": "js/assets/MixedEvaluation.16848961.js",
+    "file": "js/assets/MixedEvaluation3.js",
     "src": "src/student/views/submission/reviews/MixedEvaluation.vue",
     "isDynamicEntry": true,
     "imports": [
       "src/main.ts",
-      "_UserCard.vue_vue_type_script_setup_true_lang.c748ae7e.js"
+      "_UserCard.vue_vue_type_script_setup_true_lang.js"
     ],
     "css": [
-      "css/assets/Debugger.593f553f.css"
+      "css/assets/Debugger.css"
     ]
   },
   "src/student/views/templates/SimpleEvaluation.css": {
-    "file": "css/assets/SimpleEvaluation.18278f59.css",
+    "file": "css/assets/SimpleEvaluation.css",
     "src": "src/student/views/templates/SimpleEvaluation.css"
   },
   "Debugger.css": {
-    "file": "css/assets/Debugger.593f553f.css",
+    "file": "css/assets/Debugger.css",
     "src": "Debugger.css"
   },
   "src/main.css": {
-    "file": "css/assets/main.0f311c45.css",
+    "file": "css/assets/main.css",
     "src": "src/main.css"
   }
 }

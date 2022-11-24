@@ -1,19 +1,18 @@
 <script lang="ts" setup>
-import { ref, toRef, reactive, watch, computed, onMounted } from 'vue'
+import { ref, toRef } from 'vue'
 import { isEmpty, find } from 'lodash'
-import { FieldArray } from 'vee-validate'
 import { validateParagraph } from '@/helpers/rules'
 import CustomTextField from '@/components/fields/CustomTextField.vue'
 import UserCard from '@/student/components/UserCard.vue'
-import type {MixedResponse, MixedReviewData, User} from '@/types/typings'
+import type { IMixedResponse, IMixedReviewData, IUser } from '@/types/typings'
 // REFERENCES
 const emit = defineEmits<{
   (e: 'update:initialState', value: object): void
 }>()
 const props = defineProps<{
-  question: MixedReviewData,
-  members: User[],
-  initialState: MixedResponse,
+  question: IMixedReviewData,
+  members: IUser[],
+  initialState: IMixedResponse,
 }>()
 
 // DATA
@@ -26,7 +25,7 @@ function getResponseDetails(member_id:string, question_num:string): string {
   if(initialState.value?.data || !isEmpty(initialState.value?.data)) {
     const response = find(initialState.value?.data, { evaluatee: member_id })
     if(response?.details) {
-      const question = find(response.details, { question_number: question_num })
+      const question = find(response?.details, { question_number: question_num })
       return question?.question_comment
     }
   }
@@ -37,22 +36,22 @@ function getResponseDetails(member_id:string, question_num:string): string {
 </script>
 
 <template>
-  <div :class="`datatable question_${question.question_num} mx-4`">
+  <div :class="`datatable question_${question.question_num}`">
     <div class="question">{{ question.question_num }}. {{ question.title }} <span class="text-red-500" v-if="question.required">*</span></div>
-    <div class="description text-sm text-slate-900 leading-relaxed mx-4 mb-2">{{ question.instructions }}</div>
-    <table class="standardtable leftalignedtable">
+    <div class="description">{{ question.instructions }}</div>
+    <table class="standardtable center no-v-line">
       <thead>
       <tr>
         <th style="width: 20%">
-          <div class="text-center leading-4">
-            <div class="font-normal">Peer</div>
-            <div class="text-sm font-thin"></div>
+          <div class="flex flex-col">
+            <div class="">Peer</div>
+            <small class="small"></small>
           </div>
         </th>
         <th style="width: 80%;">
-          <div class="text-center leading-4">
-            <div class="font-normal">Comments</div>
-            <div class="text-sm font-thin"></div>
+          <div class="flex flex-col">
+            <div class="">Comments</div>
+            <small class="small"></small>
           </div>
         </th>
       </tr>
@@ -61,7 +60,6 @@ function getResponseDetails(member_id:string, question_num:string): string {
       <tr v-for="member of members" :key="member.id">
         <td><UserCard :member="member" /></td>
         <td>
-          <!-- TODO:: fire the ['update:initialState'] every 300~500 ms -->
           <CustomTextField
             :name="`data[${member.id}][EvaluationMixeval][${question.question_num}][question_comment]`"
             :value="getResponseDetails(member.id, question.question_num)"

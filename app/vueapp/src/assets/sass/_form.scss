@@ -26,11 +26,11 @@
     @apply text-sm;
     @apply font-normal;
     @apply leading-5 tracking-wider;
-    @apply text-gray-900 dark:text-white;
     @apply rounded-lg p-2.5;
     @apply outline-none;
     @apply border border-gray-300 dark:border-gray-600;
-    @apply bg-gray-50 dark:bg-gray-700;
+    @apply text-gray-800 dark:text-white;
+    @apply bg-slate-50 dark:bg-slate-800;
     @apply dark:focus:ring-gold-500 dark:focus:border-gold-500;
     @apply dark:placeholder-gray-400;
     @apply focus:ring-blue-500 focus:border-blue-500;
@@ -42,7 +42,8 @@
     }
     &:disabled {
       @apply text-gray-800 dark:text-gray-700;
-      @apply border-gray-300 dark:border-gray-100;
+      @apply border-none dark:border-none;
+      //@apply border-gray-300 border-gray-100;
       @apply bg-gray-200 dark:bg-gray-400;
     }
   }

@@ -1,6 +1,5 @@
-import { reactive } from 'vue'
 import { differenceInHours, differenceInSeconds, format } from 'date-fns'
-import { isEmpty, find, map, filter, reduce, isObject, isArray, isNumber, forEach } from 'lodash'
+import { isEmpty, map, filter, forEach } from 'lodash'
 import { enCA } from 'date-fns/locale'
 
 export const localDateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
@@ -166,61 +165,3 @@ export function jsonToFormData (json){
 
   return FORM_DATA;
 }
-
-
-
-/**
- * useReview
- * experimental
- */
-export const review = reactive({
-  data: [] as any,
-  peer(arr: object[]) {
-    if(isEmpty(arr)) return this;
-    // @ts-ignore
-    this.data = map(arr, review => review)
-    return this;
-  },
-  self: function(arr: object[], userId: string) {
-    if(isEmpty(arr)) return this;
-    // @ts-ignore
-    this.data = filter(arr, { evaluatee: userId })
-    return this;
-  },
-  where: function(value?: string) {
-    if(isEmpty(value) || isEmpty(this.data)) return this;
-    // @ts-ignore
-    this.data = map(this.data, review => {
-      return find(review.details, {criteria_number: value})
-    })
-    return this;
-  },
-  find: function(value?: string|number|Date) {
-    if(isEmpty(value) || isEmpty(this.data)) return this;
-    // @ts-ignore
-    if(Array.isArray(this.data)) {
-      // @ts-ignore
-      this.data = this.data[0][value];
-    } else {
-      // @ts-ignore
-      this.data = this.data[value];
-    }
-    return this;
-  },
-  findAll: function (value: string) {
-    if(isEmpty(value) || isEmpty(this.data)) return this;
-    // TODO:: return object[]
-    // this.data = chunk // maybe??
-    return this;
-  },
-  reduce: function (value: string, average?: string) {
-    if(isEmpty(value) || isEmpty(this.data)) return this;
-    this.data = reduce(map(this.data, d => d[value]), (acc, val) => {
-      return (acc + Number(val) / (average ? this.data.length : 1))
-    }, 0)
-    return this;
-  },
-  result: function() {
-    return this.data
-  },
-})

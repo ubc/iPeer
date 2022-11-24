@@ -17,8 +17,8 @@
 
 @layer components {
   .debugger {
-    //display: none;
-    //@apply hidden;
+    display: none;
+    @apply hidden;
   }
   .theme {
     svg {

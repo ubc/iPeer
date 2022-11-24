@@ -33,11 +33,10 @@ function getResponseDetails(member_id:string, question_num:string): string {
 </script>
 
 <template>
-  <div :class="`datatable question_${question.question_num} mx-4`">
+  <div :class="`datatable question_${question.question_num}`">
     <div class="question">{{ question.question_num }}. {{ question.title }} <span class="text-red-500" v-if="question.required">*</span></div>
-    <div class="description text-sm text-slate-900 leading-relaxed mx-4 mb-2">{{ question.instructions }}</div>
+    <div class="description">{{ question.instructions }}</div>
     <div class="mx-4">
-      <!-- TODO:: fire the ['update:initialState'] every 300~500 ms -->
       <CustomInputField
         :name="`data[${currentUser.id}][EvaluationMixeval][${question.question_num}][question_comment]`"
         :value="getResponseDetails(currentUser.id, question.question_num)"
