@@ -1,0 +1,147 @@
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  color: #333;
+}
+/**, ::after, ::before {*/
+/*  box-sizing: border-box;*/
+/*}*/
+
+*, ::after, ::before {
+  box-sizing: inherit;
+}
+body {
+  font-family: 'Lato', serif; /* provided by Google Web Fonts */
+  background: #eee;
+}
+
+/* Open Sans to enable font-weight: 600 */
+h1,h2,h3,h4,h5,h6,th {
+  font-family: 'Open Sans', serif; /* provided by Google Web Fonts */
+}
+b, strong {
+  font-weight: 600;
+}
+
+/* CONTENT CONTAINER */
+.containerOuter {
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  padding: 2em;
+  background: white;
+  box-shadow: 0 0 25px rgba(85, 85, 85, 0.28);
+  /*min-width: 540px;*/
+}
+
+.pagewidth {
+  /*min-width: 780px;*/
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0.5em;
+}
+
+
+a:link, a:visited, a:hover, input[type="submit"], button {
+  color: #1049b1;
+  text-decoration: none;
+}
+
+a:hover, a:hover *, input[type="submit"]:hover, button:hover {
+  color: green !important;
+}
+
+/* NAVIGATION */
+#navigationOuter {
+  float: left;
+  width: 100%;
+  padding: 4px 0 0 1px;
+  margin: 1em 0 1.5em;
+  border: solid 1px #ccc;
+  background: #fff;
+  box-shadow: 0 0 25px rgba(85, 85, 85, 0.28);
+}
+
+.navigation ul {
+  padding: 0.5em 0; /* needed to expand the div, keep a from overflowing the ul */
+  background-color: white;
+}
+
+.navigation li {
+  display: inline;
+  list-style: none;
+  text-align: center;
+}
+
+.navigation a {
+  color: #0a2a64;
+  font-weight: 600;
+  text-align: center;
+  padding: 9px 0.5em;
+  text-decoration: none;
+  background-color: #fff;
+  margin-top: 1px;
+}
+
+.navigation ul li:first-child a {
+  padding-left: 1em;
+}
+
+.navigation #current a,
+.navigation a:hover,
+.navigation a:active {
+  background: none;
+  border-bottom: solid 3px gold;
+}
+
+.navigation .miniLinks {
+  font-family: 'Open Sans', serif;
+  font-size: 0.8em;
+  padding: 7px 0.8em;
+  float: right;
+  border-bottom: solid 3px #fff;
+}
+
+
+.message {
+  position: relative;
+  padding: .75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: .25rem;
+}
+.message.error-message {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+
+/* FOOTER */
+#footer {
+  font-size: 0.72em;
+  color: #333;
+  text-align: center;
+
+  padding-top: 1em;
+  padding-bottom: 1em;
+  overflow: auto;
+}
+#footer p {
+  margin: auto
+}

@@ -67,24 +67,9 @@ class ReviewsSimpleRequestComponent extends CakeObject
         $sub = $this->controller->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $userId);
         $generalCommentRelease = array_sum(Set::extract($evaluateeDetails, '/EvaluationRubric/comment_release'));
         $detailedCommentRelease = array_sum(Set::extract($evaluateeDetails, '/EvaluationRubricDetail/comment_release'));
-        /**
-        $status = [
-            'comment'           => ($generalCommentRelease + $detailedCommentRelease),
-            'grade'             => array_product(Set::extract($evaluateeDetails, '/EvaluationSimple/grade_release')),
-            'autoRelease'       => $autoRelease,
-        ];*/
         
         $groupMembers = $this->controller->User->getEventGroupMembersNoTutors($event['Group']['id'], $event['Event']['self_eval'], empty($studentId) ? $userId : $studentId);
         $penalties = $this->controller->Penalty->getPenaltyByEventId($event['Event']['id']);
-    
-    
-        // JK: http_response_code(200);
-        // JK: echo json_encode([
-        // JK:     'studentResult'     => $studentResult,
-        // JK:     'gradeReleased'     => $studentResult['gradeReleased'],
-        // JK:     'commentReleased'   => $studentResult['commentReleased']
-        // JK: ]);
-        // JK: exit;
         
         $simple = [
             'remaining'             => (int) '200',
@@ -99,20 +84,12 @@ class ReviewsSimpleRequestComponent extends CakeObject
             'group'                 => $this->getGroup($event['Group']),
             'course'                => $this->getCourse($event['Event']['course_id']),
             'simple'                => $simple,
-            // 'simple'                => $this->getSimple([]),
             'evaluator'             => $this->getReviews($evaluatorDetails),
-            // 'evaluatee'             => $this->getReviews($evaluateeDetails), /** returns object[] with students info */
             'evaluatee'             => $this->getEvaluateeReviews($evaluateeDetails), /** returns string[] with the scores & comments only */
             'members'               => $this->getMembers($groupMembers),
         ];
         
         $this->JsonResponse->setContent($data)->withStatus(200);
-        
-        // REMOVE $this->set('studentResult', $studentResult);
-        // REMOVE $this->set('gradeReleased', $studentResult['gradeReleased']);
-        // REMOVE $this->set('commentReleased', $studentResult['commentReleased']);
-        // REMOVE $this->render('student_view_simple_evaluation_results');
-        // REMOVE return;
     }
     
     /**
@@ -180,44 +157,6 @@ class ReviewsSimpleRequestComponent extends CakeObject
         $output['is_ended'] = $event['is_ended'];
         $output['due_in'] = $event['due_in'];
         
-        
-        /**
-        $output = [];
-        foreach ($events as $event) {
-            // trim data as needed
-            $output['id'] = $event['id'];
-            $output['title'] = $event['title'];
-            // $output['course_id'] = $event['course_id'];
-            // $output['description'] = $event['description'];
-            $output['event_template_type_id'] = $event['event_template_type_id'];
-            $output['template_id'] = $event['template_id'];
-            $output['self_eval'] = $event['self_eval'];
-            $output['com_req'] = $event['com_req'];
-            $output['auto_release'] = $event['auto_release'];
-            $output['enable_details'] = $event['enable_details'];
-            $output['due_date'] = $event['due_date'];
-            // $output['release_date_begin'] = $event['release_date_begin'];
-            // $output['release_date_end'] = $event['release_date_end'];
-            $output['result_release_date_begin'] = $event['result_release_date_begin'];
-            $output['result_release_date_end'] = $event['result_release_date_end'];
-            $output['record_status'] = $event['record_status'];
-            // $output['creator_id'] = $event['creator_id'];
-            // $output['created'] = $event['created'];
-            // $output['updater_id'] = $event['updater_id'];
-            // $output['modified'] = $event['modified'];
-            // $output['canvas_assignment_id'] = $event['canvas_assignment_id'];
-            // $output['creator'] = $event['creator'];
-            // $output['updater'] = $event['updater'];
-            $output['response_count'] = $event['response_count'];
-            $output['to_review_count'] = $event['to_review_count'];
-            $output['student_count'] = $event['student_count'];
-            $output['group_count'] = $event['group_count'];
-            $output['completed_count'] = $event['completed_count'];
-            $output['is_released'] = $event['is_released'];
-            $output['is_result_released'] = $event['is_result_released'];
-            $output['is_ended'] = $event['is_ended'];
-            $output['due_in'] = $event['due_in'];
-        }*/
         return $output;
     }
     

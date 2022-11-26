@@ -1,0 +1,57 @@
+/* BANNER */
+.banner {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-bottom: none;
+  background-color: #fff;
+}
+
+#bannerLarge {
+  height: 40px;
+  margin: -2em;
+  padding: 2em 1em;
+  background: #eee;
+}
+
+#customLogo {
+  float: right;
+  margin-right: 1em;
+}
+
+#bannerLogoImgLeft {
+  padding-right: 0.5em;
+}
+
+#bannerLogoImgRight {
+  height: 40px;
+}
+
+#ipeerLogo {
+  float: left;
+  margin-left: 1em;
+}
+
+#bannerLogoText {
+  font-size: 1em;
+  font-weight: 200;
+  font-style: italic;
+}
+
+#ipeerI {
+  font-size: 32px;
+}
+
+#ipeerText {
+  font-size: 36px;
+}
+
+a#home, a#home:hover, a#home:active {
+  text-decoration: none;
+  color: black;
+  background-color: transparent;
+}
+
+#bannerLarge + h1.title {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}

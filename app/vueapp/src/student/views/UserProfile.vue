@@ -99,7 +99,7 @@ const currentUser   = computed(() => auth.getCurrentUser)
       <div class="your-account">
         <CustomInputField
             v-for="{ name, label, ...attrs } of fields.account" :key="name"
-            class="profile"
+            class="max-w-xl"
             :label="label"
             :name="`data[User][${name}]`"
             :value="values[name]"
@@ -117,7 +117,7 @@ const currentUser   = computed(() => auth.getCurrentUser)
       <div class="your-password">
         <CustomInputField
             v-for="{ name, label, ...attrs } of fields.password" :key="name"
-            class="profile"
+            class="max-w-xl"
             :label="label"
             :name="`data[User][${name}]`"
             :value="values[name]"

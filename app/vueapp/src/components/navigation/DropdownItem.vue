@@ -1,10 +1,12 @@
 <script lang="ts" setup>
 import { ref, reactive, watch, computed, onMounted } from 'vue';
+import { useAuthStore } from '@/stores/auth'
 
 import type { IUser } from '@/types/typings'
 interface Props {
   currentUser: IUser
 }
+const authStore = useAuthStore()
 // REFERENCES
 const emit = defineEmits<{}>()
 const props = defineProps<Props>()
@@ -40,7 +42,7 @@ function toggleDropdown(): void {
              @click="toggleDropdown"
         >
           {{ props.currentUser?.first_name }} {{ props.currentUser?.last_name }}
-          <svg @click="toggleNavDropdown" class="w-6 h-6 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <svg class="w-6 h-6 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
           </svg>
         </div>

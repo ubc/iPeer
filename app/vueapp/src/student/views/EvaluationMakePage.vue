@@ -15,12 +15,9 @@ const props = defineProps<{
 }>()
 const router = useRouter()
 // DATA
-const members     = toRef(props, 'members')
-const currentUser = toRef(props, 'currentUser')
-const evaluation  = toRef(props, 'evaluation')
 // COMPUTED
 const template = computed(() => {
-  switch (evaluation.value?.event_template_type_id) {
+  switch (props.evaluation?.event_template_type_id) {
     case '1':
       return defineAsyncComponent(() => import('@/student/views/templates/SimpleEvaluation.vue'))
     case '2':
@@ -35,34 +32,27 @@ const template = computed(() => {
 // WATCH
 // LIFECYCLE
 onMounted(() => {
-  console.log({'evaluation': evaluation.value})
-  /**
-  if(evaluation.value?.is_released) {
-    if(evaluation.value?.is_result_released) {
-      router.push({ name: 'submission.view' })
-    } else {
-      if(evaluation.value?.status === '1') {
-        router.push({ name: 'evaluation.edit' })
+  if( import.meta.env.VITE_APP_ENV !== 'development' ) {
+    /** ::NOTE::
+     * Remove the first if() statement for production
+     * the if() statement allows developer to view unfinished
+     * work even if the eval results are released
+     **/
+    if(props.evaluation?.is_released) {
+      if (props.evaluation?.is_result_released) {
+        router.push({ name: 'submission.view' })
       } else {
-        router.push({ name: 'evaluation.make' })
+        if(props.evaluation?.status === '1') {
+          router.push({ name: 'evaluation.edit' })
+        } else {
+          router.push({ name: 'evaluation.make' })
+        }
       }
-    }
-  } else {
-    router.push({ name: 'not.found' })
-  }*/
-
-  /**
-  if(evaluation.value?.is_released && evaluation.value?.is_result_released) {
-    router.push({ name: 'submission.view' })
-  } else if(evaluation.value?.is_released) {
-    if(evaluation.value?.status === '1') {
-      router.push({ name: 'evaluation.edit' })
     } else {
-      router.push({ name: 'evaluation.make' })
+      router.push({ name: 'not.found' })
     }
-  } else {
-    router.push({ name: 'not.found' })
-  }*/
+  }
+
 })
 </script>
 
@@ -70,14 +60,14 @@ onMounted(() => {
   <div class="evaluation-make-page">
     <component
       :is="template"
-      :members="members"
-      :evaluation="evaluation"
-      :currentUser="currentUser"
+      :members="props.members"
+      :evaluation="props.evaluation"
+      :currentUser="props.currentUser"
     >
       <template v-slot:header></template>
       <template v-slot:main></template>
       <template v-slot:footer><TakeNote /></template>
-      <template v-slot:cta="{ onSave, isSubmitting }">
+      <template v-slot:cta="{ onSave, isSubmitting }" v-if="!props.evaluation?.is_result_released">
         <div class="cta">
           <button type="button" class="button default flex items-center" @click="onSave">
             <span>Save Draft</span>

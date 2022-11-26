@@ -46,9 +46,6 @@ class JsonResponseComponent extends CakeObject
      */
     protected function setHeaders(): JsonResponseComponent
     {
-        // http_response_code($this->status);
-        // header('Content-Type: application/json');
-        // header('Content-length: '.strlen($this->response->data));
         return $this;
     }
     
@@ -95,30 +92,4 @@ class JsonResponseComponent extends CakeObject
         
         return $this;
     }
-    
-    /**
-     * @param string $statusText
-     * @return $this
-     */
-    /**
-    public function withStatusText(string $statusText): JsonResponseComponent
-    {
-        $this->body['statusText'] = $statusText;
-        echo json_encode($this->response);
-        $this->setHeaders();
-        return $this;
-    }*/
-    
-    /**
-     * Set the exception to attach to the response.
-     * @param $e
-     * @return $this
-     */
-    public function withException($e): JsonResponseComponent
-    {
-        echo [];
-        return $this;
-    }
 }
-
-//$jsonResponse = new JsonResponseComponent();

@@ -1,0 +1,153 @@
+
+.text-base {
+  font-size: 1rem; /* 16px */
+  line-height: 1.5rem; /* 24px */
+}
+.w-12 {width: 3.5rem}
+.h-12 {height: 3.5rem}
+
+h1, h2, h3 {
+  font-family: Garamond,Baskerville,Baskerville Old Face,Hoefler Text,Times New Roman,serif;
+}
+h1 {}
+h1.title {
+  margin: 0.5em 0 1em;
+  font-size: 2.6em;
+  font-weight: normal;
+}
+h2 {}
+h2.title {
+  padding: .3em .5em;
+  font-size: 1.6em;
+  font-weight: 600;
+  background: #8c629f;
+  box-shadow: 0 0 5px rgba(85, 85, 85, 0.28);
+  color: #fff;
+
+}
+h3 {}
+h3.subtitle {
+  padding-bottom: .3em;
+  font-size: 1.6em;
+  font-weight: 500;
+  border-bottom: 2px solid #ecbb06;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  margin: .75rem auto;
+}
+p.text-base {
+  margin: 1em 0;
+  font-size: 1em;
+  line-height: 1.4em;
+}
+
+.login {}
+.login form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-top: 2rem;
+}
+.login form .input {}
+
+.login form .input.text,
+.login form .input.password {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.login form .input.text label,
+.login form .input.password label {
+  display: inline-block;
+  margin-bottom: .5rem;
+}
+
+.login form .input.text input,
+.login form .input.password input {
+  display: block;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+/** button */
+.login form .submit {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem auto;
+}
+.login form .submit input[type="submit"] {
+  border-radius: .25rem;
+  padding: .5rem 1rem;
+  background: #e7d3f1;
+  border: 1px solid #632b7d;
+  color: #632b7d;
+  font-size: 1rem;
+  font-weight: 400;
+  cursor: pointer;
+  min-width: 3rem;
+}
+
+@media(min-width:768px) {
+  h1 {
+    font-size:1.875rem
+  }
+  h2 {
+    font-size:1.5rem
+  }
+  h3 {
+    font-size:1.25rem
+  }
+  h4 {
+    font-size:1.125rem
+  }
+
+  .login {}
+  .login form {
+
+  }
+  .login form .input {}
+
+  .login form .input.text,
+  .login form .input.password {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .login form .input.text label,
+  .login form .input.password label {
+    display: inline-block;
+    margin-bottom: 0;
+
+    flex: 0 0 16.666667%;
+    max-width: 16.666667%;
+    text-align: right;
+    padding-right: .75rem;
+  }
+
+  .login form .input.text input,
+  .login form .input.password input {
+    flex: 0 0 83.333333%;
+    max-width: 83.333333%;
+    max-width: 320px;
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.25rem; /* 20px */
+  }
+
+}
+
+@media(min-width:1024px) {}
+
+@media(min-width:1280px) {}
+

@@ -16,7 +16,6 @@ interface Props {
 const emit = defineEmits<{
   (e: 'on:submit', option: any): void
   (e: 'on:save', option: any): void
-  (e: 'set:message', option: object): void
 }>()
 const props = defineProps<Props>()
 const router = useRouter()
@@ -60,44 +59,26 @@ async function onSave() {
 
 // WATCH
 watch(() => cloneDeep(props.initialState), debounce(async (current, previous) => {
-  const formData = new FormData(evaluation_form.value)
-  formData.append('_method', 'PUT')
-  const searchParams = new URLSearchParams()
-  for (const pair of formData) {
-    searchParams.append(pair[0], pair[1])
+  if(!props.evaluation?.is_result_released) {
+    const formData = new FormData(evaluation_form.value)
+    formData.append('_method', 'PUT')
+    const searchParams = new URLSearchParams()
+    for (const pair of formData) {
+      searchParams.append(pair[0], pair[1])
+    }
+    await evaluationStore.autoSaveEvaluation(searchParams, props.evaluation?.id, props.evaluation?.group?.id)
   }
-  await evaluationStore.autoSaveEvaluation(searchParams, props.evaluation?.id, props.evaluation?.group?.id)
-
-
-
-  // autosave.value = true
-  // try {
-  //   const formData = new FormData(evaluation_form.value)
-  //   formData.append('_method', 'PUT')
-  //   const searchParams = new URLSearchParams()
-  //   for (const pair of formData) {
-  //     searchParams.append(pair[0], pair[1])
-  //   }
-  //   const response = await api.post('/evaluations/makeEvaluation', `${props.evaluation?.id}/${props.evaluation?.group?.id}`, searchParams)
-  //   if(response.status === 200 && response.statusText === 'OK') {
-  //     autosave.value = false
-  //   }
-  // } catch (err: any) {
-  //   message.value = {text: 'something went wrong...', status: 500, type: 'error'}
-  //   // message.value = { text: err.response.data.message, status: err.response.status, type: 'error' }
-  // } finally {
-  //   autosave.value = false
-  // }
 }, 5000), {deep: true})
-watch(message, (event: object) => {
-  emit('set:message', event)
-}, { deep: true })
 // LIFECYCLE
 </script>
 
 <template>
   <form novalidate @submit.prevent="onSubmit" id="evaluation_form" class="evaluation-form" ref="evaluation_form">
-    <slot :values="values" :errors="errors" :form-meta="meta"  :is-submitting="isSubmitting"
-         :message="message" :onSave="onSave" :evaluation-ref="evaluation_form"/>
+    <slot :values="values"
+          :errors="errors"
+          :form-meta="meta"
+          :is-submitting="isSubmitting"
+          :onSave="onSave"
+          :evaluation-ref="evaluation_form"/>
   </form>
 </template>

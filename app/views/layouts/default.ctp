@@ -18,7 +18,10 @@
         echo $html->css('https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/cupertino/jquery-ui.css');
         echo $html->css('https://fonts.googleapis.com/css?family=Lato:400,400italic,700');
         echo $html->css('https://fonts.googleapis.com/css?family=Open+Sans:400,600,700');
-        echo $this->Html->css('ipeer');
+        echo $this->Html->css('layout');
+        echo $this->Html->css('banner');
+        echo $this->Html->css('login');
+        //echo $this->Html->css('ipeer');
         
         // Scripts
         // as prototype does not appear to be maintained anymore, we should

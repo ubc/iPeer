@@ -20,7 +20,15 @@ const error     = computed(() => reviewsStore.error)
 const hasError  = computed(() => reviewsStore.hasError)
 // METHODS
 function getAdditionalComment(score: string|any) {
-  return '??'
+  if(score < 50) {
+    return 'less than'
+  } else if(score > 51 && score < 70) {
+    return ''
+  } else if(score > 71 && score < 90) {
+    return ''
+  } else if(score > 91) {
+    return 'more than'
+  }
 }
 // WATCH
 // LIFECYCLE
@@ -36,15 +44,15 @@ function getAdditionalComment(score: string|any) {
         <thead>
         <tr>
           <th style="width: 20%">
-            <div class="text-base font-medium leading-4 tracking-wide">
+            <div class="flex flex-col">
               <div class="">Peers</div>
-              <div class=""></div>
+              <small class="small"></small>
             </div>
           </th>
           <th style="width: 80%">
-            <div class="text-base font-medium leading-4 tracking-wide">
+            <div class="flex flex-col">
               <div class="">{{ 'Your Relative Contribution' }}</div>
-              <div class=""></div>
+              <small class="small"></small>
             </div>
           </th>
           <!--
@@ -60,10 +68,10 @@ function getAdditionalComment(score: string|any) {
         <tr>
           <td><UserCard :member="{ first_name: props.reviews?.status?.members_count, last_name: 'Peers' }" /></td>
           <td>
-            <ul class="range review text-sm text-left font-light leading-5 tracking-wide">
+            <ul class="range review">
               <template v-if="props.reviews?.evaluatee?.scores.length">
-                <li class="input list-disc list-inside" v-for="(score, index) of props.reviews?.evaluatee?.scores" :key="`${index}_${score}`">
-                  1 peer said you contributed {{ getAdditionalComment(score) }}/{{ score }} a fair amount
+                <li class="input" v-for="(score, index) of props.reviews?.evaluatee?.scores" :key="`${index}_${score}`">
+                  1 peer said you contributed {{ getAdditionalComment(score) }} a fair amount
                 </li>
               </template>
               <template v-else>
@@ -95,15 +103,15 @@ function getAdditionalComment(score: string|any) {
         <thead>
         <tr>
           <th style="width: 20%">
-            <div class="text-base font-medium leading-4 tracking-wide">
+            <div class="flex flex-col">
               <div class="">Peer</div>
-              <div class=""></div>
+              <small class="small"></small>
             </div>
           </th>
           <th style="width: 80%">
-            <div class="text-base font-medium leading-4 tracking-wide">
+            <div class="flex flex-col">
               <div class="">Comments About Your Teamwork</div>
-              <div class=""></div>
+              <small class="small"></small>
             </div>
           </th>
         </tr>
@@ -113,16 +121,18 @@ function getAdditionalComment(score: string|any) {
         <tr v-for="(comment, index) of props.reviews?.evaluatee?.comments" :key="`${comment}_${index}`">
           <td><UserCard :member="{first_name: 'Peer', last_name: ''}" class="font-medium" /></td>
           <td style="text-align: left">
-            <div class="quotes text-sm text-left font-light leading-5 tracking-wide">{{ comment }}</div>
+            <ul class="sentence review">
+              <li class="text quote">{{ comment }}</li>
+            </ul>
           </td>
         </tr>
         </template>
         <template v-else>
           <tr>
             <td colspan="2">
-              <div class="text-center font-light">
-                <div class="text-lg tracking-wider leading-relaxed">No Comments About Your Teamwork.</div>
-              </div>
+              <ul class="flex flex-col">
+                <li class="no-content-found">No Comments About Your Teamwork.</li>
+              </ul>
             </td>
           </tr>
         </template>

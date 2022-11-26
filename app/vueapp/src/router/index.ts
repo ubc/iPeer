@@ -26,6 +26,7 @@ export const routes = [
         path: '',
         name: 'student.events',
         component: () => import('../pages/EventsIndex.vue'),
+        alias: '/home',
         props: true,
         meta: {
           title: 'iPeer Dashboard',

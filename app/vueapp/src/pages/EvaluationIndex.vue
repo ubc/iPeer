@@ -39,8 +39,8 @@ const store             = useStore()
 const authStore         = useAuthStore()
 const evaluationStore   = useEvaluationStore()
 // DATA
-const event_id          = ref(route.params.event_id)
-const group_id          = ref(route.params.group_id)
+const event_id          = ref<string|any>(route.params?.event_id)
+const group_id          = ref<string|any>(route.params?.group_id)
 const status            = ref<string>('')
 const state             = reactive({
   loading: computed(() => evaluationStore.loading),
@@ -63,7 +63,6 @@ const notification = computed(() => store.getNotification)
 const evaluationPage = computed(() => {
   // Check if evaluation started
   if(state.evaluation?.is_released) {
-
     switch (route.name) {
       case 'evaluation.make':
         return defineAsyncComponent(() => import('@/student/views/EvaluationMakePage.vue'))
@@ -72,46 +71,13 @@ const evaluationPage = computed(() => {
       default:
         break
     }
-
   } else {
     router.push({ name: 'student.events' })
   }
 })
 // METHODS
-/** REMOVE
-async function fetchEvaluation() {
-  status.value = 'PENDING'
-  try {
-    const response: Promise<unknown> = await api.get('/evaluations/makeEvaluation', `${event_id.value}/${group_id.value}`)
-    if(response.status === 200 && response.statusText === 'OK') {
-      await Object.assign(evaluation, response?.data?.data)
-      members.value = updateMembersCollection(response?.data?.data?.members)
-    }
-  } catch (err) {
-    message.value = {text: err.message, status: err.statusCode, type: 'error'}
-  } finally {
-    status.value = 'READY'
-  }
-}*/
-/**
-function updateMembersCollection(_members:User[]) {
-  let tmp = [..._members]
-  const index = findIndex(tmp, { id: props.currentUser?.id})
-  if (index === -1) {
-    return _members
-  } else {
-    const spliced = tmp.splice(index, 1)
-    return [...tmp, {...spliced[0], first_name: 'Yourself', last_name: ''}]
-  }
-}
-*/
-// function setMessage(event) {
-//   message.value = event
-//   emit('set:message', event)
-// }
 // WATCH
 // LIFECYCLE
-// onMounted(async () => await fetchEvaluation())
 onMounted(async () => await evaluationStore.fetchEvaluation(event_id.value, group_id.value))
 </script>
 

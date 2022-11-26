@@ -5,7 +5,14 @@ class JsonHandlerComponent extends CakeObject
 {
     public $controller;
     public $settings;
-    public $components = ['JsonHandler', 'JsonResponse', 'RestResponseHandler'];
+    public $components = [
+        'JsonHandler', 'JsonResponse',
+        'EventResource',
+        'CourseResource',
+        'GroupResource',
+        'UserCollection',
+        'PenaltyResource', 'PenaltyCollection',
+    ];
     
     public function initialize($controller, $settings)
     {
@@ -14,76 +21,23 @@ class JsonHandlerComponent extends CakeObject
     }
     
     /**
-     * @param array $result
-     * @param string|null $userId
-     * @return array
-     */
-    public function formatEvents(array $result, string $userId = null): array
-    {
-        $data = [];
-        foreach ($result as $row) {
-            $tmp = [];
-            isset($row['Event']['id']) ? $tmp['event'] = [
-                'id' => $row['Event']['id'],
-                'title' => $row['Event']['title'],
-                'course_id' => $row['Event']['course_id'],
-                'description' => $row['Event']['description'],
-                'event_template_type_id' => $row['Event']['event_template_type_id'],
-                'template_id' => $row['Event']['template_id'],
-                'self_eval' => $row['Event']['self_eval'],
-                'com_req' => $row['Event']['com_req'],
-                'auto_release' => $row['Event']['auto_release'],
-                'enable_details' => $row['Event']['enable_details'],
-                'due_date' => $row['Event']['due_date'],
-                'release_date_begin' => $row['Event']['release_date_begin'],
-                'release_date_end' => $row['Event']['release_date_end'],
-                'result_release_date_begin' => $row['Event']['result_release_date_begin'],
-                'result_release_date_end' => $row['Event']['result_release_date_end'],
-                'record_status' => $row['Event']['record_status'],
-                'is_submitted' => $this->isSubmitted($row['Event']['id'], $row['Group']['id'], $userId),
-                'is_released' => $row['Event']['is_released'],
-                'is_result_released' => $row['Event']['is_result_released'],
-                'is_ended' => $row['Event']['is_ended'],
-                'due_in' => $row['Event']['due_in'],
-            ] : null;
-            isset($row['Course']['id']) ? $tmp['course'] = [
-                'id' => $row['Course']['id'],
-                'course' => $row['Course']['course'],
-                'title' => $row['Course']['title'],
-                'term' => $row['Course']['term'],
-            ] : null;
-            isset($row['Group']['id']) ? $tmp['group'] = [
-                'id' => $row['Group']['id'],
-                'group_num' => $row['Group']['group_num'],
-                'group_name' => $row['Group']['group_name'],
-                'member_count' => $row['Group']['member_count'],
-            ] : null;
-            isset($row['Penalty']) && !empty($row['Penalty']) ? $tmp['penalties'] = $row['Penalty'] : null;
-            isset($row['late']) ? $tmp['late'] = $row['late'] : null;
-            isset($row['percent_penalty']) ? $tmp['percent_penalty'] = $row['percent_penalty'] : null;
-            array_push($data, $tmp);
-        }
-        return $data;
-    }
-    
-    /**
      * @param array $data
      * @return void
      */
     public function formatSimpleEvaluation(array $data): void
     {
-        $json = $this->getEventData($data);
-        $json['member_count'] = $data['evaluateeCount'];
-        $json['member_ids'] = $data['memberIDs'];
-        $json['simple'] = $this->getSimpleEvaluationSettings($data['questions']);
-        $json['simple']['remaining'] = $data['remaining'];
-        $json['simple']['data'] = [
-            'points'    => [],
-            'comments'  => []
-        ];
-        $json['response'] = $this->getSimpleEvaluationSubmission($data['submission'], $data['evaluation']);
-        // $this->RestResponseHandler->toJson('SimpleEvaluation', 200, $json);
-    
+        $json                   = $this->EventResource->toArray($data);
+        $json['course']         = $this->CourseResource->courseById($data['event']['Event']['course_id']);
+        $json['group']          = $this->GroupResource->groupByIdEventId($data['event']['Group']['id'], $data['event']['Event']['id']);
+        $json['members']        = $this->UserCollection->eventGroupMembersNoTutors($data['event']['Group']['id'], $data['event']['Event']['self_eval']);
+        $json['penalty']        = $this->PenaltyResource->penaltyFinalByEventId($data['event']['Event']['id']);
+        //
+        $json['member_count']   = $data['evaluateeCount'];
+        $json['member_ids']     = $data['memberIDs'];
+        //
+        $json['simple']         = $this->getSimpleEvaluationSettings($data);
+        $json['response']       = $this->getSimpleEvaluationSubmission($data['submission'], $data['evaluation']);
+        //
         $this->JsonResponse->setContent($json)->withStatus(200);
         exit;
     }
@@ -94,17 +48,23 @@ class JsonHandlerComponent extends CakeObject
      */
     public function formatRubricEvaluation(array $data): void
     {
-        $json = $this->getEventData($data);
-        $json['member_count'] = $data['evaluateeCount'];
-        $json['rubric_id'] = $data['rubricId'];
-        $json['all_done'] = $data['allDone'];
-        $json['gen_com_req'] = $data['comReq']; // general comment section
-        $json['member_ids'] = $data['memberIDs'];
-        $json['rubric'] = $this->getRubricEvaluationSettings($data['questions']) ?? null;
+        $json                   = $this->EventResource->toArray($data);
+        $json['course']         = $this->CourseResource->courseById($data['event']['Event']['course_id']);
+        $json['group']          = $this->GroupResource->groupByIdEventId($data['event']['Group']['id'], $data['event']['Event']['id']);
+        $json['members']        = $this->UserCollection->eventGroupMembersNoTutors($data['event']['Group']['id'], $data['event']['Event']['self_eval']);
+        $json['penalty']        = $this->PenaltyResource->penaltyFinalByEventId($data['event']['Event']['id']);
+        //
+        $json['member_count']   = $data['evaluateeCount'];
+        $json['member_ids']     = $data['memberIDs'];
+        //
+        $json['rubric_id']      = $data['rubricId'];
+        $json['all_done']       = $data['allDone'];
+        $json['gen_com_req']    = $data['comReq']; // general comment section
+        //
+        $json['rubric']         = $this->getRubricEvaluationSettings($data['questions']) ?? null;
         $json['rubric']['data'] = $this->getRubricEvaluationData($data['questions']) ?? null;
-        $json['response'] = isset($data['groupMembers']) ? $this->getRubricEvaluationSubmission($data['submission'], $data['groupMembers']) : null;
-        //$this->RestResponseHandler->toJson('RubricEvaluation', 200, $json);
-    
+        $json['response']       = isset($data['groupMembers']) ? $this->getRubricEvaluationSubmission($data['submission'], $data['groupMembers']) : null;
+        
         $this->JsonResponse->setContent($json)->withStatus(200);
         exit;
     }
@@ -115,145 +75,23 @@ class JsonHandlerComponent extends CakeObject
      */
     public function formatMixedEvaluation(array $data): void
     {
-        $json = $this->getEventData($data);
-        $json['member_count'] = $data['memberCount'];
-        $json['enrol'] = $data['enrol'];
-        $json['member_ids'] = $data['memberIDs'];
-        $json['mixed'] = [
-            'id' => $data['mixeval']['Mixeval']['id'],
-            'availability' => $data['mixeval']['Mixeval']['availability'],
-            'name' => $data['mixeval']['Mixeval']['name'],
-            'peer_question' => $data['mixeval']['Mixeval']['peer_question'],
-            'self_eval' => $data['mixeval']['Mixeval']['self_eval'],
-            'total_question' => $data['mixeval']['Mixeval']['total_question'],
-            'total_marks' => $data['mixeval']['Mixeval']['total_marks'],
-            'zero_mark' => $data['mixeval']['Mixeval']['zero_mark'],
-            'data' => $this->getMixedEvaluationQuestions($data['questions']),
-        ];
-        $json['response'] = $this->getMixedEvaluationSubmission($data['submission'], $data['groupMembers']);
-        //$this->RestResponseHandler->toJson('MixedEvaluation', 200, $json);
-    
+        $json                   = $this->EventResource->toArray($data);
+        $json['course']         = $this->CourseResource->courseById($data['event']['Event']['course_id']);
+        $json['group']          = $this->GroupResource->groupByIdEventId($data['event']['Group']['id'], $data['event']['Event']['id']);
+        $json['members']        = $this->UserCollection->eventGroupMembersNoTutors($data['event']['Group']['id'], $data['event']['Event']['self_eval']);
+        $json['penalty']        = $this->PenaltyResource->penaltyFinalByEventId($data['event']['Event']['id']);
+        //
+        $json['member_count']   = $data['memberCount'];
+        $json['member_ids']     = $data['memberIDs'];
+        //
+        $json['enrol']          = $data['enrol'];
+        //
+        $json['mixed']          = $this->getMixedEvaluationSettings($data);
+        $json['response']       = $this->getMixedEvaluationSubmission($data['submission'], $data['groupMembers']);
+        
         $this->JsonResponse->setContent($json)->withStatus(200);
         exit;
     }
-    
-    
-    // NOTE:: PRIVATE HELPER METHODS
-    private function isSubmitted(string $eventId, string $groupId, string $userId)
-    {
-        $submission = $this->controller->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, $userId);
-        return $submission['EvaluationSubmission']['submitted'] ?? null;
-    }
-    
-    private function getEventData($data): array
-    {
-        $output = [
-            'id' => $data['event']['Event']['id'],
-            'title' => $data['event']['Event']['title'],
-            'description' => $data['event']['Event']['description'],
-            'event_template_type_id' => $data['event']['Event']['event_template_type_id'],
-            'template_id' => $data['event']['Event']['template_id'],
-            'self_eval' => $data['event']['Event']['self_eval'],
-            'com_req' => $data['event']['Event']['com_req'],
-            'auto_release' => $data['event']['Event']['auto_release'],
-            'due_date' => $data['event']['Event']['due_date'],
-            'release_date_begin' => $data['event']['Event']['release_date_begin'],
-            'release_date_end' => $data['event']['Event']['release_date_end'],
-            'result_release_date_begin' => $data['event']['Event']['result_release_date_begin'],
-            'result_release_date_end' => $data['event']['Event']['result_release_date_end'],
-            'group_event_id' => $data['event']['GroupEvent']['id'],
-            'group' => [
-                'id' => $data['event']['Group']['id'],
-                'name' => $data['event']['Group']['group_name'],
-            ],
-            'course'                => $this->getCourseById($data['event']['Event']['course_id']),
-            'members'               => $this->getGroupMembers($data['groupMembers']),
-            'penalty'               => $data['penaltyFinal']['Penalty'],
-            'status'                => $this->isSubmitted($data['event']['Event']['id'], $data['event']['Group']['id'], $data['userId']),
-            'is_released'           => $data['event']['Event']['is_released'],
-            'is_result_released'    => $data['event']['Event']['is_result_released'],
-            'is_ended'              => $data['event']['Event']['is_ended']
-        ];
-        return $output;
-    }
-    
-    /**
-     * @param array $data
-     * @return array
-     */
-    private function getCustomEventData(array $data): array
-    {
-        if (empty($data)) return $data;
-        
-        $output = [];
-        $output['event'] = [
-            'id' => $data['event']['Event']['id'],
-            'title' => $data['event']['Event']['title'],
-            'course_id' => $data['event']['Event']['course_id'],
-            'description' => $data['event']['Event']['description'],
-            'event_template_type_id' => $data['event']['Event']['event_template_type_id'],
-            'template_id' => $data['event']['Event']['template_id'],
-            'self_eval' => $data['event']['Event']['self_eval'],
-            'com_req' => $data['event']['Event']['com_req'],
-            'due_date' => $data['event']['Event']['due_date'],
-        ];
-        $output['course'] = $this->getCourseById($data['event']['Event']['course_id']);
-        $output['members'] = $this->getGroupMembers($data['groupMembers']);
-        $output['penalties'] = $this->getPenalties($data['penalty']);
-        $output['group_event'] = $data['event']['GroupEvent'];
-        $output['group'] = $data['event']['Group'];
-        $output['penalty_final'] = $data['penaltyFinal']['Penalty'];
-        $output['penalty_days'] = $data['penaltyDays'];
-        $output['member_ids'] = $data['memberIDs'];
-        $output['evaluatee_count'] = $data['evaluateeCount'];
-        $output['user_id'] = $data['userId'];
-        $output['allDone'] = $data['allDone'];
-        $output['comReq'] = $data['comReq'];
-        
-        return $output;
-    }
-    
-    private function getCourseById(string $courseId): array
-    {
-        if(!isset($courseId)) return [];
-        $course = $this->controller->Course->getCourseById($courseId);
-        if (isset($course)) {
-            return [
-                'id'        => $course['Course']['id'],
-                'course'    => $course['Course']['course'],
-                'title'     => $course['Course']['title'],
-            ];
-        }
-        return [];
-    }
-    
-    private function getGroupMembers(array $group_members): array
-    {
-        if (empty($group_members)) return $group_members;
-        $data = [];
-        foreach ($group_members as $member) {
-            $tmp = [];
-            $tmp['id'] = $member['User']['id'];
-            $tmp['first_name'] = $member['User']['first_name'];
-            $tmp['last_name'] = $member['User']['last_name'];
-            $tmp['role_name'] = $member['Role'][0]['name'];
-            
-            $data[] = $tmp;
-        }
-        
-        return $data;
-    }
-    
-    private function getPenalties(array $penalties): array
-    {
-        if (empty($penalties)) return $penalties;
-        $data = [];
-        foreach ($penalties as $penalty) {
-            $data[] = $penalty['Penalty'];
-        }
-        return $data;
-    }
-    
     
     // Simple
     private function getSimpleEvaluationSubmission(array $submission, array $evaluation): array
@@ -278,16 +116,18 @@ class JsonHandlerComponent extends CakeObject
         return $data;
     }
     
-    private function getSimpleEvaluationSettings($questions): array
+    private function getSimpleEvaluationSettings($data): array
     {
-        if (empty($questions)) return [];
+        if (empty($data)) return [];
         return [
-            'id' => $questions['id'],
-            'availability' => $questions['availability'],
-            'name' => $questions['name'],
-            'description' => $questions['description'],
-            'point_per_member' => $questions['point_per_member'],
-            'status' => $questions['record_status'],
+            'id'                => $data['questions']['id'],
+            'availability'      => $data['questions']['availability'],
+            'name'              => $data['questions']['name'],
+            'description'       => $data['questions']['description'],
+            'point_per_member'  => $data['questions']['point_per_member'],
+            'status'            => $data['questions']['record_status'],
+            'data'              => ['points' => [], 'comments' => []],
+            'remaining'         => $data['remaining']
         ];
     }
     
@@ -400,6 +240,21 @@ class JsonHandlerComponent extends CakeObject
     }
     
     // Mixed
+    private function getMixedEvaluationSettings(array $data): array
+    {
+        return [
+            'id' => $data['mixeval']['Mixeval']['id'],
+            'availability' => $data['mixeval']['Mixeval']['availability'],
+            'name' => $data['mixeval']['Mixeval']['name'],
+            'peer_question' => $data['mixeval']['Mixeval']['peer_question'],
+            'self_eval' => $data['mixeval']['Mixeval']['self_eval'],
+            'total_question' => $data['mixeval']['Mixeval']['total_question'],
+            'total_marks' => $data['mixeval']['Mixeval']['total_marks'],
+            'zero_mark' => $data['mixeval']['Mixeval']['zero_mark'],
+            'data' => $this->getMixedEvaluationQuestions($data['questions']),
+        ];
+    }
+    
     private function getMixedEvaluationQuestions(array $questions): array
     {
         if (empty($questions)) return $questions;

@@ -37,7 +37,7 @@ export interface ICourse {
   id: string
   course: string
   title: string
-  term: string
+  term?: string
 }
 export interface IGroup {
   id: string
@@ -49,7 +49,7 @@ export interface IMember {
   id: string
   first_name: string
   last_name: string
-  role_name: string
+  role_name?: string
 }
 export interface IPenalty {
   id: string
@@ -81,7 +81,6 @@ export interface IEvaluation {
   penalty: IPenalty
   members: IMember[]
   group_event_id: string
-  status: string|null
   simple?: ISimpleEvaluation
   rubric?: IRubricEvaluation
   mixed?: IMixedEvaluation
@@ -93,6 +92,10 @@ export interface IEvaluation {
   enrol?: string
   member_ids?: string
   member_count?: string
+  status: string|null
+  is_released?: boolean
+  is_result_released?: boolean
+  is_ended?: boolean
 }
 
 /** SimpleEvaluation/Data/Detail specifics */

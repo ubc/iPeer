@@ -133,7 +133,7 @@ watch([ sort, filter, paginate ], () => {
           <td>
             <div class="work">
               <div class="event-title">{{ row?.event?.title }}</div>
-              <div class="group-name">{{ row?.group?.group_name }}</div>
+              <div class="group-name">{{ row?.group?.name }}</div>
             </div>
           </td>
           <td>

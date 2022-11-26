@@ -5,7 +5,7 @@ class HomeRequestComponent extends CakeObject
 {
     public $Sanitize;
     public $uses = [];
-    public $components = [ 'JsonHandler', 'JsonResponse'  ];
+    public $components = [ 'JsonHandler', 'JsonResponse', 'EventResource', 'EventCollection' ];
     
     public $controller;
     public $settings;
@@ -70,8 +70,9 @@ class HomeRequestComponent extends CakeObject
     private function list($events, $userId): void
     {
         $work = $this->params['url']['work'] ?? null;
-        $current = $this->JsonHandler->formatEvents($events['upcoming'], $userId);
-        $completed = $this->JsonHandler->formatEvents(array_merge($events['submitted'], $events['expired']), $userId);
+        $current = $this->EventCollection->toArray($events['upcoming']);
+        $completed = $this->EventCollection->toArray(array_merge($events['submitted'], $events['expired']));
+        
         switch ($work) {
             case 'current':
                 $this->JsonResponse->setContent($current)->withStatus(200);

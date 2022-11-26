@@ -128,13 +128,30 @@
 
     }
   }
-  .sentence.response, .paragraph.response,
-  .sentence.review, .paragraph.review {
-    @apply flex flex-col text-left space-y-2;
+  .sentence.response, .paragraph.response, .range.response,
+  .sentence.review, .paragraph.review, .range.review {
+    @apply flex flex-col text-left space-y-2 font-light;
 
     .text {
-      @apply text-sm text-left;
+      @apply text-sm text-left tracking-wider;
     }
+
+    li.input {
+      @apply text-sm list-disc list-inside tracking-wider;
+
+      span.red {
+        @apply italic text-red-500;
+      }
+      span.green {
+        @apply italic text-green-700;
+      }
+      span.blue {
+        @apply italic text-blue-500;
+      }
+    }
+  }
+
+  .range.review {
   }
 
   .block {
