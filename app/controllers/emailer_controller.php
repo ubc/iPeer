@@ -238,7 +238,7 @@ class EmailerController extends AppController
                 $tmp_data = array();
                 for ($i=1; $i<=$data['times']; $i++) {
                     $tmp_data[$i] = $data;
-                    $tmp_data[$i]['date'] = date("Y-m-d H:i:s", strtotime($date) + ($i-1)*$data['interval_type']*$data['interval_num']);
+                    $tmp_data[$i]['date'] = date("Y-m-d H:i:s", strtotime($date) + ($i-1)*intval($data['interval_type'])*intval($data['interval_num']));
                 }
                 $data = $tmp_data;
             }
