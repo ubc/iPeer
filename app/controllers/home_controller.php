@@ -122,9 +122,13 @@ class HomeController extends AppController
         $this->set('numOverdue', $numOverdue);
         $this->set('numDue', $numDue);
         
+        $this->set('title_for_layout', 'iPeer Dashboard');
         if(!User::isInstructor()) {
-            $this->render('studentIndex');
+            $this->layout = 'vue_layout';
+            $this->render('vue_student_index');
+            // $this->render('studentIndex');
         } else {
+            // $this->render('vue_combined_index');
             $this->render('combined');
         }
     }

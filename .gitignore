@@ -21,3 +21,5 @@ vendor/
 .data
 .DS_Store
 docker-compose.override.yml
+
+.php_cs.cache

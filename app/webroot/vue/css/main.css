@@ -1,0 +1,10 @@
+h1,
+h2,
+h3 {
+  font-family: Garamond, Baskerville, Baskerville Old Face, Hoefler Text,
+  Times New Roman, serif;
+}
+.page-title {
+ font-size: 2.6em;
+ font-weight: 400;
+}
