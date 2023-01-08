@@ -18,7 +18,9 @@ class HomeController extends AppController
     public $uses =  array( 'Group', 'GroupEvent',
         'User', 'UserCourse', 'Event', 'EvaluationSubmission',
         'Course', 'Role', 'UserEnrol', 'Rubric', 'Penalty');
-
+    public $components = ['RequestHandler', 'HomeRequest'];
+    public $method  = "";
+    public $body    = "";
     /**
      * __construct
      *
@@ -28,6 +30,7 @@ class HomeController extends AppController
     function __construct()
     {
         parent::__construct();
+        $this->method  = $_SERVER['REQUEST_METHOD'];
     }
 
     /**
@@ -42,7 +45,7 @@ class HomeController extends AppController
 
         $this->set('title_for_layout', __('Home', true));
     }
-
+    
     /**
      * index
      *
@@ -115,21 +118,34 @@ class HomeController extends AppController
         foreach ($evals['upcoming'] as $e) {
             $e['late'] ? $numOverdue++ : '';
         }
-
-
-        $this->set('evals', $evals);
-        $this->set('surveys', $surveys);
-        $this->set('numOverdue', $numOverdue);
-        $this->set('numDue', $numDue);
-        
-        $this->set('title_for_layout', 'iPeer Dashboard');
-        if(!User::isInstructor()) {
-            $this->layout = 'vue_layout';
-            $this->render('vue_student_index');
-            // $this->render('studentIndex');
-        } else {
-            // $this->render('vue_combined_index');
-            $this->render('combined');
+    
+        /**
+         * promoting json request
+         */
+        if ($this->RequestHandler->accepts('json')) {
+            $this->layout = false;
+            $this->autoRender = false;
+            $userId = User::get('id');
+            
+            if(!User::isInstructor()) {
+                $this->HomeRequest->processStudentCollectionRequest($events['Evaluations'], $userId);
+            } else {
+                $this->pre_r('Request for InstructorView');
+            }
+        }
+        elseif ($this->RequestHandler->accepts('html')) {
+            $this->set('evals', $evals);
+            $this->set('surveys', $surveys);
+            $this->set('numOverdue', $numOverdue);
+            $this->set('numDue', $numDue);
+    
+            $this->set('title_for_layout', 'iPeer Dashboard');
+            if(!User::isInstructor()) {
+                $this->layout = 'vue_layout';
+                $this->render('vue_student_index'); // studentIndex
+            } else {
+                $this->render('combined'); // vue_combined_index
+            }
         }
     }
 
