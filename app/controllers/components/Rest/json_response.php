@@ -7,16 +7,23 @@ class JsonResponseComponent extends CakeObject
     public $components = [];
     
     private $statuses = [
+        // Success
         '200' => ['status' => 200, 'statusText' => 'OK', 'type' => 'success'],
         '201' => ['status' => 201, 'statusText' => 'Created', 'type' => 'success'],
         '202' => ['status' => 202, 'statusText' => 'Accepted', 'type' => 'success'],
         '204' => ['status' => 204, 'statusText' => 'No Content', 'type' => 'success'],
+        // Client Error
         '400' => ['status' => 400, 'statusText' => 'Bad Request', 'type' => 'error'],
         '401' => ['status' => 401, 'statusText' => 'Unauthorized', 'type' => 'error'],
         '403' => ['status' => 403, 'statusText' => 'Forbidden', 'type' => 'error'],
         '404' => ['status' => 404, 'statusText' => 'Not Found', 'type' => 'error'],
         '405' => ['status' => 405, 'statusText' => 'Method Not Allowed', 'type' => 'error'],
+        // Server Error
         '500' => ['status' => 500, 'statusText' => 'Internal Server Error', 'type' => 'error'],
+        '501' => ['status' => 501, 'statusText' => 'Not Implemented', 'type' => 'error'],
+        '502' => ['status' => 502, 'statusText' => 'Bad Gateway', 'type' => 'error'],
+        '503' => ['status' => 503, 'statusText' => 'Service Unavailable', 'type' => 'error'],
+        '504' => ['status' => 504, 'statusText' => 'Gateway Timeout', 'type' => 'error'],
     ];
     private $response;
     private $status;
@@ -27,10 +34,13 @@ class JsonResponseComponent extends CakeObject
         $this->settings = $settings;
     }
     
-    public function __construct() {}
+    public function __construct()
+    {
+    }
+    
     public function __destruct()
     {
-        if($this->response) {
+        if ($this->response) {
             http_response_code($this->status);
             echo json_encode($this->response);
         }
@@ -56,7 +66,7 @@ class JsonResponseComponent extends CakeObject
      */
     public function setContent(array $data): JsonResponseComponent
     {
-        if(!isset($data)) return $this;
+        if (!isset($data)) return $this;
         $this->response['data'] = $data;
         return $this;
     }
@@ -67,7 +77,7 @@ class JsonResponseComponent extends CakeObject
      */
     public function withMessage(string $message): JsonResponseComponent
     {
-        if(!isset($message)) return $this;
+        if (!isset($message)) return $this;
         $this->response['message'] = $message;
         return $this;
     }
@@ -78,7 +88,7 @@ class JsonResponseComponent extends CakeObject
      */
     public function withStatus(int $code): JsonResponseComponent
     {
-        if(!isset($code)) return $this;
+        if (!isset($code)) return $this;
         $allowedStatuses = array_keys($this->statuses);
         if (!in_array($code, $allowedStatuses)) {
             $this->status = 200; // todo: find a better status code to use as default.

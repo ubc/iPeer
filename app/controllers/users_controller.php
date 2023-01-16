@@ -27,7 +27,6 @@ class UsersController extends AppController
         'Email', 'FileUpload.FileUpload', 'PasswordGenerator', 'UsersRequest');
     public $body = [];
     public $method = '';
-    
     private $canvasEnabled;
     
     /**

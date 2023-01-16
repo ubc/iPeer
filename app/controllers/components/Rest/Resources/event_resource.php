@@ -16,8 +16,9 @@ class EventResourceComponent extends CakeObject
      * @param array $event
      * @return array
      */
-    function formatEvent(array $event): array {
-        if(!empty($event)) {
+    function format(array $event): array
+    {
+        if (!empty($event)) {
             return [
                 'id' => $event['id'],
                 'title' => $event['title'],

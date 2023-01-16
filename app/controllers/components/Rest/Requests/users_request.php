@@ -157,15 +157,9 @@ class UsersRequestComponent extends CakeObject
         $this->Session->write('ipeerSession.email', $userData['email']);
     }
     
-    function pre_r($val)
-    {
-        echo '<pre>';
-        print_r($val);
-        echo '</pre>';
-    }
-    
     public function processCollectionRequest($method): void
     {
+        // TBD
     }
     
 }

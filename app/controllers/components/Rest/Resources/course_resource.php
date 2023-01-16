@@ -20,21 +20,27 @@ class CourseResourceComponent extends CakeObject
         return [];
     }
     
+    
+    public function format(array $course): array
+    {
+        return [
+            'id' => $course['id'],
+            'course' => $course['course'],
+            'title' => $course['title'],
+            'term' => $course['term'],
+        ];
+    }
+    
     /**
      * @param $courseId
      * @return array
      */
     public function courseById($courseId): array
     {
-        if(!isset($courseId)) return [];
+        if (!isset($courseId)) return [];
         $course = $this->controller->Course->getCourseById($courseId);
         if (isset($course)) {
-            return [
-                'id'        => $course['Course']['id'],
-                'course'    => $course['Course']['course'],
-                'title'     => $course['Course']['title'],
-                'term'      => $course['Course']['term'],
-            ];
+            return $this->format($course['Course']);
         }
         return [];
     }

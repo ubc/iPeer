@@ -1,0 +1,248 @@
+h1,
+h2,
+h3 {
+  font-family: Garamond, Baskerville, Baskerville Old Face, Hoefler Text, Times New Roman, serif;
+}
+
+b, strong {
+  font-weight: 600;
+}
+
+small {
+  font-size: 85%;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.text-base {
+  font-size: 1rem; /* 16px */
+  line-height: 1.5rem; /* 24px */
+}
+
+.w-12 {
+  width: 3.5rem
+}
+
+.h-12 {
+  height: 3.5rem
+}
+
+.py-2 {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+}
+
+/*h1.title {*/
+/*  font-size: 2.6em !important;*/
+/*  !*font-size: 2.0em !important;*!*/
+/*  font-weight: 400 !important;*/
+/*  color: initial !important;*/
+/*  margin: 1.5em 0 0.5em 0 !important;*/
+/*  */
+/*}*/
+h1.title {
+  font-size: 2.6em;
+  font-weight: normal;
+  color: initial !important;
+}
+
+#bannerLarge + h1.title {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.module {
+  display: flex;
+  flex-direction: column;
+}
+
+.module .module__title {
+  padding: 0.3em 0.5em;
+  font-family: Garamond, Baskerville, Baskerville Old Face, Hoefler Text, Times New Roman, serif;
+  font-size: 1.6em;
+  font-weight: 600;
+  background: #8c629f;
+  box-shadow: 0 0 5px rgba(85, 85, 85, 0.28);
+  color: #fff;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.module .module__subtitle {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  line-height: 1.8;
+  margin: 0.75em 0 1em 0;
+  padding-bottom: 0.3em;
+  font-family: Garamond, Baskerville, "Baskerville Old Face", "Hoefler Text", "Times New Roman", serif;
+  font-size: 1.6em;
+  font-weight: 500;
+  border-bottom: 2px solid #ecbb06;
+}
+
+.module .module__subtitle svg {
+  width: 4rem;
+  height: 4rem;
+}
+
+.module .module__description {
+  margin: 0 1rem;
+  font-size: 1em;
+  line-height: 1.4em;
+}
+
+.message {
+  position: relative;
+  padding: .75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: .25rem;
+}
+
+.message.error-message {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+.module__login p {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.module__login form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-top: 2rem;
+}
+
+.module__login form .text,
+.module__login form .password {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.module__login form label {
+  margin-top: 0;
+}
+
+.module__login form .submit {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem auto;
+}
+
+.module__login form .submit input {
+  height: auto;
+}
+
+.module__login form .submit input[type="submit"],
+.module__login form .submit input[type="button"],
+.module__login form .submit button {
+  background-color: #e6e6e6;
+  padding: 8px 10px;
+  background-position: 5px 6px;
+  /*border: solid 1px #ccc;*/
+  /*border-top-color: rgb(204, 204, 204);*/
+  /*border-right-color: rgb(204, 204, 204);*/
+  /*border-bottom-color: rgb(204, 204, 204);*/
+  /*border-left-color: rgb(204, 204, 204);*/
+  border: solid 1px #adadad;
+  border-radius: 3px;
+  white-space: nowrap;
+  font-size: 0.9em;
+  background-repeat: no-repeat;
+  box-shadow: 0 0 5px rgba(85, 85, 85, 0.28);
+  cursor: pointer;
+}
+
+.module__login form .submit input[type="submit"] {
+  /*border-radius: .25rem;*/
+  /*margin: .5rem 1rem;*/
+  /*background: #e7d3f1;*/
+  /*border: 1px solid #632b7d;*/
+  /*color: #632b7d;*/
+  /*font-size: 1rem;*/
+  /*font-weight: 400;*/
+  /*cursor: pointer;*/
+  /*min-width: 3rem;*/
+
+
+  /** */
+  padding: 8px 10px;
+  background: #e7d3f1;
+  /*background: -webkit-linear-gradient(left top, #e7d3f1, #c19bd4);*/
+  /*background: -o-linear-gradient(bottom right, #e7d3f1, #c19bd4);*/
+  /*background: -moz-linear-gradient(bottom right, #e7d3f1, #c19bd4);*/
+  /*background: linear-gradient(to bottom right, #e7d3f1, #c19bd4);*/
+  border-color: #632b7d;
+  color: #632b7d;
+  font-weight: normal;
+
+}
+
+.module__login form .input.text,
+.module__login form .input.password {
+  flex-direction: row;
+  align-items: center;
+}
+
+.module__login form .input.text label,
+.module__login form .input.password label {
+  display: inline-block;
+  margin-bottom: 0;
+
+  flex: 0 0 16.666667%;
+  max-width: 16.666667%;
+  text-align: right;
+  padding-right: .75rem;
+}
+
+.module__login form .input.text input,
+.module__login form .input.password input {
+  flex: 0 0 83.333333%;
+  max-width: 83.333333%;
+  max-width: 320px;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  /*h1 {*/
+  /*  font-size: 1.875rem*/
+  /*}*/
+  /*h2 {*/
+  /*  font-size: 1.5rem*/
+  /*}*/
+  /*h3 {*/
+  /*  font-size: 1.25rem*/
+  /*}*/
+  /*h4 {*/
+  /*  font-size: 1.125rem*/
+  /*}*/
+  /*.login-form {*/
+  /*}*/
+  /*.module__login form {*/
+  /*}*/
+  /*.module__login form .input {*/
+  /*}*/
+
+
+}
+
+@media (min-width: 1024px) {
+}
+
+@media (min-width: 1280px) {
+}

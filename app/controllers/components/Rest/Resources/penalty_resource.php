@@ -21,6 +21,20 @@ class PenaltyResourceComponent extends CakeObject
     }
     
     
+    public function format($penalty): array
+    {
+        $data = [];
+        foreach ($penalty as $key => $value) {
+            $data['id'] = $value['id'];
+            $data['event_id'] = $value['event_id'];
+            $data['days_late'] = $value['days_late'];
+            $data['percent_penalty'] = $value['percent_penalty'];
+        }
+        // returns the last object in the array [refactor]
+        return $data;
+    }
+    
+    
     /**
      * @param $eventId
      * @return array|null

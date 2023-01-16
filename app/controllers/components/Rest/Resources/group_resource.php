@@ -20,22 +20,29 @@ class GroupResourceComponent extends CakeObject
         return [];
     }
     
+    
+    public function format(array $group): array
+    {
+        if (!isset($group)) return [];
+        return [
+            'id' => $group['id'],
+            'num' => $group['group_num'],
+            'name' => $group['group_name'],
+            'member_count' => $group['member_count'],
+        ];
+    }
+    
     /**
-     * @param $groupIid
+     * @param $groupId
      * @param $eventId
      * @return array
      */
-    public function groupByIdEventId($groupIid, $eventId): array
+    public function groupByIdEventId($groupId, $eventId): array
     {
-        if(!isset($groupIid)) return [];
-        $group = $this->controller->Group->getGroupByGroupIdEventId($groupIid, $eventId);
+        if (!isset($groupId)) return [];
+        $group = $this->controller->Group->getGroupByGroupIdEventId($groupId, $eventId);
         if (isset($group)) {
-            return [
-                'id'            => $group['Group']['id'],
-                'num'           => $group['Group']['group_num'],
-                'name'          => $group['Group']['group_name'],
-                'member_count'  => $group['Group']['member_count'],
-            ];
+            return $this->format($group['Group']);
         }
         return $group;
     }
