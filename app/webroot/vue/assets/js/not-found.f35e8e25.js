@@ -1,2 +1,0 @@
-"use strict";(self["webpackChunkvueapp_cli"]=self["webpackChunkvueapp_cli"]||[]).push([[942],{8217:function(u,t,e){e.r(t),e.d(t,{default:function(){return o}});var n=e(3396);const a={class:""};var s=(0,n.aZ)({__name:"NotFound",setup(u){return(u,t)=>((0,n.wg)(),(0,n.iD)("div",a,[(0,n.Uk)(" 404 NotFound "),(0,n.WI)(u.$slots,"default")]))}});const c=s;var o=c}}]);
-//# sourceMappingURL=not-found.f35e8e25.js.map
