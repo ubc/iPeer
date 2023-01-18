@@ -208,16 +208,141 @@ class EvaluationsRequestComponent extends CakeObject
     
     private function getRubricEvaluationSubmit(array $event, string $groupId, string $studentId): void
     {
+        $userId = User::get('id');
+        $eventId = $event['Event']['id'];
+        //
+        $rubricId = $event['Event']['template_id'];
+        $courseId = $event['Event']['course_id'];
+        
+        $groupEvents = $this->controller->GroupEvent->findAllByEventId($eventId);
+        $groups = Set::extract('/GroupEvent/group_id', $groupEvents);
+        
+        // if group id provided does not match the group id the user belongs to or
+        // template type is not rubric - they are redirected
+        if (!is_numeric($groupId) || !in_array($groupId, $groups) ||
+            !$this->controller->GroupsMembers->checkMembershipInGroup($groupId, empty($studentId) ? User::get('id') : $studentId)) {
+            $this->JsonResponse->withMessage('Error: Invalid Id')->withStatus(404);
+            return;
+        }
+        
+        // students can't submit outside of release date range
+        $now = time();
+        
+        if ($now < strtotime($event['Event']['release_date_begin']) ||
+            $now > strtotime($event['Event']['release_date_end'])) {
+            $this->JsonResponse->withMessage('Error: Evaluation is unavailable')->withStatus(404);
+            return;
+        }
+        
+        $event = $this->controller->Event->getEventByIdGroupId($eventId, $groupId);
+        
+        $data = $this->controller->Rubric->getRubricById($rubricId);
+        
+        $penalty = $this->controller->Penalty->getPenaltyByEventId($eventId);
+        $penaltyDays = $this->controller->Penalty->getPenaltyDays($eventId);
+        $penaltyFinal = $this->controller->Penalty->getPenaltyFinal($eventId);
+        
+        //Setup the viewData
+        $rubricId = $event['Event']['template_id'];
+        $rubric = $this->controller->Rubric->getRubricById($rubricId);
+        $rubricEvalViewData = $this->controller->Rubric->compileViewData($rubric);
+        
+        $rubricDetail = $this->controller->Evaluation->loadRubricEvaluationDetail($event, $studentId);
+        
+        $evaluated = 0; // # of group members evaluated
+        $commentsNeeded = false;
+        foreach ($rubricDetail['groupMembers'] as $row) {
+            $user = $row['User'];
+            if (isset($user['Evaluation'])) {
+                foreach ($user['Evaluation']['EvaluationRubricDetail'] as $eval) {
+                    if (!$commentsNeeded && empty($eval['criteria_comment'])) {
+                        $commentsNeeded = true;
+                    }
+                }
+                // only check if $commentsNeeded is false
+                if (!$commentsNeeded && empty($user['Evaluation']['EvaluationRubric']['comment'])) {
+                    $commentsNeeded = true;
+                }
+                if (count($user['Evaluation']['EvaluationRubricDetail']) == count($rubricDetail['rubric']['RubricsCriteria'])) {
+                    $evaluated++;
+                }
+            } else {
+                $commentsNeeded = true; // not evaluated = comments needed
+            }
+        }
+        $allDone = ($evaluated == $rubricDetail['evaluateeCount']);
+        $comReq = ($commentsNeeded && $event['Event']['com_req']);
+        
+        $evaluationSubmission = $this->controller->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($event['GroupEvent']['id'], $userId);
+        
+        $submission = [];
+        foreach ($rubricDetail['groupMembers'] as $member) {
+            $tmp = [];
+            $tmp['id'] = $member['User']['id'];
+            $tmp['first_name'] = $member['User']['first_name'];
+            $tmp['last_name'] = $member['User']['last_name'];
+            isset($member['User']['Evaluation']) ? $tmp['evaluation'] = [
+                'id' => $member['User']['Evaluation']['EvaluationRubric']['id'],
+                'comment' => $member['User']['Evaluation']['EvaluationRubric']['comment'],
+                'comment_release' => $member['User']['Evaluation']['EvaluationRubric']['comment_release'],
+                'evaluatee' => $member['User']['Evaluation']['EvaluationRubric']['evaluatee'],
+                'evaluator' => $member['User']['Evaluation']['EvaluationRubric']['evaluator'],
+                'grade_release' => $member['User']['Evaluation']['EvaluationRubric']['grade_release'],
+                'score' => $member['User']['Evaluation']['EvaluationRubric']['score'],
+            ] : null;
+            isset($member['User']['Evaluation']) ? $tmp['evaluation']['detail'] = $member['User']['Evaluation']['EvaluationRubricDetail'] : null;
+            $submission[] = $tmp;
+        }
+        
+        $criterias = [];
+        foreach ($data['RubricsCriteria'] as $criteria) {
+            $tmp = [];
+            $tmp['id'] = $criteria['id'];
+            $tmp['criteria'] = $criteria['criteria'];
+            $tmp['criteria_num'] = $criteria['criteria_num'];
+            $tmp['multiplier'] = $criteria['multiplier'];
+            $tmp['rubric_id'] = $criteria['rubric_id'];
+            $tmp['show_marks'] = $criteria['show_marks'];
+            $tmp['comments'] = $criteria['RubricsCriteriaComment'];
+            $tmp['loms'] = $data['RubricsLom'];
+            $criterias[] = $tmp;
+        }
+        
         $json = [
             'event' => $this->EventResource->format($event['Event']),
-            'course' => $this->CourseResource->format($event['Course']),
-            'group' => $this->GroupResource->groupByIdEventId($groupId, $event['Event']['id']),
-            'penalty' => isset($event['Penalty']) ? $this->PenaltyResource->format($event['Penalty']) : [],
-            'questions' => [],
-            'submission' => [
-                'data' => []
+            'course' => $this->CourseResource->courseById($event['Event']['course_id']),
+            'penalty' => $this->PenaltyResource->format($this->controller->Penalty->getPenaltyFinal($eventId)),
+            'group' => $this->GroupResource->format($event['Group']),
+            'rubric' => [
+                'id' => $data['Rubric']['id'],
+                'availability' => $data['Rubric']['availability'],
+                'criteria' => $data['Rubric']['criteria'],
+                'event_count' => $data['Rubric']['event_count'],
+                'lom_max' => $data['Rubric']['lom_max'],
+                'name' => $data['Rubric']['name'],
+                'template' => $data['Rubric']['template'],
+                'total_marks' => $data['Rubric']['total_marks'],
+                'view_mode' => $data['Rubric']['view_mode'],
+                'zero_mark' => $data['Rubric']['zero_mark'],
+                'criterias' => $criterias,
             ],
+            'submission' => [
+                "id" => "",
+                "name" => "",
+                "description" => "",
+                "record_status" => "",
+                "availability" => "",
+                "submitted" => "",
+                "submitter_id" => "",
+                "date_submitted" => "",
+                'data' => $submission,
+            ],
+            'member_count' => $rubricDetail['evaluateeCount'],
+            'member_ids' => implode(',', Set::extract('/User/id', $rubricDetail['groupMembers'])),
+            'student_id' => $studentId,
+            'com_req' => $comReq,
         ];
+        
         $this->JsonResponse->setContent($json)->withStatus(200);
     }
     

@@ -33,7 +33,7 @@
     <?php // echo $this->element('global/navigation', array()); ?>
   <main class="main">
     <!-- TBD if cake flash messaging is useful -->
-      <?php echo $this->Session->flash(); ?>
+      <?php echo $this->Session->flash('auth'); ?>
     <!-- this where the landing page will be rendered -->
       <?php echo $content_for_layout; ?>
   </main>
