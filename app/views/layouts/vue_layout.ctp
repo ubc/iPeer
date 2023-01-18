@@ -14,12 +14,12 @@
     ?>
     <?php echo $this->Html->css('ipeer'); ?>
 
-  <link rel="stylesheet" type="text/css" href="<?php Router::url(null, false); ?>vue/assets/css/main.a7ef1451.css"/>
+  <!--<link rel="stylesheet" type="text/css" href="<?php //Router::url(null, false); ?>vue/assets/css/main.css"/>-->
   <script type="text/javascript" defer
-          src="<?php Router::url(null, false); ?>vue/assets/js/chunk-vendors.1eb91d60.js"></script>
+          src="<?php Router::url(null, false); ?>vue/assets/js/chunk-vendors.js"></script>
   <script type="text/javascript" defer
-          src="<?php Router::url(null, false); ?>vue/assets/js/chunk-common.05353b6d.js"></script>
-  <script type="text/javascript" defer src="<?php Router::url(null, false); ?>vue/assets/js/main.081f16c3.js"></script>
+          src="<?php Router::url(null, false); ?>vue/assets/js/chunk-common.js"></script>
+  <script type="text/javascript" defer src="<?php Router::url(null, false); ?>vue/assets/js/main.js"></script>
 </head>
 <body>
 <noscript>
@@ -33,7 +33,7 @@
     <?php // echo $this->element('global/navigation', array()); ?>
   <main class="main">
     <!-- TBD if cake flash messaging is useful -->
-      <?php echo $this->Session->flash(); ?>
+      <?php echo $this->Session->flash('auth'); ?>
     <!-- this where the landing page will be rendered -->
       <?php echo $content_for_layout; ?>
   </main>
