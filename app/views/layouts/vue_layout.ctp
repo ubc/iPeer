@@ -14,7 +14,7 @@
     ?>
     <?php echo $this->Html->css('ipeer'); ?>
 
-  <!--<link rel="stylesheet" type="text/css" href="<?php //Router::url(null, false); ?>vue/assets/css/main.css"/>-->
+  <link rel="stylesheet" type="text/css" href="<?php Router::url(null, false); ?>vue/assets/css/main.css"/>
   <script type="text/javascript" defer
           src="<?php Router::url(null, false); ?>vue/assets/js/chunk-vendors.js"></script>
   <script type="text/javascript" defer
