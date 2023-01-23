@@ -14,12 +14,12 @@
     ?>
     <?php echo $this->Html->css('ipeer'); ?>
 
-  <link rel="stylesheet" type="text/css" href="<?php Router::url(null, false); ?>vue/assets/css/main.css"/>
+  <link rel="stylesheet" type="text/css" href="<?php Router::url(null, false); ?>vue/assets/css/main.5e5c0908.css"/>
   <script type="text/javascript" defer
-          src="<?php Router::url(null, false); ?>vue/assets/js/chunk-vendors.js"></script>
+          src="<?php Router::url(null, false); ?>vue/assets/js/chunk-vendors.5d95980a.js"></script>
   <script type="text/javascript" defer
-          src="<?php Router::url(null, false); ?>vue/assets/js/chunk-common.js"></script>
-  <script type="text/javascript" defer src="<?php Router::url(null, false); ?>vue/assets/js/main.js"></script>
+          src="<?php Router::url(null, false); ?>vue/assets/js/chunk-common.647895f0.js"></script>
+  <script type="text/javascript" defer src="<?php Router::url(null, false); ?>vue/assets/js/main.32725160.js"></script>
 </head>
 <body>
 <noscript>
