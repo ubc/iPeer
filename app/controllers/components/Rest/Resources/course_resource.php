@@ -35,6 +35,16 @@ class CourseResourceComponent extends CakeObject
      * @param $courseId
      * @return array
      */
+    public function getCourseById($courseId): array
+    {
+        if (!isset($courseId)) return [];
+        $course = $this->controller->Course->getCourseById($courseId);
+        if (isset($course)) {
+            return $this->format($course['Course']);
+        }
+        return [];
+    }
+    
     public function courseById($courseId): array
     {
         if (!isset($courseId)) return [];

@@ -8,7 +8,10 @@ class EvaluationsRequestComponent extends CakeObject
     public $Sanitize;
     public $uses = [];
     public $components = ['Session', 'EvaluationResource',
-        'EventResource', 'CourseResource', 'PenaltyResource', 'GroupResource',
+        'UserResource', 'EventResource', 'CourseResource', 'PenaltyResource', 'GroupResource',
+        'SimpleEvaluationResource',
+        'RubricEvaluationResource',
+        'MixedEvaluationResource',
         'JsonResponse'];
     
     public $controller;
@@ -39,22 +42,23 @@ class EvaluationsRequestComponent extends CakeObject
             case 'GET': // Read
                 $this->getSimpleEvaluationSubmit($event, $groupId, $studentId);
                 break;
+            case 'POST': // Create
+                $this->createSimpleEvaluationSubmit($event, $groupId, $studentId);
+                break;
             case 'PUT': // Update
-                $this->setSimpleEvaluationSubmit($event, $groupId, $studentId);
+                $this->updateSimpleEvaluationSubmit($event, $groupId, $studentId);
                 break;
             default:
                 http_response_code(405);
-                header('Allow, GET, PUT');
+                header('Allow, GET, POST, PUT');
                 break;
         }
     }
     
-    private function getSimpleEvaluationSubmit(array $event, string $groupId, string $studentId)
+    private function getSimpleEvaluationSubmit(array $event, string $groupId, string $studentId): void
     {
         $eventId = $event['Event']['id'];
-        
         $userId = User::get('id');
-        
         $grpMem = $this->controller->GroupsMembers->find('first', array(
             'conditions' => array('GroupsMembers.user_id' => empty($studentId) ? $userId : $studentId,
                 'GroupsMembers.group_id' => $groupId)));
@@ -89,17 +93,10 @@ class EvaluationsRequestComponent extends CakeObject
         //Get the target event
         $eventId = $this->Sanitize->paranoid($eventId);
         $event = $this->controller->Event->getEventByIdGroupId($eventId, $groupId);
-        $penalty = $this->controller->Penalty->getPenaltyByEventId($eventId);
-        $penaltyDays = $this->controller->Penalty->getPenaltyDays($eventId);
+        //$penalty = $this->controller->Penalty->getPenaltyByEventId($eventId);
+        //$penaltyDays = $this->controller->Penalty->getPenaltyDays($eventId);
         $penaltyFinal = $this->controller->Penalty->getPenaltyFinal($eventId);
-        
-        //Set up the courseId to session
-        $courseId = $event['Event']['course_id'];
-        
-        //Get Members for this evaluation
         $groupMembers = $this->controller->User->getEventGroupMembersNoTutors($groupId, $event['Event']['self_eval'], empty($studentId) ? $userId : $studentId);
-        
-        // enough points to distribute amongst number of members - 1 (evaluator does not evaluate him or herself)
         $numMembers = count($groupMembers);
         $simpleEvaluation = $this->controller->SimpleEvaluation->find('first', array(
             'conditions' => array('id' => $event['Event']['template_id']),
@@ -110,38 +107,40 @@ class EvaluationsRequestComponent extends CakeObject
         //$points_to_ratio = $numMembers==0 ? 0 : 1 / ($simpleEvaluation['SimpleEvaluation']['point_per_member'] * $numMembers);
         //          if ($in['comments']) $out['comments']=$in['comments'];
         
-        // render simple evaluation
-        $this->EvaluationResource->simpleEvaluation([
-            'event' => $event,
-            'penaltyFinal' => $penaltyFinal,
-            'penaltyDays' => $penaltyDays,
-            'penalty' => $penalty,
-            //
-            'questions' => $simpleEvaluation['SimpleEvaluation'],
-            'submission' => (array)$submission ?? [],
-            'evaluation' => (array)$evaluation ?? [],
-            //
-            'userId' => empty($studentId) ? $userId : $studentId,
-            'groupMembers' => $groupMembers,
-            'memberIDs' => implode(',', Set::extract('/User/id', $groupMembers)),
-            //
-            'evaluateeCount' => count($groupMembers),
-            'remaining' => $remaining,
-            'courseId' => $courseId,
-            //
-            'allDone' => [],
-            'comReq' => [],
-        ]);
+        // $getJson()
+        $json = [];
+        $json['event'] = $this->EventResource->format($event['Event']);
+        $json['course'] = $this->CourseResource->getCourseById($event['Event']['course_id']);
+        $json['group'] = $this->GroupResource->format($event['Group']);
+        $json['penalty'] = isset($penaltyFinal) ? $this->PenaltyResource->format($penaltyFinal) : [];
+        $json['evaluation'] = $this->SimpleEvaluationResource->getSimpleEvaluationQuestionsAndSubmission($simpleEvaluation, $groupMembers, $submission, $evaluation);
+        $json['evaluation']['user_id'] = $userId;
+        $json['evaluation']['member_count'] = count($groupMembers);
+        $json['evaluation']['member_ids'] = implode(',', Set::extract('/User/id', $groupMembers));
+        $json['evaluation']['remaining'] = $remaining;
+        
+        $this->JsonResponse->setContent($json)->withStatus(200);
     }
     
-    private function setSimpleEvaluationSubmit($event, $groupId, $studentId): void
+    private function createSimpleEvaluationSubmit($event, $groupId, $studentId): void
     {
+        echo "<pre>";
+        print_r($this->params);
+        die();
+        echo "</pre>";
+    }
+    
+    private function updateSimpleEvaluationSubmit($event, $groupId, $studentId): void
+    {
+        echo "<pre>";
+        print_r($this->params);
+        die();
+        echo "</pre>";
     }
     
     /** Result */
     public function processSimpleEvaluationResultRequest($event, $groupEventId, $autoRelease, $userId, $method): void
     {
-        /** $studentId = $studentId ?? $this->controller->Auth->user('id'); */
         switch ($method) {
             case 'GET': // Read
                 $this->getSimpleEvaluationResult($event, $groupEventId, $autoRelease, $userId);
@@ -151,33 +150,14 @@ class EvaluationsRequestComponent extends CakeObject
                 header('Allow, GET');
                 break;
         }
-        /**
-         * if ($groupEventId) {
-         * $this->ReviewsSimpleRequest->processResourceRequest($event, $groupEventId, $autoRelease, $userId, $method);
-         * } else {
-         * $this->ReviewsSimpleRequest->processCollectionRequest($method);
-         * }*/
     }
     
     private function getSimpleEvaluationResult($event, $groupEventId, $autoRelease, $userId): void
     {
-        $studentResult = $this->controller->EvaluationSimple->formatStudentViewOfSimpleEvaluationResult($event, $userId);
-        //$this->set('studentResult', $studentResult);
-        //$this->set('gradeReleased', $studentResult['gradeReleased']);
-        //$this->set('commentReleased', $studentResult['commentReleased']);
-        //$this->render('student_view_simple_evaluation_results');
-        
-        $json = [
-            'studentResult' => $studentResult,
-            'gradeReleased' => $studentResult['gradeReleased'],
-            'commentReleased' => $studentResult['commentReleased'],
-        ];
+        $json = [];
         
         $this->JsonResponse->setContent($json)->withStatus(200);
         exit;
-
-//        $this->pre_r($event, $groupEventId, $autoRelease, $userId);
-//        die();
     }
     
     
@@ -196,12 +176,15 @@ class EvaluationsRequestComponent extends CakeObject
             case 'GET': // Read
                 $this->getRubricEvaluationSubmit($event, $groupId, $studentId);
                 break;
+            case 'POST': // Create
+                $this->createRubricEvaluationSubmit($event, $groupId, $studentId);
+                break;
             case 'PUT': // Update
-                $this->setRubricEvaluationSubmit($event, $groupId, $studentId);
+                $this->updateRubricEvaluationSubmit($event, $groupId, $studentId);
                 break;
             default:
                 http_response_code(405);
-                header('Allow, GET, PUT');
+                header('Allow, GET, POST, PUT');
                 break;
         }
     }
@@ -218,7 +201,7 @@ class EvaluationsRequestComponent extends CakeObject
         $groups = Set::extract('/GroupEvent/group_id', $groupEvents);
         
         // if group id provided does not match the group id the user belongs to or
-        // template type is not rubric - they are redirected
+        // template type is not rubric
         if (!is_numeric($groupId) || !in_array($groupId, $groups) ||
             !$this->controller->GroupsMembers->checkMembershipInGroup($groupId, empty($studentId) ? User::get('id') : $studentId)) {
             $this->JsonResponse->withMessage('Error: Invalid Id')->withStatus(404);
@@ -227,7 +210,6 @@ class EvaluationsRequestComponent extends CakeObject
         
         // students can't submit outside of release date range
         $now = time();
-        
         if ($now < strtotime($event['Event']['release_date_begin']) ||
             $now > strtotime($event['Event']['release_date_end'])) {
             $this->JsonResponse->withMessage('Error: Evaluation is unavailable')->withStatus(404);
@@ -235,20 +217,14 @@ class EvaluationsRequestComponent extends CakeObject
         }
         
         $event = $this->controller->Event->getEventByIdGroupId($eventId, $groupId);
-        
         $data = $this->controller->Rubric->getRubricById($rubricId);
-        
-        $penalty = $this->controller->Penalty->getPenaltyByEventId($eventId);
-        $penaltyDays = $this->controller->Penalty->getPenaltyDays($eventId);
+        // $penalty = $this->controller->Penalty->getPenaltyByEventId($eventId);
+        // $penaltyDays = $this->controller->Penalty->getPenaltyDays($eventId);
         $penaltyFinal = $this->controller->Penalty->getPenaltyFinal($eventId);
-        
-        //Setup the viewData
         $rubricId = $event['Event']['template_id'];
         $rubric = $this->controller->Rubric->getRubricById($rubricId);
         $rubricEvalViewData = $this->controller->Rubric->compileViewData($rubric);
-        
         $rubricDetail = $this->controller->Evaluation->loadRubricEvaluationDetail($event, $studentId);
-        
         $evaluated = 0; // # of group members evaluated
         $commentsNeeded = false;
         foreach ($rubricDetail['groupMembers'] as $row) {
@@ -272,82 +248,39 @@ class EvaluationsRequestComponent extends CakeObject
         }
         $allDone = ($evaluated == $rubricDetail['evaluateeCount']);
         $comReq = ($commentsNeeded && $event['Event']['com_req']);
+        $submission = $this->controller->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($event['GroupEvent']['id'], $userId);
         
-        $evaluationSubmission = $this->controller->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($event['GroupEvent']['id'], $userId);
-        
-        $submission = [];
-        foreach ($rubricDetail['groupMembers'] as $member) {
-            $tmp = [];
-            $tmp['id'] = $member['User']['id'];
-            $tmp['first_name'] = $member['User']['first_name'];
-            $tmp['last_name'] = $member['User']['last_name'];
-            isset($member['User']['Evaluation']) ? $tmp['evaluation'] = [
-                'id' => $member['User']['Evaluation']['EvaluationRubric']['id'],
-                'comment' => $member['User']['Evaluation']['EvaluationRubric']['comment'],
-                'comment_release' => $member['User']['Evaluation']['EvaluationRubric']['comment_release'],
-                'evaluatee' => $member['User']['Evaluation']['EvaluationRubric']['evaluatee'],
-                'evaluator' => $member['User']['Evaluation']['EvaluationRubric']['evaluator'],
-                'grade_release' => $member['User']['Evaluation']['EvaluationRubric']['grade_release'],
-                'score' => $member['User']['Evaluation']['EvaluationRubric']['score'],
-            ] : null;
-            isset($member['User']['Evaluation']) ? $tmp['evaluation']['detail'] = $member['User']['Evaluation']['EvaluationRubricDetail'] : null;
-            $submission[] = $tmp;
-        }
-        
-        $criterias = [];
-        foreach ($data['RubricsCriteria'] as $criteria) {
-            $tmp = [];
-            $tmp['id'] = $criteria['id'];
-            $tmp['criteria'] = $criteria['criteria'];
-            $tmp['criteria_num'] = $criteria['criteria_num'];
-            $tmp['multiplier'] = $criteria['multiplier'];
-            $tmp['rubric_id'] = $criteria['rubric_id'];
-            $tmp['show_marks'] = $criteria['show_marks'];
-            $tmp['comments'] = $criteria['RubricsCriteriaComment'];
-            $tmp['loms'] = $data['RubricsLom'];
-            $criterias[] = $tmp;
-        }
-        
-        $json = [
-            'event' => $this->EventResource->format($event['Event']),
-            'course' => $this->CourseResource->courseById($event['Event']['course_id']),
-            'penalty' => $this->PenaltyResource->format($this->controller->Penalty->getPenaltyFinal($eventId)),
-            'group' => $this->GroupResource->format($event['Group']),
-            'rubric' => [
-                'id' => $data['Rubric']['id'],
-                'availability' => $data['Rubric']['availability'],
-                'criteria' => $data['Rubric']['criteria'],
-                'event_count' => $data['Rubric']['event_count'],
-                'lom_max' => $data['Rubric']['lom_max'],
-                'name' => $data['Rubric']['name'],
-                'template' => $data['Rubric']['template'],
-                'total_marks' => $data['Rubric']['total_marks'],
-                'view_mode' => $data['Rubric']['view_mode'],
-                'zero_mark' => $data['Rubric']['zero_mark'],
-                'criterias' => $criterias,
-            ],
-            'submission' => [
-                "id" => "",
-                "name" => "",
-                "description" => "",
-                "record_status" => "",
-                "availability" => "",
-                "submitted" => "",
-                "submitter_id" => "",
-                "date_submitted" => "",
-                'data' => $submission,
-            ],
-            'member_count' => $rubricDetail['evaluateeCount'],
-            'member_ids' => implode(',', Set::extract('/User/id', $rubricDetail['groupMembers'])),
-            'student_id' => $studentId,
-            'com_req' => $comReq,
-        ];
+        // $getJson()
+        $json = [];
+        $json['event'] = $this->EventResource->format($event['Event']);
+        $json['course'] = $this->CourseResource->getCourseById($event['Event']['course_id']);
+        $json['group'] = $this->GroupResource->format($event['Group']);
+        $json['penalty'] = isset($penaltyFinal) ? $this->PenaltyResource->format($penaltyFinal) : [];
+        $json['evaluation'] = $this->RubricEvaluationResource->getRubricEvaluationQuestionsAndSubmission($data, $rubricDetail['groupMembers'], $submission);
+        $json['evaluation']['user_id'] = $userId;
+        $json['evaluation']['member_count'] = $rubricDetail['evaluateeCount'];
+        $json['evaluation']['member_ids'] = implode(',', Set::extract('/User/id', $rubricDetail['groupMembers']));
+        $json['evaluation']['grp_event_id'] = '';
+        $json['evaluation']['com_req'] = $comReq;
+        $json['evaluation']['student_id'] = $studentId;
         
         $this->JsonResponse->setContent($json)->withStatus(200);
     }
     
-    private function setRubricEvaluationSubmit(array $event, string $groupId, string $studentId): void
+    private function createRubricEvaluationSubmit(array $event, string $groupId, string $studentId): void
     {
+        echo "<pre>";
+        print_r($this->params);
+        die();
+        echo "</pre>";
+    }
+    
+    private function updateRubricEvaluationSubmit(array $event, string $groupId, string $studentId): void
+    {
+        echo "<pre>";
+        print_r($this->params);
+        die();
+        echo "</pre>";
     }
     
     /** Result */
@@ -366,8 +299,10 @@ class EvaluationsRequestComponent extends CakeObject
     
     private function getRubricEvaluationResult($event, $groupEventId, $autoRelease, $userId): void
     {
-        $this->pre_r($event, $groupEventId, $autoRelease, $userId);
-        die();
+        $json = [];
+        
+        $this->JsonResponse->setContent($json)->withStatus(200);
+        exit;
     }
     
     
@@ -386,33 +321,102 @@ class EvaluationsRequestComponent extends CakeObject
             case 'GET': // Read
                 $this->getMixedEvaluationSubmit($event, $groupId, $studentId);
                 break;
+            case 'POST': // Create
+                $this->createMixedEvaluationSubmit($event, $groupId, $studentId);
+                break;
             case 'PUT': // Update
-                $this->setMixedEvaluationSubmit($event, $groupId, $studentId);
+                $this->updateMixedEvaluationSubmit($event, $groupId, $studentId);
                 break;
             default:
                 http_response_code(405);
-                header('Allow, GET, PUT');
+                header('Allow, GET, POST, PUT');
                 break;
         }
     }
     
     private function getMixedEvaluationSubmit(array $event, string $groupId, string $studentId): void
     {
-        $json = [
-            'event' => $this->EventResource->format($event['Event']),
-            'course' => $this->CourseResource->format($event['Course']),
-            'group' => $this->GroupResource->groupByIdEventId($groupId, $event['Event']['id']),
-            'penalty' => isset($event['Penalty']) ? $this->PenaltyResource->format($event['Penalty']) : [],
-            'questions' => [],
-            'submission' => [
-                'data' => []
-            ],
-        ];
+        $eventId = $event['Event']['id'];
+        
+        if (!is_numeric($groupId)) {
+            $this->JsonResponse->withMessage('Error: Invalid Id')->withStatus(404);
+            return;
+        }
+        
+        $courseId = $this->controller->Event->getCourseByEventId($eventId);
+        
+        $group = array();
+        $group_events = $this->controller->GroupEvent->getGroupEventByEventId($eventId);
+        $userId = empty($studentId) ? User::get('id') : $studentId;
+        
+        foreach ($group_events as $events) {
+            if ($this->controller->GroupsMembers->checkMembershipInGroup($events['GroupEvent']['group_id'], $userId) !== 0) {
+                $group[] = $events['GroupEvent']['group_id'];
+            }
+        }
+        
+        // if group id provided does not match the group id the user belongs to
+        if (!in_array($groupId, $group)) {
+            $this->JsonResponse->withMessage('Error: Invalid Id')->withStatus(404);
+            return;
+        }
+        
+        // students can't submit outside of release date range
+        $event = $this->controller->Event->getEventByIdGroupId($eventId, $groupId);
+        $now = time();
+        
+        if ($now < strtotime($event['Event']['release_date_begin']) ||
+            $now > strtotime($event['Event']['release_date_end'])) {
+            $this->JsonResponse->withMessage('Error: Evaluation is unavailable')->withStatus(404);
+            return;
+        }
+        
+        $submission = $this->controller->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, $userId);
+        $members = $this->controller->GroupsMembers->findAllByGroupId($groupId);
+        //$penalty = $this->controller->Penalty->getPenaltyByEventId($eventId);
+        //$penaltyDays = $this->controller->Penalty->getPenaltyDays($eventId);
+        $penaltyFinal = $this->controller->Penalty->getPenaltyFinal($eventId);
+        $enrol = $this->controller->UserEnrol->find('count', array(
+            'conditions' => array('user_id' => $userId, 'course_id' => $courseId)
+        ));
+        $self = $this->controller->EvaluationMixeval->find('first', array(
+            'conditions' => array('evaluator' => $userId, 'evaluatee' => $userId, 'event_id' => $eventId)
+        ));
+        $questions = $this->controller->MixevalQuestion->findAllByMixevalId($event['Event']['template_id']);
+        $mixeval = $this->controller->Mixeval->find('first', array(
+            'conditions' => array('id' => $event['Event']['template_id']), 'contain' => false, 'recursive' => 2));
+        $groupMembers = $this->controller->Evaluation->loadMixEvaluationDetail($event);
+        
+        // $getJson()
+        $json = [];
+        $json['event'] = $this->EventResource->format($event['Event']);
+        $json['course'] = $this->CourseResource->getCourseById($event['Event']['course_id']);
+        $json['group'] = $this->GroupResource->format($event['Group']);
+        $json['penalty'] = isset($penaltyFinal) ? $this->PenaltyResource->format($penaltyFinal) : [];
+        $json['evaluation'] = $this->MixedEvaluationResource->getMixedEvaluationQuestionsAndSubmission($mixeval, $questions, $groupMembers, $submission);
+        $json['evaluation']['user_id'] = $userId;
+        $json['evaluation']['self'] = $self;
+        $json['evaluation']['enrol'] = $enrol;
+        $json['evaluation']['member_count'] = count($members);
+        $json['evaluation']['grp_event_id'] = $event['GroupEvent']['id'];
+        
         $this->JsonResponse->setContent($json)->withStatus(200);
     }
     
-    private function setMixedEvaluationSubmit(string $eventId, string $objectId, string $studentId): void
+    private function createMixedEvaluationSubmit(array $event, string $groupId, string $studentId): void
     {
+        echo "<pre>";
+        print_r($this->params);
+        die();
+        echo "</pre>";
+    }
+    
+    private function updateMixedEvaluationSubmit(array $event, string $groupId, string $studentId): void
+    {
+        echo "<pre>";
+        print_r($this->params);
+        die();
+        echo "</pre>";
     }
     
     /** Result */
@@ -431,7 +435,9 @@ class EvaluationsRequestComponent extends CakeObject
     
     private function getMixedEvaluationResult($event, $groupEventId, $autoRelease, $userId): void
     {
-        $this->pre_r($event, $groupEventId, $autoRelease, $userId);
-        die();
+        $json = [];
+        
+        $this->JsonResponse->setContent($json)->withStatus(200);
+        exit;
     }
 }
