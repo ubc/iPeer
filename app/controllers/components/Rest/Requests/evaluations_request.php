@@ -371,7 +371,8 @@ class EvaluationsRequestComponent extends CakeObject
             return;
         }
         
-        $submission = $this->controller->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, $userId);
+        $submission = $this->controller->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId, $userId);
+        // $submission = $this->controller->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, $userId);
         $members = $this->controller->GroupsMembers->findAllByGroupId($groupId);
         //$penalty = $this->controller->Penalty->getPenaltyByEventId($eventId);
         //$penaltyDays = $this->controller->Penalty->getPenaltyDays($eventId);
@@ -399,6 +400,8 @@ class EvaluationsRequestComponent extends CakeObject
         $json['evaluation']['enrol'] = $enrol;
         $json['evaluation']['member_count'] = count($members);
         $json['evaluation']['grp_event_id'] = $event['GroupEvent']['id'];
+        // temp
+        $json['submission'] = $submission;
         
         $this->JsonResponse->setContent($json)->withStatus(200);
     }

@@ -33,6 +33,7 @@ class MixedEvaluationResourceComponent extends CakeObject
             'zero_mark' => $mixeval['Mixeval']['zero_mark'],
             'questions' => $this->getMixedEvaluationQuestionsDetail($questions),
             'submission' => isset($submission) && $submission !== false ? [
+                'group_members' => $groupMembers,
                 'id' => $submission['EvaluationSubmission']['id'],
                 'submitted' => $submission['EvaluationSubmission']['submitted'],
                 'date_submitted' => $submission['EvaluationSubmission']['date_submitted'],
