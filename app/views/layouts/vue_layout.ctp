@@ -18,8 +18,8 @@
   <script type="text/javascript" defer
           src="<?php Router::url(null, false); ?>vue/assets/js/chunk-vendors.5d95980a.js"></script>
   <script type="text/javascript" defer
-          src="<?php Router::url(null, false); ?>vue/assets/js/chunk-common.684ab6ac.js"></script>
-  <script type="text/javascript" defer src="<?php Router::url(null, false); ?>vue/assets/js/main.4cb5a105.js"></script>
+          src="<?php Router::url(null, false); ?>vue/assets/js/chunk-common.42ec3d89.js"></script>
+  <script type="text/javascript" defer src="<?php Router::url(null, false); ?>vue/assets/js/main.d33dd4bb.js"></script>
 </head>
 <body>
 <noscript>
