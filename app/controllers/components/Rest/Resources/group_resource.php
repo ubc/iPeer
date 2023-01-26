@@ -13,14 +13,9 @@ class GroupResourceComponent extends CakeObject
     }
     
     /**
+     * @param array $group
      * @return array
      */
-    public function toArray(): array
-    {
-        return [];
-    }
-    
-    
     public function format(array $group): array
     {
         if (!isset($group)) return [];
