@@ -26,7 +26,6 @@ class EvaluationCollectionComponent extends CakeObject
             $tmp['penalties'] = $row['Penalty'] ?? NULL;
             $tmp['penalty_final'] = isset($row['Event']) ? $this->PenaltyResource->getPenaltyFinalByEventId($row['Event']['id']) : NULL;
             $tmp['penalty_days'] = isset($row['Event']) ? $this->PenaltyResource->getPenaltyDaysByEventId($row['Event']['id']) : NULL;
-            //$tmp['is_submitted']    = $this->isSubmitted($row['Event']['id'], $row['Group']['id']);
             $tmp['is_submitted'] = $this->EvaluationSubmission->isSubmitted($row['Event']['id'], $row['Group']['id']);
             $tmp['penalty_percent'] = $row['percent_penalty'] ?? NULL;
             $tmp['expiry_date'] = $row['expiry_date'] ?? NULL; // JK::A
