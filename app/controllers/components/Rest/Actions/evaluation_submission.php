@@ -22,7 +22,7 @@ class EvaluationSubmissionComponent extends CakeObject
         $userId = User::get('id');
         // $submission = $this->controller->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($eventId, $userId);
         $submission = $this->controller->EvaluationSubmission->getEvalSubmissionByEventIdGroupIdSubmitter($eventId, $groupId, $userId);
-        return $submission['EvaluationSubmission']['submitted'] ?? null;
+        return !empty($submission['EvaluationSubmission']) ? $submission['EvaluationSubmission']['submitted'] : null;
     }
     
     public function submission(string $eventId, string $userId)

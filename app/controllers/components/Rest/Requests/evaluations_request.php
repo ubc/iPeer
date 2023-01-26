@@ -177,10 +177,10 @@ class EvaluationsRequestComponent extends CakeObject
                 $this->getRubricEvaluationSubmit($event, $groupId, $studentId);
                 break;
             case 'POST': // Create
-                $this->setRubricEvaluationSubmit($event, $groupId, $studentId);
+                $this->setRubricEvaluationSubmit($event, $groupId, $studentId, $method);
                 break;
             case 'PUT': // Update
-                $this->setRubricEvaluationSubmit($event, $groupId, $studentId);
+                $this->setRubricEvaluationSubmit($event, $groupId, $studentId, $method);
                 break;
             default:
                 http_response_code(405);
@@ -270,63 +270,7 @@ class EvaluationsRequestComponent extends CakeObject
         $this->JsonResponse->setContent($json)->withStatus(200);
     }
     
-    private function submitRubricEvaluationSubmit(array $event, string $groupId, string $studentId): void
-    {
-        $status = true;
-        
-        $eventId = $this->params['form']['event_id'];
-        $groupId = $this->params['form']['group_id'];
-        $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
-        $evaluators = $this->controller->GroupsMembers->findAllByGroupId($groupId);
-        $evaluators = Set::extract('/GroupsMembers/user_id', $evaluators);
-        
-        $groupEventId = $this->params['form']['group_event_id'];
-        //Get the target group event
-        $groupEvent = $this->controller->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
-        $this->controller->GroupEvent->id = $groupEvent['GroupEvent']['group_id'];
-        
-        // if no submission exists, create one
-        //Get the target event submission
-        $evaluationSubmission = $this->controller->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
-        if (empty($evaluationSubmission)) {
-            $this->controller->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
-            $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
-            $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
-            $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
-            // save evaluation submission
-            $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
-            $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
-            if (!$this->controller->EvaluationSubmission->save($evaluationSubmission)) {
-                $status = false;
-            }
-        }
-        
-        //checks if all members in the group have submitted
-        //the number of submission equals the number of members
-        //means that this group is ready to review
-        $memberCompletedNo = $this->controller->EvaluationSubmission->find('count', array(
-            'conditions' => array('grp_event_id' => $groupEventId, 'submitter_id' => $evaluators)
-        ));
-        $evaluators = count($evaluators);
-        //Check to see if all members are completed this evaluation
-        if ($memberCompletedNo == $evaluators) {
-            $groupEvent['GroupEvent']['marked'] = 'to review';
-            if (!$this->controller->GroupEvent->save($groupEvent)) {
-                $status = false;
-            }
-        }
-        
-        if ($status) {
-            CaliperHooks::submit_rubric($eventId, $evaluator, $groupEvent['GroupEvent']['id'], $groupId);
-            $this->JsonResponse->withMessage('Your Evaluation was submitted successfully.')->withStatus(200);
-            return;
-        } else {
-            $this->JsonResponse->withMessage('Your Evaluation was not submitted successfully.')->withStatus(404);
-            return;
-        }
-    }
-    
-    private function setRubricEvaluationSubmit(array $event, string $groupId, string $studentId): void
+    private function setRubricEvaluationSubmit(array $event, string $groupId, string $studentId, string $method): void
     {
         $eventId = $this->params['form']['event_id'];
         $groupId = $this->params['form']['group_id'];
@@ -355,7 +299,11 @@ class EvaluationsRequestComponent extends CakeObject
                         $msg[] = __('you still have to submit the evaluation with the Submit button below', true);
                     }
                     $suffix = empty($msg) ? '.' : ', but ' . implode(' and ', $msg) . '.';
-                    $this->JsonResponse->withMessage('Your evaluation has been saved' . $suffix)->withStatus(200);
+                    if (empty($msg) && $method === 'POST') {
+                        $this->subRubricEvaluationSubmit();
+                    } else {
+                        $this->JsonResponse->withMessage('Your evaluation has been saved' . $suffix)->withStatus(200);
+                    }
                 } else {
                     //Found error. Validate the error why the Event->save() method returned false
                     //TBD:: $this->validateErrors($this->Event);
@@ -410,6 +358,62 @@ class EvaluationsRequestComponent extends CakeObject
                     break;
                 }
             }
+            return;
+        }
+    }
+    
+    private function subRubricEvaluationSubmit(): void
+    {
+        $status = true;
+        
+        $eventId = $this->params['form']['event_id'];
+        $groupId = $this->params['form']['group_id'];
+        $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
+        $evaluators = $this->controller->GroupsMembers->findAllByGroupId($groupId);
+        $evaluators = Set::extract('/GroupsMembers/user_id', $evaluators);
+        
+        $groupEventId = $this->params['form']['group_event_id'];
+        //Get the target group event
+        $groupEvent = $this->controller->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
+        $this->controller->GroupEvent->id = $groupEvent['GroupEvent']['group_id'];
+        
+        // if no submission exists, create one
+        //Get the target event submission
+        $evaluationSubmission = $this->controller->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
+        if (empty($evaluationSubmission)) {
+            $this->controller->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
+            $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
+            $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
+            $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
+            // save evaluation submission
+            $evaluationSubmission['EvaluationSubmission']['date_submitted'] = date('Y-m-d H:i:s');
+            $evaluationSubmission['EvaluationSubmission']['submitted'] = 1;
+            if (!$this->controller->EvaluationSubmission->save($evaluationSubmission)) {
+                $status = false;
+            }
+        }
+        
+        //checks if all members in the group have submitted
+        //the number of submission equals the number of members
+        //means that this group is ready to review
+        $memberCompletedNo = $this->controller->EvaluationSubmission->find('count', array(
+            'conditions' => array('grp_event_id' => $groupEventId, 'submitter_id' => $evaluators)
+        ));
+        $evaluators = count($evaluators);
+        //Check to see if all members are completed this evaluation
+        if ($memberCompletedNo == $evaluators) {
+            $groupEvent['GroupEvent']['marked'] = 'to review';
+            if (!$this->controller->GroupEvent->save($groupEvent)) {
+                $status = false;
+            }
+        }
+        
+        if ($status) {
+            CaliperHooks::submit_rubric($eventId, $evaluator, $groupEvent['GroupEvent']['id'], $groupId);
+            $this->JsonResponse->withMessage('Your Evaluation was submitted successfully.')->withStatus(201);
+            return;
+        } else {
+            $this->JsonResponse->withMessage('Your Evaluation was not submitted successfully.')->withStatus(404);
             return;
         }
     }
