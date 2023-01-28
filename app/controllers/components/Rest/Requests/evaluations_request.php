@@ -43,10 +43,10 @@ class EvaluationsRequestComponent extends CakeObject
                 $this->getSimpleEvaluationSubmit($event, $groupId, $studentId);
                 break;
             case 'POST': // Create
-                $this->createSimpleEvaluationSubmit($event, $groupId, $studentId);
+                $this->setSimpleEvaluationSubmit($event, $groupId, $studentId);
                 break;
             case 'PUT': // Update
-                $this->updateSimpleEvaluationSubmit($event, $groupId, $studentId);
+                $this->setSimpleEvaluationSubmit($event, $groupId, $studentId);
                 break;
             default:
                 http_response_code(405);
@@ -122,15 +122,46 @@ class EvaluationsRequestComponent extends CakeObject
         $this->JsonResponse->setContent($json)->withStatus(200);
     }
     
-    private function createSimpleEvaluationSubmit($event, $groupId, $studentId): void
+    private function setSimpleEvaluationSubmit($event, $groupId, $studentId): void
     {
-        echo "<pre>";
-        print_r($this->params);
-        die();
-        echo "</pre>";
+        $eventId = $this->params['form']['event_id'];
+        $groupId = $this->params['form']['group_id'];
+        $courseId = $this->params['form']['course_id'];
+        $evaluator = $this->params['data']['Evaluation']['evaluator_id'];
+        // check that all points given are not negative numbers
+        $minimum = min($this->params['form']['points']);
+        if ($minimum < 0) {
+            $this->controller->JsonResponse->withMessage('One or more of your group members have negative points. Please use positive numbers.')->withStatus(404);
+            return;
+        }
+        
+        //Get the target event
+        $this->controller->Event->id = $eventId;
+        $event = $this->controller->Event->read();
+        
+        //Get simple evaluation tool
+        $this->controller->SimpleEvaluation->id = $event['Event']['template_id'];
+        
+        //Get the target group event
+        $groupEvent = $this->controller->GroupEvent->getGroupEventByEventIdGroupId($eventId, $groupId);
+        
+        //Get the target event submission
+        $evaluationSubmission = $this->controller->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['id'],
+            $evaluator);
+        $this->controller->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
+        
+        if ($this->controller->Evaluation->saveSimpleEvaluation($this->params, $groupEvent, $evaluationSubmission)) {
+            CaliperHooks::submit_simple_evaluation($eventId, $evaluator, $groupEvent['GroupEvent']['id'], $groupId);
+            $this->controller->JsonResponse->withMessage('Your Evaluation was submitted successfully.')->withStatus(200);
+        } else {
+            //Found error. Validate the error why the Event->save() method returned false
+            // TODO::L $this->validateErrors($this->Event);
+            $this->controller->JsonResponse->withMessage('Save Evaluation failure.')->withStatus(404);
+            return;
+        }//end if
     }
     
-    private function updateSimpleEvaluationSubmit($event, $groupId, $studentId): void
+    private function subSimpleEvaluationSubmit($event, $groupId, $studentId): void
     {
         echo "<pre>";
         print_r($this->params);
@@ -664,7 +695,7 @@ class EvaluationsRequestComponent extends CakeObject
         }
     }
     
-    private function updateMixedEvaluationSubmit(array $event, string $groupId, string $studentId): void
+    private function subMixedEvaluationSubmit(array $event, string $groupId, string $studentId): void
     {
         echo "<pre>";
         print_r($this->params);

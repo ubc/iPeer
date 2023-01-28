@@ -69,8 +69,10 @@ class SimpleEvaluationResourceComponent extends CakeObject
                 'record_status' => $evaluation[$key]['EvaluationSimple']['record_status'],
                 'release_status' => $evaluation[$key]['EvaluationSimple']['release_status'],
                 'response' => [
-                    'comment' => $evaluation[$key]['EvaluationSimple']['comment'],
-                    'score' => $evaluation[$key]['EvaluationSimple']['score'],
+                    [
+                        'comment' => $evaluation[$key]['EvaluationSimple']['comment'],
+                        'score' => $evaluation[$key]['EvaluationSimple']['score'],
+                    ]
                 ]
             ] : [];
             
