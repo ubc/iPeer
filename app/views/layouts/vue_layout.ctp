@@ -16,10 +16,10 @@
 
   <link rel="stylesheet" type="text/css" href="<?php Router::url(null, false); ?>vue/assets/css/main.44d4d1d9.css"/>
   <script type="text/javascript" defer
-          src="<?php Router::url(null, false); ?>vue/assets/js/chunk-vendors.5d95980a.js"></script>
+          src="<?php Router::url(null, false); ?>vue/assets/js/chunk-vendors.3cd8f87f.js"></script>
   <script type="text/javascript" defer
-          src="<?php Router::url(null, false); ?>vue/assets/js/chunk-common.42ec3d89.js"></script>
-  <script type="text/javascript" defer src="<?php Router::url(null, false); ?>vue/assets/js/main.d33dd4bb.js"></script>
+          src="<?php Router::url(null, false); ?>vue/assets/js/chunk-common.2700d4a1.js"></script>
+  <script type="text/javascript" defer src="<?php Router::url(null, false); ?>vue/assets/js/main.3ed01fee.js"></script>
 </head>
 <body>
 <noscript>

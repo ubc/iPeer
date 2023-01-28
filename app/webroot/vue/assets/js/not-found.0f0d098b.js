@@ -1,2 +1,2 @@
 "use strict";(self["webpackChunkvueapp"]=self["webpackChunkvueapp"]||[]).push([[942],{9128:function(u,t,e){e.r(t),e.d(t,{default:function(){return r}});var n=e(3396);const a={class:""};var s=(0,n.aZ)({__name:"NotFound",setup(u){return(u,t)=>((0,n.wg)(),(0,n.iD)("div",a,[(0,n.Uk)(" 404 NotFound "),(0,n.WI)(u.$slots,"default")]))}});const o=s;var r=o}}]);
-//# sourceMappingURL=not-found.79cf60b4.js.map
+//# sourceMappingURL=not-found.0f0d098b.js.map
