@@ -754,8 +754,6 @@ class Event extends AppModel
      */
     function getEventsByUserId($userId, $fields = null, $extraId = null)
     {
-        ini_set('display_errors', 1);
-        error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
         $evaluationFields = $surveyFields = $fields;
         if ($evaluationFields != null) {
             $evaluationFields[] = 'GroupEvent.*';
