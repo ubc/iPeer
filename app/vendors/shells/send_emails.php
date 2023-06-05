@@ -66,8 +66,7 @@ class SendEmailsShell extends Shell
             $from_id = $e['from'];
 			$event_id = $e['event_id'];
 
-            $from = $this->User->getEmails($from_id);
-            $from = (isset($from[$from_id]) && empty($from[$from_id])) ? $defaultFrom : $from[$from_id];
+            $from = $defaultFrom;
 
             //Returns the modified emaillist if the list contains the 'save_reminder' param, else returns $e['to']
 			$filter_email_list = $this->reminderFilter($event_id, $e['to'], $e['id'], $e['date']);
