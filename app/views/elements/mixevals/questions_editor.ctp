@@ -222,7 +222,7 @@ echo $html->div('', $reloadedQ, array('id' => 'questions', 'class' => 'questions
 
 // self evaluation questions section
 echo '<div id="self-eval-ques">';
-echo $html->tag('h3', __('Self-Evaluation Questions', true));
+echo $html->tag('h3', __('Include Additional Questions for Reflection', true));
 $addQButton = $form->button(__('Add', true),
     array('type' => 'button', 'onclick' => "insertQ(true);"));
 $selfQTypes = $qTypes;

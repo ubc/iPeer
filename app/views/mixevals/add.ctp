@@ -27,12 +27,40 @@ echo $html->div("help-text",
 echo $form->input('zero_mark');
 echo $html->div("help-text", 
     __('Start marks from zero for all Likert questions.', true));
+
+/**
+ * Adds evaluators to Peer Evaluation list for Self-Evaluation.
+ */
+if(isset($this->data['Mixeval']['id']) && $this->params['action'] == 'edit' && !empty($this->data['Event'])) {
+    $self_eval_checked = ($this->data['Event'][$event_index]['self_eval'] > 0) ? true : false;
+    echo $form->input('event_self_eval',
+        array(
+            'legend'  => 'Self-Evaluation',
+            'type'    => 'radio',
+            'name'    => 'data[Event]['.$event_index.'][self_eval]',
+            'value'   => $this->data['Event'][$event_index]['self_eval'],
+            'default' => $self_eval_checked,
+            'options' => array(
+                '1'   => __('Enabled', true),
+                '0'   => __('Disabled', true)
+            )
+        )
+    );
+}
+
+/**
+ * Adds a reflective questions section for evaluators.
+ */
 $check = ($this->data['Mixeval']['self_eval'] > 0) ? true : false;
-echo $form->input('self_eval', 
-    array('type' => 'checkbox', 'id' => 'self_eval', 'label' => __('Self-Evaluation', true),
-    'checked' => $check));
-echo $html->div("help-text", 
-    __('Adds a reflective questions section for evaluators.', true));
+echo $form->input('self_eval',
+    array(
+        'type'    => 'checkbox',
+        'id'      => 'self_eval',
+        'label'   => __('Additional Questions<br /> for Reflection', true),
+        'checked' => $check
+    )
+);
+echo $html->div("help-text", __('Adds a reflective questions section for evaluators.', true));
 
 // If we're editing a previously saved mixeval, will need to have an id for
 // the mixeval.
