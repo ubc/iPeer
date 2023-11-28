@@ -1,4 +1,4 @@
-FROM php:8.1-fpm
+FROM php:8.2-fpm
 
 RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests  -y \
         libpng-dev \
@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
     && pecl install timezonedb xdebug\
     && docker-php-ext-enable timezonedb xdebug
 
-COPY --from=composer:2.4 /usr/bin/composer /usr/local/bin/composer
+COPY --from=composer:2.6 /usr/bin/composer /usr/local/bin/composer
 
 COPY docker/php.ini /usr/local/etc/php/
 COPY . /var/www/html
