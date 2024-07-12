@@ -15,14 +15,14 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
     && pecl install timezonedb xdebug\
     && docker-php-ext-enable timezonedb xdebug
 
-COPY --from=composer:2.6 /usr/bin/composer /usr/local/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
 COPY docker/php.ini /usr/local/etc/php/
 COPY . /var/www/html
 COPY docker/docker-entrypoint-php-fpm.sh /
 
 RUN cd /var/www/html \
-    && composer install --no-ansi --no-dev --no-interaction --no-plugins --no-progress --no-suggest --optimize-autoloader \
+    && composer install --no-ansi --no-dev --no-interaction --no-plugins --no-progress --optimize-autoloader \
     && mkdir -p /var/www/html/app/tmp/cache/persistent /var/www/html/app/tmp/cache/models /var/www/html/app/tmp/logs \
     && chown www-data:www-data -R /var/www/html/app/tmp/cache \
     && chown www-data:www-data -R /var/www/html/app/tmp/logs
