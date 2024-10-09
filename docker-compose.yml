@@ -18,7 +18,7 @@ services:
     depends_on:
       - db
   app: &app
-    image: ubcctlt/ipeer-app
+    ##image: ubcctlt/ipeer-app
     build:
       context: .
     volumes:
@@ -62,7 +62,7 @@ services:
 
   # for running unit tests
   app-unittest:
-    image: ubcctlt/ipeer-app-unittest
+    ##image: ubcctlt/ipeer-app-unittest
     build:
       context: .
       dockerfile: Dockerfile-app-unittest
