@@ -48,7 +48,7 @@ services:
       - db
   worker: &worker
     <<: *app
-    command: bash -c "sleep 5 && cake/console/cake worker run"
+    command: bash -c "sleep 6 && cake/console/cake worker run"
     volumes: []
   web:
     image: nginx:1.27-alpine
