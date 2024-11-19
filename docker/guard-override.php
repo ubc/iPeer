@@ -9,8 +9,8 @@ $config['Guard.AuthModule.Name'] = getenv('IPEER_AUTH') ? getenv('IPEER_AUTH') :
 
 $config['Guard.AuthModule.Default'] = array();
 $config['Guard.AuthModule.Shibboleth'] = array(
-    'sessionInitiatorURL' => 'https://%HOST%/Shibboleth.sso/Login',
-    'logoutURL'           => 'https://%HOST%/Shibboleth.sso/Logout',
+    'sessionInitiatorURL' => 'https://%HOST%/Shibboleth.ssoooooo/Login',
+    'logoutURL'           => 'https://%HOST%/Shibboleth.sso000/Logout',
     'fieldMapping'        => array(
         'eppn'        => 'username',
         'affiliation' => 'role',
