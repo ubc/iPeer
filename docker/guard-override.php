@@ -41,8 +41,8 @@ $config['Guard.AuthModule.Ldap'] = array(
 );
 
 $config['Guard.AuthModule.Cwl'] = array(
-    'sessionInitiatorURL' => 'https://ipeer1-stg.apps.ctlt.ubc.ca/api/saml/login',
-    'applicationID'       => 'ServiceName-iPeer',
+    'sessionInitiatorURL' => 'https://www.auth.cwl.ubc.ca/auth/login',
+    'applicationID'       => 'ServiceName',
     'applicationPassword' => 'ServicePassword',
     'fieldMapping'        => array(
         'eppn'        => 'username',
@@ -57,8 +57,7 @@ $config['Guard.AuthModule.Cwl'] = array(
     'loginTextButton'     => 'Login',
     // CWL XML-RPC interface URLs: https://www.auth.verf.cwl.ubc.ca/auth/rpc (for verification)
     //                             https://www.auth.cwl.ubc.ca/auth/rpc
-    //'RPCURL'              => "https://www.auth.cwl.ubc.ca",
-    'RPCURL'              => "https://ipeer1-stg.apps.ctlt.ubc.ca",
+    'RPCURL'              => "https://www.auth.cwl.ubc.ca",
     'RPCPath'             => "/auth/rpc",
 
     /**
