@@ -1,4 +1,3 @@
-##FROM php:8.3-fpm
 FROM php:8.2-fpm
 
 RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests  -y \
