@@ -16,7 +16,7 @@ web1:
   php_display_errors: "0"
   after_build:
     - "mv app/config/database.pagoda.php app/config/database.php"
-    - "mv app/plugins/guard/config/guard_default.php app/config/guard.php"
+    - "mv app/config/guard-override.php app/config/guard.php"
   cron:
     - "*/15 * * * *": "cake/console/cake send_emails"
 db1:
