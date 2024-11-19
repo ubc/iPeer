@@ -2,10 +2,10 @@
 
 //$config['Guard.AuthModule.Name'] = 'Ldap';    // Using LDAP module
 //$config['Guard.AuthModule.Name'] = 'Shibboleth';    // Using Shibboleth module
-//$config['Guard.AuthModule.Name'] = getenv('IPEER_AUTH') ? getenv('IPEER_AUTH') : 'Default';     // Using default (build-in) module
+$config['Guard.AuthModule.Name'] = getenv('IPEER_AUTH') ? getenv('IPEER_AUTH') : 'Default';     // Using default (build-in) module
 
 //added Tue for testing.
-$config['Guard.AuthModule.Name'] = 'Default';
+//$config['Guard.AuthModule.Name'] = 'Default';
 
 $config['Guard.AuthModule.Default'] = array();
 $config['Guard.AuthModule.Shibboleth'] = array(
@@ -41,8 +41,8 @@ $config['Guard.AuthModule.Ldap'] = array(
 );
 
 $config['Guard.AuthModule.Cwl'] = array(
-    'sessionInitiatorURL' => 'https://www.auth.cwl.ubc.ca/auth/login',
-    'applicationID'       => 'ServiceName',
+    'sessionInitiatorURL' => 'https://ipeer1-stg.apps.ctlt.ubc.ca/api/saml/login',
+    'applicationID'       => 'ServiceName-iPeer',
     'applicationPassword' => 'ServicePassword',
     'fieldMapping'        => array(
         'eppn'        => 'username',
@@ -57,7 +57,8 @@ $config['Guard.AuthModule.Cwl'] = array(
     'loginTextButton'     => 'Login',
     // CWL XML-RPC interface URLs: https://www.auth.verf.cwl.ubc.ca/auth/rpc (for verification)
     //                             https://www.auth.cwl.ubc.ca/auth/rpc
-    'RPCURL'              => "https://www.auth.cwl.ubc.ca",
+    //'RPCURL'              => "https://www.auth.cwl.ubc.ca",
+    'RPCURL'              => "https://ipeer1-stg.apps.ctlt.ubc.ca",
     'RPCPath'             => "/auth/rpc",
 
     /**
