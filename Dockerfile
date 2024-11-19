@@ -1,7 +1,7 @@
-FROM php:8.3-fpm
+##FROM php:8.3-fpm
+FROM php:8.2-fpm
 
-# Install necessary dependencies and PHP extensions
-RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests -y \
+RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests  -y \
         libpng-dev \
         libxml2-dev \
         libldap2-dev \
@@ -9,40 +9,29 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
         libzip-dev \
         unzip \
         git \
-        openssl \
-        ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
     && ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so \
     && ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so \
     && docker-php-ext-install -j$(nproc) xml gd ldap mysqli pdo_mysql zip \
-    && pecl install timezonedb xdebug \
-    && docker-php-ext-enable timezonedb xdebug \
-    && update-ca-certificates  # Ensure OpenSSL CA certificates are updated
+    && pecl install timezonedb xdebug\
+    && docker-php-ext-enable timezonedb xdebug
 
-# Copy Composer from the Composer official image
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
-# Copy PHP configuration
 COPY docker/php.ini /usr/local/etc/php/
-
-# Copy the application code
 COPY . /var/www/html
-
-# Copy custom entrypoint script for PHP-FPM
 COPY docker/docker-entrypoint-php-fpm.sh /
 
-# Install PHP dependencies using Composer and set correct permissions
 RUN cd /var/www/html \
     && composer install --no-ansi --no-dev --no-interaction --no-plugins --no-progress --optimize-autoloader \
     && mkdir -p /var/www/html/app/tmp/cache/persistent /var/www/html/app/tmp/cache/models /var/www/html/app/tmp/logs \
     && chown www-data:www-data -R /var/www/html/app/tmp/cache \
     && chown www-data:www-data -R /var/www/html/app/tmp/logs
 
-# Customize PHP-FPM configuration
 RUN set -ex \
+    ## Customize PHP fpm configuration
     && sed -i -e "s/;clear_env\s*=\s*no/clear_env = no/g" /usr/local/etc/php-fpm.conf \
     && sed -i -e "s/;request_terminate_timeout\s*=[^\n]*/request_terminate_timeout = 300/g" /usr/local/etc/php-fpm.conf \
     && php-fpm --test
 
-# Set the entrypoint for PHP-FPM
 CMD ["/docker-entrypoint-php-fpm.sh"]
