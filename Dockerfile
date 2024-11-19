@@ -33,4 +33,6 @@ RUN set -ex \
     && sed -i -e "s/;request_terminate_timeout\s*=[^\n]*/request_terminate_timeout = 300/g" /usr/local/etc/php-fpm.conf \
     && php-fpm --test
 
+COPY docker/guard-override.php /var/www/html/app/config/guard.php
+
 CMD ["/docker-entrypoint-php-fpm.sh"]

@@ -4,7 +4,8 @@
 //$config['Guard.AuthModule.Name'] = 'Shibboleth';    // Using Shibboleth module
 //$config['Guard.AuthModule.Name'] = getenv('IPEER_AUTH') ? getenv('IPEER_AUTH') : 'Default';     // Using default (build-in) module
 
-$config['Guard.AuthModule.Name'] = 'Default';   
+//added Tue for testing.
+$config['Guard.AuthModule.Name'] = 'Default';
 
 $config['Guard.AuthModule.Default'] = array();
 $config['Guard.AuthModule.Shibboleth'] = array(
