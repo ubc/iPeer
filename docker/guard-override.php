@@ -7,9 +7,10 @@ $config['Guard.AuthModule.Name'] = getenv('IPEER_AUTH') ? getenv('IPEER_AUTH') :
 //added Tue for testing.
 //$config['Guard.AuthModule.Name'] = 'Default';
 
+
 $config['Guard.AuthModule.Default'] = array();
 $config['Guard.AuthModule.Shibboleth'] = array(
-    'sessionInitiatorURL' => 'https://ipeer1-stg.apps.ctlt.ubc.ca/api/saml/login',
+    'sessionInitiatorURL' => getenv('IPEER_AUTH_SHIBBOLETH_sessionInitiatorURL'),
     'logoutURL'           => 'https://%HOST%/Shibboleth.sso000/Logout',
     'fieldMapping'        => array(
         'eppn'        => 'username',
