@@ -110,11 +110,20 @@ class AppController extends Controller
         $this->breadcrumb = Breadcrumb::create();
 
         if ($this->Auth->isAuthorized()) {
+            $this->log('XXXXXXXXXXXXXXXXXXXXXXX:HTTP_RAW_POST_DATA:'.$HTTP_RAW_POST_DATA);
+            $this->log('XXXXXXXXXXXXXXXXXXXXXXX:sessionTransferData:'.$sessionTransferData);
+
+            // Get all object properties as an associative array
+            //$properties = get_object_vars($this);
+            //$this->log('MMMMMMMMMMMMMMMM333333333:'.json_encode($properties));
+
             // check if the user has permission to access the controller/action
             $permission = array_filter(array('controllers', ucwords($this->params['plugin']), ucwords($this->params['controller']), $this->params['action']));
             if (!User::hasPermission(join('/', $permission))) {
                 $this->Session->setFlash('Error: You do not have permission to access the page.');
-                $this->redirect('/home');
+                //$this->redirect('/home');
+                //$this->log('XXXXXXXXXXXXXXXXXXXXXXX');
+                //$this->redirect('https://ubc.ca');
                 return;
             }
 
@@ -128,6 +137,10 @@ class AppController extends Controller
         $this->set('trackingId', $trackingId);
         $this->set('domain', $domain);
         $this->set('customLogo', $customLogo);
+
+        //$this->log('XXXXXXXXXXXXXXXXXXXXXXX::trackingId::'.$trackingId);
+        //$this->log('XXXXXXXXXXXXXXXXXXXXXXX::domain::'.$domain);
+
 
         parent::beforeFilter();
     }
@@ -234,6 +247,11 @@ class AppController extends Controller
      */
     public function _beforeLogin()
     {
+        $testUID = User::get('id');
+        $testUserName = User::get('username');
+        $this->log("XXXXXXXXXXXX::_beforeLogin::".$testUID);
+        $this->log("XXXXXXXXXXXX::_beforeLogin::".$testUserName);
+
         $this->set('loginHeader', $this->SysParameter->get('display.login.header'));
         $this->set('loginFooter', $this->SysParameter->get('display.login.footer'));
     }
@@ -262,6 +280,14 @@ class AppController extends Controller
             $this->AccessControl->loadPermissions();
             $this->SysParameter->reload();
             //TODO logging!
+
+            $testUID = User::get('id');
+            $testUsername = User::get('username');
+            $testStudentNo = User::get('student_no');
+            
+            $this->log("XXXXXXXXX::_afterLogin:testUID:".$testUID);
+            $this->log("XXXXXXXXX::_afterLogin:testUsername:".$testUsername);
+            $this->log("XXXXXXXXX::_afterLogin:testStudentNo:".$testStudentNo);
 
             CaliperHooks::app_controller_after_login($this);
         }
@@ -330,6 +356,11 @@ class AppController extends Controller
 
         // find the userId by username and use it to login
         $userId = $this->User->field('id', array('username' => $this->sessionTransferData['username']));
+
+        $testUserNameAuth = $this->sessionTransferData['username'];
+        $this->log("YYYYYYYYYYY::app_controller:_authenticateWithSessionTransferData:testUserNameAuth:".$testUserNameAuth);
+        $this->log("YYYYYYYYYYY::app_controller:_authenticateWithSessionTransferData:userId:".$userId);
+
         if (!$this->Auth->login($userId)) {
             $this->log('Invalid username '.$this->sessionTransferData['username'].' from session transfer.', 'debug');
             return false;

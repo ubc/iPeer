@@ -973,6 +973,7 @@ class UsersController extends AppController
 
         // Ensure that the id is valid
         if (!is_numeric($id)) {
+            $this->log('MMMMMM-users_controller::'.$id);
             $this->cakeError('error404');
         }
 
@@ -1022,6 +1023,7 @@ class UsersController extends AppController
     function checkDuplicateName($courseId = null)
     {
         if (!$this->RequestHandler->isAjax()) {
+            $this->log('MMMMMM-checkDuplicateName::'.$puid);
             $this->cakeError('error404');
         }
         $this->layout = 'ajax';

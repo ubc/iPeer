@@ -59,7 +59,7 @@ if (IS_INSTALLED) {
   Router::connect('/login', array('plugin' => 'guard', 'controller' => 'guard',
     'action' => 'login'));
   Router::connect('/loginUBCCWL', array('plugin' => 'guard', 'controller' => 'guard',
-    'action' => 'login'));
+    'action' => 'loginUBCCWL'));
   Router::connect('/logout', array('plugin' => 'guard', 'controller' => 'guard',
     'action' => 'logout'));
   Router::connect('/loginout/loginByCWL', array('plugin' => 'guard', 'controller' => 'guard',
