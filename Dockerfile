@@ -33,11 +33,6 @@ RUN set -ex \
     && sed -i -e "s/;request_terminate_timeout\s*=[^\n]*/request_terminate_timeout = 300/g" /usr/local/etc/php-fpm.conf \
     && php-fpm --test
 
-##COPY docker/guard-override.php /var/www/html/app/config/guard.php
-
-##COPY docker/guard-controller-override.php /var/www/html/app/plugins/guard/controllers/guard_controller.php
-
-##COPY docker/guard-controllers-components-guard-override.php /var/www/html/app/plugins/guard/controllers/components/guard.php
 
 ## Modifying the login page
 COPY docker/login_default-override.ctp /var/www/html/app/plugins/guard/views/elements/login_default.ctp
@@ -45,7 +40,7 @@ COPY docker/guard_default-override.php /var/www/html/app/plugins/guard/config/gu
 
 ## IMPORTANT MODULES FOR TESTING LOGIN with admin2
 COPY docker/auth_module-override.php /var/www/html/app/plugins/guard/controllers/components/auth_module.php
-COPY docker/default_module-override.php /var/www/html/app/plugins/guard/controllers/components/default_module.php
+##COPY docker/default_module-override.php /var/www/html/app/plugins/guard/controllers/components/default_module.php
 
 
 CMD ["/docker-entrypoint-php-fpm.sh"]

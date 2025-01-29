@@ -1,4 +1,8 @@
 <?php
+
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
 /**
  * HomeController
  *
@@ -8,6 +12,8 @@
  * @copyright 2012 All rights reserved.
  * @license   MIT {@link http://www.opensource.org/licenses/MIT}
  */
+
+
 class HomeController extends AppController
 {
     /**
@@ -30,6 +36,30 @@ class HomeController extends AppController
         parent::__construct();
     }
 
+
+    /**
+     * Decodes a JWT token.
+     *
+     * @param string $jwt The JWT token to decode.
+     * @param string $secretKey The secret key used to sign the token.
+     * @return mixed The decoded data if successful, or an error message on failure.
+     */
+    function decodeJWT($jwt, $secretKey) {
+        try {
+            // Decode the JWT token
+            $decoded = JWT::decode($jwt, new Key($secretKey, 'HS256'));
+            //return $decoded;
+            return json_encode($decoded);
+
+        } catch (Exception $e) {
+            // Handle exceptions
+            //return "Error decoding JWT: " . $e->getMessage();
+            return json_encode(['error' => "Error decoding JWT: " . $e->getMessage()]);
+        }
+    }
+
+
+
     /**
      * beforeFilter
      *
@@ -38,10 +68,46 @@ class HomeController extends AppController
      */
     function beforeFilter()
     {
+
+        $secretKey = 'your_secret_key_here'; // Replace with your secret key
+
+        $id3 = isset($_REQUEST['VBiVlY3YjNORb589befb9lE0N2']) ? $_REQUEST['VBiVlY3YjNORb589befb9lE0N2'] : null;
+        if (!empty($id3)) {
+            $jsonString3 = $this->decodeJWT($id3, $secretKey);
+
+            // Decode JSON into an associative array
+            $decodedArray = json_decode($jsonString3, true); // true = associative array
+
+            $dataValue = $decodedArray['data']['value'] ?? null;
+
+            // Log or display the extracted value
+            if ($dataValue) {
+
+                $userId = $this->User->field('id', array('username' => $dataValue ));
+                $userRoleId = $this->User->field('role_id', array('username' => $dataValue ));
+    
+                if (!$this->Auth->login($userId)) {
+                    $this->log('Invalid username '.$userId.' from session transfer.', 'debug');
+                    //return false;
+                }else{
+                    $this->log('Valid username '.$userId.' from session transfer.', 'debug');
+                }
+    
+                $this->_afterLogin();
+
+
+            } 
+
+        } 
+        
+
         parent::beforeFilter();
 
         $this->set('title_for_layout', __('Home', true));
+
+
     }
+
 
     /**
      * index
@@ -52,6 +118,8 @@ class HomeController extends AppController
      */
     function index()
     {
+
+
         if (User::hasPermission('functions/coursemanager') || User::isInstructor()) {
             // Admins and profs
             $course_list = $this->Course->getAllAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'all', array(

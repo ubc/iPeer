@@ -1,18 +1,19 @@
 <?php
+// Check if the 'defaultlogin' parameter is NOT set or NOT true in the URL
+if (!isset($_GET['defaultlogin']) || $_GET['defaultlogin'] !== 'true') {
+    // Perform the redirect
+    header("Location: https://ipeer1-stg.apps.ctlt.ubc.ca/");
+    exit(); // Ensures no further code is executed after the redirect
+}
+
+// Continue with the form if 'defaultlogin=true' is set in the URL
 echo $form->create('Guard', array('url' => $login_url));
 echo $form->input('username');
 echo $form->input('password');
 ?>
 
-<table id="cwl-login" class="standardtable">
-<tr>
-    <td>Active iPeer with CWL</td>
-    <td>
-    <a href="https://ipeer1-stg.apps.ctlt.ubc.ca/" style="display:inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-align: center; text-decoration: none; border-radius: 5px;">ACTIVATE</a>
-    </td>
-</tr>
-
-</table>
-
 <input type="hidden" name="auth_method" value="default" id="GuardAuthMethod">
-<?php echo $form->end('Login');
+
+<?php
+echo $form->end('Login');
+?>

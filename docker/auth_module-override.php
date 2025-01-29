@@ -21,7 +21,7 @@ class AuthModule extends CakeObject {
      * @access protected
      * hasLoginForm = true (default)
      */
-    var $hasLoginForm = true;
+    var $hasLoginForm = false;
 
     /**
      * guard guard component
@@ -143,6 +143,9 @@ class AuthModule extends CakeObject {
 
         $this->data = $this->controller->data[$this->controller->name];
 
+        $str_thisData = serialize($this->data);
+        $this->log("AUTHMODULE::AAAAAAAAAAAAAAAAA--Auth_MODULE.getLoginData2->this->data1:".$str_thisData);
+
 
         $thisDataUsername = $this->data['username'];
         $this->log("AUTHMODULE::AAAAAAAAAAAAAAAAAAuth_MODULE.getLoginData2->this->data[userName]:".$thisDataUsername);
@@ -151,7 +154,7 @@ class AuthModule extends CakeObject {
         $this->data['password'] = $password;
 
         $str_thisData = serialize($this->data);
-        $this->log("AUTHMODULE::AAAAAAAAAAAAAAAAA--Auth_MODULE.getLoginData2->this->data:".$str_thisData);
+        $this->log("AUTHMODULE::AAAAAAAAAAAAAAAAA--Auth_MODULE.getLoginData2->this->data2:".$str_thisData);
 
         return $this->data;
     }
