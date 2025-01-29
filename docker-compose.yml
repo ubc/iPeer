@@ -18,7 +18,7 @@ services:
     depends_on:
       - db
   app: &app
-    image: ubcctlt/ipeer-app
+    ##image: ubcctlt/ipeer-app
     build:
       context: .
     volumes:
@@ -48,7 +48,7 @@ services:
       - db
   worker: &worker
     <<: *app
-    command: bash -c "sleep 5 && cake/console/cake worker run"
+    command: bash -c "sleep 6 && cake/console/cake worker run"
     volumes: []
   web:
     image: nginx:1.27-alpine
@@ -62,7 +62,7 @@ services:
 
   # for running unit tests
   app-unittest:
-    image: ubcctlt/ipeer-app-unittest
+    ##image: ubcctlt/ipeer-app-unittest
     build:
       context: .
       dockerfile: Dockerfile-app-unittest

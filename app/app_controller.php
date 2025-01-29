@@ -65,6 +65,7 @@ class AppController extends Controller
      */
     public function beforeFilter()
     {
+
         $timezone = $this->SysParameter->findByParameterCode('system.timezone');
         // default to UTC if no timezone is set
         if (!(empty($timezone) || empty($timezone['SysParameter']['parameter_value']))) {
@@ -110,15 +111,16 @@ class AppController extends Controller
         $this->breadcrumb = Breadcrumb::create();
 
         if ($this->Auth->isAuthorized()) {
+
             // check if the user has permission to access the controller/action
             $permission = array_filter(array('controllers', ucwords($this->params['plugin']), ucwords($this->params['controller']), $this->params['action']));
             if (!User::hasPermission(join('/', $permission))) {
-                $this->Session->setFlash('Error: You do not have permission to access the page.');
-                $this->redirect('/home');
+                $this->Session->setFlash('Error:AppController: You do not have permission to access the page.');
                 return;
             }
 
             $this->_checkSystemVersion();
+
         }
 
         // for setting up google analytics
@@ -128,6 +130,7 @@ class AppController extends Controller
         $this->set('trackingId', $trackingId);
         $this->set('domain', $domain);
         $this->set('customLogo', $customLogo);
+
 
         parent::beforeFilter();
     }
@@ -160,6 +163,7 @@ class AppController extends Controller
         	$this->Session->setFlash($flashMessage);
         }
     }
+
 
 
     /**
@@ -234,6 +238,7 @@ class AppController extends Controller
      */
     public function _beforeLogin()
     {
+
         $this->set('loginHeader', $this->SysParameter->get('display.login.header'));
         $this->set('loginFooter', $this->SysParameter->get('display.login.footer'));
     }
@@ -257,11 +262,14 @@ class AppController extends Controller
                 $this->redirect('/');
                 return;
             }
+
+
             // after login stuff
             $this->User->loadRoles(User::get('id'));
             $this->AccessControl->loadPermissions();
             $this->SysParameter->reload();
             //TODO logging!
+
 
             CaliperHooks::app_controller_after_login($this);
         }
@@ -310,6 +318,7 @@ class AppController extends Controller
         return false;
     }
 
+
     /**
      * authenticateWithSessionTransferData
      *
@@ -323,19 +332,19 @@ class AppController extends Controller
         $secret = $this->OauthToken->getTokenSecret($this->sessionTransferData['token']);
         $signature = base64_encode(hash_hmac('sha1', $message, $secret, true));
         if ($signature != $this->sessionTransferData['signature']) {
-            $this->log('Invalid signature! Expect '.$signature.', Got '.$this->sessionTransferData['signature']);
+
 
             return false;
         }
 
         // find the userId by username and use it to login
         $userId = $this->User->field('id', array('username' => $this->sessionTransferData['username']));
+
+
         if (!$this->Auth->login($userId)) {
             $this->log('Invalid username '.$this->sessionTransferData['username'].' from session transfer.', 'debug');
             return false;
         }
-
-        $this->log('User '.$this->sessionTransferData['username'].' is logged in with session transfer.', 'debug');
 
         return true;
     }

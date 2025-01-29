@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.3-fpm
 
 RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests  -y \
         libpng-dev \
@@ -32,5 +32,15 @@ RUN set -ex \
     && sed -i -e "s/;clear_env\s*=\s*no/clear_env = no/g" /usr/local/etc/php-fpm.conf \
     && sed -i -e "s/;request_terminate_timeout\s*=[^\n]*/request_terminate_timeout = 300/g" /usr/local/etc/php-fpm.conf \
     && php-fpm --test
+
+
+## Modifying the login page
+COPY docker/login_default-override.ctp /var/www/html/app/plugins/guard/views/elements/login_default.ctp
+COPY docker/guard_default-override.php /var/www/html/app/plugins/guard/config/guard_default.php
+
+## IMPORTANT MODULES FOR TESTING LOGIN with admin2
+COPY docker/auth_module-override.php /var/www/html/app/plugins/guard/controllers/components/auth_module.php
+##COPY docker/default_module-override.php /var/www/html/app/plugins/guard/controllers/components/default_module.php
+
 
 CMD ["/docker-entrypoint-php-fpm.sh"]

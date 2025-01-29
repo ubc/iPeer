@@ -58,6 +58,8 @@ if (IS_INSTALLED) {
   // Authentication routes
   Router::connect('/login', array('plugin' => 'guard', 'controller' => 'guard',
     'action' => 'login'));
+  Router::connect('/loginUBCCWL', array('plugin' => 'guard', 'controller' => 'guard',
+    'action' => 'loginUBCCWL'));
   Router::connect('/logout', array('plugin' => 'guard', 'controller' => 'guard',
     'action' => 'logout'));
   Router::connect('/loginout/loginByCWL', array('plugin' => 'guard', 'controller' => 'guard',

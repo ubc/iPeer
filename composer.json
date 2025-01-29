@@ -28,7 +28,8 @@
       "compass/cake-guard": "1.0.8",
       "nategood/httpful": "^0.2.20",
     "imsglobal/caliper": "1.2.0",
-    "phpoffice/phpspreadsheet": "^1.25"
+    "phpoffice/phpspreadsheet": "^1.25",
+    "firebase/php-jwt": "^6.11"
   },
   "require-dev": {
     "roave/security-advisories": "dev-master",
