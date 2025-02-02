@@ -71,9 +71,15 @@ class HomeController extends AppController
 
         $secretKey = 'your_secret_key_here'; // Replace with your secret key
 
+        //IPEER_SECRET_KEY
+        $secretKey = $_ENV['IPEER_SECRET_KEY'] ?? 'your_default_secret_key_here';
+
+        $jwtSecretKeyParm = $_ENV['SAML_JWT_PARM'] ?? 'jwt_secret_key_parm';
+
         $jwt = '';
 
-        $id3 = isset($_REQUEST['VBiVlY3YjNORb589befb9lE0N2']) ? $_REQUEST['VBiVlY3YjNORb589befb9lE0N2'] : null;
+        $id3 = isset($_REQUEST[$jwtSecretKeyParm]) ? $_REQUEST[$jwtSecretKeyParm] : null;
+
         if (!empty($id3)) {
             $jsonString3 = $this->decodeJWT($id3, $secretKey);
 

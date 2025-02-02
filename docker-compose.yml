@@ -25,6 +25,7 @@ services:
       - .:/var/www/html
       - appTmp:/var/www/html/app/tmp
     environment:
+      - IPEER_SECRET_KEY=yoursecretkey
       - IPEER_DB_HOST=db
       - IPEER_DB_USER=ipeer
       - IPEER_DB_PASSWORD=ipeer
