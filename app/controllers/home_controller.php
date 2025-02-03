@@ -47,7 +47,8 @@ class HomeController extends AppController
     function decodeJWT($jwt, $secretKey) {
         try {
             // Decode the JWT token
-            $decoded = JWT::decode($jwt, new Key($secretKey, 'HS256'));
+            //$decoded = JWT::decode($jwt, new Key($secretKey, 'HS256'));
+            $decoded = JWT::decode($jwt, new Key($secretKey, 'HS512'));
             //return $decoded;
             return json_encode($decoded);
 
