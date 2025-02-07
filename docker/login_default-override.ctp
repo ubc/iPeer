@@ -14,14 +14,10 @@ function isUrlWorking($url) {
 
 //echo($_ENV['IPEER_AUTH_SHIBB_URL']);
 
-$authShibbUrl = $_ENV['IPEER_AUTH_SHIBB_URL'] ?? 'https://ipeer2.ca';
+$authShibbUrl = $_ENV['IPEER_AUTH_SHIBB_URL'] ?? 'https://ipeer.elearning.ubc.ca/login?defaultlogin=true';
 
 // Define the URL to check using the value of $authShibbUrl
 $url_to_check = $authShibbUrl;
-
-// Define the URL to check
-// $url_to_check = "https://ipeer1-stg.apps.ctlt.ubc.ca/";
-
 
 // Check if the 'defaultlogin' parameter is NOT set or NOT true in the URL
 if (!isset($_GET['defaultlogin']) || $_GET['defaultlogin'] !== 'true') {
@@ -32,7 +28,7 @@ if (!isset($_GET['defaultlogin']) || $_GET['defaultlogin'] !== 'true') {
         exit(); // Ensures no further code is executed after the redirect
     } else {
         // If the URL is not working, show the login form
-        echo '<h2>Login Form</h2>';
+        echo '<h2>Login Form 222</h2>';
         echo $form->create('Guard', array('url' => $login_url));
         echo $form->input('username');
         echo $form->input('password');
