@@ -22,6 +22,7 @@ COPY . /var/www/html
 COPY docker/docker-entrypoint-php-fpm.sh /
 
 RUN cd /var/www/html \
+    && git clone https://github.com/seatgeek/djjob.git app/plugins/djjob/vendors \
     && composer install --no-ansi --no-dev --no-interaction --no-plugins --no-progress --optimize-autoloader \
     && mkdir -p /var/www/html/app/tmp/cache/persistent /var/www/html/app/tmp/cache/models /var/www/html/app/tmp/logs \
     && chown www-data:www-data -R /var/www/html/app/tmp/cache \

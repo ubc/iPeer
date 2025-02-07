@@ -1635,3 +1635,11 @@ CREATE TABLE IF NOT EXISTS `jobs` (
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8;
 
 SET foreign_key_checks = 1;
+
+-- --------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `cake_sessions` (
+    `id` varchar(255) NOT NULL,
+    `data` text DEFAULT NULL,
+    `expires` int(11) DEFAULT NULL, PRIMARY KEY  (`id`)
+);

@@ -51,7 +51,7 @@
     gtag('js', new Date());
 
     gtag('config', '<?php echo $trackingId['SysParameter']['parameter_value']; ?>');
-  </script>>
+  </script>
 <?php endif; ?>
 </head>
 <body>

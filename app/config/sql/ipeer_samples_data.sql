@@ -2394,4 +2394,10 @@ CREATE TABLE IF NOT EXISTS `jobs` (
 
 -- store course term
 ALTER TABLE `courses` ADD COLUMN `term` VARCHAR(50) NULL DEFAULT NULL;
---- END: Added by DB upgrade to version 17
+-- END: Added by DB upgrade to version 17
+
+CREATE TABLE IF NOT EXISTS `cake_sessions` (
+    `id` varchar(255) NOT NULL,
+    `data` text DEFAULT NULL,
+    `expires` int(11) DEFAULT NULL, PRIMARY KEY  (`id`)
+);
