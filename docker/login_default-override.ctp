@@ -5,9 +5,11 @@ function isUrlWorking($url) {
     $headers = @get_headers($url);
 
     // Check if the headers were fetched successfully and the response code is 200 (OK)
-    if ($headers && strpos($headers[0], '200')) {
+    if ($headers && (strpos($headers[0], '200') || strpos($headers[0], '302'))) {
         return true;
     }
+
+    echo $headers[0];
 
     return false;
 }
@@ -36,8 +38,9 @@ if (!isset($_GET['defaultlogin']) || $_GET['defaultlogin'] !== 'true') {
         echo $form->end('Login');
     }
 } else {
+    ///$this->Auth->logout();
     // Continue with the form if 'defaultlogin=true' is set in the URL
-    echo '<h2>Login Form</h2>';
+    echo '<h2>Login Form 111</h2>';
     echo $form->create('Guard', array('url' => $login_url));
     echo $form->input('username');
     echo $form->input('password');
