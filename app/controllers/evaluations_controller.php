@@ -1990,10 +1990,11 @@ class EvaluationsController extends AppController
         $tok = strtok($param, ';');
         $eventId = $tok;
         $releaseStatus = strtok(';');
-        $this->Event->id = $eventId;
-        $event = $this->Event->read();
-
-        $groupEventList = $this->GroupEvent->getGroupListByEventId($eventId);
+        $event = $this->Event->find('first', [
+                'conditions' => array('Event.id' => $eventId),
+                'recursive' => -1,
+        ]);
+        $groupEventList = $this->GroupEvent->getGroupListByEventId($eventId, true);
         $groupEvents = Set::extract('/GroupEvent/id', $groupEventList);
         switch ($event['Event']['event_template_type_id']) {
         case 1://simple

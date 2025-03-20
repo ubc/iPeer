@@ -1322,19 +1322,26 @@ class EvaluationComponent extends CakeObject
         // set group event to reviewed if all evaluatees' release status has been modified
         $eval = $this->EvaluationMixevalDetail->find('first', array(
             'conditions' => array('grp_event_id' => $grpEventId),
-            'order' => array('EvaluationMixevalDetail.modified ASC')
+            'order' => array('EvaluationMixevalDetail.modified ASC'),
+            'recursive' => -1
         ));
-        $event = $this->Event->findById($eventId);
+        $event = $this->Event->find('first',[
+                'conditions' => array('Event.id' => $eventId),
+                'recursive' => -1,
+        ]);
         $questions = $this->MixevalQuestion->find('list', array(
             'conditions' => array('mixeval_id' => $event['Event']['template_id'], 'mixeval_question_type_id' => array(2, 3)),
-            'fields' => array('question_num')
+            'fields' => array('question_num'),
+            'recursive' => -1
         ));
         $evalIds = $this->EvaluationMixeval->find('list', array(
-            'conditions' => array('grp_event_id' => $grpEventId)
+            'conditions' => array('grp_event_id' => $grpEventId),
+            'recursive' => -1
         ));
         $details = $this->EvaluationMixevalDetail->find('all', array(
             'conditions' => array('evaluation_mixeval_id' => $evalIds, 'question_number' => $questions),
-            'fields' => array('comment_release')
+            'fields' => array('comment_release'),
+            'recursive' => -1
         ));
         $details = Set::extract('/EvaluationMixevalDetail/comment_release', $details);
 

@@ -160,14 +160,19 @@ class GroupEvent extends AppModel
      * @return list of groups by event id
      */
 
-    function getGroupListByEventId($eventId=null)
+    function getGroupListByEventId($eventId=null, $lazy=false)
     {
         if (empty($eventId) || is_null($eventId)) {
             return;
         }
-        $tmp = $this->find('all', array(
-            'conditions' => array('event_id' => $eventId), 'fields'=>array('id', 'group_id')
-        ));
+        $params = [
+            'conditions' => ['event_id' => $eventId],
+            'fields' => ['id', 'group_id'],
+        ];
+        if ($lazy) {
+            $params['recursive'] = -1;
+        }
+        $tmp = $this->find('all', $params);
         return $tmp;
     }
 
