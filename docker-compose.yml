@@ -17,6 +17,16 @@ services:
       - 8060:8080
     depends_on:
       - db
+
+  app-oneloginsaml:
+    image: ubcctlt/ipeer-oneloginsaml
+    build:
+      context: docker/oneloginsaml
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "8090:80"
+
   app: &app
     image: ubcctlt/ipeer-app
     build:
