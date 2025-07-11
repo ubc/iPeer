@@ -31,7 +31,19 @@ use OneLogin\Saml2\Auth;
         exit;
     } else {
 
-        header('Location: https://authentication.stg.id.ubc.ca/idp/profile/Logout');
+        //header('Location: https://authentication.stg.id.ubc.ca/idp/profile/Logout');
+
+        if (!empty($_ENV['SAML_LOGOUT_URL'])) {
+            header("Location: " . $_ENV['SAML_LOGOUT_URL']);
+            exit;
+        } else {
+        // Optional: handle missing environment variable
+            http_response_code(500);
+            echo "SAML_LOGOUT_URL is not set in the environment.";
+            exit;
+        }
+
+
 
         exit;
     }
