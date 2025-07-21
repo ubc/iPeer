@@ -31,8 +31,6 @@ use OneLogin\Saml2\Auth;
         exit;
     } else {
 
-        //header('Location: https://authentication.stg.id.ubc.ca/idp/profile/Logout');
-
         if (!empty($_ENV['SAML_LOGOUT_URL'])) {
             header("Location: " . $_ENV['SAML_LOGOUT_URL']);
             exit;
