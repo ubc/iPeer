@@ -396,16 +396,16 @@ class Toolkit
         foreach ($summary as $id => &$score) {
             $summary[$id]['release_status']['gradeRelease'] = array_product($summary[$id]['release_status']['gradeRelease']);
             $summary[$id]['release_status']['commentRelease'] = array_product($summary[$id]['release_status']['commentRelease']);
-            $summary[$id]['total'] = $score['total']['score'] / $score['evaluator_count'];
+            $summary[$id]['total'] = ($score['evaluator_count'] > 0) ? $score['total']['score'] / $score['evaluator_count'] : 0;
             foreach ($score['grades'] as $num => &$grade) {
-                $summary[$id]['grades'][$num] = $grade['grade']/$grade['evaluator_count'];
+                $summary[$id]['grades'][$num] = ($grade['evaluator_count'] > 0) ? $grade['grade']/$grade['evaluator_count'] : 0;
             }
         }
 
         $group = array();
         foreach (array_unique($criteria) as $num) {
             $grades = Set::extract($summary, '/grades/'.$num);
-            $group['grades'][$num] = array_sum($grades) / count($grades);
+            $group['grades'][$num] = (count($grades) > 0) ? array_sum($grades) / count($grades) : 0;
         }
 
         return $summary + $group;

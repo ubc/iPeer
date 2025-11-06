@@ -489,7 +489,7 @@ class EvaluationMixeval extends EvaluationResponseBase
             $tmp = array();
             $tmp['id'] = 0;
             $tmp['evaluatee'] = $student['user_id'];
-            $tmp['score'] = $student['score']/$student['numEval']*(1-$student['penalty']/100);
+            $tmp['score'] = ($student['numEval'] > 0) ? $student['score']/$student['numEval']*(1-$student['penalty']/100) : 0;
             $grades[]['EvaluationMixeval'] = $tmp;
         }
 

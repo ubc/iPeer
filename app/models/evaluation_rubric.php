@@ -176,7 +176,7 @@ class EvaluationRubric extends EvaluationResponseBase
         for ($i = 0; $i < sizeof($data); $i++) {
             //Calculate grade average
             $results[$data[$i]['EvaluationRubricDetail']['criteria']] =
-                $data[$i][0]['sumScore'] / $data[$i][0]['count'];
+                ($data[$i][0]['count'] > 0) ? $data[$i][0]['sumScore'] / $data[$i][0]['count'] : 0;
         }
         return $results;
     }

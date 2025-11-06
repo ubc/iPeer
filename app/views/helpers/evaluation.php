@@ -109,10 +109,12 @@ class EvaluationHelper extends AppHelper
                 $total = array_sum($filteredScore);
                 $penalty = ($penalties[$evaluteeId] / 100) * $total;
                 if ($penalty > 0) {
+                    $percentage = ($mixeval['Mixeval']['total_marks'] > 0) ? ($total-$penalty)/$mixeval['Mixeval']['total_marks']*100 : 0;
                     $tr[] = sprintf('%.2f - <font color="red">%.2f</font> = %.2f (%.2f%%)',
-                        $total, $penalty, $total-$penalty, ($total-$penalty)/$mixeval['Mixeval']['total_marks']*100);
+                        $total, $penalty, $total-$penalty, $percentage);
                 } else {
-                    $tr[] = sprintf('%.2f (%.2f%%)', $total, $total/$mixeval['Mixeval']['total_marks']*100);
+                    $percentage = ($mixeval['Mixeval']['total_marks'] > 0) ? $total/$mixeval['Mixeval']['total_marks']*100 : 0;
+                    $tr[] = sprintf('%.2f (%.2f%%)', $total, $percentage);
                 }
                 $totalScore += $total-$penalty;
                 $totalCounter ++;
@@ -134,7 +136,7 @@ class EvaluationHelper extends AppHelper
                 $tr[] = __('N/A', true);
             }
         }
-        $tr[] = $totalCounter ? number_format($totalScore/$totalCounter, 2) : __('N/A', true);
+        $tr[] = ($totalCounter > 0) ? number_format($totalScore/$totalCounter, 2) : __('N/A', true);
         $table[] = $tr;
 
         return $table;
@@ -191,11 +193,13 @@ class EvaluationHelper extends AppHelper
             } else if ($penalties[$userId] > 0) {
                 $penalty = number_format($penalties[$userId]/100 * $scores[$userId]['total'], 2);
                 $diff = number_format($scores[$userId]['total'] - $penalty, 2);
+                $percentage = ($total > 0) ? number_format($diff/$total*100, 2) : 0;
                 $user[] = sprintf('%.2f - <font color="red">%.2f</font> = %.2f (%.2f%%)',
-                    number_format($scores[$userId]['total'], 2), $penalty, $diff, number_format($diff/$total*100, 2));
+                    number_format($scores[$userId]['total'], 2), $penalty, $diff, $percentage);
                 $totalAve += $diff;
             } else {
-                $user[] = sprintf('%.2f (%.2f%%)', $scores[$userId]['total'], number_format($scores[$userId]['total']/$total*100, 2));
+                $percentage = ($total > 0) ? number_format($scores[$userId]['total']/$total*100, 2) : 0;
+                $user[] = sprintf('%.2f (%.2f%%)', $scores[$userId]['total'], $percentage);
                 $totalAve += $scores[$userId]['total'];
             }
             $numMembers++;
@@ -206,7 +210,7 @@ class EvaluationHelper extends AppHelper
         foreach ($average as $ave) {
             $user[] = number_format($ave, 2);
         }
-        $user[] = number_format($totalAve/$numMembers, 2);
+        $user[] = ($numMembers > 0) ? number_format($totalAve/$numMembers, 2) : 0;
         $table[] = $user;
 
         return $table;

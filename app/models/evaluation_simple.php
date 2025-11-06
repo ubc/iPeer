@@ -414,10 +414,10 @@ class EvaluationSimple extends EvaluationResponseBase
                 }
             }
             if ($scorePenalty) {
-                $subtractAvgScore = ((($scorePenalty['Penalty']['percent_penalty']) / 100) * $totalScore) / $numMemberSubmissions;
+                $subtractAvgScore = ($numMemberSubmissions > 0) ? ((($scorePenalty['Penalty']['percent_penalty']) / 100) * $totalScore) / $numMemberSubmissions : 0;
             }
 
-            $aveScore = $totalScore / $numMemberSubmissions;
+            $aveScore = ($numMemberSubmissions > 0) ? $totalScore / $numMemberSubmissions : 0;
             $studentResult['numMembers'] = $numMemberSubmissions;
             $studentResult['receivedNum'] = count($receivedTotalScore);
             $studentResult['penalty'] = 0;
@@ -473,7 +473,7 @@ class EvaluationSimple extends EvaluationResponseBase
                     $i++;
                 }
             }
-            $groupAve = $tmp_total/count($avg);
+            $groupAve = (count($avg) > 0) ? $tmp_total/count($avg) : 0;
             $studentResult['avePenalty'] = $subtractAvgScore;
             $studentResult['aveScore'] = $aveScore;
             $studentResult['groupAve'] = $groupAve;
@@ -568,7 +568,7 @@ class EvaluationSimple extends EvaluationResponseBase
             $tmp = array();
             $tmp['id'] = 0;
             $tmp['evaluatee'] = $student['user_id'];
-            $tmp['score'] = $student['score']/$student['numEval']*(1-$student['penalty']/100);
+            $tmp['score'] = ($student['numEval'] > 0) ? $student['score']/$student['numEval']*(1-$student['penalty']/100) : 0;
             $grades[]['EvaluationSimple'] = $tmp;
         }
 

@@ -108,7 +108,7 @@ if (!empty($notInGroup)) {
             $scores = array_intersect_key($scores, $required);
             $deduction = number_format(array_sum($scores) * $penalty[$evaluteeId]/100, 2);
             $scaled = number_format(array_sum($scores) * (1 - $penalty[$evaluteeId]/100), 2);
-            $percent = number_format($scaled/$mixeval['Mixeval']['total_marks'] * 100);
+            $percent = ($mixeval['Mixeval']['total_marks'] > 0) ? number_format($scaled/$mixeval['Mixeval']['total_marks'] * 100) : 0;
             $ave_deduction = number_format($this->Evaluation->array_avg($scores) * $penalty[$evaluteeId]/100, 2);
             $ave_scaled = number_format($this->Evaluation->array_avg($scores) * (1 - $penalty[$evaluteeId]/100), 2);
             $ave_marks = number_format($this->Evaluation->array_avg($scores), 2);
