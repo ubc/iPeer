@@ -1195,7 +1195,7 @@ class EvaluationComponent extends CakeObject
                 }
             }
             foreach ($counter as $questionNumber => $count) {
-                $matrix[$userId][$questionNumber] = $matrix[$userId][$questionNumber]/$count;
+                $matrix[$userId][$questionNumber] = ($count > 0) ? $matrix[$userId][$questionNumber]/$count : 0;
             }
         }
 

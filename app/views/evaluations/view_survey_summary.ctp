@@ -17,8 +17,7 @@ foreach ($questions as $question) {
             $cells = array();
             // processing a multiple choice question's response
             $count = $response['count'];
-            $percent = $totalResponses > 0 ?
-                $percent = round($count / $totalResponses * 100) : 0;
+            $percent = ($totalResponses > 0) ? round($count / $totalResponses * 100) : 0;
             $cells[] = $response['response'];
             $cells[] = $count;
             $cells[] = $percent == 0 ? "-" : "$percent%";

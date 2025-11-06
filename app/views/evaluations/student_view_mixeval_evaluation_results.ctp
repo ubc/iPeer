@@ -17,7 +17,7 @@ $commentReleased = array_sum(Set::extract($evalResult[User::get('id')], '/Evalua
     <?php
     if ($gradeReleased) {
         if (isset($memberScoreSummary[User::get('id')])) {
-            $receivedAvePercent = number_format($memberScoreSummary[User::get('id')]['received_ave_score']/$mixeval['Mixeval']['total_marks'] * 100);
+            $receivedAvePercent = ($mixeval['Mixeval']['total_marks'] > 0) ? number_format($memberScoreSummary[User::get('id')]['received_ave_score']/$mixeval['Mixeval']['total_marks'] * 100) : 0;
             $receivedAvePercent = $receivedAvePercent * (100 - $penalty)/100;
         } else {
             $receivedAvePercent = 0;
