@@ -69,12 +69,12 @@ if(!isset($viewMode)){
         <td>
             <textarea cols="20" rows="2" name="<?php echo $userId?>comments[]"
                 class="char-limited"
-                maxlength="255"
+                maxlength="5000"
                 data-counter-id="eval-criteria-comment-<?php echo $userId.'-'.$i?>"
                 onChange="document.evalForm.member_<?php echo $userId; ?>_updated.value=1;"
                 ><?php echo (isset($evaluation['EvaluationDetail'][$i-1]['EvaluationRubricDetail']['criteria_comment']) ?
                     $evaluation['EvaluationDetail'][$i-1]['EvaluationRubricDetail']['criteria_comment'] : ''); ?></textarea>
-            <br><small id="eval-criteria-comment-<?php echo $userId.'-'.$i?>" class="char-counter" style="color: #666; font-size: 0.9em;">0/255 characters</small>
+            <br><small id="eval-criteria-comment-<?php echo $userId.'-'.$i?>" class="char-counter" style="color: #666; font-size: 0.9em;">0/5000 characters</small>
         </td>
         <?php endif;?>
     </tr>
