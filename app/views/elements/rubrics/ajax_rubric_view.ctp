@@ -1,4 +1,5 @@
 <!-- elements::ajax_rubric_view start -->
+<?php echo $html->script('char_counter')?>
 <?php
 $LOM_num = $data['Rubric']['lom_max'];
 $criteria_num = $data['Rubric']['criteria'];
@@ -67,9 +68,13 @@ if(!isset($viewMode)){
         <?php if ($evaluate): ?>
         <td>
             <textarea cols="20" rows="2" name="<?php echo $userId?>comments[]"
+                class="char-limited"
+                maxlength="255"
+                data-counter-id="eval-criteria-comment-<?php echo $userId.'-'.$i?>"
                 onChange="document.evalForm.member_<?php echo $userId; ?>_updated.value=1;"
                 ><?php echo (isset($evaluation['EvaluationDetail'][$i-1]['EvaluationRubricDetail']['criteria_comment']) ?
                     $evaluation['EvaluationDetail'][$i-1]['EvaluationRubricDetail']['criteria_comment'] : ''); ?></textarea>
+            <br><small id="eval-criteria-comment-<?php echo $userId.'-'.$i?>" class="char-counter" style="color: #666; font-size: 0.9em;">0/255 characters</small>
         </td>
         <?php endif;?>
     </tr>
@@ -81,8 +86,12 @@ if(!isset($viewMode)){
         <?php else: ?>
         <td colspan="<?php echo $LOM_num+2?>" align="center" class="tableheader2"><?php echo __('General Comments').$reqCom ?><br>
             <textarea cols="80" rows="2" name="<?php echo $userId?>gen_comment"
+                class="char-limited"
+                maxlength="5000"
+                data-counter-id="eval-gen-comment-<?php echo $userId?>"
                 onchange="document.evalForm.member_<?php echo $userId; ?>_updated.value=1;"
                 ><?php echo (isset($evaluation) ? $evaluation['EvaluationRubric']['comment'] : '')?></textarea>
+            <br><small id="eval-gen-comment-<?php echo $userId?>" class="char-counter" style="color: #666; font-size: 0.9em;">0/5000 characters</small>
         </td>
         <?php endif;?>
     </tr>
@@ -176,7 +185,12 @@ if(!isset($viewMode)){
                     }
                 }
             ?>
-            <textarea cols="20" rows="2" name="<?php echo $userId?>comments[]"><?php echo $comment; ?></textarea>
+            <textarea cols="20" rows="2" name="<?php echo $userId?>comments[]"
+                class="char-limited"
+                maxlength="255"
+                data-counter-id="eval-criteria-comment-view1-<?php echo $userId.'-'.$i?>"
+                ><?php echo $comment; ?></textarea>
+            <br><small id="eval-criteria-comment-view1-<?php echo $userId.'-'.$i?>" class="char-counter" style="color: #666; font-size: 0.9em;">0/255 characters</small>
         </td>
         <?php endif;?>
 

@@ -1,5 +1,6 @@
 <!-- elements::ajax_rubric_preview start -->
 <?php echo $html->script('calculate_marks')?>
+<?php echo $html->script('char_counter')?>
 <?php
 $LOM_num = $data['Rubric']['lom_max'];
 $criteria_num = $data['Rubric']['criteria'];
@@ -14,6 +15,8 @@ $default_options = array('type' => 'text',
                          'after' => '',
                          'between' => '',
                          'readonly' => $readonly,
+                         'maxlength' => 255,
+                         'class' => 'char-limited',
                         );
 ?>
 
@@ -23,7 +26,10 @@ $default_options = array('type' => 'text',
     <?php for($i = 0; $i < $LOM_num; $i++): ?>
     <th align="left">
         <div><?php __('Level of Mastery')?> <?php echo $i+1?></div>
-        <div><?php echo $this->Form->input('RubricsLom.'.$i.'.lom_comment', $default_options)?></div>
+        <div>
+            <?php echo $this->Form->input('RubricsLom.'.$i.'.lom_comment', array_merge($default_options, array('data-counter-id' => 'lom-counter-'.$i)))?>
+            <small id="lom-counter-<?php echo $i?>" class="char-counter" style="color: #666; font-size: 0.9em;">0/255 characters</small>
+        </div>
         <?php echo $this->Form->input('RubricsLom.'.$i.'.id', array('type' => 'hidden'))?>
         <?php echo $this->Form->input('RubricsLom.'.$i.'.lom_num', array('type' => 'hidden', 'value' => $i+1))?>
     </th>
@@ -38,7 +44,8 @@ $default_options = array('type' => 'text',
 <tr>
     <th>
     <?php if(!$readonly):?><div><?php __('Criteria')?> <?php echo $i+1?></div><?php endif;?>
-    <div><?php echo $this->Form->input('RubricsCriteria.'.$i.'.criteria', $default_options)?>
+    <div><?php echo $this->Form->input('RubricsCriteria.'.$i.'.criteria', array_merge($default_options, array('data-counter-id' => 'criteria-counter-'.$i)))?>
+         <small id="criteria-counter-<?php echo $i?>" class="char-counter" style="color: #666; font-size: 0.9em;">0/255 characters</small>
          <?php echo $this->Form->input('RubricsCriteria.'.$i.'.id', array('type' => 'hidden'))?>
          <?php echo $this->Form->input('RubricsCriteria.'.$i.'.criteria_num', array('type' => 'hidden', 'value' => $i+1))?>
          <?php $helptext = "Selecting this will enable the marks to be visible/hidden from the user."?>
@@ -50,7 +57,10 @@ $default_options = array('type' => 'text',
     <?php for($j=0; $j<$LOM_num; $j++):?>
     <td align="left">
     <?php if(!$readonly):?><div><?php __('Specific Comment')?></div><?php endif;?>
-    <div><?php echo $this->Form->input('RubricsCriteria.'.$i.'.RubricsCriteriaComment.'.$j.'.criteria_comment', $default_options)?></div>
+    <div>
+        <?php echo $this->Form->input('RubricsCriteria.'.$i.'.RubricsCriteriaComment.'.$j.'.criteria_comment', array_merge($default_options, array('data-counter-id' => 'criteria-comment-counter-'.$i.'-'.$j)))?>
+        <small id="criteria-comment-counter-<?php echo $i.'-'.$j?>" class="char-counter" style="color: #666; font-size: 0.9em;">0/255 characters</small>
+    </div>
     <?php echo $this->Form->input('RubricsCriteria.'.$i.'.RubricsCriteriaComment.'.$j.'.id', array('type' => 'hidden'))?>
     <div>Mark: <?php echo $this->Form->text('criteria_mark_'.$i.'_'.$j, array('size' =>3,
                                                                               'readonly' => true,
