@@ -121,104 +121,135 @@ class Rubric extends EvaluationBase
         $events = array();
         $modified_criteria_ids = array();
 
-        // check if the we should remove some of the association records
-        if (isset($data['Rubric']['id']) && !empty($data['Rubric']['id'])) {
-            $rubric = $this->find('first', array('conditions' => array('id' => $data['Rubric']['id']),
-                'contain' => array('RubricsCriteria.RubricsCriteriaComment',
-                'RubricsLom')));
-            // check level of mastery and criteria if they should be removed
-            if (null != $rubric) {
-                $result = array('RubricsCriteria' => array(), 'RubricsLom' => array());
-                foreach (array_keys($result) as $model) {
-                    foreach ($rubric[$model] as $in_db) {
-                        $found = false;
-                        foreach ($data[$model] as $d) {
-                            if (isset($d['id']) && !empty($d['id']) && $in_db['id'] == $d['id']) {
-                                $found = true;
+        // Get database connection and start transaction
+        $dataSource = $this->getDataSource();
+        $dataSource->begin($this);
+
+        try {
+            // check if the we should remove some of the association records
+            if (isset($data['Rubric']['id']) && !empty($data['Rubric']['id'])) {
+                $rubric = $this->find('first', array('conditions' => array('id' => $data['Rubric']['id']),
+                    'contain' => array('RubricsCriteria.RubricsCriteriaComment',
+                    'RubricsLom')));
+                // check level of mastery and criteria if they should be removed
+                if (null != $rubric) {
+                    $result = array('RubricsCriteria' => array(), 'RubricsLom' => array());
+                    foreach (array_keys($result) as $model) {
+                        foreach ($rubric[$model] as $in_db) {
+                            $found = false;
+                            foreach ($data[$model] as $d) {
+                                if (isset($d['id']) && !empty($d['id']) && $in_db['id'] == $d['id']) {
+                                    $found = true;
+                                }
                             }
-                        }
 
-                        if (!$found) {
-                            $result[$model][] = $in_db['id'];
-                        }
+                            if (!$found) {
+                                $result[$model][] = $in_db['id'];
+                            }
 
-                        if ($model == 'RubricsCriteria') {
-                            if ($found) {
-                                $modified_criteria_ids[]=$in_db['id'];
-                            } else {
-                                $event = CaliperHooks::rubric_delete_criteria_partial($rubric, $in_db);
-                                if ($event) {
-                                    $events[] = $event;
+                            if ($model == 'RubricsCriteria') {
+                                if ($found) {
+                                    $modified_criteria_ids[]=$in_db['id'];
+                                } else {
+                                    $event = CaliperHooks::rubric_delete_criteria_partial($rubric, $in_db);
+                                    if ($event) {
+                                        $events[] = $event;
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                foreach (array_keys($result) as $model) {
-                    if (!empty($result[$model])) {
-                        // this should also remove related comments
-                        $this->{$model}->deleteAll(array($model.'.id' => $result[$model]), true);
+                    foreach (array_keys($result) as $model) {
+                        if (!empty($result[$model])) {
+                            // this should also remove related comments
+                            $this->{$model}->deleteAll(array($model.'.id' => $result[$model]), true);
+                        }
                     }
                 }
+                // clean up LOM for criteria comments
+          /*if(!empty($result['RubricsLom']['nums'])) {
+            $ids = array();
+            foreach ($rubric['RubricsCriteria'] as $c) {
+              foreach ($c['RubricsCriteriaComment'] as $comment) {
+                if(in_array($comment['lom_num'], $result['RubricsLom']['nums'])) {
+                  $ids[] = $comment['id'];
+                }
+              }
             }
-            // clean up LOM for criteria comments
-      /*if(!empty($result['RubricsLom']['nums'])) {
-        $ids = array();
-        foreach ($rubric['RubricsCriteria'] as $c) {
-          foreach ($c['RubricsCriteriaComment'] as $comment) {
-            if(in_array($comment['lom_num'], $result['RubricsLom']['nums'])) {
-              $ids[] = $comment['id'];
+            $this->RubricsCriteriaComment->deleteAll(array('id' => $ids), true);
+          }*/
             }
-          }
-        }
-        $this->RubricsCriteriaComment->deleteAll(array('id' => $ids), true);
-      }*/
-        }
 
-        // saving the data. Because saveAll only saves direct associations. So we
-        // have to save criteria and criteria comment separately.
+            // saving the data. Because saveAll only saves direct associations. So we
+            // have to save criteria and criteria comment separately.
 
-        // remove criteria array. We only save rubric and RubricsLom first.
+            // remove criteria array. We only save rubric and RubricsLom first.
 
-        $criterias = $data['RubricsCriteria'];
-        unset($data['RubricsCriteria']);
-        if (!$this->saveAll($data)) {
-            //$this->errorMessage = __('Failed to save Rubric with Level of Mastery!', true);
+            $criterias = $data['RubricsCriteria'];
+            unset($data['RubricsCriteria']);
+            if (!$this->saveAll($data)) {
+                //$this->errorMessage = __('Failed to save Rubric with Level of Mastery!', true);
+                throw new Exception('Failed to save Rubric with Level of Mastery');
+            }
+
+            // get LOM Ids
+            $loms = $this->RubricsLom->find('all', array('conditions' => array('rubric_id' => $this->id),
+                'fields' => array('id'),
+                'contain' => false));
+
+            // now save the criteria with comments one by one
+            foreach ($criterias as $c) {
+                // link the rubric with criteria
+                $c['rubric_id'] = $this->id;
+
+                // link LOM id to comments, criteria id is linked by saveAll
+                for ($i = 0; $i < count($c['RubricsCriteriaComment']); $i++) {
+                    $c['RubricsCriteriaComment'][$i]['rubrics_loms_id'] = $loms[$i]['RubricsLom']['id'];
+                }
+
+                // prepare the data format for saveAll
+                $criteria_data['RubricsCriteriaComment'] = $c['RubricsCriteriaComment'];
+                unset($c['RubricsCriteriaComment']);
+                $criteria_data['RubricsCriteria'] = $c;
+
+                // Validate before saving (Priority 2 fix)
+                $this->RubricsCriteria->set($criteria_data['RubricsCriteria']);
+                if (!$this->RubricsCriteria->validates()) {
+                    $errors = $this->RubricsCriteria->validationErrors;
+                    throw new Exception('Criteria validation failed: ' . print_r($errors, true));
+                }
+
+                // Validate criteria comments
+                foreach ($criteria_data['RubricsCriteriaComment'] as $comment) {
+                    $this->RubricsCriteriaComment->set($comment);
+                    if (!$this->RubricsCriteriaComment->validates()) {
+                        $errors = $this->RubricsCriteriaComment->validationErrors;
+                        throw new Exception('Criteria comment validation failed: ' . print_r($errors, true));
+                    }
+                }
+
+                // save
+                if (!$this->RubricsCriteria->saveAll($criteria_data)) {
+                    //$this->errorMessage = __('Failed to save rubric criterias!', true);
+                    throw new Exception('Failed to save rubric criterias');
+                }
+            }
+
+            // can't use after save hook due to the way the criteria are stored
+            CaliperHooks::rubric_save_with_criteria($this, $events, $modified_criteria_ids, $isNewRubric);
+
+            // Commit transaction - all operations succeeded
+            $dataSource->commit($this);
+            return true;
+
+        } catch (Exception $e) {
+            // Rollback transaction on any error
+            $dataSource->rollback($this);
+            // Log the error for debugging
+            CakeLog::write('error', 'Rubric save failed: ' . $e->getMessage());
             return false;
         }
-
-        // get LOM Ids
-        $loms = $this->RubricsLom->find('all', array('conditions' => array('rubric_id' => $this->id),
-            'fields' => array('id'),
-            'contain' => false));
-
-        // now save the criteria with comments one by one
-        foreach ($criterias as $c) {
-            // link the rubric with criteria
-            $c['rubric_id'] = $this->id;
-
-            // link LOM id to comments, criteria id is linked by saveAll
-            for ($i = 0; $i < count($c['RubricsCriteriaComment']); $i++) {
-                $c['RubricsCriteriaComment'][$i]['rubrics_loms_id'] = $loms[$i]['RubricsLom']['id'];
-            }
-
-            // prepare the data format for saveAll
-            $criteria_data['RubricsCriteriaComment'] = $c['RubricsCriteriaComment'];
-            unset($c['RubricsCriteriaComment']);
-            $criteria_data['RubricsCriteria'] = $c;
-
-            // save
-            if (!$this->RubricsCriteria->saveAll($criteria_data)) {
-                //$this->errorMessage = __('Failed to save rubric criterias!', true);
-                return false;
-            }
-        }
-
-        // can't use after save hook due to the way the criteria are stored
-        CaliperHooks::rubric_save_with_criteria($this, $events, $modified_criteria_ids, $isNewRubric);
-
-        return true;
     }
 
     /**
