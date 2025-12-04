@@ -13,6 +13,16 @@ class RubricsCriteria extends AppModel
     public $name = 'RubricsCriteria';
     public $actsAs = array('Containable');
 
+    public $validate = array(
+        'criteria' => array(
+            'maxLength' => array(
+                'rule' => array('maxLength', 255),
+                'message' => 'Criteria description must not exceed 255 characters',
+                'allowEmpty' => true
+            )
+        )
+    );
+
     public $belongsTo = array( 'Rubric' => array(
         'className' => 'Rubric'
     ));
