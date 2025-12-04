@@ -27,6 +27,16 @@ class RubricsLom extends AppModel
 
     public $order = array('RubricsLom.lom_num' => 'ASC', 'RubricsLom.id' => 'ASC');
 
+    public $validate = array(
+        'lom_comment' => array(
+            'maxLength' => array(
+                'rule' => array('maxLength', 255),
+                'message' => 'Level of Mastery comment must not exceed 255 characters',
+                'allowEmpty' => true
+            )
+        )
+    );
+
     /**
      * getLoms
      *

@@ -13,6 +13,16 @@ class RubricsCriteriaComment extends AppModel
     public $name = 'RubricsCriteriaComment';
     public $actsAs = array('Containable');
 
+    public $validate = array(
+        'criteria_comment' => array(
+            'maxLength' => array(
+                'rule' => array('maxLength', 255),
+                'message' => 'Criteria comment must not exceed 255 characters',
+                'allowEmpty' => true
+            )
+        )
+    );
+
     public $belongsTo = array( 'RubricsCriteria' => array(
         'className' => 'RubricsCriteria',
         'foreignKey' => 'criteria_id'
