@@ -125,6 +125,9 @@ class Rubric extends EvaluationBase
         $dataSource = $this->getDataSource();
         $dataSource->begin($this);
 
+        // Initialize RubricsCriteriaComment model for validation
+        $this->RubricsCriteriaComment = new RubricsCriteriaComment;
+
         try {
             // check if the we should remove some of the association records
             if (isset($data['Rubric']['id']) && !empty($data['Rubric']['id'])) {
