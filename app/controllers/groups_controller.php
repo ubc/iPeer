@@ -744,7 +744,13 @@ class GroupsController extends AppController
     function import($courseId = null, $importFrom = 'file')
     {
         // Force HTTPS for this action only
-        if (!env('HTTPS')) {
+        // Check for HTTPS: direct connection, or via proxy (X-Forwarded-Proto header)
+        $isHttps = env('HTTPS');
+        if (!$isHttps && isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+            $isHttps = (strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
+        }
+        
+        if (!$isHttps) {
             // If this is a POST request (form submission), show error and redirect
             // (redirecting would lose the uploaded file)
             if (!empty($this->params['form'])) {
