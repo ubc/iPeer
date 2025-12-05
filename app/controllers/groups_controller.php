@@ -743,6 +743,20 @@ class GroupsController extends AppController
      */
     function import($courseId = null, $importFrom = 'file')
     {
+        // Force HTTPS for this action only
+        if (!env('HTTPS')) {
+            // If this is a POST request (form submission), show error and redirect
+            // (redirecting would lose the uploaded file)
+            if (!empty($this->params['form'])) {
+                $this->Session->setFlash(__('This action requires a secure HTTPS connection. Please use HTTPS and try again.', true));
+                $url = 'https://' . env('HTTP_HOST') . Router::url(null, false);
+                return $this->redirect($url);
+            }
+            // For GET requests, redirect to HTTPS
+            $url = 'https://' . env('HTTP_HOST') . Router::url(null, false);
+            return $this->redirect($url);
+        }
+
         $this->set('importFrom', $importFrom);
 
         if ($importFrom == 'canvas') {
