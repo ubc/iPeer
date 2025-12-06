@@ -218,6 +218,7 @@ class Rubric extends EvaluationBase
                 $criteria_data['RubricsCriteria'] = $c;
 
                 // Validate before saving (Priority 2 fix)
+                $this->RubricsCriteria->create();
                 $this->RubricsCriteria->set($criteria_data['RubricsCriteria']);
                 if (!$this->RubricsCriteria->validates()) {
                     $errors = $this->RubricsCriteria->validationErrors;
@@ -226,6 +227,7 @@ class Rubric extends EvaluationBase
 
                 // Validate criteria comments
                 foreach ($criteria_data['RubricsCriteriaComment'] as $comment) {
+                    $this->RubricsCriteriaComment->create();
                     $this->RubricsCriteriaComment->set($comment);
                     if (!$this->RubricsCriteriaComment->validates()) {
                         $errors = $this->RubricsCriteriaComment->validationErrors;
