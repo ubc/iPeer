@@ -125,7 +125,8 @@ class Rubric extends EvaluationBase
         $dataSource = $this->getDataSource();
         $dataSource->begin($this);
 
-        // Initialize RubricsCriteriaComment model for validation
+        // Initialize RubricsCriteria and RubricsCriteriaComment models for validation
+        $this->RubricsCriteria = new RubricsCriteria;
         $this->RubricsCriteriaComment = new RubricsCriteriaComment;
 
         try {
