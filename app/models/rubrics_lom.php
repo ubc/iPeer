@@ -30,8 +30,8 @@ class RubricsLom extends AppModel
     public $validate = array(
         'lom_comment' => array(
             'maxLength' => array(
-                'rule' => array('maxLength', 255),
-                'message' => 'Level of Mastery comment must not exceed 255 characters',
+                'rule' => array('maxLength', 254),
+                'message' => 'Level of Mastery comment must not exceed 254 characters',
                 'allowEmpty' => true
             )
         )

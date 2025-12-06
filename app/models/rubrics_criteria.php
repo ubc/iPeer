@@ -16,8 +16,8 @@ class RubricsCriteria extends AppModel
     public $validate = array(
         'criteria' => array(
             'maxLength' => array(
-                'rule' => array('maxLength', 255),
-                'message' => 'Criteria description must not exceed 255 characters',
+                'rule' => array('maxLength', 254),
+                'message' => 'Criteria description must not exceed 254 characters',
                 'allowEmpty' => true
             )
         )

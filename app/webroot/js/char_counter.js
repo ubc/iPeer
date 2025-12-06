@@ -10,6 +10,52 @@
 
 // Initialize character counters when DOM is ready
 (function() {
+    // Track all character-limited fields and their states
+    var fieldStates = {};
+    
+    // Function to check if any field is at max (254/254) and disable/enable buttons
+    function updateButtonStates() {
+        var anyFieldAtMax = false;
+        
+        // Check if any field is at max length (254/254)
+        for (var fieldId in fieldStates) {
+            if (fieldStates[fieldId].atMax) {
+                anyFieldAtMax = true;
+                break;
+            }
+        }
+        
+        // Find the buttons to disable/enable
+        var previewButton = document.getElementById('preview-rubric');
+        var saveButton = document.getElementById('submit-rubric');
+        
+        if (anyFieldAtMax) {
+            // Disable buttons when any field is at max (254/254)
+            if (previewButton) {
+                previewButton.disabled = true;
+                previewButton.style.opacity = '0.5';
+                previewButton.style.cursor = 'not-allowed';
+            }
+            if (saveButton) {
+                saveButton.disabled = true;
+                saveButton.style.opacity = '0.5';
+                saveButton.style.cursor = 'not-allowed';
+            }
+        } else {
+            // Re-enable buttons when no field is at max
+            if (previewButton) {
+                previewButton.disabled = false;
+                previewButton.style.opacity = '1';
+                previewButton.style.cursor = 'pointer';
+            }
+            if (saveButton) {
+                saveButton.disabled = false;
+                saveButton.style.opacity = '1';
+                saveButton.style.cursor = 'pointer';
+            }
+        }
+    }
+    
     // Function to update character counter
     function updateCharCounter(textarea, counter) {
         if (!textarea || !counter) return;
@@ -17,6 +63,16 @@
         var maxlength = parseInt(textarea.getAttribute('maxlength'));
         var current = textarea.value.length;
         var remaining = maxlength - current;
+        // Only consider at max when exactly at maxlength (254/254), not just when red
+        var atMax = (current === maxlength);
+        
+        // Store field state
+        var fieldId = textarea.getAttribute('data-counter-id') || textarea.id || 'field_' + Math.random();
+        fieldStates[fieldId] = {
+            atMax: atMax,
+            current: current,
+            maxlength: maxlength
+        };
         
         // Update counter text
         counter.textContent = current + '/' + maxlength + ' characters';
@@ -35,6 +91,9 @@
             counter.style.color = '#666';
             counter.style.fontWeight = 'normal';
         }
+        
+        // Update button states after updating counter
+        updateButtonStates();
     }
     
     // Function to initialize a single character counter
@@ -67,14 +126,6 @@
             var counter = document.getElementById(counterId);
             setTimeout(function() {
                 updateCharCounter(that, counter);
-                
-                // Show warning if text was truncated
-                var maxlength = parseInt(that.getAttribute('maxlength'));
-                if (that.value.length >= maxlength) {
-                    // Optional: Add visual feedback for truncation
-                    counter.style.color = 'red';
-                    counter.style.fontWeight = 'bold';
-                }
             }, 10);
         });
     }
