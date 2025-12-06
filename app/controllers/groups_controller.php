@@ -726,7 +726,12 @@ class GroupsController extends AppController
             $this->Session->setFlash(__('You cannot import any groups from Canvas because you do not have any group sets in Canvas.', true));
         }
 
-        $this->set('formUrl', Router::url($formUrl, true));
+        // Force form URL to HTTPS to ensure secure form submission
+        $finalFormUrl = Router::url($formUrl, true);
+        if (strpos($finalFormUrl, 'http://') === 0) {
+            $finalFormUrl = str_replace('http://', 'https://', $finalFormUrl);
+        }
+        $this->set('formUrl', $finalFormUrl);
         $this->set('courseId', $courseId);
         $this->set('canvasCourseId', $canvasCourseId);
         $this->set('canvasGroupCategoryId', $canvasGroupCategoryId);
@@ -782,7 +787,12 @@ class GroupsController extends AppController
 
             $this->syncCanvas($courseId);
 
-            $this->set('formUrl', Router::url(DS . $this->params['url']['url'], true));
+            // Force form URL to HTTPS to ensure secure form submission
+            $formUrl = Router::url(DS . $this->params['url']['url'], true);
+            if (strpos($formUrl, 'http://') === 0) {
+                $formUrl = str_replace('http://', 'https://', $formUrl);
+            }
+            $this->set('formUrl', $formUrl);
 
             // Fix breadcrumb
             $this->breadcrumb->pop();
@@ -815,7 +825,13 @@ class GroupsController extends AppController
             $courseId = $this->data['Group']['Course'];
         }
         $this->set('courseId', $courseId);
-        $this->set('formUrl', Router::url(null, true));
+        // Force form URL to HTTPS to ensure secure form submission
+        // This prevents browser warnings about insecure form submissions
+        $formUrl = Router::url(null, true);
+        if (strpos($formUrl, 'http://') === 0) {
+            $formUrl = str_replace('http://', 'https://', $formUrl);
+        }
+        $this->set('formUrl', $formUrl);
 
         $this->set('breadcrumb', $this->breadcrumb->push(__('Import Groups From CSV File (.csv or .txt)', true)));
 
@@ -991,7 +1007,12 @@ class GroupsController extends AppController
 
             $this->syncCanvas($courseId);
 
-            $this->set('formUrl', Router::url(DS . $this->params['url']['url'], true));
+            // Force form URL to HTTPS to ensure secure form submission
+            $formUrl = Router::url(DS . $this->params['url']['url'], true);
+            if (strpos($formUrl, 'http://') === 0) {
+                $formUrl = str_replace('http://', 'https://', $formUrl);
+            }
+            $this->set('formUrl', $formUrl);
 
             // Fix breadcrumb
             $this->breadcrumb->pop();
