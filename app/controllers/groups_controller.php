@@ -746,20 +746,26 @@ class GroupsController extends AppController
         // Force HTTPS for this action only
         // Check for HTTPS: direct connection, or via proxy (X-Forwarded-Proto header)
         $isHttps = env('HTTPS');
+        // Also check X-Forwarded-Proto header (for proxy/load balancer scenarios)
         if (!$isHttps && isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
             $isHttps = (strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
         }
+        // Also check X-Forwarded-Ssl header (alternative proxy header)
+        if (!$isHttps && isset($_SERVER['HTTP_X_FORWARDED_SSL'])) {
+            $isHttps = (strtolower($_SERVER['HTTP_X_FORWARDED_SSL']) === 'on');
+        }
         
+        // If not HTTPS, redirect to HTTPS
         if (!$isHttps) {
             // If this is a POST request (form submission), show error and redirect
             // (redirecting would lose the uploaded file)
             if (!empty($this->params['form'])) {
                 $this->Session->setFlash(__('This action requires a secure HTTPS connection. Please use HTTPS and try again.', true));
-                $url = 'https://' . env('HTTP_HOST') . Router::url(null, false);
-                return $this->redirect($url);
             }
-            // For GET requests, redirect to HTTPS
-            $url = 'https://' . env('HTTP_HOST') . Router::url(null, false);
+            // Construct full HTTPS URL using current request path and query string
+            $host = env('HTTP_HOST');
+            $requestUri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/';
+            $url = 'https://' . $host . $requestUri;
             return $this->redirect($url);
         }
 
