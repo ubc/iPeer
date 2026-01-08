@@ -227,11 +227,12 @@ class SurveyGroupsController extends AppController
         $this->File = new File($file_path.'.xml');
         $this->File->write($doc);
         //execute TeamMaker
-        $cmdline = $this->__getTeamMaker().' '.$file_path.'.xml '.$file_path.'.txt';// > ../tmp/tm_log.txt";
+        $cmdline = $this->__getTeamMaker().' '.$file_path.'.xml '.$file_path.'.txt'.' 2>&1';// > ../tmp/tm_log.txt";
         set_time_limit(1200);
         if ($make) {
             exec($cmdline, $out, $ret);
             if ($ret) {
+                CakeLog::write('error', "TeamMaker execution failed - Command: $cmdline, Return code: $ret, Output: " . implode("\n", $out));
                 $this->Session->setFlash("Unable to execute TeamMaker.");
                 $this->redirect($this->referer());
                 return;
