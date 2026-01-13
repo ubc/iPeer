@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
     && ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so \
     && ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so \
     && docker-php-ext-install -j$(nproc) xml gd ldap mysqli pdo_mysql zip \
-    && pecl install timezonedb xdebug-2.6.0\
+    && pecl install timezonedb xdebug\
     && docker-php-ext-enable timezonedb xdebug
 
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
