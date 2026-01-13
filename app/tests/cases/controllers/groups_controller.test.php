@@ -118,11 +118,11 @@ class GroupsControllerTest extends ExtendedAuthTestCase {
             'Member' => array(26, 31, 32),
         );
 
-        $this->controller->expectOnce('redirect', array('index/1'));
         $this->testAction(
             '/groups/add/1',
             array('fixturize' => true, 'data' => $data, 'method' => 'post')
         );
+        $this->controller->expectOnce('redirect', array('index/1'));
 
         $model = ClassRegistry::init('Group');
         $group = $model->find('first', array( 'conditions' => array('group_name' => 'Test1'), 'contain' => array('Member')));
@@ -156,11 +156,11 @@ class GroupsControllerTest extends ExtendedAuthTestCase {
             'Member' => array(26, 31, 32),
         );
 
-        $this->controller->expectOnce('redirect', array('/courses'));
         $this->testAction(
             '/groups/add/1',
             array('fixturize' => true, 'data' => $data, 'method' => 'post')
         );
+        $this->controller->expectOnce('redirect', array('/courses'));
 
         $model = ClassRegistry::init('Group');
         $group = $model->find('first', array( 'conditions' => array('group_name' => 'Test1'), 'contain' => array('Member')));
@@ -202,11 +202,11 @@ class GroupsControllerTest extends ExtendedAuthTestCase {
             'Member' => array(26, 31, 32),
         );
 
-        $this->controller->expectOnce('redirect', array('index/1'));
         $this->testAction(
             '/groups/edit/1',
             array('fixturize' => true, 'data' => $data, 'method' => 'post')
         );
+        $this->controller->expectOnce('redirect', array('index/1'));
 
         $model = ClassRegistry::init('Group');
         $group = $model->find('first', array( 'conditions' => array('id' => 1), 'contain' => array('Member')));
@@ -241,11 +241,11 @@ class GroupsControllerTest extends ExtendedAuthTestCase {
             'Member' => array(26, 31, 32),
         );
 
-        $this->controller->expectOnce('redirect', array('/courses'));
         $this->testAction(
             '/groups/edit/999',
             array('fixturize' => true, 'data' => $data, 'method' => 'post')
         );
+        $this->controller->expectOnce('redirect', array('/courses'));
 
         $model = ClassRegistry::init('Group');
         $group = $model->find('first', array( 'conditions' => array('id' => 999), 'contain' => array('Member')));
@@ -274,11 +274,11 @@ class GroupsControllerTest extends ExtendedAuthTestCase {
             'Member' => array(26, 31, 32),
         );
 
-        $this->controller->expectOnce('redirect', array('/courses'));
         $this->testAction(
             '/groups/edit/1',
             array('fixturize' => true, 'data' => $data, 'method' => 'post')
         );
+        $this->controller->expectOnce('redirect', array('/courses'));
 
         $model = ClassRegistry::init('Group');
         $group = $model->find('first', array( 'conditions' => array('id' => 999), 'contain' => array('Member')));
@@ -289,11 +289,11 @@ class GroupsControllerTest extends ExtendedAuthTestCase {
     }
 
     function testDelete() {
-        $this->controller->expectOnce('redirect', array('index/1'));
         $this->testAction(
             '/groups/delete/1',
             array('fixturize' => true, 'method' => 'get')
         );
+        $this->controller->expectOnce('redirect', array('index/1'));
 
         $model = ClassRegistry::init('Group');
         $found = $model->find('first', array( 'conditions' => array('id' => 1), 'contain' => false));
@@ -304,11 +304,11 @@ class GroupsControllerTest extends ExtendedAuthTestCase {
     }
 
     function testDeleteInvalidGroup() {
-        $this->controller->expectOnce('redirect', array('/courses'));
         $this->testAction(
             '/groups/delete/999',
             array('fixturize' => true, 'method' => 'get')
         );
+        $this->controller->expectOnce('redirect', array('/courses'));
 
         $model = ClassRegistry::init('Group');
         $found = $model->find('first', array( 'conditions' => array('id' => 999), 'contain' => false));
@@ -325,11 +325,11 @@ class GroupsControllerTest extends ExtendedAuthTestCase {
                 'password' => md5('ipeeripeer')
             )
         );
-        $this->controller->expectOnce('redirect', array('/courses'));
         $this->testAction(
             '/groups/delete/1',
             array('fixturize' => true, 'method' => 'get')
         );
+        $this->controller->expectOnce('redirect', array('/courses'));
 
         $model = ClassRegistry::init('Group');
         $found = $model->find('first', array( 'conditions' => array('id' => 1), 'contain' => false));

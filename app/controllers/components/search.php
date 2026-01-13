@@ -2,6 +2,7 @@
 App::import('Model', 'UserCourse');
 
 /**
+ * TODO: Appears to be unused, check if can be removed.
  * SearchComponent
  *
  * @uses Object
@@ -142,10 +143,17 @@ class SearchComponent extends CakeObject
         !empty($eventId) ? $sticky['event_id']=$eventId:$sticky['event_id']='';
         $status = isset($params['form']['status']) ? $params['form']['status']:'';
         !empty($status) ? $sticky['status']=$status:$sticky['status']='';
-        $markFrom = isset($params['data']['Search']['mark_from']) ? $params['data']['Search']['mark_from']:'';
-        !empty($markFrom) ? $sticky['mark_from']=$markFrom:$sticky['mark_from']='';
-        $markTo = isset($params['data']['Search']['mark_to']) ? $params['data']['Search']['mark_to']:'';
-        !empty($markTo) ? $sticky['mark_to']=$markTo:$sticky['mark_to']='';
+
+        $markFrom = '';
+        if (isset($params['data']['Search']['mark_from'])) {
+            $markFrom = $params['data']['Search']['mark_from'];
+        }
+        $sticky['mark_from']=$markFrom;
+        $markTo = '';
+        if (isset($params['data']['Search']['mark_to'])) {
+            $markTo = $params['data']['Search']['mark_to'];
+        }
+        $sticky['mark_to']=$markTo;
 
         $nibble['maxPercent'] = floatval($markTo)/100.0;
         $nibble['minPercent'] = floatval($markFrom)/100.0;

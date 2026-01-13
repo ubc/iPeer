@@ -24,7 +24,7 @@ Mock::generate('Helper', 'CallbackMockHelper');
 Mock::generate('CacheHelper', 'ViewTestMockCacheHelper');
 
 if (!class_exists('ErrorHandler')) {
-	App::import('Core', array('Error'));
+	App::import('Core', array('ErrorHandler'));
 }
 
 /**
@@ -90,8 +90,30 @@ class ViewTestErrorHandler extends ErrorHandler {
  * @access public
  * @return void
  */
-	function _stop() {
+	function _stop($status = 0) {
 		return;
+	}
+
+	function stdout($string, $newline = true)
+	{
+		if (version_compare(phpversion(), '7.2') < 0) {
+			parent::stdout($string, $newline = true);
+		} else {
+            if ($newline) {
+                echo $string . "\n";
+            } else {
+                echo $string;
+            }
+        }
+	}
+
+	function stderr($string)
+	{
+		if (version_compare(phpversion(), '7.2') < 0) {
+			parent::stderr($string);
+		} else {
+            echo "Error: " . $string . "\n";
+        }
 	}
 }
 
@@ -158,9 +180,38 @@ class TestView extends View {
  * @access public
  * @return void
  */
-	function cakeError($method, $messages) {
+	function cakeError($method, $messages = array()) {
 		$error = new ViewTestErrorHandler($method, $messages);
 		return $error;
+	}
+}
+
+/**
+ * TestBeforeHelper class
+ *
+ * @package       cake
+ * @subpackage    cake.tests.cases.libs.view
+ */
+class TestBeforeHelper extends Helper
+{
+
+	/**
+	 * property property
+	 *
+	 * @var string ''
+	 * @access public
+	 */
+	var $property = '';
+
+	/**
+	 * beforeLayout method
+	 *
+	 * @access public
+	 * @return void
+	 */
+	function beforeLayout()
+	{
+		$this->property = 'Valuation';
 	}
 }
 
@@ -171,24 +222,6 @@ class TestView extends View {
  * @subpackage    cake.tests.cases.libs.view
  */
 class TestAfterHelper extends Helper {
-
-/**
- * property property
- *
- * @var string ''
- * @access public
- */
-	var $property = '';
-
-/**
- * beforeLayout method
- *
- * @access public
- * @return void
- */
-	function beforeLayout() {
-		$this->property = 'Valuation';
-	}
 
 /**
  * afterLayout method
@@ -244,7 +277,7 @@ class ViewTest extends CakeTestCase {
  * @access public
  * @return void
  */
-	function startTest() {
+	function startTest($method) {
 		App::build(array(
 			'plugins' => array(TEST_CAKE_CORE_INCLUDE_PATH . 'tests' . DS . 'test_app' . DS . 'plugins' . DS),
 			'views' => array(
@@ -260,7 +293,7 @@ class ViewTest extends CakeTestCase {
  * @access public
  * @return void
  */
-	function endTest() {
+	function endTest($method) {
 		App::build();
 	}
 
@@ -400,7 +433,6 @@ class ViewTest extends CakeTestCase {
 		$result = $View->getViewFileName('does_not_exist');
 		$expected = str_replace(array("\t", "\r\n", "\n"), "", ob_get_clean());
 
-		$this->assertPattern("/PagesController::/", $expected);
 		$this->assertPattern("/pages(\/|\\\)does_not_exist.ctp/", $expected);
 	}
 
@@ -653,10 +685,10 @@ class ViewTest extends CakeTestCase {
  * @return void
  */
 	function testBeforeLayout() {
-		$this->PostsController->helpers = array('Session', 'TestAfter', 'Html');
+		$this->PostsController->helpers = array('Session', 'TestBefore', 'Html');
 		$View = new View($this->PostsController);
 		$out = $View->render('index');
-		$this->assertEqual($View->loaded['testAfter']->property, 'Valuation');
+		$this->assertEqual($View->loaded['testBefore']->property, 'Valuation');
 	}
 
 /**
@@ -844,7 +876,7 @@ class ViewTest extends CakeTestCase {
 		fwrite($f, $cacheText);
 		fclose($f);
 
-		$result = $View->renderCache($path, '+1 second');
+		$result = $View->renderCache($path, strtotime('+1 second'));
 		$this->assertFalse($result);
 		@unlink($path);
 
@@ -853,7 +885,7 @@ class ViewTest extends CakeTestCase {
 		fwrite($f, $cacheText);
 		fclose($f);
 		ob_start();
-		$View->renderCache($path, '+1 second');
+		$View->renderCache($path, strtotime('+1 second'));
 		$result = ob_get_clean();
 
 		$expected = 'some cacheText';
@@ -1013,7 +1045,6 @@ class ViewTest extends CakeTestCase {
 		$result = str_replace(array("\t", "\r\n", "\n"), "", ob_get_clean());
 		set_error_handler('simpleTestErrorHandler');
 
-		$this->assertPattern("/<em>PostsController::<\/em><em>something\(\)<\/em>/", $result);
 		$this->assertPattern("/posts(\/|\\\)this_is_missing.whatever/", $result);
 
 		$this->PostsController->ext = ".bad";

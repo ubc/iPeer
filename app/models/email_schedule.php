@@ -42,6 +42,7 @@ class EmailSchedule extends AppModel
             'conditions' => array('EmailSchedule.id' => $id),
             'fields' => array('EmailSchedule.sent')
         ));
-        return $tmp['EmailSchedule']['sent'];
+        if ($tmp) return $tmp['EmailSchedule']['sent'];
+        return null;
     }
 }

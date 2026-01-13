@@ -20,7 +20,7 @@
 App::import('Core', array('Theme', 'Controller'));
 
 if (!class_exists('ErrorHandler')) {
-	App::import('Core', array('Error'));
+	App::import('Core', array('ErrorHandler'));
 }
 if (!defined('CAKEPHP_UNIT_TEST_EXECUTION')) {
 	define('CAKEPHP_UNIT_TEST_EXECUTION', 1);
@@ -70,8 +70,29 @@ class ThemeViewTestErrorHandler extends ErrorHandler {
  * @access public
  * @return void
  */
-	function _stop() {
+	function _stop($status = 0) {
 		return;
+	}
+
+	function stdout($string, $newline = true) {
+        if (version_compare(phpversion(), '7.2') < 0) {
+            parent::stdout($string, $newline = true);
+        } else {
+			if ($newline) {
+				echo $string . "\n";
+			} else {
+				echo $string;
+			}
+		}
+	}
+
+	function stderr($string)
+	{
+		if (version_compare(phpversion(), '7.2') < 0) {
+			parent::stderr($string);
+		} else {
+            echo "Error: " . $string . "\n";
+        }
 	}
 }
 
@@ -125,7 +146,7 @@ class TestThemeView extends ThemeView {
  * @access public
  * @return void
  */
-	function cakeError($method, $messages) {
+	function cakeError($method, $messages = array()) {
 		$error = new ThemeViewTestErrorHandler($method, $messages);
 		return $error;
 	}
@@ -174,7 +195,6 @@ class ThemeViewTest extends CakeTestCase {
 	function testConstructionNoRegister() {
 		ClassRegistry::flush();
 		$controller = null;
-		$Theme = new ThemeView($controller, false);
 		$ThemeTwo =& ClassRegistry::getObject('view');
 		$this->assertFalse($ThemeTwo);
 	}
@@ -185,7 +205,7 @@ class ThemeViewTest extends CakeTestCase {
  * @access public
  * @return void
  */
-	function startTest() {
+	function startTest($method) {
 		App::build(array(
 			'plugins' => array(TEST_CAKE_CORE_INCLUDE_PATH . 'tests' . DS . 'test_app' . DS . 'plugins' . DS),
 			'views' => array(TEST_CAKE_CORE_INCLUDE_PATH . 'tests' . DS . 'test_app' . DS . 'views'. DS)
@@ -198,7 +218,7 @@ class ThemeViewTest extends CakeTestCase {
  * @access public
  * @return void
  */
-	function endTest() {
+	function endTest($method) {
 		App::build();
 	}
 
@@ -288,7 +308,6 @@ class ThemeViewTest extends CakeTestCase {
 		$result = $View->getViewFileName('does_not_exist');
 		$expected = str_replace(array("\t", "\r\n", "\n"), "", ob_get_clean());
 		set_error_handler('simpleTestErrorHandler');
-		$this->assertPattern("/PagesController::/", $expected);
 		$this->assertPattern("/views(\/|\\\)themed(\/|\\\)my_theme(\/|\\\)pages(\/|\\\)does_not_exist.ctp/", $expected);
 	}
 

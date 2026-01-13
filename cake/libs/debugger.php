@@ -180,7 +180,7 @@ class Debugger extends CakeObject {
  * @access public
  * @static
  */
-	function &getInstance($class = null) {
+	static function &getInstance($class = null) {
 		static $instance = array();
 		if (!empty($class)) {
 			if (!$instance || strtolower($class) != strtolower(get_class($instance[0]))) {
@@ -212,7 +212,7 @@ class Debugger extends CakeObject {
  * @static
  * @link http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Debugging.html#Using-the-Debugger-Class
 */
-	function dump($var) {
+	static function dump($var) {
 		$_this =& Debugger::getInstance();
 		pr($_this->exportVar($var));
 	}
@@ -227,7 +227,7 @@ class Debugger extends CakeObject {
  * @static
  * @link http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Debugging.html#Using-the-Debugger-Class
  */
-	function log($var, $level = LOG_DEBUG) {
+    static function log($var, $level = LOG_DEBUG) {
 		$_this =& Debugger::getInstance();
 		$source = $_this->trace(array('start' => 1)) . "\n";
 		CakeLog::write($level, "\n" . $source . $_this->exportVar($var));
@@ -241,12 +241,12 @@ class Debugger extends CakeObject {
  * @param string $file File on which error occurred
  * @param integer $line Line that triggered the error
  * @param array $context Context
- * @return boolean true if error was handled
+ * @return boolean true if error was handled, false otherwise
  * @access public
  */
-	function handleError($code, $description, $file = null, $line = null, $context = null) {
+	static function handleError($code, $description, $file = null, $line = null, $context = null) {
 		if (error_reporting() == 0 || $code === 2048 || $code === 8192) {
-			return;
+			return false;
 		}
 
 		$_this =& Debugger::getInstance();
@@ -263,7 +263,7 @@ class Debugger extends CakeObject {
 		if (!in_array($info, $_this->errors)) {
 			$_this->errors[] = $info;
 		} else {
-			return;
+			return false;
 		}
 
 		switch ($code) {
@@ -288,11 +288,11 @@ class Debugger extends CakeObject {
 				$level = LOG_NOTICE;
 			break;
 			default:
-				return;
+				return false;
 			break;
 		}
 
-		$helpCode = null;
+		$helpID = null;
 		if (!empty($_this->helpPath) && preg_match('/.*\[([0-9]+)\]$/', $description, $codes)) {
 			if (isset($codes[1])) {
 				$helpID = $codes[1];
@@ -335,7 +335,7 @@ class Debugger extends CakeObject {
  * @static
  * @link http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Debugging.html#Using-the-Debugger-Class
  */
-	function trace($options = array()) {
+	static function trace($options = array()) {
 		$_this =& Debugger::getInstance();
 		$defaults = array(
 			'depth'   => 999,
@@ -414,7 +414,7 @@ class Debugger extends CakeObject {
  * @access public
  * @static
  */
-	function trimPath($path) {
+    static function trimPath($path) {
 		if (!defined('CAKE_CORE_INCLUDE_PATH') || !defined('APP')) {
 			return $path;
 		}
@@ -447,7 +447,7 @@ class Debugger extends CakeObject {
  * @static
  * @link http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Debugging.html#Using-the-Debugger-Class
  */
-	function excerpt($file, $line, $context = 2) {
+	static function excerpt($file, $line, $context = 2) {
 		$data = $lines = array();
 		if (!file_exists($file)) {
 			return array();
@@ -480,7 +480,7 @@ class Debugger extends CakeObject {
  * @static
  * @link http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Debugging.html#Using-the-Debugger-Class
  */
-	function exportVar($var, $recursion = 0) {
+	static function exportVar($var, $recursion = 0) {
 		$_this =& Debugger::getInstance();
 		switch (strtolower(gettype($var))) {
 			case 'boolean':
@@ -575,7 +575,7 @@ class Debugger extends CakeObject {
  * @param array $strings Template strings to be used for the output format.
  * @access protected
  */
-	function output($format = null, $strings = array()) {
+	static function output($format = null, $strings = array()) {
 		$_this =& Debugger::getInstance();
 		$data = null;
 
@@ -692,7 +692,7 @@ class Debugger extends CakeObject {
  * @access public
  * @static
  */
-	function checkSecurityKeys() {
+	static function checkSecurityKeys() {
 		if (Configure::read('Security.salt') == 'DYhG93b0qyJfIxfs2guVoUubWwvniR2G0FgaC9mi') {
 			trigger_error(__('Please change the value of \'Security.salt\' in app/config/core.php to a salt value specific to your application', true), E_USER_NOTICE);
 		}
@@ -711,7 +711,7 @@ class Debugger extends CakeObject {
  * @static
  * @link http://book.cakephp.org/1.3/en/The-Manual/Common-Tasks-With-CakePHP/Debugging.html#Using-the-Debugger-Class
  */
-	function invoke(&$debugger) {
+	static function invoke(&$debugger) {
 		set_error_handler(array(&$debugger, 'handleError'));
 	}
 }

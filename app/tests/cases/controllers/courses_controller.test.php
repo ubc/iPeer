@@ -308,8 +308,8 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'password' => md5('ipeeripeer')
             )
         );
-        $this->controller->expectOnce('redirect', array('/home'));
         $this->testAction('/courses/index', array('return' => 'result', 'fixturize' => false));
+        $this->controller->expectOnce('redirect', array('/home'));
         $message = $this->controller->Session->read('Message.flash');
         $this->assertEqual($message['message'], 'Error: You do not have permission to access the page.');
     }
@@ -373,8 +373,8 @@ class CoursesControllerTest extends ExtendedAuthTestCase
     function testViewInvalidId()
     {
         // test invalid course id
-        $this->controller->expectOnce('redirect', array('index'));
         $this->testAction('/courses/view/9999', array('return' => 'vars'));
+        $this->controller->expectOnce('redirect', array('index'));
         $message = $this->controller->Session->read('Message.flash');
         $this->assertEqual($message['message'], 'Error: Course does not exist or you do not have permission to view this course.');
     }
@@ -388,8 +388,8 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'password' => md5('ipeeripeer')
             )
         );
-        $this->controller->expectOnce('redirect', array('index'));
         $this->testAction('/courses/view/1', array('return' => 'vars'));
+        $this->controller->expectOnce('redirect', array('index'));
         $message = $this->controller->Session->read('Message.flash');
         $this->assertEqual($message['message'], 'Error: Course does not exist or you do not have permission to view this course.');
     }
@@ -411,8 +411,8 @@ class CoursesControllerTest extends ExtendedAuthTestCase
     function testHomeInvalidId()
     {
         // test invalid course id
-        $this->controller->expectOnce('redirect', array('index'));
         $this->testAction('/courses/home/9999', array('return' => 'result'));
+        $this->controller->expectOnce('redirect', array('index'));
         $message = $this->controller->Session->read('Message.flash');
         $this->assertEqual($message['message'], 'Error: Course does not exist or you do not have permission to view this course.');
     }
@@ -426,8 +426,8 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'password' => md5('ipeeripeer')
             )
         );
-        $this->controller->expectOnce('redirect', array('index'));
         $this->testAction('/courses/home/1', array('return' => 'vars'));
+        $this->controller->expectOnce('redirect', array('index'));
         $message = $this->controller->Session->read('Message.flash');
         $this->assertEqual($message['message'], 'Error: Course does not exist or you do not have permission to view this course.');
     }
@@ -458,12 +458,12 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'Department' => array(2)
             ),
         );
-        $this->controller->expectOnce('redirect', array('index'));
 
         $this->testAction(
             '/courses/add',
             array('fixturize' => true, 'data' => $data, 'method' => 'post')
         );
+        $this->controller->expectOnce('redirect', array('index'));
 
         $courseModel = ClassRegistry::init('Course');
         $found = $courseModel->find('first', array( 'conditions' => array('course' => $data['Course']['course'])));
@@ -533,11 +533,11 @@ class CoursesControllerTest extends ExtendedAuthTestCase
             ),
         );
 
-        $this->controller->expectOnce('redirect', array('index'));
         $result = $this->testAction(
             '/courses/edit/1',
             array('fixturize' => true, 'data' => $data, 'method' => 'post')
         );
+        $this->controller->expectOnce('redirect', array('index'));
 
         $courseModel = ClassRegistry::init('Course');
         $course = $courseModel->find('all', array( 'conditions' => array('course' => $data['Course']['course']), 'contain' => array('Instructor', 'Department')));
@@ -642,11 +642,11 @@ class CoursesControllerTest extends ExtendedAuthTestCase
 
     function testDeleteNonExistingCourse()
     {
-        $this->controller->expectOnce('redirect', array('index'));
         $result = $this->testAction(
             '/courses/delete/999',
             array('fixturize' => true, 'method' => 'get')
         );
+        $this->controller->expectOnce('redirect', array('index'));
 
         $message = $this->controller->Session->read('Message.flash');
         $this->assertEqual($message['message'], 'Error: Course does not exist or you do not have permission to view this course.');
@@ -661,11 +661,11 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'password' => md5('ipeeripeer')
             )
         );
-        $this->controller->expectOnce('redirect', array('index'));
         $this->testAction(
             '/courses/delete/1',
             array('fixturize' => true, 'method' => 'get')
         );
+        $this->controller->expectOnce('redirect', array('index'));
 
         // course should not be deleted
         $courseModel = ClassRegistry::init('Course');

@@ -121,7 +121,7 @@ class DboMysqlBase extends DboSource {
 		if ($cache != null) {
 			return $cache;
 		}
-		$fields = false;
+		$fields = array();
 		$cols = $this->query('SHOW FULL COLUMNS FROM ' . $this->fullTableName($model));
 
 		foreach ($cols as $column) {
@@ -556,28 +556,6 @@ class DboMysql extends DboMysqlBase {
 	function connect() {
 		$config = $this->config;
 		$this->connected = false;
-
-		if (!$config['persistent']) {
-			$this->connection = mysql_connect($config['host'] . ':' . $config['port'], $config['login'], $config['password'], true);
-			$config['connect'] = 'mysql_connect';
-		} else {
-			$this->connection = mysql_pconnect($config['host'] . ':' . $config['port'], $config['login'], $config['password']);
-		}
-
-		if (!$this->connection) {
-			return false;
-		}
-
-		if (mysql_select_db($config['database'], $this->connection)) {
-			$this->connected = true;
-		}
-
-		if (!empty($config['encoding'])) {
-			$this->setEncoding($config['encoding']);
-		}
-
-		$this->_useAlias = (bool)version_compare(mysql_get_server_info($this->connection), "4.1", ">=");
-
 		return $this->connected;
 	}
 
@@ -681,7 +659,7 @@ class DboMysql extends DboMysqlBase {
 					return $data;
 				}
 			default:
-				return "'" . mysql_real_escape_string($data, $this->connection) . "'";
+				return "'" . mysqli_real_escape_string($data, $this->connection) . "'";
 			break;
 		}
 	}
@@ -692,8 +670,8 @@ class DboMysql extends DboMysqlBase {
  * @return string Error message with error number
  */
 	function lastError() {
-		if (mysql_errno($this->connection)) {
-			return mysql_errno($this->connection).': '.mysql_error($this->connection);
+		if (mysqli_errno($this->connection)) {
+			return mysqli_errno($this->connection).': '.mysqli_error($this->connection);
 		}
 		return null;
 	}

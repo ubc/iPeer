@@ -182,11 +182,11 @@ class UpgradeBase
             if ($sl < 0) {
                 continue;
             }
-            if ("-" == $line{0} && "-" == $line{1}) {
+            if ("-" == $line[0] && "-" == $line[1]) {
                 continue;
             }
 
-            if (";" == $line{$sl}) {
+            if (";" == $line[$sl]) {
                 $done = true;
                 $line = substr($line, 0, $sl);
             }

@@ -443,9 +443,8 @@ class Controller extends CakeObject {
 			}
 		}
 
-		if ($pluginController && $pluginName != null) {
+		if (!is_null($pluginController) && class_exists($pluginController) && $pluginName != null) {
 			$appVars = get_class_vars($pluginController);
-			$uses = $appVars['uses'];
 			$merge = array('components', 'helpers');
 
 			if ($this->uses !== null && $this->uses !== false) {
@@ -926,7 +925,9 @@ class Controller extends CakeObject {
 			$base = FULL_BASE_URL . $this->webroot;
 			if (strpos($ref, $base) === 0) {
 				$return =  substr($ref, strlen($base));
-				if (isset($return[0]) && $return[0] != '/') {
+				if (empty($return)) {
+					$return = '/';
+				} else if (isset($return[0]) && $return[0] != '/') {
 					$return = '/'.$return;
 				}
 				return $return;
@@ -1231,7 +1232,7 @@ class Controller extends CakeObject {
 		}
 		$paging = array(
 			'page'		=> $page,
-			'current'	=> count($results),
+			'current'	=> @count($results),
 			'count'		=> $count,
 			'prevPage'	=> ($page > 1),
 			'nextPage'	=> ($count > ($page * $limit)),

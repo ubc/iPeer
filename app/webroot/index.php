@@ -20,6 +20,9 @@
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
+// autoload composer installed libraries
+require realpath(dirname(__FILE__) . '/../../vendor/autoload.php');
+
 $timezone = ini_get('date.timezone') ? ini_get('date.timezone') : 'UTC';
 date_default_timezone_set($timezone); // set the default time zone
  

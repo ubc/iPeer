@@ -70,7 +70,7 @@ class FixtureTaskTest extends CakeTestCase {
  * @return void
  * @access public
  */
-	function startTest() {
+	function startTest($method) {
 		$this->Dispatcher = new TestFixtureTaskMockShellDispatcher();
 		$this->Task = new MockFixtureTask();
 		$this->Task->Model = new MockFixtureModelTask();
@@ -87,7 +87,7 @@ class FixtureTaskTest extends CakeTestCase {
  * @return void
  * @access public
  */
-	function endTest() {
+	function endTest($method) {
 		unset($this->Task, $this->Dispatcher);
 		ClassRegistry::flush();
 	}
@@ -99,6 +99,7 @@ class FixtureTaskTest extends CakeTestCase {
  * @access public
  */
 	function testConstruct() {
+		$this->Dispatch = new \stdClass();
 		$this->Dispatch->params['working'] = DS . 'my' . DS . 'path';
 		$Task = new FixtureTask($this->Dispatch);
 

@@ -1,5 +1,5 @@
 <?php
-// $Id$
+// $Id: http_test.php 1505 2007-04-30 23:39:59Z lastcraft $
 require_once(dirname(__FILE__) . '/../autorun.php');
 require_once(dirname(__FILE__) . '/../encoding.php');
 require_once(dirname(__FILE__) . '/../http.php');
@@ -12,11 +12,13 @@ Mock::generatePartial('SimpleRoute', 'PartialSimpleRoute', array('_createSocket'
 Mock::generatePartial(
         'SimpleProxyRoute',
         'PartialSimpleProxyRoute',
-        array('_createSocket'));
+        array('_createSocket')
+);
 
-class TestOfDirectRoute extends UnitTestCase {
-    
-    function testDefaultGetRequest() {
+class TestOfDirectRoute extends UnitTestCase
+{
+    public function testDefaultGetRequest()
+    {
         $socket = new MockSimpleSocket();
         $socket->expectArgumentsAt(0, 'write', array("GET /here.html HTTP/1.0\r\n"));
         $socket->expectArgumentsAt(1, 'write', array("Host: a.valid.host\r\n"));
@@ -30,7 +32,8 @@ class TestOfDirectRoute extends UnitTestCase {
         $this->assertReference($route->createConnection('GET', 15), $socket);
     }
     
-    function testDefaultPostRequest() {
+    public function testDefaultPostRequest()
+    {
         $socket = new MockSimpleSocket();
         $socket->expectArgumentsAt(0, 'write', array("POST /here.html HTTP/1.0\r\n"));
         $socket->expectArgumentsAt(1, 'write', array("Host: a.valid.host\r\n"));
@@ -44,7 +47,8 @@ class TestOfDirectRoute extends UnitTestCase {
         $route->createConnection('POST', 15);
     }
     
-    function testGetWithPort() {
+    public function testGetWithPort()
+    {
         $socket = new MockSimpleSocket();
         $socket->expectArgumentsAt(0, 'write', array("GET /here.html HTTP/1.0\r\n"));
         $socket->expectArgumentsAt(1, 'write', array("Host: a.valid.host:81\r\n"));
@@ -58,7 +62,8 @@ class TestOfDirectRoute extends UnitTestCase {
         $route->createConnection('GET', 15);
     }
     
-    function testGetWithParameters() {
+    public function testGetWithParameters()
+    {
         $socket = new MockSimpleSocket();
         $socket->expectArgumentsAt(0, 'write', array("GET /here.html?a=1&b=2 HTTP/1.0\r\n"));
         $socket->expectArgumentsAt(1, 'write', array("Host: a.valid.host\r\n"));
@@ -73,9 +78,10 @@ class TestOfDirectRoute extends UnitTestCase {
     }
 }
 
-class TestOfProxyRoute extends UnitTestCase {
-    
-    function testDefaultGet() {
+class TestOfProxyRoute extends UnitTestCase
+{
+    public function testDefaultGet()
+    {
         $socket = new MockSimpleSocket();
         $socket->expectArgumentsAt(0, 'write', array("GET http://a.valid.host/here.html HTTP/1.0\r\n"));
         $socket->expectArgumentsAt(1, 'write', array("Host: my-proxy:8080\r\n"));
@@ -86,11 +92,13 @@ class TestOfProxyRoute extends UnitTestCase {
         $route->setReturnReference('_createSocket', $socket);
         $route->SimpleProxyRoute(
                 new SimpleUrl('http://a.valid.host/here.html'),
-                new SimpleUrl('http://my-proxy'));
+                new SimpleUrl('http://my-proxy')
+        );
         $route->createConnection('GET', 15);
     }
     
-    function testDefaultPost() {
+    public function testDefaultPost()
+    {
         $socket = new MockSimpleSocket();
         $socket->expectArgumentsAt(0, 'write', array("POST http://a.valid.host/here.html HTTP/1.0\r\n"));
         $socket->expectArgumentsAt(1, 'write', array("Host: my-proxy:8080\r\n"));
@@ -101,11 +109,13 @@ class TestOfProxyRoute extends UnitTestCase {
         $route->setReturnReference('_createSocket', $socket);
         $route->SimpleProxyRoute(
                 new SimpleUrl('http://a.valid.host/here.html'),
-                new SimpleUrl('http://my-proxy'));
+                new SimpleUrl('http://my-proxy')
+        );
         $route->createConnection('POST', 15);
     }
     
-    function testGetWithPort() {
+    public function testGetWithPort()
+    {
         $socket = new MockSimpleSocket();
         $socket->expectArgumentsAt(0, 'write', array("GET http://a.valid.host:81/here.html HTTP/1.0\r\n"));
         $socket->expectArgumentsAt(1, 'write', array("Host: my-proxy:8081\r\n"));
@@ -116,11 +126,13 @@ class TestOfProxyRoute extends UnitTestCase {
         $route->setReturnReference('_createSocket', $socket);
         $route->SimpleProxyRoute(
                 new SimpleUrl('http://a.valid.host:81/here.html'),
-                new SimpleUrl('http://my-proxy:8081'));
+                new SimpleUrl('http://my-proxy:8081')
+        );
         $route->createConnection('GET', 15);
     }
     
-    function testGetWithParameters() {
+    public function testGetWithParameters()
+    {
         $socket = new MockSimpleSocket();
         $socket->expectArgumentsAt(0, 'write', array("GET http://a.valid.host/here.html?a=1&b=2 HTTP/1.0\r\n"));
         $socket->expectArgumentsAt(1, 'write', array("Host: my-proxy:8080\r\n"));
@@ -131,11 +143,13 @@ class TestOfProxyRoute extends UnitTestCase {
         $route->setReturnReference('_createSocket', $socket);
         $route->SimpleProxyRoute(
                 new SimpleUrl('http://a.valid.host/here.html?a=1&b=2'),
-                new SimpleUrl('http://my-proxy'));
+                new SimpleUrl('http://my-proxy')
+        );
         $route->createConnection('GET', 15);
     }
     
-    function testGetWithAuthentication() {
+    public function testGetWithAuthentication()
+    {
         $encoded = base64_encode('Me:Secret');
 
         $socket = new MockSimpleSocket();
@@ -151,14 +165,16 @@ class TestOfProxyRoute extends UnitTestCase {
                 new SimpleUrl('http://a.valid.host/here.html'),
                 new SimpleUrl('http://my-proxy'),
                 'Me',
-                'Secret');
+                'Secret'
+        );
         $route->createConnection('GET', 15);
     }
 }
 
-class TestOfHttpRequest extends UnitTestCase {
-    
-    function testReadingBadConnection() {
+class TestOfHttpRequest extends UnitTestCase
+{
+    public function testReadingBadConnection()
+    {
         $socket = new MockSimpleSocket();
         
         $route = new MockSimpleRoute();
@@ -169,7 +185,8 @@ class TestOfHttpRequest extends UnitTestCase {
         $this->assertTrue($reponse->isError());
     }
     
-    function testReadingGoodConnection() {
+    public function testReadingGoodConnection()
+    {
         $socket = new MockSimpleSocket();
         $socket->expectOnce('write', array("\r\n"));
         
@@ -181,7 +198,8 @@ class TestOfHttpRequest extends UnitTestCase {
         $this->assertIsA($request->fetch(15), 'SimpleHttpResponse');
     }
     
-    function testWritingAdditionalHeaders() {
+    public function testWritingAdditionalHeaders()
+    {
         $socket = new MockSimpleSocket();
         $socket->expectArgumentsAt(0, 'write', array("My: stuff\r\n"));
         $socket->expectArgumentsAt(1, 'write', array("\r\n"));
@@ -195,7 +213,8 @@ class TestOfHttpRequest extends UnitTestCase {
         $request->fetch(15);
     }
     
-    function testCookieWriting() {
+    public function testCookieWriting()
+    {
         $socket = new MockSimpleSocket();
         $socket->expectArgumentsAt(0, 'write', array("Cookie: a=A\r\n"));
         $socket->expectArgumentsAt(1, 'write', array("\r\n"));
@@ -212,7 +231,8 @@ class TestOfHttpRequest extends UnitTestCase {
         $this->assertIsA($request->fetch(15), 'SimpleHttpResponse');
     }
     
-    function testMultipleCookieWriting() {
+    public function testMultipleCookieWriting()
+    {
         $socket = new MockSimpleSocket();
         $socket->expectArgumentsAt(0, 'write', array("Cookie: a=A;b=B\r\n"));
         
@@ -229,9 +249,10 @@ class TestOfHttpRequest extends UnitTestCase {
     }
 }
 
-class TestOfHttpPostRequest extends UnitTestCase {
-    
-    function testReadingBadConnectionCausesErrorBecauseOfDeadSocket() {
+class TestOfHttpPostRequest extends UnitTestCase
+{
+    public function testReadingBadConnectionCausesErrorBecauseOfDeadSocket()
+    {
         $socket = new MockSimpleSocket();
         
         $route = new MockSimpleRoute();
@@ -242,7 +263,8 @@ class TestOfHttpPostRequest extends UnitTestCase {
         $this->assertTrue($reponse->isError());
     }
     
-    function testReadingGoodConnection() {
+    public function testReadingGoodConnection()
+    {
         $socket = new MockSimpleSocket();
         $socket->expectArgumentsAt(0, 'write', array("Content-Length: 0\r\n"));
         $socket->expectArgumentsAt(1, 'write', array("Content-Type: application/x-www-form-urlencoded\r\n"));
@@ -257,7 +279,8 @@ class TestOfHttpPostRequest extends UnitTestCase {
         $this->assertIsA($request->fetch(15), 'SimpleHttpResponse');
     }
     
-    function testContentHeadersCalculated() {
+    public function testContentHeadersCalculated()
+    {
         $socket = new MockSimpleSocket();
         $socket->expectArgumentsAt(0, 'write', array("Content-Length: 3\r\n"));
         $socket->expectArgumentsAt(1, 'write', array("Content-Type: application/x-www-form-urlencoded\r\n"));
@@ -270,33 +293,39 @@ class TestOfHttpPostRequest extends UnitTestCase {
         
         $request = new SimpleHttpRequest(
                 $route,
-                new SimplePostEncoding(array('a' => 'A')));
+                new SimplePostEncoding(array('a' => 'A'))
+        );
         $this->assertIsA($request->fetch(15), 'SimpleHttpResponse');
     }
 }
     
-class TestOfHttpHeaders extends UnitTestCase {
-    
-    function testParseBasicHeaders() {
+class TestOfHttpHeaders extends UnitTestCase
+{
+    public function testParseBasicHeaders()
+    {
         $headers = new SimpleHttpHeaders(
                 "HTTP/1.1 200 OK\r\n" .
                 "Date: Mon, 18 Nov 2002 15:50:29 GMT\r\n" .
                 "Content-Type: text/plain\r\n" .
                 "Server: Apache/1.3.24 (Win32) PHP/4.2.3\r\n" .
-                "Connection: close");
+                "Connection: close"
+        );
         $this->assertIdentical($headers->getHttpVersion(), "1.1");
         $this->assertIdentical($headers->getResponseCode(), 200);
         $this->assertEqual($headers->getMimeType(), "text/plain");
     }
     
-    function testNonStandardResponseHeader() {
+    public function testNonStandardResponseHeader()
+    {
         $headers = new SimpleHttpHeaders(
                 "HTTP/1.1 302 (HTTP-Version SP Status-Code CRLF)\r\n" .
-                "Connection: close");
+                "Connection: close"
+        );
         $this->assertIdentical($headers->getResponseCode(), 302);
     }
     
-    function testCanParseMultipleCookies() {
+    public function testCanParseMultipleCookies()
+    {
         $jar = new MockSimpleCookieJar();
         $jar->expectAt(0, 'setCookie', array('a', 'aaa', 'host', '/here/', 'Wed, 25 Dec 2002 04:24:20 GMT'));
         $jar->expectAt(1, 'setCookie', array('b', 'bbb', 'host', '/', false));
@@ -308,11 +337,13 @@ class TestOfHttpHeaders extends UnitTestCase {
                 "Server: Apache/1.3.24 (Win32) PHP/4.2.3\r\n" .
                 "Set-Cookie: a=aaa; expires=Wed, 25-Dec-02 04:24:20 GMT; path=/here/\r\n" .
                 "Set-Cookie: b=bbb\r\n" .
-                "Connection: close");
+                "Connection: close"
+        );
         $headers->writeCookiesToJar($jar, new SimpleUrl('http://host'));
     }
     
-    function testCanRecogniseRedirect() {
+    public function testCanRecogniseRedirect()
+    {
         $headers = new SimpleHttpHeaders("HTTP/1.1 301 OK\r\n" .
                 "Content-Type: text/plain\r\n" .
                 "Content-Length: 0\r\n" .
@@ -323,7 +354,8 @@ class TestOfHttpHeaders extends UnitTestCase {
         $this->assertTrue($headers->isRedirect());
     }
     
-    function testCanParseChallenge() {
+    public function testCanParseChallenge()
+    {
         $headers = new SimpleHttpHeaders("HTTP/1.1 401 Authorization required\r\n" .
                 "Content-Type: text/plain\r\n" .
                 "Connection: close\r\n" .
@@ -334,9 +366,10 @@ class TestOfHttpHeaders extends UnitTestCase {
     }
 }
 
-class TestOfHttpResponse extends UnitTestCase {
-    
-    function testBadRequest() {
+class TestOfHttpResponse extends UnitTestCase
+{
+    public function testBadRequest()
+    {
         $socket = new MockSimpleSocket();
         $socket->setReturnValue('getSent', '');
 
@@ -347,7 +380,8 @@ class TestOfHttpResponse extends UnitTestCase {
         $this->assertIdentical($response->getSent(), '');
     }
     
-    function testBadSocketDuringResponse() {
+    public function testBadSocketDuringResponse()
+    {
         $socket = new MockSimpleSocket();
         $socket->setReturnValueAt(0, "read", "HTTP/1.1 200 OK\r\n");
         $socket->setReturnValueAt(1, "read", "Date: Mon, 18 Nov 2002 15:50:29 GMT\r\n");
@@ -360,7 +394,8 @@ class TestOfHttpResponse extends UnitTestCase {
         $this->assertEqual($response->getSent(), 'HTTP/1.1 ...');
     }
     
-    function testIncompleteHeader() {
+    public function testIncompleteHeader()
+    {
         $socket = new MockSimpleSocket();
         $socket->setReturnValueAt(0, "read", "HTTP/1.1 200 OK\r\n");
         $socket->setReturnValueAt(1, "read", "Date: Mon, 18 Nov 2002 15:50:29 GMT\r\n");
@@ -372,7 +407,8 @@ class TestOfHttpResponse extends UnitTestCase {
         $this->assertEqual($response->getContent(), "");
     }
     
-    function testParseOfResponseHeadersWhenChunked() {
+    public function testParseOfResponseHeadersWhenChunked()
+    {
         $socket = new MockSimpleSocket();
         $socket->setReturnValueAt(0, "read", "HTTP/1.1 200 OK\r\nDate: Mon, 18 Nov 2002 15:50:29 GMT\r\n");
         $socket->setReturnValueAt(1, "read", "Content-Type: text/plain\r\n");
@@ -385,7 +421,8 @@ class TestOfHttpResponse extends UnitTestCase {
         $this->assertFalse($response->isError());
         $this->assertEqual(
                 $response->getContent(),
-                "this is a test file\nwith two lines in it\n");
+                "this is a test file\nwith two lines in it\n"
+        );
         $headers = $response->getHeaders();
         $this->assertIdentical($headers->getHttpVersion(), "1.1");
         $this->assertIdentical($headers->getResponseCode(), 200);
@@ -394,7 +431,8 @@ class TestOfHttpResponse extends UnitTestCase {
         $this->assertFalse($headers->getLocation());
     }
     
-    function testRedirect() {
+    public function testRedirect()
+    {
         $socket = new MockSimpleSocket();
         $socket->setReturnValueAt(0, "read", "HTTP/1.1 301 OK\r\n");
         $socket->setReturnValueAt(1, "read", "Content-Type: text/plain\r\n");
@@ -409,7 +447,8 @@ class TestOfHttpResponse extends UnitTestCase {
         $this->assertEqual($headers->getLocation(), "http://www.somewhere-else.com/");
     }
     
-    function testRedirectWithPort() {
+    public function testRedirectWithPort()
+    {
         $socket = new MockSimpleSocket();
         $socket->setReturnValueAt(0, "read", "HTTP/1.1 301 OK\r\n");
         $socket->setReturnValueAt(1, "read", "Content-Type: text/plain\r\n");
@@ -424,4 +463,3 @@ class TestOfHttpResponse extends UnitTestCase {
         $this->assertEqual($headers->getLocation(), "http://www.somewhere-else.com:80/");
     }
 }
-?>

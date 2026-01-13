@@ -3,7 +3,7 @@
  *  base include file for SimpleTest
  *  @package    SimpleTest
  *  @subpackage UnitTester
- *  @version    $Id$
+ *  @version    $Id: shell_tester.php 1723 2008-04-08 00:34:10Z lastcraft $
  */
 
 /**#@+
@@ -17,14 +17,16 @@ require_once(dirname(__FILE__) . '/test_case.php');
  *    @package SimpleTest
  *    @subpackage UnitTester
  */
-class SimpleShell {
-    var $_output;
+class SimpleShell
+{
+    public $_output;
 
     /**
      *    Executes the shell comand and stashes the output.
      *    @access public
      */
-    function SimpleShell() {
+    public function __construct()
+    {
         $this->_output = false;
     }
 
@@ -36,7 +38,8 @@ class SimpleShell {
      *    @return integer           Exit code.
      *    @access public
      */
-    function execute($command) {
+    public function execute($command)
+    {
         $this->_output = false;
         exec($command, $this->_output, $ret);
         return $ret;
@@ -47,7 +50,8 @@ class SimpleShell {
      *    @return string        Output as text.
      *    @access public
      */
-    function getOutput() {
+    public function getOutput()
+    {
         return implode("\n", $this->_output);
     }
 
@@ -56,7 +60,8 @@ class SimpleShell {
      *    @return array         Output as array of lines.
      *    @access public
      */
-    function getOutputAsList() {
+    public function getOutputAsList()
+    {
         return $this->_output;
     }
 }
@@ -68,10 +73,11 @@ class SimpleShell {
  *    @package SimpleTest
  *    @subpackage UnitTester
  */
-class ShellTestCase extends SimpleTestCase {
-    var $_current_shell;
-    var $_last_status;
-    var $_last_command;
+class ShellTestCase extends SimpleTestCase
+{
+    public $_current_shell;
+    public $_last_status;
+    public $_last_command;
 
     /**
      *    Creates an empty test case. Should be subclassed
@@ -80,8 +86,9 @@ class ShellTestCase extends SimpleTestCase {
      *                             the class name if none specified.
      *    @access public
      */
-    function ShellTestCase($label = false) {
-        $this->SimpleTestCase($label);
+    public function __construct($label = false)
+    {
+        parent::__construct($label);
         $this->_current_shell = &$this->_createShell();
         $this->_last_status = false;
         $this->_last_command = '';
@@ -93,7 +100,8 @@ class ShellTestCase extends SimpleTestCase {
      *    @return boolean            True if zero exit code.
      *    @access public
      */
-    function execute($command) {
+    public function execute($command)
+    {
         $shell = &$this->_getShell();
         $this->_last_status = $shell->execute($command);
         $this->_last_command = $command;
@@ -104,7 +112,8 @@ class ShellTestCase extends SimpleTestCase {
      *    Dumps the output of the last command.
      *    @access public
      */
-    function dumpOutput() {
+    public function dumpOutput()
+    {
         $this->dump($this->getOutput());
     }
 
@@ -113,7 +122,8 @@ class ShellTestCase extends SimpleTestCase {
      *    @return string        Output as text.
      *    @access public
      */
-    function getOutput() {
+    public function getOutput()
+    {
         $shell = &$this->_getShell();
         return $shell->getOutput();
     }
@@ -123,7 +133,8 @@ class ShellTestCase extends SimpleTestCase {
      *    @return array         Output as array of lines.
      *    @access public
      */
-    function getOutputAsList() {
+    public function getOutputAsList()
+    {
         $shell = &$this->_getShell();
         return $shell->getOutputAsList();
     }
@@ -137,7 +148,8 @@ class ShellTestCase extends SimpleTestCase {
      *    @return boolean           True on pass
      *    @access public
      */
-    function assertTrue($result, $message = false) {
+    public function assertTrue($result, $message = false)
+    {
         return $this->assert(new TrueExpectation(), $result, $message);
     }
 
@@ -151,7 +163,8 @@ class ShellTestCase extends SimpleTestCase {
      *    @return boolean           True on pass
      *    @access public
      */
-    function assertFalse($result, $message = '%s') {
+    public function assertFalse($result, $message = '%s')
+    {
         return $this->assert(new FalseExpectation(), $result, $message);
     }
     
@@ -165,11 +178,13 @@ class ShellTestCase extends SimpleTestCase {
      *    @return boolean              True on pass
      *    @access public
      */
-    function assertEqual($first, $second, $message = "%s") {
+    public function assertEqual($first, $second, $message = "%s")
+    {
         return $this->assert(
                 new EqualExpectation($first),
                 $second,
-                $message);
+                $message
+        );
     }
     
     /**
@@ -182,11 +197,13 @@ class ShellTestCase extends SimpleTestCase {
      *    @return boolean               True on pass
      *    @access public
      */
-    function assertNotEqual($first, $second, $message = "%s") {
+    public function assertNotEqual($first, $second, $message = "%s")
+    {
         return $this->assert(
                 new NotEqualExpectation($first),
                 $second,
-                $message);
+                $message
+        );
     }
 
     /**
@@ -197,7 +214,8 @@ class ShellTestCase extends SimpleTestCase {
      *    @return boolean          True if pass.
      *    @access public
      */
-    function assertExitCode($status, $message = "%s") {
+    public function assertExitCode($status, $message = "%s")
+    {
         $message = sprintf($message, "Expected status code of [$status] from [" .
                 $this->_last_command . "], but got [" .
                 $this->_last_status . "]");
@@ -212,12 +230,14 @@ class ShellTestCase extends SimpleTestCase {
      *    @return boolean          True if pass.
      *    @access public
      */
-    function assertOutput($expected, $message = "%s") {
+    public function assertOutput($expected, $message = "%s")
+    {
         $shell = &$this->_getShell();
         return $this->assert(
                 new EqualExpectation($expected),
                 $shell->getOutput(),
-                $message);
+                $message
+        );
     }
 
     /**
@@ -228,12 +248,14 @@ class ShellTestCase extends SimpleTestCase {
      *    @return boolean           True if pass.
      *    @access public
      */
-    function assertOutputPattern($pattern, $message = "%s") {
+    public function assertOutputPattern($pattern, $message = "%s")
+    {
         $shell = &$this->_getShell();
         return $this->assert(
                 new PatternExpectation($pattern),
                 $shell->getOutput(),
-                $message);
+                $message
+        );
     }
 
     /**
@@ -244,12 +266,14 @@ class ShellTestCase extends SimpleTestCase {
      *    @return boolean           True if pass.
      *    @access public
      */
-    function assertNoOutputPattern($pattern, $message = "%s") {
+    public function assertNoOutputPattern($pattern, $message = "%s")
+    {
         $shell = &$this->_getShell();
         return $this->assert(
                 new NoPatternExpectation($pattern),
                 $shell->getOutput(),
-                $message);
+                $message
+        );
     }
 
     /**
@@ -259,7 +283,8 @@ class ShellTestCase extends SimpleTestCase {
      *    @return boolean          True if pass.
      *    @access public
      */
-    function assertFileExists($path, $message = "%s") {
+    public function assertFileExists($path, $message = "%s")
+    {
         $message = sprintf($message, "File [$path] should exist");
         return $this->assertTrue(file_exists($path), $message);
     }
@@ -271,7 +296,8 @@ class ShellTestCase extends SimpleTestCase {
      *    @return boolean          True if pass.
      *    @access public
      */
-    function assertFileNotExists($path, $message = "%s") {
+    public function assertFileNotExists($path, $message = "%s")
+    {
         $message = sprintf($message, "File [$path] should not exist");
         return $this->assertFalse(file_exists($path), $message);
     }
@@ -285,12 +311,14 @@ class ShellTestCase extends SimpleTestCase {
      *    @return boolean           True if pass.
      *    @access public
      */
-    function assertFilePattern($pattern, $path, $message = "%s") {
+    public function assertFilePattern($pattern, $path, $message = "%s")
+    {
         $shell = &$this->_getShell();
         return $this->assert(
                 new PatternExpectation($pattern),
                 implode('', file($path)),
-                $message);
+                $message
+        );
     }
 
     /**
@@ -302,12 +330,14 @@ class ShellTestCase extends SimpleTestCase {
      *    @return boolean           True if pass.
      *    @access public
      */
-    function assertNoFilePattern($pattern, $path, $message = "%s") {
+    public function assertNoFilePattern($pattern, $path, $message = "%s")
+    {
         $shell = &$this->_getShell();
         return $this->assert(
                 new NoPatternExpectation($pattern),
                 implode('', file($path)),
-                $message);
+                $message
+        );
     }
 
     /**
@@ -316,7 +346,8 @@ class ShellTestCase extends SimpleTestCase {
      *    @return Shell        Current shell.
      *    @access protected
      */
-    function &_getShell() {
+    public function &_getShell()
+    {
         return $this->_current_shell;
     }
 
@@ -325,9 +356,9 @@ class ShellTestCase extends SimpleTestCase {
      *    @return Shell        New shell object.
      *    @access protected
      */
-    function &_createShell() {
+    public function &_createShell()
+    {
         $shell = new SimpleShell();
         return $shell;
     }
 }
-?>

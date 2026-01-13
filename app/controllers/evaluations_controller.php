@@ -749,7 +749,9 @@ class EvaluationsController extends AppController
             //Get the target event submission
             $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEvent['GroupEvent']['id'],
                 $evaluator);
-            $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
+            if ($evaluationSubmission) {
+                $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
+            }
 
             if ($this->Evaluation->saveSimpleEvaluation($this->params, $groupEvent, $evaluationSubmission)) {
                 CaliperHooks::submit_simple_evaluation($eventId, $evaluator, $groupEvent['GroupEvent']['id'], $groupId);
@@ -1144,7 +1146,6 @@ class EvaluationsController extends AppController
         //Get the target event submission
         $evaluationSubmission = $this->EvaluationSubmission->getEvalSubmissionByGrpEventIdSubmitter($groupEventId, $evaluator);
         if (empty($evaluationSubmission)) {
-            $this->EvaluationSubmission->id = $evaluationSubmission['EvaluationSubmission']['id'];
             $evaluationSubmission['EvaluationSubmission']['grp_event_id'] = $groupEventId;
             $evaluationSubmission['EvaluationSubmission']['event_id'] = $eventId;
             $evaluationSubmission['EvaluationSubmission']['submitter_id'] = $evaluator;
@@ -1989,10 +1990,11 @@ class EvaluationsController extends AppController
         $tok = strtok($param, ';');
         $eventId = $tok;
         $releaseStatus = strtok(';');
-        $this->Event->id = $eventId;
-        $event = $this->Event->read();
-
-        $groupEventList = $this->GroupEvent->getGroupListByEventId($eventId);
+        $event = $this->Event->find('first', [
+                'conditions' => array('Event.id' => $eventId),
+                'recursive' => -1,
+        ]);
+        $groupEventList = $this->GroupEvent->getGroupListByEventId($eventId, true);
         $groupEvents = Set::extract('/GroupEvent/id', $groupEventList);
         switch ($event['Event']['event_template_type_id']) {
         case 1://simple
@@ -2148,8 +2150,9 @@ class EvaluationsController extends AppController
 
             $students[$pos]['Member']['full_name'] = $name['full_name'];
             $students[$pos]['Member']['student_no'] = $name['student_no'];
+            $students[$pos]['users']['submitted'] = false;
 
-            if (isset($evalSubmission)) {
+            if ($evalSubmission) {
                 $students[$pos]['users']['submitted'] = $evalSubmission['EvaluationSubmission']['submitted'];
                 $students[$pos]['users']['date_submitted'] = $evalSubmission['EvaluationSubmission']['date_submitted'];
                 $students[$pos]['users']['due_date'] = $event['Event']['due_date'];

@@ -197,7 +197,7 @@ if (!defined('VENDORS')) {
  */
 if (!defined('FULL_BASE_URL')) {
 	$s = null;
-	if (env('HTTPS') || env('HTTP_X_FORWARDED_PROTOCOL') == 'https' || env('HTTP_X_FORWARDED_PROTO') == 'https') {
+	if (env('HTTPS')) {
 		$s ='s';
 	}
 

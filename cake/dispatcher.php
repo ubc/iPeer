@@ -241,7 +241,7 @@ class Dispatcher extends CakeObject {
  * @return array Parameters found in POST and GET.
  * @access public
  */
-	function parseParams($fromUrl) {
+	static function parseParams($fromUrl) {
 		$params = array();
 
 		if (isset($_POST)) {
@@ -508,7 +508,7 @@ class Dispatcher extends CakeObject {
 		} else {
 			$url = $_GET['url'];
 		}
-		if ($url{0} == '/') {
+		if ($url[0] == '/') {
 			$url = substr($url, 1);
 		}
 		return $url;

@@ -1,4 +1,6 @@
 <?php
+App::import('Component', 'ExportBaseNew');
+
 /**
  * ExportCsvComponent
  *
@@ -115,6 +117,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         }
 
         $this->render($grid);
+        return $grid;
     }
 
     /**

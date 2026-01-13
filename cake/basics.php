@@ -431,7 +431,10 @@ if (!function_exists('array_combine')) {
 			if (isset($_SERVER['HTTPS'])) {
 				return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
 			}
-			return (strpos(env('SCRIPT_URI'), 'https://') === 0);
+			if (env('SCRIPT_URI')) {
+				return (strpos(env('SCRIPT_URI'), 'https://') === 0);
+			}
+			return false;
 		}
 
 		if ($key == 'SCRIPT_NAME') {
@@ -1020,6 +1023,13 @@ if (!function_exists('file_put_contents')) {
 				}
 			}
 			return implode($argSep, $out);
+		}
+	}
+
+	if (!function_exists('is_countable')) {
+		function is_countable($var)
+		{
+			return (is_array($var) || $var instanceof Countable);
 		}
 	}
 

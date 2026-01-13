@@ -202,8 +202,8 @@ class TestTask extends BakeTask {
 			$keys[] = $key;
 		}
 		$selection = $this->in(__('Choose an existing class, or enter the name of a class that does not exist', true));
-		if (isset($options[$selection - 1])) {
-			return $options[$selection - 1];
+		if (isset($options[(int) $selection - 1])) {
+			return $options[(int) $selection - 1];
 		}
 		return $selection;
 	}
@@ -362,7 +362,7 @@ class TestTask extends BakeTask {
  * @access protected
  */
 	function _addFixture($name) {
-		$parent = get_parent_class($name);
+		$parent = get_parent_class(new $name);
 		$prefix = 'app.';
 		if (strtolower($parent) != 'appmodel' && strtolower(substr($parent, -8)) == 'appmodel') {
 			$pluginName = substr($parent, 0, strlen($parent) -8);

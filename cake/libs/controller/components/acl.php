@@ -328,7 +328,7 @@ class DbAcl extends AclBase {
 							case -1:
 								return false;
 							case 0:
-								continue;
+								continue 2;
 							break;
 							case 1:
 								return true;
@@ -374,7 +374,7 @@ class DbAcl extends AclBase {
 			}
 			if (is_array($actions)) {
 				foreach ($actions as $action) {
-					if ($action{0} != '_') {
+					if ($action[0] != '_') {
 						$action = '_' . $action;
 					}
 					if (in_array($action, $permKeys)) {

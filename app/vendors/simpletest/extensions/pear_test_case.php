@@ -3,7 +3,7 @@
      *	adapter for SimpleTest to use PEAR PHPUnit test cases
      *	@package	SimpleTest
      *	@subpackage Extensions
-     *	@version	$Id$
+     *	@version	$Id: pear_test_case.php 1388 2006-11-10 20:59:59Z lastcraft $
      */
     
     /**#@+
@@ -13,7 +13,7 @@
     require_once(dirname(__FILE__) . '/../compatibility.php');
     require_once(dirname(__FILE__) . '/../test_case.php');
     require_once(dirname(__FILE__) . '/../expectation.php');
-	/**#@-*/
+    /**#@-*/
    
     /**
      *    Adapter for PEAR PHPUnit test case to allow
@@ -21,16 +21,18 @@
      *    @package      SimpleTest
      *    @subpackage   Extensions
      */
-    class PHPUnit_TestCase extends SimpleTestCase {
-        var $_loosely_typed;
+    class PHPUnit_TestCase extends SimpleTestCase
+    {
+        public $_loosely_typed;
         
         /**
          *    Constructor. Sets the test name.
          *    @param $label        Test name to display.
          *    @public
          */
-        function PHPUnit_TestCase($label = false) {
-            $this->SimpleTestCase($label);
+        public function __construct($label = false)
+        {
+            parent::__construct($label);
             $this->_loosely_typed = false;
         }
         
@@ -42,7 +44,8 @@
          *    @param $message        Message to display.
          *    @public
          */
-        function assertEquals($first, $second, $message = "%s", $delta = 0) {
+        public function assertEquals($first, $second, $message = "%s", $delta = 0)
+        {
             if ($this->_loosely_typed) {
                 $expectation = new EqualExpectation($first);
             } else {
@@ -57,7 +60,8 @@
          *    @param $message        Message to display.
          *    @public
          */
-        function assertNotNull($value, $message = "%s") {
+        public function assertNotNull($value, $message = "%s")
+        {
             parent::assert(new TrueExpectation(), isset($value), $message);
         }
         
@@ -67,7 +71,8 @@
          *    @param $message        Message to display.
          *    @public
          */
-        function assertNull($value, $message = "%s") {
+        public function assertNull($value, $message = "%s")
+        {
             parent::assert(new TrueExpectation(), !isset($value), $message);
         }
         
@@ -79,17 +84,20 @@
          *    @param $message        Message to display.
          *    @public
          */
-        function assertSame(&$first, &$second, $message = "%s") {
+        public function assertSame(&$first, &$second, $message = "%s")
+        {
             $dumper = new SimpleDumper();
             $message = sprintf(
                     $message,
                     "[" . $dumper->describeValue($first) .
                             "] and [" . $dumper->describeValue($second) .
-                            "] should reference the same object");
+                            "] should reference the same object"
+            );
             return $this->assert(
-					new TrueExpectation(),
+                    new TrueExpectation(),
                     SimpleTestCompatibility::isReference($first, $second),
-                    $message);
+                    $message
+            );
         }
         
         /**
@@ -100,17 +108,20 @@
          *    @param $message        Message to display.
          *    @public
          */
-        function assertNotSame(&$first, &$second, $message = "%s") {
+        public function assertNotSame(&$first, &$second, $message = "%s")
+        {
             $dumper = new SimpleDumper();
             $message = sprintf(
                     $message,
                     "[" . $dumper->describeValue($first) .
                             "] and [" . $dumper->describeValue($second) .
-                            "] should not be the same object");
+                            "] should not be the same object"
+            );
             return $this->assert(
-					new falseExpectation(),
+                    new falseExpectation(),
                     SimpleTestCompatibility::isReference($first, $second),
-                    $message);
+                    $message
+            );
         }
         
         /**
@@ -120,7 +131,8 @@
          *    @param $message        Message to display.
          *    @public
          */
-        function assertTrue($condition, $message = "%s") {
+        public function assertTrue($condition, $message = "%s")
+        {
             parent::assert(new TrueExpectation(), $condition, $message);
         }
         
@@ -131,7 +143,8 @@
          *    @param $message        Message to display.
          *    @public
          */
-        function assertFalse($condition, $message = "%s") {
+        public function assertFalse($condition, $message = "%s")
+        {
             parent::assert(new FalseExpectation(), $condition, $message);
         }
         
@@ -142,7 +155,8 @@
          *    @param $message        Message to display.
          *    @public
          */
-        function assertRegExp($pattern, $subject, $message = "%s") {
+        public function assertRegExp($pattern, $subject, $message = "%s")
+        {
             $this->assert(new PatternExpectation($pattern), $subject, $message);
         }
         
@@ -153,7 +167,8 @@
          *    @param $message        Message to display.
          *    @public
          */
-        function assertType($value, $type, $message = "%s") {
+        public function assertType($value, $type, $message = "%s")
+        {
             parent::assert(new TrueExpectation(), gettype($value) == strtolower($type), $message);
         }
         
@@ -164,7 +179,8 @@
          *    @param $loosely_typed     True for broader comparison.
          *    @public
          */
-        function setLooselyTyped($loosely_typed) {
+        public function setLooselyTyped($loosely_typed)
+        {
             $this->_loosely_typed = $loosely_typed;
         }
 
@@ -174,7 +190,8 @@
          *    @return            Usually one.
          *    @public
          */
-        function countTestCases() {
+        public function countTestCases()
+        {
             return $this->getSize();
         }
         
@@ -183,7 +200,8 @@
          *    name.
          *    @public
          */
-        function getName() {
+        public function getName()
+        {
             return $this->getLabel();
         }
         
@@ -192,7 +210,7 @@
          *    @param $name        Dummy
          *    @public
          */
-        function setName($name) {
+        public function setName($name)
+        {
         }
     }
-?>

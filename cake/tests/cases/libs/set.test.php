@@ -2174,7 +2174,7 @@ class SetTest extends CakeTestCase {
 				'hasOne' => array('className', 'foreignKey', 'conditions', 'fields', 'order', 'dependent'),
 				'hasMany' => array('className', 'foreignKey', 'conditions', 'fields', 'order', 'limit', 'offset', 'dependent', 'exclusive', 'finderQuery', 'counterQuery'),
 				'hasAndBelongsToMany' => array('className', 'joinTable', 'with', 'foreignKey', 'associationForeignKey', 'conditions', 'fields', 'order', 'limit', 'offset', 'unique', 'finderQuery', 'deleteQuery', 'insertQuery')),
-			'__associations' => array('belongsTo', 'hasOne', 'hasMany', 'hasAndBelongsToMany'), '__backAssociation' => array(), '__insertID' => null, '__numRows' => null, '__affectedRows' => null,
+			'__associations' => array('belongsTo', 'hasOne', 'hasMany', 'hasAndBelongsToMany'), '__backAssociation' => array(), '__insertID' => null, '__numRows' => null, '__safeUpdateMode' => false, '__affectedRows' => null,
 				'_findMethods' => array('all' => true, 'first' => true, 'count' => true, 'neighbors' => true, 'list' => true, 'threaded' => true));
 		$result = Set::reverse($model);
 
@@ -2798,7 +2798,7 @@ class SetTest extends CakeTestCase {
  * @access protected
  * @return void
  */
-	function _method($val1, $val2) {
+	static function _method($val1, $val2) {
 		$val1 += $val2;
 		return $val1;
 	}
@@ -2858,7 +2858,7 @@ class SetTest extends CakeTestCase {
 					array(
 						'title' => 'Re: share views between actions?',
 						'link' => 'http://groups.google.com/group/cake-php/msg/8b350d898707dad8',
-						'description' => 'Then perhaps you might do us all a favour and refrain from replying to <br> things you do not understand. That goes especially for asinine comments. <br> Indeed. <br> To sum up: <br> No comment. <br> In my day, a simple &quot;RTFM&quot; would suffice. I\'ll keep in mind to ignore any <br> further responses from you. <br> You (and I) were referring to the *online documentation*, not other',
+						'description' => "Then perhaps you might do us all a favour and refrain from replying to <br> things you do not understand. That goes especially for asinine comments. <br> Indeed. <br> To sum up: <br> No comment. <br> In my day, a simple &quot;RTFM&quot; would suffice. I'll keep in mind to ignore any <br> further responses from you. <br> You (and I) were referring to the *online documentation*, not other",
 						'guid' => array('isPermaLink' => 'true', 'value' => 'http://groups.google.com/group/cake-php/msg/8b350d898707dad8'),
 						'author' => 'subtropolis.z...@gmail.com(subtropolis zijn)',
 						'pubDate' => 'Fri, 28 Dec 2007 00:45:01 UT'

@@ -3,7 +3,7 @@
  *  Global state for SimpleTest and kicker script in future versions.
  *  @package    SimpleTest
  *  @subpackage UnitTester
- *  @version    $Id$
+ *  @version    $Id: simpletest.php 1723 2008-04-08 00:34:10Z lastcraft $
  */
 
 /**#@+
@@ -24,7 +24,8 @@ require_once(dirname(__FILE__) . '/compatibility.php');
  *    @package  SimpleTest
  *    @subpackage   UnitTester
  */
-class SimpleTest {
+class SimpleTest
+{
 
     /**
      *    Reads the SimpleTest version from the release file.
@@ -32,7 +33,8 @@ class SimpleTest {
      *    @static
      *    @access public
      */
-    function getVersion() {
+    public function getVersion()
+    {
         $content = file(dirname(__FILE__) . '/VERSION');
         return trim($content[0]);
     }
@@ -46,7 +48,8 @@ class SimpleTest {
      *    @static
      *    @access public
      */
-    function ignore($class) {
+    public static function ignore($class)
+    {
         $registry = &SimpleTest::_getRegistry();
         $registry['IgnoreList'][strtolower($class)] = true;
     }
@@ -66,7 +69,8 @@ class SimpleTest {
      *    @static
      *    @access public
      */
-    function ignoreParentsIfIgnored($classes) {
+    public static function ignoreParentsIfIgnored($classes)
+    {
         $registry = &SimpleTest::_getRegistry();
         foreach ($classes as $class) {
             if (SimpleTest::isIgnored($class)) {
@@ -87,7 +91,8 @@ class SimpleTest {
      *   @access public
      *   @see preferred()
      */
-    function prefer(&$object) {
+    public function prefer(&$object)
+    {
         $registry = &SimpleTest::_getRegistry();
         $registry['Preferred'][] = &$object;
     }
@@ -102,7 +107,8 @@ class SimpleTest {
      *   @return array|object|null
      *   @see prefer()
      */
-    function &preferred($classes) {
+    public function &preferred($classes)
+    {
         if (! is_array($classes)) {
             $classes = array($classes);
         }
@@ -128,7 +134,8 @@ class SimpleTest {
      *    @access public
      *    @static
      */
-    function isIgnored($class) {
+    public static function isIgnored($class)
+    {
         $registry = &SimpleTest::_getRegistry();
         return isset($registry['IgnoreList'][strtolower($class)]);
     }
@@ -136,7 +143,8 @@ class SimpleTest {
     /**
      *    @deprecated
      */
-    function setMockBaseClass($mock_base) {
+    public static function setMockBaseClass($mock_base)
+    {
         $registry = &SimpleTest::_getRegistry();
         $registry['MockBaseClass'] = $mock_base;
     }
@@ -144,7 +152,8 @@ class SimpleTest {
     /**
      *    @deprecated
      */
-    function getMockBaseClass() {
+    public static function getMockBaseClass()
+    {
         $registry = &SimpleTest::_getRegistry();
         return $registry['MockBaseClass'];
     }
@@ -159,7 +168,8 @@ class SimpleTest {
      *    @param string $password  Proxy password for authentication.
      *    @access public
      */
-    function useProxy($proxy, $username = false, $password = false) {
+    public static function useProxy($proxy, $username = false, $password = false)
+    {
         $registry = &SimpleTest::_getRegistry();
         $registry['DefaultProxy'] = $proxy;
         $registry['DefaultProxyUsername'] = $username;
@@ -171,7 +181,8 @@ class SimpleTest {
      *    @return string       Proxy URL.
      *    @access public
      */
-    function getDefaultProxy() {
+    public function getDefaultProxy()
+    {
         $registry = &SimpleTest::_getRegistry();
         return $registry['DefaultProxy'];
     }
@@ -181,7 +192,8 @@ class SimpleTest {
      *    @return string    Proxy username for authentication.
      *    @access public
      */
-    function getDefaultProxyUsername() {
+    public function getDefaultProxyUsername()
+    {
         $registry = &SimpleTest::_getRegistry();
         return $registry['DefaultProxyUsername'];
     }
@@ -191,7 +203,8 @@ class SimpleTest {
      *    @return string    Proxy password for authentication.
      *    @access public
      */
-    function getDefaultProxyPassword() {
+    public function getDefaultProxyPassword()
+    {
         $registry = &SimpleTest::_getRegistry();
         return $registry['DefaultProxyPassword'];
     }
@@ -202,7 +215,8 @@ class SimpleTest {
      *    @access private
      *    @static
      */
-    function &_getRegistry() {
+    public static function &_getRegistry()
+    {
         static $registry = false;
         if (! $registry) {
             $registry = SimpleTest::_getDefaults();
@@ -217,7 +231,8 @@ class SimpleTest {
      *    @access public
      *    @static
      */
-    function &getContext() {
+    public static function &getContext()
+    {
         static $context = false;
         if (! $context) {
             $context = new SimpleTestContext();
@@ -231,7 +246,8 @@ class SimpleTest {
      *    @access private
      *    @static
      */
-    function _getDefaults() {
+    public static function _getDefaults()
+    {
         return array(
                 'StubBaseClass' => 'SimpleStub',
                 'MockBaseClass' => 'SimpleMock',
@@ -251,16 +267,18 @@ class SimpleTest {
  *    the mocks.
  *    @package  SimpleTest
  */
-class SimpleTestContext {
-    var $_test;
-    var $_reporter;
-    var $_resources;
+class SimpleTestContext
+{
+    public $_test;
+    public $_reporter;
+    public $_resources;
 
     /**
      *    Clears down the current context.
      *    @access public
      */
-    function clear() {
+    public function clear()
+    {
         $this->_resources = array();
     }
 
@@ -271,7 +289,8 @@ class SimpleTestContext {
      *    @param SimpleTestCase $test        Test case to register.
      *    @access public
      */
-    function setTest(&$test) {
+    public function setTest(&$test)
+    {
         $this->clear();
         $this->_test = &$test;
     }
@@ -281,7 +300,8 @@ class SimpleTestContext {
      *    @return SimpleTestCase    Current test.
      *    @access public
      */
-    function &getTest() {
+    public function &getTest()
+    {
         return $this->_test;
     }
 
@@ -292,7 +312,8 @@ class SimpleTestContext {
      *    @param SimpleReporter $reporter     Reporter to register.
      *    @access public
      */
-    function setReporter(&$reporter) {
+    public function setReporter(&$reporter)
+    {
         $this->clear();
         $this->_reporter = &$reporter;
     }
@@ -302,7 +323,8 @@ class SimpleTestContext {
      *    @return SimpleReporter    Current reporter.
      *    @access public
      */
-    function &getReporter() {
+    public function &getReporter()
+    {
         return $this->_reporter;
     }
 
@@ -312,7 +334,8 @@ class SimpleTestContext {
      *    @access public
      *    @static
      */
-    function &get($resource) {
+    public function &get($resource)
+    {
         if (! isset($this->_resources[$resource])) {
             $this->_resources[$resource] = new $resource();
         }
@@ -326,15 +349,17 @@ class SimpleTestContext {
  *    @package SimpleTest
  *    @subpackage UnitTester
  */
-class SimpleStackTrace {
-    var $_prefixes;
+class SimpleStackTrace
+{
+    public $_prefixes;
 
     /**
      *    Stashes the list of target prefixes.
      *    @param array $prefixes      List of method prefixes
      *                                to search for.
      */
-    function SimpleStackTrace($prefixes) {
+    public function __construct($prefixes)
+    {
         $this->_prefixes = $prefixes;
     }
 
@@ -346,7 +371,8 @@ class SimpleStackTrace {
      *                             number and file.
      *    @access public
      */
-    function traceMethod($stack = false) {
+    public function traceMethod($stack = false)
+    {
         $stack = $stack ? $stack : $this->_captureTrace();
         foreach ($stack as $frame) {
             if ($this->_frameLiesWithinSimpleTestFolder($frame)) {
@@ -365,7 +391,8 @@ class SimpleStackTrace {
      *    @return boolean         True if a SimpleTest file.
      *    @access private
      */
-    function _frameLiesWithinSimpleTestFolder($frame) {
+    public function _frameLiesWithinSimpleTestFolder($frame)
+    {
         if (isset($frame['file'])) {
             $path = substr(SIMPLE_TEST, 0, -1);
             if (strpos($frame['file'], $path) === 0) {
@@ -383,7 +410,8 @@ class SimpleStackTrace {
      *    @return boolean         True if matches a target.
      *    @access private
      */
-    function _frameMatchesPrefix($frame) {
+    public function _frameMatchesPrefix($frame)
+    {
         foreach ($this->_prefixes as $prefix) {
             if (strncmp($frame['function'], $prefix, strlen($prefix)) == 0) {
                 return true;
@@ -397,7 +425,8 @@ class SimpleStackTrace {
      *    @return array        Fulle trace.
      *    @access private
      */
-    function _captureTrace() {
+    public function _captureTrace()
+    {
         if (function_exists('debug_backtrace')) {
             return array_reverse(debug_backtrace());
         }
@@ -410,69 +439,78 @@ class SimpleStackTrace {
  *    @subpackage UnitTester
  *    @deprecated
  */
-class SimpleTestOptions extends SimpleTest {
+class SimpleTestOptions extends SimpleTest
+{
 
     /**
      *    @deprecated
      */
-    function getVersion() {
+    public function getVersion()
+    {
         return Simpletest::getVersion();
     }
 
     /**
      *    @deprecated
      */
-    function ignore($class) {
+    public static function ignore($class)
+    {
         return Simpletest::ignore($class);
     }
 
     /**
      *    @deprecated
      */
-    function isIgnored($class) {
+    public static function isIgnored($class)
+    {
         return Simpletest::isIgnored($class);
     }
 
     /**
      *    @deprecated
      */
-    function setMockBaseClass($mock_base) {
+    public static function setMockBaseClass($mock_base)
+    {
         return Simpletest::setMockBaseClass($mock_base);
     }
 
     /**
      *    @deprecated
      */
-    function getMockBaseClass() {
+    public static function getMockBaseClass()
+    {
         return Simpletest::getMockBaseClass();
     }
 
     /**
      *    @deprecated
      */
-    function useProxy($proxy, $username = false, $password = false) {
+    public static function useProxy($proxy, $username = false, $password = false)
+    {
         return Simpletest::useProxy($proxy, $username, $password);
     }
 
     /**
      *    @deprecated
      */
-    function getDefaultProxy() {
+    public function getDefaultProxy()
+    {
         return Simpletest::getDefaultProxy();
     }
 
     /**
      *    @deprecated
      */
-    function getDefaultProxyUsername() {
+    public function getDefaultProxyUsername()
+    {
         return Simpletest::getDefaultProxyUsername();
     }
 
     /**
      *    @deprecated
      */
-    function getDefaultProxyPassword() {
+    public function getDefaultProxyPassword()
+    {
         return Simpletest::getDefaultProxyPassword();
     }
 }
-?>

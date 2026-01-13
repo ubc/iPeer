@@ -119,7 +119,7 @@ class UserOauth extends AppModel
                 'conditions' => array('UserOauth.user_id =' => $id['user_id'], 'UserOauth.provider =' => $id['provider']),
                 'fields' => $fields
             ));
-            $id = $oauth['UserOauth']['id'];
+            if ($oauth) $id = $oauth['UserOauth']['id'];
         }
 
         return parent::read($fields, $id);

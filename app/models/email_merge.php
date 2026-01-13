@@ -42,7 +42,8 @@ class EmailMerge extends AppModel
             'conditions' => array('value' => $value),
             'fields' => array('table_name', 'field_name')
         ));
-        return $table['EmailMerge'];
+        if ($table) return $table['EmailMerge'];
+        return null;
     }
 
     /**

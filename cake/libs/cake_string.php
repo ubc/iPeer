@@ -34,7 +34,7 @@ class CakeString {
  * @return RFC 4122 UUID
  * @static
  */
-	function uuid() {
+	static function uuid() {
 		$node = env('SERVER_ADDR');
 		$pid = null;
 
@@ -114,7 +114,7 @@ class CakeString {
  * @access public
  * @static
  */
-	function tokenize($data, $separator = ',', $leftBound = '(', $rightBound = ')') {
+	static function tokenize($data, $separator = ',', $leftBound = '(', $rightBound = ')') {
 		if (empty($data) || is_array($data)) {
 			return $data;
 		}
@@ -140,21 +140,21 @@ class CakeString {
 			}
 			if ($tmpOffset !== -1) {
 				$buffer .= substr($data, $offset, ($tmpOffset - $offset));
-				if ($data{$tmpOffset} == $separator && $depth == 0) {
+				if ($data[$tmpOffset] == $separator && $depth == 0) {
 					$results[] = $buffer;
 					$buffer = '';
 				} else {
-					$buffer .= $data{$tmpOffset};
+					$buffer .= $data[$tmpOffset];
 				}
 				if ($leftBound != $rightBound) {
-					if ($data{$tmpOffset} == $leftBound) {
+					if ($data[$tmpOffset] == $leftBound) {
 						$depth++;
 					}
-					if ($data{$tmpOffset} == $rightBound) {
+					if ($data[$tmpOffset] == $rightBound) {
 						$depth--;
 					}
 				} else {
-					if ($data{$tmpOffset} == $leftBound) {
+					if ($data[$tmpOffset] == $leftBound) {
 						if (!$open) {
 							$depth++;
 							$open = true;
@@ -205,7 +205,7 @@ class CakeString {
  * @access public
  * @static
  */
-	function insert($str, $data, $options = array()) {
+	static function insert($str, $data, $options = array()) {
 		$defaults = array(
 			'before' => ':', 'after' => null, 'escape' => '\\', 'format' => null, 'clean' => false
 		);
@@ -273,7 +273,7 @@ class CakeString {
  * @static
  * @see String::insert()
  */
-	function cleanInsert($str, $options) {
+	static function cleanInsert($str, $options) {
 		$clean = $options['clean'];
 		if (!$clean) {
 			return $str;

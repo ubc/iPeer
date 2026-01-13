@@ -413,12 +413,17 @@ class EvaluationSimple extends EvaluationResponseBase
                     $scorePenalty = $this->Penalty->getPenaltyByEventAndDaysLate($eventId, $days_late);
                 }
             }
-            $subtractAvgScore = ((($scorePenalty['Penalty']['percent_penalty']) / 100) * $totalScore) / $numMemberSubmissions;
+            if ($scorePenalty) {
+                $subtractAvgScore = ((($scorePenalty['Penalty']['percent_penalty']) / 100) * $totalScore) / $numMemberSubmissions;
+            }
 
             $aveScore = $totalScore / $numMemberSubmissions;
             $studentResult['numMembers'] = $numMemberSubmissions;
             $studentResult['receivedNum'] = count($receivedTotalScore);
-            $studentResult['penalty'] = $scorePenalty['Penalty']['percent_penalty'];
+            $studentResult['penalty'] = 0;
+            if ($scorePenalty) {
+                $studentResult['penalty'] = $scorePenalty['Penalty']['percent_penalty'];
+            }
 
             $tmp_total = 0;
             $avg = $this->find('all', array(

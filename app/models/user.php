@@ -468,7 +468,8 @@ class User extends AppModel
      * */
     public function getRoleName($id) {
         $user = $this->findById($id);
-        return $user['Role'][0]['name'];
+        if ($user) return $user['Role'][0]['name'];
+        return null;
     }
 
     /**
@@ -480,7 +481,8 @@ class User extends AppModel
      * */
     public function getRoleId($id) {
         $user = $this->findById($id);
-        return $user['Role'][0]['id'];
+        if ($user) return $user['Role'][0]['id'];
+        return null;
     }
 
     /**
@@ -597,7 +599,7 @@ class User extends AppModel
      * @access public
      * @return $user logged in user
      * */
-    function getCurrentLoggedInUser()
+    static function getCurrentLoggedInUser()
     {
         App::import('Component', 'Session');
         $Session = new SessionComponent();
@@ -1022,6 +1024,7 @@ class User extends AppModel
     function getEventGroupMembersNoTutors($groupId, $selfEval, $userId)
     {
         $group = $this->Group->findById($groupId);
+        if (!$group) return null;
 
         $conditions['Group.id'] = $groupId;
         $conditions['Enrolment.id'] = $group['Group']['course_id'];
@@ -1142,7 +1145,7 @@ class User extends AppModel
      * @access public
      * @return void
      * */
-    function getInstance($user = null)
+    static function getInstance($user = null)
     {
         static $instance = array();
 
@@ -1166,7 +1169,7 @@ class User extends AppModel
      * @access public
      * @return void
      * */
-    function store($user)
+    static function store($user)
     {
         if (empty($user)) {
             return false;
@@ -1183,7 +1186,7 @@ class User extends AppModel
      * @access public
      * @return void
      * */
-    function get($path)
+    static function get($path)
     {
         $_user = User::getInstance();
         $path = str_replace('.', '/', $path);
@@ -1211,7 +1214,7 @@ class User extends AppModel
      * @access public
      * @return bool if user is logged in
      * */
-    function isLoggedIn()
+    static function isLoggedIn()
     {
         return self::getInstance() !== null;
     }
@@ -1237,7 +1240,7 @@ class User extends AppModel
      * @access public
      * @return array list of courses
      * */
-    function getMyCourseList()
+    static function getMyCourseList()
     {
         $model = Classregistry::init('Course');
 
@@ -1252,7 +1255,7 @@ class User extends AppModel
      * @access public
      * @return array list of courses
      */
-    function getMyDepartmentsCourseList($findType = 'list')
+    static function getMyDepartmentsCourseList($findType = 'list')
     {
         $userFaculty = Classregistry::init('UserFaculty');
         $department = Classregistry::init('Department');
@@ -1270,7 +1273,7 @@ class User extends AppModel
      * @access public
      * @return list of course ids
      */
-    function getAccessibleCourses()
+    static function getAccessibleCourses()
     {
         if (User::hasPermission('functions/user/admin')) {
             return array_keys(User::getMyDepartmentsCourseList('list'));

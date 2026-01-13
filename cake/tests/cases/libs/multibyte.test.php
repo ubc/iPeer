@@ -4797,10 +4797,6 @@ class MultibyteTest extends CakeTestCase {
  * @return void
  */
 	function testUsingMbStrrpos() {
-		$skip = extension_loaded('mbstring') && version_compare(PHP_VERSION, '5.2.0', '<');
-		if ($this->skipIf($skip, '%s PHP version does not support $offset parameter in mb_strrpos().')) {
-			return;
-		}
 		$string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 		$find = 'F';
 		$result = mb_strrpos($string, $find);
@@ -6595,7 +6591,7 @@ class MultibyteTest extends CakeTestCase {
 
 		$string = 'ԀԂԄԆԈԊԌԎԐԒ';
 		$result = mb_strtolower($string);
-		$expected = 'ԁԃԅԇԉԋԍԏԐԒ';
+		$expected = 'ԁԃԅԇԉԋԍԏԑԓ';
 		$this->assertEqual($result, $expected);
 
 		$string = 'ԱԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՁՂՃՄՅՆՇՈՉՊՋՌՍՎՏՐՑՒՓՔՕՖև';
@@ -6605,7 +6601,7 @@ class MultibyteTest extends CakeTestCase {
 
 		$string = 'ႠႡႢႣႤႥႦႧႨႩႪႫႬႭႮႯႰႱႲႳႴႵႶႷႸႹႺႻႼႽႾႿჀჁჂჃჄჅ';
 		$result = mb_strtolower($string);
-		$expected = 'ႠႡႢႣႤႥႦႧႨႩႪႫႬႭႮႯႰႱႲႳႴႵႶႷႸႹႺႻႼႽႾႿჀჁჂჃჄჅ';
+		$expected = 'ⴀⴁⴂⴃⴄⴅⴆⴇⴈⴉⴊⴋⴌⴍⴎⴏⴐⴑⴒⴓⴔⴕⴖⴗⴘⴙⴚⴛⴜⴝⴞⴟⴠⴡⴢⴣⴤⴥ';
 		$this->assertEqual($result, $expected);
 
 		$string = 'ḀḂḄḆḈḊḌḎḐḒḔḖḘḚḜḞḠḢḤḦḨḪḬḮḰḲḴḶḸḺḼḾṀṂṄṆṈṊṌṎṐṒṔṖṘṚṜṞṠṢṤṦṨṪṬṮṰṲṴṶṸṺṼṾẀẂẄẆẈẊẌẎẐẒẔẖẗẘẙẚẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼẾỀỂỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỲỴỶỸ';
@@ -6658,7 +6654,12 @@ mb_strtolower does not work for these strings.
  * @access public
  * @return void
  */
-	function testMultibyteStrtolower() {
+	function testMultibyteStrtolower()
+	{
+		$skip = extension_loaded('mbstring') && version_compare(PHP_VERSION, '7.3.0', '<');
+		if ($this->skipIf($skip, '%s PHP version does not support $offset parameter in mb_strrpos().')) {
+			return;
+		}
 		$string = '!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~';
 		$result = Multibyte::strtolower($string);
 		$expected = '!"#$%&\'()*+,-./0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
@@ -7217,6 +7218,10 @@ mb_strtolower does not work for these strings.
  * @return void
  */
 	function testUsingMbStrtoupper() {
+		$skip = extension_loaded('mbstring') && version_compare(PHP_VERSION, '7.3.0', '<');
+		if ($this->skipIf($skip, '%s PHP version does not support $offset parameter in mb_strrpos().')) {
+			return;
+		}
 		$string = '!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
 		$result = mb_strtoupper($string);
 		$expected = '!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~';
@@ -7709,7 +7714,7 @@ mb_strtolower does not work for these strings.
 
 		$string = 'աբգդեզէըթժիլխծկհձղճմյնշոչպջռսվտրցւփքօֆև';
 		$result = mb_strtoupper($string);
-		$expected = 'ԱԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՁՂՃՄՅՆՇՈՉՊՋՌՍՎՏՐՑՒՓՔՕՖև';
+		$expected = 'ԱԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՁՂՃՄՅՆՇՈՉՊՋՌՍՎՏՐՑՒՓՔՕՖԵՒ';
 		$this->assertEqual($result, $expected);
 
 		$string = 'ႠႡႢႣႤႥႦႧႨႩႪႫႬႭႮႯႰႱႲႳႴႵႶႷႸႹႺႻႼႽႾႿჀჁჂჃჄჅ';
@@ -7719,7 +7724,7 @@ mb_strtolower does not work for these strings.
 
 		$string = 'ḁḃḅḇḉḋḍḏḑḓḕḗḙḛḝḟḡḣḥḧḩḫḭḯḱḳḵḷḹḻḽḿṁṃṅṇṉṋṍṏṑṓṕṗṙṛṝṟṡṣṥṧṩṫṭṯṱṳṵṷṹṻṽṿẁẃẅẇẉẋẍẏẑẓẕẖẗẘẙẚạảấầẩẫậắằẳẵặẹẻẽếềểễệỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹ';
 		$result = mb_strtoupper($string);
-		$expected = 'ḀḂḄḆḈḊḌḎḐḒḔḖḘḚḜḞḠḢḤḦḨḪḬḮḰḲḴḶḸḺḼḾṀṂṄṆṈṊṌṎṐṒṔṖṘṚṜṞṠṢṤṦṨṪṬṮṰṲṴṶṸṺṼṾẀẂẄẆẈẊẌẎẐẒẔẖẗẘẙẚẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼẾỀỂỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỲỴỶỸ';
+		$expected = 'ḀḂḄḆḈḊḌḎḐḒḔḖḘḚḜḞḠḢḤḦḨḪḬḮḰḲḴḶḸḺḼḾṀṂṄṆṈṊṌṎṐṒṔṖṘṚṜṞṠṢṤṦṨṪṬṮṰṲṴṶṸṺṼṾẀẂẄẆẈẊẌẎẐẒẔH̱T̈W̊Y̊AʾẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼẾỀỂỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪỬỮỰỲỴỶỸ';
 		$this->assertEqual($result, $expected);
 
 		$string = 'ωkå';
@@ -7752,7 +7757,7 @@ mb_strtoupper does not work for these strings.
 */
 		$string = 'ﬀﬁﬂﬃﬄﬅﬆﬓﬔﬕﬖﬗ';
 		$result = mb_strtoupper($string);
-		$expected = 'ﬀﬁﬂﬃﬄﬅﬆﬓﬔﬕﬖﬗ';
+		$expected = 'FFFIFLFFIFFLSTSTՄՆՄԵՄԻՎՆՄԽ';
 		$this->assertEqual($result, $expected);
 	}
 

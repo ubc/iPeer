@@ -72,7 +72,8 @@ class Question extends AppModel
             'conditions' => array('Question.id' => $id),
             'fields' => array('type')
         ));
-        return $type['Question']['type'];
+        if ($type) return $type['Question']['type'];
+        return null;
     }
 
     /**

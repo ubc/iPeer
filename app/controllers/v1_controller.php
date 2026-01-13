@@ -286,6 +286,7 @@ class V1Controller extends Controller {
      * @param mixed $id
      */
     public function users($id = null) {
+        $body = null;
         // view
         if ($this->RequestHandler->isGet()) {
             $data = array();
@@ -296,7 +297,9 @@ class V1Controller extends Controller {
                     foreach ($users as $user) {
                         $tmp = array();
                         $tmp['id'] = $user['User']['id'];
-                        $tmp['role_id'] = $user['Role']['0']['id'];
+                        $tmp['role_id'] = null;
+                        if (isset($user['Role']['0']['id']))
+                            $tmp['role_id'] = $user['Role']['0']['id'];
                         $tmp['username'] = $user['User']['username'];
                         $tmp['last_name'] = $user['User']['last_name'];
                         $tmp['first_name'] = $user['User']['first_name'];
@@ -351,7 +354,7 @@ class V1Controller extends Controller {
                 $role = array('Role' => array('RolesUser' => array('role_id' => $roleId)));
                 unset($decode['role_id']);
                 // do some clean up before we insert the values
-                array_walk($decode, create_function('&$val', '$val = trim($val);'));
+                array_walk($decode, function (&$val) { $val = trim($val); });
                 $user = array('User' => $decode);
                 $user = $user + $role;
                 // does not save role in RolesUser - need to fix
@@ -363,7 +366,6 @@ class V1Controller extends Controller {
                     $body = $combine;
                 } else {
                     $statusCode = 'HTTP/1.1 500 Internal Server Error';
-                    $body = null;
                 }
             // adding multiple users from import (expected input: array)
             } else if (isset($decode['0'])) {
@@ -399,7 +401,7 @@ class V1Controller extends Controller {
                     $person['record_status'] = 'A';
                     unset($person['role_id']);
                     // do some clean up before we insert the values
-                    array_walk($person, create_function('&$val', '$val = trim($val);'));
+                    array_walk($person, function (&$val) { $val = trim($val); });
                     $pUser = array('User' => $person);
                     $data[] = $pUser + $pRole;
                 }
@@ -442,7 +444,6 @@ class V1Controller extends Controller {
             // incorrect format
             } else {
                 $statusCode = 'HTTP/1.1 400 Bad Request';
-                $body = null;
             }
             $this->set('statusCode', $statusCode);
             $this->set('result', $body);

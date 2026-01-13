@@ -695,7 +695,7 @@ class EvaluationComponent extends CakeObject
 
                 $selectedLom = $form['selected_lom_'.$targetEvaluatee.'_'.$i];
                 $evalRubricDetail = $this->EvaluationRubricDetail->getByEvalRubricIdCritera($evalRubricId, $i);
-                if (isset($evalRubricDetail)) {
+                if ($evalRubricDetail) {
                     $this->EvaluationRubricDetail->id=$evalRubricDetail['EvaluationRubricDetail']['id'] ;
                 }
                 $evalRubricDetail['EvaluationRubricDetail']['evaluation_rubric_id'] = $evalRubricId;
@@ -1213,13 +1213,14 @@ class EvaluationComponent extends CakeObject
      */
     function getStudentViewMixevalResultDetailReview ($event, $userId)
     {
+        if (!$event || !$userId) return array();
         $userPOS = 0;
         $this->EvaluationMixeval  = ClassRegistry::init('EvaluationMixeval');
         $this->EvaluationMixevalDetail   = ClassRegistry::init('EvaluationMixevalDetail');
         $this->User = ClassRegistry::init('User');
         $evalResult = array();
         $this->User->id = $userId;
-        if ($event['GroupEvent']['id'] && $userId) {
+        if ($event['GroupEvent']['id']) {
             $mixevalResult = $this->EvaluationMixeval->getResultsByEvaluator($event['GroupEvent']['id'], $userId);
             $evalResult[$userId] = $mixevalResult;
             foreach ($mixevalResult as $row) {
@@ -1321,19 +1322,26 @@ class EvaluationComponent extends CakeObject
         // set group event to reviewed if all evaluatees' release status has been modified
         $eval = $this->EvaluationMixevalDetail->find('first', array(
             'conditions' => array('grp_event_id' => $grpEventId),
-            'order' => array('EvaluationMixevalDetail.modified ASC')
+            'order' => array('EvaluationMixevalDetail.modified ASC'),
+            'recursive' => -1
         ));
-        $event = $this->Event->findById($eventId);
+        $event = $this->Event->find('first',[
+                'conditions' => array('Event.id' => $eventId),
+                'recursive' => -1,
+        ]);
         $questions = $this->MixevalQuestion->find('list', array(
             'conditions' => array('mixeval_id' => $event['Event']['template_id'], 'mixeval_question_type_id' => array(2, 3)),
-            'fields' => array('question_num')
+            'fields' => array('question_num'),
+            'recursive' => -1
         ));
         $evalIds = $this->EvaluationMixeval->find('list', array(
-            'conditions' => array('grp_event_id' => $grpEventId)
+            'conditions' => array('grp_event_id' => $grpEventId),
+            'recursive' => -1
         ));
         $details = $this->EvaluationMixevalDetail->find('all', array(
             'conditions' => array('evaluation_mixeval_id' => $evalIds, 'question_number' => $questions),
-            'fields' => array('comment_release')
+            'fields' => array('comment_release'),
+            'recursive' => -1
         ));
         $details = Set::extract('/EvaluationMixevalDetail/comment_release', $details);
 
@@ -1466,6 +1474,7 @@ class EvaluationComponent extends CakeObject
 
         // Get all required data from each table for every question
         $survey = $this->Survey->getSurveyWithQuestionsById($surveyId);
+        if (!$survey) return false;
         $questions = $survey['Question'];
         $conditions = array('event_id' => $eventId);
         if (!empty($userIds)) {

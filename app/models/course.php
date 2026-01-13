@@ -253,6 +253,7 @@ class Course extends AppModel
     function getCourseName($id)
     {
         $tmp = $this->read(null, $id);
+        if (!$tmp) return null;
         return $tmp['Course']['course'];
     }
 

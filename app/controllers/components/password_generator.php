@@ -139,7 +139,7 @@ class PasswordGeneratorComponent extends CakeObject {
         // request base64 return value.  We squeeze out the
         // redundancy and useless ==CRLF by hashing...
         if ($pr_bits) {
-            $pr_bits = $this->binconvert($pr_bits, true);
+            $pr_bits = $this->binconvert($pr_bits);
         }
       } catch (Exception $ex) {
         return "";

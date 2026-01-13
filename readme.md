@@ -36,6 +36,8 @@ docker-compose restart
 ```
 Launch a browser and go to http://localhost:8080/ to continue the initial setup.
 
+Sample data user login password is: ipeeripeer
+
 Running with Docker
 ---------------------------
 ### Prerequisites

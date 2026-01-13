@@ -305,7 +305,11 @@ class HttpSocket extends CakeSocket {
 			$this->config['request']['cookies'] = array_merge($this->config['request']['cookies'], $this->response['cookies']);
 		}
 
-		return $this->response['body'];
+		if (isset($this->response['body'])) {
+			return $this->response['body'];
+		}
+
+		return false;
 	}
 
 /**
@@ -431,7 +435,7 @@ class HttpSocket extends CakeSocket {
 			$url = '/';
 		}
 		if (is_string($url)) {
-			if ($url{0} == '/') {
+			if ($url[0] == '/') {
 				$url = $this->config['request']['uri']['host'].':'.$this->config['request']['uri']['port'] . $url;
 			}
 			if (!preg_match('/^.+:\/\/|\*|^\//', $url)) {

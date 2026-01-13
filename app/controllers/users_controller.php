@@ -730,32 +730,42 @@ class UsersController extends AppController
             $this->data['User'] = array_map('trim', $this->data['User']);
 
             // add list of courses the user is enrolled in but the logged
-            // in user does not have access to so that the user would not
-            // be unenrolled from the course when their profile is edited.
+            // in user does not have access to
             $hiddenCourses = $this->_notUnenrolCourses($this->Auth->user('id'), $userId);
-
-            // REMOVE OLD STUDENT STATUSES
-            // unenrol student from course, group, surveygroup
-            // only students will go in because only they have records in Enrolment
-            foreach ($enrolCourses as $course) {
-                if (!in_array($course, $hiddenCourses) && $this->data['CourseEnroll'][$course] != 5) {
-                    $this->User->removeStudent($userId, $course);
+            // create a map of existing course enrolment, course id => role id
+            $courseEnrol = [];
+            foreach ($enrolCourses as $course) $courseEnrol[$course] = 5;
+            foreach ($tutorCourses as $course) $courseEnrol[$course] = 4;
+            foreach ($instructors as $course) $courseEnrol[$course] = 3;
+            // NOTE: In previous implementation, sysadmins can mistakenly
+            // unenrol users when editing a user. This is because it required
+            // every submit to contain every enrolment and this stopped
+            // happening at around 1k courses.  To avoid this, this new
+            // implementation only modify enrolments that are actually sent in
+            // the submit.
+            foreach ($this->data['CourseEnroll'] as $course => $newRole) {
+                if (in_array($course, $hiddenCourses)) {
+                    // logged in user isn't allowed to edit enrolment for course
+                    continue;
                 }
-            }
-
-            // REMOVE OLD TUTOR STATUSES
-            // unenrol tutor from course, group
-            foreach ($tutorCourses as $course) {
-                if (!in_array($course, $hiddenCourses) && $this->data['CourseEnroll'][$course] != 4) {
-                    $this->User->removeTutor($userId, $course);
+                elseif (isset($courseEnrol[$course])) {
+                    // modify existing enrolment
+                    $oldRole = $courseEnrol[$course];
+                    if ($oldRole != $newRole) {
+                        // honestly not sure if the remove functions are good
+                        // but trying not to change too much, so calling them
+                        if ($oldRole == 5)
+                            $this->User->removeStudent($userId, $course);
+                        elseif ($oldRole == 4)
+                            $this->User->removeTutor($userId, $course);
+                        elseif ($oldRole == 3)
+                            $this->User->removeInstructor($userId, $course);
+                        $courseEnrol[$course] = $newRole;
+                    }
                 }
-            }
-
-            // REMOVE OLD INSTRUCTOR STATUSES
-            // unenrol instructor from course
-            foreach ($instructors as $course) {
-                if (!in_array($course, $hiddenCourses) && $this->data['CourseEnroll'][$course] != 3) {
-                    $this->User->removeInstructor($userId, $course);
+                elseif ($newRole > 0) {
+                    // new enrolment in a course
+                    $courseEnrol[$course] = $newRole;
                 }
             }
 
@@ -764,7 +774,7 @@ class UsersController extends AppController
             $newStudentCourses = array();
 
             // ADD NEW (possibly existing) STATUSES
-            foreach($this->data['CourseEnroll'] as $currCourseId => $currRoleId) {
+            foreach($courseEnrol as $currCourseId => $currRoleId) {
                 if(!is_numeric($currCourseId)) {
                     continue;
                 }
@@ -1301,7 +1311,7 @@ class UsersController extends AppController
                 foreach ($errors as $error){
                     if (is_array($error)) {
                         foreach ($error as $error_detail) {
-                            $error_message .= '<li>' . $error_detail . '</li>';
+                            $error_message .= '<li>' . print_r($error_detail, true) . '</li>';
                         }
                     }
                     else {
@@ -1321,10 +1331,12 @@ class UsersController extends AppController
             }
 
             // enrol the users in the selected course
-            $insertedIds = array_merge(
-                $insertedIds,
-                Set::extract('/User/id', $result['updated_users']));
-            $this->Course->enrolStudents($insertedIds, $this->data['Course']['Course']);
+            if ($result) {
+                $insertedIds = array_merge(
+                    $insertedIds,
+                    Set::extract('/User/id', $result['updated_users']));
+                $this->Course->enrolStudents($insertedIds, $this->data['Course']['Course']);
+            }
 
             if (!isset($resultInstructors['failed_users'])) {
                 $resultInstructors['failed_users'] = array();

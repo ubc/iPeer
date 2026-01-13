@@ -1,14 +1,34 @@
 {
   "repositories": [
     {
-      "type": "git",
-      "url": "https://github.com/IMSGlobal/caliper-php"
+      "type": "package",
+      "package": {
+        "name": "imsglobal/caliper",
+        "version": "1.2.0",
+        "dist": {
+          "type": "zip",
+          "url" : "https://github.com/ubc/mediawiki-extensions-caliper/raw/master/packages/caliper-php.zip"
+        },
+        "autoload": {
+          "psr-4": {
+            "IMSGlobal\\Caliper\\": "src/"
+          }
+        },
+        "_comment": {
+          "source": {
+            "url": "https://github.com/IMSGlobal/caliper-php",
+            "type": "git",
+            "reference": "dev-develop#c7e34e230abc7bbb647f8f94245cb649f6191bcd"
+          }
+        }
+      }
     }
   ],
   "require": {
       "compass/cake-guard": "1.0.8",
       "nategood/httpful": "^0.2.20",
-      "imsglobal/caliper": "dev-develop#c7e34e230abc7bbb647f8f94245cb649f6191bcd as 1.2.0"
+    "imsglobal/caliper": "1.2.0",
+    "phpoffice/phpspreadsheet": "^1.25"
   },
   "require-dev": {
     "roave/security-advisories": "dev-master",
@@ -17,8 +37,7 @@
     "phpmd/phpmd" : "@stable",
     "squizlabs/php_codesniffer": "2.*",
     "sebastian/phpcpd": "*",
-    "jms/serializer": "1.7.*",
-    "phpdocumentor/phpdocumentor": "^2.9"
+    "jms/serializer": "1.7.*"
   },
   "scripts": {
       "post-install-cmd": [
@@ -32,7 +51,7 @@
   },
   "config": {
       "platform": {
-          "php": "7.2"
+          "php": "8.0"
       }
   }
 }

@@ -149,7 +149,7 @@ class File extends CakeObject {
 			}
 		}
 
-		$this->handle = fopen($this->path, $mode);
+		$this->handle = @fopen($this->path, $mode);
 		if (is_resource($this->handle)) {
 			return true;
 		}
@@ -221,7 +221,7 @@ class File extends CakeObject {
  * @return string The with converted line endings.
  * @access public
  */
-	function prepare($data, $forceWindows = false) {
+	static function prepare($data, $forceWindows = false) {
 		$lineBreak = "\n";
 		if (DIRECTORY_SEPARATOR == '\\' || $forceWindows === true) {
 			$lineBreak = "\r\n";
@@ -295,7 +295,7 @@ class File extends CakeObject {
 			$this->handle = null;
 		}
 		if ($this->exists()) {
-			return unlink($this->path);
+			return @unlink($this->path);
 		}
 		return false;
 	}

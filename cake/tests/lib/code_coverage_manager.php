@@ -19,6 +19,7 @@
  * @since         CakePHP(tm) v 1.2.0.4433
  * @license       http://www.opensource.org/licenses/opengroup.php The Open Group Test Suite License
  */
+include_once CAKE_TESTS_LIB . 'reporter' . DS . 'cake_html_reporter.php';
 App::import('Core', 'Folder');
 
 /**
@@ -78,7 +79,7 @@ class CodeCoverageManager {
  * @return object
  * @access public
  */
-	function &getInstance() {
+	static function &getInstance() {
 		static $instance = array();
 		if (!$instance) {
 			$instance[0] = new CodeCoverageManager();
@@ -94,7 +95,7 @@ class CodeCoverageManager {
  * @return void
  * @static
  */
-	function init($testCaseFile, &$reporter) {
+	static function init($testCaseFile, &$reporter) {
 		$manager =& CodeCoverageManager::getInstance();
 		$manager->reporter =& $reporter;
 		$testCaseFile = str_replace(DS . DS, DS, $testCaseFile);
@@ -113,7 +114,7 @@ class CodeCoverageManager {
  * @return void
  * @static
  */
-	function start() {
+	static function start() {
 		xdebug_start_code_coverage(XDEBUG_CC_UNUSED | XDEBUG_CC_DEAD_CODE);
 	}
 
@@ -124,7 +125,7 @@ class CodeCoverageManager {
  * @return void
  * @static
  */
-	function stop() {
+	static function stop() {
 		xdebug_stop_code_coverage(false);
 	}
 
@@ -135,7 +136,7 @@ class CodeCoverageManager {
  * @return void
  * @static
  */
-	function clear() {
+	static function clear() {
 		xdebug_stop_code_coverage();
 	}
 
@@ -165,7 +166,7 @@ class CodeCoverageManager {
  * @return void
  * @static
  */
-	function report($output = true) {
+	static function report($output = true) {
 		$manager =& CodeCoverageManager::getInstance();
 
 		CodeCoverageManager::stop();
@@ -257,9 +258,12 @@ class CodeCoverageManager {
  * @return void
  * @static
  */
-	function reportCaseHtmlDiff($testObjectFile, $coverageData, $execCodeLines, $numContextLines) {
+	static function reportCaseHtmlDiff($testObjectFile, $coverageData, $execCodeLines, $numContextLines) {
 		$manager = CodeCoverageManager::getInstance();
-		$total = count($testObjectFile);
+		$total = 0;
+		if (is_countable($testObjectFile)) {
+            $total = count($testObjectFile);
+        }
 		$lines = array();
 
 		for ($i = 1; $i < $total + 1; $i++) {
@@ -346,23 +350,25 @@ class CodeCoverageManager {
 		// get the output
 		$lineCount = $coveredCount = 0;
 		$report = '';
-		foreach ($testObjectFile as $num => $line) {
-			// start line count at 1
-			$num++;
-			$class = $lines[$num];
+		if (is_countable($testObjectFile)) {
+            foreach ($testObjectFile as $num => $line) {
+                // start line count at 1
+                $num++;
+                $class = $lines[$num];
 
-			if (strpos($class, 'ignored') === false) {
-				$lineCount++;
+                if (strpos($class, 'ignored') === false) {
+                    $lineCount++;
 
-				if (strpos($class, 'covered') !== false && strpos($class, 'uncovered') === false) {
-					$coveredCount++;
-				}
-			}
+                    if (strpos($class, 'covered') !== false && strpos($class, 'uncovered') === false) {
+                        $coveredCount++;
+                    }
+                }
 
-			if (strpos($class, 'show') !== false) {
-				$report .= $manager->__paintCodeline($class, $num, $line);
-			}
-		}
+                if (strpos($class, 'show') !== false) {
+                    $report .= $manager->__paintCodeline($class, $num, $line);
+                }
+            }
+        }
 		return $manager->__paintHeader($lineCount, $coveredCount, $report);
 	}
 
@@ -376,7 +382,7 @@ class CodeCoverageManager {
  * @return void
  * @static
  */
-	function reportCaseCli($testObjectFile, $coverageData, $execCodeLines) {
+	static function reportCaseCli($testObjectFile, $coverageData, $execCodeLines) {
 		$manager = CodeCoverageManager::getInstance();
 		$lineCount = $coveredCount = 0;
 		$report = '';
@@ -407,7 +413,7 @@ class CodeCoverageManager {
  * @return void
  * @static
  */
-	function reportGroupHtml($testObjectFiles, $coverageData, $execCodeLines, $numContextLines) {
+	static function reportGroupHtml($testObjectFiles, $coverageData, $execCodeLines, $numContextLines) {
 		$manager = CodeCoverageManager::getInstance();
 		$report = '';
 
@@ -448,7 +454,7 @@ class CodeCoverageManager {
  * @return void
  * @static
  */
-	function reportGroupCli($testObjectFiles, $coverageData, $execCodeLines) {
+	static function reportGroupCli($testObjectFiles, $coverageData, $execCodeLines) {
 		$manager = CodeCoverageManager::getInstance();
 		$report = '';
 

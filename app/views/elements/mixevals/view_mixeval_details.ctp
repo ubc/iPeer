@@ -2,7 +2,7 @@
 $evaluation = isset($user['Evaluation']) ? $user['Evaluation'] : null;
 $self = isset($self) ? $self : null;
 $evaluation = $self_eval ? $self : $evaluation;
-$details = Set::combine($evaluation['EvaluationMixevalDetail'], '{n}.question_number', '{n}');
+$details = $evaluation ? Set::combine($evaluation['EvaluationMixevalDetail'], '{n}.question_number', '{n}') : null;
 $peerNum = 1;
 echo "<input type='hidden' name=data[$user[id]][".$eval."][evaluatee_id] value='$user[id]'/>";
 echo "<input type='hidden' name=data[$user[id]][".$eval."][evaluator_id] value='".User::get('id')."'/>";
