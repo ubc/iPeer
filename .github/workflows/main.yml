@@ -82,7 +82,7 @@ jobs:
         id: meta_oneloginsaml
         uses: docker/metadata-action@v3
         with:
-          images: ubcctlt/ipeer-oneloginsaml
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-oneloginsaml
           tags: |
             type=schedule
             type=ref,event=branch
