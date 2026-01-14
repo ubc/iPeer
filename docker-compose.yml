@@ -70,40 +70,63 @@ services:
     depends_on:
       - app
 
-  # for running unit tests
-  # app-unittest:
-  #   image: ubcctlt/ipeer-app-unittest
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile-app-unittest
-  #   volumes:
-  #     - .:/var/www/html
-  #   environment:
-  #     - IPEER_DB_HOST=db
-  #     - IPEER_DB_USER=ipeer
-  #     - IPEER_DB_PASSWORD=ipeer
-  #     - IPEER_DB_NAME=ipeer_test
-  #     - IPEER_DEBUG=2
-  #     - IPEER_SESSION_SAVE=database
-  #     - SELENIUM_HOST=selenium-local
-  #     - SELENIUM_BROWSER=chrome
-  #     #- SELENIUM_BROWSER=firefox
-  #     - SERVER_TEST=http://ipeer_web_unittest
-  #     #- IPEER_AUTH=Ldap
-  #     #- IPEER_AUTH_LDAP_host=ldap.example.com
-  #     #- IPEER_AUTH_LDAP_port=636
-  #   depends_on:
-  #     - db
-  # for running unit tests
-  # web-unittest:
-  #   image: nginx:1.19-alpine
-  #   volumes:
-  #     - ./app/webroot:/var/www/html
-  #     - ./docker/nginx-unittest.conf:/etc/nginx/conf.d/default.conf
-  #   ports:
-  #     - "8081:80"
-  #   depends_on:
-  #     - app-unittest
+  db-test:
+    image: mariadb:10.11
+    environment:
+      - MYSQL_ROOT_PASSWORD=randompassword
+      - MYSQL_DATABASE=ipeer_test
+      - MYSQL_USER=ipeer
+      - MYSQL_PASSWORD=ipeer
+      - MARIADB_AUTO_UPGRADE=1
+    profiles: [ "test" ]
+    networks: [ "test" ]
+
+  app-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    volumes:
+      - .:/var/www/html
+    environment:
+      - IPEER_DB_HOST=db-test
+      - IPEER_DB_USER=ipeer
+      - IPEER_DB_PASSWORD=ipeer
+      - IPEER_DB_NAME=ipeer_test
+      - IPEER_DEBUG=2
+      - IPEER_SESSION_SAVE=database
+      - SELENIUM_HOST=selenium-local
+      - SELENIUM_BROWSER=chrome
+      #- SELENIUM_BROWSER=firefox
+      - SERVER_TEST=http://web-test
+      #- IPEER_AUTH=Ldap
+      #- IPEER_AUTH_LDAP_host=ldap.example.com
+      #- IPEER_AUTH_LDAP_port=636
+    depends_on:
+      - db-test
+    healthcheck:
+      test: ["CMD-SHELL", "php -r \"exit(@fsockopen('localhost', 9000) ? 0 : 1);\""]
+      interval: 2s
+      timeout: 2s
+      retries: 3
+    profiles: [ "test" ]
+    networks: [ "test" ]
+
+  web-test:
+    image: nginx:1.19-alpine
+    volumes:
+      - ./app/webroot:/var/www/html
+      - ./docker/nginx-unittest.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "8081:80"
+    depends_on:
+      app-test:
+        condition: service_healthy
+    profiles: [ "test" ]
+    networks: [ "test" ]
+
+networks:
+  test:
 
 volumes:
   mysqlDbData:

@@ -2,9 +2,9 @@ name: CI to Docker Hub
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
+  # Triggers the workflow on master commits, tagged commits, or PRs into master
   push:
-    branches: [ "*" ]
+    branches: [ master ]
     tags: [ "*" ]
   pull_request:
     branches: [ master ]
@@ -67,6 +67,7 @@ jobs:
         with:
           context: ./
           file: ./Dockerfile
+          target: app
           push: ${{ github.event_name != 'pull_request'  }}
           tags: ${{ steps.meta.outputs.tags  }}
           labels: ${{ steps.meta.outputs.labels  }}
@@ -105,3 +106,19 @@ jobs:
 
       - name: Image digest (oneloginsaml)
         run: echo ${{ steps.docker_build_oneloginsaml.outputs.digest }}
+
+  unit-integration-tests:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Build and startup test containers
+        run: ./build/unit-integration-tests/prepare.sh
+
+      - name: Run tests
+        run: ./build/unit-integration-tests/run.sh
