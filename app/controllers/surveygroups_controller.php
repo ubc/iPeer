@@ -165,6 +165,7 @@ class SurveyGroupsController extends AppController
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))
             ->push(__('Create Group Set', true)));
         $this->set('events', $this->Event->find('list', array('conditions' => array('course_id' => $course_id, 'event_template_type_id' => 3))));
+        $this->set('has_sufficient_students_for_grouping', !empty($this->__makeGroupList($course['Course']['student_count'])));
     }
 
 
