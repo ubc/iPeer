@@ -184,6 +184,20 @@
         <chmod file="app/tmp" mode="0777"/>
     </target>
 
+    <target name="test-single" description="Run a single test case or group" depends="init-test-db">
+        <fail unless="test.type" message="Property test.type must be set (e.g., 'case' or 'group')"/>
+        <fail unless="test.name" message="Property test.name must be set (e.g., 'components/evaluation_component' or 'model')"/>
+        <exec command="IPEER_DB_NAME=${db.name} sh cake/console/cake -app app testsuite app ${test.type} ${test.name}" passthru="true" returnProperty="result.single"/>
+        <phingcall target="post-test"/>
+        <fail message="Test ${test.type} ${test.name} failed">
+            <condition>
+                <not>
+                    <equals arg1="${result.single}" arg2="0"/>
+                </not>
+            </condition>
+        </fail>
+    </target>
+
     <target name="test" description="Run unit tests" depends="init-test-db">
         <exec command="IPEER_DB_NAME=${db.name} sh cake/console/cake -app app testsuite app group component" passthru="true" returnProperty="result.component"/>
         <exec command="IPEER_DB_NAME=${db.name} sh cake/console/cake -app app testsuite app group model" passthru="true" returnProperty="result.model"/>

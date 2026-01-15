@@ -68,18 +68,20 @@ Note: if you are planning to develop iPeer and did not run docker pull with abov
 docker-compose up -d
 ```
 
-#### Running iPeer unit tests
+#### Running iPeer unit/integration tests
 
 - Running unit tests within docker containers with `phing` requires additional libraries to be installed. This can be done by building the `ipeer-app` image with `Dockerfile-app-unittest` which is specific for running test cases:
-    - If the containers are up, stop them by running `docker-compose down`
-    - Rebuild the `ipeer-app` image with the command `docker-compose build --no-cache app-unittest`
-    - Start the containers by running `docker-compose up -d`
+    - If the containers are up, stop them by running `docker compose down`
+    - Rebuild the `ipeer-app` image with the command `docker compose build --no-cache app-test`
+    - Start the containers by running `docker compose --profile test up -d`
 
 - To run the unit tests on containers:
-    - On host, run an interactive shell in the unit test app container: `docker exec -it ipeer_app_unittest bash`
-    - In the interactive shell, while at `/var/www/html`, run the command `vendor/bin/phing test`
+    - On host, run an interactive shell in the unit test app container: `docker compose exec -it app-test bash`
+    - In the interactive shell, while at `/var/www/html`, run the command `vendor/bin/phing test` or `vendor/bin/phing test-single -Dtest.type="..." -Dtest.name="..."`. Examples:
+        - `vendor/bin/phing test-single -Dtest.type="case" -Dtest.name="controllers/V1Controller"` (see `./app/tests/cases`)
+        - `vendor/bin/phing test-single -Dtest.type="group" -Dtest.name="model"` (see `./app/tests/groups`)
     
-#### Running integration tests
+#### Running end-to-end tests
 
 - Install PHP Webdriver (https://github.com/Element-34/php-webdriver) and Sausage (https://github.com/jlipps/sausage) under `vendors` directory.  These are defined as submodules and can be updated by:
 ```
