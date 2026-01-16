@@ -22,6 +22,7 @@
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
+/////// CWL LOGIN //////////
 
 /**
  * Configure routing so that if iPeer has not been installed, the user
@@ -55,11 +56,21 @@ if (IS_INSTALLED) {
   // Connect url '/test' to our test controller. For dev use
   Router::connect('/tests', array('controller' => 'tests',
     'action' => 'index'));
-  // Authentication routes
+
+  // UBC CWL Authentication 
+  Router::connect('/__samlwrapper/api/saml/auth', array('controller' => 'homeubcsaml', 'action' => 'index'));
+  Router::connect('/__samlwrapper/api/saml/metadata', array('controller' => 'samlmetadata', 'action' => 'index3'));
+  Router::connect('/__samlwrapper/api/saml/single_logout', array('plugin' => 'guard', 'controller' => 'guard',
+  'action' => 'logout'));
+
+    // Authentication routes
   Router::connect('/login', array('plugin' => 'guard', 'controller' => 'guard',
     'action' => 'login'));
-  Router::connect('/logout', array('plugin' => 'guard', 'controller' => 'guard',
-    'action' => 'logout'));
+  Router::connect('/loginUBCCWL', array('plugin' => 'guard', 'controller' => 'guard',
+    'action' => 'loginUBCCWL'));
+
+  Router::connect('/logout', array('controller' => 'homeubcsamllogout', 'action' => 'index'));
+
   Router::connect('/loginout/loginByCWL', array('plugin' => 'guard', 'controller' => 'guard',
     'action' => 'logout'));
   // Connect url to groups api
