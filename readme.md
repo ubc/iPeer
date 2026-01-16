@@ -23,7 +23,7 @@ cp app/config/database.php.default app/config/database.php
 docker-compose pull && docker-compose up -d
 
 # open a shell into the app container
-docker exec -it ipeer_app bash
+docker compose exec -it app bash
 # within the container, install any missing packages
 composer install
 # exit the container
@@ -31,6 +31,11 @@ exit
 
 # on host, change the permission of tmp folders
 chmod -R 777 app/tmp
+
+# create DB schema and load sample data
+# (or use another seed file instead of ipeer_samples_data.sql)
+docker compose exec -T db bash -c 'mysql -u root -p"$MYSQL_ROOT_PASSWORD" ipeer' < app/config/sql/ipeer_samples_data.sql
+
 # restart containers
 docker-compose restart
 ```

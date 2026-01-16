@@ -7,3 +7,8 @@ Boxfile
 Vagrantfile
 app/tmp
 /vendor/
+
+# dev/test-only dependencies (via git submodules)
+/puppet/modules
+/vendors/sausage/
+/vendors/webdriver/
