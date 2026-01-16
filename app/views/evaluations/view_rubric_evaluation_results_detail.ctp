@@ -85,7 +85,7 @@ if (!empty($notInGroup)) {
     foreach ($scoreRecords as $userId => $row) {
         $scaled[$userId] = $row['total'] * (1 - ($penalties[$userId] / 100));
     }
-    $groupAve = array_sum($scaled) / count($scaled);
+    $groupAve = (count($scaled) > 0) ? array_sum($scaled) / count($scaled) : 0;
     foreach($scoreRecords as $userId => $row) {?>
         <div id="panel<?php echo $userId?>" class="panelName">
         <div id="panel<?php echo $userId?>Header" class="panelheader">
@@ -94,7 +94,7 @@ if (!empty($notInGroup)) {
         <div style="height: 200px;text-align: center;" id="panel1Content" class="panelContent">
             <br><?php
                 $deduction = number_format($row['total'] * ($penalties[$userId] / 100), 2);
-                $percent = number_format($scaled[$userId]/$rubric['Rubric']['total_marks']*100);
+                $percent = ($rubric['Rubric']['total_marks'] > 0) ? number_format($scaled[$userId]/$rubric['Rubric']['total_marks']*100) : 0;
 
                 echo __(" (Number of Evaluator(s): ",true).$row['evaluator_count'].")<br/>";
                 echo __("Final Total: ",true).number_format($row['total'],2);
