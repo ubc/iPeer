@@ -15,7 +15,7 @@ class OauthNonceFixture extends CakeTestFixture {
 		array(
 			'id' => 1,
 			'nonce' => 1,
-			'expires' => 1344891924
+			'expires' => '2012-08-13 14:05:24'
 		),
 	);
 }

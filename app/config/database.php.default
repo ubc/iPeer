@@ -101,10 +101,10 @@ class DATABASE_CONFIG {
     }
 
     public static function getInstance() {
-        if (!$instance) {
-            $instance = new DATABASE_CONFIG();
+        if (!self::$instance) {
+            self::$instance = new DATABASE_CONFIG();
         }
 
-        return $instance;
+        return self::$instance;
     }
 }

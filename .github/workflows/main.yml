@@ -1,4 +1,4 @@
-name: CI to Docker Hub
+name: iPeer Docker Builds and Tests
 
 # Controls when the workflow will run
 on:
