@@ -10,5 +10,5 @@ app/tmp
 
 # dev/test-only dependencies (via git submodules)
 /puppet/modules
-/vendors/sausage/
-/vendors/webdriver/
+/vendors/sausage
+/vendors/webdriver
