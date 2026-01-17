@@ -1,4 +1,4 @@
-FROM php:8.3-fpm AS base
+FROM php:8.3-fpm
 
 RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests  -y \
         libpng-dev \
@@ -34,9 +34,3 @@ RUN set -ex \
     && php-fpm --test
 
 CMD ["/docker-entrypoint-php-fpm.sh"]
-
-FROM base AS test
-RUN pecl install oauth && docker-php-ext-enable oauth
-
-# leave this last so it's the default
-FROM base AS app

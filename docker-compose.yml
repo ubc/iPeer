@@ -85,7 +85,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: test
     volumes:
       - .:/var/www/html
     environment:
