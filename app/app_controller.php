@@ -77,6 +77,19 @@ class AppController extends Controller
             }
         }
 
+        static $supportEmailApplied = false;
+        if (!$supportEmailApplied) {
+            $supportEmail = getenv('IPEER_SUPPORT_EMAIL');
+            if (!empty($supportEmail)) {
+                $currentSupport = $this->SysParameter->get('display.contact_info');
+                if ($currentSupport !== $supportEmail) {
+                    $this->SysParameter->setValue('display.contact_info', $supportEmail);
+                    $this->SysParameter->reload();
+                }
+            }
+            $supportEmailApplied = true;
+        }
+
         $this->Auth->autoRedirect = false;
         // backward compatible with original ipeer hash  method
         Security::setHash('md5');
@@ -110,10 +123,20 @@ class AppController extends Controller
         $this->breadcrumb = Breadcrumb::create();
 
         if ($this->Auth->isAuthorized()) {
+
+            // Check if user has permission for this action
+            
             // check if the user has permission to access the controller/action
             $permission = array_filter(array('controllers', ucwords($this->params['plugin']), ucwords($this->params['controller']), $this->params['action']));
             if (!User::hasPermission(join('/', $permission))) {
-                $this->Session->setFlash('Error: You do not have permission to access the page.');
+                $supportEmail = getenv('IPEER_SUPPORT_EMAIL');
+                if (empty($supportEmail)) {
+                    $supportEmail = $this->SysParameter->get('display.contact_info');
+                }
+                if (empty($supportEmail)) {
+                    $supportEmail = 'support@your-domain.ca';
+                }
+                $this->Session->setFlash('Access to this page is limited to authorized users. Please contact the course shell owner if you believe you should have access, or reach out to ' . $supportEmail);
                 $this->redirect('/home');
                 return;
             }
@@ -155,9 +178,9 @@ class AppController extends Controller
         $sysv = $this->SysParameter->get('system.version');
 
         if (User::hasPermission('controllers/upgrade') && version_compare(IPEER_VERSION, $sysv) > 0) {
-        	$flashMessage = "Your system version is older than the current version. ";
-        	$flashMessage .= "Please do the <a href=" . $this->webroot ."upgrade" .">upgrade</a>.";
-        	$this->Session->setFlash($flashMessage);
+            $flashMessage = "Your system version is older than the current version. ";
+            $flashMessage .= "Please do the <a href=" . $this->webroot ."upgrade" .">upgrade</a>.";
+            $this->Session->setFlash($flashMessage);
         }
     }
 
@@ -259,6 +282,26 @@ class AppController extends Controller
             }
             // after login stuff
             $this->User->loadRoles(User::get('id'));
+            
+            $isStudent = User::get('role_id') == $this->User->USER_TYPE_STUDENT;
+
+            // Only check course enrollment for students 
+            if ( $isStudent ) {
+                $enrolledCourses = $this->User->getEnrolledCourses(User::get('id'));
+                $tutorCourses = $this->User->getTutorCourses(User::get('id'));
+                
+                if (empty($enrolledCourses) && empty($tutorCourses)) {
+                    // Show message and logout to SAML
+                    $this->Auth->logout();
+                    $message = __('You do not have any course enrollment in iPeer. Please contact your instructor.', true);
+                    $samlLogoutUrl = Configure::read('SAML_LOGOUT_URL');
+                    $logoutUrl = !empty($samlLogoutUrl) ? $samlLogoutUrl : '/logout';
+                    
+                    echo "<script>alert(" . json_encode($message) . "); window.location.href=" . json_encode($logoutUrl) . ";</script>";
+                    exit;
+                }
+            }
+
             $this->AccessControl->loadPermissions();
             $this->SysParameter->reload();
             //TODO logging!
