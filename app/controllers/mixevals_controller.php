@@ -221,7 +221,6 @@ class MixevalsController extends AppController
     {
         $eval = $this->Mixeval->find('first', array(
             'conditions' => array('id' => $id),
-            'contain' => 'Question.Description',
         ));
 
         // check to see if $id is a valid mixed evaluation

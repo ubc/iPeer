@@ -311,7 +311,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->testAction('/courses/index', array('return' => 'result', 'fixturize' => false));
         $this->controller->expectOnce('redirect', array('/home'));
         $message = $this->controller->Session->read('Message.flash');
-        $this->assertEqual($message['message'], 'Error: You do not have permission to access the page.');
+        $this->assertPattern('/Access to this page is limited to authorized users/', $message['message']);
     }
 
     function testIndexFacultyAdminInstructorRareCase() {
