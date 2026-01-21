@@ -475,7 +475,7 @@ class AuthComponent extends CakeObject {
 			'sessionKey' => 'Auth.' . $model,
 			'logoutRedirect' => $this->loginAction,
 			'loginError' => __('Login failed. Invalid username or password.', true),
-			'authError' => __('You are not authorized to access that location.', true)
+			'authError' => __(getenv('CUSTOM_AUTH_ERROR_MESSAGE') ?: 'You are not authorized to access that location.', true)
 		);
 		foreach ($defaults as $key => $value) {
 			if (empty($this->{$key})) {
