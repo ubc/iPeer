@@ -137,48 +137,9 @@ docker-compose up -d
     cake/console/cake -app app testsuite app case system/studentSimple    # run a specific test case
 ```
 
-Running Virtual Development Server
----------------------------
-Virtual Environment Setup:
-
-1.  Install VirtualBox at http://virtualbox.org
-2.  Install Vagrant at http://www.vagrantup.com/downloads
-3.  Go to the iPeer root directory in the terminal. Then run the following commands:
-    
-        git submodule init
-        git submodule update
-        vagrant box add ipeerbox http://developer.nrel.gov/downloads/vagrant-boxes/CentOS-6.4-x86_64-v20130731.box
-        vagrant plugin install vagrant-vbguest
-        vagrant up
-4.  Go to localhost:2000 in your browser.
-
-Using a different port (the port number must be available on both the virtual and host environment):
-
-1. change the line in file puppet/dev.pp from
-
-        port => 2000,
-to (eg. port 8888)
-        
-        port => 8888,
-2. AND change the line in file app/tests/cases/controllers/v1_controller.test.php from
-    
-        $server = 'http://localhost:2000';
-to
-
-        $server = 'http://localhost:8888';
-
-Running Tests:
-
-Go to the iPeer root directory. Then run the following commands
-    vagrant ssh
-    cd /var/www
-    phing test
-
-For more vagrant commands go to http://docs.vagrantup.com/v2/cli/index.html.
-
 Running Tests
 ---------------------------
-Integration Tests
+End-to-End Tests
 
 Requirements:
 * Selenium Server 2.38+
