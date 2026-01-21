@@ -14,7 +14,7 @@ class SurveyGroupTestCase extends CakeTestCase {
         'app.rubrics_criteria', 'app.rubrics_criteria_comment',
         'app.faculty', 'app.user_faculty', 'app.department',
         'app.course_department', 'app.sys_parameter', 'app.user_tutor',
-        'app.penalty', 'app.evaluation_simple', 'app.survey_input', 'app.oauth_token',
+        'app.penalty', 'app.evaluation_simple', 'app.survey_input',
         'app.evaluation_mixeval', 'app.evaluation_mixeval_detail', 'app.evaluation_rubric',
         'app.evaluation_rubric_detail'
     );

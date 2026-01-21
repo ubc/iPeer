@@ -18,7 +18,7 @@ class AccessesControllerTest extends ExtendedAuthTestCase
     public $controller = null;
     
     public $fixtures = array(
-        'app.access', 'app.oauth_token', 'app.sys_parameter',
+        'app.access', 'app.sys_parameter',
         'app.user', 'app.evaluation_submission', 'app.event', 'app.event_template_type',
         'app.course', 'app.group', 'app.group_event', 'app.evaluation_simple',
         'app.survey_input', 'app.survey_group_member', 'app.survey_group_set',

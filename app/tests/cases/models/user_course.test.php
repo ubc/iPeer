@@ -13,7 +13,7 @@ class UserCourseTestCase extends CakeTestCase
         'app.response', 'app.survey_question', 'app.role', 'app.roles_user',
         'app.user_tutor', 'app.user_enrol', 'app.groups_member', 
         'app.department', 'app.course_department', 'app.penalty',
-        'app.oauth_token', 'app.evaluation_mixeval', 'app.evaluation_rubric',
+        'app.evaluation_mixeval', 'app.evaluation_rubric',
         'app.evaluation_mixeval_detail', 'app.evaluation_rubric_detail', 'app.sys_parameter'
     );
     public $UserCourse = null;
