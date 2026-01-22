@@ -280,6 +280,10 @@ class AppController extends Controller
                 $this->redirect('/');
                 return;
             }
+
+            // Clear any auth error flash message from the login redirect
+            $this->Session->delete('Message.auth');
+
             // after login stuff
             $this->User->loadRoles(User::get('id'));
             
