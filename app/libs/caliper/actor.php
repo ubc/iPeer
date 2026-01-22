@@ -43,7 +43,7 @@ class CaliperActor {
 
     public static function generateActor(&$user) {
         # happens when not logged in
-        if (!$user['id']) {
+        if (empty($user) || empty($user['id'])) {
             return Person::makeAnonymous();
         }
 
