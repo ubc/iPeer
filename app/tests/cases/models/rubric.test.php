@@ -69,7 +69,7 @@ class RubricTestCase extends CakeTestCase
         $this->assertEqual($rubricsCriteria['RubricsCriteria']['criteria'], $tmp['RubricsCriteria'][0]['criteria']);
 
         // Assert that RubricsCriteriaComment was saved correctly
-        $rubricsCriteriaComment0 = $this->RubricsCriteriaComment->find('first', array('conditions' => array('criteria_num' => 50)));
+        $rubricsCriteriaComment0 = $this->RubricsCriteriaComment->find('first', array('conditions' => array('criteria_id' => 50)));
         $this->assertEqual(
             $rubricsCriteriaComment0['RubricsCriteriaComment']['criteria_comment'],
             $tmp['RubricsCriteria'][0]['RubricsCriteriaComment'][0]['criteria_comment']);
