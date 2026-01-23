@@ -98,6 +98,6 @@ class CanvasCourseUserComponent extends CakeObject
         $result = $enquirer->find('first', array(
             'conditions' => array('User.username' => $this->$user_key)));
 
-        return $result['User'];
+        return $result ? $result['User'] : null;
     }
 }
