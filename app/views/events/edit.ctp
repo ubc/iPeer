@@ -136,7 +136,7 @@ echo $this->Form->input(
 <?php
 echo $this->Form->input('EmailTemplate',
     array('div' => array('id' => 'EmailTemplateDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevE', 'target' => '_blank')),
-            'selected' => $emailId));
+            'selected' => $emailId ?? null));
 ?>
 <div class='email-temp-help-text'><?php __('Select the preferred email template.') ?></div>
 <?php
