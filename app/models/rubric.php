@@ -125,10 +125,6 @@ class Rubric extends EvaluationBase
         $dataSource = $this->getDataSource();
         $dataSource->begin($this);
 
-        // Initialize RubricsCriteria and RubricsCriteriaComment models for validation
-        $this->RubricsCriteria = new RubricsCriteria;
-        $this->RubricsCriteriaComment = new RubricsCriteriaComment;
-
         try {
             // check if the we should remove some of the association records
             if (isset($data['Rubric']['id']) && !empty($data['Rubric']['id'])) {
@@ -227,10 +223,10 @@ class Rubric extends EvaluationBase
 
                 // Validate criteria comments
                 foreach ($criteria_data['RubricsCriteriaComment'] as $comment) {
-                    $this->RubricsCriteriaComment->create();
-                    $this->RubricsCriteriaComment->set($comment);
-                    if (!$this->RubricsCriteriaComment->validates()) {
-                        $errors = $this->RubricsCriteriaComment->validationErrors;
+                    $this->RubricsCriteria->RubricsCriteriaComment->create();
+                    $this->RubricsCriteria->RubricsCriteriaComment->set($comment);
+                    if (!$this->RubricsCriteria->RubricsCriteriaComment->validates()) {
+                        $errors = $this->RubricsCriteria->RubricsCriteriaComment->validationErrors;
                         throw new Exception('Criteria comment validation failed: ' . print_r($errors, true));
                     }
                 }
