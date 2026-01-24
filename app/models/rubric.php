@@ -125,6 +125,10 @@ class Rubric extends EvaluationBase
         $dataSource = $this->getDataSource();
         $dataSource->begin($this);
 
+        // Initialize RubricsCriteria and RubricsCriteriaComment models for validation
+        $this->RubricsCriteria = new RubricsCriteria;
+        $this->RubricsCriteriaComment = new RubricsCriteriaComment;
+
         try {
             // check if the we should remove some of the association records
             if (isset($data['Rubric']['id']) && !empty($data['Rubric']['id'])) {
@@ -213,7 +217,8 @@ class Rubric extends EvaluationBase
                 unset($c['RubricsCriteriaComment']);
                 $criteria_data['RubricsCriteria'] = $c;
 
-                // Validate before saving
+                // Validate before saving (Priority 2 fix)
+                $this->RubricsCriteria->create();
                 $this->RubricsCriteria->set($criteria_data['RubricsCriteria']);
                 if (!$this->RubricsCriteria->validates()) {
                     $errors = $this->RubricsCriteria->validationErrors;
@@ -222,6 +227,7 @@ class Rubric extends EvaluationBase
 
                 // Validate criteria comments
                 foreach ($criteria_data['RubricsCriteriaComment'] as $comment) {
+                    $this->RubricsCriteriaComment->create();
                     $this->RubricsCriteriaComment->set($comment);
                     if (!$this->RubricsCriteriaComment->validates()) {
                         $errors = $this->RubricsCriteriaComment->validationErrors;
