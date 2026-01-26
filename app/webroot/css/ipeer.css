@@ -2396,3 +2396,53 @@ form div.help-text {
 	border-color: #666666;
 	background-color: #ffffff;
 }
+
+/* Character Counter Styles */
+
+.char-counter {
+    display: inline-block;
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 0.25em;
+    font-style: italic;
+    transition: color 0.3s ease, font-weight 0.3s ease;
+}
+
+/* Character counter states (managed by JavaScript) */
+/* Normal state: plenty of space */
+.char-counter.normal {
+    color: #666;
+    font-weight: normal;
+}
+
+/* Warning state: approaching limit (50 or fewer chars) */
+.char-counter.warning {
+    color: orange;
+    font-weight: normal;
+}
+
+/* Alert state: near limit (10 or fewer chars) */
+.char-counter.alert {
+    color: red;
+    font-weight: bold;
+}
+
+/* Textarea styling for character-limited fields */
+textarea.char-limited,
+input[type="text"].char-limited {
+    border: 1px solid #ccc;
+    transition: border-color 0.3s ease;
+}
+
+textarea.char-limited:focus,
+input[type="text"].char-limited:focus {
+    border-color: #5b9dd9;
+    outline: none;
+}
+
+/* Optional: Add a subtle visual indicator when approaching/at limit */
+textarea.char-limited.at-limit,
+input[type="text"].char-limited.at-limit {
+    border-color: #d9534f;
+    box-shadow: 0 0 3px rgba(217, 83, 79, 0.5);
+}

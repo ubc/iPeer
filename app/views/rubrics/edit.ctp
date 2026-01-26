@@ -85,7 +85,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
           case 'View Rubric':
             break;
           default:
-            echo $this->Form->submit(__('Preview (Update Format)', true), array('Name'=>'preview', 'div' => false));
+            echo $this->Form->submit(__('Preview (Update Format)', true), array('id' => 'preview-rubric', 'Name'=>'preview', 'div' => false));
             echo $this->Form->submit(__('Save', true), array('id' => 'submit-rubric', 'Name' => 'submit', 'div' => false));
           }?>
 </div>
