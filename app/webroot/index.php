@@ -25,7 +25,19 @@ require realpath(dirname(__FILE__) . '/../../vendor/autoload.php');
 
 $timezone = ini_get('date.timezone') ? ini_get('date.timezone') : 'UTC';
 date_default_timezone_set($timezone); // set the default time zone
- 
+
+/**
+ * Detect HTTPS when behind a reverse proxy (load balancer, nginx, etc.)
+ * that terminates SSL. The proxy sets X-Forwarded-Proto header.
+ * This ensures Router::url() generates correct HTTPS URLs.
+ */
+if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+    $_SERVER['HTTPS'] = 'on';
+}
+if (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on') {
+    $_SERVER['HTTPS'] = 'on';
+}
+
 /**
  * Use the DS to separate the directories in other defines
  */
