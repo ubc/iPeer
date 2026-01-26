@@ -190,7 +190,7 @@ if(!isset($viewMode)){
                 maxlength="254"
                 data-counter-id="eval-criteria-comment-view1-<?php echo $userId.'-'.$i?>"
                 ><?php echo h($comment); ?></textarea>
-            <br><small id="eval-criteria-comment-view1-<?php echo $userId.'-'.$i?>" class="char-counter" style="color: #666; font-size: 0.9em;">0/255 characters</small>
+            <br><small id="eval-criteria-comment-view1-<?php echo $userId.'-'.$i?>" class="char-counter" style="color: #666; font-size: 0.9em;">0/254 characters</small>
         </td>
         <?php endif;?>
 
