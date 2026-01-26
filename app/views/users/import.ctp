@@ -25,9 +25,10 @@
     <?php else: ?>
         <ul>
             <li><?php __("This function will import instructors, TAs, and students from corresponding Canvas course")?></li>
+            <li><?php __("Students who enrolled since the last sync will be added. Students who unenrolled will be removed.")?></li>
+            <li><?php __("Existing students will have their personal info updated from their Canvas profile. Their group memberships will remain unchanged.")?></li>
             <li><?php __("TAs in Canvas will be imported as instructors for the course")?></li>
             <li><?php __("Instructors / TAs with existing iPeer accounts but not with Primary Role as Instructor will NOT be imported")?></li>
-            <li><?php __("Existing students in the iPeer course will be removed and a fresh roster is imported from Canvas")?></li>
             <li><?php __("Existing instructors / TAs in the iPeer course will be kept and merged with those imported from Canvas")?></li>
         </ul>
     <?php endif; ?>
