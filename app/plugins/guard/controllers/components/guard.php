@@ -104,7 +104,7 @@ class GuardComponent extends AuthComponent {
         }
 
         // if the auth_method is specified, use it to override configuration
-        if (isset($_REQUEST['auth_method'])) {
+        if (Configure::read('debug') > 0 && isset($_REQUEST['auth_method'])) {
             $authModuleName = $_REQUEST['auth_method'];
         }
 
