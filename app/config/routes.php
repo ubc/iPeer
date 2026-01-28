@@ -59,7 +59,6 @@ if (IS_INSTALLED) {
 
   // UBC CWL Authentication 
   Router::connect('/__samlwrapper/api/saml/auth', array('controller' => 'homeubcsaml', 'action' => 'index'));
-  Router::connect('/__samlwrapper/api/saml/metadata', array('controller' => 'samlmetadata', 'action' => 'index3'));
   Router::connect('/__samlwrapper/api/saml/single_logout', array('plugin' => 'guard', 'controller' => 'guard',
   'action' => 'logout'));
 
