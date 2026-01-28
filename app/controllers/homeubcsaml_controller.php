@@ -93,14 +93,6 @@ class HomeUBCSamlController extends AppController
             $this->log( "No user found with username '" . $username . "'<br>", 'debug');
             
             //FOR ONBOARDING STUDENTS MUST BE DONE by iPeer thru Import Groups from Canvas
-            
-            //if ($this->add_user_with_role_extended($username, $password, $role_id, $strGivenName, $strLastName, $strStudentNo, $strEmail)) {
-            //    $this->log( "User '" . $username . "' has been added to the database with role ID '" . $role_id . "'.<br>", 'debug' );
-            //    return $username;
-            //} else {
-            //    $this->log( "Failed to add user '" . $username . "' to the database.<br>" );
-            //    return null;
-            //}
 
         }
         return null;
