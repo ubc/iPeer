@@ -23,6 +23,18 @@ class GuardController extends AppController {
         if( !(empty($this->data)) && $this->Auth->user() ){
             $this->redirect('/login');
         }
+
+        $forceGuardAuth = ($_GET['defaultlogin'] ?? '') === "true";
+        if ($forceGuardAuth) {
+            // continue loading/rendering Guard plugin and views as normal
+            // (mostly meant for fallback password-based auth)
+            return;
+        }
+
+        $shibbolethUrl = env('IPEER_AUTH_SHIBB_URL');
+        if ($shibbolethUrl && !$this->Auth->isLoggedIn()) {
+            $this->redirect($shibbolethUrl);
+        }
     }
 
     /**

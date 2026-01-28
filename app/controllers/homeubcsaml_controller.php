@@ -74,85 +74,14 @@ class HomeUBCSamlController extends AppController
         }
     }
 
-    function add_user_with_role($username, $password, $role_id) {
-        $connection = $this->connect_to_db();
-        if (!$connection) {
-            // echo "Failed to connect to the database.";
-            return false;
-        }
-
-        try {
-            $connection->beginTransaction();
-
-            // Step 1: Insert into users table
-            $user_query = "INSERT INTO users (username, password) VALUES (:username, MD5(:password))";
-            $stmt = $connection->prepare($user_query);
-            $stmt->execute(['username' => $username, 'password' => $password]);
-
-            // Step 2: Insert into roles_users table
-            $role_query = "INSERT INTO roles_users (role_id, user_id) VALUES (:role_id, (SELECT id FROM users WHERE username = :username LIMIT 1))";
-            $stmt = $connection->prepare($role_query);
-            $stmt->execute(['role_id' => $role_id, 'username' => $username]);
-
-            $connection->commit();
-            return true;
-        } catch (PDOException $e) {
-            $connection->rollBack();
-            // echo "Error inserting into the database: " . $e->getMessage();
-            return false;
-        }
-    }
-
-    function add_user_with_role_extended($username, $password, $role_id, $first_name, $last_name, $student_no, $email) {
-        $connection = $this->connect_to_db();
-        if (!$connection) {
-            // echo "Failed to connect to the database.";
-            return false;
-        }
-
-        try {
-            $connection->beginTransaction();
-
-            // Step 1: Insert into users table with additional fields
-            $user_query = "INSERT INTO users (username, password, first_name, last_name, student_no, email) VALUES (:username, MD5(:password), :first_name, :last_name, :student_no, :email)";
-            $stmt = $connection->prepare($user_query);
-            $stmt->execute([
-                'username' => $username,
-                'password' => $password,
-                'first_name' => $first_name,
-                'last_name' => $last_name,
-                'student_no' => $student_no,
-                'email' => $email
-            ]);
-
-            // Step 2: Insert into roles_users table
-            $role_query = "INSERT INTO roles_users (role_id, user_id) VALUES (:role_id, (SELECT id FROM users WHERE username = :username LIMIT 1))";
-            $stmt = $connection->prepare($role_query);
-            $stmt->execute(['role_id' => $role_id, 'username' => $username]);
-
-            $connection->commit();
-            return true;
-        } catch (PDOException $e) {
-            $connection->rollBack();
-            // echo "Error inserting into the database: " . $e->getMessage();
-            return false;
-        }
-    }
-
-
-    function process_user($username, $defaultPassword, $defaultRoleID, $strGivenName, $strLastName, $strStudentNo, $strEmail) {
+    function process_user($username) {
         if (!$username) {
             //echo "No username provided.";
             $this->log('NO USERNAME provided:');
             return null;
         }
 
-        $password = !empty(trim($defaultPassword)) ? trim($defaultPassword) : "default-password";
-        $role_id = !empty($defaultRoleID) ? $defaultRoleID : 5;
-        $strGivenName = !empty($strGivenName) ? $strGivenName : "DefaultFirstName";
-        $strLastName = !empty($strLastName) ? $strLastName : "DefaultLastName";
-        $strStudentNo = !empty($strStudentNo) ? $strStudentNo : "00000000";
-        $strEmail = !empty($strEmail) ? $strEmail : "default@example.com";
+
 
 
         $user_id = $this->get_user_id_by_username($username);
@@ -164,14 +93,6 @@ class HomeUBCSamlController extends AppController
             $this->log( "No user found with username '" . $username . "'<br>", 'debug');
             
             //FOR ONBOARDING STUDENTS MUST BE DONE by iPeer thru Import Groups from Canvas
-            
-            //if ($this->add_user_with_role_extended($username, $password, $role_id, $strGivenName, $strLastName, $strStudentNo, $strEmail)) {
-            //    $this->log( "User '" . $username . "' has been added to the database with role ID '" . $role_id . "'.<br>", 'debug' );
-            //    return $username;
-            //} else {
-            //    $this->log( "Failed to add user '" . $username . "' to the database.<br>" );
-            //    return null;
-            //}
 
         }
         return null;
@@ -222,8 +143,6 @@ class HomeUBCSamlController extends AppController
      */
     function beforeFilter()
     {
-
-
         ///////////////////////////////////////////////////////////////
         // Initialize SAML authentication
 
@@ -364,18 +283,16 @@ class HomeUBCSamlController extends AppController
                 //TODO: ENV VAR THESE ATTRIBUTES
                 $strGivenName = $attributes['urn:mace:dir:attribute-def:givenNameLthub'] ?? "";
                 $strLastName = $attributes['urn:mace:dir:attribute-def:snLthub'] ?? "";
-                $strCWLID = $attributes['urn:oid:0.9.2342.19200300.100.1.1'] ?? "";
                 $username = $attributes['urn:oid:1.3.6.1.4.1.60.6.1.6'] ?? "";
                 $strEmail = $attributes['urn:oid:0.9.2342.19200300.100.1.3'] ?? "";
 
                 $strStudentNo = $attributes['urn:oid:1.3.6.1.4.1.60.6.1.6.1'] ?? "";
-                $strUBCPersonStudentNumber = $attributes['urn:oid:1.3.6.1.4.1.60.6.1.6'] ?? "";
 
                 $defaultRoleID = 1;
 
                 // Call the process_user function with the gathered values
                 $this->log(
-                    "usernane::::::::".($username) . ":" .
+                    "username::::::::".($username) . ":" .
                     ($defaultRoleID ?? 5) . ":" .
                     ($strGivenName ?? "GivenName") . ":" .
                     ($strLastName ?? "LastName") . ":" .
@@ -385,19 +302,9 @@ class HomeUBCSamlController extends AppController
 
 
                 if (!empty($username)) {
-                    $password = 'iPeer!' . $strStudentNo;
-
-                    //$username .= $datetime;  //for TESTING
                     $processUser = $this->process_user(
                         $username,
-                        $password, // default password to StudentNo
-                        $defaultRoleID ?? 5,
-                        $strGivenName ?? "GivenName",
-                        $strLastName ?? "LastName",
-                        $strStudentNo ?? (string)$datetime,
-                        $strEmail ?? "no-reply@example.com"
                     );
-
                 }
 
 

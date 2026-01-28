@@ -37,7 +37,7 @@ if(!Configure::read('debug') == 0 &&
 Permission: <?php echo $hasUserModel ? count(User::getPermissions()) : "no user"; ?></a>
       <input type="button" onclick="jQuery('#permission-data').toggle();" value="show/hide" />
     </td>
-    <td><a href="#actions-data">Actions: <?php echo !is_countable($action) ? 0 : count($action); ?></a>
+    <td><a href="#actions-data">Actions: <?php echo !is_countable($action ?? null) ? 0 : count($action); ?></a>
       <input type="button" onclick="jQuery('#actions-data').toggle();" value="show/hide" />
     </td>
     <td><a href="#params-data">Params: <?php echo empty($this->params) ? 0 : count($this->params); ?></a>
