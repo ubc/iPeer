@@ -323,6 +323,8 @@ class EventsController extends AppController
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $event['Course']))->push(array('event' => $event['Event']))->push(__('View', true)));
         $this->set('event', $event);
         $this->set('modelName', $modelName);
+        $this->set('editUrl', '/events/edit/' . $eventId);
+        $this->set('editLabel', __('Edit Event', true));
     }
 
     /**

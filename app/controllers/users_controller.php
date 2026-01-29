@@ -403,6 +403,8 @@ class UsersController extends AppController
 
         $this->set('title_for_layout', __('View User', true));
         $this->set('user', $this->data);
+        $this->set('editUrl', '/users/edit/' . $id);
+        $this->set('editLabel', __('Edit User', true));
     }
 
     /**
