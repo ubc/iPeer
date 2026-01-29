@@ -12,7 +12,6 @@ var AjaxListTableRowSelectedBackgroundColor = "#F8F850";
 // How long to wait after a user has finished typing to start a search
 var searchAfterTypeDelay = 1100; //ms
 
-var AjaxListActionNewWindowFeatures = "width=640, height=480";
 
 var iconURL = "img/icons/";
 var busyIconURL = "img/big-rotation.gif";
@@ -148,6 +147,24 @@ AjaxListLibrary.prototype.setOpacity = function (obj, value) {
         obj.style.opacity = value;
     }
 }
+
+// Builds the URL path for an action given an entry row and action definition
+AjaxListLibrary.prototype.buildActionUrl = function (action, entry, controller) {
+    var url = action[ACTION_CONTROLLER] ? action[ACTION_CONTROLLER] : controller;
+
+    for (var j = ACTION_URL_PARTS_START; j < action.length; j++) {
+        var urlPart = action[j];
+
+        var split = urlPart.split(".", 2);
+        if ((split.length == 2) && entry[split[0]] && entry[split[0]][split[1]]) {
+            url += "/" + entry[split[0]][split[1]];
+        } else {
+            url += "/" + urlPart;
+        }
+    }
+
+    return url;
+};
 
 // Instantiate the library.
 var ajaxListLibrary = new AjaxListLibrary();
@@ -845,10 +862,8 @@ AjaxList.prototype.renderTableBody = function(tbody) {
                         contents = contents.substring(0, 159).concat(' ...');
                     }
                     var link = new Element("a").update(contents);
-                    link.href="";
-                    link.onclick = ajaxListLibrary.createDelegateWithParams(this,
-                        this.doAction, entry, column[ACTION_COL]);
-                        div.appendChild(link);
+                    link.href = this.getActionUrl(column[ACTION_COL], entry);
+                    div.appendChild(link);
                 } else if (column[TYPE_COL] == "link") {
                     // Create an icon with a link in it
                     if (contents && (contents.length > 10)) { // 10 is min url length
@@ -886,7 +901,6 @@ AjaxList.prototype.renderTableBody = function(tbody) {
             td.appendChild(div);
 
             var clickDelegate = ajaxListLibrary.createDelegateWithParams(this, this.rowClicked, entry, tr);
-            td.onclick = clickDelegate;
             td.oncontextmenu = clickDelegate;
             tr.appendChild(td);
         }
@@ -907,6 +921,16 @@ AjaxList.prototype.renderTable = function() {
 
     this.table.appendChild(tbody);
 }
+
+// Finds an action by name and builds the full URL for the given entry
+AjaxList.prototype.getActionUrl = function (actionName, entry) {
+    for (var i = 0; i < this.actions.length; i++) {
+        if (this.actions[i][ACTION_NAME] == actionName) {
+            return this.webroot + ajaxListLibrary.buildActionUrl(this.actions[i], entry, this.controller);
+        }
+    }
+    return "";
+};
 
 // When user clicks a link-type table cell entry
 AjaxList.prototype.doAction = function (event, entryRow, actionDesc) {
@@ -1304,36 +1328,9 @@ AjaxListAction.prototype.performAction = function(event, action) {
         }
     }
 
-    var newWindow = false;
-
-    // Figure out the proper URL, starting with the controller
-    var url = action[ACTION_CONTROLLER] ? action[ACTION_CONTROLLER] : this.controller;
-
-    // Combine the URL components
-    for (j = ACTION_URL_PARTS_START; j < action.length; j++) {
-        urlPart = action[j];
-
-        // a "!" in front of url action means open a new window
-        if (!newWindow && urlPart.length > 0 && urlPart.charAt(0) == '!') {
-            urlPart = urlPart.substr(1);
-            newWindow = true;
-        }
-
-        var split = urlPart.split(".", 2);
-        if ((split.length == 2) && (this.entry[split[0]][split[1]])) {
-            // If this is an actual value, set it.
-            var lookedUpEntry = this.entry[split[0]][split[1]];
-        } else {
-            // Otherwise, display the value exactly as it was put in
-            var lookedUpEntry = urlPart;
-        }
-
-        url += "/" + lookedUpEntry;
-    }
+    var url = ajaxListLibrary.buildActionUrl(action, this.entry, this.controller);
 
     this.close();
 
-    if (!newWindow) {
-       window.location = this.root + url;
-    }
+    window.location = this.root + url;
 }
