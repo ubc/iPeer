@@ -72,6 +72,15 @@
         <?php echo $title_for_layout;?>
     <?php endif; ?>
   </h1>
+  <?php if (isset($editUrl)): ?>
+  <div class="button-row">
+    <ul>
+      <li>
+        <a href="<?php echo $editUrl; ?>" class="edit-button"><?php echo $editLabel ?? __('Edit', true); ?></a>
+      </li>
+    </ul>
+  </div>
+  <?php endif; ?>
   <!-- ERRORS -->
   <?php echo $this->Session->flash(); ?>
   <?php echo $this->Session->flash('auth'); ?>

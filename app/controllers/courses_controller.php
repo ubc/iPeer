@@ -185,6 +185,8 @@ class CoursesController extends AppController
         }
 
         $this->set('data', $course);
+        $this->set('editUrl', '/courses/edit/' . $id);
+        $this->set('editLabel', __('Edit Course', true));
     }
 
     /**
@@ -211,6 +213,8 @@ class CoursesController extends AppController
         //Setup the courseId to session
         $this->Session->write('ipeerSession.courseId', $id);
 
+        $this->set('editUrl', '/courses/edit/' . $id);
+        $this->set('editLabel', __('Edit Course', true));
         $this->render('home');
     }
 
