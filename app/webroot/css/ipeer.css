@@ -2073,7 +2073,14 @@ table.content-table {
     margin: 0 auto 0 auto;
 }
 
-.add-button, .delete-button, .edit-button, .merge-button, .export-excel-button, .compare-button, .canvas-button,
+.add-button,
+.delete-button,
+.edit-button,
+.info-button,
+.merge-button,
+.export-excel-button,
+.compare-button,
+.canvas-button,
 .button, input[type="submit"], input[type="button"], button {
     background-color: #e6e6e6;
     padding: 5px 5px 5px 25px;
@@ -2114,6 +2121,7 @@ input[type="submit"], button.submit {
 .add-button:hover,
 .delete-button:hover,
 .edit-button:hover,
+.info-button:hover,
 .merge-button:hover,
 .export-excel-button:hover,
 .compare-button:hover,
@@ -2151,8 +2159,12 @@ button:hover {
     background-image: url('../img/icons/edit.gif');
 }
 
+.info-button {
+    background-image: url('../img/icons/info.gif');
+}
+
 .merge-button {
-    background-image: url('../img/icons/merge.gif');
+    background-image: url('../img/icons/merge.png');
 }
 
 .export-excel-button {
