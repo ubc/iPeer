@@ -185,8 +185,11 @@ class CoursesController extends AppController
         }
 
         $this->set('data', $course);
-        $this->set('editUrl', '/courses/edit/' . $id);
-        $this->set('editLabel', __('Edit Course', true));
+        $this->set('title_for_layout', $course['Course']['full_name']);
+        $this->set('topLevelActionButtons', [
+            ['url' => '/courses/home/' . $id, 'label' => __('Course Overview', true), 'class' => 'info-button'],
+            ['url' => '/courses/edit/' . $id, 'label' => __('Edit Course', true), 'class' => 'edit-button'],
+        ]);
     }
 
     /**
@@ -213,8 +216,10 @@ class CoursesController extends AppController
         //Setup the courseId to session
         $this->Session->write('ipeerSession.courseId', $id);
 
-        $this->set('editUrl', '/courses/edit/' . $id);
-        $this->set('editLabel', __('Edit Course', true));
+        $this->set('topLevelActionButtons', [
+            ['url' => '/courses/view/' . $id, 'label' => __('View Details', true), 'class' => 'info-button'],
+            ['url' => '/courses/edit/' . $id, 'label' => __('Edit Course', true), 'class' => 'edit-button'],
+        ]);
         $this->render('home');
     }
 

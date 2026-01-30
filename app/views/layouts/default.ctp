@@ -72,12 +72,14 @@
         <?php echo $title_for_layout;?>
     <?php endif; ?>
   </h1>
-  <?php if (isset($editUrl)): ?>
+  <?php if ($topLevelActionButtons ?? null): ?>
   <div class="button-row">
     <ul>
+      <?php foreach ($topLevelActionButtons as $button): ?>
       <li>
-        <a href="<?php echo $editUrl; ?>" class="edit-button"><?php echo $editLabel ?? __('Edit', true); ?></a>
+        <a href="<?php echo $button['url']; ?>" class="<?php echo $button['class']; ?>"><?php echo $button['label']; ?></a>
       </li>
+      <?php endforeach; ?>
     </ul>
   </div>
   <?php endif; ?>
