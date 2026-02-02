@@ -72,10 +72,10 @@
         <?php echo $title_for_layout;?>
     <?php endif; ?>
   </h1>
-  <?php if ($topLevelActionButtons ?? null): ?>
+  <?php if ($topActionButtons ?? null): ?>
   <div class="button-row">
     <ul>
-      <?php foreach ($topLevelActionButtons as $button): ?>
+      <?php foreach ($topActionButtons as $button): ?>
       <li>
         <a href="<?php echo $button['url']; ?>" class="<?php echo $button['class']; ?>"><?php echo $button['label']; ?></a>
       </li>
@@ -89,6 +89,17 @@
   <?php echo $this->Session->flash('good'); ?>
   <!-- ACTUAL PAGE -->
   <?php echo $content_for_layout; ?>
+  <?php if ($bottomActionButtons ?? null): ?>
+  <div class="button-row bottom-actions">
+    <ul>
+      <?php foreach ($bottomActionButtons as $button): ?>
+      <li>
+        <a href="<?php echo $button['url']; ?>" class="<?php echo $button['class']; ?>"><?php echo $button['label']; ?></a>
+      </li>
+      <?php endforeach; ?>
+    </ul>
+  </div>
+  <?php endif; ?>
 </div>
 
 <!-- FOOTER -->

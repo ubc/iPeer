@@ -98,13 +98,10 @@ class CoursesController extends AppController
         }
 
         // Set up actions
-        $warning = __("Are you sure you want to delete this course permanently?", true);
-
         $actions = array(
             array(__("Course Home", true), "", "", "", "home", "Course.id"),
             array(__("View Record", true), "", "", "", "view", "Course.id"),
             array(__("Edit Course", true), "", "", "", "edit", "Course.id"),
-            array(__("Delete Course", true), $warning, "", "", "delete", "Course.id"),
             array(__("View Creator", true), "",    "", "users", "view", "Course.creator_id"));
 
         $recursive = 0;
@@ -186,9 +183,12 @@ class CoursesController extends AppController
 
         $this->set('data', $course);
         $this->set('title_for_layout', $course['Course']['full_name']);
-        $this->set('topLevelActionButtons', [
+        $this->set('topActionButtons', [
             ['url' => '/courses/home/' . $id, 'label' => __('Course Overview', true), 'class' => 'info-button'],
             ['url' => '/courses/edit/' . $id, 'label' => __('Edit Course', true), 'class' => 'edit-button'],
+        ]);
+        $this->set('bottomActionButtons', [
+            ['url' => '/courses/delete/' . $id, 'label' => __('Delete Course', true), 'class' => 'delete-button'],
         ]);
     }
 
@@ -216,9 +216,12 @@ class CoursesController extends AppController
         //Setup the courseId to session
         $this->Session->write('ipeerSession.courseId', $id);
 
-        $this->set('topLevelActionButtons', [
+        $this->set('topActionButtons', [
             ['url' => '/courses/view/' . $id, 'label' => __('View Details', true), 'class' => 'info-button'],
             ['url' => '/courses/edit/' . $id, 'label' => __('Edit Course', true), 'class' => 'edit-button'],
+        ]);
+        $this->set('bottomActionButtons', [
+            ['url' => '/courses/delete/' . $id, 'label' => __('Delete Course', true), 'class' => 'delete-button'],
         ]);
         $this->render('home');
     }
@@ -467,6 +470,20 @@ class CoursesController extends AppController
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('index');
+            return;
+        }
+
+        if (empty($this->data)) {
+            // GET request: render delete confirmation view
+            $this->set('course', $course);
+            return;
+        }
+
+        // POST request: validate and proceed with deletion
+        $deleteConfirmationCourseName = trim($this->data['Course']['confirm_name']);
+        if ($deleteConfirmationCourseName !== trim($course['Course']['full_name'])) {
+            $this->Session->setFlash(__('Error: The course name you entered does not match. Please try again.', true));
+            $this->set('course', $course);
             return;
         }
 
