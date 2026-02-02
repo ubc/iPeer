@@ -2037,6 +2037,11 @@ div.panelContent {
     height: 2em;
 }
 
+.bottom-actions {
+    clear: both;
+    padding-top: 1em;
+}
+
 /* No clue what these does */
 
 table.form-table {
@@ -2457,4 +2462,17 @@ textarea.char-limited.at-limit,
 input[type="text"].char-limited.at-limit {
     border-color: #d9534f;
     box-shadow: 0 0 3px rgba(217, 83, 79, 0.5);
+}
+
+pre code {
+    display: block;
+    background-color: #f4f4f4;
+    color: #333;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: 'Courier New', Courier, monospace;
+    line-height: 1.5;
+    overflow-x: auto;
+    white-space: pre-wrap;
 }

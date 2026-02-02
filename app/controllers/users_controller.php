@@ -403,7 +403,7 @@ class UsersController extends AppController
 
         $this->set('title_for_layout', __('View User', true));
         $this->set('user', $this->data);
-        $this->set('topLevelActionButtons', [
+        $this->set('topActionButtons', [
             ['url' => '/users/edit/' . $id, 'label' => __('Edit User', true), 'class' => 'edit-button'],
         ]);
     }
