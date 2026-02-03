@@ -41,6 +41,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Determine commit SHA
+        id: commit
+        run: echo "sha=${COMMIT_SHA}" >> $GITHUB_OUTPUT
+        env:
+          COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
@@ -55,7 +61,7 @@ jobs:
            type=semver,pattern={{version}}
            type=semver,pattern={{major}}.{{minor}}
            type=semver,pattern={{major}}
-           type=sha
+           type=raw,value=sha-${{ steps.commit.outputs.sha }}
 
       - name: Set up Docker Buildx
         id: buildx
@@ -70,6 +76,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags  }}
           labels: ${{ steps.meta.outputs.labels  }}
+          build-args: |
+            COMMIT_HASH=${{ steps.commit.outputs.sha }}
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}

@@ -164,6 +164,11 @@ class AppController extends Controller
     function beforeRender() {
         CaliperHooks::app_controller_before_render($this);
 
+        $commitHash = getenv('IPEER_COMMIT_HASH');
+        if (!empty($commitHash) && User::hasPermission('functions/superadmin')) {
+            $this->set('ipeerCommitHash', htmlspecialchars($commitHash));
+        }
+
         parent::beforeRender();
     }
 
