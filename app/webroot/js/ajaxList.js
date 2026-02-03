@@ -230,7 +230,9 @@ function AjaxList (parameterArray, whereToDisplay) {
         this.renderHeader();
         this.renderTable();
         this.renderFooter(this.footer);
-        this.renderUsage(this.display);
+        if (!this.disableContextMenu) {
+            this.renderUsage(this.display);
+        }
     } else {
         this.updateFromServer(false);
     }

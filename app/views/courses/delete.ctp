@@ -4,7 +4,7 @@
 <p><?php echo __('You are about to permanently delete the following course:', true); ?></p>
 <pre><code><?php echo h($course['Course']['full_name']); ?></code></pre>
 
-<p><?php echo __('To confirm, type the full course name exactly as shown above:', true); ?></p>
+<p><?php echo __('To confirm, type or copy/paste the full course name exactly as shown above:', true); ?></p>
 
 <?php
 echo $this->Form->create('Course', array('url' => '/courses/delete/' . $course['Course']['id']));

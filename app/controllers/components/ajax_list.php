@@ -477,7 +477,7 @@ class AjaxListComponent extends CakeObject
             header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
             header("expires: 0"); // HTTP/1.1
             header("Content-type: application/json");
-            echo json_encode($listData); // Send it away!!
+            echo json_encode($listData, JSON_INVALID_UTF8_SUBSTITUTE);
             exit;  // Nothing more to do.
         }
     }
