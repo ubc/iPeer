@@ -59,6 +59,18 @@ class CoursesController extends AppController
         $this->set('canvasEnabled', $this->canvasEnabled);
     }
 
+    function postProcessData($data)
+    {
+        if (empty($data)) {
+            return $data;
+        }
+        foreach ($data as $i => $entry) {
+            $entry['!Custom']['edit'] = '<span class="edit-link">' . __('Edit', true) . '</span>';
+            $data[$i] = $entry;
+        }
+        return $data;
+    }
+
     /**
      * _setUpAjaxList
      *
@@ -75,7 +87,8 @@ class CoursesController extends AppController
             array("Course.term",          __("Term", true),       "auto", "action", "Course Home"),
             array("Course.creator_id",           "",            "",     "hidden"),
             array("Course.record_status", __("Status", true),      "5em",  "map",     array("A" => __("Active", true), "I" => __("Inactive", true))),
-            array("Course.creator",     __("Created by", true),  "10em", "action", "View Creator")
+            array("Course.creator",     __("Created by", true),  "10em", "action", "View Creator"),
+            array("!Custom.edit",       __("Edit", true),        "4em",  "action", "Edit Course"),
         );
 
         // put all the joins together
@@ -107,7 +120,8 @@ class CoursesController extends AppController
         $recursive = 0;
 
         $this->AjaxList->setUp($this->Course, $columns, $actions,
-            'Course.course', 'Course.course', $joinTables, $extraFilters, $recursive);
+            'Course.course', 'Course.course', $joinTables, $extraFilters, $recursive, "postProcessData");
+        $this->AjaxList->disableContextMenu = true;
     }
 
 

@@ -181,6 +181,7 @@ function AjaxList (parameterArray, whereToDisplay) {
     this.timeStamp      = parameterArray.data.timeStamp;
     this.state          = parameterArray.data.state;
     this.actions        = parameterArray.actions;
+    this.disableContextMenu = parameterArray.disableContextMenu || false;
     this.joinTables    = parameterArray.joinFilters;
     this.webroot        = parameterArray.webroot;
 
@@ -823,7 +824,8 @@ AjaxList.prototype.renderTableBody = function(tbody) {
 
     // Render each entry
     for (j = 0; j < this.data.length; j++) {
-        var tr = new Element("tr",{ "style" : "cursor: pointer;"});
+        var cursorStyle = this.disableContextMenu ? "default" : "pointer";
+        var tr = new Element("tr",{ "style" : "cursor: " + cursorStyle + ";"});
         var entry = this.data[j];
         for (i = 0; i < this.columns.length; i++) {
             var column = this.columns[i];
@@ -900,8 +902,10 @@ AjaxList.prototype.renderTableBody = function(tbody) {
             // Append the contents division onto the element
             td.appendChild(div);
 
-            var clickDelegate = ajaxListLibrary.createDelegateWithParams(this, this.rowClicked, entry, tr);
-            td.oncontextmenu = clickDelegate;
+            if (!this.disableContextMenu) {
+                var clickDelegate = ajaxListLibrary.createDelegateWithParams(this, this.rowClicked, entry, tr);
+                td.oncontextmenu = clickDelegate;
+            }
             tr.appendChild(td);
         }
 
