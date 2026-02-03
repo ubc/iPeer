@@ -33,4 +33,7 @@ RUN set -ex \
     && sed -i -e "s/;request_terminate_timeout\s*=[^\n]*/request_terminate_timeout = 300/g" /usr/local/etc/php-fpm.conf \
     && php-fpm --test
 
+ARG COMMIT_HASH=""
+ENV IPEER_COMMIT_HASH=$COMMIT_HASH
+
 CMD ["/docker-entrypoint-php-fpm.sh"]
