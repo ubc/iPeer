@@ -69,6 +69,14 @@ class AjaxListComponent extends CakeObject
     public $model = null;
     public $columns = null;
     public $actions = null;
+    // $actions are used for both context menu generation,
+    // and generating href values for the links in the list,
+    // hence the need for a separate $disableContextMenu.
+    // Ideally, AjaxList would be refactored to decouple href properties
+    // from the $actions menu, thus allowing us to simply delete
+    // all $actions to disable the context menu, and removing the
+    // need for $disableContextMenu.
+    public $disableContextMenu = false;
     public $joinFilters = null;
     public $extraFilters = null;
 
@@ -592,6 +600,7 @@ class AjaxListComponent extends CakeObject
             'controller'  => $this->controllerName,
             'columns'     => $this->columns,
             'actions'     => $this->actions,
+            'disableContextMenu' => $this->disableContextMenu,
             'joinFilters' => $this->joinFilters,
             'data'        => $this->getListByState()
         );

@@ -2164,6 +2164,14 @@ button:hover {
     background-image: url('../img/icons/edit.gif');
 }
 
+.edit-link {
+    background: url('../img/icons/edit.gif') no-repeat left center;
+    padding-left: 20px;
+}
+.edit-link:hover {
+    opacity: 0.7;
+}
+
 .info-button {
     background-image: url('../img/icons/info.gif');
 }
