@@ -90,7 +90,8 @@ class DATABASE_CONFIG {
             'login'    => 'IPEER_DB_USER',
             'password' => 'IPEER_DB_PASSWORD',
             'database' => 'IPEER_DB_NAME',
-            'prefix'   => 'IPEER_DB_PREFIX'
+            'prefix'   => 'IPEER_DB_PREFIX',
+            'encoding' => 'IPEER_DB_ENCODING',
         );
 
         foreach($vars as $key => $var) {
