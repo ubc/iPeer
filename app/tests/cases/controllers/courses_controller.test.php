@@ -623,13 +623,11 @@ class CoursesControllerTest extends ExtendedAuthTestCase
     function testDelete()
     {
         $courseModel = ClassRegistry::init('Course');
-        $course = $courseModel->find('first', array('conditions' => array('id' => 1)));
-        $courseName = $course['Course']['full_name'];
 
         $result = $this->testAction(
             '/courses/delete/1',
             array('fixturize' => true, 'method' => 'post', 'data' => array(
-                'Course' => array('confirm_name' => $courseName),
+                'Course' => array('confirm' => '1'),
             ))
         );
 
