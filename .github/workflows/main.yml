@@ -82,6 +82,7 @@ jobs:
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
+
   check-oneloginsaml-changes:
     runs-on: ubuntu-latest
     permissions:
@@ -99,6 +100,7 @@ jobs:
           filters: |
             changed:
               - 'docker/oneloginsaml/**'
+
 
   build-and-push-oneloginsaml:
     needs: check-oneloginsaml-changes
