@@ -13,12 +13,13 @@
 <table class='standardtable'>
 <tr>
     <th>Name</th>
-    <th>Write Email</th>
+    <?php if ($emailInterfaceEnabled ?? true): ?><th>Write Email</th><?php endif; ?>
     <th>User Details</th>
 </tr>
 <?php foreach($data['Member'] as $user):?>
 <tr>
     <td><?php echo $user['full_name']?></td>
+    <?php if ($emailInterfaceEnabled ?? true): ?>
     <td><?php echo $html->link(
             __('Email to ', true).$user['full_name'],
             array(
@@ -28,6 +29,7 @@
             ),
             array('escape'=>false)
         )?></td>
+    <?php endif; ?>
     <td><?php echo $html->link(
             $html->image('icons/view.gif', array('alt'=>'Detail')),
             '/users/view/'.$user['id'],
@@ -35,6 +37,7 @@
         )?></td>
 </tr>
 <?php endforeach; ?>
+<?php if ($emailInterfaceEnabled ?? true): ?>
 <tr>
     <td colspan='3'>
     <?php
@@ -51,6 +54,7 @@
     ?>
     </td>
 </tr>
+<?php endif; ?>
 </table>
 
 <p>

@@ -33,6 +33,7 @@ class AppController extends Controller
     public $actionList = array ();
     public $breadcrumb;
     public $validTZ;
+    public $emailInterfaceEnabled = true;
 
     /**
      * if this request has session transfer data
@@ -143,6 +144,13 @@ class AppController extends Controller
 
             $this->_checkSystemVersion();
         }
+
+        // check if email interface is globally disabled
+        $this->emailInterfaceEnabled = !in_array(
+            $this->SysParameter->get('email.disableEmailInterface', 'false'),
+            array('1', 'true', 'yes')
+        );
+        $this->set('emailInterfaceEnabled', $this->emailInterfaceEnabled);
 
         // for setting up google analytics
         $trackingId = $this->SysParameter->findByParameterCode('google_analytics.tracking_id');

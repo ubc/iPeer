@@ -115,30 +115,29 @@ echo $this->Form->input('result_release_date_begin',
 echo $this->Form->input('result_release_date_end',
     array('div' => array('id' => 'ResultReleaseEndDiv'), 'label' => 'Until', 'type' => 'text'));
 
-echo $this->Form->input(
-    'email_schedule',
-    array(
-        'label' => 'Email Reminder Frequency ',
-        'options' => $emailSchedules,
-        'default' => "$email_schedule",
-        'div' => array('id' => 'emailSchedule'),
-        'disabled' => !$reminder_enabled
-    )
-);
+$emailRemindersEnabled = ($emailInterfaceEnabled ?? true) && $reminder_enabled;
+if ($emailRemindersEnabled):
+    echo $this->Form->input(
+        'email_schedule',
+        array(
+            'label' => 'Email Reminder Frequency ',
+            'options' => $emailSchedules,
+            'default' => "$email_schedule",
+            'div' => array('id' => 'emailSchedule'),
+        )
+    );
 ?>
-<?php if (!$reminder_enabled): ?>
-    <?php echo $this->Form->input('email_schedule', array('hidden' => true, 'type' => 'text', 'value' => $email_schedule, 'label' => false)); ?>
-    <div class='email-help-text'><?php __('Email reminder feature is disabled in the system.') ?></div>
-<?php else: ?>
 <div class='email-help-text'><?php __('Select the number of days in between each email reminder for submitting
     evaluations. The first email is sent when the event is released.') ?></div>
-<?php endif; ?>
 <?php
-echo $this->Form->input('EmailTemplate',
-    array('div' => array('id' => 'EmailTemplateDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevE', 'target' => '_blank')),
-            'selected' => $emailId ?? null));
+    echo $this->Form->input('EmailTemplate',
+        array('div' => array('id' => 'EmailTemplateDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevE', 'target' => '_blank')),
+                'selected' => $emailId ?? null));
 ?>
 <div class='email-temp-help-text'><?php __('Select the preferred email template.') ?></div>
+<?php else:
+    echo $this->Form->input('email_schedule', array('hidden' => true, 'type' => 'text', 'value' => $email_schedule, 'label' => false));
+endif; ?>
 <?php
 echo $this->Form->input('Group',
     array('div' => array('id' => 'GroupsDiv'), 'label' => 'Group(s)')); ?>
@@ -254,7 +253,7 @@ jQuery("#unselectAll").click(function() {
 // keep track of the number of penalties entered.
 var penaltyCount = <?php echo $numPenalties; ?>;
 // save the current selected groups
-var oldGroups = jQuery('#GroupGroup').val();
+var oldGroups = jQuery('#GroupGroup').val() || [];
 
 function initDateTime() {
     var format = { dateFormat: 'yy-mm-dd', timeFormat: 'hh:mm:ss' }

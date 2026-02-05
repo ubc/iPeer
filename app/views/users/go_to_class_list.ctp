@@ -68,9 +68,11 @@ function fnFormatDetails ( oTable, nTr )
     sOut += '<div style="cursor: default; padding: 4px; font-weight: bold; color: black;">Edit';
     sOut += '</div></a>';
 
+    <?php if ($emailInterfaceEnabled ?? true): ?>
     sOut += '<a href="<?php echo $this->base; ?>/emailer/write/U/'+aData[0]+'">';
     sOut += '<div style="cursor: default; padding: 4px; font-weight: bold; color: black;">Email';
     sOut += '</div></a>';
+    <?php endif; ?>
 
     sOut += '<a href="<?php echo $this->base; ?>/users/resetPassword/'+aData[0]+'/<?php echo $courseId?>" onclick="return resetConfirmed()">';
     sOut += '<div style="cursor: default; padding: 4px; font-weight: bold; color: black;">Reset Password';

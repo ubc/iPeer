@@ -53,6 +53,12 @@ class EmailtemplatesController extends AppController
     {
         parent::beforeFilter();
 
+        if (!$this->emailInterfaceEnabled) {
+            $this->Session->setFlash(__('Email functionality is currently disabled.', true));
+            $this->redirect('/');
+            return;
+        }
+
         $this->set('title_for_layout', __('Email',true));
     }
 

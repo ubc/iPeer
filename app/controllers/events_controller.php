@@ -676,7 +676,7 @@ class EventsController extends AppController
         $new_due_date = $data['Event']['due_date'];
         $orig_frequency = $email_frequency;
         $new_frequency =  $data['Event']['email_schedule'];
-        $new_template = $data['Event']['EmailTemplate'];
+        $new_template = $data['Event']['EmailTemplate'] ?? $originalTemp;
 
         if ($orig_release_date_begin != $new_release_date_begin || $orig_due_date != $new_due_date
             || $orig_frequency != $new_frequency || $originalTemp != $new_template) {
