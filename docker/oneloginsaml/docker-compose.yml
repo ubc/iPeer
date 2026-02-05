@@ -1,8 +1,12 @@
-version: '3.8'
 services:
   php-saml-app:
     build: .
+    env_file: .env
     ports:
-      - "80:80"
+      - "8800:80"
     volumes:
-      - .:/var/www/html
+      - ./composer.json:/var/www/html/composer.json
+      - ./composer.lock:/var/www/html/composer.lock
+      - ./index.php:/var/www/html/index.php
+      - ./config:/var/www/html/config
+      - ./public:/var/www/html/public

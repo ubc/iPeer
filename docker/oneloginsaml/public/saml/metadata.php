@@ -1,11 +1,12 @@
 <?php
-// public/saml/metadata.php
+
+if (empty($_ENV['ENABLE_SAML_METADATA'])) {
+    http_response_code(404);
+    exit;
+}
+
 require_once '../../vendor/autoload.php';
 use OneLogin\Saml2\Auth;
-
-// Initialize SAML authenticationn
 $samlSettings = require '../../config/saml_settings.php';
 $auth = new Auth($samlSettings);
-
-// Generate SAML metadata
 echo $auth->getMetadata();
