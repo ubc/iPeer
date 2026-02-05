@@ -82,9 +82,9 @@ class CoursesController extends AppController
         // Set up Columns
         $columns = array(
             array("Course.id",            "",            "",      "hidden"),
-            array("Course.course",        __("Course", true),      "15em",  "action", "Course Home"),
+            array("Course.course",        __("Course", true),      "15em",  "string"),
             array("Course.title",         __("Title", true),       "auto", "action", "Course Home"),
-            array("Course.term",          __("Term", true),       "auto", "action", "Course Home"),
+            array("Course.term",          __("Term", true),       "auto", "string"),
             array("Course.creator_id",           "",            "",     "hidden"),
             array("Course.record_status", __("Status", true),      "5em",  "map",     array("A" => __("Active", true), "I" => __("Inactive", true))),
             array("Course.creator",     __("Created by", true),  "10em", "action", "View Creator"),
@@ -113,7 +113,6 @@ class CoursesController extends AppController
         // Set up actions
         $actions = array(
             array(__("Course Home", true), "", "", "", "home", "Course.id"),
-            array(__("View Record", true), "", "", "", "view", "Course.id"),
             array(__("Edit Course", true), "", "", "", "edit", "Course.id"),
             array(__("View Creator", true), "",    "", "users", "view", "Course.creator_id"));
 
@@ -231,7 +230,6 @@ class CoursesController extends AppController
         $this->Session->write('ipeerSession.courseId', $id);
 
         $this->set('topActionButtons', [
-            ['url' => '/courses/view/' . $id, 'label' => __('View Details', true), 'class' => 'info-button'],
             ['url' => '/courses/edit/' . $id, 'label' => __('Edit Course', true), 'class' => 'edit-button'],
         ]);
         $this->set('bottomActionButtons', [
@@ -487,20 +485,13 @@ class CoursesController extends AppController
             return;
         }
 
-        if (empty($this->data)) {
-            // GET request: render delete confirmation view
+        if (!isset($this->data['Course']['confirm']) || $this->data['Course']['confirm'] !== '1') {
+            // GET request (or unconfirmed POST request): render delete confirmation view
             $this->set('course', $course);
             return;
         }
 
-        // POST request: validate and proceed with deletion
-        $deleteConfirmationCourseName = trim($this->data['Course']['confirm_name']);
-        if ($deleteConfirmationCourseName !== trim($course['Course']['full_name'])) {
-            $this->Session->setFlash(__('Error: The course name you entered does not match. Please try again.', true));
-            $this->set('course', $course);
-            return;
-        }
-
+        // POST request: proceed with deletion
         if ($this->Course->delete($id)) {
             //Delete all corresponding data start here
             //Instructors: Instructor record will remain in database, but the join table records will be deleted

@@ -3,15 +3,10 @@
 
 <p><?php echo __('You are about to permanently delete the following course:', true); ?></p>
 <pre><code><?php echo h($course['Course']['full_name']); ?></code></pre>
-
-<p><?php echo __('To confirm, type or copy/paste the full course name exactly as shown above:', true); ?></p>
-
+<br />
 <?php
 echo $this->Form->create('Course', array('url' => '/courses/delete/' . $course['Course']['id']));
-echo $this->Form->input('confirm_name', array(
-    'label' => __('Course Name', true),
-    'type' => 'text',
-));
+echo $this->Form->hidden('confirm', array('value' => '1'));
 echo $html->div('center',
     $form->submit(__('Delete Course', true), array('div' => false)) .
     ' ' .
