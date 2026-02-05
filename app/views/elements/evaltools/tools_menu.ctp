@@ -32,10 +32,10 @@ if (User::hasPermission('controllers/mixevals')) {
 if (User::hasPermission('controllers/surveys')) {
     generateLink($this, 'surveys', __('Surveys',true));
 }
-if (User::hasPermission('controllers/emailer')) {
+if (($emailInterfaceEnabled ?? true) && User::hasPermission('controllers/emailer')) {
     generateLink($this, 'emailer', __('Emailer',true));
 }
-if (User::hasPermission('controllers/emailtemplates')) {
+if (($emailInterfaceEnabled ?? true) && User::hasPermission('controllers/emailtemplates')) {
     generateLink($this, 'emailtemplates', __('Email Templates',true));
 }
 ?>

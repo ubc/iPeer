@@ -63,28 +63,27 @@ echo $this->Form->input('result_release_date_begin',
 echo $this->Form->input('result_release_date_end',
     array('div' => array('id' => 'ResultReleaseEndDiv'), 'label' => 'Until', 'type' => 'text'));
 
-echo $this->Form->input(
-    'email_schedule',
-    array(
-        'label' => 'Email Reminder Frequency ',
-        'options' => $emailSchedules,
-        'div' => array('id' => 'emailSchedule'),
-        'disabled' => !$reminder_enabled
-    )
-);
+$emailRemindersEnabled = ($emailInterfaceEnabled ?? true) && $reminder_enabled;
+if ($emailRemindersEnabled):
+    echo $this->Form->input(
+        'email_schedule',
+        array(
+            'label' => 'Email Reminder Frequency ',
+            'options' => $emailSchedules,
+            'div' => array('id' => 'emailSchedule'),
+        )
+    );
 ?>
-<?php if (!$reminder_enabled): ?>
-    <?php echo $this->Form->input('email_schedule', array('hidden' => true, 'type' => 'text', 'value' => 0, 'label' => false)); ?>
-    <div class='email-help-text'><?php __('Email reminder feature is disabled in the system.') ?></div>
-<?php else: ?>
 <div class='email-help-text'><?php __('Select the number of days in between each email reminder for submitting
     evaluations. The first email is sent when the event is released.') ?></div>
-<?php endif; ?>
 <?php
-echo $this->Form->input('EmailTemplate',
-    array('div' => array('id' => 'EmailTemplateDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevE', 'target' => '_blank'))));
+    echo $this->Form->input('EmailTemplate',
+        array('div' => array('id' => 'EmailTemplateDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevE', 'target' => '_blank'))));
 ?>
 <div class='email-temp-help-text'><?php __('Select the preferred email template.') ?></div>
+<?php else:
+    echo $this->Form->input('email_schedule', array('hidden' => true, 'type' => 'text', 'value' => 0, 'label' => false));
+endif; ?>
 <?php
 echo $this->Form->input('Group',
     array('div' => array('id' => 'GroupsDiv'), 'label' => 'Group(s)')); ?>

@@ -14,11 +14,10 @@ switch($submenu) {
         array('name' => 'List Students', 'link' => "/users/goToClassList/$course_id")
     );
     if ($status == 'A') {
-        array_push(
-            $items,
-            array('name' => 'Email to All Students',  'link' => "/emailer/write/C/$course_id"),
-            array('name' => 'Import Students from CSV', 'link' => "/users/import/$course_id")
-        );
+        if ($emailInterfaceEnabled ?? true) {
+            $items[] = array('name' => 'Email to All Students',  'link' => "/emailer/write/C/$course_id");
+        }
+        $items[] = array('name' => 'Import Students from CSV', 'link' => "/users/import/$course_id");
     }
     break;
   case "Group":
