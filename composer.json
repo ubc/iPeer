@@ -27,7 +27,8 @@
   "require": {
       "nategood/httpful": "^1.0",
     "imsglobal/caliper": "1.2.0",
-    "phpoffice/phpspreadsheet": "^1.29"
+    "phpoffice/phpspreadsheet": "^1.29",
+    "onelogin/php-saml": "^4.2"
   },
   "require-dev": {
     "roave/security-advisories": "dev-master",
