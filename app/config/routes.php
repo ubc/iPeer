@@ -57,7 +57,14 @@ if (IS_INSTALLED) {
   Router::connect('/tests', array('controller' => 'tests',
     'action' => 'index'));
 
-  // UBC CWL Authentication 
+  // SAML Service Provider endpoints (auth initiation, logout, metadata)
+  if (getenv('SAML_SETTINGS')) {
+    Router::connect('/public/saml/auth.php', array('controller' => 'saml', 'action' => 'auth'));
+    Router::connect('/public/saml/logout.php', array('controller' => 'saml', 'action' => 'logout'));
+    Router::connect('/public/saml/metadata.php', array('controller' => 'saml', 'action' => 'metadata'));
+  }
+
+  // UBC CWL Authentication
   Router::connect('/__samlwrapper/api/saml/auth', array('controller' => 'homeubcsaml', 'action' => 'index'));
   Router::connect('/__samlwrapper/api/saml/single_logout', array('plugin' => 'guard', 'controller' => 'guard',
   'action' => 'logout'));
