@@ -62,19 +62,16 @@ if (IS_INSTALLED) {
     Router::connect('/public/saml/auth.php', array('controller' => 'saml', 'action' => 'auth'));
     Router::connect('/public/saml/logout.php', array('controller' => 'saml', 'action' => 'logout'));
     Router::connect('/public/saml/metadata.php', array('controller' => 'saml', 'action' => 'metadata'));
+
+    Router::connect('/__samlwrapper/api/saml/auth', array('controller' => 'homeubcsaml', 'action' => 'index'));
+    Router::connect('/__samlwrapper/api/saml/single_logout', array('controller' => 'saml', 'action' => 'logout'));
   }
 
-  // UBC CWL Authentication
-  Router::connect('/__samlwrapper/api/saml/auth', array('controller' => 'homeubcsaml', 'action' => 'index'));
-  Router::connect('/__samlwrapper/api/saml/single_logout', array('plugin' => 'guard', 'controller' => 'guard',
-  'action' => 'logout'));
-
-    // Authentication routes
+  // Authentication routes
   Router::connect('/login', array('plugin' => 'guard', 'controller' => 'guard',
     'action' => 'login'));
-
-  if (env('IPEER_AUTH_SHIBB_URL')) {
-    Router::connect('/logout', array('controller' => 'homeubcsamllogout', 'action' => 'index'));
+  if (getenv('SAML_SETTINGS')) {
+    Router::connect('/logout', array('controller' => 'saml', 'action' => 'logout'));
   } else {
     Router::connect('/logout', array('plugin' => 'guard', 'controller' => 'guard', 'action' => 'logout'));
   }

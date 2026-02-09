@@ -31,9 +31,8 @@ class GuardController extends AppController {
             return;
         }
 
-        $shibbolethUrl = env('IPEER_AUTH_SHIBB_URL');
-        if ($shibbolethUrl && !$this->Auth->isLoggedIn()) {
-            $this->redirect($shibbolethUrl);
+        if (getenv('SAML_SETTINGS') && !$this->Auth->isLoggedIn()) {
+            $this->redirect('/public/saml/auth.php');
         }
     }
 
