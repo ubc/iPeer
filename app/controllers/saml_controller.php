@@ -4,9 +4,11 @@ require_once 'vendor/autoload.php';
 
 use OneLogin\Saml2\Auth;
 use OneLogin\Saml2\Settings;
+use caliper\CaliperHooks;
 
 class SamlController extends Controller {
     var $uses = array();
+    var $components = array('Session');
 
     private function getSamlSettings() {
         $samlSettings = getenv('SAML_SETTINGS');
@@ -38,11 +40,8 @@ class SamlController extends Controller {
 
         $auth = new Auth($this->getSamlSettings());
 
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        session_unset();
-        session_destroy();
+        CaliperHooks::app_controller_after_logout($this);
+        $this->Session->destroy();
 
         if (isset($_COOKIE['SAMLRequest'])) {
             setcookie('SAMLRequest', '', time() - 3600, '/');
