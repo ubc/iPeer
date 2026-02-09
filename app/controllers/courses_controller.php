@@ -14,9 +14,9 @@ class CoursesController extends AppController
     public $uses =  array('GroupEvent', 'Course', 'Personalize', 'UserCourse',
         'UserEnrol', 'Group', 'Event', 'User', 'UserFaculty', 'Department',
         'CourseDepartment', 'EvaluationSubmission', 'SurveyInput', 'UserTutor', 'SysParameter');
-    public $helpers = array('Html', 'Ajax', 'excel', 'Javascript', 'Time',
+    public $helpers = array('Html', 'Ajax', 'Javascript', 'Time',
         'Js' => array('Prototype'), 'FileUpload.FileUpload');
-    public $components = array('ExportBaseNew', 'AjaxList', 'ExportCsv', 'ExportExcel',
+    public $components = array('ExportBaseNew', 'AjaxList', 'ExportCsv',
         'FileUpload.FileUpload', 'RequestHandler', 'CanvasCourse', 'CanvasCourseUser');
     private $canvasEnabled;
 

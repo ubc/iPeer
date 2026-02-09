@@ -28,7 +28,7 @@ class EvaluationsController extends AppController
         'MixevalQuestionDesc');
     public $components = array('ExportBaseNew', 'Auth', 'AjaxList', 'Output',
         'userPersonalize', 'framework',
-        'Evaluation', 'Export', 'ExportCsv', 'ExportExcel', 'ExportPdf',
+        'Evaluation', 'Export', 'ExportCsv', 'ExportPdf',
         'RequestHandler');
 
     /**
@@ -338,9 +338,6 @@ class EvaluationsController extends AppController
                     break;
                 case "pdf":
                     $this->ExportPdf->createPdf($this->params['form'], $event);
-                    break;
-                case "excel" :
-                    $this->ExportExcel->createExcel($this->params['form'], $event);
                     break;
                 default :
                     throw new Exception("Invalid evaluation selection.");
