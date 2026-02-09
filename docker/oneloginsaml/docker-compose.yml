@@ -1,8 +1,0 @@
-version: '3.8'
-services:
-  php-saml-app:
-    build: .
-    ports:
-      - "80:80"
-    volumes:
-      - .:/var/www/html
