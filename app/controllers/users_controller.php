@@ -730,7 +730,7 @@ class UsersController extends AppController
     public function edit($userId = null, $courseId = null) {
         $this->set('title_for_layout', 'Edit User');
         $this->set('topActionButtons', [
-            ['url' => '/users/view/' . $userId, 'label' => __('View User (cancel changes)', true), 'class' => 'edit-button'],
+            ['url' => '/users/view/' . $userId, 'label' => __('View User (discard changes)', true), 'class' => 'edit-button'],
         ]);
         $enrolCourses = $this->User->getEnrolledCourses($userId);
         $tutorCourses = $this->User->getTutorCourses($userId);

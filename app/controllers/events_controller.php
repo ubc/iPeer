@@ -116,6 +116,9 @@ class EventsController extends AppController
                 $entry['!Custom']['group_count'] = "<font color='red'>0</font>";
             }
 
+            // Edit link
+            $entry['!Custom']['edit'] = '<span class="edit-link">' . __('Edit', true) . '</span>';
+
             // Write the entry back
             $data[$i] = $entry;
         }
@@ -135,15 +138,10 @@ class EventsController extends AppController
      */
     function setUpAjaxList($courseId = null)
     {
-        // Grab the course list
-        $coursesList = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
-
         // Set up Columns
         $columns = array(
             array("Event.id",             "",            "",     "hidden"),
-            array("Course.id",            "",            "",     "hidden"),
             array("Event.group_count", "", "", "hidden"),
-            array("Course.course",        __("Course", true),      "9em", "action", "View Course"),
             array("Event.Title",          __("Title", true),       "auto", "action", "View Event"),
             array("!Custom.results",       __("View", true),       "4em", "action", "View Results"),
             array("!Custom.group_count", __("Groups", true), "2em", "string"),
@@ -156,6 +154,7 @@ class EventsController extends AppController
             array("Event.due_date",       __("Due Date", true),    "10em", "date"),
             array("!Custom.isReleased",    __("Released ?", true), "8em", "string"),
             array("!Custom.resultReleased",       __("Result Released", true),   "6em", "string"),
+            array("!Custom.edit",          __("Edit", true),       "4em", "action", "Edit Event"),
 
             // Release window
             array("Event.release_date_begin", "", "",    "hidden"),
@@ -165,61 +164,21 @@ class EventsController extends AppController
             array("Event.auto_release", "", "", "hidden"),
         );
 
-        // put all the joins together
-        // shows all events of courses the user (not student) has access to
-        if ($courseId == null) {
-            $joinTables =  array( array (
-                // GUI aspects
-                "id" => "course_id",
-                "description" => __("for Course:", true),
-                // The choice and default values
-                "list" => $coursesList,
-            ));
-        // shows only the events from the current selected course (parameter)
-        // non-numeric and invalid ids will result in "No Results"
-        } else {
-            $joinTables =  array( array (
-                // GUI aspects
-                "id" => "course_id",
-                "description" => __("for Course:", true),
-                // The choice and default values
-                "list" => $coursesList,
-                "default" => $courseId,
-            ));
-        }
+        $extraFilters = array('Event.course_id' => $courseId);
 
-        // super admins
-        if (User::hasPermission('functions/superadmin')) {
-            $extraFilters = "";
-        // faculty admins or instructors - $coursesList from above
-        } else {
-            $extraFilters = " ( ";
-            $courseIds = array_keys($coursesList);
-            foreach ($courseIds as $id) {
-                $extraFilters .= "course_id=$id or ";
-            }
-            $extraFilters .= "1=0 ) ";
-        }
-
-        // Surveys cannot be exported
-        $restrictions['Event.event_template_type_id'] = array(1 => true, 2 => true,
-            4 => true, "!default" => false);
-
-        // Set up actions
-        $warning = __("Are you sure you want to delete this event permanently?", true);
+        // actions needed for column href resolution
         $actions = array(
             array("View Results", "", "", "evaluations", "view", "Event.id"),
             array("View Event", "", "", "", "view", "Event.id"),
             array("Edit Event", "", "", "", "edit", "Event.id"),
-            array("View Course", "", "", "courses", "view", "Course.id"),
-            array("Export Results", "", $restrictions, "evaluations", "export/event", "Event.id"),
-            array("Delete Event", $warning, "", "", "delete", "Event.id"));
+        );
 
         $recursive = 0;
 
         $this->AjaxList->setUp($this->Event, $columns, $actions,
-            "Course.course", "Course.course", $joinTables, $extraFilters,
+            "Event.Title", "Event.Title", null, $extraFilters,
             $recursive, "postProcessData");
+        $this->AjaxList->disableContextMenu = true;
     }
 
     /**
@@ -232,17 +191,19 @@ class EventsController extends AppController
      */
     function index($courseId = null)
     {
-        $course = array('Course' => array('id' => $courseId));
-        // check for permission to course ($courseId) only when $courseId is provided
-        if (!is_null($courseId)) {
-            $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
-            if (!$course) {
-                $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
-                $this->redirect('index');
-                return;
-            }
-            $this->breadcrumb->push(array('course' => $course['Course']));
+        if (is_null($courseId)) {
+            $this->Session->setFlash(__('Error: A course must be specified to view events.', true));
+            $this->redirect('/courses');
+            return;
         }
+
+        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
+        if (!$course) {
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
+            $this->redirect('/courses');
+            return;
+        }
+        $this->breadcrumb->push(array('course' => $course['Course']));
 
         // We need to change the session state to point to this
         // course:
@@ -250,12 +211,6 @@ class EventsController extends AppController
         $this->AjaxList->quickSetUp();
         // Clear the state first, we don't want any previous searches/selections
         $this->AjaxList->clearState();
-        // Set and update session state Variable
-        $joinFilterSelections = new CakeObject();
-        $joinFilterSelections->course_id = $courseId;
-        $this->AjaxList->setStateVariable("joinFilterSelections", $joinFilterSelections);
-
-        // Set up the basic static ajax list variables
         $this->Session->write('eventsControllerCourseId', $courseId);
         $this->setUpAjaxList($courseId);
         // Set the display list
@@ -325,6 +280,9 @@ class EventsController extends AppController
         $this->set('modelName', $modelName);
         $this->set('topActionButtons', [
             ['url' => '/events/edit/' . $eventId, 'label' => __('Edit Event', true), 'class' => 'edit-button'],
+        ]);
+        $this->set('bottomActionButtons', [
+            ['url' => '/events/delete/' . $eventId, 'label' => __('Delete Event', true), 'class' => 'delete-button'],
         ]);
     }
 
@@ -504,6 +462,11 @@ class EventsController extends AppController
             $this->redirect('index');
             return;
         }
+
+        $this->set('topActionButtons', [
+            ['url' => '/events/view/' . $eventId, 'label' => __('View Event (discard changes)', true), 'class' => 'edit-button'],
+            ['url' => '/events/delete/' . $eventId, 'label' => __('Delete Event', true), 'class' => 'delete-button'],
+        ]);
 
         $orig_email_frequency = $this->calculateFrequency($eventId);
         $this->set('email_schedule', $orig_email_frequency);
@@ -725,28 +688,26 @@ class EventsController extends AppController
      */
     function delete ($eventId)
     {
-        // Check whether the course exists
+        // Check whether the event exists and user has access
         if (!($event = $this->Event->getAccessibleEventById($eventId, User::get('id'), User::getCourseFilterPermission(), array('Course', 'Group', 'Penalty')))) {
             $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
             $this->redirect('/home');
             return;
         }
 
-        // what's this????
-        if (isset($this->params['form']['id'])) {
-            $eventId = intval(substr($this->params['form']['id'], 5));
-
+        // confirmation step: show confirmation page unless POST confirms
+        if (empty($this->data['Event']['confirm']) || $this->data['Event']['confirm'] !== '1') {
+            $this->set('event', $event);
+            $this->set('title_for_layout', __('Delete Event', true));
+            return;
         }
 
         if ($this->Event->delete($eventId)) {
             $this->Session->setFlash(__('The event has been deleted successfully.', true), 'good');
-            $this->redirect('index/'.$event['Event']['course_id']);
-            return;
         } else {
             $this->Session->setFlash(__('Failed to delete the event', true));
-            $this->redirect('index/'.$event['Event']['course_id']);
-            return;
         }
+        $this->redirect('index/'.$event['Event']['course_id']);
     }
 
     /**
