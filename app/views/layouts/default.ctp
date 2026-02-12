@@ -77,7 +77,15 @@
     <ul>
       <?php foreach ($topActionButtons as $button): ?>
       <li>
-        <a href="<?php echo $button['url']; ?>" class="<?php echo $button['class']; ?>"><?php echo $button['label']; ?></a>
+        <a
+          href="<?php echo $button['url']; ?>"
+          class="<?php echo $button['class']; ?>"
+          <?php if (!empty($button['confirmationMessage'])): ?>
+            onclick="return confirm('<?php echo h(addslashes($button['confirmationMessage'])); ?>');"
+          <?php endif; ?>
+        >
+          <?php echo $button['label']; ?>
+        </a>
       </li>
       <?php endforeach; ?>
     </ul>
@@ -94,7 +102,15 @@
     <ul>
       <?php foreach ($bottomActionButtons as $button): ?>
       <li>
-        <a href="<?php echo $button['url']; ?>" class="<?php echo $button['class']; ?>"><?php echo $button['label']; ?></a>
+        <a
+          href="<?php echo $button['url']; ?>"
+          class="<?php echo $button['class']; ?>"
+          <?php if (!empty($button['confirmationMessage'])): ?>
+            onclick="return confirm('<?php echo h(addslashes($button['confirmationMessage'])); ?>');"
+          <?php endif; ?>
+        >
+          <?php echo $button['label']; ?>
+        </a>
       </li>
       <?php endforeach; ?>
     </ul>
