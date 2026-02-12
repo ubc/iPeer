@@ -20,6 +20,13 @@
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
+if (!empty(getenv('IPEER_MAINTENANCE'))) {
+    http_response_code(503);
+    header('Content-Type: text/html; charset=utf-8');
+    require __DIR__ . '/maintenance.php';
+    exit;
+}
+
 // autoload composer installed libraries
 require realpath(dirname(__FILE__) . '/../../vendor/autoload.php');
 
