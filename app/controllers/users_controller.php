@@ -67,6 +67,21 @@ class UsersController extends AppController
     }
 
     /**
+     * Adds an inline Edit link to the AjaxList rows.
+     */
+    function postProcessData($data)
+    {
+        if (empty($data)) {
+            return $data;
+        }
+        foreach ($data as $i => $entry) {
+            $entry['!Custom']['edit'] = '<span class="edit-link">' . __('Edit', true) . '</span>';
+            $data[$i] = $entry;
+        }
+        return $data;
+    }
+
+    /**
      * Setup the ajax list component. The ajax list component is used to
      * display many iPeer tables since it allows easy sorting and filtering
      * by columns.
@@ -117,10 +132,13 @@ class UsersController extends AppController
             array_push($columns, $email);
         }
 
-        // define action warnings
-        $deleteUserWarning = __("Delete this user. Irreversible. Are you sure?", true);
-        $resetPassWarning = __("Resets user's password. Are you sure?", true);
-        $resetPassWOEmail = __("Resets user's password without sending a email. The user will lose access to the system. Are you sure?", true);
+        $columns[] = array(
+            "!Custom.edit",
+            __("Edit", true),
+            "4em",
+            "action",
+            "Edit User"
+        );
 
         $actionRestrictions = "";
 
@@ -165,23 +183,15 @@ class UsersController extends AppController
             $extraFilters[] = 'User.id IN (' . $query.implode(' OR ', $conditions) . ')';
         }
 
-        // define right click menu actions
+        // actions needed for column href attribute generation
         $actions = array(
-            //   display name, (warning shown), fixed parameters or Column ids
             array(__("View User", true),  "", "", "", "view", "User.id"),
-            array(__("Send Email", true),  "", "", "emailer", "write", 'U', "User.id"),
             array(__("Edit User", true),  "", $actionRestrictions, "", "edit", "User.id"),
-            array(__("Delete User", true),    $deleteUserWarning,   $actionRestrictions, "", "delete", "User.id"),
-            array(__("Reset Password", true), $resetPassWarning,  $actionRestrictions, "", "resetPassword", "User.id")
         );
 
-        // add the functionality of resetting a user's password without sending the user a email
-        if(User::hasPermission('controllers/users/resetpasswordwithoutemail')) {
-            $actions[] = array(__("Reset Password Without Email", true), $resetPassWOEmail, "", "", "resetPasswordWithoutEmail", "User.id");
-        }
-
         $this->AjaxList->setUp($this->User, $columns, $actions,
-            "User.id", "User.username", $joinTables, $extraFilters);
+            "User.id", "User.username", $joinTables, $extraFilters, 0, "postProcessData");
+        $this->AjaxList->disableContextMenu = true;
     }
 
 
@@ -401,11 +411,26 @@ class UsersController extends AppController
             }
         }
 
+        $isDisabled = $this->data['User']['record_status'] === 'I';
+
         $this->set('title_for_layout', __('View User', true));
         $this->set('user', $this->data);
+        $this->set('isDisabled', $isDisabled);
         $this->set('topActionButtons', [
             ['url' => '/users/edit/' . $id, 'label' => __('Edit User', true), 'class' => 'edit-button'],
         ]);
+
+        $bottomActionButtons = [];
+        if (!$isDisabled && User::hasPermission('functions/user/' . $role, 'delete')) {
+            $bottomActionButtons[] = ['url' => '/users/delete/' . $id, 'label' => __('Delete User', true), 'class' => 'delete-button'];
+        }
+        if (User::hasPermission('functions/user') && $this->emailInterfaceEnabled) {
+            $bottomActionButtons[] = ['url' => '/users/resetPassword/' . $id, 'label' => __('Reset Password', true), 'class' => 'edit-button', 'confirmationMessage' => __("Are you sure you want to reset this user's password?", true)];
+        }
+        if (User::hasPermission('controllers/users/resetpasswordwithoutemail')) {
+            $bottomActionButtons[] = ['url' => '/users/resetPasswordWithoutEmail/' . $id, 'label' => __('Reset Password Without Email', true), 'class' => 'edit-button', 'confirmationMessage' => __("Are you sure you want to reset this user's password without sending an email?", true)];
+        }
+        $this->set('bottomActionButtons', $bottomActionButtons);
     }
 
     /**
@@ -704,6 +729,9 @@ class UsersController extends AppController
      */
     public function edit($userId = null, $courseId = null) {
         $this->set('title_for_layout', 'Edit User');
+        $this->set('topActionButtons', [
+            ['url' => '/users/view/' . $userId, 'label' => __('View User (cancel changes)', true), 'class' => 'edit-button'],
+        ]);
         $enrolCourses = $this->User->getEnrolledCourses($userId);
         $tutorCourses = $this->User->getTutorCourses($userId);
         $instructors = $this->User->getInstructorCourses($userId);
@@ -981,6 +1009,18 @@ class UsersController extends AppController
 
         // soft delete user
         if (is_null($courseId)) {
+            // confirmation step: show confirmation page unless POST confirms
+            if (empty($this->data['User']['confirm']) || $this->data['User']['confirm'] !== '1') {
+                $user = $this->User->findById($id);
+                if (!$user) {
+                    $this->Session->setFlash(__('Error: This user does not exist', true));
+                    $this->redirect('index');
+                }
+                $this->set('user', $user);
+                $this->set('title_for_layout', __('Delete User', true));
+                return;
+            }
+
             $delete = array('User' => array(
                 'id' => $id,
                 'record_status' => 'I',
@@ -1002,6 +1042,7 @@ class UsersController extends AppController
             } else {
                 $this->Session->setFlash(__('Error: Delete failed!', true));
             }
+            $this->redirect('index');
         // unenrol user from course
         } else {
             if ($this->User->removeStudent($id, $courseId)) {
@@ -1009,9 +1050,8 @@ class UsersController extends AppController
             } else {
                 $this->Session->setFlash(__('Error: Unenrol failed!', true));
             }
+            $this->redirect($this->referer());
         }
-
-        $this->redirect($this->referer());
     }
 
     /**
@@ -1062,7 +1102,7 @@ class UsersController extends AppController
 
         //Save Data
         if ($tmp_password = $this->User->savePassword($userId)) {
-            $message = sprintf(__("Password successfully reset. The new password is %s.", true).'<br />', $tmp_password);
+            $message = __("Password successfully reset. The new password is", true).' <pre>'.$tmp_password.'</pre>. <br />';
             $user_data['User']['tmp_password'] = $tmp_password;
             $this->User->set('id', $userId);
 
@@ -1075,7 +1115,7 @@ class UsersController extends AppController
                     $message .= __("Email was <u>not</u> sent to the user. ", true) . $this->Email->smtpError;
                 }
             } else {
-                $message .= __('No email has been sent. User does not have email address.', true);
+                $message .= __('No email has been sent. User does not have an email address.', true);
             }
             $this->Session->setFlash($message, 'good');
             $this->redirect($this->referer());
@@ -1100,7 +1140,7 @@ class UsersController extends AppController
 
         // generate and save new password
         if ($tmp_password = $this->User->savePassword($userId)) {
-            $message = sprintf(__("Password successfully reset. The new password is %s.", true).'<br />', $tmp_password);
+            $message = __("Password successfully reset. The new password is", true).' <pre>'.$tmp_password.'</pre>';
             $this->Session->setFlash($message, 'good');
             $this->redirect($this->referer());
         } else {
