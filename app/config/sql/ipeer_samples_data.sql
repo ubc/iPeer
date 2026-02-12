@@ -2066,7 +2066,7 @@ INSERT INTO `sys_parameters` (`parameter_code`, `parameter_value`, `parameter_ty
 ('google_analytics.tracking_id', '', 'S', 'tracking id for Google Analytics', 'A', 0, NOW(), 0, NOW()),
 ('google_analytics.domain', '', 'S', 'domain name for Google Analytics', 'A', 0, NOW(), 0, NOW()),
 ('banner.custom_logo', '', 'S', 'custom logo that appears on the left side of the banner', 'A', 0, NOW(), 0, NOW()),
-('system.timezone', 'Etc/GMT+7', 'S', 'timezone', 'A', 0, NOW(), 0, NOW()),
+('system.timezone', '', 'S', 'timezone', 'A', 0, NOW(), 0, NOW()),
 ('system.student_number', 'true', 'B', 'allow students to change their student number', 'A', 0, NOW(), 0, NOW()),
 ('course.creation.instructions', '', 'S', 'Display course creation instructions', 'A', 0, NOW(), 0, NOW()),
 ('email.reminder_enabled', 'true', 'B', 'Enable email reminder feature', 'A', 0, NOW(), NULL, NOW());

@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
 COPY docker/php.ini /usr/local/etc/php/
+COPY docker/zz-docker-ipeer.conf /usr/local/etc/php-fpm.d/
 COPY . /var/www/html
 COPY docker/docker-entrypoint-php-fpm.sh /
 

@@ -13,6 +13,7 @@ uses('sanitize');
 App::import('Lib', 'toolkit');
 App::import('Lib', 'breadcrumb');
 App::import('Lib', 'caliper');
+require_once APP . 'libs/request_context.php';
 use caliper\CaliperHooks;
 
 /**
@@ -120,6 +121,13 @@ class AppController extends Controller
 
         // store user in the singleton for global access
         User::store($this->Auth->user());
+
+        if ($this->Auth->user()) {
+            RequestContext::setUserId($this->Auth->user('id'));
+            RequestContext::setUsername($this->Auth->user('username'));
+        }
+
+        $this->log("Accessing " . $this->params['controller'] . '::' . $this->params['action'], 'info');
 
         $this->breadcrumb = Breadcrumb::create();
 

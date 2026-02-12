@@ -30,6 +30,7 @@ services:
       - IPEER_DB_USER=ipeer
       - IPEER_DB_PASSWORD=ipeer
       - IPEER_DEBUG=2
+      - IPEER_LOG_FORMAT=PrettyLog
       - IPEER_SESSION_SAVE=database
       # uncomment to test Caliper
       # - CALIPER_HOST=https://caliper.imsglobal.org/caliper/44c6173f-907f-40c5-8c93-a1acfaa6485c/message
@@ -84,6 +85,7 @@ services:
       - IPEER_DB_PASSWORD=ipeer
       - IPEER_DB_NAME=ipeer_test
       - IPEER_DEBUG=2
+      - IPEER_LOG_FORMAT=PrettyLog
       - IPEER_SESSION_SAVE=database
       - SELENIUM_HOST=selenium-local
       - SELENIUM_BROWSER=chrome
