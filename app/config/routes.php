@@ -57,21 +57,25 @@ if (IS_INSTALLED) {
   Router::connect('/tests', array('controller' => 'tests',
     'action' => 'index'));
 
-  // SAML Service Provider endpoints (auth initiation, logout, metadata)
   if (getenv('SAML_SETTINGS')) {
-    Router::connect('/public/saml/auth.php', array('controller' => 'saml', 'action' => 'auth'));
-    Router::connect('/public/saml/logout.php', array('controller' => 'saml', 'action' => 'logout'));
+    // The specific SAML endpoint paths are kept for backwards compatibility (so we don't need to
+    // reconfigure the IdP / auth server). If we ever need to reconfigure SAML, we can clean up
+    // these paths.
+    Router::connect('/public/saml/auth.php', array('controller' => 'saml', 'action' => 'singleSignOn'));
+    Router::connect('/public/saml/logout.php', array('controller' => 'saml', 'action' => 'singleLogout'));
     Router::connect('/public/saml/metadata.php', array('controller' => 'saml', 'action' => 'metadata'));
 
-    Router::connect('/__samlwrapper/api/saml/auth', array('controller' => 'homeubcsaml', 'action' => 'index'));
-    Router::connect('/__samlwrapper/api/saml/single_logout', array('controller' => 'saml', 'action' => 'logout'));
+    Router::connect('/__samlwrapper/api/saml/auth', array('controller' => 'saml', 'action' => 'assertionConsumerService'));
+    Router::connect('/__samlwrapper/api/saml/single_logout', array('controller' => 'saml', 'action' => 'singleLogout'));
+    // Duplicate metadata action since we used both when registering with IdPs
+    Router::connect('/__samlwrapper/api/saml/metadata', array('controller' => 'saml', 'action' => 'metadata'));
   }
 
   // Authentication routes
   Router::connect('/login', array('plugin' => 'guard', 'controller' => 'guard',
     'action' => 'login'));
   if (getenv('SAML_SETTINGS')) {
-    Router::connect('/logout', array('controller' => 'saml', 'action' => 'logout'));
+    Router::connect('/logout', array('controller' => 'saml', 'action' => 'singleLogout'));
   } else {
     Router::connect('/logout', array('plugin' => 'guard', 'controller' => 'guard', 'action' => 'logout'));
   }
