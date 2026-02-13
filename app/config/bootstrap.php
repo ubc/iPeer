@@ -51,6 +51,30 @@
 
 #include_once('fix_mysql.inc.php')
 
+$logEngines = array('EcsLog', 'PrettyLog');
+$logEngine = getenv('IPEER_LOG_FORMAT');
+if (!$logEngine || !in_array($logEngine, $logEngines)) {
+    $logEngine = 'EcsLog';
+}
+CakeLog::config('default', array(
+    'engine' => $logEngine,
+    'path' => LOGS,
+));
+
+require_once APP . 'libs/request_context.php';
+RequestContext::reset();
+
+set_exception_handler(function ($e) {
+    $message = get_class($e) . ': ' . $e->getMessage() . ' in [' . $e->getFile() . ', line ' . $e->getLine() . ']';
+    CakeLog::write('error', $message);
+    CakeLog::write('debug', $e->getTraceAsString());
+
+    if (!headers_sent()) {
+        http_response_code(500);
+    }
+    exit(1);
+});
+
 ;if (file_exists(dirname(__FILE__).'/bootstrap.local.php')) {
   include('bootstrap.local.php');
 }
