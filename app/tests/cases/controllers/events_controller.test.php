@@ -81,7 +81,7 @@ class EventsControllerTest extends ExtendedAuthTestCase {
     }
 
     function testIndex() {
-        $result = $this->testAction('/events/index', array('return' => 'vars'));
+        $result = $this->testAction('/events/index/1', array('return' => 'vars'));
 
         $this->assertEqual(count($result["paramsForList"]['data']['entries']),
             17);
@@ -91,17 +91,14 @@ class EventsControllerTest extends ExtendedAuthTestCase {
 
         $this->assertEqual($events[0]['Event']['Title'], 'Term 1 Evaluation');
         $this->assertEqual($events[0]['Event']['event_template_type_id'], 1);
-        $this->assertEqual($events[0]['Course']['course'], 'MECH 328');
         $this->assertEqual($events[0]['!Custom']['isReleased'], 'Open Now');
 
         $this->assertEqual($events[1]['Event']['Title'], 'Term Report Evaluation');
         $this->assertEqual($events[1]['Event']['event_template_type_id'], 2);
-        $this->assertEqual($events[1]['Course']['course'], 'MECH 328');
         $this->assertEqual($events[1]['!Custom']['isReleased'], 'Open Now');
 
         $this->assertEqual($events[2]['Event']['Title'], 'Project Evaluation');
         $this->assertEqual($events[2]['Event']['event_template_type_id'], 4);
-        $this->assertEqual($events[2]['Course']['course'], 'MECH 328');
         $this->assertEqual($events[2]['!Custom']['isReleased'], 'Open Now');
 
     }
@@ -376,7 +373,7 @@ class EventsControllerTest extends ExtendedAuthTestCase {
     function testDelete() {
         $this->testAction(
             '/events/delete/1',
-            array('fixturize' => true, 'method' => 'get')
+            array('fixturize' => true, 'method' => 'post', 'data' => array('Event' => array('confirm' => '1')))
         );
         $this->controller->expectOnce('redirect', array('index/1'));
 

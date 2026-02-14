@@ -132,9 +132,4 @@
         </td>
     </tr>
 </table>
-
-<div style="text-align: center;">
-    <?php echo $html->link(__('Edit this Event', true), '/events/edit/'.$event['Event']['id']); ?> |
-    <?php echo $html->link(__('Back to Event Listing', true), '/events/index/'.$event['Event']['course_id']); ?>
-</div>
 </form>
