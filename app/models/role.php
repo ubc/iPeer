@@ -61,4 +61,42 @@ class Role extends AppModel
         return $this->field('id', array('name' => 'student'));
     }
 
+    /**
+     * Returns the role name for each of the given user IDs, indexed by user ID.
+     *
+     * Assumes each user has only 1 primary role (at the time of writing, this is
+     * enforced at the php-level, not DB-level).
+     * @param array $userIds
+     *
+     * @return array  e.g. array(42 => 'Student', 7 => 'Instructor')
+     */
+    public function getRolesByUserIds($userIds)
+    {
+        $result = array();
+        if (empty($userIds)) {
+            return $result;
+        }
+
+        $rows = $this->find('all', array(
+            'joins' => array(
+                array(
+                    'table'      => 'roles_users',
+                    'alias'      => 'RolesUser',
+                    'type'       => 'INNER',
+                    'conditions' => array('RolesUser.role_id = Role.id'),
+                ),
+            ),
+            'fields'     => array('RolesUser.user_id', 'Role.name'),
+            'conditions' => array('RolesUser.user_id' => $userIds),
+            'recursive'  => -1,
+        ));
+
+        foreach ($rows as $row) {
+            $uid = $row['RolesUser']['user_id'];
+            $result[$uid] = ucwords($row['Role']['name']);
+        }
+
+        return $result;
+    }
+
 }
