@@ -74,7 +74,28 @@ class UsersController extends AppController
         if (empty($data)) {
             return $data;
         }
+
+        // Batch-fetch primary role for all users in this page
+        $userIds = Set::extract('/User/id', $data);
+        $userRoles = array();
+        if (!empty($userIds)) {
+            $rows = $this->Role->query(
+                'SELECT ru.user_id, r.name FROM roles_users ru ' .
+                'INNER JOIN roles r ON r.id = ru.role_id ' .
+                'WHERE ru.user_id IN (' . implode(',', array_map('intval', $userIds)) . ') ' .
+                'ORDER BY r.id ASC'
+            );
+            foreach ($rows as $row) {
+                $uid = $row['ru']['user_id'];
+                if (!isset($userRoles[$uid])) {
+                    $userRoles[$uid] = ucwords($row['r']['name']);
+                }
+            }
+        }
+
         foreach ($data as $i => $entry) {
+            $uid = $entry['User']['id'];
+            $entry['!Custom']['role'] = isset($userRoles[$uid]) ? $userRoles[$uid] : '';
             $entry['!Custom']['edit'] = '<span class="edit-link">' . __('Edit', true) . '</span>';
             $data[$i] = $entry;
         }
@@ -116,6 +137,12 @@ class UsersController extends AppController
                 "User.full_name",
                 __("Full Name", true),
                 "15em",
+                "string"
+            ),
+            array(
+                "!Custom.role",
+                __("Role", true),
+                "7em",
                 "string"
             ),
         );

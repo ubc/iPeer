@@ -64,7 +64,26 @@ class CoursesController extends AppController
         if (empty($data)) {
             return $data;
         }
+
+        // Batch-fetch event counts for all courses in this page
+        $courseIds = Set::extract('/Course/id', $data);
+        $eventCounts = array();
+        if (!empty($courseIds)) {
+            $rows = $this->Event->find('all', array(
+                'fields' => array('Event.course_id', 'COUNT(*) as count'),
+                'conditions' => array('Event.course_id' => $courseIds),
+                'group' => 'Event.course_id',
+                'recursive' => -1,
+            ));
+            foreach ($rows as $row) {
+                $eventCounts[$row['Event']['course_id']] = $row[0]['count'];
+            }
+        }
+
         foreach ($data as $i => $entry) {
+            $courseId = $entry['Course']['id'];
+            $count = isset($eventCounts[$courseId]) ? $eventCounts[$courseId] : 0;
+            $entry['!Custom']['event_count'] = $count;
             $entry['!Custom']['edit'] = '<span class="edit-link">' . __('Edit', true) . '</span>';
             $data[$i] = $entry;
         }
@@ -84,6 +103,7 @@ class CoursesController extends AppController
             array("Course.id",            "",            "",      "hidden"),
             array("Course.course",        __("Course", true),      "15em",  "string"),
             array("Course.title",         __("Title", true),       "auto", "action", "Course Home"),
+            array("!Custom.event_count", __("Events", true),     "4em",  "action", "View Events"),
             array("Course.term",          __("Term", true),       "auto", "string"),
             array("Course.creator_id",           "",            "",     "hidden"),
             array("Course.record_status", __("Status", true),      "5em",  "map",     array("A" => __("Active", true), "I" => __("Inactive", true))),
@@ -114,7 +134,8 @@ class CoursesController extends AppController
         $actions = array(
             array(__("Course Home", true), "", "", "", "home", "Course.id"),
             array(__("Edit Course", true), "", "", "", "edit", "Course.id"),
-            array(__("View Creator", true), "",    "", "users", "view", "Course.creator_id"));
+            array(__("View Creator", true), "",    "", "users", "view", "Course.creator_id"),
+            array(__("View Events", true), "", "", "events", "index", "Course.id"));
 
         $recursive = 0;
 

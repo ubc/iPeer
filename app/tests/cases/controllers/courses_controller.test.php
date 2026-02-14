@@ -56,7 +56,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'record_status' => 'A',
                 'creator' => 'Super Admin'
             ),
-            '!Custom' => array('edit' => '<span class="edit-link">Edit</span>'),
+            '!Custom' => array('event_count' => 17, 'edit' => '<span class="edit-link">Edit</span>'),
         ),
         array(
             'Course' => array(
@@ -68,7 +68,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'record_status' => 'A',
                 'creator' => 'Super Admin'
             ),
-            '!Custom' => array('edit' => '<span class="edit-link">Edit</span>'),
+            '!Custom' => array('event_count' => 0, 'edit' => '<span class="edit-link">Edit</span>'),
         ),
         array(
             'Course' => array(
@@ -80,7 +80,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'record_status' => 'I',
                 'creator' => 'Super Admin'
             ),
-            '!Custom' => array('edit' => '<span class="edit-link">Edit</span>'),
+            '!Custom' => array('event_count' => 0, 'edit' => '<span class="edit-link">Edit</span>'),
         ),
         array(
             'Course' => array(
@@ -92,7 +92,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
                 'record_status' => 'A',
                 'creator' => 'Super Admin'
             ),
-            '!Custom' => array('edit' => '<span class="edit-link">Edit</span>'),
+            '!Custom' => array('event_count' => 0, 'edit' => '<span class="edit-link">Edit</span>'),
         ),
     );
 
