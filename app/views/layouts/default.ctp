@@ -59,6 +59,7 @@
 <div class='containerOuter pagewidth'>
 <!-- BANNER -->
 <?php echo $this->element('global/banner', array('customLogo' => $customLogo ?? null)); ?>
+<?php echo $this->element('global/maintenance_notice'); ?>
 
 <!-- NAVIGATION -->
 <?php echo $this->element('global/navigation', array());?>
