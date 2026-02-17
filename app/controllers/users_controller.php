@@ -598,6 +598,7 @@ class UsersController extends AppController
                     }
                     $this->UserFaculty->saveAll($userfac);
                 }
+                CakeLog::write('info', 'User created: ' . $this->data['User']['username']);
                 // Success!
                 $message = "User successfully created!
                     <br>Password: <b>$password</b><br>";
@@ -622,6 +623,7 @@ class UsersController extends AppController
 
                 $this->redirect('/users/add');
             } else {
+                CakeLog::write('error', 'User creation failed for username: ' . $this->data['User']['username']);
                 // Failed
                 $this->Session->setFlash("Error: Unable to create user.");
             }
@@ -840,6 +842,7 @@ class UsersController extends AppController
 
             // Now we actually attempt to save the data
             if ($this->User->save($this->data)) {
+                CakeLog::write('info', 'User profile updated for ' . $this->data['User']['username']);
                 // Success!
                 $this->Session->setFlash(__('User successfully updated!', true), 'good');
                 // course id given - assume an instructor
@@ -847,6 +850,7 @@ class UsersController extends AppController
                     $this->redirect('goToClassList/'.$courseId);
                 }
             } else {
+                CakeLog::write('error', 'User profile update failed for ' . $this->data['User']['username']);
                 // Failed
                 $this->Session->setFlash(__('Error: Unable to update user.', true));
             }
@@ -1033,6 +1037,7 @@ class UsersController extends AppController
                 'UserTutor',
             );
             if ($this->User->save($delete)) {
+                CakeLog::write('info', 'User deactivated: user id ' . $id);
                 $this->Session->setFlash(__('Record is successfully deleted!', true), 'good');
                 // unenrol/remove them from courses/groups if they are soft-deleted
                 foreach ($cleanUpModels as $model) {
@@ -1040,14 +1045,17 @@ class UsersController extends AppController
                     $this->$model->deleteAll($condition);
                 }
             } else {
+                CakeLog::write('error', 'User deactivation failed for user id ' . $id);
                 $this->Session->setFlash(__('Error: Delete failed!', true));
             }
             $this->redirect('index');
         // unenrol user from course
         } else {
             if ($this->User->removeStudent($id, $courseId)) {
+                CakeLog::write('info', 'User id ' . $id . ' unenrolled from course id ' . $courseId);
                 $this->Session->setFlash(__('Student is successfully unenrolled!', true), 'good');
             } else {
+                CakeLog::write('error', 'User unenrollment failed for user id ' . $id . ' from course id ' . $courseId);
                 $this->Session->setFlash(__('Error: Unenrol failed!', true));
             }
             $this->redirect($this->referer());
@@ -1111,15 +1119,19 @@ class UsersController extends AppController
             if (!empty($user_data['User']['email'])) {
                 if ($this->_sendEmail('', 'iPeer Password Reset', null, $user_data['User']['email'], 'resetPassword')) {
                     $message .= __("Email has been sent. ", true);
+                    CakeLog::write('info', 'Password reset for ' . $user_data['User']['username'] . ' (email sent)');
                 } else {
                     $message .= __("Email was <u>not</u> sent to the user. ", true) . $this->Email->smtpError;
+                    CakeLog::write('warning', 'Password reset for ' . $user_data['User']['username'] . ' (but email send failed)');
                 }
             } else {
                 $message .= __('No email has been sent. User does not have an email address.', true);
+                CakeLog::write('info', 'Password reset for ' . $user_data['User']['username'] . ' (no email address on account)');
             }
             $this->Session->setFlash($message, 'good');
             $this->redirect($this->referer());
         } else {
+            CakeLog::write('error', 'Password reset failed for user id ' . $userId);
             //Get render page according to the user type
             $this->redirect($this->referer());
         }
@@ -1136,14 +1148,16 @@ class UsersController extends AppController
     public function resetPasswordWithoutEmail($userId, $courseId = null)
     {
         // checks the user's permissions
-        $this->_checkResetPasswordPermission($userId, $courseId);
+        $user_data = $this->_checkResetPasswordPermission($userId, $courseId);
 
         // generate and save new password
         if ($tmp_password = $this->User->savePassword($userId)) {
             $message = __("Password successfully reset. The new password is", true).' <pre>'.$tmp_password.'</pre>';
+            CakeLog::write('info', 'Password reset for ' . $user_data['User']['username'] . ' (without email)');
             $this->Session->setFlash($message, 'good');
             $this->redirect($this->referer());
         } else {
+            CakeLog::write('error', 'Password reset failed for user id ' . $userId);
             //Get render page according to the user type
             $this->redirect($this->referer());
         }

@@ -397,10 +397,12 @@ class CoursesController extends AppController
                     $department = $this->Department->findAllByFacultyId(Set::extract('/UserFaculty/faculty_id', $faculty));
                     $this->CourseDepartment->insertCourses($this->Course->id, Set::extract('/Department/id', $department));
                 }
+                CakeLog::write('info', 'Course created: ' . $this->data['Course']['course']);
                 $this->Session->setFlash('Course created!', 'good');
                 $this->redirect('index');
                 return;
             } else {
+                CakeLog::write('error', 'Course creation failed for course code: ' . $this->data['Course']['course']);
                 $this->Session->setFlash('Add course failed.');
             }
         }
@@ -451,10 +453,12 @@ class CoursesController extends AppController
             }
             $success = $this->Course->save($this->data);
             if ($success) {
+                CakeLog::write('info', 'Course updated: ' . $course['Course']['full_name']);
                 $this->Session->setFlash(__('The course was updated successfully.', true), 'good');
                 $this->redirect('index');
                 return;
             } else if (!$success) {
+                CakeLog::write('error', 'Course update failed for course id ' . $courseId);
                 $this->Session->setFlash(__('Error: Course edits could not be saved.', true));
             }
         }
@@ -493,6 +497,7 @@ class CoursesController extends AppController
 
         // POST request: proceed with deletion
         if ($this->Course->delete($id)) {
+            CakeLog::write('info', 'Course deleted: ' . $course['Course']['full_name']);
             //Delete all corresponding data start here
             //Instructors: Instructor record will remain in database, but the join table records will be deleted
             $this->Course->UserCourse->deleteAll(array('UserCourse.course_id' => $id));
@@ -502,6 +507,7 @@ class CoursesController extends AppController
             //Events: TODO
             $this->Session->setFlash(__('The course was deleted successfully.', true), 'good');
         } else {
+            CakeLog::write('error', 'Course deletion failed for course id ' . $id);
             $this->Session->setFlash('Cannot delete the course. Check errors below');
         }
         $this->redirect('index');
