@@ -168,6 +168,9 @@ class AppController extends Controller
         $this->set('domain', $domain);
         $this->set('customLogo', $customLogo);
 
+        $maintenanceNotice = $this->SysParameter->get('display.maintenance_notice', '');
+        $this->set('maintenanceNotice', $maintenanceNotice);
+
         parent::beforeFilter();
     }
 

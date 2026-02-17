@@ -340,6 +340,16 @@ a#home, a#home:hover, a#home:active {
     background-color: transparent;
 }
 
+.maintenance-notice {
+    padding: 0.75em 1em;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.9em;
+    background-color: #fff0e0;
+    color: #8a4500;
+    border: 1px solid #e8a040;
+}
+
 /* NAVIGATION */
 #navigationOuter {
     float: left;
@@ -567,11 +577,11 @@ i {
 .login {
     width: 20em;
     margin: 1em auto;
-    border: 1px solid crimson;
+    border: 1px solid darkgreen;
 }
 
 .login h4 {
-    background-color: crimson;
+    background-color: darkgreen;
     color: white;
     margin: 0;
     padding: 0.5em;
