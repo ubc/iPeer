@@ -176,8 +176,16 @@ class HomeUBCSamlController extends AppController
 
             $privRes = openssl_pkey_get_private($spPem);
             if (!$privRes) {
-                $this->log('openssl_pkey_get_private failed: ' . openssl_error_string());
-
+                $this->log('openssl_pkey_get_private failed: ' . openssl_error_string(), 'info');
+            } else {
+                $pubKeyDetails = openssl_pkey_get_details($privRes);
+                $pubKeyPem = $pubKeyDetails['key'] ?? '(unknown)';
+                $pubKeyMd5 = md5(base64_decode(trim(str_replace(
+                    ['-----BEGIN PUBLIC KEY-----', '-----END PUBLIC KEY-----', "\n"],
+                    '',
+                    $pubKeyPem
+                ))));
+                $this->log('IPEER_SECRET_KEY public key MD5: ' . $pubKeyMd5, 'info');
             }
 
 
@@ -206,24 +214,32 @@ class HomeUBCSamlController extends AppController
 
             $encKeyBin = base64_decode($encKeyNode->nodeValue, true);
             if ($encKeyBin === false) {
-                $this->log('EncryptedKey: base‑64 decode failed');
-
+                $this->log('EncryptedKey: strict base64 decode failed (whitespace in CipherValue?), retrying non-strict', 'info');
+                $encKeyBin = base64_decode($encKeyNode->nodeValue);
+            }
+            $this->log(sprintf('EncryptedKey: decoded_length=%d first16hex=%s',
+                strlen($encKeyBin),
+                bin2hex(substr($encKeyBin, 0, 16))
+            ), 'info');
+            $oaepOk = openssl_private_decrypt($encKeyBin, $aesKey, $privRes, OPENSSL_PKCS1_OAEP_PADDING);
+            if (!$oaepOk) {
+                $this->log('RSA-OAEP decrypt failed: ' . openssl_error_string(), 'info');
+            } else {
+                $this->log('RSA-OAEP decrypt succeeded, aesKey_len=' . strlen($aesKey), 'info');
             }
 
-            if (!openssl_private_decrypt($encKeyBin, $aesKey, $privRes, OPENSSL_PKCS1_OAEP_PADDING)) {
-                $this->log('RSA‑OAEP decrypt failed: ' . openssl_error_string());
-
-            }
-
-
+            $this->log('aesKey before normalization: len=' . strlen($aesKey) . ' hex=' . bin2hex($aesKey), 'info');
             if (strlen($aesKey) !== 16) {                                // not 16 bytes?
                 $try = base64_decode($aesKey, true);                     // maybe still b64
                 if ($try !== false && strlen($try) === 16) {
                     $aesKey = $try;
+                    $this->log('aesKey normalized via base64 decode', 'info');
                 } else {                                                 // last fallback
                     $aesKey = substr($aesKey, 0, 16);
+                    $this->log('aesKey truncated to 16 bytes', 'info');
                 }
             }
+            $this->log('aesKey after normalization: len=' . strlen($aesKey), 'info');
 
 
             $cipherBin = base64_decode($encDataNode->nodeValue, true);
@@ -236,11 +252,13 @@ class HomeUBCSamlController extends AppController
             $cipherBody = substr($cipherBin, 16);
 
             /* First attempt: normal PKCS#7 padding (OpenSSL default) */
+            $this->log(sprintf('AES-CBC attempt: cipherBody_len=%d aesKey_len=%d', strlen($cipherBody), strlen($aesKey)), 'info');
             $plain = openssl_decrypt($cipherBody, 'aes-128-cbc', $aesKey,
                 OPENSSL_RAW_DATA, $iv);
 
             /* Retry with ZERO_PADDING + manual PKCS#7 strip if first failed */
             if ($plain === false) {
+                $this->log('First SAML decrypt failed, retrying with zero padding', 'info');
                 $plain = openssl_decrypt($cipherBody, 'aes-128-cbc', $aesKey,
                     OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
                 if ($plain !== false) {
