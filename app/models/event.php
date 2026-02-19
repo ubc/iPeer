@@ -412,6 +412,34 @@ class Event extends AppModel
     }
 
     /**
+     * Returns event counts for each of the given course IDs, indexed by course ID.
+     * Courses with no events are not included; callers should default missing keys to 0.
+     *
+     * @param array $courseIds
+     *
+     * @return array  e.g. array(3 => 12, 7 => 4)
+     */
+    function getEventCountsByCourseIds($courseIds)
+    {
+        if (empty($courseIds)) {
+            return array();
+        }
+
+        $rows = $this->find('all', array(
+            'fields'     => array('Event.course_id', 'COUNT(*) as count'),
+            'conditions' => array('Event.course_id' => $courseIds),
+            'group'      => 'Event.course_id',
+            'recursive'  => -1,
+        ));
+
+        $result = array();
+        foreach ($rows as $row) {
+            $result[$row['Event']['course_id']] = (int) $row[0]['count'];
+        }
+        return $result;
+    }
+
+    /**
      * Get course for an event
      *
      * @param int $eventId event id

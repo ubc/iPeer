@@ -74,7 +74,13 @@ class UsersController extends AppController
         if (empty($data)) {
             return $data;
         }
+
+        $userIds = Set::extract('/User/id', $data);
+        $userRoles = $this->Role->getRolesByUserIds($userIds);
+
         foreach ($data as $i => $entry) {
+            $uid = $entry['User']['id'];
+            $entry['!Custom']['role'] = $userRoles[$uid] ?? '';
             $entry['!Custom']['edit'] = '<span class="edit-link">' . __('Edit', true) . '</span>';
             $data[$i] = $entry;
         }
@@ -118,6 +124,12 @@ class UsersController extends AppController
                 "15em",
                 "string"
             ),
+            array(
+                "!Custom.role",
+                __("Role", true),
+                "7em",
+                "string"
+            ),
         );
 
         if (User::hasPermission('functions/viewemailaddresses')) {
@@ -125,8 +137,7 @@ class UsersController extends AppController
                 "User.email",
                 __("Email", true),
                 "auto",
-                "action",
-                "Send Email"
+                "string"
             );
 
             array_push($columns, $email);
