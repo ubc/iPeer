@@ -36,8 +36,9 @@ class SamlController extends Controller {
     }
 
     public function logout() {
-        $this->autoRender = false;
+        CakeLog::write('info', 'SAML Logout Starting');
 
+        $this->autoRender = false;
         $auth = new Auth($this->getSamlSettings());
 
         CaliperHooks::app_controller_after_logout($this);
@@ -55,6 +56,9 @@ class SamlController extends Controller {
         if (isset($_COOKIE['PHPSESSID'])) {
             setcookie('PHPSESSID', '', time() - 3600, '/');
         }
+
+        // both `$auth->logout()` or the direct `header` calls perform redirects and `exit`, so need to log before
+        CakeLog::write('info', 'SAML Logout Finished. Redirecting...');
 
         if ($auth->isAuthenticated()) {
             $auth->logout();

@@ -127,7 +127,14 @@ class AppController extends Controller
             RequestContext::setUsername($this->Auth->user('username'));
         }
 
-        $this->log("Accessing " . $this->params['controller'] . '::' . $this->params['action'], 'info');
+        $actionParams = is_array($this->params['pass'] ?? null) ? $this->params['pass'] : array();
+        $this->log(
+            "Accessing " . ($_SERVER['REQUEST_METHOD'] ?? '') . ' '
+                . $this->params['controller'] . '::'
+                . $this->params['action']
+                . '(' . implode(', ', $actionParams) . ')',
+            'info'
+        );
 
         $this->breadcrumb = Breadcrumb::create();
 
@@ -138,6 +145,7 @@ class AppController extends Controller
             // check if the user has permission to access the controller/action
             $permission = array_filter(array('controllers', ucwords($this->params['plugin']), ucwords($this->params['controller']), $this->params['action']));
             if (!User::hasPermission(join('/', $permission))) {
+                CakeLog::write('warning', 'Permission denied for ' . join('/', $permission));
                 $supportEmail = getenv('IPEER_SUPPORT_EMAIL');
                 if (empty($supportEmail)) {
                     $supportEmail = $this->SysParameter->get('display.contact_info');
@@ -299,6 +307,7 @@ class AppController extends Controller
             User::getInstance($this->Auth->user());
             // deny access for inactive users
             if (User::get('record_status') == 'I') {
+                CakeLog::write('warning', 'Login denied for inactive user: ' . User::get('username'));
                 $this->Auth->logout();
                 $this->Session->setFlash(__('Your account is currently inactive.', true));
                 $this->redirect('/');
@@ -332,7 +341,6 @@ class AppController extends Controller
 
             $this->AccessControl->loadPermissions();
             $this->SysParameter->reload();
-            //TODO logging!
 
             CaliperHooks::app_controller_after_login($this);
         }

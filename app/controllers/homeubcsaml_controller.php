@@ -297,7 +297,8 @@ class HomeUBCSamlController extends AppController
                     ($strGivenName ?? "GivenName") . ":" .
                     ($strLastName ?? "LastName") . ":" .
                     ($strStudentNo ?? (string) $datetime) . ":" .
-                    ($strEmail ?? "no-reply@example.com") . ":"
+                    ($strEmail ?? "no-reply@example.com") . ":",
+                    'debug'
                 );
 
 
@@ -315,13 +316,13 @@ class HomeUBCSamlController extends AppController
                     $userRoleId = $this->User->field('role_id', array('username' => $username ));
 
                     if (!$this->Auth->login($userId)) {
-                        $this->log('Invalid username '.$userId.' from session transfer.', 'debug');
+                        $this->log('Invalid user '.$userId.' from session transfer.', 'info');
                         //return false;
                     }else{
-                        $this->log('Valid username '.$userId.' from session transfer.', 'debug');
+                        $this->log('Valid user '.$userId.' from session transfer.', 'info');
                     }
                 }else{
-                    $this->log("PROCESS USER:EXISTING-USER::" . $name . ":" . $value , 'debug');
+                    $this->log("No user found for $username. Redirecting to logout...", 'info');
                     
                     $this->_afterLogout();
 
@@ -334,8 +335,8 @@ class HomeUBCSamlController extends AppController
 
 
         } else {
-            $this->log("Error: SAMLResponse is not properly Base64-encoded.", 'debug');
-            $this->log($samlResponse);
+            $this->log("Error: SAMLResponse is not properly Base64-encoded.", 'info');
+            $this->log($samlResponse, 'debug');
 
         }
 

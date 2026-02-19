@@ -3,6 +3,7 @@ Configure::load('guard');
 
 App::import('Component', 'Auth');
 App::import('AuthModule', 'AuthModule', true, array(dirname(__FILE__)), Inflector::underscore('AuthModule').'.php');
+require_once APP . 'libs/request_context.php';
 
 /**
  * GuardComponent the guard component extended from CakePHP build-in
@@ -210,7 +211,7 @@ class GuardComponent extends AuthComponent {
                 }
             } catch (Exception $e) {
                 if (isset($this->authModule->fallbackInternal) && $this->authModule->fallbackInternal) {
-                    CakeLog::write('debug', 'Extneral authentication failed, fallback to internal authentication module.');
+                    CakeLog::write('debug', 'External authentication failed, fallback to internal authentication module.');
                     $internal = new DefaultModule($this);
                     if (!$internal->authenticate($this->authModule->data[$this->fields['username']])) {
                         CakeLog::write('login', 'User '.$this->authModule->data[$this->fields['username']]. ' login failed with Default module. '.$e->getMessage());
@@ -220,11 +221,21 @@ class GuardComponent extends AuthComponent {
                         CakeLog::write('login', 'User '.$this->authModule->data[$this->fields['username']].' logged in with Default module.');
                     }
                 } else {
+                    CakeLog::write('info', 'User '.($this->authModule->data[$this->fields['username'] ?? 'username'] ?? 'unknown').' login failed');
                     return false;
                 }
             }
 
             $this->_loggedIn = true;
+
+            $username = $this->authModule->data[$this->fields['username'] ?? 'username'] ?? null;
+            if (!empty($username)) {
+                RequestContext::setUserId($this->user('id'));
+                RequestContext::setUsername($username);
+                CakeLog::write('info', 'User '.$username.' logged in successfully');
+            } else {
+                CakeLog::write('error', 'Guard plugin logged in without expected field structure. Please check guard plugin configuration.');
+            }
 
             if (method_exists($controller, '_afterLogin')) {
                 $controller->_afterLogin();

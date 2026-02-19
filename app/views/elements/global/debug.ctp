@@ -2,7 +2,8 @@
 <?php
 // only show this section if we have debug on and we're in a controller
 if(!Configure::read('debug') == 0 &&
-  isset($this->params['controller']))
+  isset($this->params['controller']) &&
+  class_exists('User') && User::hasPermission('functions/superadmin'))
 {
     $branch = `git rev-parse --abbrev-ref HEAD`;
     if (!$branch) {
