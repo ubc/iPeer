@@ -67,12 +67,6 @@ class SamlController extends Controller {
 
     public function metadata() {
         $this->autoRender = false;
-
-        if (!getenv('ENABLE_SAML_METADATA')) {
-            http_response_code(403);
-            return;
-        }
-
         $settings = new Settings($this->getSamlSettings());
         header('Content-Type: application/xml');
         echo $settings->getSPMetadata();

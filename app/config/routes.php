@@ -65,6 +65,8 @@ if (IS_INSTALLED) {
 
     Router::connect('/__samlwrapper/api/saml/auth', array('controller' => 'homeubcsaml', 'action' => 'index'));
     Router::connect('/__samlwrapper/api/saml/single_logout', array('controller' => 'saml', 'action' => 'logout'));
+    // Duplicate metadata action route for backwards compatibility
+    Router::connect('/__samlwrapper/api/saml/metadata', array('controller' => 'saml', 'action' => 'metadata'));
   }
 
   // Authentication routes
