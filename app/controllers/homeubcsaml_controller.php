@@ -322,11 +322,9 @@ class HomeUBCSamlController extends AppController
                     }
                 }else{
                     $this->log("PROCESS USER:EXISTING-USER::" . $name . ":" . $value , 'debug');
-                    
-                    $this->_afterLogout();
 
-                    $this->redirect('/public/saml/logout.php');
-                   
+                    $this->_afterLogout();
+                    $this->redirect('/login?notice=no_account');
                     exit;
                 }
 
