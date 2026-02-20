@@ -1,8 +1,12 @@
 <!-- Debugging output -->
 <?php
-// only show this section if we have debug on and we're in a controller
+// only show this section if we have debug on, we're in a controller, and the user is a superadmin
+// (or IPEER_DEBUG_FOR_ALL_USERS is set)
+$hasUserModel = class_exists('User');
+$debugForAllUsers = !empty(getenv('IPEER_DEBUG_FOR_ALL_USERS'));
 if(!Configure::read('debug') == 0 &&
-  isset($this->params['controller']))
+  isset($this->params['controller']) &&
+  ($debugForAllUsers || ($hasUserModel && User::isLoggedIn() && User::hasRole('superadmin'))))
 {
     $branch = `git rev-parse --abbrev-ref HEAD`;
     if (!$branch) {
@@ -12,7 +16,6 @@ if(!Configure::read('debug') == 0 &&
     if (!$commit) {
         $commit = "Unknown";
     }
-    $hasUserModel = class_exists('User');
 ?>
 
 <div id='debugsection'>

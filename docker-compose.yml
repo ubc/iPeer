@@ -30,6 +30,7 @@ services:
       - IPEER_DB_USER=ipeer
       - IPEER_DB_PASSWORD=ipeer
       - IPEER_DEBUG=2
+      - IPEER_DEBUG_FOR_ALL_USERS=true
       - IPEER_LOG_FORMAT=PrettyLog
       - IPEER_SESSION_SAVE=database
       # uncomment to test Caliper
