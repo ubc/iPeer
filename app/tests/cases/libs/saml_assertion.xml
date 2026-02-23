@@ -1,0 +1,22 @@
+<saml2:Assertion xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion"
+                 ID="{{ASSERTION_ID}}"
+                 IssueInstant="{{ISSUE_INSTANT}}"
+                 Version="2.0">
+  <saml2:Issuer>{{ISSUER}}</saml2:Issuer>
+  <saml2:Subject>
+    <saml2:NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">testuser</saml2:NameID>
+    <saml2:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+      <saml2:SubjectConfirmationData NotOnOrAfter="{{NOT_ON_OR_AFTER}}" Recipient="{{ACS_URL}}"/>
+    </saml2:SubjectConfirmation>
+  </saml2:Subject>
+  <saml2:Conditions NotBefore="{{NOT_BEFORE}}" NotOnOrAfter="{{NOT_ON_OR_AFTER}}">
+    <saml2:AudienceRestriction>
+      <saml2:Audience>{{AUDIENCE}}</saml2:Audience>
+    </saml2:AudienceRestriction>
+  </saml2:Conditions>
+  <saml2:AttributeStatement>
+    <saml2:Attribute Name="urn:oid:1.3.6.1.4.1.60.6.1.6">
+      <saml2:AttributeValue>testuser123</saml2:AttributeValue>
+    </saml2:Attribute>
+  </saml2:AttributeStatement>
+</saml2:Assertion>

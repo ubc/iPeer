@@ -69,6 +69,11 @@ class SamlController extends Controller {
         $this->autoRender = false;
 
         if (!getenv('ENABLE_SAML_METADATA')) {
+            // Due to a limitation in the `onelogin/php-saml` library,
+            // we don't expose this by default in case we configured
+            // our IdP to use separate private keys for signing requests
+            // and response decryption. In that case, we need to manually
+            // prep the metadata file.
             http_response_code(403);
             return;
         }

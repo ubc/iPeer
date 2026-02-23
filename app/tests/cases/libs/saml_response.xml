@@ -1,0 +1,12 @@
+<saml2p:Response xmlns:saml2p="urn:oasis:names:tc:SAML:2.0:protocol"
+                 xmlns:saml2="urn:oasis:names:tc:SAML:2.0:assertion"
+                 Destination="{{ACS_URL}}"
+                 ID="{{RESPONSE_ID}}"
+                 IssueInstant="{{ISSUE_INSTANT}}"
+                 Version="2.0">
+  <saml2:Issuer>{{ISSUER}}</saml2:Issuer>
+  <saml2p:Status>
+    <saml2p:StatusCode Value="{{STATUS_CODE}}"/>
+  </saml2p:Status>
+  <saml2:EncryptedAssertion/>
+</saml2p:Response>
