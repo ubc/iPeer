@@ -27,78 +27,6 @@ class HomeUBCSamlController extends AppController
         parent::__construct();
     }
 
-    function connect_to_db() {
-        // Database connection settings
-        $DB_HOST = getenv("IPEER_DB_HOST") ?: "db-host";
-        $DB_PORT = getenv("DB_IPEER_DATABASE_PORT") ?: "3306";
-        $DB_NAME = getenv("DB_IPEER_DATABASE") ?: "ipeer";
-        $DB_USER = getenv("IPEER_DB_USER") ?: "ipeer";
-        $DB_PASSWORD = getenv("IPEER_DB_PASSWORD") ?: "password";
-
-        try {
-            // Establish connection
-            $dsn = "mysql:host=$DB_HOST;port=$DB_PORT;dbname=$DB_NAME;charset=utf8mb4";
-            $options = [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES => false,
-            ];
-
-            $connection = new PDO($dsn, $DB_USER, $DB_PASSWORD, $options);
-            //$this->log("======== Connection to the database was successful! ===================", 'debug');
-            return $connection;
-        } catch (PDOException $e) {
-            $this->log("=============== Error connecting to the database: " . $e->getMessage() );
-            return null;
-        }
-    }
-
-
-    function get_user_id_by_username($username) {
-
-        $connection = $this->connect_to_db();
-
-        if (!$connection) {
-            return null;
-        }
-
-        try {
-            $query = "SELECT id, username FROM users WHERE username = :username";
-            $stmt = $connection->prepare($query);
-            $stmt->execute(['username' => $username]);
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            return $result ? $result['id'] : null;
-        } catch (PDOException $e) {
-            return null;
-        }
-    }
-
-    function process_user($username) {
-        if (!$username) {
-            //echo "No username provided.";
-            $this->log('NO USERNAME provided:');
-            return null;
-        }
-
-
-
-
-        $user_id = $this->get_user_id_by_username($username);
-
-        if ($user_id) {
-            $this->log( "User ID for username '" . $username . "': " . $user_id . "<br>" , 'debug');
-            return $username;
-        } else {
-            $this->log( "No user found with username '" . $username . "'<br>", 'debug');
-            
-            //FOR ONBOARDING STUDENTS MUST BE DONE by iPeer thru Import Groups from Canvas
-
-        }
-        return null;
-    }
-
-
     function extractCipherValues($samlResponseBase64) {
         // Decode the Base64 SAML Response
         $samlXML = base64_decode($samlResponseBase64);
@@ -280,7 +208,6 @@ class HomeUBCSamlController extends AppController
                 }
 
 
-                //TODO: ENV VAR THESE ATTRIBUTES
                 $strGivenName = $attributes['urn:mace:dir:attribute-def:givenNameLthub'] ?? "";
                 $strLastName = $attributes['urn:mace:dir:attribute-def:snLthub'] ?? "";
                 $username = $attributes['urn:oid:1.3.6.1.4.1.60.6.1.6'] ?? "";
@@ -288,12 +215,8 @@ class HomeUBCSamlController extends AppController
 
                 $strStudentNo = $attributes['urn:oid:1.3.6.1.4.1.60.6.1.6.1'] ?? "";
 
-                $defaultRoleID = 1;
-
-                // Call the process_user function with the gathered values
                 $this->log(
                     "username::::::::".($username) . ":" .
-                    ($defaultRoleID ?? 5) . ":" .
                     ($strGivenName ?? "GivenName") . ":" .
                     ($strLastName ?? "LastName") . ":" .
                     ($strStudentNo ?? (string) $datetime) . ":" .
@@ -301,40 +224,31 @@ class HomeUBCSamlController extends AppController
                     "debug"
                 );
 
+                $this->log("Received username '" . $username . "' from SAML ", 'info');
 
                 if (!empty($username)) {
-                    $processUser = $this->process_user(
-                        $username,
-                    );
+                    $userId = $this->User->field('id', array('username' => $username));
                 }
 
-
-                if (!empty($processUser)) {
-                    $username = $processUser;
-
-                    $userId = $this->User->field('id', array('username' => $username ));
-                    $userRoleId = $this->User->field('role_id', array('username' => $username ));
-
+                if (!empty($userId)) {
                     if (!$this->Auth->login($userId)) {
                         $this->log('Invalid username '.$userId.' from session transfer.', 'debug');
-                        //return false;
-                    }else{
+                    } else {
                         $this->log('Valid username '.$userId.' from session transfer.', 'debug');
                     }
-                }else{
-                    $this->log("PROCESS USER:EXISTING-USER::" . $name . ":" . $value , 'debug');
+                } else {
+                    $this->log("No user found with username '" . $username . "'", 'debug');
 
                     $this->_afterLogout();
                     $this->redirect('/login?notice=no_account');
                     exit;
                 }
-
             }
 
 
         } else {
-            $this->log("Error: SAMLResponse is not properly Base64-encoded.", 'debug');
-            $this->log($samlResponse);
+            $this->log("Error: SAMLResponse is not properly Base64-encoded.", 'info');
+            $this->log($samlResponse, 'debug');
 
         }
 
