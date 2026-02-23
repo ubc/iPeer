@@ -11,6 +11,7 @@ class GuardController extends AppController {
      * @return void
      */
     function login() {
+        $this->set('title_for_layout', 'Log In');
         $this->set('login_url', $this->Auth->getLoginUrl());
         $this->set('is_logged_in', $this->Auth->isLoggedIn());
         $this->set('params', $this->Auth->getParameters());
@@ -18,11 +19,20 @@ class GuardController extends AppController {
         // check if the auth module needs a login form or just a button
         $this->set('auth_module_name', $this->Auth->getAuthModuleName());
 
+        if ($this->Auth->isLoggedIn()) {
+            $this->redirect('/');
+            return;
+        }
+
         // this redirect only happens when autoRedirect is set to false
         // so that application can do some stuff after user login
         if( !(empty($this->data)) && $this->Auth->user() ){
             $this->redirect('/login');
         }
+
+        $allowed_notices = array('inactive', 'no_enrollment', 'no_account');
+        $notice = $this->params['url']['notice'] ?? false;
+        $this->set('notice', in_array($notice, $allowed_notices, true) ? $notice : null);
 
         $forceGuardAuth = ($_GET['defaultlogin'] ?? '') === "true";
         if ($forceGuardAuth) {
@@ -31,8 +41,12 @@ class GuardController extends AppController {
             return;
         }
 
-        if (getenv('SAML_SETTINGS') && !$this->Auth->isLoggedIn()) {
-            $this->redirect('/public/saml/auth.php');
+        if (getenv('SAML_SETTINGS')) {
+            $this->set('saml_logout_notice', ClassRegistry::init('SysParameter')->get(
+                'display.saml_logout_notice',
+                __('You are still logged in with your institution. If you wish, you can log out everywhere by clicking the button below.', true)
+            ));
+            $this->render('/guard/saml_login');
         }
     }
 

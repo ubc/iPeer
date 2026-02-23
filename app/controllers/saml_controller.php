@@ -28,7 +28,7 @@ class SamlController extends Controller {
         $auth = new Auth($this->getSamlSettings());
 
         if ($auth->isAuthenticated()) {
-            $this->redirect('/dashboard');
+            $this->redirect('/');
             return;
         }
 

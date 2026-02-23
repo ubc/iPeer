@@ -300,8 +300,7 @@ class AppController extends Controller
             // deny access for inactive users
             if (User::get('record_status') == 'I') {
                 $this->Auth->logout();
-                $this->Session->setFlash(__('Your account is currently inactive.', true));
-                $this->redirect('/');
+                $this->redirect('/login?notice=inactive');
                 return;
             }
 
@@ -309,9 +308,9 @@ class AppController extends Controller
             $this->Session->delete('Message.auth');
 
             // after login stuff
-            $this->User->loadRoles(User::get('id'));
-            
-            $isStudent = User::get('role_id') == $this->User->USER_TYPE_STUDENT;
+            $roles = $this->User->loadRoles(User::get('id'));
+
+            $isStudent = array_key_exists($this->User->USER_TYPE_STUDENT, $roles);
 
             // Only check course enrollment for students 
             if ( $isStudent ) {
@@ -319,14 +318,9 @@ class AppController extends Controller
                 $tutorCourses = $this->User->getTutorCourses(User::get('id'));
                 
                 if (empty($enrolledCourses) && empty($tutorCourses)) {
-                    // Show message and logout to SAML
                     $this->Auth->logout();
-                    $message = __('You do not have any course enrollment in iPeer. Please contact your instructor.', true);
-                    $samlLogoutUrl = Configure::read('SAML_LOGOUT_URL');
-                    $logoutUrl = !empty($samlLogoutUrl) ? $samlLogoutUrl : '/logout';
-                    
-                    echo "<script>alert(" . json_encode($message) . "); window.location.href=" . json_encode($logoutUrl) . ";</script>";
-                    exit;
+                    $this->redirect('/login?notice=no_enrollment');
+                    return;
                 }
             }
 
