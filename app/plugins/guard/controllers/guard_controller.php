@@ -11,6 +11,15 @@ class GuardController extends AppController {
      * @return void
      */
     function login() {
+        // Clear stale flash messages (e.g. "Access to this page is limited...",
+        // "You must be logged in to access this location") when the user arrives
+        // at the login page, since logging in will resolve them.
+        // Skip this when form data is present so that login error messages (e.g.
+        // "Invalid Login Credentials") are preserved after a failed attempt.
+        if (empty($this->data)) {
+            $this->Session->delete('Message.flash');
+            $this->Session->delete('Message.auth');
+        }
         $this->set('title_for_layout', 'Log In');
         $this->set('login_url', $this->Auth->getLoginUrl());
         $this->set('is_logged_in', $this->Auth->isLoggedIn());
