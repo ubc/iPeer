@@ -37,7 +37,7 @@ class IPeerSamlResponse extends Response
     public function __construct(array $config, string|null $response)
     {
         if (empty($response)) {
-            throw new Exception('SAML: Empty SAMLResponse received');
+            throw new Exception('Empty SAMLResponse received');
         }
 
         $decryptKey = getenv('IPEER_SECRET_KEY') ?: ($config['sp']['privateKeyForDecryption'] ?? null);
@@ -68,7 +68,7 @@ class IPeerSamlResponse extends Response
     {
         $idpCert = $this->_settings->getIdPData()['x509cert'] ?? null;
         if (!$idpCert) {
-            throw new Exception('SAML: IdP certificate not configured (idp.x509cert missing from SAML_SETTINGS)');
+            throw new Exception('IdP certificate not configured (idp.x509cert missing from SAML_SETTINGS)');
         }
 
         $doc   = clone $this->decryptedDocument;
@@ -83,7 +83,7 @@ class IPeerSamlResponse extends Response
         }
 
         if (!Utils::validateSign($doc, Utils::formatCert($idpCert))) {
-            throw new Exception('SAML: Assertion signature validation failed — signature does not match IdP certificate');
+            throw new Exception('Assertion signature validation failed — signature does not match IdP certificate');
         }
     }
 
@@ -97,13 +97,13 @@ class IPeerSamlResponse extends Response
 
         $issuers = $this->getIssuers();
         if (empty($issuers)) {
-            throw new Exception('SAML: No Issuer element found in response');
+            throw new Exception('No Issuer element found in response');
         }
 
         $normalizedExpected = rtrim($expectedIssuer, '/');
         foreach ($issuers as $issuer) {
             if (rtrim($issuer, '/') !== $normalizedExpected) {
-                throw new Exception("SAML: Issuer mismatch (expected=$expectedIssuer, got=$issuer)");
+                throw new Exception("Issuer mismatch (expected=$expectedIssuer, got=$issuer)");
             }
         }
     }
@@ -123,11 +123,11 @@ class IPeerSamlResponse extends Response
 
         $audiences = $this->getAudiences();
         if (empty($audiences)) {
-            throw new Exception('SAML: No AudienceRestriction found in assertion');
+            throw new Exception('No AudienceRestriction found in assertion');
         }
 
         if (!in_array($spEntityId, $audiences)) {
-            throw new Exception("SAML: Audience mismatch — SP entityId '$spEntityId' not in assertion audiences: " . implode(', ', $audiences));
+            throw new Exception("Audience mismatch — SP entityId '$spEntityId' not in assertion audiences: " . implode(', ', $audiences));
         }
     }
 
@@ -146,7 +146,7 @@ class IPeerSamlResponse extends Response
         }
 
         if (rtrim($destination, '/') !== rtrim($acsUrl, '/')) {
-            throw new Exception("SAML: Destination mismatch (expected=$acsUrl, got=$destination)");
+            throw new Exception("Destination mismatch (expected=$acsUrl, got=$destination)");
         }
     }
 
@@ -163,13 +163,13 @@ class IPeerSamlResponse extends Response
         $nodes = $xpath->query('//saml2:SubjectConfirmationData/@Recipient');
 
         if ($nodes->length === 0) {
-            throw new Exception('SAML: No SubjectConfirmationData Recipient found in assertion');
+            throw new Exception('No SubjectConfirmationData Recipient found in assertion');
         }
 
         $normalizedAcs = rtrim($acsUrl, '/');
         foreach ($nodes as $node) {
             if (rtrim($node->value, '/') !== $normalizedAcs) {
-                throw new Exception("SAML: SubjectConfirmationData Recipient mismatch (expected=$acsUrl, got={$node->value})");
+                throw new Exception("SubjectConfirmationData Recipient mismatch (expected=$acsUrl, got={$node->value})");
             }
         }
     }
