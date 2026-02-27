@@ -63,7 +63,7 @@ if (IS_INSTALLED) {
     Router::connect('/public/saml/logout.php', array('controller' => 'saml', 'action' => 'logout'));
     Router::connect('/public/saml/metadata.php', array('controller' => 'saml', 'action' => 'metadata'));
 
-    Router::connect('/__samlwrapper/api/saml/auth', array('controller' => 'homeubcsaml', 'action' => 'index'));
+    Router::connect('/__samlwrapper/api/saml/auth', array('controller' => 'saml', 'action' => 'acs'));
     Router::connect('/__samlwrapper/api/saml/single_logout', array('controller' => 'saml', 'action' => 'logout'));
   }
 

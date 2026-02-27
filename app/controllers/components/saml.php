@@ -40,8 +40,9 @@ class SamlComponent extends CakeObject
                 $attributes[$name] = $values[0];
             }
         } catch (Exception $e) {
-            // OneLogin\Saml2 unfortunately throws bare `Exception`, so we have to leave this catch broad
-            CakeLog::write('warning', $e->getMessage());
+            // OneLogin\Saml2 unfortunately throws bare `Exception`s, so we had to make the catch broad.
+            // (Then we made our wrapper code also do the same to match)
+            CakeLog::write('warning', 'SAML: ' . $e->getMessage());
             return null;
         }
 
