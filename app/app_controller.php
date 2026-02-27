@@ -92,10 +92,17 @@ class AppController extends Controller
             $supportEmailApplied = true;
         }
 
+        $ipeerSalt = getenv('IPEER_SECURITY_SALT');
+        if ($ipeerSalt) {
+            Security::setHash('sha256');
+            Configure::write('Security.salt', $ipeerSalt);
+        } else {
+            // backward compatible with original ipeer hash method
+            Security::setHash('md5');
+            Configure::write('Security.salt', '');
+        }
+
         $this->Auth->autoRedirect = false;
-        // backward compatible with original ipeer hash  method
-        Security::setHash('md5');
-        Configure::write('Security.salt', '');
 
         if (!$this->_checkCsrfReferer()) {
             return;
@@ -411,8 +418,13 @@ class AppController extends Controller
 
     public static function logControllerAction($controller) {
         $params = implode(', ', $controller->params['pass']);
+        $rawMethod = env('REQUEST_METHOD') ?? '';
+        $overrideMethod = $controller->params['form']['_method'] ?? null;
+        $methodInfo = $overrideMethod !== null
+            ? $rawMethod . ' (_method=' . $overrideMethod . ')'
+            : $rawMethod;
         $controller->log(
-            "Accessing " . $controller->params['controller'] . '::' . $controller->params['action'] . '(' . $params . ')',
+            "Accessing " . $methodInfo . ' ' . $controller->params['controller'] . '::' . $controller->params['action'] . '(' . $params . ')',
             'info'
         );
     }

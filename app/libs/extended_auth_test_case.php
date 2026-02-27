@@ -133,7 +133,6 @@ class ExtendedAuthTestCase extends ExtendedTestCase
      */
     function login($controller)
     {
-        $login = array();
         if (null == $this->login && null == $this->defaultLogin) {
             trigger_error('You have to define at least one login credentials (login or defaultLogin variable)!', E_USER_ERROR);
         }
@@ -142,7 +141,20 @@ class ExtendedAuthTestCase extends ExtendedTestCase
         // reset login so that next test will not be affected
         $this->login = null;
 
-        return $controller->Auth->login($login);
+        $model = $controller->Auth->getModel();
+        $user = $model->find('first', array(
+            'conditions' => array($model->alias.'.username' => $login[$model->alias]['username']),
+            'recursive' => 0
+        ));
+
+        if (empty($user)) {
+            return false;
+        }
+
+        // Bypass password verification: pass the fetched user record directly so
+        // tests are not sensitive to which hashing algorithm is active (sha256 vs
+        // legacy md5). We are testing controller behaviour, not auth.
+        return $controller->Auth->login($user[$model->alias]);
     }
 
     /**
