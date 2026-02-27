@@ -129,10 +129,56 @@ class UserTestCase extends CakeTestCase {
 
     function testHashPassword()
     {
+        // hashPassword() returns a bcrypt hash verifiable with password_verify()
+        $hash = User::hashPassword('frogleg');
+        $this->assertTrue(password_verify('frogleg', $hash));
+
+        // hashPasswords() without a username blanks the password so auth fails
         $input = array('User' => array('password' => 'frogleg'));
         $ret = $this->User->hashPasswords($input);
-        $this->assertEqual($ret['User']['password'],
-            '6f40a1a25eec7d325310dea310949005');
+        $this->assertEqual($ret['User']['password'], '');
+
+        // set up a user with a known bcrypt password for happy/sad path tests
+        $plaintext = 'frogleg';
+        $this->User->save(array('User' => array(
+            'id' => 0,
+            'username' => 'hashtest_user',
+            'password' => User::hashPassword($plaintext),
+            'email' => 'hashtest@example.com',
+            'first_name' => 'Hash',
+            'last_name' => 'Test',
+            'student_no' => '',
+        )));
+        $stored = $this->User->field('password', array('username' => 'hashtest_user'));
+
+        // happy path: correct password returns the stored hash
+        $input = array('User' => array('username' => 'hashtest_user', 'password' => $plaintext));
+        $ret = $this->User->hashPasswords($input);
+        $this->assertEqual($ret['User']['password'], $stored);
+
+        // wrong password returns empty string (auth will fail)
+        $input['User']['password'] = 'wrongpassword';
+        $ret = $this->User->hashPasswords($input);
+        $this->assertEqual($ret['User']['password'], '');
+    }
+
+    function testHashPasswordLegacyMode()
+    {
+        putenv('USE_LEGACY_PASSWORD_HASHING=true');
+
+        // hashPassword() returns MD5 in legacy mode
+        $this->assertEqual(User::hashPassword('frogleg'), md5('frogleg'));
+
+        // hashPasswords() hashes directly without a DB lookup
+        $input = array('User' => array('password' => 'frogleg'));
+        $ret = $this->User->hashPasswords($input);
+        $this->assertEqual($ret['User']['password'], md5('frogleg'));
+
+        // verifyPassword() checks against MD5
+        $this->assertTrue(User::verifyPassword('frogleg', md5('frogleg')));
+        $this->assertFalse(User::verifyPassword('wrongpassword', md5('frogleg')));
+
+        putenv('USE_LEGACY_PASSWORD_HASHING');
     }
 
     function testGetRoleName()

@@ -51,7 +51,6 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->defaultLogin = array(
             'User' => array(
                 'username' => 'root',
-                'password' => md5('ipeeripeer')
             )
         );
     }
@@ -165,7 +164,6 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->login = array(
             'User' => array(
                 'username' => 'instructor1',
-                'password' => md5('ipeeripeer')
             )
         );
         $data = array(
@@ -217,7 +215,6 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->login = array(
             'User' => array(
                 'username' => 'instructor2',
-                'password' => md5('ipeeripeer')
             )
         );
         $data = array(
@@ -322,7 +319,6 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->login = array(
             'User' => array(
                 'username' => 'instructor2',
-                'password' => md5('ipeeripeer')
             )
         );
 
@@ -390,7 +386,6 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->login = array(
             'User' => array(
                 'username' => 'instructor2',
-                'password' => md5('ipeeripeer')
             )
         );
 

@@ -93,9 +93,6 @@ class AppController extends Controller
         }
 
         $this->Auth->autoRedirect = false;
-        // backward compatible with original ipeer hash  method
-        Security::setHash('md5');
-        Configure::write('Security.salt', '');
 
         if (!$this->_checkCsrfReferer()) {
             return;

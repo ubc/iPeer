@@ -49,7 +49,6 @@ class HomeControllerTest extends ExtendedAuthTestCase
         $this->defaultLogin = array(
             'User' => array(
                 'username' => 'root',
-                'password' => md5('ipeeripeer')
             )
         );
     }
@@ -104,7 +103,6 @@ class HomeControllerTest extends ExtendedAuthTestCase
         $this->login = array(
             'User' => array(
                 'username' => 'instructor1',
-                'password' => md5('ipeeripeer')
             )
         );
         $result = $this->testAction('/home/index', array('return' => 'vars'));
@@ -118,7 +116,6 @@ class HomeControllerTest extends ExtendedAuthTestCase
         $this->login = array(
             'User' => array(
                 'username' => 'instructor3',
-                'password' => md5('ipeeripeer')
             )
         );
         $result = $this->testAction('/home/index', array('return' => 'vars'));
@@ -133,7 +130,6 @@ class HomeControllerTest extends ExtendedAuthTestCase
         $this->login = array(
             'User' => array(
                 'username' => 'admin1',
-                'password' => md5('ipeeripeer')
             )
         );
         // test that courses are in alphabetical order
@@ -156,7 +152,6 @@ class HomeControllerTest extends ExtendedAuthTestCase
         $this->login = array(
             'User' => array(
                 'username' => 'redshirt0001',
-                'password' => md5('ipeeripeer')
             )
         );
         $result = $this->testAction('/home/index', array('return' => 'vars'));
@@ -202,7 +197,6 @@ class HomeControllerTest extends ExtendedAuthTestCase
         $this->login = array(
             'User' => array(
                 'username' => 'admin3',
-                'password' => md5('ipeeripeer')
             )
         );
         // test that combined admin'd/taught active courses are in alphabetical order
@@ -226,7 +220,6 @@ class HomeControllerTest extends ExtendedAuthTestCase
         $this->login = array(
             'User' => array(
                 'username' => 'admin4',
-                'password' => md5('ipeeripeer')
             )
         );
         // test that courses are in alphabetical order

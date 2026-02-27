@@ -41,7 +41,6 @@ class AccessesControllerTest extends ExtendedAuthTestCase
         $this->defaultLogin = array(
             'User' => array(
                 'username' => 'root',
-                'password' => md5('ipeeripeer')
             )
         );
     }

@@ -440,22 +440,58 @@ class User extends AppModel
         ));
     }
 
-    /**
-     * Hash password
-     *
-     * @param array $data array containing password
-     *
-     * @access public
-     * @return hashed password
-     * */
+    public static function isLegacyPasswordMode()
+    {
+        $val = getenv('USE_LEGACY_PASSWORD_HASHING');
+        return $val === 'true' || $val === '1';
+    }
+
+    public static function hashPassword($plaintext)
+    {
+        if (User::isLegacyPasswordMode()) {
+            return md5($plaintext);
+        }
+        return password_hash($plaintext, PASSWORD_BCRYPT);
+    }
+
+    public static function verifyPassword($plaintext, $hash)
+    {
+        if (User::isLegacyPasswordMode()) {
+            return md5($plaintext) === $hash;
+        }
+        return password_verify($plaintext, $hash);
+    }
+
     function hashPasswords($data)
     {
-        if (isset($data['User']['password'])) {
-            $data['User']['password'] = md5($data['User']['password']);
-
+        if (!isset($data['User']['password'])) {
             return $data;
         }
 
+        if (User::isLegacyPasswordMode()) {
+            $data['User']['password'] = User::hashPassword($data['User']['password']);
+            return $data;
+        }
+
+        if (!isset($data['User']['username'])) {
+            CakeLog::write('warning', 'hashPasswords() called with password but no username; auth will fail.');
+            $data['User']['password'] = '';
+            return $data;
+        }
+
+        $plaintext = $data['User']['password'];
+        $user = $this->find('first', array(
+            'conditions' => array('User.username' => $data['User']['username']),
+            'fields' => array('User.password'),
+            'recursive' => -1
+        ));
+
+        if (empty($user) || !User::verifyPassword($plaintext, $user['User']['password'])) {
+            $data['User']['password'] = '';
+            return $data;
+        }
+
+        $data['User']['password'] = $user['User']['password'];
         return $data;
     }
 
@@ -651,13 +687,12 @@ class User extends AppModel
             if (empty($u[User::IMPORT_PASSWORD])) {
                 $tmp['import_password'] = "";
                 $tmp['tmp_password'] = $u[User::GENERATED_PASSWORD];
+                $tmp['password'] = User::hashPassword($u[User::GENERATED_PASSWORD]);
             } else {
                 $tmp['import_password'] = $u[User::IMPORT_PASSWORD];
                 $tmp['tmp_password'] = "";
+                $tmp['password'] = User::hashPassword($u[User::IMPORT_PASSWORD]);
             }
-
-            empty($u[User::IMPORT_PASSWORD]) ? $tmp['password'] = md5($u[User::GENERATED_PASSWORD]) :
-                $tmp['password'] = md5($u[User::IMPORT_PASSWORD]); // Will be hashed by the Users controller
 
             $tmp['creator_id']   = User::get('id');
             $data[$u[User::IMPORT_USERNAME]]['User'] = $tmp;
@@ -1109,7 +1144,7 @@ class User extends AppModel
 
         $tmp_password = $psGen->generate();
         $user_data['User']['tmp_password'] = $tmp_password;
-        $user_data['User']['password'] =  md5($tmp_password);
+        $user_data['User']['password'] = User::hashPassword($tmp_password);
         $user_data['User']['id'] =  $user_id;
 
         if($this->save($user_data, true, array('password'))) {

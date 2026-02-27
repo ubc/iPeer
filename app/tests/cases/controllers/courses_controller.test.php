@@ -243,7 +243,6 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->defaultLogin = array(
             'User' => array(
                 'username' => 'root',
-                'password' => md5('ipeeripeer')
             )
         );
     }
@@ -309,7 +308,6 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->login = array(
             'User' => array(
                 'username' => 'redshirt0001',
-                'password' => md5('ipeeripeer')
             )
         );
         $this->testAction('/courses/index', array('return' => 'result', 'fixturize' => false));
@@ -323,7 +321,6 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->login = array(
             'User' => array(
                 'username' => 'admin3',
-                'password' => md5('ipeeripeer')
             )
         );
         $result = $this->testAction('/courses/index', array('return' => 'vars'));
@@ -340,7 +337,6 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->login = array(
             'User' => array(
                 'username' => 'admin4',
-                'password' => md5('ipeeripeer')
             )
         );
         $result = $this->testAction('/courses/index', array('return' => 'vars'));
@@ -389,7 +385,6 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->login = array(
             'User' => array(
                 'username' => 'instructor2',
-                'password' => md5('ipeeripeer')
             )
         );
         $this->testAction('/courses/view/1', array('return' => 'vars'));
@@ -427,7 +422,6 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->login = array(
             'User' => array(
                 'username' => 'instructor2',
-                'password' => md5('ipeeripeer')
             )
         );
         $this->testAction('/courses/home/1', array('return' => 'vars'));
@@ -593,7 +587,6 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->login = array(
             'User' => array(
                 'username' => 'instructor2',
-                'password' => md5('ipeeripeer')
             )
         );
         $data = array(
@@ -665,7 +658,6 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->login = array(
             'User' => array(
                 'username' => 'instructor2',
-                'password' => md5('ipeeripeer')
             )
         );
         $this->testAction(
