@@ -127,7 +127,7 @@ class AppController extends Controller
             RequestContext::setUsername($this->Auth->user('username'));
         }
 
-        $this->log("Accessing " . $this->params['controller'] . '::' . $this->params['action'], 'info');
+        self::logControllerAction($this);
 
         $this->breadcrumb = Breadcrumb::create();
 
@@ -403,5 +403,13 @@ class AppController extends Controller
         $this->log('User '.$this->sessionTransferData['username'].' is logged in with session transfer.', 'debug');
 
         return true;
+    }
+
+    public static function logControllerAction($controller) {
+        $params = implode(', ', $controller->params['pass']);
+        $controller->log(
+            "Accessing " . $controller->params['controller'] . '::' . $controller->params['action'] . '(' . $params . ')',
+            'info'
+        );
     }
 }

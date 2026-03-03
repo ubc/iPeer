@@ -222,7 +222,9 @@
  * Set to `true` to apply timestamps when debug > 0. Set to 'force' to always enable
  * timestamping regardless of debug value.
  */
-	//Configure::write('Asset.timestamp', true);
+	$assetTimestamp = getenv('ASSET_TIMESTAMP') ?: 'force';
+	$assetTimestamp = in_array($assetTimestamp, array('true', 'false')) ? $assetTimestamp === 'true' : $assetTimestamp;
+	Configure::write('Asset.timestamp', $assetTimestamp);
 /**
  * Compress CSS output by removing comments, whitespace, repeating tags, etc.
  * This requires a/var/cache directory to be writable by the web server for caching.
