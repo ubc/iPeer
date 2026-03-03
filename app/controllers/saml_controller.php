@@ -29,7 +29,7 @@ class SamlController extends AppController {
         } else {
             // all other endpoints don't have dependencies on our AppController
             // in this case, we only do logging that AppController::beforeFilter normally does
-            $this->log("Accessing " . $this->params['controller'] . '::' . $this->params['action'], 'info');
+            AppController::logControllerAction($this);
         }
     }
 
