@@ -97,6 +97,10 @@ class AppController extends Controller
         Security::setHash('md5');
         Configure::write('Security.salt', '');
 
+        if (!$this->_checkCsrfReferer()) {
+            return;
+        }
+
         $locale = $this->SysParameter->findByParameterCode('display.locale');
         // default to eng if no locale is set
         if (!(empty($locale) || empty($locale['SysParameter']['parameter_value']))) {
@@ -411,5 +415,99 @@ class AppController extends Controller
             "Accessing " . $controller->params['controller'] . '::' . $controller->params['action'] . '(' . $params . ')',
             'info'
         );
+    }
+
+    /**
+     * Checks the HTTP Referer header as a lightweight CSRF mitigation if
+     * `IPEER_ENFORCE_REFERRER` is set to true.
+     *
+     * An absent Referer is treated the same as a cross-origin one (rejected).
+     *
+     * Covers POST, PUT, DELETE, and PATCH — including CakePHP's _method override
+     * which rewrites REQUEST_METHOD from POST to the tunnelled method.
+     *
+     * Ideally we should use Cakephp's form helpers and generate CSRF tokens,
+     * but this would require refactoring and testing a lot of forms. We would
+     * also need to switch all the GET state-changing endpoints. At the time
+     * of writing, we don't want to invest much more time in iPeer 3.x, so this
+     * measure is a decent tradeoff.
+     *
+     * @return bool false if the request was rejected (caller should return immediately)
+     */
+    protected function _checkCsrfReferer() {
+        // Non-GET endpoints that legitimately receive cross-origin requests
+        $nonGetRequestsAllowed = array(
+            'saml/acs',
+        );
+
+        // State-changing actions reachable via plain HTTP GET
+        // These should be changed to POSTs if we decide to continue working on iPeer 3.x
+        $getRequestsDisallowed = array(
+            'users/enrol',
+            'users/readd',
+            'users/resetpassword',
+            'users/resetpasswordwithoutemail',
+            'departments/delete',
+            'faculties/delete',
+            'groups/delete',
+        );
+
+        $action = strtolower($this->params['controller'] . '/' . $this->params['action']);
+        $method = env('REQUEST_METHOD');
+
+        if ($method !== 'GET' && !in_array($action, $nonGetRequestsAllowed)) {
+            return $this->_requireSameOriginReferer();
+        }
+
+        if ($method === 'GET' && in_array($action, $getRequestsDisallowed)) {
+            return $this->_requireSameOriginReferer();
+        }
+
+        return true;
+    }
+
+    /**
+     * @return array{ok: bool, receivedHost: string, expectedHost: string}
+     */
+    protected function _testSameOriginReferer() {
+        $expectedHost = strtok(env('HTTP_HOST') ?? '', ':');
+        $referer = env('HTTP_REFERER');
+        if (empty($referer)) {
+            return array('ok' => false, 'receivedHost' => '(none)', 'expectedHost' => $expectedHost);
+        }
+        $receivedHost = parse_url($referer, PHP_URL_HOST);
+        return array('ok' => $receivedHost === $expectedHost, 'receivedHost' => $receivedHost, 'expectedHost' => $expectedHost);
+    }
+
+    protected function _requireSameOriginReferer() {
+        $result = $this->_testSameOriginReferer();
+
+        if ($result['ok']) {
+            return true;
+        }
+
+        $action = $this->params['controller'] . '/' . $this->params['action'];
+        $enforce = (bool) getenv('IPEER_ENFORCE_REFERRER');
+
+        CakeLog::write(
+            'warning',
+            'CSRF: referer mismatch' . ($enforce ? ' (blocked)' : ' (allowed, enforcement disabled)') .
+            '. Action: ' . $action . ', ' .
+            'received host: ' . $result['receivedHost'] . ', expected: ' . $result['expectedHost']
+        );
+        if (!$enforce) {
+            return true;
+        }
+
+        if (!headers_sent()) {
+            header('X-iPeer-CSRF-Blocked: received=' . $result['receivedHost'] . ', expected=' . $result['expectedHost']);
+        }
+        $this->Session->setFlash(__(
+            'iPeer could not complete your request. It looks like your request came from outside the app. ' .
+            'This action must be done from within iPeer.',
+            true
+        ));
+        $this->redirect('/home');
+        return false;
     }
 }
