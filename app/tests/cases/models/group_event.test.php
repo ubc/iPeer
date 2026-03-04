@@ -157,10 +157,7 @@ class GroupEventTestCase extends CakeTestCase {
         $this->assertFalse($events);
     }
 
-    /*
-    // NOTE: These 2 tests seem to make group_event test fail on jenkin.
-    // Might be because it takes too long to run them, so I've commented
-    // them out for now.
+
     function testGetLowMark()
     {
         $event = $this->GroupEvent->getLowMark(1, 1, 100, 0);
@@ -177,7 +174,7 @@ class GroupEventTestCase extends CakeTestCase {
         $events = $this->GroupEvent->getLate(999);
         $this->assertEqual(Set::extract('/GroupEvent/id', $events), null);
     }
-     */
+
 
     function testGetGroupEventByEventId()
     {

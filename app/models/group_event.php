@@ -234,6 +234,10 @@ class GroupEvent extends AppModel
      */
     function getLowMark($eventId=null, $eventTypeId=null, $maxPercent=1, $minPercent=0)
     {
+        $eventId = $this->castOrFail($eventId, FILTER_VALIDATE_INT);
+        $eventTypeId = $this->castOrFail($eventTypeId, FILTER_VALIDATE_INT);
+        $maxPercent = $this->castOrFail($maxPercent, FILTER_VALIDATE_FLOAT);
+        $minPercent = $this->castOrFail($minPercent, FILTER_VALIDATE_FLOAT);
         $eventTypeEval = array(1=>'evaluation_simples',2=>'evaluation_rubrics',4=>'evaluation_mixevals');
         $eventType = array(1=>'simple_evaluations',2=>'rubrics',4=>'mixevals');
         switch ($eventTypeId) {
@@ -369,6 +373,7 @@ class GroupEvent extends AppModel
 
     function getLate($eventId)
     {
+        $eventId = $this->castOrFail($eventId, FILTER_VALIDATE_INT);
         // use the php date to get php time with timezone instead of now() in
         // mysql, just in case the DB has different timezone setting with php
         return $this->query('SELECT GroupEvent.id,GroupEvent.group_id,GroupEvent.marked
@@ -389,7 +394,7 @@ class GroupEvent extends AppModel
             GROUP BY evaluation_submissions.grp_event_id) AS tb2
             ON tb1.id=tb2.grp_event_id
             WHERE count1 > count2 OR count2 IS NULL)
-            AND GroupEvent.group_id != 0 AND (Event.due_date < '.date("Y-m-d H:i:s").' OR date_submitted > due_date)'
+            AND GroupEvent.group_id != 0 AND (Event.due_date < \''.date("Y-m-d H:i:s").'\' OR date_submitted > due_date)'
         );
     }
 
@@ -463,5 +468,14 @@ class GroupEvent extends AppModel
     {
         return $this->find('first', array('conditions' => array('GroupEvent.id' => $grpEventid),
             'fields' => $fields));
+    }
+
+    function castOrFail($value, $filter)
+    {
+        $result = filter_var($value, $filter);
+        if ($result === false) {
+            throw new InvalidArgumentException('Invalid value: ' . var_export($value, true));
+        }
+        return $result;
     }
 }
