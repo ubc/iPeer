@@ -391,7 +391,7 @@ class UsersController extends AppController
 
         if (!($this->data = $this->User->findById($id))) {
             $this->Session->setFlash(__('Error: This user does not exist', true));
-            $this->redirect($this->referer());
+            $this->redirect('/users');
         }
 
         $role = $this->User->getRoleName($id);
@@ -1437,8 +1437,13 @@ class UsersController extends AppController
         $this->set('secondaryAccounts', array());
         $this->set('primaryAccounts', array());
         if($this->data) {
-            $primaryAccount = $this->data['User']['primaryAccount'];
-            $secondaryAccount = $this->data['User']['secondaryAccount'];
+            if (!ctype_digit($this->data['User']['primaryAccount']) ||
+                !ctype_digit($this->data['User']['secondaryAccount'])) {
+                $this->Session->setFlash(__('Error: Invalid account ID provided.', true));
+                return;
+            }
+            $primaryAccount = (int) $this->data['User']['primaryAccount'];
+            $secondaryAccount = (int) $this->data['User']['secondaryAccount'];
             $primaryRole = $this->User->getRoleId($primaryAccount);
             $secondaryRole = $this->User->getRoleId($secondaryAccount);
 
@@ -1713,18 +1718,47 @@ class UsersController extends AppController
      * @access private
      * @return void
      */
+    /**
+     * Returns a CakePHP ORM "field NOT IN (values)" condition that works for
+     * both single- and multi-element arrays. CakePHP 1.3 generates invalid SQL
+     * (`field NOT = ('val')`) when 'field NOT' is paired with a single-element
+     * array; use `field !=` with a scalar instead for that case.
+     *
+     * @param string $field  Fully qualified field name (e.g. 'Model.field')
+     * @param array  $values Non-empty array of excluded values
+     * @return array Condition fragment for find/updateAll/deleteAll
+     */
+    private function _notInCondition($field, array $values)
+    {
+        if (count($values) === 1) {
+            return array($field . ' !=' => reset($values));
+        }
+        return array($field . ' NOT' => array_values($values));
+    }
+
     private function _updateCreatorUpdaterId($updated, $primary, $secondary)
     {
         $models = array('Course', 'Department', 'EmailTemplate', 'EvaluationMixevalDetail',
             'EvaluationRubricDetail', 'Event', 'EventTemplateType', 'Group',
             'GroupEvent', 'Mixeval', 'Rubric', 'SimpleEvaluation', 'SysParameter', 'Survey');
         foreach ($models as $model) {
-            $name = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $model)).'s';
-            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
-            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+            $updated = $updated && $this->$model->updateAll(
+                array($model.'.creator_id' => $primary),
+                array($model.'.creator_id' => $secondary)
+            );
+            $updated = $updated && $this->$model->updateAll(
+                array($model.'.updater_id' => $primary),
+                array($model.'.updater_id' => $secondary)
+            );
         }
-        $updated = $updated && $this->Faculty->query('UPDATE faculties SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
-        $updated = $updated && $this->Faculty->query('UPDATE faculties SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+        $updated = $updated && $this->Faculty->updateAll(
+            array('Faculty.creator_id' => $primary),
+            array('Faculty.creator_id' => $secondary)
+        );
+        $updated = $updated && $this->Faculty->updateAll(
+            array('Faculty.updater_id' => $primary),
+            array('Faculty.updater_id' => $secondary)
+        );
 
         return $updated;
     }
@@ -1755,13 +1789,22 @@ class UsersController extends AppController
                 $_function_name = $functionNames[$model];
                 $updated = $updated && $this->User->$_function_name($secondary, $conflict);
             }
-            $conflict = implode(',', $conflict);
-            $name = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $model)).'s';
-            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
-            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
-            $change = 'UPDATE '.$name.' SET user_id='.$primary.' WHERE user_id='.$secondary;
-            $change .= ($conflict) ? ' AND course_id NOT IN ('.$conflict.');' : ';';
-            $updated = $updated && $this->$model->query($change);
+            $updated = $updated && $this->$model->updateAll(
+                array($model.'.creator_id' => $primary),
+                array($model.'.creator_id' => $secondary)
+            );
+            $updated = $updated && $this->$model->updateAll(
+                array($model.'.updater_id' => $primary),
+                array($model.'.updater_id' => $secondary)
+            );
+            $conditions = array($model.'.user_id' => $secondary);
+            if ($conflict) {
+                $conditions += $this->_notInCondition($model.'.course_id', $conflict);
+            }
+            $updated = $updated && $this->$model->updateAll(
+                array($model.'.user_id' => $primary),
+                $conditions
+            );
         }
 
         return $updated;
@@ -1788,14 +1831,26 @@ class UsersController extends AppController
                 $updated = $updated && $this->$model->deleteAll(
                     array('evaluator' => $secondary, 'grp_event_id' => $conflict));
             }
-            $conflict = implode(',', $conflict);
-            $name = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $model)).'s';
-            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
-            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
-            $updated = $updated && $this->$model->query('UPDATE '.$name.' SET evaluatee='.$primary.' WHERE evaluatee='.$secondary.';');
-            $change = 'UPDATE '.$name.' SET evaluator='.$primary.' WHERE evaluator='.$secondary;
-            $change .= ($conflict) ? ' AND grp_event_id NOT IN ('.$conflict.');' : ';';
-            $updated = $updated && $this->$model->query($change);
+            $updated = $updated && $this->$model->updateAll(
+                array($model.'.creator_id' => $primary),
+                array($model.'.creator_id' => $secondary)
+            );
+            $updated = $updated && $this->$model->updateAll(
+                array($model.'.updater_id' => $primary),
+                array($model.'.updater_id' => $secondary)
+            );
+            $updated = $updated && $this->$model->updateAll(
+                array($model.'.evaluatee' => $primary),
+                array($model.'.evaluatee' => $secondary)
+            );
+            $conditions = array($model.'.evaluator' => $secondary);
+            if ($conflict) {
+                $conditions += $this->_notInCondition($model.'.grp_event_id', $conflict);
+            }
+            $updated = $updated && $this->$model->updateAll(
+                array($model.'.evaluator' => $primary),
+                $conditions
+            );
         }
 
         return $updated;
@@ -1831,16 +1886,24 @@ class UsersController extends AppController
                 $updated = $updated && $this->$_merge_model->deleteAll(
                     array('user_id' => $secondaryUser, $model[User::MERGE_FIELD] => $conflict));
             }
-            $conflict = implode(',', $conflict);
-            $change = 'UPDATE '.$model[User::MERGE_TABLE].' SET user_id='.$primary.' WHERE user_id='.$secondary;
-            $change .= ($conflict) ? ' AND '.$model[User::MERGE_FIELD].' NOT IN ('.$conflict.');' : ';';
-            $updated = $updated && $this->$_merge_model->query($change);
+            $conditions = array($_merge_model.'.user_id' => $secondary);
+            if ($conflict) {
+                $conditions += $this->_notInCondition($_merge_model.'.'.$model[User::MERGE_FIELD], $conflict);
+            }
+            $updated = $updated && $this->$_merge_model->updateAll(
+                array($_merge_model.'.user_id' => $primary),
+                $conditions
+            );
         }
 
-        //oauth_clients
-        $updated = $updated && $this->OauthClient->query('UPDATE oauth_clients SET user_id='.$primary.' WHERE user_id='.$secondary.';');
-        //oauth_tokens
-        $updated = $updated && $this->OauthToken->query('UPDATE oauth_tokens SET user_id='.$primary.' WHERE user_id='.$secondary.';');
+        $updated = $updated && $this->OauthClient->updateAll(
+            array('OauthClient.user_id' => $primary),
+            array('OauthClient.user_id' => $secondary)
+        );
+        $updated = $updated && $this->OauthToken->updateAll(
+            array('OauthToken.user_id' => $primary),
+            array('OauthToken.user_id' => $secondary)
+        );
 
         return $updated;
     }
@@ -1857,41 +1920,50 @@ class UsersController extends AppController
      */
     private function _updateTablesWithUserId($updated, $primary, $secondary)
     {
+        if (!is_int($primary) || !is_int($secondary)) {
+            return false;
+        }
+
         //evaluation_submissions
-        //update creator_id and updater_id
-        $updated = $updated && $this->EvaluationSubmission->query('UPDATE evaluation_submissions SET creator_id='.$primary.' WHERE creator_id='.$secondary.';');
-        $updated = $updated && $this->EvaluationSubmission->query('UPDATE evaluation_submissions SET updater_id='.$primary.' WHERE updater_id='.$secondary.';');
+        $updated = $updated && $this->EvaluationSubmission->updateAll(
+            array('EvaluationSubmission.creator_id' => $primary),
+            array('EvaluationSubmission.creator_id' => $secondary)
+        );
+        $updated = $updated && $this->EvaluationSubmission->updateAll(
+            array('EvaluationSubmission.updater_id' => $primary),
+            array('EvaluationSubmission.updater_id' => $secondary)
+        );
         $primaryEval = $this->EvaluationSubmission->getGrpEventIdEvalSub($primary);
         $primarySurvey = $this->EvaluationSubmission->getEventIdSurveySub($primary);
         $secondaryEval = $this->EvaluationSubmission->getGrpEventIdEvalSub($secondary);
         $secondarySurvey = $this->EvaluationSubmission->getEventIdSurveySub($secondary);
 
-        $evalConflict = array_intersect($primaryEval, $secondaryEval);  //grp_evnt_id
+        $evalConflict = array_intersect($primaryEval, $secondaryEval);  //grp_event_id
         $surveyConflict = array_intersect($primarySurvey, $secondarySurvey); //event_id
-        //delete conflicted evaluation submissions by grp_event_id
         if ($evalConflict) {
             $updated = $updated && $this->EvaluationSubmission->deleteAll(
                 array('EvaluationSubmission.submitter_id' => $secondary, 'EvaluationSubmission.grp_event_id' => $evalConflict));
         }
-        //delete conflicted survey submissions by event_id
         if ($surveyConflict) {
             $updated = $updated && $this->EvaluationSubmission->deleteAll(
                 array('EvaluationSubmission.submitter_id' => $secondary, 'EvaluationSubmission.event_id' => $surveyConflict));
         }
-        $evalConflict = implode(',', $evalConflict);
-        $surveyConflict = implode(',', $surveyConflict);
+        $conditions = array('EvaluationSubmission.submitter_id' => $secondary);
+        if ($evalConflict) {
+            $conditions += $this->_notInCondition('EvaluationSubmission.grp_event_id', $evalConflict);
+        }
+        if ($surveyConflict) {
+            $conditions += $this->_notInCondition('EvaluationSubmission.event_id', $surveyConflict);
+        }
+        $updated = $updated && $this->EvaluationSubmission->updateAll(
+            array('EvaluationSubmission.submitter_id' => $primary),
+            $conditions
+        );
 
-        $change = 'UPDATE evaluation_submissions SET submitter_id='.$primary.' WHERE submitter_id='.$secondary;
-        $change .= ($evalConflict || $surveyConflict) ? ' AND (' : ';';
-        //append grp_event_id if any evaluation submissions are conflicted
-        $change .= ($evalConflict) ? 'grp_event_id NOT IN ('.$evalConflict.')' : '';
-        $change .= ($evalConflict && $surveyConflict) ? ' OR ' : '';
-        //append event_id if any survey submissions are conflicted
-        $change .= ($surveyConflict) ? 'event_id NOT IN ('.$surveyConflict.')' : '';
-        $change .= ($evalConflict || $surveyConflict) ? ');' : '';
-        $updated = $updated && $this->EvaluationSubmission->query($change);
-
-        //email_schedules
+        // email_schedules: the REPLACE() calls below cannot be expressed through updateAll() since
+        // CakePHP's ORM has no equivalent for MySQL's REPLACE() string function. Raw queries are
+        // safe here because $primary and $secondary are cast to (int) at the start of merge() and
+        // validated as integers by the is_int() guard at the top of this function.
         $updated = $updated && $this->EmailSchedule->query("UPDATE email_schedules SET creator_id=".$primary." WHERE creator_id=".$secondary.";");
         $updated = $updated && $this->EmailSchedule->query("UPDATE email_schedules SET `from`=".$primary." WHERE `from`=".$secondary.";");
         // middle of the string eg. ;17;
