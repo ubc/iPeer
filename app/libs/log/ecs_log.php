@@ -22,8 +22,14 @@ class EcsLog extends BaseLog
             'log.level' => $type,
             'message' => $message,
             'transaction.id' => RequestContext::correlationId(),
+            'service.name' => 'iPeer',
             'ecs.version' => '8.17.0',
         );
+
+        $commitHash = getenv('IPEER_COMMIT_HASH');
+        if (!empty($commitHash)) {
+            $entry['service.version'] = $commitHash;
+        }
 
         $userId = RequestContext::userId();
         if ($userId !== null) {
@@ -33,6 +39,11 @@ class EcsLog extends BaseLog
         $username = RequestContext::username();
         if ($username !== null) {
             $entry['user.name'] = $username;
+        }
+
+        $clientIp = RequestContext::clientIp();
+        if ($clientIp !== null) {
+            $entry['client.ip'] = $clientIp;
         }
 
         return json_encode($entry, JSON_UNESCAPED_SLASHES) . "\n";

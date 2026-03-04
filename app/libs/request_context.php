@@ -12,12 +12,14 @@ class RequestContext
     static $_correlationId = null;
     static $_userId = null;
     static $_username = null;
+    static $_clientIp = null;
 
     static function reset()
     {
         self::$_correlationId = null;
         self::$_userId = null;
         self::$_username = null;
+        self::$_clientIp = null;
     }
 
     static function correlationId()
@@ -46,6 +48,25 @@ class RequestContext
     static function username()
     {
         return self::$_username;
+    }
+
+    static function resolveClientIp()
+    {
+        $realIp = env('HTTP_X_REAL_IP');
+        if (!empty($realIp)) {
+            self::$_clientIp = trim($realIp);
+            return;
+        }
+
+        $forwarded = env('HTTP_X_FORWARDED_FOR');
+        if (!empty($forwarded)) {
+            self::$_clientIp = trim(explode(',', $forwarded)[0]);
+        }
+    }
+
+    static function clientIp()
+    {
+        return self::$_clientIp;
     }
 
     private static function _generateUuidV4()

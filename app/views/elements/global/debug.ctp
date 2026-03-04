@@ -8,14 +8,9 @@ if(!Configure::read('debug') == 0 &&
   isset($this->params['controller']) &&
   ($debugForAllUsers || ($hasUserModel && User::isLoggedIn() && User::hasRole('superadmin'))))
 {
-    $branch = `git rev-parse --abbrev-ref HEAD`;
-    if (!$branch) {
-        $branch = "Unknown";
-    }
-    $commit = `git describe --tags --always`;
-    if (!$commit) {
-        $commit = "Unknown";
-    }
+    $isGitRepo = is_dir(ROOT . DS . '.git');
+    $branch = trim($isGitRepo ? `git rev-parse --abbrev-ref HEAD` : null) ?: 'Unknown';
+    $commit = trim($isGitRepo ? `git describe --tags --always` : null) ?: (getenv('IPEER_COMMIT_HASH') ?: 'Unknown');
 ?>
 
 <div id='debugsection'>

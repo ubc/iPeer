@@ -220,6 +220,7 @@ class GuardComponent extends AuthComponent {
                         CakeLog::write('login', 'User '.$this->authModule->data[$this->fields['username']].' logged in with Default module.');
                     }
                 } else {
+                    CakeLog::write('login', 'User '.$this->authModule->data[$this->fields['username']].' login failed with '.$this->authModule->name.' module. '.$e->getMessage());
                     return false;
                 }
             }

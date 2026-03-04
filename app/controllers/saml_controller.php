@@ -89,6 +89,7 @@ class SamlController extends AppController {
     public function logout() {
         $auth = new Auth($this->getSamlSettings());
 
+        CakeLog::write('info', 'SAML logout: User ' . $this->Auth->user('username') . ' (ID: ' . $this->Auth->user('id') . ') logged out');
         CaliperHooks::app_controller_after_logout($this);
         $this->Session->destroy();
 
