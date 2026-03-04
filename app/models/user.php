@@ -440,22 +440,11 @@ class User extends AppModel
         ));
     }
 
-    /**
-     * Hash password
-     *
-     * @param array $data array containing password
-     *
-     * @access public
-     * @return hashed password
-     * */
     function hashPasswords($data)
     {
         if (isset($data['User']['password'])) {
-            $data['User']['password'] = md5($data['User']['password']);
-
-            return $data;
+            $data['User']['password'] = Security::hash($data['User']['password'], null, true);
         }
-
         return $data;
     }
 
@@ -651,13 +640,12 @@ class User extends AppModel
             if (empty($u[User::IMPORT_PASSWORD])) {
                 $tmp['import_password'] = "";
                 $tmp['tmp_password'] = $u[User::GENERATED_PASSWORD];
+                $tmp['password'] = Security::hash($u[User::GENERATED_PASSWORD], null, true);
             } else {
                 $tmp['import_password'] = $u[User::IMPORT_PASSWORD];
                 $tmp['tmp_password'] = "";
+                $tmp['password'] = Security::hash($u[User::IMPORT_PASSWORD], null, true);
             }
-
-            empty($u[User::IMPORT_PASSWORD]) ? $tmp['password'] = md5($u[User::GENERATED_PASSWORD]) :
-                $tmp['password'] = md5($u[User::IMPORT_PASSWORD]); // Will be hashed by the Users controller
 
             $tmp['creator_id']   = User::get('id');
             $data[$u[User::IMPORT_USERNAME]]['User'] = $tmp;
@@ -1109,7 +1097,7 @@ class User extends AppModel
 
         $tmp_password = $psGen->generate();
         $user_data['User']['tmp_password'] = $tmp_password;
-        $user_data['User']['password'] =  md5($tmp_password);
+        $user_data['User']['password'] = Security::hash($tmp_password, null, true);
         $user_data['User']['id'] =  $user_id;
 
         if($this->save($user_data, true, array('password'))) {

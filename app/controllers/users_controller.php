@@ -595,7 +595,7 @@ class UsersController extends AppController
 
             // Now we add in the password
             $password = $this->PasswordGenerator->generate();
-            $this->data['User']['password'] = $this->Auth->password($password);
+            $this->data['User']['password'] = Security::hash($password, null, true);
 
             // Now we actually attempt to save the data
             if ($ret = $this->User->save($this->data)) {
@@ -917,9 +917,9 @@ class UsersController extends AppController
 
             if (!empty($this->data['User']['temp_password'])) {
                 $user = $this->User->findUserByidWithFields($id, array('password'));
-                if (md5($this->data['User']['old_password'])==$user['password']) {
+                if (Security::hash($this->data['User']['old_password'], null, true) === $user['password']) {
                     if ($this->data['User']['temp_password']==$this->data['User']['confirm_password']) {
-                        $this->data['User']['password'] = md5($this->data['User']['temp_password']);
+                        $this->data['User']['password'] = Security::hash($this->data['User']['temp_password'], null, true);
                     } else {
                         $this->Session->setFlash(__("New passwords do not match", true));
                         $this->redirect('editProfile/'.$id);

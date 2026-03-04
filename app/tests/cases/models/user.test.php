@@ -129,10 +129,11 @@ class UserTestCase extends CakeTestCase {
 
     function testHashPassword()
     {
+        Security::setHash('sha256');
+        Configure::write('Security.salt', 'testsalt');
         $input = array('User' => array('password' => 'frogleg'));
         $ret = $this->User->hashPasswords($input);
-        $this->assertEqual($ret['User']['password'],
-            '6f40a1a25eec7d325310dea310949005');
+        $this->assertEqual($ret['User']['password'], hash('sha256', 'testsaltfrogleg'));
     }
 
     function testGetRoleName()
