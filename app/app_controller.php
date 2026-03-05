@@ -121,6 +121,7 @@ class AppController extends Controller
 
         // if we have a session transfered to us
         if ($this->_hasSessionTransferData()) {
+            $this->log('Using session transfer data for login', 'info');
             if ($this->_authenticateWithSessionTransferData()) {
                 if (method_exists($this, '_afterLogin')) {
                     $this->_afterLogin(false);
@@ -132,6 +133,8 @@ class AppController extends Controller
 
         // store user in the singleton for global access
         User::store($this->Auth->user());
+
+        RequestContext::resolveClientIp();
 
         if ($this->Auth->user()) {
             RequestContext::setUserId($this->Auth->user('id'));
@@ -407,11 +410,11 @@ class AppController extends Controller
         // find the userId by username and use it to login
         $userId = $this->User->field('id', array('username' => $this->sessionTransferData['username']));
         if (!$this->Auth->login($userId)) {
-            $this->log('Invalid username '.$this->sessionTransferData['username'].' from session transfer.', 'debug');
+            $this->log('Invalid username '.$this->sessionTransferData['username'].' from session transfer.', 'info');
             return false;
         }
 
-        $this->log('User '.$this->sessionTransferData['username'].' is logged in with session transfer.', 'debug');
+        $this->log('User '.$this->sessionTransferData['username'].' is logged in with session transfer.', 'info');
 
         return true;
     }
@@ -447,8 +450,8 @@ class AppController extends Controller
      * @return bool false if the request was rejected (caller should return immediately)
      */
     protected function _checkCsrfReferer() {
-        // Non-GET endpoints that legitimately receive cross-origin requests
-        $nonGetRequestsAllowed = array(
+        // State-mutating endpoints (POST/PUT/DELETE/PATCH) that legitimately receive cross-origin requests
+        $crossOriginAllowed = array(
             'saml/acs',
         );
 
@@ -460,14 +463,21 @@ class AppController extends Controller
             'users/resetpassword',
             'users/resetpasswordwithoutemail',
             'departments/delete',
+            'emailtemplates/delete',
             'faculties/delete',
             'groups/delete',
+            'mixevals/delete',
+            'rubrics/delete',
+            'simpleevaluations/delete',
+            'surveys/delete',
+            'sysparameters/delete',
         );
 
         $action = strtolower($this->params['controller'] . '/' . $this->params['action']);
-        $method = env('REQUEST_METHOD');
+        $method = strtoupper(env('REQUEST_METHOD'));
 
-        if ($method !== 'GET' && !in_array($action, $nonGetRequestsAllowed)) {
+        $stateMutatingMethods = array('POST', 'PUT', 'DELETE', 'PATCH');
+        if (in_array($method, $stateMutatingMethods) && !in_array($action, $crossOriginAllowed)) {
             return $this->_requireSameOriginReferer();
         }
 
