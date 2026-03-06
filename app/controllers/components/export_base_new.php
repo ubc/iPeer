@@ -155,7 +155,7 @@ class ExportBaseNewComponent extends CakeObject
         // Fill in grid Results
         $yInc = 0;
 
-        $xDimension = $this->calcDimensionX($params, $event);
+        $xDimension = $this->calcDimensionX($params, $event, $peerEval);
         //$yDimensions = count($group['Member']);
         $grid = array();
 
@@ -252,7 +252,8 @@ class ExportBaseNewComponent extends CakeObject
                     }
                     
                     if ($missing_required_question) {
-                        //skip the rest of output
+                        //skip the rest of output — pad to expected column count
+                        $row += array_fill(count($row), $xDimension - count($row), '');
                         $grid[] = $row;
                         $yInc++;
                         continue;
@@ -312,14 +313,22 @@ class ExportBaseNewComponent extends CakeObject
     /**
      * calcDimensionX
      *
-     * @param mixed $params params
-     * @param mixed $event  event
+     * @param mixed $params   params
+     * @param mixed $event    event
+     * @param int   $peerEval 1 for peer evaluation section, 0 for self-evaluation section
      *
      * @access public
-     * @return void
+     * @return int number of columns in the export row
      */
-    public function calcDimensionX($params, $event) {
-        $total = 2 + count($params['include']);
+    public function calcDimensionX($params, $event, $peerEval = 1) {
+        $total = count($params['include']);
+        // Subtract behavioral flags that are part of $params['include'] but don't add columns
+        if (isset($params['include']['export_all'])) {
+            $total--;
+        }
+        if (isset($params['include']['question_title'])) {
+            $total--;
+        }
         if (4 == $event['Event']['event_template_type_id']) {
             $commentQuestions = Set::extract($event, '/Question[mixeval_question_type_id=2]');
             if (isset($params['include']['grade_tables'])) {
@@ -341,11 +350,22 @@ class ExportBaseNewComponent extends CakeObject
             }
         }
 
-        if (isset($params['include']['student_name'])) {
-            $total++;
-        }
-        if (isset($params['include']['student_id'])) {
-            $total++;
+        if ($peerEval) {
+            $total += 2; // Raw Score + Late Penalty
+            if (isset($params['include']['student_name'])) {
+                $total++; // second column: Evaluator
+            }
+            if (isset($params['include']['student_id'])) {
+                $total++; // second column: Evaluator S#
+            }
+        } else {
+            // eval_event_type and final_marks columns are skipped in self-eval section
+            if (isset($params['include']['eval_event_type'])) {
+                $total--;
+            }
+            if (isset($params['include']['final_marks'])) {
+                $total--;
+            }
         }
 
         return $total;
