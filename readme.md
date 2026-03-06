@@ -2,7 +2,8 @@
 
 iPeer is a peer evaluation app that enables instructors to create forms and rubrics for students to fill out. It is commonly used in Team-Based Learning or project-based courses, where teammates have to evaluate each other's contributions.
 
-iPeer was first developed in 2002 and has had many contributors over the the decades. However, maintenance and improvements have been sporadic over the last few years. While iPeer is still deployable and usable, support and up-to-date documentation are limited. If you are interested in using iPeer for your institution or course, please contact UBC's CTLT and LTIC departments, and we can provide you with the latest operational resources.
+> [!IMPORTANT]
+> iPeer was first developed in 2002 and has had many contributors over the decades. However, maintenance and improvements have been sporadic over the last few years. While iPeer is still deployable and usable, up-to-date development documentation is limited. If you are interested in using iPeer for your institution, please contact UBC's CTLT and LTIC departments, and we can provide you with the latest operational recommendations and resources. As of 2026, we are considering rebuilding iPeer on a new platform to address its existing issues and encourage contributions from other institutions.
 
 ## Local Development
 
