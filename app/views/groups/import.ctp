@@ -40,7 +40,10 @@
         echo $this->Form->hidden('Course', array('value' => $courseId));
     }
     echo $this->Form->input("Course", array("label"=>"Into iPeer Course", "multiple"=>false, "default" => $courseId, "disabled"=>!empty($courseId)));
-    echo $this->Form->input('update_groups', array('label'=>'Update group members for existing groups.', 'type'=>'checkbox'));
+    echo $this->Form->input('update_groups', array('label'=>'Remove existing group members not listed in the CSV', 'type'=>'checkbox'));
+    ?>
+    <div class="help-text"><?php __('When unchecked, members already in the group are kept even if absent from the CSV.')?></div>
+    <?php
     echo $this->Form->submit(__('Import', true));
     echo $this->Form->end();
     ?>
