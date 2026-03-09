@@ -104,9 +104,7 @@ class AppController extends Controller
 
         $this->Auth->autoRedirect = false;
 
-        if (!$this->_checkCsrfReferer()) {
-            return;
-        }
+
 
         $locale = $this->SysParameter->findByParameterCode('display.locale');
         // default to eng if no locale is set
@@ -142,6 +140,10 @@ class AppController extends Controller
         }
 
         self::logControllerAction($this);
+
+        if (!$this->_checkCsrfReferer()) {
+            return;
+        }
 
         $this->breadcrumb = Breadcrumb::create();
 
@@ -453,6 +455,7 @@ class AppController extends Controller
         // State-mutating endpoints (POST/PUT/DELETE/PATCH) that legitimately receive cross-origin requests
         $crossOriginAllowed = array(
             'saml/acs',
+            'home/index',
         );
 
         // State-changing actions reachable via plain HTTP GET
@@ -516,7 +519,8 @@ class AppController extends Controller
             'CSRF: referer mismatch' . ($enforce ? ' (blocked)' : ' (allowed, enforcement disabled)') .
             '. Action: ' . $action . ', ' .
             'method: ' . env('REQUEST_METHOD') . ', ' .
-            'received host: ' . $result['receivedHost'] . ', expected: ' . $result['expectedHost']
+            'received host: ' . $result['receivedHost'] . ', expected: ' . $result['expectedHost'] . ', ' .
+            'referer: ' . env('HTTP_REFERER')
         );
         if (!$enforce) {
             return true;
