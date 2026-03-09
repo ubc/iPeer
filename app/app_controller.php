@@ -515,6 +515,7 @@ class AppController extends Controller
             'warning',
             'CSRF: referer mismatch' . ($enforce ? ' (blocked)' : ' (allowed, enforcement disabled)') .
             '. Action: ' . $action . ', ' .
+            'method: ' . env('REQUEST_METHOD') . ', ' .
             'received host: ' . $result['receivedHost'] . ', expected: ' . $result['expectedHost']
         );
         if (!$enforce) {
