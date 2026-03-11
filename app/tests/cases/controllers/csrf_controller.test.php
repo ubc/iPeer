@@ -73,6 +73,7 @@ class CsrfControllerTestCase extends ExtendedAuthTestCase {
     function endTest($method) {
         unset($_SERVER['HTTP_REFERER']);
         putenv('IPEER_ENFORCE_REFERRER');
+        putenv('IPEER_REFERRER_ALLOWED_DOMAINS');
         if (isset($this->controller->Auth)) {
             $this->controller->Auth->logout();
         }
@@ -109,6 +110,23 @@ class CsrfControllerTestCase extends ExtendedAuthTestCase {
         $_SERVER['HTTP_REFERER'] = 'http://' . $_SERVER['HTTP_HOST'] . '/some/page';
         $this->testAction('/departments/index', array('method' => 'post'));
         $this->assertNull($this->controller->redirectUrl);
+    }
+
+    function testAllowedDomainCsvIsAllowed() {
+        putenv('IPEER_REFERRER_ALLOWED_DOMAINS=first.com , allowed.com , third.com');
+        $_SERVER['HTTP_REFERER'] = 'http://allowed.com/some/page';
+        $this->testAction('/departments/index', array('method' => 'post'));
+        $this->assertNull($this->controller->redirectUrl);
+    }
+
+    function testSubstringDomainIsBlocked() {
+        putenv('IPEER_REFERRER_ALLOWED_DOMAINS=allowed.com');
+        // Note how 'allowed.com' is a substring of `evil-allowed.com`.
+        // This ensures that we don't accidentally just do a "substring" check,
+        // but an exact match against the values in the env var.
+        $_SERVER['HTTP_REFERER'] = 'http://evil-allowed.com/some/page';
+        $this->testAction('/departments/index', array('method' => 'post'));
+        $this->assertEqual($this->controller->redirectUrl, '/home');
     }
 
     function testSameHostDifferentPortIsAllowed() {

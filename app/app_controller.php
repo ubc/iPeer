@@ -512,8 +512,23 @@ class AppController extends Controller
         }
 
         $action = $this->params['controller'] . '/' . $this->params['action'];
-        $enforce = (bool) getenv('IPEER_ENFORCE_REFERRER');
 
+        $allowedDomainsEnv = getenv('IPEER_REFERRER_ALLOWED_DOMAINS');
+        if (!empty($allowedDomainsEnv)) {
+            $allowedDomains = array_map('trim', explode(',', $allowedDomainsEnv));
+            if (in_array($result['receivedHost'], $allowedDomains, true)) {
+                CakeLog::write(
+                    'info',
+                    'CSRF: cross-origin referer allowed via IPEER_REFERRER_ALLOWED_DOMAINS. ' .
+                    'Action: ' . $action . ', ' .
+                    'method: ' . env('REQUEST_METHOD') . ', ' .
+                    'referer host: ' . $result['receivedHost']
+                );
+                return true;
+            }
+        }
+
+        $enforce = (bool) getenv('IPEER_ENFORCE_REFERRER');
         CakeLog::write(
             'warning',
             'CSRF: referer mismatch' . ($enforce ? ' (blocked)' : ' (allowed, enforcement disabled)') .
