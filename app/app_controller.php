@@ -456,6 +456,7 @@ class AppController extends Controller
         $crossOriginAllowed = array(
             'saml/acs',
             'home/index',
+            'guard/login',
         );
 
         // State-changing actions reachable via plain HTTP GET
