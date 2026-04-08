@@ -138,6 +138,7 @@ if ($emailRemindersEnabled):
 <?php else:
     echo $this->Form->input('email_schedule', array('hidden' => true, 'type' => 'text', 'value' => $email_schedule, 'label' => false));
 endif; ?>
+<div id='groupSelectionControls'>
 <?php
 echo $this->Form->input('Group',
     array('div' => array('id' => 'GroupsDiv'), 'label' => 'Group(s)')); ?>
@@ -146,6 +147,12 @@ echo $this->Form->input('Group',
 echo $this->Form->button('Unselect All', array('type' => 'button', 'id' => 'unselectAll'));?>
 </div>
 <div class='help-text'><?php __('Holding "ctrl" or "command" key to select multiple groups.') ?></div>
+</div>
+<div id='groupLockNotice' class='message info-message' style='display:none'>
+    <strong><?php __('Group selection is locked.') ?></strong><br>
+    <?php __('This event is already open. Removing groups will delete their submitted responses. Please be careful when editing groups.') ?><br>
+    <button type='button' id='unlockGroups'><?php __('Unlock group selection') ?></button>
+</div>
 
 <?php
 // No nice way of inserting new penalty entries using CakePHP, doing it
@@ -254,6 +261,24 @@ jQuery("#unselectAll").click(function() {
 var penaltyCount = <?php echo $numPenalties; ?>;
 // save the current selected groups
 var oldGroups = jQuery('#GroupGroup').val() || [];
+
+var eventReleaseDateBegin = <?php echo json_encode(date('c', strtotime($event['Event']['release_date_begin']))); ?>;
+
+function initGroupLock() {
+    if (!eventReleaseDateBegin || new Date() < new Date(eventReleaseDateBegin)) return;
+
+    var groupElements = jQuery('#groupSelectionControls');
+
+    groupElements.hide();
+    jQuery('#groupLockNotice').show();
+
+    jQuery('#unlockGroups').click(function() {
+        groupElements.show();
+        jQuery('#groupLockNotice').hide();
+    });
+}
+
+initGroupLock();
 
 function initDateTime() {
     var format = { dateFormat: 'yy-mm-dd', timeFormat: 'hh:mm:ss' }
