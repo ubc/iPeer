@@ -262,10 +262,13 @@ var penaltyCount = <?php echo $numPenalties; ?>;
 // save the current selected groups
 var oldGroups = jQuery('#GroupGroup').val() || [];
 
-var eventReleaseDateBegin = <?php echo json_encode(date('c', strtotime($event['Event']['release_date_begin']))); ?>;
+var eventReleaseDateBegin = <?php
+    $releaseBegin = $event['Event']['release_date_begin'];
+    echo json_encode($releaseBegin ? strtotime($releaseBegin) : null);
+?>;
 
 function initGroupLock() {
-    if (!eventReleaseDateBegin || new Date() < new Date(eventReleaseDateBegin)) return;
+    if (!eventReleaseDateBegin || Math.floor(Date.now() / 1000) < eventReleaseDateBegin) return;
 
     var groupElements = jQuery('#groupSelectionControls');
 
