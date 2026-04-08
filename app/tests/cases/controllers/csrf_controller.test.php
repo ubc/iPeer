@@ -20,6 +20,14 @@ class MockCsrfController extends MockCsrfBaseController {
             $this->redirectUrl = $url;
         }
     }
+
+    // Expose _checkCsrfReferer for direct unit testing without going through
+    // the full dispatch cycle (which would kill the process via missingAction
+    // for non-existent actions).
+    function checkCsrfRefererForTest($action) {
+        $this->params['action'] = $action;
+        return $this->_checkCsrfReferer();
+    }
 }
 
 class CsrfControllerTestCase extends ExtendedAuthTestCase {
@@ -136,4 +144,29 @@ class CsrfControllerTestCase extends ExtendedAuthTestCase {
         $this->testAction('/departments/index', array('method' => 'post'));
         $this->assertNull($this->controller->redirectUrl);
     }
+
+    function testCrossOriginPostToNonExistentActionIsNotCsrfBlocked() {
+        // A request to a non-existent action will 404; CSRF checking should be
+        // skipped so the user gets the 404, not a misleading CSRF error.
+        // Use the direct proxy to avoid the full dispatch cycle, which would
+        // kill the process via missingAction for non-existent actions.
+        $_SERVER['HTTP_REFERER'] = 'http://other.com/url';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $result = $this->controller->checkCsrfRefererForTest('thisActionDoesNotExist');
+        $this->assertTrue($result);
+        $this->assertNull($this->controller->redirectUrl);
+    }
+
+    function testCrossOriginPostToBaseControllerMethodIsNotCsrfBlocked() {
+        // Base Controller methods like "render" are not dispatchable actions; a
+        // request for them will 404. CSRF checking must be skipped for these too,
+        // since method_exists() returns true for inherited methods even though the
+        // dispatcher will reject them the same as any other missing action.
+        $_SERVER['HTTP_REFERER'] = 'http://other.com/url';
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $result = $this->controller->checkCsrfRefererForTest('render');
+        $this->assertTrue($result);
+        $this->assertNull($this->controller->redirectUrl);
+    }
+
 }

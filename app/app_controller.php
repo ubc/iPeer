@@ -477,6 +477,14 @@ class AppController extends Controller
             'sysparameters/delete',
         );
 
+        // Non-existent actions will result in a 404; skip CSRF checking for them.
+        // Use the same predicate as the dispatcher ($this->methods excludes base
+        // Controller methods, which are also not dispatchable as actions).
+        $dispatchableMethods = array_flip($this->methods);
+        if (!isset($dispatchableMethods[strtolower($this->params['action'])])) {
+            return true;
+        }
+
         $action = strtolower($this->params['controller'] . '/' . $this->params['action']);
         $method = strtoupper(env('REQUEST_METHOD'));
 
