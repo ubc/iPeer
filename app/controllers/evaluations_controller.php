@@ -533,15 +533,13 @@ class EvaluationsController extends AppController
                         try {
                             $mute_result = $canvasAssignment->setAssignmentPostPolicy($this, User::get('id'), true);
                         } catch (Exception $e) {
-                            err_log('Problem marking the assignment grade for manual release');
-                            error_log($e->getMessage());
+                            CakeLog::write('warning', 'Problem setting manual release policy on Canvas assignment: ' . $e->getMessage());
                         }
                     }
                 }
 
                 // Export grades
                 if ($canvasAssignment) {
-
                     $gradeExportProgress = $canvasAssignment->grade($this, User::get('id'), $grades);
 
                     if (!$gradeExportProgress) {
@@ -1528,7 +1526,7 @@ class EvaluationsController extends AppController
 
             $mixeval = $this->Mixeval->find('first', array(
                 'conditions' => array('Mixeval.id' => $event['Event']['template_id']),
-                'recursive' => 2
+                'contain' => array('MixevalQuestion'),
             ));
             $required = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}.required');
             $peerQues = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}.self_eval');
@@ -1701,7 +1699,7 @@ class EvaluationsController extends AppController
         case 4: //View Mix Evaluation Result
             $mixeval = $this->Mixeval->find('first', array(
                 'conditions' => array('Mixeval.id' => $event['Event']['template_id']),
-                'recursive' => 2
+                'contain' => array('MixevalQuestion'),
             ));
             $required = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}.required');
             $peerQues = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}.self_eval');

@@ -551,7 +551,7 @@ class EvaluationSimple extends EvaluationResponseBase
             $final_penalty = $pen->getPenaltyFinal($eventId);
             $noSubmissions = array_diff(Set::extract($data, '/user_id'), Set::extract($sub, '/EvaluationSubmission/submitter_id'));
             foreach ($noSubmissions as $userId) {
-                $data[$userId]['penalty'] = $final_penalty['Penalty']['percent_penalty'];
+                $data[$userId]['penalty'] = $final_penalty['Penalty']['percent_penalty'] ?? 0;
             }
         }
         //cleanup

@@ -17,6 +17,10 @@
 }
 else if ($canvasProgressId) { ?>
 
+<div class="message good-message">
+    <?php __("iPeer has now successfully finished pushing grades to Canvas. The progress bar below reflects Canvas' processing of the grades. For large courses, Canvas might need several minutes to finish processing data. You can safely leave this iPeer page."); ?>
+</div>
+
 <div class="progressbar-wrapper">
     <div class="progressbar" id="export-progressbar"></div>
 </div>
@@ -61,7 +65,7 @@ else if ($canvasProgressId) { ?>
         jQuery.get('<?php echo Router::url(null, false) . '/' . $canvasProgressId; ?>', function( data ) {
             jQuery('#export-progressbar').css('width', data.completion + '%');
             if (data.workflow_state == 'queued' || data.workflow_state == 'running') {
-                setTimeout(updateProgressbar, 500);
+                setTimeout(updateProgressbar, 2000);
             }
             else if (data.workflow_state == 'failed') {
                 jQuery('#export-progressbar').css('background', 'red');

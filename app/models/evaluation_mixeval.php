@@ -412,14 +412,15 @@ class EvaluationMixeval extends EvaluationResponseBase
         $pen = ClassRegistry::init('Penalty');
         $mixeval = ClassRegistry::init('Mixeval');
         $event = $this->Event->find('first', array('conditions' => array('Event.id' => $eventId)));
-        
+
         // get required questions for event
         $event_mixeval = $mixeval->find('first', array(
             'conditions' => array('Mixeval.id' => $event['Event']['template_id']),
-            'recursive' => 2
+            'contain' => array('MixevalQuestion'),
         ));
-        $required = Set::combine($event_mixeval['MixevalQuestion'], '{n}.question_num', '{n}.required');
-        $peerQues = Set::combine($event_mixeval['MixevalQuestion'], '{n}.question_num', '{n}.self_eval');
+        $mixevalQuestions = $event_mixeval['MixevalQuestion'] ?? array();
+        $required = Set::combine($mixevalQuestions, '{n}.question_num', '{n}.required');
+        $peerQues = Set::combine($mixevalQuestions, '{n}.question_num', '{n}.self_eval');
         // only required peer evaluation questions are counted toward the averages
         $required = array_intersect(array_keys($required, 1), array_keys($peerQues, 0));
 
@@ -439,7 +440,7 @@ class EvaluationMixeval extends EvaluationResponseBase
             if ($missing_required_question) {
                 continue;
             }
-            
+
             $evaluatee_id = $mark['EvaluationMixeval']['evaluatee'];
             $score = $mark['EvaluationMixeval']['score'];
             if (!isset($data[$evaluatee_id])) {
@@ -453,7 +454,6 @@ class EvaluationMixeval extends EvaluationResponseBase
         }
         //cleanup
         unset($list);
-        
 
         $penalties = $pen->getPenaltyByEventId($eventId);
 
@@ -464,7 +464,7 @@ class EvaluationMixeval extends EvaluationResponseBase
                 $penalty = $pen->getPenaltyByPenaltiesAndDaysLate($penalties, $days);
                 $data[$stu['EvaluationSubmission']['submitter_id']]['penalty'] = (isset($penalty['Penalty']['percent_penalty'])) ? $penalty['Penalty']['percent_penalty'] :
                         0;
-            } 
+            }
         }
         $end = strtotime($event['Event']['release_date_end']);
         $now = time();
@@ -472,7 +472,7 @@ class EvaluationMixeval extends EvaluationResponseBase
             $final_penalty = $pen->getPenaltyFinal($eventId);
             $noSubmissions = array_diff(Set::extract($data, '/user_id'), Set::extract($sub, '/EvaluationSubmission/submitter_id'));
             foreach ($noSubmissions as $userId) {
-                $data[$userId]['penalty'] = $final_penalty['Penalty']['percent_penalty'];
+                $data[$userId]['penalty'] = $final_penalty['Penalty']['percent_penalty'] ?? 0;
             }
         }
         //cleanup
