@@ -151,6 +151,38 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
         $this->assertNull($message);
     }
 
+    // Regression test: viewEvaluationResults for mixeval events previously used
+    // recursive=>2 which failed to load MixevalQuestionType and MixevalQuestionDesc.
+    // The view accesses $ques['MixevalQuestionType']['type'] so those nested
+    // associations must always be present in the data passed to the view.
+    function testViewMixevalEvaluationResultsIncludesQuestionTypeAssociation()
+    {
+        $this->login = array(
+            'User' => array(
+                'username' => 'root',
+                'password' => md5('ipeeripeer')
+            )
+        );
+
+        // event 3 is the mixeval event (template_id=1), group 1 (group_event_id=5)
+        $result = $this->testAction('/evaluations/viewEvaluationResults/3/1', array('return' => 'vars'));
+
+        $questions = $result['mixeval']['MixevalQuestion'];
+        $this->assertFalse(empty($questions));
+        foreach ($questions as $question) {
+            $this->assertFalse(
+                empty($question['MixevalQuestionType']['type']),
+                'MixevalQuestionType must be loaded for question ' . $question['question_num']
+            );
+            $this->assertTrue(
+                isset($question['MixevalQuestionDesc']),
+                'MixevalQuestionDesc must be loaded for question ' . $question['question_num']
+            );
+        }
+        // Question 1 is Likert and has descriptors in the fixture — verify they loaded
+        $this->assertFalse(empty($questions[0]['MixevalQuestionDesc']));
+    }
+
     function testMakeEvaluationSurveyForStudent()
     {
         $this->login = array(
