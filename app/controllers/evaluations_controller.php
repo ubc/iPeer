@@ -1526,7 +1526,7 @@ class EvaluationsController extends AppController
 
             $mixeval = $this->Mixeval->find('first', array(
                 'conditions' => array('Mixeval.id' => $event['Event']['template_id']),
-                'contain' => array('MixevalQuestion'),
+                'contain' => array('MixevalQuestion' => array('MixevalQuestionType', 'MixevalQuestionDesc')),
             ));
             $required = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}.required');
             $peerQues = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}.self_eval');
@@ -1699,7 +1699,7 @@ class EvaluationsController extends AppController
         case 4: //View Mix Evaluation Result
             $mixeval = $this->Mixeval->find('first', array(
                 'conditions' => array('Mixeval.id' => $event['Event']['template_id']),
-                'contain' => array('MixevalQuestion'),
+                'contain' => array('MixevalQuestion' => array('MixevalQuestionType', 'MixevalQuestionDesc')),
             ));
             $required = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}.required');
             $peerQues = Set::combine($mixeval['MixevalQuestion'], '{n}.question_num', '{n}.self_eval');
