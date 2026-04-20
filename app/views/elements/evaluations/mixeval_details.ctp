@@ -47,23 +47,28 @@ if ($details) {
                     $name = '<label class='.$class.'>'.$names[$sub['evaluator']].':</label>';
                 }
                 if ($type == '1') {
-                    $step = $multiplier / ($scale - $zero_mark);
-                    $start = $zero_mark ? 0 : $step;
-                    $marks = array_map('number_format', range($start, $multiplier, $step),
-                        array_fill(0, $scale, 2));
-                    $options = array_combine($marks, $marks);
                     $grade = '<label class="grade">'.__('Grade:', true).' ';
                     $grade .= $sub['grade'].' / '.$multiplier.'</label>';
                     $grade .= (empty($descriptors[$sub['selected_lom']])) ? '' :
                         '<label class="desc">('.$descriptors[$sub['selected_lom']].')</label>';
-                    echo $form->input('ques_'.$qnum.'_'.$num.'_'.$evaluatee, array(
-                        'type' => 'radio',
-                        'options' => $options,
-                        'disabled' => true,
-                        'default' => $sub['grade'],
-                        'before' => '<li>'.$name,
-                        'after' => $grade.'</li>'
-                    ));
+                    $denominator = $scale - $zero_mark;
+                    if ($multiplier > 0 && $denominator > 0) {
+                        $step = $multiplier / $denominator;
+                        $start = $zero_mark ? 0 : $step;
+                        $marks = array_map('number_format', range($start, $multiplier, $step),
+                            array_fill(0, $scale, 2));
+                        $options = array_combine($marks, $marks);
+                        echo $form->input('ques_'.$qnum.'_'.$num.'_'.$evaluatee, array(
+                            'type' => 'radio',
+                            'options' => $options,
+                            'disabled' => true,
+                            'default' => $sub['grade'],
+                            'before' => '<li>'.$name,
+                            'after' => $grade.'</li>'
+                        ));
+                    } else {
+                        echo '<li>'.$name.$grade.'</li>';
+                    }
                 } else if ($type == '4') {
                     echo '<li>'.$name.$sub['grade'].'</li>';
                 } else {

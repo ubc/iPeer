@@ -9,7 +9,8 @@ foreach ($mixeval['MixevalQuestion'] as $question) {
 }
 
 $summaryTableData = $this->Evaluation->getSummaryTable($memberList, $mixevalDetails, $numberQuestions, $mixeval, $penalty, $notInGroup);
-$groupAvg = end(end($summaryTableData));
+$lastRow = end($summaryTableData);
+$groupAvg = end($lastRow);
 
 echo $html->script('ricobase');
 echo $html->script('ricoeffects');
