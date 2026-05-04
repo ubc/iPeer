@@ -66,6 +66,10 @@ class GuardControllerTestCase extends ExtendedAuthTestCase {
             isset($result['saml_logout_notice']),
             '?defaultlogin=true bypass should be blocked when FORCE_SAML_LOGIN is active'
         );
+        $this->assertTrue(
+            !empty($result['local_auth_disabled']),
+            'local_auth_disabled should be true so the "disabled" message is shown'
+        );
     }
 
     function testForceSamlLoginBlocksCraftedPost() {
