@@ -44,13 +44,13 @@ class GuardController extends AppController {
         $this->set('notice', in_array($notice, $allowed_notices, true) ? $notice : null);
 
         $forceGuardAuth = ($_GET['defaultlogin'] ?? '') === "true";
-        if ($forceGuardAuth) {
+        if ($forceGuardAuth && !$this->Auth->isForceSamlLogin()) {
             // continue loading/rendering Guard plugin and views as normal
             // (mostly meant for fallback password-based auth)
             return;
         }
-
         if (getenv('SAML_SETTINGS')) {
+            $this->set('local_auth_disabled', $forceGuardAuth && $this->Auth->isForceSamlLogin());
             $this->set('saml_logout_notice', ClassRegistry::init('SysParameter')->get(
                 'display.saml_logout_notice',
                 __('You are still logged in with your institution. If you wish, you can log out everywhere by clicking the button below.', true)

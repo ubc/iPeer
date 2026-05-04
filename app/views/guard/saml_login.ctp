@@ -6,7 +6,14 @@ $notice_messages = array(
 );
 $notice_message = isset($notice) ? ($notice_messages[$notice] ?? null) : null;
 ?>
-<?php if ($notice_message): ?>
+<?php if (!empty($local_auth_disabled)): ?>
+    <div class="message error-message">
+        <?php __('This login method is disabled.') ?>
+    </div>
+    <div style="text-align: center; margin-top: 1.5em;">
+        <a href="/public/saml/auth.php" class="button button-large"><?php __('Sign In') ?></a>
+    </div>
+<?php elseif ($notice_message): ?>
     <div class="message error-message">
         <?php echo $notice_message; ?>
     </div>

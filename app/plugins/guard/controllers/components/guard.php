@@ -190,6 +190,9 @@ class GuardComponent extends AuthComponent {
         }
 
         if ($loginAction == $url || $url == '/loginout/loginByCWL') {
+            if ($this->isForceSamlLogin()) {
+                return false;
+            }
             // we are in the login action
             try {
                 if (!$this->authModule->hasLoginData()) {
@@ -367,6 +370,18 @@ class GuardComponent extends AuthComponent {
      */
     function getParameters() {
         return $this->authModule->getParameters();
+    }
+
+    /**
+     * When true, only SAML authentication is permitted.
+     * Added to comply with UBC security policies.
+     * Can be false for other institutions or those who use local user/pass login.
+     *
+     * @access public
+     * @return boolean
+     */
+    function isForceSamlLogin() {
+        return getenv('SAML_SETTINGS') && filter_var(getenv('FORCE_SAML_LOGIN'), FILTER_VALIDATE_BOOLEAN);
     }
 
     /**
