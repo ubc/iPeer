@@ -48,4 +48,12 @@ class ToolkitTestCase extends CakeTestCase
         $this->assertEqual('First',  $result[0][1]);
         $this->assertEqual('user2',  $result[1][0]);
     }
+
+    function testParseCSVShortFile()
+    {
+        // File shorter than BOM (3 bytes) — rewind path should still work
+        $file = $this->writeTmp("a\n");
+        $result = Toolkit::parseCSV($file);
+        $this->assertEqual('a', $result[0][0]);
+    }
 }
