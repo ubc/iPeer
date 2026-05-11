@@ -102,6 +102,12 @@ class Toolkit
     {
         $ret = array();
         if (($handle = fopen($file, "r")) !== false) {
+            $bom = fread($handle, 3); # check for and strip byte order marker (BOM) if present
+            if ($bom === false) {
+                trigger_error('Error reading file ' . $file, E_USER_ERROR);
+            } elseif ($bom !== "\xEF\xBB\xBF") {
+                rewind($handle);
+            }
             while (($data = fgetcsv($handle, 1000, ",")) !== false) {
                 $ret[] = array_map('trim', $data);
             }
