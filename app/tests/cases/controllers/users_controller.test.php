@@ -1,10 +1,25 @@
 <?php
 App::import('Controller', 'Users');
 App::import('Lib', 'ExtendedAuthTestCase');
+App::import('Component', 'CanvasApi');
 
 Mock::generatePartial('UsersController',
     'MockUsersController',
-    array('isAuthorized', 'render', 'redirect', '_stop', 'header'));
+    array('isAuthorized', 'render', 'redirect', '_stop', 'header', '_createCanvasApi'));
+
+/**
+ * Stub subclass used by canvasOauthCallback tests to prevent real HTTP calls
+ * to the Canvas token endpoint. Set $fakeToken before calling handleOauthCallback.
+ */
+class TestCanvasApiComponent extends CanvasApiComponent
+{
+    public $fakeToken = null;
+
+    public function getApiTokenUsingCode($code)
+    {
+        return $this->fakeToken;
+    }
+}
 
 class UsersControllerTestCase extends ExtendedAuthTestCase
 {
@@ -120,4 +135,193 @@ class UsersControllerTestCase extends ExtendedAuthTestCase
         $secondary = $userModel->find('first', array('conditions' => array('User.id' => 6)));
         $this->assertFalse($secondary, 'Secondary account should have been deleted after merge.');
     }
+
+    // ---------------------------------------------------------------------------
+    // canvasOauthCallback tests
+    //
+    // These call the action directly (not via testAction) so we can control auth
+    // state and avoid the full request lifecycle. _exchangeCanvasCode is mocked
+    // to prevent real HTTP calls to Canvas.
+    // ---------------------------------------------------------------------------
+
+    /**
+     * Initialises the controller for direct canvasOauthCallback calls.
+     * Sets params to reflect the callback action so Auth->allow() is respected
+     * during Component::startup(). Pass false to skip login (unauthenticated tests).
+     */
+    private function _setupCallbackController($loggedIn = true)
+    {
+        $this->controller->__construct();
+        $this->controller->constructClasses();
+        $this->controller->Session->delete('Message');
+        $this->controller->params = array(
+            'controller' => 'users',
+            'action'     => 'canvasOauthCallback',
+            'url'        => array('url' => '/users/canvasOauthCallback'),
+            'named'      => array(),
+            'pass'       => array(),
+            'plugin'     => null,
+        );
+        $this->controller->action = '/users/canvasOauthCallback';
+        $this->controller->Component->initialize($this->controller);
+        if ($loggedIn) {
+            $this->login($this->controller);
+            $this->afterLogin($this->controller);
+        }
+        $this->controller->beforeFilter();
+        $this->controller->Component->startup($this->controller);
+    }
+
+    /**
+     * Unauthenticated visitor hits the callback URL (e.g. session expired between
+     * OAuth initiation and Canvas redirect). Should see an explanatory flash and
+     * be sent to the login page without attempting any token exchange.
+     */
+    public function testCanvasOauthCallbackSessionExpired()
+    {
+        $this->_setupCallbackController(false);
+
+        $this->controller->canvasOauthCallback();
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertPattern('/session expired/', $message['message']);
+    }
+
+    /**
+     * User cancelled the Canvas authorisation dialog. Should see the cancellation
+     * message, and both OAuth session keys should be cleaned up so the stale state
+     * cannot interfere with a subsequent attempt.
+     */
+    public function testCanvasOauthCallbackAccessDenied()
+    {
+        $testApi = new TestCanvasApiComponent(1);
+        $this->_setupCallbackController();
+        $this->controller->setReturnValue('_createCanvasApi', $testApi);
+        $this->controller->Session->write('oauth_canvas_state', 'st_abc');
+        $this->controller->Session->write('canvas_oauth_return_url', '/courses/1');
+        $this->controller->params['url']['error'] = 'access_denied';
+
+        $this->controller->canvasOauthCallback();
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertPattern('/cancelled/', $message['message']);
+        $this->assertNull($this->controller->Session->read('oauth_canvas_state'),
+            'oauth_canvas_state should be deleted on access_denied');
+        $this->assertNull($this->controller->Session->read('canvas_oauth_return_url'),
+            'canvas_oauth_return_url should be deleted on access_denied');
+    }
+
+    /**
+     * Canvas redirected back with a state but no code — malformed callback.
+     * Should show a generic authentication error and leave session state intact
+     * (no token exchange attempted).
+     */
+    public function testCanvasOauthCallbackMissingCode()
+    {
+        $testApi = new TestCanvasApiComponent(1);
+        $this->_setupCallbackController();
+        $this->controller->setReturnValue('_createCanvasApi', $testApi);
+        $this->controller->Session->write('oauth_canvas_state', 'st_abc');
+        $this->controller->Session->write('canvas_oauth_return_url', '/courses/1');
+        $this->controller->params['url']['state'] = 'st_abc';
+        // no 'code' in params
+
+        $this->controller->canvasOauthCallback();
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertPattern('/authentication error/', $message['message']);
+        $this->assertEqual('st_abc', $this->controller->Session->read('oauth_canvas_state'),
+            'oauth_canvas_state should not be deleted when code is missing');
+    }
+
+    /**
+     * State parameter returned by Canvas does not match what was stored in session.
+     * This is the CSRF guard — the token exchange must not proceed.
+     */
+    public function testCanvasOauthCallbackStateMismatch()
+    {
+        $testApi = new TestCanvasApiComponent(1);
+        $this->_setupCallbackController();
+        $this->controller->setReturnValue('_createCanvasApi', $testApi);
+        $this->controller->Session->write('oauth_canvas_state', 'st_abc');
+        $this->controller->Session->write('canvas_oauth_return_url', '/courses/1');
+        $this->controller->params['url']['code']  = 'canvas_code';
+        $this->controller->params['url']['state'] = 'TAMPERED';
+
+        $this->controller->canvasOauthCallback();
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertPattern('/authentication error/', $message['message']);
+        $this->assertEqual('st_abc', $this->controller->Session->read('oauth_canvas_state'),
+            'oauth_canvas_state should not be deleted on state mismatch');
+    }
+
+    /**
+     * No OAuth flow was ever initiated for this session (no state in session).
+     * A request with a code but no matching state must be rejected — guards
+     * against the null != null bypass that loose comparison allowed previously.
+     */
+    public function testCanvasOauthCallbackNullSessionState()
+    {
+        $testApi = new TestCanvasApiComponent(1);
+        $this->_setupCallbackController();
+        $this->controller->setReturnValue('_createCanvasApi', $testApi);
+        // deliberately do NOT write oauth_canvas_state
+        $this->controller->params['url']['code']  = 'canvas_code';
+        $this->controller->params['url']['state'] = 'st_abc';
+
+        $this->controller->canvasOauthCallback();
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertPattern('/authentication error/', $message['message']);
+    }
+
+    /**
+     * Happy path: valid code and matching state, Canvas returns an access token.
+     * Session keys should be cleaned up and the user should see the success message.
+     */
+    public function testCanvasOauthCallbackSuccess()
+    {
+        $testApi = new TestCanvasApiComponent(1);
+        $testApi->fakeToken = array('accessToken' => 'tok123');
+        $this->_setupCallbackController();
+        $this->controller->setReturnValue('_createCanvasApi', $testApi);
+        $this->controller->Session->write('oauth_canvas_state', 'st_abc');
+        $this->controller->Session->write('canvas_oauth_return_url', '/courses/1');
+        $this->controller->params['url']['code']  = 'canvas_code';
+        $this->controller->params['url']['state'] = 'st_abc';
+
+        $this->controller->canvasOauthCallback();
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertPattern('/successfully connected/', $message['message']);
+        $this->assertEqual('good', $message['element'],
+            'Success flash should use the "good" element');
+        $this->assertNull($this->controller->Session->read('oauth_canvas_state'),
+            'oauth_canvas_state should be deleted after successful exchange');
+        $this->assertNull($this->controller->Session->read('canvas_oauth_return_url'),
+            'canvas_oauth_return_url should be deleted after successful exchange');
+    }
+
+    /**
+     * Canvas token endpoint returned an error (e.g. code already used).
+     * The specific error message from the API should be surfaced to the user.
+     */
+    public function testCanvasOauthCallbackTokenError()
+    {
+        $testApi = new TestCanvasApiComponent(1);
+        $testApi->fakeToken = array('err' => 'Error: invalid_grant');
+        $this->_setupCallbackController();
+        $this->controller->setReturnValue('_createCanvasApi', $testApi);
+        $this->controller->Session->write('oauth_canvas_state', 'st_abc');
+        $this->controller->Session->write('canvas_oauth_return_url', '/courses/1');
+        $this->controller->params['url']['code']  = 'canvas_code';
+        $this->controller->params['url']['state'] = 'st_abc';
+
+        $this->controller->canvasOauthCallback();
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual('Error: invalid_grant', $message['message']);
+    }
+
 }

@@ -283,10 +283,21 @@ class CanvasApiComponent extends CakeObject
         $state = uniqid('st');
         $_controller->Session->write('oauth_'.$this->provider.'_state', $state);
 
+        // save the current page so the callback can return the user here after completing
+        $_split_current_url = explode('?', $this->_getCurrentUrl());
+        $_controller->Session->write('canvas_oauth_return_url', array_shift($_split_current_url));
+
         // if true, it will force the user to enter their credentials, even if they're already logged into Canvas. By default, if
         // a user already has an active Canvas web session, they will not be asked to re-enter their credentials.
         $forceLogin = in_array($this->SysParameter->get('system.canvas_force_login', 'false'), array('1', 'true', 'yes'));
-        $_split_current_url = explode('?', $this->_getCurrentUrl());
+
+        // Canvas LMS requires a fixed, pre-registered redirect URI — use the dedicated callback action
+        $appUrl = $this->SysParameter->get('system.absolute_url');
+        if (empty($appUrl)) {
+            $callbackUrl = Router::url(array('controller' => 'users', 'action' => 'canvasOauthCallback'), true);
+        } else {
+            $callbackUrl = $appUrl . Router::url(array('controller' => 'users', 'action' => 'canvasOauthCallback'), false);
+        }
 
         $canvasOauthUrl = $this->getBaseUrl(true) . '/login/oauth2/auth' .
                             '?client_id=' . $this->SysParameter->get('system.canvas_client_id') .
@@ -294,9 +305,65 @@ class CanvasApiComponent extends CakeObject
                             '&state=' . $state .
                             ($forceLogin ? '&force_login=1' : '') .
                             '&purpose=iPeer' .
-                            '&redirect_uri=' . array_shift($_split_current_url);
+                            '&redirect_uri=' . $callbackUrl;
 
         $_controller->redirect($canvasOauthUrl);
+    }
+
+    /**
+     * Handle the OAuth callback from Canvas on the fixed /users/canvasOauthCallback route.
+     * Validates the CSRF state, exchanges the authorisation code for an access token,
+     * and redirects the user back to where they were when the OAuth flow started.
+     * Auth check (session still alive?) must be done by the caller before invoking this.
+     *
+     * @param object $_controller the UsersController handling the request
+     *
+     * @access public
+     * @return void
+     */
+    public function handleOauthCallback($_controller)
+    {
+        $returnUrl = $_controller->Session->read('canvas_oauth_return_url');
+        if (empty($returnUrl)) {
+            $returnUrl = '/';
+        }
+
+        if (isset($_controller->params['url']['error']) && $_controller->params['url']['error'] == 'access_denied') {
+            $_controller->Session->delete('oauth_' . $this->provider . '_state');
+            $_controller->Session->delete('canvas_oauth_return_url');
+            $_controller->Session->setFlash(__('Canvas authorization was cancelled. You need to authorize iPeer '
+                                              .'in order to use Canvas functionalities.', true));
+            $_controller->redirect($returnUrl);
+            return;
+        }
+
+        if (!isset($_controller->params['url']['code'])) {
+            $_controller->Session->setFlash(__('There was an authentication error while trying to connect to Canvas. Please try again.', true));
+            $_controller->redirect($returnUrl);
+            return;
+        }
+
+        $sessionState = $_controller->Session->read('oauth_' . $this->provider . '_state');
+        if (empty($sessionState) || !isset($_controller->params['url']['state']) || $_controller->params['url']['state'] !== $sessionState) {
+            $_controller->Session->setFlash(__('There was an authentication error while trying to connect to Canvas. Please try again.', true));
+            $_controller->redirect($returnUrl);
+            return;
+        }
+
+        $_controller->Session->delete('oauth_' . $this->provider . '_state');
+        $_controller->Session->delete('canvas_oauth_return_url');
+
+        $apiToken = $this->getApiTokenUsingCode($_controller->params['url']['code']);
+
+        if (isset($apiToken['accessToken'])) {
+            $_controller->Session->setFlash(__('You have successfully connected to Canvas.', true), 'good');
+        } elseif (isset($apiToken['err'])) {
+            $_controller->Session->setFlash($apiToken['err']);
+        } else {
+            $_controller->Session->setFlash(__('There was an error connecting to Canvas. Please try again.', true));
+        }
+
+        $_controller->redirect($returnUrl);
     }
 
     /**

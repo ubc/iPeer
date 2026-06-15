@@ -64,6 +64,9 @@ class UsersController extends AppController
         $this->FileUpload->attr('forceWebroot', false);
 
         $this->canvasEnabled = in_array($this->SysParameter->get('system.canvas_enabled', 'false'), array('1', 'true', 'yes'));
+
+        // Bypass ACL tree for the Canvas OAuth callback — access is enforced inside the action
+        $this->Auth->allow('canvasOauthCallback');
     }
 
     /**
@@ -1167,6 +1170,24 @@ class UsersController extends AppController
      *
      * @return void
      */
+    public function canvasOauthCallback()
+    {
+        if (!$this->Auth->user()) {
+            $this->Session->setFlash(__('Your session expired during Canvas authorization. Please log in and try again.', true));
+            $this->redirect($this->Auth->loginAction);
+            return;
+        }
+
+        $api = $this->_createCanvasApi($this->Auth->user('id'));
+        $api->handleOauthCallback($this);
+    }
+
+    protected function _createCanvasApi($userId)
+    {
+        App::import('Component', 'CanvasApi');
+        return new CanvasApiComponent($userId);
+    }
+
     public function import($courseId = null, $importFrom = 'file')
     {
         $iPeerCourse = null;
