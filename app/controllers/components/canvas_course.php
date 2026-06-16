@@ -82,10 +82,19 @@ class CanvasCourseComponent extends CakeObject
     static public function getAllByIPeerUser($_controller, $user_id, $force_auth=true, $enrollment_type=CanvasCourseUserComponent::ENROLLMENT_QUERY_TEACHER)
     {
         $api = new CanvasApiComponent($user_id);
-        $params = array(
-            'include[]' => 'term',
-            'enrollment_type' => $enrollment_type,
+
+        $superadminAllCourses = in_array(
+            $api->SysParameter->get('system.canvas_superadmin_all_courses', 'false'),
+            array('1', 'true', 'yes')
         );
+        if ($superadminAllCourses && User::hasPermission('functions/superadmin')) {
+            $enrollment_type = null;
+        }
+
+        $params = array('include[]' => 'term');
+        if ($enrollment_type !== null) {
+            $params['enrollment_type'] = $enrollment_type;
+        }
 
         $courses_json = $api->getCanvasData($_controller, $force_auth, '/courses', $params);
 
