@@ -20,7 +20,7 @@ class CanvasApiComponent extends CakeObject
     protected $paginationMaxRetrieveAll;    // max how many items to retrieve when auto-looping pagination
     protected $paginationMaxCall;           // limit the number of Canvas API call when auto-looping pagination
 
-    protected $SysParameter;
+    public $SysParameter;
     protected $userId;
     protected $provider = 'canvas';
     protected $apiPath = '/api/v1';
@@ -199,31 +199,72 @@ class CanvasApiComponent extends CakeObject
             }
         }
 
-        // returning from canvas with auth code
+        // returning from canvas with auth code (legacy: redirect_uri was the current page)
         if (isset($_controller->params['url']['code'])){
-            // ensure state is the same for security, then get tokens
-            if ($_controller->params['url']['state'] == $_controller->Session->read('oauth_'.$this->provider.'_state')){
-                $_controller->Session->delete('oauth_'.$this->provider.'_state');
-                $apiToken = $this->getApiTokenUsingCode($_controller->params['url']['code']);
-                if (isset($apiToken['accessToken'])) {
-                    $_controller->Session->setFlash('You have successfully connected to Canvas.', 'good');
-                    $_controller->redirect($this->_getCurrentUrl());
-                }
-                elseif (isset($apiToken['err'])){
-                    $_controller->Session->setFlash($apiToken['err']);
-                }
-                else {
-                    $_controller->Session->setFlash('There was an error connecting to Canvas. Please try again.');
-                }
-            }
-            else {
-                $_controller->Session->setFlash('There was an authentication error while trying to connect to Canvas. Please try again.');
+            $destination = $this->handleOauthCallback($_controller);
+            if ($destination) {
+                $_controller->redirect($destination);
             }
         }
         // if no access token, get a new access token by forwarding the user to the canvas auth page
         elseif ($force_auth) {
             $this->_getNewOauth($_controller);
         }
+    }
+
+    /**
+     * handle the OAuth callback from Canvas (code exchange + state validation)
+     *
+     * @param object $_controller the controller that received the Canvas redirect
+     *
+     * @access public
+     * @return mixed destination URL string on success, false on failure (flash message already set)
+     */
+    public function handleOauthCallback($_controller)
+    {
+        if (!isset($_controller->params['url']['code'])) {
+            $received = array_keys((array) $_controller->params['url']);
+            CakeLog::write('warning', 'Canvas OAuth callback: no code parameter received. URL params present: ' . implode(', ', $received));
+            return false;
+        }
+
+        $receivedState = isset($_controller->params['url']['state']) ? $_controller->params['url']['state'] : null;
+        $sessionState  = $_controller->Session->read('oauth_'.$this->provider.'_state');
+
+        if (empty($receivedState) || empty($sessionState)) {
+            CakeLog::write('warning', 'Canvas OAuth callback: missing state parameter or no OAuth flow in session for user ' . $this->userId);
+            $_controller->Session->setFlash('There was an authentication error while trying to connect to Canvas. Please try again.');
+            return false;
+        }
+
+        if ($receivedState === $sessionState) {
+            $_controller->Session->delete('oauth_'.$this->provider.'_state');
+            $apiToken = $this->getApiTokenUsingCode($_controller->params['url']['code']);
+            // destination path is embedded in the state after '|'; fall back to current URL for legacy flows
+            $parts = explode('|', $receivedState, 2);
+            if (isset($parts[1])) {
+                $path = $parts[1];
+                // only accept a simple relative path — rejects external URLs and protocol-relative URLs
+                $destination = (strpos($path, '/') === 0 && strpos($path, '//') !== 0) ? $path : '/';
+            } else {
+                $destination = $this->_getCurrentUrl();
+            }
+            if (isset($apiToken['accessToken'])) {
+                $_controller->Session->setFlash('You have successfully connected to Canvas.', 'good');
+                return $destination;
+            }
+            elseif (isset($apiToken['err'])) {
+                $_controller->Session->setFlash($apiToken['err']);
+            }
+            else {
+                $_controller->Session->setFlash('There was an error connecting to Canvas. Please try again.');
+            }
+        }
+        else {
+            $_controller->Session->setFlash('There was an authentication error while trying to connect to Canvas. Please try again.');
+        }
+
+        return false;
     }
 
     /**
@@ -279,24 +320,72 @@ class CanvasApiComponent extends CakeObject
             $_controller->redirect('/');
         }
 
-        // this will be passed back by Canvas along with the code, so we save it in session and check it at that point to ensure security
-        $state = uniqid('st');
+        // embed the return path (not full URL) in the state so the callback can redirect back;
+        // using only the path prevents open-redirect via a crafted HTTP_HOST header
+        $stateId   = bin2hex(random_bytes(16));
+        $parsedUrl = parse_url($this->_getCurrentUrl());
+        $returnPath = $parsedUrl['path'];
+        if (!empty($parsedUrl['query'])) {
+            $returnPath .= '?' . $parsedUrl['query'];
+        }
+        $state = $stateId . '|' . $returnPath;
         $_controller->Session->write('oauth_'.$this->provider.'_state', $state);
 
         // if true, it will force the user to enter their credentials, even if they're already logged into Canvas. By default, if
         // a user already has an active Canvas web session, they will not be asked to re-enter their credentials.
         $forceLogin = in_array($this->SysParameter->get('system.canvas_force_login', 'false'), array('1', 'true', 'yes'));
-        $_split_current_url = explode('?', $this->_getCurrentUrl());
+
+        $scopes = implode(' ', array(
+            'url:GET|/api/v1/courses',
+            'url:GET|/api/v1/courses/:id',
+            'url:GET|/api/v1/courses/:course_id/users',
+            'url:GET|/api/v1/courses/:course_id/groups',
+            'url:GET|/api/v1/courses/:course_id/group_categories',
+            'url:GET|/api/v1/courses/:course_id/assignment_groups',
+            'url:GET|/api/v1/courses/:course_id/custom_gradebook_columns',
+            'url:GET|/api/v1/courses/:course_id/custom_gradebook_columns/:id/data',
+            'url:GET|/api/v1/courses/:course_id/assignments/:id',
+            'url:GET|/api/v1/courses/:course_id/assignments/:assignment_id/submissions',
+            'url:GET|/api/v1/group_categories/:group_category_id/groups',
+            'url:GET|/api/v1/group_categories/:group_category_id',
+            'url:GET|/api/v1/groups/:group_id/users',
+            'url:GET|/api/v1/progress/:id',
+            'url:POST|/api/v1/courses/:course_id/assignments',
+            'url:POST|/api/v1/courses/:course_id/assignment_groups',
+            'url:POST|/api/v1/courses/:course_id/group_categories',
+            'url:POST|/api/v1/group_categories/:group_category_id/groups',
+            'url:POST|/api/v1/groups/:group_id/memberships',
+            'url:POST|/api/v1/courses/:course_id/custom_gradebook_columns',
+            'url:POST|/api/v1/courses/:course_id/assignments/:assignment_id/submissions/update_grades',
+            'url:DELETE|/api/v1/groups/:group_id',
+            'url:DELETE|/api/v1/courses/:course_id/custom_gradebook_columns/:id',
+        ));
 
         $canvasOauthUrl = $this->getBaseUrl(true) . '/login/oauth2/auth' .
                             '?client_id=' . $this->SysParameter->get('system.canvas_client_id') .
                             '&response_type=code' .
-                            '&state=' . $state .
+                            '&state=' . urlencode($state) .
                             ($forceLogin ? '&force_login=1' : '') .
                             '&purpose=iPeer' .
-                            '&redirect_uri=' . array_shift($_split_current_url);
+                            '&scope=' . urlencode($scopes) .
+                            '&redirect_uri=' . $this->_getCallbackUrl();
 
         $_controller->redirect($canvasOauthUrl);
+    }
+
+    /**
+     * get the absolute URL for the centralised OAuth callback endpoint
+     *
+     * @access private
+     * @return string
+     */
+    private function _getCallbackUrl()
+    {
+        $appUrl = $this->SysParameter->get('system.absolute_url');
+        if (empty($appUrl)) {
+            return Router::url('/canvas_oauth_callback/callback', true);
+        }
+        return rtrim($appUrl, '/') . '/canvas_oauth_callback/callback';
     }
 
     /**
@@ -332,10 +421,12 @@ class CanvasApiComponent extends CakeObject
                 switch ($response->error) {
                     case 'invalid_client':
                         $auth_error = 'The client ID for Canvas Oauth is invalid. Please contact an administrator.';
+                        break;
                     case 'invalid_grant':
                         $auth_error = 'This ' . $grantType . ' was not found. This is sometimes caused by refreshing the page. If you continue having this issue, please contact an administrator.';
+                        break;
                     default:
-                        $auth_error = ucfirst($response->error_description);
+                        $auth_error = isset($response->error_description) ? h(ucfirst($response->error_description)) : 'An unknown error occurred.';
                 }
                 $error_description = sprintf(__('Error: Authentication failed. %s', true), $auth_error);
                 $error = $response->error;
@@ -457,6 +548,7 @@ class CanvasApiComponent extends CakeObject
                 }
                 // only merge result if there is no error
                 elseif (is_object($response->body) && isset($response->body->errors)) {
+                    CakeLog::write('warning', 'Canvas API error on ' . strtoupper($method) . ' ' . $uri . ': ' . $this->_getErrorsAsString($response->body->errors, ', '));
                     $_controller->Session->setFlash('There was an error sending / receiving Canvas data:' .
                                                     $this->_getErrorsAsString($response->body->errors));
                     break;

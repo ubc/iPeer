@@ -237,9 +237,19 @@ class CoursesController extends AppController
         //Setup the courseId to session
         $this->Session->write('ipeerSession.courseId', $id);
 
-        $this->set('topActionButtons', [
+        $topActionButtons = [
             ['url' => '/courses/edit/' . $id, 'label' => __('Edit Course', true), 'class' => 'edit-button'],
-        ]);
+        ];
+        $canvasBaseUrl = $this->SysParameter->get('system.canvas_baseurl');
+        if ($canvasBaseUrl && !empty($course['Course']['canvas_id'])) {
+            array_unshift($topActionButtons, [
+                'url'    => rtrim($canvasBaseUrl, '/') . '/courses/' . intval($course['Course']['canvas_id']),
+                'label'  => __('View in Canvas', true),
+                'class'  => 'canvas-button',
+                'target' => '_blank',
+            ]);
+        }
+        $this->set('topActionButtons', $topActionButtons);
         $this->set('bottomActionButtons', [
             ['url' => '/courses/delete/' . $id, 'label' => __('Delete Course', true), 'class' => 'delete-button'],
         ]);

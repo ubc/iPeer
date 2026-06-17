@@ -81,6 +81,10 @@
         <a
           href="<?php echo $button['url']; ?>"
           class="<?php echo $button['class']; ?>"
+          <?php if (!empty($button['target'])): ?>
+            target="<?php echo h($button['target']); ?>"
+            rel="noopener noreferrer"
+          <?php endif; ?>
           <?php if (!empty($button['confirmationMessage'])): ?>
             onclick="return confirm('<?php echo h(addslashes($button['confirmationMessage'])); ?>');"
           <?php endif; ?>
