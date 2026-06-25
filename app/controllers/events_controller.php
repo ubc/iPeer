@@ -659,13 +659,16 @@ class EventsController extends AppController
                 3 => array('model' => 'Survey', 'controller' => 'surveys'),
                 4 => array('model' => 'Mixeval', 'controller' => 'mixevals'),
             );
-            $eventTemplateTypeList = $this->EventTemplateType->getEventTemplateTypeList(true);
+            // Pass false so a type that is no longer offered for selection still
+            // resolves to its name when displaying an existing event's value.
+            $eventTemplateTypeList = $this->EventTemplateType->getEventTemplateTypeList(false);
             if (isset($eventTemplateTypeList[$lockedTypeId])) {
                 $lockedTypeName = $eventTemplateTypeList[$lockedTypeId];
             }
             if (isset($templateModelMap[$lockedTypeId])) {
                 $modelName = $templateModelMap[$lockedTypeId]['model'];
-                $lockedTemplateName = $this->{$modelName}->field('name', array($modelName . '.id' => $lockedTemplateId));
+                // field() returns false when the template row has been deleted.
+                $lockedTemplateName = (string) $this->{$modelName}->field('name', array($modelName . '.id' => $lockedTemplateId));
                 $lockedTemplateLink = '/' . $templateModelMap[$lockedTypeId]['controller'] . '/view/' . $lockedTemplateId;
             }
         }
