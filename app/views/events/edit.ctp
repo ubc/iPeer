@@ -41,7 +41,7 @@ $lockEvaluationType = $lockEvaluationType ?? false;
 if ($lockEvaluationType === true) {
     echo '<div class="input select">';
     echo '<label>' . __('Evaluation Type and Template', true) . '</label>';
-    echo '<span>' . $lockedTypeName;
+    echo '<span>' . h($lockedTypeName);
     if ($lockedTemplateName !== '') {
         echo ' - ' . $html->link($lockedTemplateName, $lockedTemplateLink, array('target' => '_blank'));
     }
