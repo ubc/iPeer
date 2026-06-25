@@ -41,6 +41,9 @@ if (!empty($notInGroup)) {
 <?php
 $aveScoreSum = 0;
 $scores = array();
+if (!is_array($scoreRecords ?? null)) {
+    $scoreRecords = array();
+}
 array_pop($scoreRecords);
 //This section will display the average scores their peers gave them for various criteria
 foreach ($scoreRecords as $userId => $member) {

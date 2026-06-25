@@ -614,10 +614,67 @@ class EventsController extends AppController
         $this->set('emailTemplates', $this->EmailTemplate->getPermittedEmailTemplate(User::get('id'), 'list'));
         $this->set('emailSchedules', $emailReminders);
 
+        $this->_setEvaluationTypeLock($eventId, $event);
+
         $this->set('event', $event);
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $event['Course']))->push(array('event' => $event['Event']))->push(__('Edit', true)));
 
         $this->data = $event;
+    }
+
+    /**
+     * Set view variables that lock the evaluation type/template selector once
+     * answers or submissions exist for the event. Changing the type after data
+     * has been collected orphans the answers in the old type's table. This is a
+     * cosmetic guard - the hidden inputs still submit their current values so
+     * other edits save normally.
+     *
+     * @param int   $eventId event id
+     * @param array $event   event record (with Event.event_template_type_id and Event.template_id)
+     *
+     * @return void
+     */
+    private function _setEvaluationTypeLock($eventId, $event)
+    {
+        $lockEvaluationType = false;
+        foreach (array('EvaluationSubmission', 'EvaluationSimple', 'EvaluationRubric', 'EvaluationMixeval') as $answerModel) {
+            if ($this->Event->{$answerModel}->find('count', array('conditions' => array($answerModel . '.event_id' => $eventId)))) {
+                $lockEvaluationType = true;
+                break;
+            }
+        }
+        $this->set('lockEvaluationType', $lockEvaluationType);
+
+        // When locked, resolve the current type name, template name and a link
+        // to the template page so the read-only display can show them.
+        $lockedTypeName = '';
+        $lockedTemplateName = '';
+        $lockedTemplateLink = '';
+        if ($lockEvaluationType) {
+            $lockedTypeId = $event['Event']['event_template_type_id'];
+            $lockedTemplateId = $event['Event']['template_id'];
+            $templateModelMap = array(
+                1 => array('model' => 'SimpleEvaluation', 'controller' => 'simpleevaluations'),
+                2 => array('model' => 'Rubric', 'controller' => 'rubrics'),
+                3 => array('model' => 'Survey', 'controller' => 'surveys'),
+                4 => array('model' => 'Mixeval', 'controller' => 'mixevals'),
+            );
+            // Pass false so a type that is no longer offered for selection still
+            // resolves to its name when displaying an existing event's value.
+            $eventTemplateTypeList = $this->EventTemplateType->getEventTemplateTypeList(false);
+            if (isset($eventTemplateTypeList[$lockedTypeId])) {
+                $lockedTypeName = $eventTemplateTypeList[$lockedTypeId];
+            }
+            if (isset($templateModelMap[$lockedTypeId])) {
+                $modelName = $templateModelMap[$lockedTypeId]['model'];
+                // field() returns false when the template row has been deleted.
+                $lockedTemplateName = (string) $this->{$modelName}->field('name', array($modelName . '.id' => $lockedTemplateId));
+                $lockedTemplateLink = '/' . $templateModelMap[$lockedTypeId]['controller'] . '/view/' . $lockedTemplateId;
+            }
+        }
+        $this->set('lockedTypeName', $lockedTypeName);
+        $this->set('lockedTemplateName', $lockedTemplateName);
+        $this->set('lockedTemplateLink', $lockedTemplateLink);
     }
 
     /**

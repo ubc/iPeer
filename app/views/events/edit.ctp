@@ -33,6 +33,27 @@ echo $this->Form->input('id');
 <?php echo $this->Form->input('title', array('label' => 'Event Title'));
 echo "<div id='titleWarning' class='red'></div>";
 echo $this->Form->input('description', array('type' => 'textarea'));
+
+$lockEvaluationType = $lockEvaluationType ?? false;
+// Once submissions/answers exist the evaluation type and template are locked.
+// Show the current type read-only and hide (but keep enabled) the real inputs
+// so their current values still submit and other edits save normally.
+if ($lockEvaluationType === true) {
+    echo '<div class="input select">';
+    echo '<label>' . __('Evaluation Type and Template', true) . '</label>';
+    echo '<span>' . h($lockedTypeName);
+    if ($lockedTemplateName !== '') {
+        echo ' - ' . $html->link($lockedTemplateName, $lockedTemplateLink, array('target' => '_blank'));
+    }
+    echo '</span>';
+    echo '<div class="help-text">' . __('The evaluation type and template are locked because submissions have already been received.', true) . '</div>';
+    echo '</div>';
+
+
+
+    echo '<div style="display:none">'; // hides the following fields
+}
+
 echo $this->Form->input('event_template_type_id');
 
 echo $this->Form->input('SimpleEvaluation',
@@ -67,6 +88,10 @@ echo $this->Form->input('Mixeval',
         'selected' => $mixevalSelected
     )
 );
+
+if ($lockEvaluationType === true) {
+    echo '</div>';
+}
 
 echo $this->Form->input(
     'self_eval',
