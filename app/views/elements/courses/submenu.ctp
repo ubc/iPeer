@@ -55,6 +55,9 @@ switch($submenu) {
     );
     break;
   case "TeamMaker":
+    if (!($teamMakerEnabled ?? true)) {
+        break;
+    }
     if ($status == 'A') {
         array_push(
             $items,
@@ -90,6 +93,12 @@ switch($submenu) {
         // );
     }
     break;
+}
+
+// nothing to show (e.g. the section is disabled) - skip the heading and
+// border rather than rendering an empty box
+if (empty($items)) {
+    return;
 }
 ?>
 <div class="course_submenu course_submenu-<?php echo $submenu; ?>">
