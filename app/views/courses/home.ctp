@@ -61,7 +61,7 @@ $submenuTitle = __('Evaluation Events', true);
 $params = array('controller'=>'courses', 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'course_id'=>$data['Course']['id']);
 echo $this->element('courses/submenu', $params);
 
-if (!empty($teamMakerEnabled) && User::hasPermission('controllers/Surveys')) {
+if (($teamMakerEnabled ?? true) && User::hasPermission('controllers/Surveys')) {
   $submenu = 'TeamMaker';
   $submenuTitle = __('Team Maker', true);
   $params = array('controller'=>'courses', 'submenu'=>$submenu, 'submenuTitle'=>$submenuTitle, 'course_id'=>$data['Course']['id']);

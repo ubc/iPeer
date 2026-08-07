@@ -35,7 +35,7 @@ class AppController extends Controller
     public $breadcrumb;
     public $validTZ;
     public $emailInterfaceEnabled = true;
-    public $teamMakerEnabled = false;
+    public $teamMakerEnabled = true;
 
     /**
      * if this request has session transfer data
@@ -180,7 +180,7 @@ class AppController extends Controller
         // check if TeamMaker is enabled. Set here rather than per-controller
         // because the footer, which renders on every layout, needs it.
         $this->teamMakerEnabled = in_array(
-            $this->SysParameter->get('system.teammaker_enabled', 'false'),
+            $this->SysParameter->get('system.teammaker_enabled', 'true'),
             array('1', 'true', 'yes')
         );
         $this->set('teamMakerEnabled', $this->teamMakerEnabled);

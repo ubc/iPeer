@@ -86,7 +86,7 @@ if (isset($course_list['I']))
     <li><?php __('Then <i>register students</i> into that course from that course\'s home page. This display will be available (once the course is created) by clicking on the course\'s name from most menus.')?>
     </li>
 
-    <li><?php if (!empty($teamMakerEnabled)) {
+    <li><?php if ($teamMakerEnabled ?? true) {
         __('Put your students into <i>groups</i> manually, (or, if you have the students complete a survey, iPeer can do it for you, using TeamMaker).');
     } else {
         __('Put your students into <i>groups</i> manually.');

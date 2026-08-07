@@ -55,7 +55,7 @@ switch($submenu) {
     );
     break;
   case "TeamMaker":
-    if (empty($teamMakerEnabled)) {
+    if (!($teamMakerEnabled ?? true)) {
         break;
     }
     if ($status == 'A') {
