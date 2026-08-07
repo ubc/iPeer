@@ -87,9 +87,9 @@ if (isset($course_list['I']))
     </li>
 
     <li><?php if ($teamMakerEnabled ?? true) {
-        __('Put your students into <i>groups</i> manually, (or, if you have the students complete a survey, iPeer can do it for you, using TeamMaker).');
+        __('Put your students into <i>groups</i> (or, if you have the students complete a survey, iPeer can do it for you, using TeamMaker).');
     } else {
-        __('Put your students into <i>groups</i> manually.');
+        __('Put your students into <i>groups</i>.');
     } ?>
     </li>
 
