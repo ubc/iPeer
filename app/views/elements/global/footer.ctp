@@ -1,6 +1,10 @@
 <div id='footer' class='pagewidth'>
   <p>
-  <?php __('Powered by iPeer and TeamMaker - Created by UBC and Rose-Hulman')?>
+  <?php if (!empty($teamMakerEnabled)) {
+      __('Powered by iPeer and TeamMaker - Created by UBC and Rose-Hulman');
+  } else {
+      __('Powered by iPeer - Created by UBC and Rose-Hulman');
+  } ?>
   </p>
   <?php if (!empty($ipeerCommitHash)): ?>
   <p>

@@ -35,6 +35,7 @@ class AppController extends Controller
     public $breadcrumb;
     public $validTZ;
     public $emailInterfaceEnabled = true;
+    public $teamMakerEnabled = false;
 
     /**
      * if this request has session transfer data
@@ -175,6 +176,14 @@ class AppController extends Controller
             array('1', 'true', 'yes')
         );
         $this->set('emailInterfaceEnabled', $this->emailInterfaceEnabled);
+
+        // check if TeamMaker is enabled. Set here rather than per-controller
+        // because the footer, which renders on every layout, needs it.
+        $this->teamMakerEnabled = in_array(
+            $this->SysParameter->get('system.teammaker_enabled', 'false'),
+            array('1', 'true', 'yes')
+        );
+        $this->set('teamMakerEnabled', $this->teamMakerEnabled);
 
         // for setting up google analytics
         $trackingId = $this->SysParameter->findByParameterCode('google_analytics.tracking_id');

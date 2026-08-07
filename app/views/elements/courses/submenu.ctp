@@ -55,6 +55,9 @@ switch($submenu) {
     );
     break;
   case "TeamMaker":
+    if (empty($teamMakerEnabled)) {
+        break;
+    }
     if ($status == 'A') {
         array_push(
             $items,
