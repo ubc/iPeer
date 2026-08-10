@@ -143,6 +143,10 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->assertEqual($result['rubrics'][1], 'Term Report Evaluation');
         $this->assertEqual($result['simpleEvaluations'][1], 'Module 1 Project Evaluation');
         $this->assertEqual($result['mixevals'][1], 'Default Mix Evaluation');
+        // root created the sample templates, so the "Mine only" lists match
+        $this->assertEqual($result['rubricsMine'][1], 'Term Report Evaluation');
+        $this->assertEqual($result['simpleEvaluationsMine'][1], 'Module 1 Project Evaluation');
+        $this->assertEqual($result['mixevalsMine'][1], 'Default Mix Evaluation');
         // evauation types
         $this->assertEqual(count($result['eventTemplateTypes']), 4);
         // course list
@@ -158,6 +162,99 @@ class EventsControllerTest extends ExtendedAuthTestCase {
             1 => 'Reapers',
             2 => 'Lazy Engineers',
         ));
+    }
+
+    function testAddTemplateListsExcludeOthersFromMine() {
+        // instructor1 did not create the sample templates - they only show up
+        // in the full lists, because they are public
+        $this->login = array(
+            'User' => array(
+                'username' => 'instructor1',
+                'password' => md5('ipeeripeer')
+            )
+        );
+        $result = $this->testAction('/events/add/1', array('return' => 'vars'));
+
+        $this->assertEqual($result['rubrics'][1], 'Term Report Evaluation');
+        $this->assertFalse(isset($result['rubricsMine'][1]));
+        $this->assertFalse(isset($result['simpleEvaluationsMine'][1]));
+        $this->assertFalse(isset($result['mixevalsMine'][1]));
+    }
+
+    function testAddWithoutTemplate() {
+        $data = array(
+            'Event' => array(
+                'title' => 'no template evaluation',
+                'description' => 'no template selected',
+                'event_template_type_id' => 1,
+                'SimpleEvaluation' => '',
+                'self_eval' => 0,
+                'com_req' => 0,
+                'due_date' => '2012-11-28 00:00:01',
+                'release_date_begin' => '2012-11-20 00:00:01',
+                'release_date_end' => '2012-11-29 00:00:01',
+                'result_release_date_begin' => '2012-11-30 00:00:01',
+                'result_release_date_end' => '2022-12-12 00:00:01',
+                'email_schedule' => 0,
+                'EmailTemplate' => 2,
+            ),
+            'Group' => array(
+                'Group' => array(1,2)
+            ),
+        );
+        $this->testAction(
+            '/events/add/1',
+            array('fixturize' => true, 'data' => $data, 'method' => 'post')
+        );
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Add event failed. Please select an evaluation template.');
+
+        $model = ClassRegistry::init('Event');
+        $event = $model->find('first', array('conditions' => array('title' => 'no template evaluation'), 'contain' => false));
+        $this->assertFalse($event);
+    }
+
+    function testEditWithoutTemplate() {
+        $data = array(
+            'formLoaded' => true,
+            'Event' => array(
+                'id' => 8,
+                'title' => 'simple evaluation 4a',
+                'description' => 'no template selected',
+                'event_template_type_id' => 1,
+                'SimpleEvaluation' => '',
+                'self_eval' => 0,
+                'com_req' => 0,
+                'enable_details' => 0,
+                'auto_release' => 0,
+                'due_date' => '2012-11-28 00:00:01',
+                'release_date_begin' => '2012-11-20 00:00:01',
+                'release_date_end' => '2012-11-29 00:00:01',
+                'result_release_date_begin' => '2012-11-30 00:00:01',
+                'result_release_date_end' => '2022-12-12 00:00:01',
+                'email_schedule' => 0,
+                'EmailTemplate' => 2,
+            ),
+            // no groups submitted - the guard has to stop before the
+            // GroupEvent rows are deleted
+            'Group' => array(
+                'Group' => array()
+            ),
+        );
+        $this->testAction(
+            '/events/edit/8',
+            array('fixturize' => true, 'data' => $data, 'method' => 'post')
+        );
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Edit event failed. Please select an evaluation template.');
+
+        $model = ClassRegistry::init('Event');
+        $event = $model->find('first', array('conditions' => array('id' => 8), 'contain' => array('GroupEvent')));
+        // nothing saved and nothing deleted
+        $this->assertEqual($event['Event']['title'], 'simple evaluation 4');
+        $this->assertEqual(count($event['GroupEvent']), 1);
     }
 
     function testAddWithData() {

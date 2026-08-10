@@ -23,6 +23,7 @@ function checkGroups() {
 
 <?php
 $html->script("jquery-ui-timepicker-addon", array("inline"=>false));
+$html->script("template_autocomplete", array("inline"=>false));
 echo $this->Form->create('Event', array('action' => "edit", "onsubmit" => "return checkGroups()"));
 echo '<input type="hidden" name="required" id="required" value="eventId" />';
 echo $this->Form->input('id');
@@ -54,40 +55,51 @@ if ($lockEvaluationType === true) {
     echo '<div style="display:none">'; // hides the following fields
 }
 
+echo "<div class='templateBox'>";
 echo $this->Form->input('event_template_type_id');
 
+// 'empty' covers the case where the event's template has been deleted - the
+// selected value below still wins whenever the template still exists. The
+// selects are hidden by initTemplateAutocomplete() below and replaced with a
+// search box, but they remain the fields that are submitted.
+$templateEmpty = __('-- Select a template --', true);
 echo $this->Form->input('SimpleEvaluation',
     array(
         'div' => array('id' => 'SimpleEvalDiv'),
+        'empty' => $templateEmpty,
         'label' => $html->link(
-            'Preview', '', array('id' => 'prevS', 'target' => '_blank')),
+            'Preview', '', array('id' => 'prevS', 'class' => 'templatePreviewLink', 'target' => '_blank')),
         'selected' => $simpleSelected
     )
 );
 echo $this->Form->input('Rubric',
     array(
         'div' => array('id' => 'RubricDiv'),
+        'empty' => $templateEmpty,
         'label' => $html->link(
-            'Preview', '', array('id' => 'prevR', 'target' => '_blank')),
+            'Preview', '', array('id' => 'prevR', 'class' => 'templatePreviewLink', 'target' => '_blank')),
         'selected'=> $rubricSelected
     )
 );
 echo $this->Form->input('Survey',
     array(
         'div' => array('id' => 'SurveyDiv'),
+        'empty' => $templateEmpty,
         'label' => $html->link(
-            'Preview', '', array('id' => 'prevV', 'target' => '_blank')),
+            'Preview', '', array('id' => 'prevV', 'class' => 'templatePreviewLink', 'target' => '_blank')),
         'selected' => $surveySelected
     )
 );
 echo $this->Form->input('Mixeval',
     array(
         'div' => array('id' => 'MixevalDiv'),
+        'empty' => $templateEmpty,
         'label' => $html->link(
-            'Preview', '', array('id' => 'prevM', 'target' => '_blank')),
+            'Preview', '', array('id' => 'prevM', 'class' => 'templatePreviewLink', 'target' => '_blank')),
         'selected' => $mixevalSelected
     )
 );
+echo "</div>";
 
 if ($lockEvaluationType === true) {
     echo '</div>';
@@ -269,6 +281,13 @@ jQuery("#EventSimpleEvaluation").change(updatePreview);
 jQuery("#EventRubric").change(updatePreview);
 jQuery("#EventSurvey").change(updatePreview);
 jQuery("#EventMixeval").change(updatePreview);
+// turn the four template selects into searchable inputs with a "Mine only"
+// filter. Done after the change handlers above so picking an item updates the
+// Preview links.
+initTemplateAutocomplete("#EventSimpleEvaluation", <?php echo json_encode(array_keys((array) $simpleEvaluationsMine)); ?>);
+initTemplateAutocomplete("#EventRubric", <?php echo json_encode(array_keys((array) $rubricsMine)); ?>);
+initTemplateAutocomplete("#EventSurvey", <?php echo json_encode(array_keys((array) $surveysMine)); ?>);
+initTemplateAutocomplete("#EventMixeval", <?php echo json_encode(array_keys((array) $mixevalsMine)); ?>);
 jQuery("#EventEmailSchedule").change(toggleEmailTemplate);
 jQuery("#EventEmailTemplate").change(updateEmailPreview);
 jQuery("input:radio[name=data['Event']['self_eval']]").change(toggleSelfEval);

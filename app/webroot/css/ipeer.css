@@ -1189,6 +1189,26 @@ i {
     margin-bottom: 0.5em;
 }
 
+/* search box that replaces the evaluation template selects */
+#Events .templateAutocomplete {
+    width: 20em;
+}
+
+#Events .templateFilter {
+    margin-left: 0.5em;
+    font-size: 0.9em;
+    color: gray;
+    white-space: nowrap;
+}
+
+/* the label is inside div.select, so undo the 18em form label width */
+#Events .select label.templateMineOnlyLabel {
+    display: inline;
+    width: auto;
+    margin-left: 0.25em;
+    font-weight: normal;
+}
+
 #Events .text label, #Events .password label,
 #Events .textarea label, #Events .select label,
 #Events .datetime label, #Events .radio legend,
@@ -2516,4 +2536,70 @@ pre code {
     margin: 0 0.2em;
     border-radius: 3px;
     font-size: 0.95em;
+}
+
+/* Events - evaluation type and template selection box
+ * These rules come after the earlier #Events template rules on purpose, so the
+ * "Mine only" label overrides land last without editing anything above.
+ * */
+#Events .templateBox {
+    clear: both;
+    overflow: hidden; /* contain the floated labels */
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background-color: #fafafa;
+    /* no left padding, so labels stay aligned with the rest of the form */
+    padding: 0.75em 1em 0.75em 0;
+    margin: 0.5em 0 1em 0;
+}
+
+/* the "Mine only" label sits inside div.select, where the shared form styling
+ * floats labels into their own 18em column - undo that so the label stays
+ * beside its checkbox */
+#Events .templateBox .select label.templateMineOnlyLabel {
+    float: none;
+    clear: none;
+    display: inline;
+    width: auto;
+    min-width: 0;
+    margin: 0 0 0 0.25em;
+    padding: 0;
+    text-align: left;
+    font-weight: normal;
+    vertical-align: middle;
+    font-size: 0.9em;
+}
+
+/* the input and the filter line share this box, which sits wherever the form
+ * label ends */
+#Events .templateBox .templateField {
+    display: inline-block;
+    vertical-align: top;
+}
+
+/* own line below the search box, indented by the input's own margin so the
+ * checkbox lines up with the left edge of the box above it */
+#Events .templateBox .templateFilter {
+    display: block;
+    margin-left: 0.35em;
+    white-space: nowrap;
+}
+
+#Events .templateBox .templateMineOnly {
+    margin: 0;
+    vertical-align: middle;
+}
+
+/* the autocomplete menu is appended to the body, so it cannot be scoped to
+ * #Events - the "no matching templates" row is a message, not a choice */
+.ui-autocomplete li.templateNoResults a {
+    color: gray;
+    font-style: italic;
+    cursor: default;
+}
+
+.ui-autocomplete li.templateNoResults a.ui-state-hover,
+.ui-autocomplete li.templateNoResults a.ui-state-focus {
+    background: none;
+    border-color: transparent;
 }

@@ -204,6 +204,42 @@ class Mixeval extends AppModel
     }
 
     /**
+     * getBelongingOnly
+     * Returns only the mixed evaluations made by this user - public ones made
+     * by other users are excluded. Optionally include an additional evaluation
+     * by id, so a template already attached to an event stays selectable even
+     * if it belongs to somebody else.
+     *
+     * Note duplicate in evaluation_base, for the same reason
+     * getBelongingOrPublic above is duplicated.
+     *
+     * @param mixed $user_id
+     * @param mixed $include_id
+     *
+     * @access public
+     * @return array
+     */
+    function getBelongingOnly($user_id, $include_id=NULL)
+    {
+        if (!is_numeric($user_id)) {
+            return false;
+        }
+
+        if (!is_null($include_id) && !is_numeric($include_id)) {
+            return false;
+        }
+
+        $conditions = array('creator_id' => $user_id);
+        if (!is_null($include_id)) {
+            $conditions = array('OR' => array(
+                'creator_id' => $user_id,
+                'id' => $include_id,
+            ));
+        }
+        return $this->find('list', array('conditions' => $conditions, 'fields' => array('name'), 'order' => 'name'));
+    }
+
+    /**
      * formatPenaltyArray return the array that student has penalty. key will
      * be the user id and value will be the penalty. The student without
      * penalty will be value 0.

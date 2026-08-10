@@ -328,6 +328,24 @@ class EventsController extends AppController
             'rubrics',
             $this->Rubric->getBelongingOrPublic($this->Auth->user('id'))
         );
+        // the same lists restricted to the user's own templates, used by the
+        // "Mine only" filter on the template autocompletes
+        $this->set(
+            'mixevalsMine',
+            $this->Mixeval->getBelongingOnly($this->Auth->user('id'))
+        );
+        $this->set(
+            'simpleEvaluationsMine',
+            $this->SimpleEvaluation->getBelongingOnly($this->Auth->user('id'))
+        );
+        $this->set(
+            'surveysMine',
+            $this->Survey->getBelongingOnly($this->Auth->user('id'))
+        );
+        $this->set(
+            'rubricsMine',
+            $this->Rubric->getBelongingOnly($this->Auth->user('id'))
+        );
         $emailReminders = array('0'=> 'Disable', '1' => '1 Day', '2'=>'2 Days','3'=>'3 Days','4'=>'4 Days','5'=>'5 Days','6'=>'6 Days','7'=>'7 Days');
         $this->set('emailTemplates', $this->EmailTemplate->getPermittedEmailTemplate(User::get('id'), 'list'));
         $this->set('emailSchedules', $emailReminders);
@@ -350,6 +368,12 @@ class EventsController extends AppController
             } else if ($typeId == 4) {
                 $this->data['Event']['template_id'] =
                     $this->data['Event']['Mixeval'];
+            }
+            // no template is preselected, so the user can submit without
+            // picking one - stop here and re-render with what was entered
+            if (empty($this->data['Event']['template_id'])) {
+                $this->Session->setFlash(__('Add event failed. Please select an evaluation template.', true));
+                return;
             }
             $this->data = $this->_multiMap($this->data);
             if ($this->Event->saveAll($this->data)) {
@@ -499,66 +523,72 @@ class EventsController extends AppController
                 $this->data['Event']['template_id'] =
                     $this->data['Event']['Mixeval'];
             }
-
-            // if all groups unselected - delete groupEvents
-            if (empty($this->data['Group']['Group'])) {
-                $this->GroupEvent->deleteAll(array('GroupEvent.event_id' => $eventId));
-            }
-
-            // update submitted evaluations release status if auto-release status has been changed
-            $groupEvents = $this->GroupEvent->find('list',
-                array('conditions' => array('event_id'=>$eventId)));
-            if ($this->data['Event']['auto_release'] != $event['Event']['auto_release']) {
-                $model = null;
-                switch ($event['Event']['event_template_type_id']) {
-                case 1://simple
-                    //$model = 'EvaluationSimple';
-                    $this->EvaluationSimple->setAllEventCommentRelease($eventId, $this->Auth->user('id'), $this->data['Event']['auto_release']);
-                    $this->EvaluationSimple->setAllEventGradeRelease($eventId, $this->data['Event']['auto_release']);
-                    break;
-                case 2://rubric
-                    $this->Evaluation->changeRubricEvalCommentRelease($this->data['Event']['auto_release'], $groupEvents);
-                    $this->EvaluationRubric->setAllEventGradeRelease($eventId, $this->data['Event']['auto_release']);
-                    break;
-                case 4:
-                    $this->Evaluation->changeMixedEvalCommentRelease($this->data['Event']['auto_release'], $groupEvents);
-                    $this->EvaluationMixeval->setAllEventGradeRelease($eventId, $this->data['Event']['auto_release']);
-                    break;
-                }
-
-                if ($this->data['Event']['auto_release']) {
-                    $this->Evaluation->setGroupEventsReleaseStatus($groupEvents, 'Auto');
-                } else {
-                    $this->Evaluation->setGroupEventsReleaseStatus($groupEvents, 'None');
-                }
-            }
-
-            $penaltyData = $this->Penalty->find('all', array('conditions' => array('event_id' => $eventId), 'contain' => false));
-            $penalties = array();
-            foreach ($penaltyData as $tmp) {
-                array_splice($tmp['Penalty'], 1, -2);
-                $penalties[] = $tmp['Penalty'];
-            }
-
-            isset($this->data['Penalty']) ? $formPenalty = $this->data['Penalty'] : $formPenalty = array();
-            // check differences (table vs form data), delete what's missing in form data from db
-            foreach ($penalties as $pTmp) {
-                if (!in_array($pTmp, $formPenalty)) {
-                    $this->Penalty->delete($pTmp['id']);
-                }
-            }
-            $this->data = $this->_multiMap($this->data);
-            if ($this->Event->saveAll($this->data)) {
-                $this->Session->setFlash("Edit event successful!", 'good');
-                if ($this->checkIfChanged($event, $this->data, $orig_email_frequency, $emailTemp)) {
-                    // only delete emails that haven't been sent
-                    $this->EmailSchedule->deleteAll(array('event_id' => $eventId, 'sent' => 0), false);
-                    $this->setSchedule($eventId, $this->data);
-                }
-                $this->redirect('index/'.$event['Event']['course_id']);
-                return;
+            // no template is preselected, so the user can submit without
+            // picking one - stop before anything is deleted or saved
+            if (empty($this->data['Event']['template_id'])) {
+                $this->Session->setFlash(__('Edit event failed. Please select an evaluation template.', true));
             } else {
-                $this->Session->setFlash("Edit event failed.");
+
+                // if all groups unselected - delete groupEvents
+                if (empty($this->data['Group']['Group'])) {
+                    $this->GroupEvent->deleteAll(array('GroupEvent.event_id' => $eventId));
+                }
+
+                // update submitted evaluations release status if auto-release status has been changed
+                $groupEvents = $this->GroupEvent->find('list',
+                    array('conditions' => array('event_id'=>$eventId)));
+                if ($this->data['Event']['auto_release'] != $event['Event']['auto_release']) {
+                    $model = null;
+                    switch ($event['Event']['event_template_type_id']) {
+                    case 1://simple
+                        //$model = 'EvaluationSimple';
+                        $this->EvaluationSimple->setAllEventCommentRelease($eventId, $this->Auth->user('id'), $this->data['Event']['auto_release']);
+                        $this->EvaluationSimple->setAllEventGradeRelease($eventId, $this->data['Event']['auto_release']);
+                        break;
+                    case 2://rubric
+                        $this->Evaluation->changeRubricEvalCommentRelease($this->data['Event']['auto_release'], $groupEvents);
+                        $this->EvaluationRubric->setAllEventGradeRelease($eventId, $this->data['Event']['auto_release']);
+                        break;
+                    case 4:
+                        $this->Evaluation->changeMixedEvalCommentRelease($this->data['Event']['auto_release'], $groupEvents);
+                        $this->EvaluationMixeval->setAllEventGradeRelease($eventId, $this->data['Event']['auto_release']);
+                        break;
+                    }
+
+                    if ($this->data['Event']['auto_release']) {
+                        $this->Evaluation->setGroupEventsReleaseStatus($groupEvents, 'Auto');
+                    } else {
+                        $this->Evaluation->setGroupEventsReleaseStatus($groupEvents, 'None');
+                    }
+                }
+
+                $penaltyData = $this->Penalty->find('all', array('conditions' => array('event_id' => $eventId), 'contain' => false));
+                $penalties = array();
+                foreach ($penaltyData as $tmp) {
+                    array_splice($tmp['Penalty'], 1, -2);
+                    $penalties[] = $tmp['Penalty'];
+                }
+
+                isset($this->data['Penalty']) ? $formPenalty = $this->data['Penalty'] : $formPenalty = array();
+                // check differences (table vs form data), delete what's missing in form data from db
+                foreach ($penalties as $pTmp) {
+                    if (!in_array($pTmp, $formPenalty)) {
+                        $this->Penalty->delete($pTmp['id']);
+                    }
+                }
+                $this->data = $this->_multiMap($this->data);
+                if ($this->Event->saveAll($this->data)) {
+                    $this->Session->setFlash("Edit event successful!", 'good');
+                    if ($this->checkIfChanged($event, $this->data, $orig_email_frequency, $emailTemp)) {
+                        // only delete emails that haven't been sent
+                        $this->EmailSchedule->deleteAll(array('event_id' => $eventId, 'sent' => 0), false);
+                        $this->setSchedule($eventId, $this->data);
+                    }
+                    $this->redirect('index/'.$event['Event']['course_id']);
+                    return;
+                } else {
+                    $this->Session->setFlash("Edit event failed.");
+                }
             }
         } else if (!empty($this->data)) {
             $this->Session->setFlash("Edit event failed because the form hasn't finished loading yet.");
@@ -605,6 +635,26 @@ class EventsController extends AppController
         $this->set(
             'rubrics',
             $this->Rubric->getBelongingOrPublic($this->Auth->user('id'), $rubricSelected)
+        );
+        // the same lists restricted to the user's own templates, used by the
+        // "Mine only" filter on the template autocompletes. The already
+        // attached template is included so it stays selectable when filtering,
+        // even if it is somebody else's public template.
+        $this->set(
+            'mixevalsMine',
+            $this->Mixeval->getBelongingOnly($this->Auth->user('id'), $mixevalSelected)
+        );
+        $this->set(
+            'simpleEvaluationsMine',
+            $this->SimpleEvaluation->getBelongingOnly($this->Auth->user('id'), $simpleSelected)
+        );
+        $this->set(
+            'surveysMine',
+            $this->Survey->getBelongingOnly($this->Auth->user('id'), $surveySelected)
+        );
+        $this->set(
+            'rubricsMine',
+            $this->Rubric->getBelongingOnly($this->Auth->user('id'), $rubricSelected)
         );
         $this->set(
             'eventTemplateTypes',

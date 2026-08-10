@@ -1,21 +1,28 @@
 <div id='Events'>
 <?php
 $html->script("jquery-ui-timepicker-addon", array("inline"=>false));
+$html->script("template_autocomplete", array("inline"=>false));
 
 echo $this->Form->create('Event', array('action' => "add/$course_id"));
 echo $this->Form->input('course_id', array('default' => $course_id));
 echo $this->Form->input('title', array('label' => 'Event Title'));
 echo "<div id='titleWarning' class='red'></div>";
 echo $this->Form->input('description', array('type' => 'textarea'));
+echo "<div class='templateBox'>";
 echo $this->Form->input('event_template_type_id');
+// 'empty' means no template is preselected - the user has to pick one. The
+// selects are hidden by initTemplateAutocomplete() below and replaced with a
+// search box, but they remain the fields that are submitted.
+$templateEmpty = __('-- Select a template --', true);
 echo $this->Form->input('SimpleEvaluation',
-    array('div' => array('id' => 'SimpleEvalDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevS', 'target' => '_blank'))));
+    array('div' => array('id' => 'SimpleEvalDiv'), 'empty' => $templateEmpty, 'label' => $html->link('Preview', '', array('id' => 'prevS', 'class' => 'templatePreviewLink', 'target' => '_blank'))));
 echo $this->Form->input('Rubric',
-    array('div' => array('id' => 'RubricDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevR', 'target' => '_blank'))));
+    array('div' => array('id' => 'RubricDiv'), 'empty' => $templateEmpty, 'label' => $html->link('Preview', '', array('id' => 'prevR', 'class' => 'templatePreviewLink', 'target' => '_blank'))));
 echo $this->Form->input('Survey',
-    array('div' => array('id' => 'SurveyDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevV', 'target' => '_blank'))));
+    array('div' => array('id' => 'SurveyDiv'), 'empty' => $templateEmpty, 'label' => $html->link('Preview', '', array('id' => 'prevV', 'class' => 'templatePreviewLink', 'target' => '_blank'))));
 echo $this->Form->input('Mixeval',
-    array('div' => array('id' => 'MixevalDiv'), 'label' => $html->link('Preview', '', array('id' => 'prevM', 'target' => '_blank'))));
+    array('div' => array('id' => 'MixevalDiv'), 'empty' => $templateEmpty, 'label' => $html->link('Preview', '', array('id' => 'prevM', 'class' => 'templatePreviewLink', 'target' => '_blank'))));
+echo "</div>";
 echo $this->Form->input(
     'self_eval',
     array(
@@ -176,6 +183,13 @@ jQuery("#EventSimpleEvaluation").change(updatePreview);
 jQuery("#EventRubric").change(updatePreview);
 jQuery("#EventSurvey").change(updatePreview);
 jQuery("#EventMixeval").change(updatePreview);
+// turn the four template selects into searchable inputs with a "Mine only"
+// filter. Done after the change handlers above so picking an item updates the
+// Preview links.
+initTemplateAutocomplete("#EventSimpleEvaluation", <?php echo json_encode(array_keys((array) $simpleEvaluationsMine)); ?>);
+initTemplateAutocomplete("#EventRubric", <?php echo json_encode(array_keys((array) $rubricsMine)); ?>);
+initTemplateAutocomplete("#EventSurvey", <?php echo json_encode(array_keys((array) $surveysMine)); ?>);
+initTemplateAutocomplete("#EventMixeval", <?php echo json_encode(array_keys((array) $mixevalsMine)); ?>);
 jQuery("#EventEmailSchedule").change(toggleEmailTemplate);
 jQuery("#EventEmailTemplate").change(updateEmailPreview);
 jQuery("input:radio[name=data['Event']['self_eval']]").change(toggleSelfEval);
