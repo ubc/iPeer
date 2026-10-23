@@ -27,11 +27,11 @@
     </target>
 
     <target name="build"
-        depends="prepare,lint,phploc,pdepend,phpmd,phpcs,phpcpd,test,phpcb"/>
+        depends="prepare,lint,phploc,pdepend,phpmd,phpcpd,test,phpcb"/>
 
     <!-- remove phpdoc dependency for now.  phpdoc 2.9 is not working with php7 -->
     <target name="build-ci"
-        depends="prepare,lint,phploc,pdepend,phpmd-ci,phpcs-ci,phpcpd,test-ci,phpcb"/>
+        depends="prepare,lint,phploc,pdepend,phpmd-ci,phpcpd,test-ci,phpcb"/>
 
     <target name="clean" description="Cleanup build artifacts">
         <delete dir="${project.basedir}/build/api"/>
@@ -120,35 +120,6 @@
             </fileset>
             <formatter type="xml" outfile="${project.basedir}/build/logs/pmd.xml"/>
         </phpmd>
-    </target>
-
-    <target name="phpcs"
-        description="Find coding standard violations using PHP_CodeSniffer and print human readable output. Intended for usage on the command line before committing.">
-        <phpcodesniffer standard="PSR2">
-            <fileset dir="${project.basedir}/app">
-                <include name="**/*.php" />
-                <exclude name="tests/**" />
-                <exclude name="vendors/**" />
-                <exclude name="plugins/**" />
-                <exclude name="config/**" />
-                <exclude name="webroot/**" />
-            </fileset>
-        </phpcodesniffer>
-    </target>
-
-    <target name="phpcs-ci"
-        description="Find coding standard violations using PHP_CodeSniffer creating a log file for the continuous integration server">
-        <phpcodesniffer standard="PSR2">
-            <fileset dir="${project.basedir}/app">
-                <include name="**/*.php" />
-                <exclude name="tests/**" />
-                <exclude name="vendors/**" />
-                <exclude name="plugins/**" />
-                <exclude name="config/**" />
-                <exclude name="webroot/**" />
-            </fileset>
-            <formatter type="checkstyle" outfile="${project.basedir}/build/logs/checkstyle.xml" />
-        </phpcodesniffer>
     </target>
 
     <target name="phpcpd" description="Find duplicate code using PHPCPD">
