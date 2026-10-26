@@ -15,6 +15,11 @@ if (!class_exists('DJJob')) {
         'file' => 'DJJob.php',
     ));
 }
+if (!class_exists('MaintainedDJWorker')) {
+    App::import('Lib', 'CakeDjjob.maintained_dj_worker', array(
+        'file' => 'maintained_dj_worker.php',
+    ));
+}
 
 /**
  * Uses _ (underscore) to denote plugins, since php classnames
@@ -39,52 +44,6 @@ function unserialize_jobs($className) {
     }
 
     App::import('Lib', $plugin . 'jobs/' . Inflector::underscore($className));
-}
-
-/**
- * DJWorker that periodically cleans up the jobs table while running.
- *
- * Jobs keep their lock forever if the worker dies mid-job (pod killed, fatal
- * error), since locks are only released by the worker that owns them.
- */
-class MaintainedDJWorker extends DJWorker {
-    var $maintenanceInterval = 3600;  // seconds between cleanups
-    var $staleLockAge = 3600;         // seconds before a lock is considered abandoned
-    var $retentionDays = 30;          // days to keep failed jobs (for replay)
-    var $lastMaintenance = 0;
-
-    public function getNewJob() {
-        if (time() - $this->lastMaintenance >= $this->maintenanceInterval) {
-            $this->lastMaintenance = time();
-            $this->maintain();
-        }
-        return parent::getNewJob();
-    }
-
-    public function maintain() {
-        try {
-            // count the abandoned run as an attempt so a job that kills the
-            // worker eventually stops being picked up, and mark it failed once
-            // out of attempts (same as DJJob::finishWithError) so it gets cleaned up
-            $unlocked = self::runUpdate("
-                UPDATE " . self::$jobsTable . "
-                SET locked_at = NULL, locked_by = NULL, attempts = attempts + 1,
-                    failed_at = IF(attempts >= ?, NOW(), NULL),
-                    error = IF(attempts >= ?, 'Lock abandoned by worker', NULL)
-                WHERE locked_at < DATE_SUB(NOW(), INTERVAL ? SECOND)",
-                array($this->max_attempts, $this->max_attempts, $this->staleLockAge)
-            );
-            // only failed jobs are deleted; pending and running jobs are never removed
-            $deleted = self::runUpdate("
-                DELETE FROM " . self::$jobsTable . "
-                WHERE failed_at < DATE_SUB(NOW(), INTERVAL ? DAY)",
-                array($this->retentionDays)
-            );
-            $this->log("[WORKER] maintenance: released {$unlocked} stale locks, deleted {$deleted} old failed jobs", self::INFO);
-        } catch (Exception $e) {
-            $this->log("[WORKER] maintenance failed: {$e->getMessage()}", self::ERROR);
-        }
-    }
 }
 
 /**

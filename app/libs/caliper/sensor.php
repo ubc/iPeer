@@ -125,18 +125,27 @@ class CaliperSensor {
         if ($responseCode < 200 || $responseCode >= 300) {
             $error = 'Caliper Emit Error: '. ($responseCode ? $responseCode : 'no response ('. $curlError .')');
             \CakeLog::write('error', $error);
-            \CakeLog::write('error', 'Caliper Envelope JSON: '. $envelopeJson);
             if ( self::$isTest ) {
-                throw new \Exception('Caliper Emit Error: '. $responseCode .'\n'.$envelopeJson);
+                throw new \Exception($error .'\n'.$envelopeJson);
             }
             // let the job queue retry; after max attempts the job is kept as failed
-            // (failed_at set) and can be replayed by clearing failed_at/attempts
+            // (failed_at set) and can be replayed by clearing failed_at/attempts.
+            // The envelope is logged by SendCaliperEventsJob once retries run out.
             $exception = new \DJRetryException($error);
-            $transient = is_null($responseCode) || $responseCode == 429 || $responseCode >= 500;
-            $exception->setDelay($transient ? 600 : 3600);
+            $exception->setDelay(self::retryDelay($responseCode));
             throw $exception;
         }
         return true;
+    }
+
+    /**
+     * Seconds to wait before retrying a failed send
+     *
+     * @param int|null $responseCode HTTP response code, null if there was no response
+     */
+    public static function retryDelay($responseCode) {
+        $transient = is_null($responseCode) || $responseCode == 429 || $responseCode >= 500;
+        return $transient ? 1800 : 3600;
     }
 
     public static function iso8601_duration($seconds) {

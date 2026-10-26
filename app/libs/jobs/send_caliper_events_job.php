@@ -22,4 +22,9 @@ class SendCaliperEventsJob extends CakeJob {
         }
     }
 
+    // called by DJJob once all attempts have failed
+    function _onDjjobRetryError($error) {
+        CakeLog::write('error', 'Caliper Envelope JSON: '. $this->envelopeJson);
+    }
+
 }
