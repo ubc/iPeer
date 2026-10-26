@@ -116,6 +116,15 @@ class CaliperAppControllerHooksTest extends CaliperAuthTestCase
         $this->assertEqual(1, count($events));
         $actualEvent = $events[0];
         $this->assertEqual($expected_event, $actualEvent);
+
+        # check anonymous views are skipped
+        $session = new SessionComponent();
+        $authUser = $session->read('Auth.User');
+        $session->delete('Auth.User');
+        CaliperHooks::app_controller_before_render($this->controller);
+        $events = $this->_get_caliper_events();
+        $this->assertEqual(0, count($events));
+        $session->write('Auth.User', $authUser);
     }
 
     function test_app_controller_after_login_and_out()

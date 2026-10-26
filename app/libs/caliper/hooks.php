@@ -19,6 +19,9 @@ use caliper\CaliperSensor;
 class CaliperHooks {
     public static function app_controller_before_render($app_controller) {
         if (!CaliperSensor::caliperEnabled()) { return; }
+        // skip anonymous views (login page, 404s, scanners)
+        $session = new \SessionComponent();
+        if (!$session->read('Auth.User.id')) { return; }
 
         $queryParams = $app_controller->params['url'];
         if ($queryParams['url']) {
