@@ -50,7 +50,7 @@ function unserialize_jobs($className) {
 class MaintainedDJWorker extends DJWorker {
     var $maintenanceInterval = 3600;  // seconds between cleanups
     var $staleLockAge = 3600;         // seconds before a lock is considered abandoned
-    var $retentionDays = 30;          // delete any job older than this
+    var $retentionDays = 30;          // days to keep failed jobs (for replay)
     var $lastMaintenance = 0;
 
     public function getNewJob() {
@@ -63,20 +63,24 @@ class MaintainedDJWorker extends DJWorker {
 
     public function maintain() {
         try {
-            $deleted = self::runUpdate("
-                DELETE FROM " . self::$jobsTable . "
-                WHERE created_at < DATE_SUB(NOW(), INTERVAL ? DAY)",
-                array($this->retentionDays)
-            );
             // count the abandoned run as an attempt so a job that kills the
-            // worker eventually stops being picked up
+            // worker eventually stops being picked up, and mark it failed once
+            // out of attempts (same as DJJob::finishWithError) so it gets cleaned up
             $unlocked = self::runUpdate("
                 UPDATE " . self::$jobsTable . "
-                SET locked_at = NULL, locked_by = NULL, attempts = attempts + 1
+                SET locked_at = NULL, locked_by = NULL, attempts = attempts + 1,
+                    failed_at = IF(attempts >= ?, NOW(), NULL),
+                    error = IF(attempts >= ?, 'Lock abandoned by worker', NULL)
                 WHERE locked_at < DATE_SUB(NOW(), INTERVAL ? SECOND)",
-                array($this->staleLockAge)
+                array($this->max_attempts, $this->max_attempts, $this->staleLockAge)
             );
-            $this->log("[WORKER] maintenance: deleted {$deleted} old jobs, released {$unlocked} stale locks", self::INFO);
+            // only failed jobs are deleted; pending and running jobs are never removed
+            $deleted = self::runUpdate("
+                DELETE FROM " . self::$jobsTable . "
+                WHERE failed_at < DATE_SUB(NOW(), INTERVAL ? DAY)",
+                array($this->retentionDays)
+            );
+            $this->log("[WORKER] maintenance: released {$unlocked} stale locks, deleted {$deleted} old failed jobs", self::INFO);
         } catch (Exception $e) {
             $this->log("[WORKER] maintenance failed: {$e->getMessage()}", self::ERROR);
         }
