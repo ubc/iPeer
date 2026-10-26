@@ -86,12 +86,15 @@ class MaintainedDJWorkerTestCase extends CakeTestCase
         $this->insertJob(4, array('attempts' => 5, 'failed_at' => 'NOW() - INTERVAL 40 DAY', 'error' => "'old'"));
         $this->insertJob(5, array('attempts' => 5, 'failed_at' => 'NOW() - INTERVAL 5 DAY', 'error' => "'recent'"));
         $this->insertJob(6, array('locked_at' => 'NOW() - INTERVAL 5 MINUTE', 'locked_by' => "'host::busy pid::3'"));
+        // worker died between finishWithError's update and releasing the lock
+        $this->insertJob(7, array('attempts' => 5, 'failed_at' => 'NOW() - INTERVAL 1 DAY', 'error' => "'real error'",
+            'locked_at' => 'NOW() - INTERVAL 1 DAY', 'locked_by' => "'host::dead pid::4'"));
 
         $worker = new MaintainedDJWorker(array('max_attempts' => 5));
         $worker->maintain();
         $jobs = $this->getJobs();
 
-        $this->assertEqual(array(1, 2, 3, 5, 6), array_keys($jobs), 'only the old failed job is deleted');
+        $this->assertEqual(array(1, 2, 3, 5, 6, 7), array_keys($jobs), 'only the old failed job is deleted');
         // pending job is never deleted, however old
         $this->assertEqual(0, $jobs[1]['attempts']);
         // stale lock on the last attempt is released and marked failed
@@ -108,6 +111,9 @@ class MaintainedDJWorkerTestCase extends CakeTestCase
         // fresh lock is left alone
         $this->assertEqual('host::busy pid::3', $jobs[6]['locked_by']);
         $this->assertEqual(0, $jobs[6]['attempts']);
+        // already failed job keeps its error and attempts
+        $this->assertEqual('real error', $jobs[7]['error']);
+        $this->assertEqual(5, $jobs[7]['attempts']);
     }
 
     function testStartReleasesLocksWithOwnName()

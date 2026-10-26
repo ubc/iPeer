@@ -123,7 +123,8 @@ class CaliperSensor {
         curl_close($client);
         $responseCode = $responseText ? $responseInfo['http_code'] : null;
         if ($responseCode < 200 || $responseCode >= 300) {
-            $error = 'Caliper Emit Error: '. ($responseCode ? $responseCode : 'no response ('. $curlError .')');
+            $error = 'Caliper Emit Error: '. ($responseCode ? $responseCode : 'no response ('. $curlError .')')
+                . (self::isTransientError($responseCode) ? ' (transient)' : ' (rejected by LRS, check API key or payload)');
             \CakeLog::write('error', $error);
             if ( self::$isTest ) {
                 throw new \Exception($error .'\n'.$envelopeJson);
@@ -144,8 +145,17 @@ class CaliperSensor {
      * @param int|null $responseCode HTTP response code, null if there was no response
      */
     public static function retryDelay($responseCode) {
-        $transient = is_null($responseCode) || $responseCode == 429 || $responseCode >= 500;
-        return $transient ? 1800 : 3600;
+        return self::isTransientError($responseCode) ? 1800 : 3600;
+    }
+
+    /**
+     * Whether a failed send is likely to succeed later without changes
+     * (outage, rate limit) rather than rejected (bad API key, payload, WAF)
+     *
+     * @param int|null $responseCode HTTP response code, null if there was no response
+     */
+    public static function isTransientError($responseCode) {
+        return is_null($responseCode) || $responseCode == 429 || $responseCode >= 500;
     }
 
     public static function iso8601_duration($seconds) {

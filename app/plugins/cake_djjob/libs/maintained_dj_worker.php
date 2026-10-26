@@ -13,7 +13,9 @@ if (!class_exists('DJJob')) {
  */
 class MaintainedDJWorker extends DJWorker {
     var $maintenanceInterval = 3600;  // seconds between cleanups
-    var $staleLockAge = 3600;         // seconds before a lock is considered abandoned
+    // seconds before a lock is considered abandoned. Jobs must finish well
+    // within this, or another worker will release the lock and run them again.
+    var $staleLockAge = 3600;
     var $retentionDays = 30;          // days to keep failed jobs (for replay)
     var $lastMaintenance = 0;
 
@@ -71,7 +73,7 @@ class MaintainedDJWorker extends DJWorker {
     protected function releaseLocksHeldBy($workerName) {
         return self::runUpdate("
             UPDATE " . self::$jobsTable . self::RELEASE_LOCK_SET . "
-            WHERE locked_at IS NOT NULL AND locked_by = ?",
+            WHERE locked_at IS NOT NULL AND locked_by = ? AND failed_at IS NULL",
             array($this->max_attempts, $this->max_attempts, (string) $workerName)
         );
     }
@@ -84,7 +86,7 @@ class MaintainedDJWorker extends DJWorker {
     protected function releaseLocksOlderThan($seconds) {
         return self::runUpdate("
             UPDATE " . self::$jobsTable . self::RELEASE_LOCK_SET . "
-            WHERE locked_at < DATE_SUB(NOW(), INTERVAL ? SECOND)",
+            WHERE locked_at < DATE_SUB(NOW(), INTERVAL ? SECOND) AND failed_at IS NULL",
             array($this->max_attempts, $this->max_attempts, (int) $seconds)
         );
     }
