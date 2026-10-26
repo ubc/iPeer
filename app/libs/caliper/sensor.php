@@ -131,7 +131,9 @@ class CaliperSensor {
             }
             // let the job queue retry; after max attempts the job is kept as failed
             // (failed_at set) and can be replayed by clearing failed_at/attempts.
-            // The envelope is logged by SendCaliperEventsJob once retries run out.
+            // A summary of the envelope is logged by SendCaliperEventsJob when the
+            // last attempt fails here (not when the worker marks a job failed for
+            // an abandoned lock; that only sets the job's error).
             $exception = new \DJRetryException($error);
             $exception->setDelay(self::retryDelay($responseCode));
             throw $exception;
@@ -150,12 +152,12 @@ class CaliperSensor {
 
     /**
      * Whether a failed send is likely to succeed later without changes
-     * (outage, rate limit) rather than rejected (bad API key, payload, WAF)
+     * (outage, timeout, rate limit) rather than rejected (bad API key, payload, WAF)
      *
      * @param int|null $responseCode HTTP response code, null if there was no response
      */
     public static function isTransientError($responseCode) {
-        return is_null($responseCode) || $responseCode == 429 || $responseCode >= 500;
+        return is_null($responseCode) || $responseCode == 408 || $responseCode == 429 || $responseCode >= 500;
     }
 
     /**

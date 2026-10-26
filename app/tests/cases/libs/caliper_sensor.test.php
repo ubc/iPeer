@@ -46,6 +46,7 @@ class CaliperSensorTestCase extends CakeTestCase
     function testRetryDelay()
     {
         $this->assertEqual(1800, CaliperSensor::retryDelay(null));
+        $this->assertEqual(1800, CaliperSensor::retryDelay(408));
         $this->assertEqual(1800, CaliperSensor::retryDelay(429));
         $this->assertEqual(1800, CaliperSensor::retryDelay(500));
         $this->assertEqual(1800, CaliperSensor::retryDelay(503));
