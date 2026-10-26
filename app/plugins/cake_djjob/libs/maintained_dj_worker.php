@@ -17,13 +17,22 @@ class MaintainedDJWorker extends DJWorker {
     var $retentionDays = 30;          // days to keep failed jobs (for replay)
     var $lastMaintenance = 0;
 
+    // The abandoned run counts as an attempt so a job that kills the worker
+    // eventually stops being picked up, and is marked failed once out of
+    // attempts (same as DJJob::finishWithError) so it gets cleaned up.
+    // Params: max_attempts, max_attempts
+    const RELEASE_LOCK_SET = "
+        SET locked_at = NULL, locked_by = NULL, attempts = attempts + 1,
+            failed_at = IF(attempts >= ?, NOW(), NULL),
+            error = IF(attempts >= ?, 'Lock abandoned by worker', NULL)";
+
     public function start() {
         // a freshly started worker holds no locks, so any under its name were
         // left by a dead predecessor with the same host and pid (e.g. container
         // restarted in the same pod). Without this the worker would reclaim the
         // lock and re-run a job that crashed it without counting the attempt.
         try {
-            $released = $this->releaseAbandonedLocks('locked_by = ?', array($this->name));
+            $released = $this->releaseLocksHeldBy($this->name);
             $this->log("[WORKER] released {$released} locks left by a previous worker with this name", self::INFO);
         } catch (Exception $e) {
             $this->log("[WORKER] releasing previous locks failed: {$e->getMessage()}", self::ERROR);
@@ -41,10 +50,7 @@ class MaintainedDJWorker extends DJWorker {
 
     public function maintain() {
         try {
-            $unlocked = $this->releaseAbandonedLocks(
-                'locked_at < DATE_SUB(NOW(), INTERVAL ? SECOND)',
-                array($this->staleLockAge)
-            );
+            $unlocked = $this->releaseLocksOlderThan($this->staleLockAge);
             // only failed jobs are deleted; pending and running jobs are never removed
             $deleted = self::runUpdate("
                 DELETE FROM " . self::$jobsTable . "
@@ -58,21 +64,28 @@ class MaintainedDJWorker extends DJWorker {
     }
 
     /**
-     * Releases locks matching $where. The abandoned run counts as an attempt
-     * so a job that kills the worker eventually stops being picked up, and is
-     * marked failed once out of attempts (same as DJJob::finishWithError) so
-     * it gets cleaned up.
+     * Releases locks held by the given worker name as abandoned attempts.
      *
      * @return int number of jobs released
      */
-    protected function releaseAbandonedLocks($where, $params) {
+    protected function releaseLocksHeldBy($workerName) {
         return self::runUpdate("
-            UPDATE " . self::$jobsTable . "
-            SET locked_at = NULL, locked_by = NULL, attempts = attempts + 1,
-                failed_at = IF(attempts >= ?, NOW(), NULL),
-                error = IF(attempts >= ?, 'Lock abandoned by worker', NULL)
-            WHERE locked_at IS NOT NULL AND $where",
-            array_merge(array($this->max_attempts, $this->max_attempts), $params)
+            UPDATE " . self::$jobsTable . self::RELEASE_LOCK_SET . "
+            WHERE locked_at IS NOT NULL AND locked_by = ?",
+            array($this->max_attempts, $this->max_attempts, (string) $workerName)
+        );
+    }
+
+    /**
+     * Releases locks older than the given number of seconds as abandoned attempts.
+     *
+     * @return int number of jobs released
+     */
+    protected function releaseLocksOlderThan($seconds) {
+        return self::runUpdate("
+            UPDATE " . self::$jobsTable . self::RELEASE_LOCK_SET . "
+            WHERE locked_at < DATE_SUB(NOW(), INTERVAL ? SECOND)",
+            array($this->max_attempts, $this->max_attempts, (int) $seconds)
         );
     }
 }
