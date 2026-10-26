@@ -127,6 +127,31 @@ class CaliperAppControllerHooksTest extends CaliperAuthTestCase
         $session->write('Auth.User', $authUser);
     }
 
+    function test_app_controller_before_render_sanitizes_query()
+    {
+        $this->setupSession('/home/index');
+        $this->_enable_caliper();
+        $this->controller->params['url'] = array(
+            'url' => 'home/index',
+            'page' => '2',
+            'q' => 'Jane Student',
+            'redirect' => '../../etc/passwd',
+            'next' => 'http://169.254.169.254/latest/meta-data',
+            '../x' => '1',
+            'ids' => array('1', '2'),
+        );
+
+        CaliperHooks::app_controller_before_render($this->controller);
+        $events = $this->_get_caliper_events();
+        $this->assertEqual(1, count($events));
+        $this->assertEqual(array(
+            'relativePath' => '',
+            'queryString' => 'page=&q=&redirect=&next=&ids=',
+            'absolutePath' => 'http://cakephp.org/',
+            'absoluteUrl' => 'http://cakephp.org/?page=&q=&redirect=&next=&ids=',
+        ), $events[0]['extensions']);
+    }
+
     function test_app_controller_after_login_and_out()
     {
         $this->setupSession();
