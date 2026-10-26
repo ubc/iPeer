@@ -158,6 +158,32 @@ class CaliperSensor {
         return is_null($responseCode) || $responseCode == 429 || $responseCode >= 500;
     }
 
+    /**
+     * Summarizes an envelope for logging: ids, types and times only, so no
+     * actor or other user data (names, URLs with query strings) ends up in logs
+     *
+     * @param string $envelopeJson
+     * @return string JSON
+     */
+    public static function summarizeEnvelope($envelopeJson) {
+        $envelope = json_decode($envelopeJson, true);
+        $events = array();
+        foreach ((array) ($envelope['data'] ?? array()) as $event) {
+            $object = $event['object'] ?? null;
+            $events[] = array(
+                'id' => $event['id'] ?? null,
+                'type' => $event['type'] ?? null,
+                'action' => $event['action'] ?? null,
+                'eventTime' => $event['eventTime'] ?? null,
+                'objectType' => is_array($object) ? ($object['type'] ?? null) : null,
+            );
+        }
+        return json_encode(array(
+            'sendTime' => $envelope['sendTime'] ?? null,
+            'events' => $events,
+        ));
+    }
+
     public static function iso8601_duration($seconds) {
         if (!is_integer($seconds)) {
             throw new \InvalidArgumentException(__METHOD__ . ': integer expected');

@@ -54,6 +54,42 @@ class CaliperSensorTestCase extends CakeTestCase
         $this->assertEqual(3600, CaliperSensor::retryDelay(403));
     }
 
+    function testSummarizeEnvelope()
+    {
+        $envelope = json_encode(array(
+            'sensor' => 'http://test.ipeer.com',
+            'sendTime' => '2026-10-26T18:00:00.000Z',
+            'data' => array(
+                array(
+                    'id' => 'urn:uuid:1',
+                    'type' => 'NavigationEvent',
+                    'action' => 'NavigatedTo',
+                    'eventTime' => '2026-10-26T17:59:59.000Z',
+                    'actor' => array('id' => 'http://www.ubc.ca/student1', 'name' => 'Jane Student'),
+                    'object' => array('id' => 'http://test.ipeer.com/users?q=Jane', 'type' => 'WebPage'),
+                ),
+                // missing fields and a non-entity object
+                array('type' => 'SessionEvent', 'object' => 'http://test.ipeer.com'),
+            ),
+        ));
+        $summary = CaliperSensor::summarizeEnvelope($envelope);
+
+        $this->assertEqual(array(
+            'sendTime' => '2026-10-26T18:00:00.000Z',
+            'events' => array(
+                array('id' => 'urn:uuid:1', 'type' => 'NavigationEvent', 'action' => 'NavigatedTo',
+                    'eventTime' => '2026-10-26T17:59:59.000Z', 'objectType' => 'WebPage'),
+                array('id' => null, 'type' => 'SessionEvent', 'action' => null,
+                    'eventTime' => null, 'objectType' => null),
+            ),
+        ), json_decode($summary, true));
+        $this->assertNoPattern('/Jane|student1/', $summary);
+
+        $empty = array('sendTime' => null, 'events' => array());
+        $this->assertEqual($empty, json_decode(CaliperSensor::summarizeEnvelope('not json'), true));
+        $this->assertEqual($empty, json_decode(CaliperSensor::summarizeEnvelope('{}'), true));
+    }
+
     function testSendEventFailureThrowsRetry()
     {
         CaliperSensor::isTest(false);
