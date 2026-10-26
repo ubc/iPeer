@@ -119,16 +119,71 @@ class CaliperSensor {
 
         $responseText = curl_exec($client);
         $responseInfo = curl_getinfo($client);
+        $curlError = curl_error($client);
         curl_close($client);
         $responseCode = $responseText ? $responseInfo['http_code'] : null;
-        if ($responseCode != 200) {
-            \CakeLog::write('error', 'Caliper Emit Error: '. $responseCode);
-            \CakeLog::write('error', 'Caliper Envelope JSON: '. $envelopeJson);
+        if ($responseCode < 200 || $responseCode >= 300) {
+            $error = 'Caliper Emit Error: '. ($responseCode ? $responseCode : 'no response ('. $curlError .')')
+                . (self::isTransientError($responseCode) ? ' (transient)' : ' (rejected by LRS, check API key or payload)');
+            \CakeLog::write('error', $error);
             if ( self::$isTest ) {
-                throw new \Exception('Caliper Emit Error: '. $responseCode .'\n'.$envelopeJson);
+                throw new \Exception($error .'\n'.$envelopeJson);
             }
+            // let the job queue retry; after max attempts the job is kept as failed
+            // (failed_at set) and can be replayed by clearing failed_at/attempts.
+            // A summary of the envelope is logged by SendCaliperEventsJob when the
+            // last attempt fails here (not when the worker marks a job failed for
+            // an abandoned lock; that only sets the job's error).
+            $exception = new \DJRetryException($error);
+            $exception->setDelay(self::retryDelay($responseCode));
+            throw $exception;
         }
         return true;
+    }
+
+    /**
+     * Seconds to wait before retrying a failed send
+     *
+     * @param int|null $responseCode HTTP response code, null if there was no response
+     */
+    public static function retryDelay($responseCode) {
+        return self::isTransientError($responseCode) ? 1800 : 3600;
+    }
+
+    /**
+     * Whether a failed send is likely to succeed later without changes
+     * (outage, timeout, rate limit) rather than rejected (bad API key, payload, WAF)
+     *
+     * @param int|null $responseCode HTTP response code, null if there was no response
+     */
+    public static function isTransientError($responseCode) {
+        return is_null($responseCode) || $responseCode == 408 || $responseCode == 429 || $responseCode >= 500;
+    }
+
+    /**
+     * Summarizes an envelope for logging: ids, types and times only, so no
+     * actor or other user data (names, URLs with query strings) ends up in logs
+     *
+     * @param string $envelopeJson
+     * @return string JSON
+     */
+    public static function summarizeEnvelope($envelopeJson) {
+        $envelope = json_decode($envelopeJson, true);
+        $events = array();
+        foreach ((array) ($envelope['data'] ?? array()) as $event) {
+            $object = $event['object'] ?? null;
+            $events[] = array(
+                'id' => $event['id'] ?? null,
+                'type' => $event['type'] ?? null,
+                'action' => $event['action'] ?? null,
+                'eventTime' => $event['eventTime'] ?? null,
+                'objectType' => is_array($object) ? ($object['type'] ?? null) : null,
+            );
+        }
+        return json_encode(array(
+            'sendTime' => $envelope['sendTime'] ?? null,
+            'events' => $events,
+        ));
     }
 
     public static function iso8601_duration($seconds) {

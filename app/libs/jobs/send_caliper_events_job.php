@@ -18,8 +18,14 @@ class SendCaliperEventsJob extends CakeJob {
         if ($success) {
             $this->out('Finished sending Caliper envelope');
         } else {
-            $this->out("Issue sending Caliper envelope:\n".var_export($this->envelopeJson, TRUE));
+            $this->out('Issue sending Caliper envelope: '. CaliperSensor::summarizeEnvelope($this->envelopeJson));
         }
+    }
+
+    // called by DJJob once all attempts have failed
+    function _onDjjobRetryError($error) {
+        // full envelope stays in the jobs table for replay; only log a summary
+        CakeLog::write('error', 'Caliper envelope not sent: '. CaliperSensor::summarizeEnvelope($this->envelopeJson));
     }
 
 }

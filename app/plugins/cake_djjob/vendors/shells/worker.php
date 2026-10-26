@@ -15,6 +15,11 @@ if (!class_exists('DJJob')) {
         'file' => 'DJJob.php',
     ));
 }
+if (!class_exists('MaintainedDJWorker')) {
+    App::import('Lib', 'CakeDjjob.maintained_dj_worker', array(
+        'file' => 'maintained_dj_worker.php',
+    ));
+}
 
 /**
  * Uses _ (underscore) to denote plugins, since php classnames
@@ -170,7 +175,7 @@ class WorkerShell extends Shell {
             )));
         }
 
-        $worker = new DJWorker(array(
+        $worker = new MaintainedDJWorker(array(
             "queue" => $this->_queue,
             "count" => $this->_count,
             "sleep" => $this->_sleep,
