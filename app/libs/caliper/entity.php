@@ -60,8 +60,10 @@ class CaliperEntity {
         }
 
 		$extensions = [];
-		if ( array_key_exists( 'HTTP_REFERER', $_SERVER ) ) {
-			$extensions['referer'] = $_SERVER['HTTP_REFERER'];
+		// browsers send the full previous URL, query included
+		$referer = CaliperUrl::sanitizeUrl( $_SERVER['HTTP_REFERER'] ?? '' );
+		if ( ! is_null( $referer ) ) {
+			$extensions['referer'] = $referer;
 		}
 		if ( [] !== $extensions ) {
 			$session->setExtensions( $extensions );
