@@ -42,6 +42,48 @@ function unserialize_jobs($className) {
 }
 
 /**
+ * DJWorker that periodically cleans up the jobs table while running.
+ *
+ * Jobs keep their lock forever if the worker dies mid-job (pod killed, fatal
+ * error), since locks are only released by the worker that owns them.
+ */
+class MaintainedDJWorker extends DJWorker {
+    var $maintenanceInterval = 3600;  // seconds between cleanups
+    var $staleLockAge = 3600;         // seconds before a lock is considered abandoned
+    var $retentionDays = 30;          // delete any job older than this
+    var $lastMaintenance = 0;
+
+    public function getNewJob() {
+        if (time() - $this->lastMaintenance >= $this->maintenanceInterval) {
+            $this->lastMaintenance = time();
+            $this->maintain();
+        }
+        return parent::getNewJob();
+    }
+
+    public function maintain() {
+        try {
+            $deleted = self::runUpdate("
+                DELETE FROM " . self::$jobsTable . "
+                WHERE created_at < DATE_SUB(NOW(), INTERVAL ? DAY)",
+                array($this->retentionDays)
+            );
+            // count the abandoned run as an attempt so a job that kills the
+            // worker eventually stops being picked up
+            $unlocked = self::runUpdate("
+                UPDATE " . self::$jobsTable . "
+                SET locked_at = NULL, locked_by = NULL, attempts = attempts + 1
+                WHERE locked_at < DATE_SUB(NOW(), INTERVAL ? SECOND)",
+                array($this->staleLockAge)
+            );
+            $this->log("[WORKER] maintenance: deleted {$deleted} old jobs, released {$unlocked} stale locks", self::INFO);
+        } catch (Exception $e) {
+            $this->log("[WORKER] maintenance failed: {$e->getMessage()}", self::ERROR);
+        }
+    }
+}
+
+/**
  * Worker runs jobs created by the DJJob system.
  *
  * @package       job_workers
@@ -170,7 +212,7 @@ class WorkerShell extends Shell {
             )));
         }
 
-        $worker = new DJWorker(array(
+        $worker = new MaintainedDJWorker(array(
             "queue" => $this->_queue,
             "count" => $this->_count,
             "sleep" => $this->_sleep,

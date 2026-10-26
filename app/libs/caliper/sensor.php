@@ -119,14 +119,22 @@ class CaliperSensor {
 
         $responseText = curl_exec($client);
         $responseInfo = curl_getinfo($client);
+        $curlError = curl_error($client);
         curl_close($client);
         $responseCode = $responseText ? $responseInfo['http_code'] : null;
-        if ($responseCode != 200) {
-            \CakeLog::write('error', 'Caliper Emit Error: '. $responseCode);
+        if ($responseCode < 200 || $responseCode >= 300) {
+            $error = 'Caliper Emit Error: '. ($responseCode ? $responseCode : 'no response ('. $curlError .')');
+            \CakeLog::write('error', $error);
             \CakeLog::write('error', 'Caliper Envelope JSON: '. $envelopeJson);
             if ( self::$isTest ) {
                 throw new \Exception('Caliper Emit Error: '. $responseCode .'\n'.$envelopeJson);
             }
+            // let the job queue retry; after max attempts the job is kept as failed
+            // (failed_at set) and can be replayed by clearing failed_at/attempts
+            $exception = new \DJRetryException($error);
+            $transient = is_null($responseCode) || $responseCode == 429 || $responseCode >= 500;
+            $exception->setDelay($transient ? 600 : 3600);
+            throw $exception;
         }
         return true;
     }
