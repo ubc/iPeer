@@ -22,16 +22,19 @@ class CaliperHooks {
         // skip anonymous views (login page, 404s, scanners)
         $session = new \SessionComponent();
         if (!$session->read('Auth.User.id')) { return; }
+        // skip error pages (404s, missing actions), which echo back whatever was requested
+        if ($app_controller->name == 'CakeError') { return; }
 
         $queryParams = $app_controller->params['url'];
         if ($queryParams['url']) {
             unset($queryParams['url']);
         }
-        $queryParams = self::sanitize_query_params($queryParams);
-        $absoluteUrl = \Router::url($app_controller->here, true) . \Router::queryString($queryParams);
-        $absolutePath = ltrim(\Router::url($app_controller->here, true), '/');
-        $relativeUrl =  \Router::url($app_controller->here, false) . \Router::queryString($queryParams);
-        $relativePath = ltrim(\Router::url($app_controller->here, false), '/');
+        $queryParams = CaliperUrl::sanitizeQueryParams($queryParams);
+        $here = CaliperUrl::sanitizePath($app_controller->here);
+        $absoluteUrl = \Router::url($here, true) . \Router::queryString($queryParams);
+        $absolutePath = ltrim(\Router::url($here, true), '/');
+        $relativeUrl =  \Router::url($here, false) . \Router::queryString($queryParams);
+        $relativePath = ltrim(\Router::url($here, false), '/');
         $queryString = ltrim(\Router::queryString($queryParams), '?');
         // skip favicon views
         if ($relativePath != 'favicon.ico') {
@@ -47,19 +50,6 @@ class CaliperHooks {
                 ]);
             CaliperSensor::sendEvent($event);
         }
-    }
-
-    // Query values are user input (search terms, redirect URLs) that can carry
-    // names or text that trips the LRS's WAF, so only keep parameter names, and
-    // only those that are plain identifiers, with their values redacted.
-    private static function sanitize_query_params($queryParams) {
-        $sanitized = array();
-        foreach (array_keys((array) $queryParams) as $key) {
-            if (preg_match('/^[A-Za-z0-9_-]{1,64}$/', (string) $key)) {
-                $sanitized[$key] = '';
-            }
-        }
-        return $sanitized;
     }
 
     public static function app_controller_after_login($app_controller) {

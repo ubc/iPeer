@@ -152,6 +152,34 @@ class CaliperAppControllerHooksTest extends CaliperAuthTestCase
         ), $events[0]['extensions']);
     }
 
+    function test_app_controller_before_render_sanitizes_path()
+    {
+        $this->setupSession('/home/index');
+        $this->_enable_caliper();
+        $this->controller->here = '/home/index/5/../Jane Student/sort:name';
+
+        CaliperHooks::app_controller_before_render($this->controller);
+        $events = $this->_get_caliper_events();
+        $this->assertEqual(1, count($events));
+        $this->assertEqual('http://test.ipeer.com/home/index/5/_/_/sort:', $events[0]['object']['id']);
+        $this->assertEqual(array(
+            'relativePath' => 'home/index/5/_/_/sort:',
+            'queryString' => '',
+            'absolutePath' => 'http://cakephp.org/home/index/5/_/_/sort:',
+            'absoluteUrl' => 'http://cakephp.org/home/index/5/_/_/sort:',
+        ), $events[0]['extensions']);
+    }
+
+    function test_app_controller_before_render_skips_error_pages()
+    {
+        $this->setupSession('/home/index');
+        $this->_enable_caliper();
+        $this->controller->name = 'CakeError';
+
+        CaliperHooks::app_controller_before_render($this->controller);
+        $this->assertEqual(0, count($this->_get_caliper_events()));
+    }
+
     function test_app_controller_after_login_and_out()
     {
         $this->setupSession();
