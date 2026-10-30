@@ -10,5 +10,6 @@ class LibsGroupTest extends TestSuite
         TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'ipeer_saml_response');
         TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'caliper_sensor');
         TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'maintained_dj_worker');
+        TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'same_site');
     }
 }
