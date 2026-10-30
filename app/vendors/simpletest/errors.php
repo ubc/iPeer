@@ -6,13 +6,6 @@
  *  @version    $Id: errors.php 1672 2008-03-02 04:47:34Z edwardzyang $
  */
 
-/**
- * @ignore - PHP5 compatibility fix.
- */
-if (! defined('E_STRICT')) {
-    define('E_STRICT', 2048);
-}
-
 /**#@+
  * Includes SimpleTest files.
  */
@@ -153,11 +146,14 @@ class SimpleErrorQueue
      */
     public function tally()
     {
-        while (list($severity, $message, $file, $line) = $this->extract()) {
+        // extract() returns false when empty; destructuring false warns in PHP 8.5
+        while (($error = $this->extract()) !== false) {
+            list($severity, $message, $file, $line) = $error;
             $severity = $this->getSeverityAsString($severity);
             $this->_test->error($severity, $message, $file, $line);
         }
-        while (list($expected, $message) = $this->_extractExpectation()) {
+        while (($expectation = $this->_extractExpectation()) !== false) {
+            list($expected, $message) = $expectation;
             $this->_test->assert($expected, false, "%s -> Expected error not caught");
         }
     }
@@ -258,7 +254,6 @@ class SimpleErrorQueue
     public static function getSeverityAsString($severity)
     {
         static $map = array(
-                E_STRICT => 'E_STRICT',
                 E_ERROR => 'E_ERROR',
                 E_WARNING => 'E_WARNING',
                 E_PARSE => 'E_PARSE',
