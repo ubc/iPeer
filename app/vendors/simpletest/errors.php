@@ -153,11 +153,14 @@ class SimpleErrorQueue
      */
     public function tally()
     {
-        while (list($severity, $message, $file, $line) = $this->extract()) {
+        // extract() returns false when empty; destructuring false warns in PHP 8.5
+        while (($error = $this->extract()) !== false) {
+            list($severity, $message, $file, $line) = $error;
             $severity = $this->getSeverityAsString($severity);
             $this->_test->error($severity, $message, $file, $line);
         }
-        while (list($expected, $message) = $this->_extractExpectation()) {
+        while (($expectation = $this->_extractExpectation()) !== false) {
+            list($expected, $message) = $expectation;
             $this->_test->assert($expected, false, "%s -> Expected error not caught");
         }
     }
@@ -258,7 +261,7 @@ class SimpleErrorQueue
     public static function getSeverityAsString($severity)
     {
         static $map = array(
-                E_STRICT => 'E_STRICT',
+                2048 => 'E_STRICT', // E_STRICT constant is deprecated in PHP 8.4
                 E_ERROR => 'E_ERROR',
                 E_WARNING => 'E_WARNING',
                 E_PARSE => 'E_PARSE',

@@ -372,7 +372,7 @@ class SimpleHttpHeaders
      */
     public function getResponseCode()
     {
-        return (integer)$this->_response_code;
+        return (int)$this->_response_code;
     }
     
     /**
@@ -394,7 +394,7 @@ class SimpleHttpHeaders
     public function isRedirect()
     {
         return in_array($this->_response_code, array(301, 302, 303, 307)) &&
-                (boolean)$this->getLocation();
+                (bool)$this->getLocation();
     }
     
     /**
@@ -406,8 +406,8 @@ class SimpleHttpHeaders
     public function isChallenge()
     {
         return ($this->_response_code == 401) &&
-                (boolean)$this->_authentication &&
-                (boolean)$this->_realm;
+                (bool)$this->_authentication &&
+                (bool)$this->_realm;
     }
     
     /**
