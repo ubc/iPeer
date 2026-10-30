@@ -16,7 +16,7 @@ class SameSite {
     }
 
 
-    public static function handle(string $userAgent = null) : bool {
+    public static function handle(?string $userAgent = null) : bool {
         return (new self($userAgent))->shouldSendSameSiteNone();
     }
 

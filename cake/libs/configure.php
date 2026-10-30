@@ -115,7 +115,7 @@ class Configure extends CakeObject {
 				if (!class_exists('Debugger')) {
 					require LIBS . 'debugger.php';
 				}
-				$reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT;
+				$reporting = E_ALL & ~E_DEPRECATED;
 				if (function_exists('ini_set')) {
 					ini_set('display_errors', 1);
 				}
@@ -128,7 +128,7 @@ class Configure extends CakeObject {
 				if (is_integer($_this->log) && !$_this->debug) {
 					$reporting = $_this->log;
 				} else {
-					$reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT;
+					$reporting = E_ALL & ~E_DEPRECATED;
 				}
 				error_reporting($reporting);
 				if (!class_exists('CakeLog')) {
