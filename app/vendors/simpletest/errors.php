@@ -6,13 +6,6 @@
  *  @version    $Id: errors.php 1672 2008-03-02 04:47:34Z edwardzyang $
  */
 
-/**
- * @ignore - PHP5 compatibility fix.
- */
-if (! defined('E_STRICT')) {
-    define('E_STRICT', 2048);
-}
-
 /**#@+
  * Includes SimpleTest files.
  */
@@ -261,7 +254,6 @@ class SimpleErrorQueue
     public static function getSeverityAsString($severity)
     {
         static $map = array(
-                2048 => 'E_STRICT', // E_STRICT constant is deprecated in PHP 8.4
                 E_ERROR => 'E_ERROR',
                 E_WARNING => 'E_WARNING',
                 E_PARSE => 'E_PARSE',
