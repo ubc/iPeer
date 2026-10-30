@@ -1217,7 +1217,7 @@ class Controller extends CakeObject {
 		} elseif (intval($page) < 1) {
 			$options['page'] = $page = 1;
 		}
-		$page = $options['page'] = (integer)$page;
+		$page = $options['page'] = (int)$page;
 
 		if (method_exists($object, 'paginate')) {
 			$results = $object->paginate(
