@@ -3,14 +3,16 @@ App::import('Core', 'CakeSession');
 
 /**
  * Tests for the database session storage (Session.save = 'database'),
- * which production uses. PHP calls these CakeSession callbacks through
+ * which production uses via IPEER_SESSION_SAVE (core.php's 'php' default is
+ * overridden there). PHP calls these CakeSession callbacks through
  * the save handler that CakeSession::__initSession() registers:
  * open/read at session start, write/close at the end of the request,
  * destroy on logout (session_destroy, session_regenerate_id(true)) and
  * gc with session.gc_maxlifetime.
  *
- * The test runner has already sent output, so PHP won't start a real
- * session here; the tests call the callbacks in the order PHP does.
+ * CakeSession::__initSession() returns early under the CLI, so no save
+ * handler is registered and no real session starts here; the tests call
+ * the callbacks directly, in the order PHP does.
  *
  * @package app.tests.cases.libs
  */
@@ -23,6 +25,9 @@ class CakeSessionDatabaseTestCase extends CakeTestCase
 
     function startTest($method)
     {
+        // __close() runs gc when mt_rand(1, 150) <= 3; with this seed the next
+        // draws are 146 and 90, so it doesn't, and these tests stay deterministic
+        mt_srand(1);
         // the callbacks use whatever model is registered as 'Session'
         ClassRegistry::removeObject('Session');
         $this->Session =& ClassRegistry::init(array(
@@ -37,6 +42,7 @@ class CakeSessionDatabaseTestCase extends CakeTestCase
     {
         unset($this->Session);
         ClassRegistry::removeObject('Session');
+        mt_srand();
     }
 
     private function row($id)
