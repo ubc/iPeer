@@ -23118,22 +23118,20 @@ Putting 1 is equivalent to putting 0 and calling Ln() just after. Default value:
 		$this->_out(sprintf('%F %F %F %F %F %F cm', $svgscale_x, 0, 0, $svgscale_y, ($e + $svgoffset_x), ($f + $svgoffset_y)));
 		// creates a new XML parser to be used by the other XML functions
 		$parser = xml_parser_create('UTF-8');
-		// the following function allows to use parser inside object
-		xml_set_object($parser, $this);
 		// disable case-folding for this XML parser
 		xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
 		// sets the element handler functions for the XML parser
-		xml_set_element_handler($parser, 'startSVGElementHandler', 'endSVGElementHandler');
+		// pass [$this, method] callables instead of calling xml_set_object(), which is deprecated in PHP 8.4
+		xml_set_element_handler($parser, array($this, 'startSVGElementHandler'), array($this, 'endSVGElementHandler'));
 		// sets the character data handler function for the XML parser
-		xml_set_character_data_handler($parser, 'segSVGContentHandler');
+		xml_set_character_data_handler($parser, array($this, 'segSVGContentHandler'));
 		// start parsing an XML document
 		if (!xml_parse($parser, $svgdata)) {
 			$error_message = sprintf('SVG Error: %s at line %d', xml_error_string(xml_get_error_code($parser)), xml_get_current_line_number($parser));
 			$this->Error($error_message);
 		}
-		// free this XML parser
-		xml_parser_free($parser);
-
+		// xml_parser_free() is a no-op since PHP 8.0 and deprecated in PHP 8.5;
+		// unsetting the parser below frees it
 		// >= PHP 7.0.0 "explicitly unset the reference to parser to avoid memory leaks"
 		unset($parser);
 
