@@ -491,9 +491,10 @@ class CakeSession extends CakeObject {
 		if ($iniSet && env('HTTPS')) {
 			ini_set('session.cookie_secure', 1);
 		}
-		if ($iniSet && ($this->security === 'high' || $this->security === 'medium')) {
-		    ini_set('session.referer_check', $this->host);
-		}
+		// CakePHP originally set session.referer_check to $this->host here when
+		// Security.level was 'medium' or 'high'. The setting is deprecated in
+		// PHP 8.4, and the Referer header is optional and easily omitted, so it
+		// only ever acted as a weak extra check.
 
         if ($iniSet && !empty(Configure::read('Session.httpOnly'))) {
             ini_set('session.cookie_httponly', 'On');
