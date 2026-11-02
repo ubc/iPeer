@@ -978,7 +978,9 @@ class Xml extends XmlNode {
 				break;
 			}
 		}
-		// XMLParser objects are freed automatically; xml_parser_free() is deprecated in PHP 8.5
+		// Originally the CakePHP code called `xml_parser_free($this->__parser);` here.
+		// As of PHP 8.0 it is no longer required (XMLParser objects are freed automatically),
+		// and xml_parser_free() is deprecated in PHP 8.5.
 		$this->__parser = null;
 		return true;
 	}

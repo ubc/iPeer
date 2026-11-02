@@ -40,6 +40,11 @@ class CookieComponentTestCase extends CakeTestCase
             restore_error_handler();
         }
 
+        // Requests without a User-Agent header (e.g. curl, health checks) have
+        // no HTTP_USER_AGENT key. Reading $_SERVER['HTTP_USER_AGENT'] directly
+        // raised an "Undefined array key" warning on PHP 8; the Cookie component now
+        // reads it with env(), which returns null instead. (part of PHP upgrade work)
+        // We leave this test as a regression test (ensure warning doesn't get emitted).
         $this->assertEqual(array(), preg_grep('/HTTP_USER_AGENT/', $errors));
     }
 }
