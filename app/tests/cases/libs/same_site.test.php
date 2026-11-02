@@ -63,6 +63,18 @@ class SameSiteTestCase extends CakeTestCase
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.1.2 Safari/605.1.15'));
     }
 
+    function testMacos1014EmbeddedBrowserHasWebKitBug()
+    {
+        // WKWebView-based apps send a bare WebKit user agent
+        $this->assertFalse(SameSite::handle(
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko)'));
+        $this->assertTrue(SameSite::handle(
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)'));
+        // Chrome on 10.14 is not affected
+        $this->assertTrue(SameSite::handle(
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'));
+    }
+
     function testOldUcBrowserDropsSameSiteNone()
     {
         $this->assertFalse(SameSite::handle(

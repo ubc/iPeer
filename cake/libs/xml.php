@@ -978,7 +978,9 @@ class Xml extends XmlNode {
 				break;
 			}
 		}
-		xml_parser_free($this->__parser);
+		// Originally the CakePHP code called `xml_parser_free($this->__parser);` here.
+		// As of PHP 8.0 it is no longer required (XMLParser objects are freed automatically),
+		// and xml_parser_free() is deprecated in PHP 8.5.
 		$this->__parser = null;
 		return true;
 	}
@@ -992,7 +994,6 @@ class Xml extends XmlNode {
 	function __initParser() {
 		if (empty($this->__parser)) {
 			$this->__parser = xml_parser_create();
-			xml_set_object($this->__parser, $this);
 			xml_parser_set_option($this->__parser, XML_OPTION_CASE_FOLDING, 0);
 			xml_parser_set_option($this->__parser, XML_OPTION_SKIP_WHITE, 1);
 		}

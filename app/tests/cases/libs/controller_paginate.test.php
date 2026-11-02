@@ -70,4 +70,16 @@ class ControllerPaginateTestCase extends CakeTestCase
         $this->assertIdentical(1, $this->pageFor('0')['page']);
         $this->assertIdentical(1, $this->pageFor('-1')['page']);
     }
+
+    function testNonNumericPageGoesToFirst()
+    {
+        $this->assertIdentical(1, $this->pageFor('abc')['page']);
+    }
+
+    function testNoResultsIsPageOne()
+    {
+        $paging = $this->pageFor('1', array('PaginateFaculty.id' => -1));
+        $this->assertIdentical(0, $paging['count']);
+        $this->assertIdentical(1, $paging['page']);
+    }
 }
