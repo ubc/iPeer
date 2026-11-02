@@ -619,7 +619,7 @@ class CacheEngine {
  * @access public
  */
 	function write($key, &$value, $duration) {
-		trigger_error(sprintf(__('Method write() not implemented in %s', true), get_class($this)), E_USER_ERROR);
+		trigger_error(sprintf(__('Method write() not implemented in %s', true), get_class($this)), E_USER_WARNING);
 	}
 
 /**
@@ -630,7 +630,7 @@ class CacheEngine {
  * @access public
  */
 	function read($key) {
-		trigger_error(sprintf(__('Method read() not implemented in %s', true), get_class($this)), E_USER_ERROR);
+		trigger_error(sprintf(__('Method read() not implemented in %s', true), get_class($this)), E_USER_WARNING);
 	}
 
 /**
@@ -642,7 +642,7 @@ class CacheEngine {
  * @access public
  */
 	function increment($key, $offset = 1) {
-		trigger_error(sprintf(__('Method increment() not implemented in %s', true), get_class($this)), E_USER_ERROR);
+		trigger_error(sprintf(__('Method increment() not implemented in %s', true), get_class($this)), E_USER_WARNING);
 	}
 /**
  * Decrement a number under the key and return decremented value
@@ -653,7 +653,7 @@ class CacheEngine {
  * @access public
  */
 	function decrement($key, $offset = 1) {
-		trigger_error(sprintf(__('Method decrement() not implemented in %s', true), get_class($this)), E_USER_ERROR);
+		trigger_error(sprintf(__('Method decrement() not implemented in %s', true), get_class($this)), E_USER_WARNING);
 	}
 /**
  * Delete a key from the cache

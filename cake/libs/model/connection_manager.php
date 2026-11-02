@@ -99,7 +99,7 @@ class ConnectionManager extends CakeObject {
 		}
 
 		if (empty($_this->_connectionsEnum[$name])) {
-			trigger_error(sprintf(__("ConnectionManager::getDataSource - Non-existent data source %s", true), $name), E_USER_ERROR);
+			trigger_error(sprintf(__("ConnectionManager::getDataSource - Non-existent data source %s", true), $name), E_USER_WARNING);
 			$null = null;
 			return $null;
 		}
@@ -107,7 +107,7 @@ class ConnectionManager extends CakeObject {
 		$class = $conn['classname'];
 
 		if ($_this->loadDataSource($name) === null) {
-			trigger_error(sprintf(__("ConnectionManager::getDataSource - Could not load class %s", true), $class), E_USER_ERROR);
+			trigger_error(sprintf(__("ConnectionManager::getDataSource - Could not load class %s", true), $class), E_USER_WARNING);
 			$null = null;
 			return $null;
 		}
@@ -182,7 +182,7 @@ class ConnectionManager extends CakeObject {
 		$class = "{$conn['plugin']}.{$conn['classname']}";
 
 		if (!App::import('Datasource', $class, !is_null($conn['plugin']))) {
-			trigger_error(sprintf(__('ConnectionManager::loadDataSource - Unable to import DataSource class %s', true), $class), E_USER_ERROR);
+			trigger_error(sprintf(__('ConnectionManager::loadDataSource - Unable to import DataSource class %s', true), $class), E_USER_WARNING);
 			return null;
 		}
 		return true;

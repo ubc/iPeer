@@ -326,7 +326,7 @@ class GuardComponent extends AuthComponent {
      * @return void
      */
     function error($message) {
-        trigger_error($message, E_USER_ERROR);
+        trigger_error($message, E_USER_WARNING);
         $this->_stop();
     }
 
