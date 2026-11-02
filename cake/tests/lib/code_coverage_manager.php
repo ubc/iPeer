@@ -102,7 +102,7 @@ class CodeCoverageManager {
 		$thisFile = str_replace('.php', '.test.php', basename(__FILE__));
 
 		if (strpos($testCaseFile, $thisFile) !== false) {
-			trigger_error(__('Xdebug supports no parallel coverage analysis - so this is not possible.', true), E_USER_ERROR);
+			throw new RuntimeException(__('Xdebug supports no parallel coverage analysis - so this is not possible.', true));
 		}
 		$manager->setParams($reporter);
 		$manager->testCaseFile = $testCaseFile;

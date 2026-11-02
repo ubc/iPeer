@@ -399,7 +399,7 @@ class Configure extends CakeObject {
 			Configure::write('App', array('base' => false, 'baseUrl' => false, 'dir' => APP_DIR, 'webroot' => WEBROOT_DIR, 'www_root' => WWW_ROOT));
 
 			if (!include(CONFIGS . 'core.php')) {
-				trigger_error(sprintf(__("Can't find application core file. Please create %score.php, and make sure it is readable by PHP.", true), CONFIGS), E_USER_ERROR);
+				throw new RuntimeException(sprintf(__("Can't find application core file. Please create %score.php, and make sure it is readable by PHP.", true), CONFIGS));
 			}
 
 			if (Configure::read('Cache.disable') !== true) {

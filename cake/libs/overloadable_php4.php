@@ -70,7 +70,7 @@ class Overloadable extends CakeObject {
  */
 	function __call($method, $params, &$return) {
 		if (!method_exists($this, 'call__')) {
-			trigger_error(sprintf(__('Magic method handler call__ not defined in %s', true), get_class($this)), E_USER_ERROR);
+			throw new BadMethodCallException(sprintf(__('Magic method handler call__ not defined in %s', true), get_class($this)));
 		}
 		$return = $this->call__($method, $params);
 		return true;
@@ -130,7 +130,7 @@ class Overloadable2 extends CakeObject {
  */
 	function __call($method, $params, &$return) {
 		if (!method_exists($this, 'call__')) {
-			trigger_error(sprintf(__('Magic method handler call__ not defined in %s', true), get_class($this)), E_USER_ERROR);
+			throw new BadMethodCallException(sprintf(__('Magic method handler call__ not defined in %s', true), get_class($this)));
 		}
 		$return = $this->call__($method, $params);
 		return true;
