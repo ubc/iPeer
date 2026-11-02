@@ -391,7 +391,7 @@ class CookieComponent extends CakeObject {
 	function __write($name, $value) {
 		$sendSameSiteValue = true;
 		if (strtolower(trim($this->samesite)) === 'none') {
-			$sendSameSiteValue = SameSite::handle($_SERVER['HTTP_USER_AGENT']);
+			$sendSameSiteValue = SameSite::handle(env('HTTP_USER_AGENT'));
 		}
 
 		if ($sendSameSiteValue) {

@@ -1212,9 +1212,12 @@ class Controller extends CakeObject {
 		}
 		$pageCount = intval(ceil($count / $limit));
 
-		if ($page === 'last' || $page >= $pageCount) {
+		// compare as integers: on PHP 8 a non-numeric page such as 'abc' compares
+		// as a string and would be treated as past the last page
+		if ($page === 'last' || intval($page) >= $pageCount) {
 			$options['page'] = $page = $pageCount;
-		} elseif (intval($page) < 1) {
+		}
+		if (intval($page) < 1) {
 			$options['page'] = $page = 1;
 		}
 		$page = $options['page'] = (int)$page;

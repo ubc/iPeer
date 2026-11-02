@@ -12,7 +12,8 @@ class SameSite {
     protected $userAgent = null;
 
     public function __construct($userAgent) {
-        $this->userAgent = $userAgent;
+        // a missing User-Agent arrives as null; preg_match() requires a string
+        $this->userAgent = (string)$userAgent;
     }
 
 
@@ -83,7 +84,7 @@ class SameSite {
 
 
     protected function isMacEmbeddedBrowser() : bool {
-        $regex = "#/^Mozilla\/[\.\d]+ \(Macintosh;.*Mac OS X [_\d]+\) AppleWebKit\/[\.\d]+ \(KHTML, like Gecko\)$#";
+        $regex = "/^Mozilla\/[\.\d]+ \(Macintosh;.*Mac OS X [_\d]+\) AppleWebKit\/[\.\d]+ \(KHTML, like Gecko\)$/";
         return preg_match($regex,$this->userAgent);
     }
 
