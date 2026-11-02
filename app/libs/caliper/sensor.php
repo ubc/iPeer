@@ -120,7 +120,6 @@ class CaliperSensor {
         $responseText = curl_exec($client);
         $responseInfo = curl_getinfo($client);
         $curlError = curl_error($client);
-        curl_close($client);
         $responseCode = $responseText ? $responseInfo['http_code'] : null;
         if ($responseCode < 200 || $responseCode >= 300) {
             $error = 'Caliper Emit Error: '. ($responseCode ? $responseCode : 'no response ('. $curlError .')')

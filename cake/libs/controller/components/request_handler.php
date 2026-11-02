@@ -819,8 +819,8 @@ class RequestHandlerComponent extends CakeObject {
 		if ($this->__typesInitialized) {
 			return;
 		}
-		if (isset($this->__requestContent[$this->ext])) {
-			$content = $this->__requestContent[$this->ext];
+		if (isset($this->__requestContent[$this->ext ?? ''])) {
+			$content = $this->__requestContent[$this->ext ?? ''];
 			if (is_array($content)) {
 				$content = $content[0];
 			}

@@ -718,8 +718,8 @@ class Helper extends Overloadable {
 		}
 
 		if (is_array($result)) {
-			if (array_key_exists($view->fieldSuffix, $result)) {
-				$result = $result[$view->fieldSuffix];
+			if (array_key_exists($view->fieldSuffix ?? '', $result)) {
+				$result = $result[$view->fieldSuffix ?? ''];
 			}
 		}
 

@@ -108,7 +108,7 @@ class Toolkit
             } elseif ($bom !== "\xEF\xBB\xBF") {
                 rewind($handle);
             }
-            while (($data = fgetcsv($handle, 1000, ",")) !== false) {
+            while (($data = fgetcsv($handle, 1000, ",", '"', "\\")) !== false) {
                 $ret[] = array_map('trim', $data);
             }
             fclose($handle);
