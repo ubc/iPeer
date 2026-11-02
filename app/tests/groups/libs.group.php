@@ -13,5 +13,6 @@ class LibsGroupTest extends TestSuite
         TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'cake_session_database');
         TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'same_site');
         TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'controller_paginate');
+        TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'view_helpers');
     }
 }

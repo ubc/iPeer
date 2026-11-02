@@ -56,4 +56,13 @@ class ToolkitTestCase extends CakeTestCase
         $result = Toolkit::parseCSV($file);
         $this->assertEqual('a', $result[0][0]);
     }
+
+    function testParseCSVBackslashBeforeQuote()
+    {
+        // fgetcsv() treats a backslash as an escape character: the quote
+        // after it doesn't end the field, and the backslash is kept
+        $file = $this->writeTmp("\"a\\\"b\",c\n");
+        $result = Toolkit::parseCSV($file);
+        $this->assertIdentical(array(array('a\\"b', 'c')), $result);
+    }
 }

@@ -258,4 +258,35 @@ class ExportCsvComponentTestCase extends CakeTestCase
                 "export_all empty row $i must have same column count as header");
         }
     }
+
+    // -------------------------------------------------------------------------
+    // CSV output
+    // -------------------------------------------------------------------------
+
+    function testRenderCsvOutput()
+    {
+        // fputcsv() quotes fields with spaces, delimiters, quotes or the
+        // escape character; a quote after a backslash is not doubled
+        ob_start();
+        $this->ExportCsv->render(array(
+            array('plain', 'with space', 'comma,inside', 'quote"inside', 'back\\"slash'),
+            array('', '1'),
+        ));
+        $out = ob_get_clean();
+
+        $this->assertIdentical(
+            "plain,\"with space\",\"comma,inside\",\"quote\"\"inside\",\"back\\\"slash\"\n,1\n",
+            $out
+        );
+    }
+
+    function testExportCsvOutput()
+    {
+        ob_start();
+        $ret = $this->ExportCsv->exportCSV(array(array('a b', 'c\\"d'), array('e')), 'name');
+        $out = ob_get_clean();
+
+        $this->assertTrue($ret);
+        $this->assertIdentical("\"a b\",\"c\\\"d\"\ne\n", $out);
+    }
 }
