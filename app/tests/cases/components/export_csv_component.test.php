@@ -285,6 +285,10 @@ class ExportCsvComponentTestCase extends CakeTestCase
         ob_start();
         $ret = $this->ExportCsv->exportCSV(array(array('a b', 'c\\"d'), array('e')), 'name');
         $out = ob_get_clean();
+        // exportCSV() sends download headers; in the browser test runner they would
+        // make the browser download the buffered report as name.csv instead of showing it
+        header_remove('Content-Type');
+        header_remove('Content-Disposition');
 
         $this->assertTrue($ret);
         $this->assertIdentical("\"a b\",\"c\\\"d\"\ne\n", $out);
