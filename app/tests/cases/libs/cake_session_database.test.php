@@ -132,10 +132,9 @@ class CakeSessionDatabaseTestCase extends CakeTestCase
 
     function testGcWithMaxLifetimeComparesItAsATimestamp()
     {
-        // PHP passes session.gc_maxlifetime (e.g. 1440) as the first
-        // argument, and __gc() treats it as the expiry timestamp, so it
-        // only removes rows that expired in the first seconds of 1970.
-        // This pins the current behaviour; it is not a recommendation.
+        // Known bug: PHP passes session.gc_maxlifetime (e.g. 1440) here, but __gc()
+        // treats it as an absolute timestamp, so PHP-triggered cleanup never removes
+        // expired sessions. Update this test when the gc fix lands.
         $this->insert('ancient', 1000);
         $this->insert('expired', time() - 10);
 
