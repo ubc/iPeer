@@ -607,7 +607,7 @@ class CakeSession extends CakeObject {
  * Passing the callbacks to session_set_save_handler() one by one is
  * deprecated in PHP 8.4, so they are wrapped in an object instead. The
  * callbacks are the same ones the old call used, and are called with
- * the same arguments.
+ * the same arguments, except gc (see CakeSessionSaveHandler::gc()).
  *
  * @param string $save Session.save value
  * @return CakeSessionSaveHandler|null null for storage PHP handles itself
@@ -932,7 +932,8 @@ class CakeSessionSaveHandler implements SessionHandlerInterface {
 	#[\ReturnTypeWillChange]
 	function gc($maxLifetime) {
 		// each row stores its own expiry time, so PHP's max lifetime isn't needed;
-		// __gc() would read it as a timestamp (1970) and delete nothing
+		// __gc() would read it as a timestamp (1970) and delete nothing.
+		// Cache::gc() takes no argument either.
 		return call_user_func($this->callbacks['gc']);
 	}
 }

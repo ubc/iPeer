@@ -29,7 +29,8 @@ class SessionCallbackRecorder
  * the save handler that CakeSession::__initSession() registers:
  * open/read at session start, write/close at the end of the request,
  * destroy on logout (session_destroy, session_regenerate_id(true)) and
- * gc with session.gc_maxlifetime.
+ * gc after read at session start (on about 1% of starts). PHP passes gc
+ * session.gc_maxlifetime; the handler doesn't pass it on to __gc().
  *
  * CakeSession::__initSession() returns early under the CLI, so no save
  * handler is registered and no real session starts here; the tests call
@@ -147,7 +148,8 @@ class CakeSessionDatabaseTestCase extends CakeTestCase
 
     function testGcRemovesExpiredSessions()
     {
-        // __close() calls this (with no argument) on about 2% of requests
+        // __close() calls this (with no argument) on about 2% of requests,
+        // and the save handler's gc() on about 1% of session starts
         $this->insert('expired', time() - 10);
         $this->insert('live', time() + 3600);
 
