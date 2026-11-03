@@ -2,6 +2,13 @@
 App::import('Lib', 'Toolkit');
 App::import('Core', 'ConnectionManager');
 App::import('Component', 'Guard.Guard');
+App::import('Core', 'DboSource');
+
+// a database driver whose PHP extension isn't loaded
+class DisabledDboForError extends DboSource
+{
+    function enabled() { return false; }
+}
 
 Mock::generatePartial('GuardComponent', 'MockGuardComponentForError', array('_stop'));
 
@@ -42,5 +49,15 @@ class UserErrorsTestCase extends CakeTestCase
 
         $this->expectError(new PatternExpectation('/^Guard error message$/'));
         $guard->error('Guard error message');
+    }
+
+    function testDboSourceDisabledDriverThrows()
+    {
+        try {
+            new DisabledDboForError(array(), false);
+            $this->fail('Expected a RuntimeException for a disabled driver');
+        } catch (RuntimeException $e) {
+            $this->assertEqual('DisabledDboForError - Selected driver is not enabled', $e->getMessage());
+        }
     }
 }

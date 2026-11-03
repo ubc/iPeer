@@ -648,7 +648,7 @@ class SimpleErrorThrower
     /**
      *    Stashes an error to throw later.
      *    @param string $error      Error message.
-     *    @param integer $severity  PHP error constant, e.g E_USER_ERROR.
+     *    @param integer $severity  PHP error constant, e.g E_USER_WARNING.
      *    @access public
      */
     public function __construct($error, $severity)
@@ -741,9 +741,8 @@ class SimpleMock
     public function _checkArgumentsIsArray($args, $task)
     {
         if (! is_array($args)) {
-            trigger_error(
-                "Cannot $task as \$args parameter is not an array",
-                E_USER_ERROR
+            throw new InvalidArgumentException(
+                "Cannot $task as \$args parameter is not an array"
             );
         }
     }
@@ -758,9 +757,8 @@ class SimpleMock
     public function _dieOnNoMethod($method, $task)
     {
         if ($this->_is_strict && ! method_exists($this, $method)) {
-            trigger_error(
-                    "Cannot $task as no ${method}() in class " . get_class($this),
-                    E_USER_ERROR
+            throw new BadMethodCallException(
+                    "Cannot $task as no {$method}() in class " . get_class($this)
             );
         }
     }
@@ -1086,7 +1084,7 @@ class SimpleMock
      *    Sets up a trigger to throw an error upon the
      *    method call.
      */
-    public function errorOn($method, $error = 'A mock error', $args = false, $severity = E_USER_ERROR)
+    public function errorOn($method, $error = 'A mock error', $args = false, $severity = E_USER_WARNING)
     {
         $this->_dieOnNoMethod($method, "error on");
         $this->_actions->register($method, $args, new SimpleErrorThrower($error, $severity));
@@ -1096,7 +1094,7 @@ class SimpleMock
      *    Sets up a trigger to throw an error upon the
      *    method call.
      */
-    public function errorAt($timing, $method, $error = 'A mock error', $args = false, $severity = E_USER_ERROR)
+    public function errorAt($timing, $method, $error = 'A mock error', $args = false, $severity = E_USER_WARNING)
     {
         $this->_dieOnNoMethod($method, "error at");
         $this->_actions->registerAt($timing, $method, $args, new SimpleErrorThrower($error, $severity));
@@ -1660,11 +1658,11 @@ class MockGenerator
         $code .= $this->_bailOutIfNotMocked("\$method");
         $code .= "        \$this->_mock->throwAt(\$timing, \$method, \$exception, \$args);\n";
         $code .= "    }\n";
-        $code .= "    function errorOn(\$method, \$error = 'A mock error', \$args = false, \$severity = E_USER_ERROR) {\n";
+        $code .= "    function errorOn(\$method, \$error = 'A mock error', \$args = false, \$severity = E_USER_WARNING) {\n";
         $code .= $this->_bailOutIfNotMocked("\$method");
         $code .= "        \$this->_mock->errorOn(\$method, \$error, \$args, \$severity);\n";
         $code .= "    }\n";
-        $code .= "    function errorAt(\$timing, \$method, \$error = 'A mock error', \$args = false, \$severity = E_USER_ERROR) {\n";
+        $code .= "    function errorAt(\$timing, \$method, \$error = 'A mock error', \$args = false, \$severity = E_USER_WARNING) {\n";
         $code .= $this->_bailOutIfNotMocked("\$method");
         $code .= "        \$this->_mock->errorAt(\$timing, \$method, \$error, \$args, \$severity);\n";
         $code .= "    }\n";

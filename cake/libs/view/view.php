@@ -451,7 +451,7 @@ class View extends CakeObject {
 			$this->hasRendered = true;
 		} else {
 			$out = $this->_render($viewFileName, $this->viewVars);
-			trigger_error(sprintf(__("Error in view %s, got: <blockquote>%s</blockquote>", true), $viewFileName, $out), E_USER_ERROR);
+			trigger_error(sprintf(__("Error in view %s, got: <blockquote>%s</blockquote>", true), $viewFileName, $out), E_USER_WARNING);
 		}
 		return $out;
 	}
@@ -495,7 +495,7 @@ class View extends CakeObject {
 
 		if ($this->output === false) {
 			$this->output = $this->_render($layoutFileName, $dataForLayout);
-			trigger_error(sprintf(__("Error in layout %s, got: <blockquote>%s</blockquote>", true), $layoutFileName, $this->output), E_USER_ERROR);
+			trigger_error(sprintf(__("Error in layout %s, got: <blockquote>%s</blockquote>", true), $layoutFileName, $this->output), E_USER_WARNING);
 			return false;
 		}
 

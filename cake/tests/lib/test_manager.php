@@ -132,11 +132,9 @@ class TestManager {
 		$testCaseFileWithPath = $this->_getTestsPath() . DS . $testCaseFile;
 
 		if (!file_exists($testCaseFileWithPath) || strpos($testCaseFileWithPath, '..')) {
-			trigger_error(
-				sprintf(__("Test case %s cannot be found", true), htmlentities($testCaseFile)),
-				E_USER_ERROR
+			throw new RuntimeException(
+				sprintf(__("Test case %s cannot be found", true), htmlentities($testCaseFile))
 			);
-			return false;
 		}
 
 		if ($testing) {
@@ -160,13 +158,11 @@ class TestManager {
 		$filePath = $this->_getTestsPath('groups') . DS . strtolower($groupTestName) . $this->_groupExtension;
 
 		if (!file_exists($filePath) || strpos($filePath, '..')) {
-			trigger_error(sprintf(
-					__("Group test %s cannot be found at %s", true), 
-					htmlentities($groupTestName), 
-					htmlentities($filePath)
-				),
-				E_USER_ERROR
-			);
+			throw new RuntimeException(sprintf(
+				__("Group test %s cannot be found at %s", true),
+				htmlentities($groupTestName),
+				htmlentities($filePath)
+			));
 		}
 
 		require_once $filePath;

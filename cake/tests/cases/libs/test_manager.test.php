@@ -65,9 +65,12 @@ class TestManagerTest extends CakeTestCase {
  */
 	function testRunTestCase() {
 		$file = md5(time());
-		$result = $this->TestManager->runTestCase($file, $this->Reporter);
-		$this->assertError('Test case ' . $file . ' cannot be found');
-		$this->assertFalse($result);
+		try {
+			$this->TestManager->runTestCase($file, $this->Reporter);
+			$this->fail('Expected a RuntimeException for a missing test case');
+		} catch (RuntimeException $e) {
+			$this->assertEqual('Test case ' . $file . ' cannot be found', $e->getMessage());
+		}
 
 		$file = str_replace(CORE_TEST_CASES, '', __FILE__);
 		$result = $this->TestManager->runTestCase($file, $this->Reporter, true);

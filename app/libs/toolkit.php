@@ -104,7 +104,7 @@ class Toolkit
         if (($handle = fopen($file, "r")) !== false) {
             $bom = fread($handle, 3); # check for and strip byte order marker (BOM) if present
             if ($bom === false) {
-                trigger_error('Error reading file ' . $file, E_USER_ERROR);
+                trigger_error('Error reading file ' . $file, E_USER_WARNING);
             } elseif ($bom !== "\xEF\xBB\xBF") {
                 rewind($handle);
             }
@@ -113,7 +113,7 @@ class Toolkit
             }
             fclose($handle);
         } else {
-            trigger_error('Error to open file '.$file, E_USER_ERROR);
+            trigger_error('Error to open file '.$file, E_USER_WARNING);
         }
 
         return $ret;

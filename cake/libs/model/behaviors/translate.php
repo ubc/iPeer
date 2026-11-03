@@ -71,7 +71,7 @@ class TranslateBehavior extends ModelBehavior {
 		if (!$db->connected) {
 			trigger_error(
 				sprintf(__('Datasource %s for TranslateBehavior of model %s is not connected', true), $model->useDbConfig, $model->alias),
-				E_USER_ERROR
+				E_USER_WARNING
 			);
 			return false;
 		}
@@ -562,7 +562,7 @@ class TranslateBehavior extends ModelBehavior {
 					if (isset($model->{$type}[$association]) || isset($model->__backAssociation[$type][$association])) {
 						trigger_error(
 							sprintf(__('Association %s is already binded to model %s', true), $association, $model->alias),
-							E_USER_ERROR
+							E_USER_WARNING
 						);
 						return false;
 					}
