@@ -326,7 +326,13 @@ class GuardComponent extends AuthComponent {
      * @return void
      */
     function error($message) {
-        trigger_error($message, E_USER_WARNING);
+        // auth failures (e.g. LDAP bind) end the request, so log them at
+        // error level; with debug on, show them through the Debugger
+        if (Configure::read('debug') > 0) {
+            trigger_error($message, E_USER_WARNING);
+        } else {
+            CakeLog::write('error', $message);
+        }
         $this->_stop();
     }
 

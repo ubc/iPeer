@@ -1319,6 +1319,14 @@ class UsersController extends AppController
 
                 $data = Toolkit::parseCSV($uploadFile);
 
+                // stop on an unreadable or empty file: with update_class set,
+                // an empty list would remove every student from the course
+                if (empty($data)) {
+                    $this->FileUpload->removeFile($uploadFile);
+                    $this->Session->setFlash(__('Error: The file got uploaded, but could not be processed as a csv.', true));
+                    return;
+                }
+
                 // generation password for users who weren't given one
                 foreach ($data as &$user) {
                     if (empty($user[User::IMPORT_PASSWORD])) {

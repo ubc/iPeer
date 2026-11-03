@@ -72,9 +72,12 @@ class CodeCoverageManagerTest extends CakeTestCase {
 		CodeCoverageManager::report(false);
 		$this->assertError();
 
-		CodeCoverageManager::init('tests' . DS . 'lib' . DS . basename(__FILE__), $reporter);
-		CodeCoverageManager::report(false);
-		$this->assertError();
+		try {
+			CodeCoverageManager::init('tests' . DS . 'lib' . DS . basename(__FILE__), $reporter);
+			$this->fail('Expected a RuntimeException for coverage of the coverage test');
+		} catch (RuntimeException $e) {
+			$this->assertEqual('Xdebug supports no parallel coverage analysis - so this is not possible.', $e->getMessage());
+		}
 	}
 
 /**

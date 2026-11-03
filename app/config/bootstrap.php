@@ -69,8 +69,16 @@ set_exception_handler(function ($e) {
     CakeLog::write('error', $message);
     CakeLog::write('debug', $e->getTraceAsString());
 
-    if (!headers_sent()) {
-        http_response_code(500);
+    if (PHP_SAPI === 'cli') {
+        // the log goes to the container's stderr, not the terminal or CI output
+        fwrite(STDERR, $message . "\n");
+    } else {
+        if (!headers_sent()) {
+            http_response_code(500);
+        }
+        if (Configure::read('debug') > 0) {
+            echo '<pre>' . h($message) . '</pre>';
+        }
     }
     exit(1);
 });
