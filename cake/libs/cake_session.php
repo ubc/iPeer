@@ -556,6 +556,8 @@ class CakeSession extends CakeObject {
 						ini_set('session.auto_start', 0);
 					}
 				}
+				// false: don't register session_write_close() as a shutdown function,
+				// so the session is still written when the callback form wrote it
 				session_set_save_handler(CakeSession::_saveHandler('database'), false);
 			break;
 			case 'php':
@@ -585,6 +587,8 @@ class CakeSession extends CakeObject {
 						ini_set('session.cookie_path', $this->path);
 					}
 				}
+				// false: don't register session_write_close() as a shutdown function,
+				// so the session is still written when the callback form wrote it
 				session_set_save_handler(CakeSession::_saveHandler('cache'), false);
 			break;
 			default:
@@ -607,7 +611,7 @@ class CakeSession extends CakeObject {
  *
  * @param string $save Session.save value
  * @return CakeSessionSaveHandler|null null for storage PHP handles itself
- * @access protected
+ * @access public
  */
 	static function _saveHandler($save) {
 		switch ($save) {
@@ -866,6 +870,10 @@ class CakeSession extends CakeObject {
  * unchanged, so the storage behaves exactly as before; the return types
  * are left undeclared for that reason.
  *
+ * #[\ReturnTypeWillChange] silences the tentative-return-type notice until
+ * PHP makes those types required. Then declare them, and convert callback
+ * results that don't match (__gc() returns true, Cache::gc() returns null).
+ *
  * @package       cake
  * @subpackage    cake.cake.libs
  */
@@ -875,9 +883,8 @@ class CakeSessionSaveHandler implements SessionHandlerInterface {
  * Callbacks keyed by open, close, read, write, destroy and gc
  *
  * @var array
- * @access public
  */
-	var $callbacks = array();
+	protected $callbacks = array();
 
 /**
  * Constructor
@@ -886,6 +893,15 @@ class CakeSessionSaveHandler implements SessionHandlerInterface {
  */
 	function __construct($callbacks) {
 		$this->callbacks = $callbacks;
+	}
+
+/**
+ * Returns the callbacks, keyed by handler method name
+ *
+ * @return array
+ */
+	function getCallbacks() {
+		return $this->callbacks;
 	}
 
 	#[\ReturnTypeWillChange]

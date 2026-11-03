@@ -221,7 +221,7 @@ class CakeSessionDatabaseTestCase extends CakeTestCase
             'write' => array('CakeSession', '__write'),
             'destroy' => array('CakeSession', '__destroy'),
             'gc' => array('CakeSession', '__gc'),
-        ), $database->callbacks);
+        ), $database->getCallbacks());
 
         $cache = CakeSession::_saveHandler('cache');
         $this->assertIdentical(array(
@@ -231,7 +231,7 @@ class CakeSessionDatabaseTestCase extends CakeTestCase
             'write' => array('Cache', 'write'),
             'destroy' => array('Cache', 'delete'),
             'gc' => array('Cache', 'gc'),
-        ), $cache->callbacks);
+        ), $cache->getCallbacks());
     }
 
     function testDatabaseSaveHandlerLoginLogoutAndGc()
