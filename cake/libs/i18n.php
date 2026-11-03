@@ -139,7 +139,9 @@ class I18n extends CakeObject {
 
 		if (($_this->__lang && $_this->__lang !== $language) || !$_this->__lang) {
 			$lang = $_this->l10n->get($language);
-			$_this->__lang = $lang;
+			// L10n::get() returns null when no language is set; __lang is used
+			// as an array key below, where null has always meant ''
+			$_this->__lang = $lang ?? '';
 		}
 
 		if (is_null($domain)) {
@@ -338,8 +340,8 @@ class I18n extends CakeObject {
 			}
 			$this->__domains = Set::pushDiff($this->__domains, $merge);
 
-			if (isset($this->__domains[$domain][$this->__lang][$this->category][null])) {
-				unset($this->__domains[$domain][$this->__lang][$this->category][null]);
+			if (isset($this->__domains[$domain][$this->__lang][$this->category][''])) {
+				unset($this->__domains[$domain][$this->__lang][$this->category]['']);
 			}
 		}
 		return $domain;

@@ -365,7 +365,9 @@ class FileUploadHelper extends AppHelper{
 		 * @return void
 		 */
 		function close(){
-			return @imagedestroy($this->_img);
+			// imagedestroy() has done nothing since PHP 8.0 (deprecated in 8.5);
+			// the image is freed when it is no longer referenced
+			return true;
 		}
     
 		/**
@@ -379,11 +381,11 @@ class FileUploadHelper extends AppHelper{
 			$image_per = 100;
 			list($width, $height, $type, $attr) = @getimagesize($this->imgFile);
 			if($width > $imgwidth && $imgwidth > 0){
-				$image_per = (double)(($imgwidth * 100) / $width);
+				$image_per = (float)(($imgwidth * 100) / $width);
       }
 
 			if(floor(($height * $image_per)/100)>$imgheight && $imgheight > 0){
-				$image_per = (double)(($imgheight * 100) / $height);
+				$image_per = (float)(($imgheight * 100) / $height);
       }
 
 			$this->resize_percentage($image_per,$newfile);
@@ -545,7 +547,6 @@ class FileUploadHelper extends AppHelper{
 					@imagepng($newimg);
 				}
 			}
-			@imagedestroy($newimg);
 		}
 	}
 ?>

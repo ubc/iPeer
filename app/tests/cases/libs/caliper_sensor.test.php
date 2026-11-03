@@ -38,7 +38,6 @@ class CaliperSensorTestCase extends CakeTestCase
     {
         foreach (array('options', 'sensor') as $name) {
             $property = new ReflectionProperty('caliper\CaliperSensor', $name);
-            $property->setAccessible(true);
             $property->setValue(null, null);
         }
     }

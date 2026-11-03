@@ -386,7 +386,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
     {
         $resource = fopen('php://output', 'a');
         foreach ($grid as $row) {
-            fputcsv($resource, $row);
+            fputcsv($resource, $row, ',', '"', '\\');
         }
         fclose($resource);
     }
@@ -422,7 +422,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
             foreach($rows as $row)
             {
                 # Add the rows to the body
-                fputcsv($output, $row);
+                fputcsv($output, $row, ',', '"', '\\');
             }
             
             return true;

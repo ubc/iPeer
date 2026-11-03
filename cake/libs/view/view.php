@@ -825,8 +825,8 @@ class View extends CakeObject {
 					$loaded =& $this->_loadHelpers($loaded, $loaded[$helper]->helpers, $helper);
 				}
 			}
-			if (isset($loaded[$parent])) {
-				$loaded[$parent]->{$helper} =& $loaded[$helper];
+			if (isset($loaded[$parent ?? ''])) {
+				$loaded[$parent ?? '']->{$helper} =& $loaded[$helper];
 			}
 		}
 		return $loaded;
