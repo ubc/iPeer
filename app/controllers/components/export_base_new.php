@@ -19,6 +19,31 @@ class ExportBaseNewComponent extends CakeObject
     public $evaluationModel = null;
 
     /**
+     * Get a safe download file name from the export form.
+     *
+     * Spaces become "_", and characters other than [a-zA-Z0-9_.-] are
+     * removed. These are the rules that TCPDF 6.5 Output() used; TCPDF
+     * 6.6 and later do not clean the name. If nothing is left, or no
+     * name was given, the name is the date (m.d.y).
+     *
+     * @param mixed  $params    export form params
+     * @param string $extension file extension without the dot
+     *
+     * @access public
+     * @return string file name with extension
+     */
+    function fileName($params, $extension)
+    {
+        $name = isset($params['file_name']) ? (string) $params['file_name'] : '';
+        $name = preg_replace('/[^a-zA-Z0-9_\.-]/', '', preg_replace('/[\s]+/', '_', $name));
+        if ($name === '') {
+            $name = date('m.d.y');
+        }
+
+        return $name.'.'.$extension;
+    }
+
+    /**
      * generateHeader2
      *
      * @param mixed $params params

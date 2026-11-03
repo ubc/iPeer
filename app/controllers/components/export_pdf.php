@@ -47,26 +47,6 @@ Class ExportPdfComponent extends ExportBaseNewComponent
     }
 
     /**
-     * Get the download file name.
-     *
-     * TCPDF 6.5 removed unsafe characters from the name in Output().
-     * TCPDF 6.6 and later do not, so do the same cleaning here: spaces
-     * become "_", and characters other than [a-zA-Z0-9_.-] are removed.
-     *
-     * @param mixed $params params
-     *
-     * @access protected
-     * @return string file name with .pdf extension
-     */
-    function _fileName($params)
-    {
-        $name = !empty($params['file_name']) ? $params['file_name'] : date('m.d.y');
-        $name = preg_replace('/[\s]+/', '_', $name.'.pdf');
-
-        return preg_replace('/[^a-zA-Z0-9_\.-]/', '', $name);
-    }
-
-    /**
      * _writeTitle
      *
      * @param mixed $event  event
@@ -107,7 +87,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         $epdf->setFontSubsetting(false);
         $epdf->SetFont('helvetica', '', 10);
         // Construct the filename and extension
-        $fileName = $this->_fileName($params);
+        $fileName = $this->fileName($params, 'pdf');
         $epdf->AddPage();
         
         $epdf->writeHTML($this->_writeTitle($event, $params), true, false, true, false, '');

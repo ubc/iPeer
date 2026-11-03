@@ -269,9 +269,22 @@ class ExportPdfComponentTestCase extends CakeTestCase
 
     function testFileNameIsCleanedAsInTcpdf65()
     {
-        $this->assertIdentical($this->Pdf->_fileName(array('file_name' => 'Week 3 results')), 'Week_3_results.pdf');
-        $this->assertIdentical($this->Pdf->_fileName(array('file_name' => 'A/B "x"')), 'AB_x.pdf');
-        $this->assertIdentical($this->Pdf->_fileName(array('file_name' => '')), date('m.d.y').'.pdf');
+        $this->assertIdentical($this->Pdf->fileName(array('file_name' => 'Week 3 results'), 'pdf'), 'Week_3_results.pdf');
+        $this->assertIdentical($this->Pdf->fileName(array('file_name' => 'A/B "x"'), 'pdf'), 'AB_x.pdf');
+        // header parameter injection is removed (CSV uses the same method)
+        $this->assertIdentical(
+            $this->Pdf->fileName(array('file_name' => "x; filename*=UTF-8''evil.exe"), 'csv'),
+            'x_filenameUTF-8evil.exe.csv'
+        );
+    }
+
+    function testFileNameFallsBackToDate()
+    {
+        $date = date('m.d.y');
+        $this->assertIdentical($this->Pdf->fileName(array('file_name' => ''), 'pdf'), $date.'.pdf');
+        $this->assertIdentical($this->Pdf->fileName(array(), 'csv'), $date.'.csv');
+        // nothing left after cleaning
+        $this->assertIdentical($this->Pdf->fileName(array('file_name' => '中文'), 'csv'), $date.'.csv');
     }
 
     function testHShowsTypedEntitiesLiterally()
