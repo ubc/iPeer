@@ -136,8 +136,9 @@ class DboSource extends DataSource {
 		parent::__construct($config);
 		$this->fullDebug = Configure::read() > 1;
 		if (!$this->enabled()) {
-			trigger_error(sprintf(__('%s - Selected driver is not enabled', true), get_class($this)), E_USER_WARNING);
-			return false;
+			// stop: a constructor's return value is ignored, so returning would
+			// hand callers an unconnected data source
+			throw new RuntimeException(sprintf(__('%s - Selected driver is not enabled', true), get_class($this)));
 		}
 		if ($autoConnect) {
 			return $this->connect();

@@ -134,7 +134,7 @@ class ExtendedAuthTestCase extends ExtendedTestCase
     function login($controller)
     {
         if (null == $this->login && null == $this->defaultLogin) {
-            trigger_error('You have to define at least one login credentials (login or defaultLogin variable)!', E_USER_WARNING);
+            throw new RuntimeException('You have to define at least one login credentials (login or defaultLogin variable)!');
         }
 
         $login = (null == $this->login) ? $this->defaultLogin : $this->login;

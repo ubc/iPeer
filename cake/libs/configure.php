@@ -440,7 +440,8 @@ class Configure extends CakeObject {
 			}
 			App::build();
 			if (!include(CONFIGS . 'bootstrap.php')) {
-				trigger_error(sprintf(__("Can't find application bootstrap file. Please create %sbootstrap.php, and make sure it is readable by PHP.", true), CONFIGS), E_USER_WARNING);
+				// stop, like a missing core.php: the app can't run without its bootstrap
+				throw new RuntimeException(sprintf(__("Can't find application bootstrap file. Please create %sbootstrap.php, and make sure it is readable by PHP.", true), CONFIGS));
 			}
 		}
 	}
