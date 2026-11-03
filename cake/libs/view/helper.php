@@ -707,7 +707,7 @@ class Helper extends Overloadable {
 			$result = Set::extract(join('.', $entity), $this->data);
 		}
 
-		$habtmKey = $this->field();
+		$habtmKey = $this->field() ?? '';
 		if (empty($result) && isset($this->data[$habtmKey][$habtmKey]) && is_array($this->data[$habtmKey])) {
 			$result = $this->data[$habtmKey][$habtmKey];
 		} elseif (empty($result) && isset($this->data[$habtmKey]) && is_array($this->data[$habtmKey])) {
