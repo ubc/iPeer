@@ -12,6 +12,24 @@
 Class ExportPdfComponent extends ExportBaseNewComponent
 {
     /**
+     * Escape text before it goes into HTML for TCPDF writeHTML().
+     *
+     * Values from the database are user input. If they are not escaped,
+     * markup such as <img src="..."> makes TCPDF read local files or
+     * fetch remote URLs. TCPDF decodes the entities, so the PDF shows
+     * the original text.
+     *
+     * @param mixed $text text (null is accepted)
+     *
+     * @access protected
+     * @return string
+     */
+    function _h($text)
+    {
+        return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
+    }
+
+    /**
      * createPdf
      *
      * @param mixed $params params
@@ -38,8 +56,8 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         $fileName = !empty($params['file_name']) ? $params['file_name'].'.pdf' : date('m.d.y').'.pdf';
         $epdf->AddPage();
         
-        $courseName = $params['include']['course'] ? ': '.$event['Course']['course'] : '';
-        $eventName = $params['include']['eval_event_names'] ? ' - '.$event['Event']['title'] : '';
+        $courseName = $params['include']['course'] ? ': '.$this->_h($event['Course']['course']) : '';
+        $eventName = $params['include']['eval_event_names'] ? ' - '.$this->_h($event['Event']['title']) : '';
         $headerText = '<h2>Evaluation Event Detail'.$courseName.$eventName.'</h2>';
         $epdf->writeHTML($headerText, true, false, true, false, '');
         
@@ -89,7 +107,8 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             $inComplete = array_diff($members, $evaluators);
             $unEnrolled = array_diff($all_group_user_ids, $members);
             
-            $names = $this->User->getFullNames($all_group_user_ids);
+            // escape once here; every _write* method uses these names in HTML
+            $names = array_map(array($this, '_h'), $this->User->getFullNames($all_group_user_ids));
             
             $eval_submitted = $this->EvaluationSubmission->findAllByGrpEventId($grpEventId);
             $eval_submitted = Set::extract('/EvaluationSubmission/submitter_id', $eval_submitted);
@@ -204,7 +223,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                 if ($type == 1 || $type == 4) {
                     $indivEval[$evaluatee][$ques['question_number']][$evaluator] = $ques['grade'];
                 } else {
-                    $indivEval[$evaluatee][$ques['question_number']][$evaluator] = $ques['question_comment'];
+                    $indivEval[$evaluatee][$ques['question_number']][$evaluator] = $this->_h($ques['question_comment']);
                 }
             }
         }
@@ -257,7 +276,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                 }
                 $tempEval = '';
                 $qNum = $mixQues['self_eval'] ? $sNum : $pNum;
-                $tempEval .= '<span nobr="true"><h4>'.$qNum.'. '.$mixQues['title'].'</h4>';
+                $tempEval .= '<span nobr="true"><h4>'.$qNum.'. '.$this->_h($mixQues['title']).'</h4>';
                 $tempEval .= '<ul>';
                 if (isset($questions[$num])) {
                     foreach ($questions[$num] as $evaluator => $answer) {
@@ -527,7 +546,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         
         $header = '<br><table border="1" align="center"><tr><th><b>'.__('Evaluator', true).'</b></th>';
         foreach ($rubric_criteria as $criterion) {
-            $header .= '<th>('.$criterion['RubricsCriteria']['criteria_num'].') '.$criterion['RubricsCriteria']['criteria'].'</th>';
+            $header .= '<th>('.$criterion['RubricsCriteria']['criteria_num'].') '.$this->_h($criterion['RubricsCriteria']['criteria']).'</th>';
         }
         $header .= '</tr>';
         
@@ -557,14 +576,14 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                 $drop = in_array($evaluatorId, $dropped) ? ' *' : '';
                 $rSTBL .= '<tr><td rowspan="2">'.$names[$evaluatorId].$drop.'</td>';
                 foreach ($details as $mark) {
-                    $critCom = ($params['include']['comments']) ? $mark['criteria_comment'] : '-';
+                    $critCom = ($params['include']['comments']) ? $this->_h($mark['criteria_comment']) : '-';
                     $critGrd = ($params['include']['grade_tables']) ? $mark['grade'].' / '.$rubricMark[$mark['criteria_number']] : '-';
                     $rSTBL .= '<td><b>'.__('Grade', true).'</b>: '.$critGrd;
                     $rSTBL .= '<br><b>'.__('Comment', true).'</b>: '.$critCom.'</td>';
                 }
                 $rSTBL .= '</tr>';
                 $rSTBL .= '<tr><td colspan="'.count($rubricMark).'">';
-                $genCom = ($params['include']['comments']) ? $comments[$evaluateeId][$evaluatorId] : '-';
+                $genCom = ($params['include']['comments']) ? $this->_h($comments[$evaluateeId][$evaluatorId]) : '-';
                 $rSTBL .= '<b>'.__('General Comment', true).':</b><br>'.$genCom.'</td></tr>'; 
             }
             $rSTBL .= '</table></div>';
@@ -592,7 +611,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         foreach ($comments as $userId => $evaluator) {
             $results []= '<br><b>Evaluator: '.$names[$userId].'</b><br>'; // Evaluator
             foreach ($evaluator as $evaluatee => $com) {
-                $results []= $names[$evaluatee].': '.$com.'<br>';
+                $results []= $names[$evaluatee].': '.$this->_h($com).'<br>';
             }
         }
         
@@ -695,20 +714,20 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         $this->Group = ClassRegistry::init('Group');
         $group = $this->Group->findById($grpId);
         //Write Group name
-        $groupName = $params['include']['group_names'] ? $group['Group']['group_name'] : '-';
+        $groupName = $params['include']['group_names'] ? $this->_h($group['Group']['group_name']) : '-';
         $groupName = '<p><b>'.__('Group', true).': </b>'.$groupName.'<br>';
         //Write if self-eval is 'yes' or 'no'
         $selfEval = $event['Event']['self_eval'] ? 'Yes' : 'No';
         $selfEval = '<b>'.__('Self-Evaluation', true).': </b>'.$selfEval.'<br>';
         //Write Event Name
-        $eventName = $params['include']['eval_event_names'] ? $event['Event']['title'] : '-';
+        $eventName = $params['include']['eval_event_names'] ? $this->_h($event['Event']['title']) : '-';
         $eventName = '<b>'.__('Event Name', true).': </b>'.$eventName.'<br>';
         $eventTemplateType = $params['include']['eval_event_type'] ? 
-            ucwords(strtolower($event['EventTemplateType']['type_name'])) : '-';
+            $this->_h(ucwords(strtolower($event['EventTemplateType']['type_name']))) : '-';
         $eventTemplateType = '<b>'.__('Evaluation Type', true).': </b>'.$eventTemplateType.'<br>';
         //Write due date and description
         $dueDate = '<b>'.__('Due Date', true).': </b>'.date("D, F j, Y g:i a", strtotime($event['Event']['due_date'])).'<br>';
-        $description = '<b>'.__('Description', true).': </b>'.$event['Event']['description'].'</p>';
+        $description = '<b>'.__('Description', true).': </b>'.$this->_h($event['Event']['description']).'</p>';
         
         return ($groupName.$selfEval.$eventName.$eventTemplateType.$dueDate.$description);
     }
