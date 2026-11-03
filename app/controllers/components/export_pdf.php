@@ -26,7 +26,61 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      */
     function _h($text)
     {
-        return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
+        // ENT_SUBSTITUTE: without it, text with invalid UTF-8 becomes ''
+        return htmlspecialchars((string) $text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    }
+
+    /**
+     * Get full names of users, escaped for HTML.
+     *
+     * Every _write* method puts these names into HTML, so they are
+     * escaped once here and not again in those methods.
+     *
+     * @param array $userIds user ids
+     *
+     * @access protected
+     * @return array escaped full names, keyed by user id
+     */
+    function _names($userIds)
+    {
+        return array_map(array($this, '_h'), $this->User->getFullNames($userIds));
+    }
+
+    /**
+     * Get the download file name.
+     *
+     * TCPDF 6.5 removed unsafe characters from the name in Output().
+     * TCPDF 6.6 and later do not, so do the same cleaning here: spaces
+     * become "_", and characters other than [a-zA-Z0-9_.-] are removed.
+     *
+     * @param mixed $params params
+     *
+     * @access protected
+     * @return string file name with .pdf extension
+     */
+    function _fileName($params)
+    {
+        $name = !empty($params['file_name']) ? $params['file_name'] : date('m.d.y');
+        $name = preg_replace('/[\s]+/', '_', $name.'.pdf');
+
+        return preg_replace('/[^a-zA-Z0-9_\.-]/', '', $name);
+    }
+
+    /**
+     * _writeTitle
+     *
+     * @param mixed $event  event
+     * @param mixed $params params
+     *
+     * @access protected
+     * @return string HTML for the title at the top of the report
+     */
+    function _writeTitle($event, $params)
+    {
+        $courseName = $params['include']['course'] ? ': '.$this->_h($event['Course']['course']) : '';
+        $eventName = $params['include']['eval_event_names'] ? ' - '.$this->_h($event['Event']['title']) : '';
+
+        return '<h2>Evaluation Event Detail'.$courseName.$eventName.'</h2>';
     }
 
     /**
@@ -53,13 +107,10 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         $epdf->setFontSubsetting(false);
         $epdf->SetFont('helvetica', '', 10);
         // Construct the filename and extension
-        $fileName = !empty($params['file_name']) ? $params['file_name'].'.pdf' : date('m.d.y').'.pdf';
+        $fileName = $this->_fileName($params);
         $epdf->AddPage();
         
-        $courseName = $params['include']['course'] ? ': '.$this->_h($event['Course']['course']) : '';
-        $eventName = $params['include']['eval_event_names'] ? ' - '.$this->_h($event['Event']['title']) : '';
-        $headerText = '<h2>Evaluation Event Detail'.$courseName.$eventName.'</h2>';
-        $epdf->writeHTML($headerText, true, false, true, false, '');
+        $epdf->writeHTML($this->_writeTitle($event, $params), true, false, true, false, '');
         
         // fetch this data only once
         switch ($event['Event']['event_template_type_id']) {
@@ -107,8 +158,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             $inComplete = array_diff($members, $evaluators);
             $unEnrolled = array_diff($all_group_user_ids, $members);
             
-            // escape once here; every _write* method uses these names in HTML
-            $names = array_map(array($this, '_h'), $this->User->getFullNames($all_group_user_ids));
+            $names = $this->_names($all_group_user_ids);
             
             $eval_submitted = $this->EvaluationSubmission->findAllByGrpEventId($grpEventId);
             $eval_submitted = Set::extract('/EvaluationSubmission/submitter_id', $eval_submitted);
