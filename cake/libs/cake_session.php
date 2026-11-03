@@ -556,14 +556,9 @@ class CakeSession extends CakeObject {
 						ini_set('session.auto_start', 0);
 					}
 				}
-				session_set_save_handler(
-					array('CakeSession','__open'),
-					array('CakeSession', '__close'),
-					array('CakeSession', '__read'),
-					array('CakeSession', '__write'),
-					array('CakeSession', '__destroy'),
-					array('CakeSession', '__gc')
-				);
+				// false: don't register session_write_close() as a shutdown function,
+				// so the session is still written when the callback form wrote it
+				session_set_save_handler(CakeSession::_saveHandler('database'), false);
 			break;
 			case 'php':
 				if (empty($_SESSION)) {
@@ -592,14 +587,9 @@ class CakeSession extends CakeObject {
 						ini_set('session.cookie_path', $this->path);
 					}
 				}
-				session_set_save_handler(
-					array('CakeSession','__open'),
-					array('CakeSession', '__close'),
-					array('Cache', 'read'),
-					array('Cache', 'write'),
-					array('Cache', 'delete'),
-					array('Cache', 'gc')
-				);
+				// false: don't register session_write_close() as a shutdown function,
+				// so the session is still written when the callback form wrote it
+				session_set_save_handler(CakeSession::_saveHandler('cache'), false);
 			break;
 			default:
 				$config = CONFIGS . Configure::read('Session.save') . '.php';
@@ -609,6 +599,42 @@ class CakeSession extends CakeObject {
 				}
 			break;
 		}
+	}
+
+/**
+ * Builds the save handler for the 'database' and 'cache' session storage.
+ *
+ * Passing the callbacks to session_set_save_handler() one by one is
+ * deprecated in PHP 8.4, so they are wrapped in an object instead. The
+ * callbacks are the same ones the old call used, and are called with
+ * the same arguments.
+ *
+ * @param string $save Session.save value
+ * @return CakeSessionSaveHandler|null null for storage PHP handles itself
+ * @access public
+ */
+	static function _saveHandler($save) {
+		switch ($save) {
+			case 'database':
+				return new CakeSessionSaveHandler(array(
+					'open' => array('CakeSession', '__open'),
+					'close' => array('CakeSession', '__close'),
+					'read' => array('CakeSession', '__read'),
+					'write' => array('CakeSession', '__write'),
+					'destroy' => array('CakeSession', '__destroy'),
+					'gc' => array('CakeSession', '__gc'),
+				));
+			case 'cache':
+				return new CakeSessionSaveHandler(array(
+					'open' => array('CakeSession', '__open'),
+					'close' => array('CakeSession', '__close'),
+					'read' => array('Cache', 'read'),
+					'write' => array('Cache', 'write'),
+					'destroy' => array('Cache', 'delete'),
+					'gc' => array('Cache', 'gc'),
+				));
+		}
+		return null;
 	}
 
 /**
@@ -832,5 +858,79 @@ class CakeSession extends CakeObject {
 
 		$return = $model->deleteAll(array($model->alias . ".expires <" => $expires), false, false);
 		return (bool) $return;
+	}
+}
+
+/**
+ * Session save handler that forwards each call to a callback.
+ *
+ * This replaces the six separate callbacks CakeSession used to pass to
+ * session_set_save_handler() (deprecated in PHP 8.4). Each method passes
+ * PHP's arguments through unchanged and returns the callback's result
+ * unchanged, so the storage behaves exactly as before; the return types
+ * are left undeclared for that reason.
+ *
+ * #[\ReturnTypeWillChange] silences the tentative-return-type notice until
+ * PHP makes those types required. Then declare them, and convert callback
+ * results that don't match (__gc() returns true, Cache::gc() returns null).
+ *
+ * @package       cake
+ * @subpackage    cake.cake.libs
+ */
+class CakeSessionSaveHandler implements SessionHandlerInterface {
+
+/**
+ * Callbacks keyed by open, close, read, write, destroy and gc
+ *
+ * @var array
+ */
+	protected $callbacks = array();
+
+/**
+ * Constructor
+ *
+ * @param array $callbacks Callbacks keyed by handler method name
+ */
+	function __construct($callbacks) {
+		$this->callbacks = $callbacks;
+	}
+
+/**
+ * Returns the callbacks, keyed by handler method name
+ *
+ * @return array
+ */
+	function getCallbacks() {
+		return $this->callbacks;
+	}
+
+	#[\ReturnTypeWillChange]
+	function open($path, $name) {
+		return call_user_func($this->callbacks['open'], $path, $name);
+	}
+
+	#[\ReturnTypeWillChange]
+	function close() {
+		return call_user_func($this->callbacks['close']);
+	}
+
+	#[\ReturnTypeWillChange]
+	function read($id) {
+		return call_user_func($this->callbacks['read'], $id);
+	}
+
+	#[\ReturnTypeWillChange]
+	function write($id, $data) {
+		return call_user_func($this->callbacks['write'], $id, $data);
+	}
+
+	#[\ReturnTypeWillChange]
+	function destroy($id) {
+		return call_user_func($this->callbacks['destroy'], $id);
+	}
+
+	#[\ReturnTypeWillChange]
+	function gc($maxLifetime) {
+		return call_user_func($this->callbacks['gc'], $maxLifetime);
 	}
 }

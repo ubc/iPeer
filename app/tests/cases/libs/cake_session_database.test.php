@@ -2,6 +2,27 @@
 App::import('Core', 'CakeSession');
 
 /**
+ * Stand-in session callbacks that record how they were called.
+ */
+class SessionCallbackRecorder
+{
+    public static $calls = array();
+
+    public static function record($name, $args, $return)
+    {
+        self::$calls[] = array($name, $args);
+        return $return;
+    }
+
+    public static function open() { return self::record('open', func_get_args(), true); }
+    public static function close() { return self::record('close', func_get_args(), true); }
+    public static function read() { return self::record('read', func_get_args(), 'stored data'); }
+    public static function write() { return self::record('write', func_get_args(), false); }
+    public static function destroy() { return self::record('destroy', func_get_args(), true); }
+    public static function gc() { return self::record('gc', func_get_args(), null); }
+}
+
+/**
  * Tests for the database session storage (Session.save = 'database'),
  * which production uses via IPEER_SESSION_SAVE (core.php's 'php' default is
  * overridden there). PHP calls these CakeSession callbacks through
@@ -148,5 +169,97 @@ class CakeSessionDatabaseTestCase extends CakeTestCase
 
         $this->assertFalse($this->row('ancient'));
         $this->assertTrue((bool)$this->row('expired'));
+    }
+
+    // -------------------------------------------------------------------------
+    // CakeSessionSaveHandler, the object registered with
+    // session_set_save_handler()
+    // -------------------------------------------------------------------------
+
+    function testSaveHandlerForwardsArgumentsAndResults()
+    {
+        $callbacks = array();
+        foreach (array('open', 'close', 'read', 'write', 'destroy', 'gc') as $name) {
+            $callbacks[$name] = array('SessionCallbackRecorder', $name);
+        }
+        $handler = new CakeSessionSaveHandler($callbacks);
+        SessionCallbackRecorder::$calls = array();
+
+        $this->assertIdentical(true, $handler->open('/save/path', 'IPEER'));
+        $this->assertIdentical('stored data', $handler->read('sid'));
+        $this->assertIdentical(false, $handler->write('sid', 'data'));
+        $this->assertIdentical(true, $handler->destroy('sid'));
+        $this->assertIdentical(null, $handler->gc(1440));
+        $this->assertIdentical(true, $handler->close());
+
+        $this->assertIdentical(array(
+            array('open', array('/save/path', 'IPEER')),
+            array('read', array('sid')),
+            array('write', array('sid', 'data')),
+            array('destroy', array('sid')),
+            array('gc', array(1440)),
+            array('close', array()),
+        ), SessionCallbackRecorder::$calls);
+    }
+
+    function testSaveHandlerTypes()
+    {
+        $this->assertIsA(CakeSession::_saveHandler('database'), 'SessionHandlerInterface');
+        $this->assertIsA(CakeSession::_saveHandler('cache'), 'SessionHandlerInterface');
+        $this->assertNull(CakeSession::_saveHandler('php'));
+        $this->assertNull(CakeSession::_saveHandler('cake'));
+    }
+
+    function testSaveHandlerCallbacks()
+    {
+        // the same callbacks the 6-argument session_set_save_handler() used
+        $database = CakeSession::_saveHandler('database');
+        $this->assertIdentical(array(
+            'open' => array('CakeSession', '__open'),
+            'close' => array('CakeSession', '__close'),
+            'read' => array('CakeSession', '__read'),
+            'write' => array('CakeSession', '__write'),
+            'destroy' => array('CakeSession', '__destroy'),
+            'gc' => array('CakeSession', '__gc'),
+        ), $database->getCallbacks());
+
+        $cache = CakeSession::_saveHandler('cache');
+        $this->assertIdentical(array(
+            'open' => array('CakeSession', '__open'),
+            'close' => array('CakeSession', '__close'),
+            'read' => array('Cache', 'read'),
+            'write' => array('Cache', 'write'),
+            'destroy' => array('Cache', 'delete'),
+            'gc' => array('Cache', 'gc'),
+        ), $cache->getCallbacks());
+    }
+
+    function testDatabaseSaveHandlerLoginLogoutAndGc()
+    {
+        $handler = CakeSession::_saveHandler('database');
+        $id = 'handler-session';
+
+        // request 1: new session, user logs in
+        $this->assertTrue($handler->open('', 'IPEER'));
+        $this->assertIdentical('', $handler->read($id));
+        $this->assertTrue($handler->write($id, $this->loginData));
+        $this->assertTrue($handler->close());
+
+        // request 2: still logged in
+        $this->assertTrue($handler->open('', 'IPEER'));
+        $this->assertIdentical($this->loginData, $handler->read($id));
+
+        // logout
+        $this->assertTrue($handler->destroy($id));
+        $this->assertIdentical('', $handler->read($id));
+        $this->assertFalse($this->row($id));
+        $this->assertTrue($handler->close());
+
+        // gc through the handler gets PHP's max lifetime, as before
+        $this->insert('ancient', 1000);
+        $this->insert('live', time() + 3600);
+        $this->assertTrue($handler->gc(1440));
+        $this->assertFalse($this->row('ancient'));
+        $this->assertTrue((bool)$this->row('live'));
     }
 }
