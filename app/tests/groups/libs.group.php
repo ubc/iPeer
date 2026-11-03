@@ -7,10 +7,14 @@ class LibsGroupTest extends TestSuite
         // listed explicitly: libs/extended_test_case is the ExtendedTestCase
         // plugin's own test and doesn't run in this app
         TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'toolkit');
+        TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'user_errors');
         TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'ipeer_saml_response');
         TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'caliper_sensor');
         TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'maintained_dj_worker');
+        TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'cake_session_database');
         TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'same_site');
         TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'controller_paginate');
+        TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'view_helpers');
+        TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'i18n_cache_key');
     }
 }
