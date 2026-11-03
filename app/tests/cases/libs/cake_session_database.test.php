@@ -157,11 +157,11 @@ class CakeSessionDatabaseTestCase extends CakeTestCase
         $this->assertTrue((bool)$this->row('live'));
     }
 
-    function testGcWithMaxLifetimeComparesItAsATimestamp()
+    function testGcArgumentIsATimestamp()
     {
-        // Known bug: PHP passes session.gc_maxlifetime (e.g. 1440) here, but __gc()
-        // treats it as an absolute timestamp, so PHP-triggered cleanup never removes
-        // expired sessions. Update this test when the gc fix lands.
+        // __gc($expires) deletes rows that expire before an absolute timestamp.
+        // The save handler doesn't pass PHP's session.gc_maxlifetime (e.g. 1440)
+        // here; see testDatabaseSaveHandlerLoginLogoutAndGc.
         $this->insert('ancient', 1000);
         $this->insert('expired', time() - 10);
 
@@ -197,7 +197,7 @@ class CakeSessionDatabaseTestCase extends CakeTestCase
             array('read', array('sid')),
             array('write', array('sid', 'data')),
             array('destroy', array('sid')),
-            array('gc', array(1440)),
+            array('gc', array()),  // PHP's max lifetime isn't passed on
             array('close', array()),
         ), SessionCallbackRecorder::$calls);
     }
@@ -255,11 +255,13 @@ class CakeSessionDatabaseTestCase extends CakeTestCase
         $this->assertFalse($this->row($id));
         $this->assertTrue($handler->close());
 
-        // gc through the handler gets PHP's max lifetime, as before
+        // PHP calls gc with session.gc_maxlifetime; every expired row goes
         $this->insert('ancient', 1000);
+        $this->insert('expired', time() - 10);
         $this->insert('live', time() + 3600);
         $this->assertTrue($handler->gc(1440));
         $this->assertFalse($this->row('ancient'));
+        $this->assertFalse($this->row('expired'));
         $this->assertTrue((bool)$this->row('live'));
     }
 }
