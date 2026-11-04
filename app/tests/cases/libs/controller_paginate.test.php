@@ -10,7 +10,27 @@ class PaginateFaculty extends Model
 }
 
 /**
- * Tests for how Controller::paginate() normalises the requested page.
+ * Model whose paginate() override finds nothing and returns false.
+ */
+class PaginateNothing extends Model
+{
+    public $name = 'PaginateNothing';
+    public $useTable = 'faculties';
+
+    function paginate($conditions, $fields, $order, $limit, $page = 1, $recursive = null, $extra = array())
+    {
+        return false;
+    }
+
+    function paginateCount($conditions = null, $recursive = 0, $extra = array())
+    {
+        return 0;
+    }
+}
+
+/**
+ * Tests for how Controller::paginate() normalises the requested page,
+ * sort and direction.
  *
  * @package app.tests.cases.libs
  */
@@ -81,5 +101,36 @@ class ControllerPaginateTestCase extends CakeTestCase
         $paging = $this->pageFor('1', array('PaginateFaculty.id' => -1));
         $this->assertIdentical(0, $paging['count']);
         $this->assertIdentical(1, $paging['page']);
+    }
+
+    private function orderFor($args)
+    {
+        $this->Controller->passedArgs = $args;
+        $this->Controller->paginate('PaginateFaculty');
+        $paging = $this->Controller->params['paging']['PaginateFaculty'];
+        return isset($paging['options']['order']) ? $paging['options']['order'] : null;
+    }
+
+    function testSortAndDirection()
+    {
+        $this->assertIdentical(array('PaginateFaculty.name' => 'desc'), $this->orderFor(array('sort' => 'name', 'direction' => 'desc')));
+        $this->assertIdentical(array('PaginateFaculty.name' => 'asc'), $this->orderFor(array('sort' => 'name', 'direction' => 'sideways')));
+    }
+
+    function testSortThatIsNotAStringIsIgnored()
+    {
+        $this->assertNull($this->orderFor(array('sort' => array('name'), 'direction' => 'asc')));
+    }
+
+    function testDirectionThatIsNotAStringIsAsc()
+    {
+        $this->assertIdentical(array('PaginateFaculty.name' => 'asc'), $this->orderFor(array('sort' => 'name', 'direction' => array('desc'))));
+    }
+
+    function testFalseResultsCountAsZero()
+    {
+        $model = ClassRegistry::init(array('class' => 'PaginateNothing', 'ds' => 'test_suite'));
+        $this->assertFalse($this->Controller->paginate($model));
+        $this->assertIdentical(0, $this->Controller->params['paging']['PaginateNothing']['current']);
     }
 }

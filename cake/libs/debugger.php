@@ -245,7 +245,8 @@ class Debugger extends CakeObject {
  * @access public
  */
 	static function handleError($code, $description, $file = null, $line = null, $context = null) {
-		if (error_reporting() == 0 || $code === 2048 || $code === 8192) {
+		// on PHP 8, @ leaves fatal error levels in error_reporting(), so test the bit
+		if (!(error_reporting() & $code) || $code === 2048 || $code === 8192) {
 			return false;
 		}
 
