@@ -328,12 +328,10 @@ class EvaluationsController extends AppController
                 return;
             }
 
-            $fileName = isset($this->params['form']['file_name']) && !empty($this->params['form']['file_name']) ? $this->params['form']['file_name']:date('m.d.y');
-
             switch($this->params['form']['export_type']) {
                 case "csv" :
                     header('Content-Type: application/csv');
-                    header('Content-Disposition: attachment; filename=' . $fileName . '.csv');
+                    header('Content-Disposition: attachment; filename="' . $this->ExportCsv->fileName($this->params['form'], 'csv') . '"');
                     $this->ExportCsv->createCsv($this->params['form'], $event);
                     break;
                 case "pdf":

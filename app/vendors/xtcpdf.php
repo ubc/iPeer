@@ -1,5 +1,6 @@
 <?php
-App::import('Vendor','tcpdf/tcpdf');
+// TCPDF comes from the Composer package tecnickcom/tcpdf. The entry points
+// (app/webroot/index.php, cake/console/cake.php) load vendor/autoload.php.
 class XTCPDF  extends TCPDF
 {
 
