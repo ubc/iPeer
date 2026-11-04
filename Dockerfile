@@ -1,4 +1,4 @@
-FROM php:8.3-fpm
+FROM php:8.5-fpm
 
 RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests  -y \
         libpng-dev \
@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
         libzip-dev \
         unzip \
         git \
+        ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
     && ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so \
     && ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so \
