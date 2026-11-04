@@ -48,6 +48,17 @@ class SearchsControllerTest extends CakeTestCase {
     function endTest($method) {
     }
 
+    function testSortAndDirectionThatAreNotStringsUseDefaults() {
+        $get = $_GET;
+        $_GET = array('sort' => array('name'), 'direction' => array('desc'));
+        $controller = new SearchsController();
+        $_GET = $get;
+
+        $this->assertIdentical('id', $controller->sortBy);
+        $this->assertIdentical('asc', $controller->direction);
+        $this->assertIdentical('id ASC', $controller->order);
+    }
+
     function testIndex() {
     /*    $result = $this->testAction('/home/index', array('connection' => 'test_suite', 'return' => 'contents'));
         var_dump($result);

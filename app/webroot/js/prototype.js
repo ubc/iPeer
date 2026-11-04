@@ -5616,9 +5616,6 @@ Form.EventObserver = Class.create(Abstract.EventObserver, {
   if (Prototype.Browser.IE)
     window.attachEvent('onunload', _destroyCache);
 
-  if (Prototype.Browser.WebKit)
-    window.addEventListener('unload', Prototype.emptyFunction, false);
-
 
   var _getDOMEventName = Prototype.K,
       translations = { mouseenter: "mouseover", mouseleave: "mouseout" };

@@ -1120,9 +1120,13 @@ class Controller extends CakeObject {
 			unset($options['order']);
 		}
 
+		// sort and direction come from the request; ignore anything that isn't a string
+		if (isset($options['sort']) && !is_string($options['sort'])) {
+			unset($options['sort'], $options['order']);
+		}
 		if (isset($options['sort'])) {
 			$direction = null;
-			if (isset($options['direction'])) {
+			if (isset($options['direction']) && is_string($options['direction'])) {
 				$direction = strtolower($options['direction']);
 			}
 			if ($direction != 'asc' && $direction != 'desc') {
@@ -1146,7 +1150,7 @@ class Controller extends CakeObject {
 				$options['order'][$object->alias . '.' . $field] = $value;
 			} elseif ($correctAlias && $object->hasField($key, true)) {
 				$options['order'][$field] = $value;
-			} elseif (isset($object->{$alias}) && $object->{$alias}->hasField($field)) {
+			} elseif (isset($object->{$alias}) && $object->{$alias} instanceof Model && $object->{$alias}->hasField($field)) {
 				$options['order'][$alias . '.' . $field] = $value;
 			}
 		}
@@ -1233,9 +1237,12 @@ class Controller extends CakeObject {
 			}
 			$results = $object->find($type, array_merge($parameters, $extra));
 		}
+		if (!is_array($results)) {
+			$results = array();
+		}
 		$paging = array(
 			'page'		=> $page,
-			'current'	=> @count($results),
+			'current'	=> count($results),
 			'count'		=> $count,
 			'prevPage'	=> ($page > 1),
 			'nextPage'	=> ($count > ($page * $limit)),

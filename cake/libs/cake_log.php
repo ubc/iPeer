@@ -253,7 +253,8 @@ class CakeLog {
  * @return void
  */
 	static function handleError($code, $description, $file = null, $line = null, $context = null) {
-		if ($code === 2048 || $code === 8192 || error_reporting() === 0) {
+		// on PHP 8, @ leaves fatal error levels in error_reporting(), so test the bit
+		if ($code === 2048 || $code === 8192 || !(error_reporting() & $code)) {
 			return;
 		}
 		switch ($code) {

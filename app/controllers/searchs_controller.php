@@ -44,8 +44,8 @@ class SearchsController extends AppController
         if ($this->show == 'all') {
             $this->show = 99999999;
         }
-        $this->sortBy = empty($_GET['sort'])? 'id': $_GET['sort'];
-        $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
+        $this->sortBy = (empty($_GET['sort']) || !is_string($_GET['sort']))? 'id': $_GET['sort'];
+        $this->direction = (empty($_GET['direction']) || !is_string($_GET['direction']))? 'asc': $this->Sanitize->paranoid($_GET['direction']);
         $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
         $this->order = $this->sortBy.' '.strtoupper($this->direction);
 
