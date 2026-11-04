@@ -16,5 +16,6 @@ class LibsGroupTest extends TestSuite
         TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'controller_paginate');
         TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'view_helpers');
         TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'i18n_cache_key');
+        TestManager::addTestFile($this, APP_TEST_CASES . DS . 'libs' . DS . 'silenced_errors');
     }
 }

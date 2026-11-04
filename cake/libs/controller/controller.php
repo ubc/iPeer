@@ -1120,9 +1120,13 @@ class Controller extends CakeObject {
 			unset($options['order']);
 		}
 
+		// sort and direction come from the request; ignore anything that isn't a string
+		if (isset($options['sort']) && !is_string($options['sort'])) {
+			unset($options['sort']);
+		}
 		if (isset($options['sort'])) {
 			$direction = null;
-			if (isset($options['direction'])) {
+			if (isset($options['direction']) && is_string($options['direction'])) {
 				$direction = strtolower($options['direction']);
 			}
 			if ($direction != 'asc' && $direction != 'desc') {
@@ -1235,7 +1239,7 @@ class Controller extends CakeObject {
 		}
 		$paging = array(
 			'page'		=> $page,
-			'current'	=> @count($results),
+			'current'	=> is_array($results) ? count($results) : 0,
 			'count'		=> $count,
 			'prevPage'	=> ($page > 1),
 			'nextPage'	=> ($count > ($page * $limit)),
