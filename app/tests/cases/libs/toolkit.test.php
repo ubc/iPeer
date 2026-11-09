@@ -65,4 +65,33 @@ class ToolkitTestCase extends CakeTestCase
         $result = Toolkit::parseCSV($file);
         $this->assertIdentical(array(array('a\\"b', 'c')), $result);
     }
+
+    function testParseCSVWindowsLineEndings()
+    {
+        $file = $this->writeTmp("TESTUSER001,Jane\r\nTESTUSER002,John\r\n");
+        $result = Toolkit::parseCSV($file);
+        $this->assertIdentical(
+            array(array('TESTUSER001', 'Jane'), array('TESTUSER002', 'John')),
+            $result
+        );
+    }
+
+    function testParseCSVCarriageReturnLineEndings()
+    {
+        // A file that uses only CR needs auto_detect_line_endings, which
+        // app_controller.php turns on for every request. The default is off,
+        // so this test sets it. PHP 8.1 deprecated the setting: when PHP
+        // removes it, this test fails and tells us that CR files no longer
+        // parse.
+        $old = ini_get('auto_detect_line_endings');
+        ini_set('auto_detect_line_endings', '1');
+        $file = $this->writeTmp("TESTUSER001,Jane\rTESTUSER002,John\r");
+        $result = Toolkit::parseCSV($file);
+        ini_set('auto_detect_line_endings', $old);
+
+        $this->assertIdentical(
+            array(array('TESTUSER001', 'Jane'), array('TESTUSER002', 'John')),
+            $result
+        );
+    }
 }

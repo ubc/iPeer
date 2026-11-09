@@ -1,8 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { PASSWORD, USERS } from '../support/helpers';
 
-// Seed account from app/config/sql/ipeer_samples_data.sql.
-const USERNAME = 'root';
-const PASSWORD = 'ipeeripeer';
+// This spec fills the login form itself, instead of the login() helper, because
+// the login form is what it tests.
+const USERNAME = USERS.superAdmin;
 
 test('a user can log in, see the home page and log out', async ({ page }) => {
   await page.goto('/');
