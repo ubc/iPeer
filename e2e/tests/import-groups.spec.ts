@@ -1,13 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
 import path from 'path';
+import { expectGroupMembers, openGroupList } from '../support/groups';
 import {
   USERS,
-  expectGroupMembers,
   flashMessage,
   goodMessage,
   idFromUrl,
   login,
-  openGroupList,
   pageTitle,
   resultsTable,
 } from '../support/helpers';

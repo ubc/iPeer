@@ -1,15 +1,17 @@
 import { expect, test, type Page } from '@playwright/test';
 import {
-  USERS,
   assignToGroup,
   deleteGroup,
+  openGroupList,
+  removeFromGroup,
+} from '../support/groups';
+import {
+  USERS,
   errorMessage,
   goodMessage,
   idFromUrl,
   login,
-  openGroupList,
   pageTitle,
-  removeFromGroup,
 } from '../support/helpers';
 
 // Ported from app/tests/cases/system/add_group.test.php.

@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
+import { deleteCourse } from '../support/courses';
 import {
   USERS,
-  deleteCourse,
   errorMessage,
   flashMessage,
   goodMessage,
