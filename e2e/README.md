@@ -15,8 +15,11 @@ The tests do not cover surveys, because the feature is not in use. They do not c
 docker compose up -d playwright
 docker compose exec playwright npm ci
 docker compose exec app-test vendor/bin/phing init-test-db
-docker compose exec playwright npx playwright test
+docker compose exec playwright npm test
 ```
+
+`npm test` checks the types first. To check the types alone, use
+`docker compose exec playwright npm run typecheck`.
 
 The tests change data in the test database. Run `init-test-db` again before each run. It replaces all data in the test database with the seed data.
 
