@@ -13,7 +13,6 @@ import {
 
 // Ported from app/tests/cases/system/add_course.test.php.
 
-/** Opens the course home page from the course list and returns the course id. */
 async function openCourse(page: Page, name: string, title: string): Promise<string> {
   await page.goto('/courses');
   const row = page
@@ -52,7 +51,6 @@ test('an admin adds a course through the Courses tab', async ({ page }) => {
   await page.getByRole('button', { name: 'Save' }).click();
   await expect(goodMessage(page)).toHaveText('Course created!');
 
-  // The course exists with the instructors and tutors that were chosen.
   const courseId = await openCourse(page, 'EECE 474 101', 'Project Course');
   await expect(page.getByRole('link', { name: 'Instructor 1' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Instructor 3' })).toBeVisible();
@@ -163,7 +161,6 @@ test('an inactive course gets limited access and is listed apart', async ({ page
   await expect(page.getByRole('link', { name: 'List Groups' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'List Evaluation Events' })).toBeVisible();
 
-  // The home page lists the course under Inactive Courses.
   await page.goto('/home');
   const inactive = page.locator(
     "xpath=//h2[normalize-space()='Inactive Courses']/following-sibling::div[@class='course']"

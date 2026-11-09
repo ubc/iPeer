@@ -16,7 +16,6 @@ import {
 
 const fixture = (name: string) => path.join(__dirname, '..', 'fixtures', name);
 
-/** Uploads a CSV on the group import page of a course. */
 async function importCsv(
   page: Page,
   courseId: string,
@@ -29,7 +28,6 @@ async function importCsv(
   await page.getByRole('button', { name: 'Import' }).click();
 }
 
-/** Opens a group of a course by name and returns its id. */
 async function openGroup(page: Page, courseId: string, name: string): Promise<string> {
   await openGroupList(page, courseId);
   await page.getByRole('link', { name: new RegExp(`^${name} \\(`) }).click();
@@ -44,7 +42,6 @@ test('an import with no file is refused', async ({ page }) => {
   await page.getByRole('button', { name: 'Import' }).click();
   await expect(flashMessage(page)).toHaveText('Please select a file to upload.');
 
-  // The group of the CSV file was not created.
   await openGroupList(page, '2');
   await expect(page.getByRole('link', { name: /^Team \(/ })).toHaveCount(0);
 });
@@ -59,7 +56,6 @@ test('an import of a file type that is not allowed is refused', async ({ page })
   });
   await expect(flashMessage(page)).toContainText('extension is not allowed');
 
-  // The group of the CSV file was not created.
   await openGroupList(page, '2');
   await expect(page.getByRole('link', { name: /^Team \(/ })).toHaveCount(0);
 });

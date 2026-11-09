@@ -35,7 +35,6 @@ test.afterEach(async ({ page }) => {
   }
 });
 
-/** Opens a group of the course by name and returns its id. */
 async function openGroup(page: Page, name: string): Promise<string> {
   await openGroupList(page, COURSE_ID);
   await page.getByRole('link', { name: new RegExp(`^${name} \\(`) }).click();
@@ -43,7 +42,6 @@ async function openGroup(page: Page, name: string): Promise<string> {
   return idFromUrl(page);
 }
 
-/** Creates a group in the course and returns its id. */
 async function createGroup(page: Page, name: string, students: string[]): Promise<string> {
   await page.goto(`/courses/home/${COURSE_ID}`);
   await page.getByRole('link', { name: 'Add Group', exact: true }).click();
@@ -83,7 +81,6 @@ test('an admin creates a group with the students that were assigned', async ({ p
   await page.getByRole('button', { name: 'Add Group' }).click();
   await expect(goodMessage(page)).toHaveText('The group was added successfully.');
 
-  // The group view page shows the name and every member.
   const groupId = await openGroup(page, 'Amazing Group');
   created.push(groupId);
   await expect(page.getByRole('cell', { name: 'Amazing Group', exact: true })).toBeVisible();
@@ -122,7 +119,6 @@ test('an admin renames a group and changes its members', async ({ page }) => {
   await page.getByRole('button', { name: 'Edit Group' }).click();
   await expect(goodMessage(page)).toHaveText('The group was updated successfully.');
 
-  // The changes are kept.
   await page.goto(`/groups/view/${groupId}`);
   await expect(page.getByRole('cell', { name: 'Group To Edit Two', exact: true })).toBeVisible();
   await expect(page.getByRole('cell', { name: 'Geoff Student', exact: true })).toBeVisible();

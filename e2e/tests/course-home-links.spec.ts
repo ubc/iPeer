@@ -7,16 +7,13 @@ import { USERS, login, pageTitle } from '../support/helpers';
 const COURSE_ID = '1';
 const COURSE = 'MECH 328 - Mechanical Engineering Design Project';
 
-/**
- * Follows each link of the course home page and checks the page it opens.
- * iPeer answers an error page with HTTP 200, so the title of the page is the
- * proof that the link reached the feature it names.
- */
 async function expectLinks(page: Page, links: [string, string, string][]): Promise<void> {
   for (const [name, path, title] of links) {
     await page.goto(`/courses/home/${COURSE_ID}`);
     await page.getByRole('link', { name, exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`${path}$`));
+    // iPeer answers an error page with HTTP 200, so the title is the proof
+    // that the link reached the feature it names.
     await expect(pageTitle(page)).toHaveText(new RegExp(title));
   }
 }
