@@ -1,17 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-
-// Seed accounts from app/config/sql/ipeer_samples_data.sql, named by the role
-// each one has. Every seed account has the same password.
-export const USERS = {
-  superAdmin: 'root',
-  admin: 'admin2',
-  instructor1: 'instructor1',
-  instructor2: 'instructor2',
-  tutor: 'tutor2',
-  student: 'redshirt0001',
-} as const;
-
-export const PASSWORD = 'ipeeripeer';
+import { PASSWORD } from './seed';
 
 export async function login(page: Page, username: string): Promise<void> {
   // Log out first, then load a fresh login form: the form that /logout renders
@@ -48,7 +36,8 @@ export function goodMessage(page: Page): Locator {
 }
 
 export function flashMessage(page: Page): Locator {
-  // Holds the error messages as well as the good ones.
+  // Only the default flash element renders this id. A message set with the
+  // 'good' key renders through elements/good.ctp instead, so use goodMessage().
   return page.locator('#flashMessage');
 }
 

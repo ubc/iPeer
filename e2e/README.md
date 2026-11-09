@@ -6,7 +6,9 @@ The tests run in the `playwright` Docker Compose service. This service is part o
 
 The tests do not cover surveys, because the feature is not in use. They do not cover the Canvas integration, because it needs an external service and account credentials.
 
-`support/helpers.ts` holds the shared steps, such as login and the group member lists. `fixtures/` holds the CSV files that the import tests upload. The tests assert roles, headings and links instead of exact counts of seeded data, so that more seed data does not break them.
+`support/seed.ts` holds the accounts, courses and students that `app/config/sql/ipeer_samples_data.sql` creates. `tests/seed.setup.ts` checks those facts before the rest of the suite runs, so a change to the seed file fails there and not in many specs. `support/helpers.ts` holds the steps that every spec uses, such as login and the page locators, and `support/groups.ts` and `support/courses.ts` hold the steps for those areas. `fixtures/` holds the CSV files that the import tests upload.
+
+The tests assert roles, headings and links instead of exact counts of seeded data, so that more seed data does not break them.
 
 ## Run the tests
 

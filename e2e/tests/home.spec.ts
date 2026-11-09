@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { USERS, expectTabs, login, pageTitle, sectionHeadings } from '../support/helpers';
+import { expectTabs, login, pageTitle, sectionHeadings } from '../support/helpers';
+import { COURSES, USERS, fullName } from '../support/seed';
 
 // Ported from app/tests/cases/system/home.test.php.
 // Surveys are out of scope, so these tests assert only the peer-evaluation
@@ -12,13 +13,8 @@ test('a super admin sees every course and the full tab bar', async ({ page }) =>
   await expect(page.getByRole('heading', { level: 2, name: 'My Courses' })).toBeVisible();
   await expect(page.getByRole('heading', { level: 2, name: 'Inactive Courses' })).toBeVisible();
 
-  for (const course of [
-    'MECH 328 - Mechanical Engineering Design Project',
-    'APSC 201 - Technical Communication',
-    'CPSC 404 - Advanced Software Engineering',
-    // CPSC 101 is a seeded inactive course.
-    'CPSC 101 - Connecting with Computer Science',
-  ]) {
+  // cpsc101 is the seeded inactive course, and a super admin sees it too.
+  for (const course of Object.values(COURSES).map(fullName)) {
     await expect(page.getByRole('heading', { level: 3, name: course })).toBeVisible();
   }
 

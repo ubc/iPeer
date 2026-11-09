@@ -5,13 +5,16 @@ export async function deleteGroup(page: Page, groupId: string): Promise<void> {
   await page.goto(`/groups/delete/${groupId}`);
 }
 
-async function optionValue(page: Page, listId: string, student: string): Promise<string> {
-  // The chooser labels a student with their student number as well as their
-  // name, so the match is partial.
-  const option = page.locator(`#${listId} option`).filter({ hasText: student }).first();
+export type Student = { readonly name: string; readonly number: string };
+
+async function optionValue(page: Page, listId: string, student: Student): Promise<string> {
+  // Match on the student number, not the name: the seed data has people who
+  // share a full name. A locator that resolves to more than one option throws,
+  // which is what we want.
+  const option = page.locator(`#${listId} option`).filter({ hasText: student.number });
   const value = await option.getAttribute('value');
   if (value === null) {
-    throw new Error(`no option for ${student} in ${listId}`);
+    throw new Error(`no option for ${student.name} (${student.number}) in ${listId}`);
   }
   return value;
 }
@@ -26,14 +29,14 @@ export async function expectGroupMembers(page: Page, studentNumbers: string[]): 
   }
 }
 
-export async function assignToGroup(page: Page, students: string[]): Promise<void> {
+export async function assignToGroup(page: Page, students: readonly Student[]): Promise<void> {
   for (const student of students) {
     await page.locator('#all_groups').selectOption(await optionValue(page, 'all_groups', student));
     await page.getByRole('button', { name: 'Assign >>' }).click();
   }
 }
 
-export async function removeFromGroup(page: Page, students: string[]): Promise<void> {
+export async function removeFromGroup(page: Page, students: readonly Student[]): Promise<void> {
   const values: string[] = [];
   for (const student of students) {
     values.push(await optionValue(page, 'selected_groups', student));

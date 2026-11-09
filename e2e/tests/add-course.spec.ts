@@ -1,7 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { deleteCourse } from '../support/courses';
 import {
-  USERS,
   errorMessage,
   flashMessage,
   goodMessage,
@@ -10,8 +9,28 @@ import {
   nav,
   pageTitle,
 } from '../support/helpers';
+import { USERS } from '../support/seed';
 
 // Ported from app/tests/cases/system/add_course.test.php.
+
+// The courses a test created. They are removed after the test, also when the
+// test failed: a course that survives makes every later test fail on a
+// duplicate name instead of on its own subject.
+let created = new Set<string>();
+
+test.beforeEach(() => {
+  created = new Set();
+});
+
+test.afterEach(async ({ page }) => {
+  for (const courseId of created) {
+    await page.goto(`/courses/delete/${courseId}`);
+    const confirm = page.getByRole('button', { name: 'Delete Course' });
+    if (await confirm.count()) {
+      await confirm.click();
+    }
+  }
+});
 
 async function openCourse(page: Page, name: string, title: string): Promise<string> {
   await page.goto('/courses');
@@ -19,8 +38,12 @@ async function openCourse(page: Page, name: string, title: string): Promise<stri
     .getByRole('row')
     .filter({ has: page.getByRole('cell', { name, exact: true }) });
   await row.getByRole('link', { name: title, exact: true }).click();
+  // Register for cleanup before asserting, so a failure below does not leave
+  // the course behind.
+  const courseId = idFromUrl(page);
+  created.add(courseId);
   await expect(pageTitle(page)).toContainText(name);
-  return idFromUrl(page);
+  return courseId;
 }
 
 test('an admin adds a course through the Courses tab', async ({ page }) => {

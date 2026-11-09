@@ -4,29 +4,35 @@ import {
   deleteGroup,
   openGroupList,
   removeFromGroup,
+  type Student,
 } from '../support/groups';
 import {
-  USERS,
   errorMessage,
   goodMessage,
   idFromUrl,
   login,
   pageTitle,
 } from '../support/helpers';
+import { COURSES, STUDENTS as SEED_STUDENTS, USERS, fullName } from '../support/seed';
 
 // Ported from app/tests/cases/system/add_group.test.php.
 
 // APSC 201 has no seeded group, so the group numbers start at 1.
-const COURSE_ID = '2';
-const COURSE = 'APSC 201 - Technical Communication';
-const STUDENTS = ['Geoff Student', 'Van Hong Student', 'Denny Student', 'Trevor Student'];
+const COURSE_ID = COURSES.apsc201.id;
+const COURSE = fullName(COURSES.apsc201);
+const STUDENTS = [
+  SEED_STUDENTS.geoff,
+  SEED_STUDENTS.vanHong,
+  SEED_STUDENTS.denny,
+  SEED_STUDENTS.trevor,
+];
 
 // The groups that a test created. They are removed after the test, also when
 // the test failed, so that every test starts with the seeded course.
-let created: string[] = [];
+let created = new Set<string>();
 
 test.beforeEach(() => {
-  created = [];
+  created = new Set();
 });
 
 test.afterEach(async ({ page }) => {
@@ -38,11 +44,19 @@ test.afterEach(async ({ page }) => {
 async function openGroup(page: Page, name: string): Promise<string> {
   await openGroupList(page, COURSE_ID);
   await page.getByRole('link', { name: new RegExp(`^${name} \\(`) }).click();
+  // Register for cleanup before asserting anything: the group already exists,
+  // so a failed assertion below must not leave it behind for later specs.
+  const groupId = idFromUrl(page);
+  created.add(groupId);
   await expect(pageTitle(page)).toContainText(`${COURSE} > Groups > View`);
-  return idFromUrl(page);
+  return groupId;
 }
 
-async function createGroup(page: Page, name: string, students: string[]): Promise<string> {
+async function createGroup(
+  page: Page,
+  name: string,
+  students: readonly Student[]
+): Promise<string> {
   await page.goto(`/courses/home/${COURSE_ID}`);
   await page.getByRole('link', { name: 'Add Group', exact: true }).click();
   await page.locator('#GroupGroupName').fill(name);
@@ -50,7 +64,7 @@ async function createGroup(page: Page, name: string, students: string[]): Promis
   await page.getByRole('button', { name: 'Add Group' }).click();
   await expect(goodMessage(page)).toHaveText('The group was added successfully.');
   const groupId = await openGroup(page, name);
-  created.push(groupId);
+  created.add(groupId);
   return groupId;
 }
 
@@ -82,10 +96,10 @@ test('an admin creates a group with the students that were assigned', async ({ p
   await expect(goodMessage(page)).toHaveText('The group was added successfully.');
 
   const groupId = await openGroup(page, 'Amazing Group');
-  created.push(groupId);
+  created.add(groupId);
   await expect(page.getByRole('cell', { name: 'Amazing Group', exact: true })).toBeVisible();
   for (const student of STUDENTS) {
-    await expect(page.getByRole('cell', { name: student, exact: true })).toBeVisible();
+    await expect(page.getByRole('cell', { name: student.name, exact: true })).toBeVisible();
   }
   await expect(page.getByRole('link', { name: 'Back to Group Listing' })).toHaveAttribute(
     'href',
@@ -95,7 +109,7 @@ test('an admin creates a group with the students that were assigned', async ({ p
   // A second group with the same name is refused.
   await page.goto(`/groups/add/${COURSE_ID}`);
   await page.locator('#GroupGroupName').fill(' Amazing Group ');
-  await assignToGroup(page, ['Geoff Student']);
+  await assignToGroup(page, [SEED_STUDENTS.geoff]);
   await page.getByRole('button', { name: 'Add Group' }).click();
   await expect(errorMessage(page)).toHaveText('A group with the name already exists.');
 });
@@ -113,8 +127,8 @@ test('an admin renames a group and changes its members', async ({ page }) => {
 
   await page.goto(`/groups/edit/${groupId}`);
   await page.locator('#GroupGroupName').fill('Group To Edit Two');
-  await removeFromGroup(page, ['Denny Student', 'Trevor Student']);
-  await assignToGroup(page, ['Michael Student']);
+  await removeFromGroup(page, [SEED_STUDENTS.denny, SEED_STUDENTS.trevor]);
+  await assignToGroup(page, [SEED_STUDENTS.michael]);
   await expect(page.locator('#selected_groups option')).toHaveCount(3);
   await page.getByRole('button', { name: 'Edit Group' }).click();
   await expect(goodMessage(page)).toHaveText('The group was updated successfully.');

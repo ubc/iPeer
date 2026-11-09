@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { PASSWORD, USERS } from '../support/helpers';
+import { PASSWORD, USERS } from '../support/seed';
 
 // This spec fills the login form itself, instead of the login() helper, because
 // the login form is what it tests.

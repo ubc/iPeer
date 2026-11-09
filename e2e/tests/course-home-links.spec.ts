@@ -1,11 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
-import { USERS, login, pageTitle } from '../support/helpers';
+import { login, pageTitle } from '../support/helpers';
+import { COURSES, USERS, fullName } from '../support/seed';
 
 // Ported from the link tests of app/tests/cases/system/add_course.test.php.
 
 // MECH 328 is a seeded course with students, groups and events.
-const COURSE_ID = '1';
-const COURSE = 'MECH 328 - Mechanical Engineering Design Project';
+const COURSE_ID = COURSES.mech328.id;
+const COURSE = fullName(COURSES.mech328);
 
 async function expectLinks(page: Page, links: [string, string, string][]): Promise<void> {
   for (const [name, path, title] of links) {
