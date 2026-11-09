@@ -14,6 +14,18 @@ export const USERS = {
   student: 'redshirt0001',
 } as const;
 
+// What the navigation bar shows for each account. The User model builds
+// full_name from the first and last name, and falls back to the username when
+// both are empty, which is why admin2 shows as its username.
+export const FULL_NAMES: Record<keyof typeof USERS, string> = {
+  superAdmin: 'Super Admin',
+  admin: 'admin2',
+  instructor1: 'Instructor 1',
+  instructor2: 'Instructor 2',
+  tutor: 'Tutor 2',
+  student: 'Ed Student',
+};
+
 export const COURSES = {
   mech328: { id: '1', name: 'MECH 328', title: 'Mechanical Engineering Design Project' },
   apsc201: { id: '2', name: 'APSC 201', title: 'Technical Communication' },

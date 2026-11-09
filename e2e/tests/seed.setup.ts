@@ -1,16 +1,21 @@
 import { expect, test } from '@playwright/test';
-import { login, logout, pageTitle } from '../support/helpers';
-import { COURSES, STUDENTS, USERS, fullName } from '../support/seed';
+import { login, logout, nav, pageTitle } from '../support/helpers';
+import { COURSES, FULL_NAMES, STUDENTS, USERS, fullName } from '../support/seed';
 
 // Checks that support/seed.ts still describes the seeded database. The other
 // specs build on these facts, so a change to ipeer_samples_data.sql must fail
 // here, with a message that names what moved, instead of failing scattered
 // assertions that each look like an application bug.
 
-test('every seed account can log in', async ({ page }) => {
+test('every seed account logs in as the expected person', async ({ page }) => {
   for (const [role, username] of Object.entries(USERS)) {
     await login(page, username);
-    await expect(page.getByRole('link', { name: 'Logout' }), `${role} (${username})`).toBeVisible();
+    // The navigation bar links to the profile of whoever is signed in, so it
+    // proves which account the session belongs to.
+    await expect(
+      nav(page).getByRole('link', { name: FULL_NAMES[role as keyof typeof USERS], exact: true }),
+      `${role} (${username})`
+    ).toBeVisible();
   }
   await logout(page);
 });
