@@ -13,9 +13,18 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [
+    // The seed check runs first. If the seeded database is not what
+    // support/seed.ts describes, the rest of the suite is skipped.
+    {
+      name: 'seed',
+      testMatch: /seed\.setup\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
     {
       name: 'chromium',
+      testIgnore: /seed\.setup\.ts/,
       use: { ...devices['Desktop Chrome'] },
+      dependencies: ['seed'],
     },
   ],
 });

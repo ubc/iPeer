@@ -135,6 +135,9 @@ jobs:
       - name: Install Playwright dependencies
         run: docker compose exec playwright npm ci
 
+      - name: Check the types of the browser tests
+        run: docker compose exec playwright npm run typecheck
+
       - name: Run Playwright tests
         run: docker compose exec playwright npx playwright test
 
