@@ -46,11 +46,11 @@ abstract class SystemBaseTestCase extends CakeTestCase
         $this->capabilities['version'] = getenv('SELENIUM_VERSION') ? getenv('SELENIUM_VERSION') : '';
 
         // get the repo info
-        $branch = `git rev-parse --abbrev-ref HEAD`;
+        $branch = shell_exec('git rev-parse --abbrev-ref HEAD');
         if (!$branch) {
             $branch = "Unknown";
         }
-        $commit = `git describe --tags --always`;
+        $commit = shell_exec('git describe --tags --always');
         if (!$commit) {
             $commit = "Unknown";
         }
