@@ -1,7 +1,9 @@
 // What app/config/sql/ipeer_samples_data.sql puts in the test database. These
 // values are true of a freshly seeded database, and a test that changes them
-// puts them back. tests/seed.setup.ts checks them before the rest of the suite
-// runs, so a change to the seed file fails there instead of in many specs.
+// should put them back. tests/seed.setup.ts checks them before the rest of the
+// suite runs, so a change to the seed file fails there instead of in many specs.
+// In the future, we can consider resetting the DB between tests, and/or making
+// each test independent.
 
 export const PASSWORD = 'ipeeripeer';
 
