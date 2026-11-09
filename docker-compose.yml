@@ -126,6 +126,8 @@ services:
     # The tag must match the @playwright/test version in e2e/package.json
     image: mcr.microsoft.com/playwright:v1.64.1-noble
     init: true
+    # Chromium needs more shared memory than the 64 MB default
+    ipc: host
     working_dir: /e2e
     command: [ "sleep", "infinity" ]
     volumes:
