@@ -120,6 +120,19 @@ async function optionValue(page: Page, listId: string, student: string): Promise
   return value;
 }
 
+/**
+ * Checks the selected list of the group member chooser holds these students and
+ * no others. The list labels a student with their student number, which is
+ * unique, so the student number identifies the student.
+ */
+export async function expectGroupMembers(page: Page, studentNumbers: string[]): Promise<void> {
+  const options = page.locator('#selected_groups option');
+  await expect(options).toHaveCount(studentNumbers.length);
+  for (const studentNo of studentNumbers) {
+    await expect(options.filter({ hasText: studentNo }), `student ${studentNo}`).toHaveCount(1);
+  }
+}
+
 /** Moves students into the selected list of the group member chooser. */
 export async function assignToGroup(page: Page, students: string[]): Promise<void> {
   for (const student of students) {

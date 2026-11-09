@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import path from 'path';
 import {
   USERS,
+  expectGroupMembers,
   flashMessage,
   goodMessage,
   idFromUrl,
@@ -82,7 +83,9 @@ test('a valid CSV creates the listed groups with the listed members', async ({ p
   await expect(page.getByRole('cell', { name: 'Team', exact: true })).toBeVisible();
   await page.goto(`/groups/edit/${groupId}`);
   await expect(page.locator('#GroupGroupName')).toHaveValue('Team');
-  await expect(page.locator('#selected_groups option')).toHaveCount(3);
+  // The students of importGroup.csv: redshirt0003, redshirt0005 and
+  // redshirt0006. The chooser labels them by student number.
+  await expectGroupMembers(page, ['98985481', '81121651', '87800283']);
 
   await page.goto(`/groups/delete/${groupId}`);
   await expect(goodMessage(page)).toHaveText('The group was deleted successfully.');
@@ -134,7 +137,9 @@ test('an import can match students by student number', async ({ page }) => {
 
   const groupId = await openGroup(page, '1', 'Best Team');
   await page.goto(`/groups/edit/${groupId}`);
-  await expect(page.locator('#selected_groups option')).toHaveCount(4);
+  // The same student numbers the CSV named, so the import matched the right
+  // students and not only the right number of them.
+  await expectGroupMembers(page, ['65498451', '65468188', '98985481', '84188465']);
 
   await page.goto(`/groups/delete/${groupId}`);
   await expect(goodMessage(page)).toHaveText('The group was deleted successfully.');
