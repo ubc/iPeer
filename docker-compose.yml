@@ -122,6 +122,22 @@ services:
     profiles: [ "test" ]
     networks: [ "test" ]
 
+  playwright:
+    # The tag must match the @playwright/test version in e2e/package.json
+    image: mcr.microsoft.com/playwright:v1.64.1-noble
+    init: true
+    working_dir: /e2e
+    command: [ "sleep", "infinity" ]
+    volumes:
+      - ./e2e:/e2e
+    environment:
+      - BASE_URL=http://web-test
+      - CI
+    depends_on:
+      - web-test
+    profiles: [ "test" ]
+    networks: [ "test" ]
+
 networks:
   test:
 

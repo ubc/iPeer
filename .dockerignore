@@ -6,6 +6,7 @@ build.xml
 Boxfile
 app/tmp
 /vendor/
+/e2e
 
 # dev/test-only dependencies (via git submodules)
 /vendors/sausage
