@@ -1,6 +1,18 @@
 import { expect, test } from '@playwright/test';
+import { expectClassSize, expectCourseTutors } from '../support/courses';
 import { login, logout, nav, pageTitle } from '../support/helpers';
-import { COURSES, FULL_NAMES, STUDENTS, USERS, fullName } from '../support/seed';
+import { permissionAccess } from '../support/permissions';
+import {
+  COURSES,
+  FACULTIES,
+  FULL_NAMES,
+  INSTRUCTOR_PERMISSIONS,
+  ROLES,
+  STUDENTS,
+  TUTORS,
+  USERS,
+  fullName,
+} from '../support/seed';
 
 // Checks that support/seed.ts still describes the seeded database. The other
 // specs build on these facts, so a change to ipeer_samples_data.sql must fail
@@ -18,6 +30,28 @@ test('every seed account logs in as the expected person', async ({ page }) => {
     ).toBeVisible();
   }
   await logout(page);
+});
+
+test('the seeded roles, faculties and instructor permissions are the expected ones', async ({
+  page,
+}) => {
+  await login(page, USERS.superAdmin);
+
+  // The permissions editor is addressed by role id and names the role it has
+  // opened, so one page proves the id of every role.
+  for (const [name, id] of Object.entries(ROLES)) {
+    await page.goto(`/accesses/view/${id}`);
+    await expect(pageTitle(page), `role id ${id}`).toContainText(`Permissions Editor > ${name}`);
+  }
+
+  await page.goto('/users/add');
+  await expect(page.locator('#FacultyFaculty').getByRole('option')).toHaveText([...FACULTIES]);
+
+  for (const [key, permission] of Object.entries(INSTRUCTOR_PERMISSIONS)) {
+    expect(await permissionAccess(page, ROLES.instructor, permission.name), key).toEqual(
+      permission.seeded
+    );
+  }
 });
 
 test('the seeded courses exist, and only CPSC 101 is inactive', async ({ page }) => {
@@ -63,5 +97,18 @@ test('the seeded students are enrolled where expected, with their student number
         `${key} in ${courseKey}`
       ).toHaveCount(1);
     }
+  }
+});
+
+test('the seeded courses have the expected class size and tutors', async ({ page }) => {
+  await login(page, USERS.superAdmin);
+
+  for (const [courseKey, course] of Object.entries(COURSES)) {
+    await expectClassSize(page, course.id, course.studentCount);
+
+    const tutors = Object.values(TUTORS)
+      .filter((tutor) => (tutor.courses as readonly string[]).includes(courseKey))
+      .map((tutor) => tutor.name);
+    await expectCourseTutors(page, course.id, tutors);
   }
 });

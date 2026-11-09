@@ -10,6 +10,9 @@ export const PASSWORD = 'ipeeripeer';
 export const USERS = {
   superAdmin: 'root',
   admin: 'admin2',
+  // A second account of the admin role. The merge specs need two accounts that
+  // share a role and that neither spec may consume.
+  adminAlt: 'admin1',
   instructor1: 'instructor1',
   instructor2: 'instructor2',
   tutor: 'tutor2',
@@ -22,17 +25,57 @@ export const USERS = {
 export const FULL_NAMES: Record<keyof typeof USERS, string> = {
   superAdmin: 'Super Admin',
   admin: 'admin2',
+  adminAlt: 'admin1',
   instructor1: 'Instructor 1',
   instructor2: 'Instructor 2',
   tutor: 'Tutor 2',
   student: 'Ed Student',
 };
 
+// iPeer refuses to save an instructor or an admin that has no faculty, so a
+// spec that changes a role to one of those has to pick one of these.
+export const FACULTIES = ['Applied Science', 'Science'] as const;
+
+// The permissions editor and the user edit form address a role by its id, so
+// the id is part of the fact, not only the name.
+export const ROLES = {
+  superadmin: '1',
+  admin: '2',
+  instructor: '3',
+  tutor: '4',
+  student: '5',
+} as const;
+
+// The two permissions the permissions-editor spec switches, with the access the
+// seed gives the instructor role. A spec that changes one of them puts it back.
+export const INSTRUCTOR_PERMISSIONS = {
+  permissionsEditor: {
+    name: 'controllers/accesses/view',
+    seeded: { Create: 'Deny', Read: 'Deny', Update: 'Deny', Delete: 'Deny' },
+  },
+  mixedEvaluations: {
+    name: 'controllers/mixevals/index',
+    seeded: { Create: 'Allow', Read: 'Allow', Update: 'Allow', Delete: 'Allow' },
+  },
+} as const;
+
+// studentCount is every enrolment row of the course, so a test that enrols
+// someone twice by mistake makes it disagree.
 export const COURSES = {
-  mech328: { id: '1', name: 'MECH 328', title: 'Mechanical Engineering Design Project' },
-  apsc201: { id: '2', name: 'APSC 201', title: 'Technical Communication' },
-  cpsc101: { id: '3', name: 'CPSC 101', title: 'Connecting with Computer Science' },
-  cpsc404: { id: '4', name: 'CPSC 404', title: 'Advanced Software Engineering' },
+  mech328: {
+    id: '1',
+    name: 'MECH 328',
+    title: 'Mechanical Engineering Design Project',
+    studentCount: 13,
+  },
+  apsc201: { id: '2', name: 'APSC 201', title: 'Technical Communication', studentCount: 15 },
+  cpsc101: {
+    id: '3',
+    name: 'CPSC 101',
+    title: 'Connecting with Computer Science',
+    studentCount: 2,
+  },
+  cpsc404: { id: '4', name: 'CPSC 404', title: 'Advanced Software Engineering', studentCount: 0 },
 } as const;
 
 // The full name is what iPeer shows in page titles and course lists.
@@ -57,4 +100,13 @@ export const STUDENTS = {
   michael: { username: 'redshirt0020', name: 'Michael Student', number: '39823059', courses: ['apsc201'] },
   vanHong: { username: 'redshirt0023', name: 'Van Hong Student', number: '40289059', courses: ['apsc201'] },
   geoff: { username: 'redshirt0026', name: 'Geoff Student', number: '27879030', courses: ['apsc201'] },
+} as const;
+
+// A tutor is attached to a course apart from the student enrolments, so the
+// course home page lists them in their own column. Tutor 3 tutors no course
+// that MECH 328 shares, which is why the enrolment specs move them there.
+export const TUTORS = {
+  tutor1: { username: 'tutor1', name: 'Tutor 1', courses: ['mech328'] },
+  tutor2: { username: 'tutor2', name: 'Tutor 2', courses: ['mech328'] },
+  tutor3: { username: 'tutor3', name: 'Tutor 3', courses: ['apsc201', 'cpsc101'] },
 } as const;

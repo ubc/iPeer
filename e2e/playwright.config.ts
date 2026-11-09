@@ -16,15 +16,15 @@ export default defineConfig({
     // The seed check runs first. If the seeded database is not what
     // support/seed.ts describes, the rest of the suite is skipped.
     {
-      name: 'seed',
+      name: 'verify-seed',
       testMatch: /seed\.setup\.ts/,
       use: { ...devices['Desktop Chrome'] },
     },
     {
-      name: 'chromium',
+      name: 'main',
       testIgnore: /seed\.setup\.ts/,
       use: { ...devices['Desktop Chrome'] },
-      dependencies: ['seed'],
+      dependencies: ['verify-seed'],
     },
   ],
 });

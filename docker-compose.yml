@@ -131,6 +131,8 @@ services:
     command: [ "sleep", "infinity" ]
     volumes:
       - ./e2e:/e2e
+    ports:
+      - "127.0.0.1:9323:9323" # Playwright UI mode and the HTML report
     environment:
       - BASE_URL=http://web-test
       - CI
