@@ -65,13 +65,19 @@ export function errorMessage(page: Page): Locator {
 }
 
 export async function expectAccessDenied(page: Page): Promise<void> {
-  // A refused page sends the visitor to the home page with a message that
-  // names no permission, so the message and the landing page are all there is
-  // to tell a refusal from a working page.
-  await expect(flashMessage(page)).toContainText(
-    'Access to this page is limited to authorized users'
+  await test.step(
+    'Expect access denied',
+    async () => {
+      // A refused page sends the visitor to the home page with a message that
+      // names no permission, so the message and the landing page are all there
+      // is to tell a refusal from a working page.
+      await expect(flashMessage(page)).toContainText(
+        'Access to this page is limited to authorized users'
+      );
+      await expect(page).toHaveURL(/\/home$/);
+    },
+    { box: true }
   );
-  await expect(page).toHaveURL(/\/home$/);
 }
 
 export function pageTitle(page: Page): Locator {

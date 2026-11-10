@@ -1,4 +1,4 @@
-import { expect, type Locator, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { goodMessage } from './helpers';
 
 // The permissions editor addresses a role by its id, so the id is part of
@@ -31,8 +31,14 @@ export type Access = 'Allow' | 'Deny';
 export type PermissionAccess = Readonly<Record<PermissionAction, Access>>;
 
 export async function openPermissionsEditor(page: Page, roleId: string): Promise<void> {
-  await page.goto(`/accesses/view/${roleId}`);
-  await expect(page.locator('#table_id_filter input')).toBeVisible();
+  await test.step(
+    `Open the permissions editor for role ${roleId}`,
+    async () => {
+      await page.goto(`/accesses/view/${roleId}`);
+      await expect(page.locator('#table_id_filter input')).toBeVisible();
+    },
+    { box: true }
+  );
 }
 
 async function filterToPermission(page: Page, permission: string): Promise<Locator> {
@@ -48,17 +54,23 @@ export async function permissionAccess(
   roleId: string,
   permission: string
 ): Promise<PermissionAccess> {
-  await openPermissionsEditor(page, roleId);
-  const row = await filterToPermission(page, permission);
-  const cells = await row.getByRole('cell').allInnerTexts();
-  // The name column comes first and the four action columns follow it in the
-  // order of PERMISSION_ACTIONS. The id column is in the markup but the table
-  // script hides it, so count the action columns from the end of the row.
-  expect(cells, `row of ${permission}`).toContain(permission);
-  const access = cells.slice(-PERMISSION_ACTIONS.length).map((text) => text.trim());
-  return Object.fromEntries(
-    PERMISSION_ACTIONS.map((action, index) => [action, access[index]])
-  ) as PermissionAccess;
+  return test.step(
+    `Read the access of ${permission} for role ${roleId}`,
+    async () => {
+      await openPermissionsEditor(page, roleId);
+      const row = await filterToPermission(page, permission);
+      const cells = await row.getByRole('cell').allInnerTexts();
+      // The name column comes first and the four action columns follow it in the
+      // order of PERMISSION_ACTIONS. The id column is in the markup but the table
+      // script hides it, so count the action columns from the end of the row.
+      expect(cells, `row of ${permission}`).toContain(permission);
+      const access = cells.slice(-PERMISSION_ACTIONS.length).map((text) => text.trim());
+      return Object.fromEntries(
+        PERMISSION_ACTIONS.map((action, index) => [action, access[index]])
+      ) as PermissionAccess;
+    },
+    { box: true }
+  );
 }
 
 async function openActionPanel(page: Page, roleId: string, permission: string): Promise<Locator> {
@@ -77,12 +89,18 @@ export async function expectPermissionActions(
   permission: string,
   labels: readonly string[]
 ): Promise<void> {
-  const panel = await openActionPanel(page, roleId, permission);
-  // Each action is offered as its opposite, so the labels name the access the
-  // permission has now as much as what a click would do.
-  for (const label of labels) {
-    await expect(panel.getByRole('link', { name: label, exact: true }), label).toHaveCount(1);
-  }
+  await test.step(
+    `Expect the actions ${labels.join(', ')} on ${permission} for role ${roleId}`,
+    async () => {
+      const panel = await openActionPanel(page, roleId, permission);
+      // Each action is offered as its opposite, so the labels name the access the
+      // permission has now as much as what a click would do.
+      for (const label of labels) {
+        await expect(panel.getByRole('link', { name: label, exact: true }), label).toHaveCount(1);
+      }
+    },
+    { box: true }
+  );
 }
 
 export async function changePermission(
@@ -91,8 +109,14 @@ export async function changePermission(
   permission: string,
   label: string
 ): Promise<void> {
-  const panel = await openActionPanel(page, roleId, permission);
-  page.once('dialog', (dialog) => dialog.accept());
-  await panel.getByRole('link', { name: label, exact: true }).click();
-  await expect(goodMessage(page)).toHaveText('Permissions have been updated');
+  await test.step(
+    `${label} on ${permission} for role ${roleId}`,
+    async () => {
+      const panel = await openActionPanel(page, roleId, permission);
+      page.once('dialog', (dialog) => dialog.accept());
+      await panel.getByRole('link', { name: label, exact: true }).click();
+      await expect(goodMessage(page)).toHaveText('Permissions have been updated');
+    },
+    { box: true }
+  );
 }
