@@ -18,19 +18,6 @@ function userSummaryTable(page: Page, heading: string): Locator {
   return page.locator(`xpath=//h3[normalize-space()='${heading}']/following-sibling::table[1]`);
 }
 
-async function submitImportForm(page: Page): Promise<void> {
-  // The view rewrites the action of this form to https so that an upload
-  // always leaves the browser encrypted. The test web server serves plain http
-  // only, so the form would post to a port that nothing listens on. Put the
-  // scheme back to the one this environment answers on; everything else about
-  // the request is what the browser would send.
-  await page.locator('#UserImport form').evaluate((form) => {
-    const upload = form as HTMLFormElement;
-    upload.action = upload.action.replace(/^https:/, 'http:');
-  });
-  await page.getByRole('button', { name: 'Import' }).click();
-}
-
 async function importUsers(
   page: Page,
   courseId: string,
@@ -42,7 +29,7 @@ async function importUsers(
   if (removeOldStudents) {
     await page.getByLabel('Remove old students').check();
   }
-  await submitImportForm(page);
+  await page.getByRole('button', { name: 'Import' }).click();
 }
 
 test('an import of a file type that is not allowed is refused and creates no user', async ({
@@ -74,7 +61,7 @@ test('a CSV import creates new users, updates existing ones and enrols them all'
   await page.getByRole('link', { name: 'Import Students from CSV', exact: true }).click();
 
   await page.locator('input[type="file"]').setInputFiles(fixture('newClass_APSC201.csv'));
-  await submitImportForm(page);
+  await page.getByRole('button', { name: 'Import' }).click();
   await expect(goodMessage(page)).toContainText('Import successful!');
 
   // The summary separates the account the file introduced from the accounts
