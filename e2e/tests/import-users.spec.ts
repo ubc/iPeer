@@ -2,7 +2,12 @@ import { expect, test, type Locator, type Page } from '../support/test';
 import { expectClassSize } from '../support/courses';
 import { fixture, flashMessage, goodMessage, login, nav, pageTitle } from '../support/helpers';
 import { COURSES, STUDENTS, USERS, fullName } from '../support/seed';
-import { enrolExistingUser, expectInClassList, expectNotInClassList } from '../support/users';
+import {
+  classListUserId,
+  enrolExistingUser,
+  expectInClassList,
+  expectNotInClassList,
+} from '../support/users';
 
 // Ported from app/tests/cases/system/import_users.test.php.
 // The CSV files are the ones the old tests used.
@@ -52,6 +57,16 @@ test('a CSV import creates new users, updates existing ones and enrols them all'
 }) => {
   await login(page, USERS.superAdmin);
 
+  // Rename Ed first, so that the import has a change to save: the file has
+  // his seeded name. The class list matches names as case-insensitive
+  // substrings, so the temporary name must not contain "ed Student".
+  const edId = await classListUserId(page, COURSES.mech328.id, STUDENTS.ed);
+  await page.goto(`/users/edit/${edId}`);
+  await page.getByLabel('First Name').fill('Temporary');
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(goodMessage(page)).toHaveText('User successfully updated!');
+  await expectInClassList(page, COURSES.mech328.id, { ...STUDENTS.ed, name: 'Temporary Student' });
+
   await nav(page).getByRole('link', { name: 'Courses', exact: true }).click();
   const row = page
     .getByRole('row')
@@ -81,6 +96,7 @@ test('a CSV import creates new users, updates existing ones and enrols them all'
   ).toBeVisible();
 
   await expectInClassList(page, COURSES.apsc201.id, NEW_STUDENT);
+  // Under his name from the file, so the import saved it.
   await expectInClassList(page, COURSES.apsc201.id, STUDENTS.ed);
   await expectClassSize(page, COURSES.apsc201.id, COURSES.apsc201.studentCount + 2);
 });
