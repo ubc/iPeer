@@ -20,7 +20,7 @@ Playwright writes an HTML report to `e2e/playwright-report` after each run. If a
 
 ## The Test Database
 
-Each test starts from a freshly loaded copy of the seed data. Before each test, the fixture in `support/test.ts` refills `ipeer_test`, which the application uses, from that a fresh copy kept in `ipeer_seed`. See `support/db.ts` and `docker/db-test-init/e2e-seed.sql`. To reset the seed data, run `docker compose up -d --force-recreate --renew-anon-volumes db-test`.
+Each test starts from a freshly loaded copy of the seed data. Before each test, the fixture in `support/test.ts` refills `ipeer_test` from `ipeer_seed`. See `support/db.ts` and `docker/db-test-init/e2e-seed.sql`. To reset the seed data, run `docker compose up -d --force-recreate --renew-anon-volumes db-test`.
 
 Specs import `test` and `expect` from `support/test.ts`, not from `@playwright/test`. A test that imports them from `@playwright/test` might fail as the previous test's changes will be visible.
 

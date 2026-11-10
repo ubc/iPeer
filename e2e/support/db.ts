@@ -49,8 +49,10 @@ async function loadSeedFile(database: string): Promise<void> {
   }
 }
 
-// Runs once before the tests. Loading the seed into ipeer_test as well makes
-// its tables match the seed, also when the schema changed since the last run.
+// Runs once before the tests. The seed file drops and creates again most of
+// its tables, so ipeer_test gets their current columns. It creates jobs,
+// user_oauths and cake_sessions only when they are missing, so those keep the
+// columns they had when they were first made. No spec uses them.
 export async function loadSeed(): Promise<void> {
   await loadSeedFile(SEED_DB());
   await loadSeedFile(APP_DB());

@@ -1,7 +1,6 @@
 // What app/config/sql/ipeer_samples_data.sql puts in the test database. Each
-// test starts from this data (see support/db.ts). tests/seed.spec.ts checks
-// these values, so a change to the seed file fails there with a clear message
-// instead of in many specs.
+// test starts from this data (see support/db.ts). If the seed file changes,
+// update these values.
 
 export const PASSWORD = 'ipeeripeer';
 
