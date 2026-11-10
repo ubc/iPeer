@@ -1,17 +1,6 @@
 import { expect, test, type Page } from '../support/test';
-import {
-  assignToGroup,
-  openGroupList,
-  removeFromGroup,
-  type Student,
-} from '../support/groups';
-import {
-  errorMessage,
-  goodMessage,
-  idFromUrl,
-  login,
-  pageTitle,
-} from '../support/helpers';
+import { assignToGroup, openGroupList, removeFromGroup, type Student } from '../support/groups';
+import { errorMessage, goodMessage, idFromUrl, login, pageTitle } from '../support/helpers';
 import { COURSES, STUDENTS as SEED_STUDENTS, USERS, fullName } from '../support/seed';
 
 // Ported from app/tests/cases/system/add_group.test.php.

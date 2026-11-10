@@ -60,7 +60,9 @@ test('the course home page links to the group pages of that course', async ({ pa
   ]);
 });
 
-test('the course home page links to the evaluation event pages of that course', async ({ page }) => {
+test('the course home page links to the evaluation event pages of that course', async ({
+  page,
+}) => {
   await login(page, USERS.superAdmin);
   await expectLinks(page, [
     ['Add Event', `/events/add/${COURSE_ID}`, `${COURSE} > Add Event`],
@@ -78,7 +80,11 @@ test('the course home page links to the evaluation event pages of that course', 
 test('the course home page links to the team maker pages of that course', async ({ page }) => {
   await login(page, USERS.superAdmin);
   await expectLinks(page, [
-    ['Create Groups (Auto)', `/surveygroups/makegroups/${COURSE_ID}`, `${COURSE} > Create Group Set`],
+    [
+      'Create Groups (Auto)',
+      `/surveygroups/makegroups/${COURSE_ID}`,
+      `${COURSE} > Create Group Set`,
+    ],
     ['List Survey Group Sets', `/surveygroups/index/${COURSE_ID}`, `${COURSE} > Survey Groups`],
     [
       'Export Survey Group Sets',

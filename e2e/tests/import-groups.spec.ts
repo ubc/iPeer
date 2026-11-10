@@ -1,13 +1,7 @@
 import { expect, test, type Page } from '../support/test';
 import path from 'path';
 import { expectGroupMembers, openGroupList } from '../support/groups';
-import {
-  flashMessage,
-  idFromUrl,
-  login,
-  pageTitle,
-  resultsTable,
-} from '../support/helpers';
+import { flashMessage, idFromUrl, login, pageTitle, resultsTable } from '../support/helpers';
 import { COURSES, STUDENTS, USERS } from '../support/seed';
 
 // Ported from app/tests/cases/system/import_groups.test.php.
@@ -81,7 +75,10 @@ test('a valid CSV creates the listed groups with the listed members', async ({ p
   await expect(page.getByRole('cell', { name: 'Team', exact: true })).toBeVisible();
   await page.goto(`/groups/edit/${groupId}`);
   await expect(page.locator('#GroupGroupName')).toHaveValue('Team');
-  await expectGroupMembers(page, BY_USERNAME.map((s) => s.number));
+  await expectGroupMembers(
+    page,
+    BY_USERNAME.map((s) => s.number)
+  );
 });
 
 test('an import reports the students it could not place', async ({ page }) => {
@@ -108,7 +105,7 @@ test('an import reports the students it could not place', async ({ page }) => {
   }
 
   // The group is created, but with none of those students in it.
-  const groupId = await openGroup(page, COURSES.mech328.id,'Team Supreme');
+  const groupId = await openGroup(page, COURSES.mech328.id, 'Team Supreme');
   await expect(page.getByRole('cell', { name: 'Team Supreme', exact: true })).toBeVisible();
   await page.goto(`/groups/edit/${groupId}`);
   await expect(page.locator('#selected_groups option')).toHaveCount(0);
@@ -126,7 +123,10 @@ test('an import can match students by student number', async ({ page }) => {
   }
   await expect(page.getByRole('heading', { name: 'Students Not Placed' })).toHaveCount(0);
 
-  const groupId = await openGroup(page, COURSES.mech328.id,'Best Team');
+  const groupId = await openGroup(page, COURSES.mech328.id, 'Best Team');
   await page.goto(`/groups/edit/${groupId}`);
-  await expectGroupMembers(page, BY_NUMBER.map((s) => s.number));
+  await expectGroupMembers(
+    page,
+    BY_NUMBER.map((s) => s.number)
+  );
 });

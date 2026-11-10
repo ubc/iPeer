@@ -40,6 +40,8 @@ export function fullName(course: { name: string; title: string }): string {
 
 // The courses a student is enrolled in decide which group chooser lists them,
 // so the enrolment is part of the fact. Matt is in two courses.
+// One row per student reads as a table, so Prettier leaves it as it is.
+// prettier-ignore
 export const STUDENTS = {
   ed: { username: 'redshirt0001', name: 'Ed Student', number: '65498451', courses: ['mech328'] },
   alex: { username: 'redshirt0002', name: 'Alex Student', number: '65468188', courses: ['mech328'] },

@@ -113,6 +113,12 @@ jobs:
       - name: Build and startup test containers
         run: ./build/unit-integration-tests/prepare.sh
 
+      # iPeer serves its installer until the users table exists, so the test
+      # site shows a login page only after the database is seeded. The browser
+      # tests load the seed again in their global setup.
+      - name: Seed test database
+        run: docker compose exec app-test vendor/bin/phing init-test-db
+
       - name: Wait for the test site to serve pages
         run: |
           for i in $(seq 1 30); do
@@ -134,6 +140,9 @@ jobs:
 
       - name: Check the types of the browser tests
         run: docker compose exec playwright npm run typecheck
+
+      - name: Check the formatting of the browser tests
+        run: docker compose exec playwright npm run format:check
 
       - name: Run Playwright tests
         run: docker compose exec playwright npx playwright test

@@ -85,16 +85,20 @@ export async function resetToSeed({ connection, tables }: TestDatabase): Promise
   // other tests. Changing a counter is slow, so change only those.
   const [moved] = await connection.query<RowDataPacket[]>(
     `SELECT test.table_name AS name, seed.auto_increment AS next_id
-       FROM information_schema.tables test
-       JOIN information_schema.tables seed
-         ON seed.table_schema = ? AND seed.table_name = test.table_name
-      WHERE test.table_schema = DATABASE() AND test.auto_increment <> seed.auto_increment`,
+         FROM information_schema.tables test
+                  JOIN information_schema.tables seed
+                       ON seed.table_schema = ? AND seed.table_name = test.table_name
+         WHERE test.table_schema = DATABASE()
+           AND test.auto_increment <> seed.auto_increment`,
     [SEED_DB()]
   );
   if (moved.length > 0) {
     await connection.query(
       moved
-        .map((row) => `ALTER TABLE ${mysql.escapeId(String(row.name))} AUTO_INCREMENT = ${Number(row.next_id)}`)
+        .map(
+          (row) =>
+            `ALTER TABLE ${mysql.escapeId(String(row.name))} AUTO_INCREMENT = ${Number(row.next_id)}`
+        )
         .join(';\n')
     );
   }

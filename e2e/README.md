@@ -22,9 +22,7 @@ Playwright writes an HTML report to `e2e/playwright-report` after each run. If a
 
 Each test starts from the seed data. A test can change any data, and it does not have to remove what it created. A test also does not depend on the tests that ran before it, so you can run one test alone.
 
-- Before the tests, `support/global-setup.ts` loads the seed file into two schemas: `ipeer_test`, which the application uses, and `ipeer_seed`, which keeps a copy.
-- Before each test, the fixture in `support/test.ts` copies every table from `ipeer_seed` into `ipeer_test`. This takes about 25 ms. Loading the seed file takes about 160 ms.
-- `cake_sessions` is not reset, because it holds the sessions of the web server.
+The seed is loaded once per run into a copy, the `ipeer_seed` schema. Before each test, the fixture in `support/test.ts` refills `ipeer_test`, which the application uses, from that copy. `support/db.ts` tells how, and why this is faster than loading the seed file each time.
 
 Specs import `test` and `expect` from `support/test.ts`, not from `@playwright/test`. A test that imports them from `@playwright/test` starts from whatever the test before it left.
 

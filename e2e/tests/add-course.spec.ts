@@ -14,9 +14,7 @@ import { USERS } from '../support/seed';
 
 async function openCourse(page: Page, name: string, title: string): Promise<string> {
   await page.goto('/courses');
-  const row = page
-    .getByRole('row')
-    .filter({ has: page.getByRole('cell', { name, exact: true }) });
+  const row = page.getByRole('row').filter({ has: page.getByRole('cell', { name, exact: true }) });
   await row.getByRole('link', { name: title, exact: true }).click();
   const courseId = idFromUrl(page);
   await expect(pageTitle(page)).toContainText(name);
