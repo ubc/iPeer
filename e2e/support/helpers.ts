@@ -1,13 +1,13 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import { PASSWORD } from './seed';
 
-export async function login(page: Page, username: string): Promise<void> {
+export async function login(page: Page, username: string, password = PASSWORD): Promise<void> {
   // Log out first, then load a fresh login form: the form that /logout renders
   // belongs to the session it has just ended.
   await page.goto('/logout');
   await page.goto('/');
   await page.getByLabel('Username').fill(username);
-  await page.getByLabel('Password').fill(PASSWORD);
+  await page.getByLabel('Password').fill(password);
   await page.getByRole('button', { name: 'Login' }).click();
   await expect(page.locator('#navigationOuter')).toBeVisible();
 }

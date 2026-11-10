@@ -1,8 +1,7 @@
 import { expect, type Page } from '@playwright/test';
+import type { Person } from './seed';
 
-export type Student = { readonly name: string; readonly number: string };
-
-async function optionValue(page: Page, listId: string, student: Student): Promise<string> {
+async function optionValue(page: Page, listId: string, student: Person): Promise<string> {
   // Match on the student number, not the name: the seed data has people who
   // share a full name. A locator that resolves to more than one option throws,
   // which is what we want.
@@ -24,14 +23,14 @@ export async function expectGroupMembers(page: Page, studentNumbers: string[]): 
   }
 }
 
-export async function assignToGroup(page: Page, students: readonly Student[]): Promise<void> {
+export async function assignToGroup(page: Page, students: readonly Person[]): Promise<void> {
   for (const student of students) {
     await page.locator('#all_groups').selectOption(await optionValue(page, 'all_groups', student));
     await page.getByRole('button', { name: 'Assign >>' }).click();
   }
 }
 
-export async function removeFromGroup(page: Page, students: readonly Student[]): Promise<void> {
+export async function removeFromGroup(page: Page, students: readonly Person[]): Promise<void> {
   const values: string[] = [];
   for (const student of students) {
     values.push(await optionValue(page, 'selected_groups', student));
