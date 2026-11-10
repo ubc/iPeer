@@ -5,6 +5,7 @@ import {
   flashMessage,
   idFromUrl,
   login,
+  notCsvFile,
   pageTitle,
   resultsTable,
 } from '../support/helpers';
@@ -51,11 +52,7 @@ test('an import with no file is refused', async ({ page }) => {
 test('an import of a file type that is not allowed is refused', async ({ page }) => {
   await login(page, USERS.instructor2);
 
-  await importCsv(page, COURSES.apsc201.id, {
-    name: 'groups.docx',
-    mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    buffer: Buffer.from('not a CSV file'),
-  });
+  await importCsv(page, COURSES.apsc201.id, notCsvFile('groups'));
   await expect(flashMessage(page)).toHaveText('extension is not allowed.');
 
   await openGroupList(page, COURSES.apsc201.id);

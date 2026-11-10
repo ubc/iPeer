@@ -1,6 +1,15 @@
-import { expect, test, type Locator, type Page } from '../support/test';
+import { expect, test, type Page } from '../support/test';
 import { expectClassSize } from '../support/courses';
-import { fixture, flashMessage, goodMessage, login, nav, pageTitle } from '../support/helpers';
+import {
+  fixture,
+  flashMessage,
+  goodMessage,
+  login,
+  nav,
+  notCsvFile,
+  pageTitle,
+  resultsTable,
+} from '../support/helpers';
 import { COURSES, STUDENTS, USERS, fullName } from '../support/seed';
 import {
   classListUserId,
@@ -18,10 +27,6 @@ const NEW_STUDENT = { username: 'username11', name: 'New Student', number: '1234
 
 // oldClass_APSC201.csv lists exactly the students APSC 201 starts with.
 const SEEDED_CLASS_FILE = 'oldClass_APSC201.csv';
-
-function userSummaryTable(page: Page, heading: string): Locator {
-  return page.locator(`xpath=//h3[normalize-space()='${heading}']/following-sibling::table[1]`);
-}
 
 async function importUsers(
   page: Page,
@@ -42,11 +47,7 @@ test('an import of a file type that is not allowed is refused and creates no use
 }) => {
   await login(page, USERS.superAdmin);
 
-  await importUsers(page, COURSES.apsc201.id, {
-    name: 'users.docx',
-    mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    buffer: Buffer.from('not a CSV file'),
-  });
+  await importUsers(page, COURSES.apsc201.id, notCsvFile('users'));
   await expect(flashMessage(page)).toHaveText('extension is not allowed.');
 
   await expectClassSize(page, COURSES.apsc201.id, COURSES.apsc201.studentCount);
@@ -83,13 +84,13 @@ test('a CSV import creates new users, updates existing ones and enrols them all'
   // that already existed. Ed is a MECH 328 student the file names, so the
   // import updates him rather than creating him.
   await expect(
-    userSummaryTable(page, 'User(s) created successfully:').getByRole('cell', {
+    resultsTable(page, 'User(s) created successfully:', 'h3').getByRole('cell', {
       name: NEW_STUDENT.username,
       exact: true,
     })
   ).toBeVisible();
   await expect(
-    userSummaryTable(page, 'User(s) updated successfully:').getByRole('cell', {
+    resultsTable(page, 'User(s) updated successfully:', 'h3').getByRole('cell', {
       name: STUDENTS.ed.username,
       exact: true,
     })

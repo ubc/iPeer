@@ -78,8 +78,12 @@ export function sectionHeadings(page: Page, section: string): Locator {
   );
 }
 
-export function resultsTable(page: Page, heading: string): Locator {
-  return page.locator(`xpath=//h2[normalize-space()='${heading}']/following-sibling::table[1]`);
+// The table that follows a heading, on pages that report the result of an
+// import.
+export function resultsTable(page: Page, heading: string, level: 'h2' | 'h3' = 'h2'): Locator {
+  return page.locator(
+    `xpath=//${level}[normalize-space()='${heading}']/following-sibling::table[1]`
+  );
 }
 
 export function idFromUrl(page: Page): string {
@@ -90,4 +94,13 @@ export function idFromUrl(page: Page): string {
 // The path of a file in e2e/fixtures, for an upload.
 export function fixture(name: string): string {
   return path.join(__dirname, '..', 'fixtures', name);
+}
+
+// An upload with an extension the import pages do not allow.
+export function notCsvFile(name: string): { name: string; mimeType: string; buffer: Buffer } {
+  return {
+    name: `${name}.docx`,
+    mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    buffer: Buffer.from('not a CSV file'),
+  };
 }
