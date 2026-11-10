@@ -56,9 +56,8 @@ export const test = base.extend<
   // every such request, so that the next reset does not race with its write.
   settledRequests: [
     async ({ page, baseURL }, use) => {
-      // Only page loads and AJAX calls to iPeer can write data. Other requests
-      // are left out: Playwright sends no end event for a font or a script
-      // that a navigation interrupted, so they could look open forever.
+      // Only page loads and AJAX calls to iPeer can write data, so only those
+      // are tracked.
       if (!baseURL) {
         throw new Error('baseURL is not set in playwright.config.ts.');
       }
@@ -73,7 +72,11 @@ export const test = base.extend<
           open.add(request);
         }
       });
-      page.on('requestfinished', (request) => open.delete(request));
+      // The server has done its work once it sends the response headers, so a
+      // request counts as done at its response. Waiting for the end of the
+      // body does not work: when a navigation interrupts a page load,
+      // Playwright sends no end event for it.
+      page.on('response', (response) => open.delete(response.request()));
       page.on('requestfailed', (request) => open.delete(request));
       await use();
       await expect
