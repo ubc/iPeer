@@ -1,9 +1,6 @@
-// What app/config/sql/ipeer_samples_data.sql puts in the test database. These
-// values are true of a freshly seeded database, and a test that changes them
-// should put them back. tests/seed.setup.ts checks them before the rest of the
-// suite runs, so a change to the seed file fails there instead of in many specs.
-// In the future, we can consider resetting the DB between tests, and/or making
-// each test independent.
+// What app/config/sql/ipeer_samples_data.sql puts in the test database. Each
+// test starts from this data (see support/db.ts). If the seed file changes,
+// update these values.
 
 export const PASSWORD = 'ipeeripeer';
 
@@ -42,6 +39,8 @@ export function fullName(course: { name: string; title: string }): string {
 
 // The courses a student is enrolled in decide which group chooser lists them,
 // so the enrolment is part of the fact. Matt is in two courses.
+// One row per student reads as a table, so Prettier leaves it as it is.
+// prettier-ignore
 export const STUDENTS = {
   ed: { username: 'redshirt0001', name: 'Ed Student', number: '65498451', courses: ['mech328'] },
   alex: { username: 'redshirt0002', name: 'Alex Student', number: '65468188', courses: ['mech328'] },

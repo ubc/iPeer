@@ -60,9 +60,7 @@ export function sectionHeadings(page: Page, section: string): Locator {
 }
 
 export function resultsTable(page: Page, heading: string): Locator {
-  return page.locator(
-    `xpath=//h2[normalize-space()='${heading}']/following-sibling::table[1]`
-  );
+  return page.locator(`xpath=//h2[normalize-space()='${heading}']/following-sibling::table[1]`);
 }
 
 export function idFromUrl(page: Page): string {

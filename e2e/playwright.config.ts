@@ -2,7 +2,10 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
-  // The tests share one seeded database, so they run one at a time.
+  // Loads the seed data once. support/test.ts then resets the database to it
+  // before each test.
+  globalSetup: './support/global-setup.ts',
+  // The tests share one database, so they run one at a time.
   fullyParallel: false,
   workers: 1,
   forbidOnly: !!process.env.CI,
@@ -13,18 +16,9 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [
-    // The seed check runs first. If the seeded database is not what
-    // support/seed.ts describes, the rest of the suite is skipped.
-    {
-      name: 'seed',
-      testMatch: /seed\.setup\.ts/,
-      use: { ...devices['Desktop Chrome'] },
-    },
     {
       name: 'chromium',
-      testIgnore: /seed\.setup\.ts/,
       use: { ...devices['Desktop Chrome'] },
-      dependencies: ['seed'],
     },
   ],
 });

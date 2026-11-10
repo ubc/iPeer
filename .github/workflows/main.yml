@@ -113,6 +113,9 @@ jobs:
       - name: Build and startup test containers
         run: ./build/unit-integration-tests/prepare.sh
 
+      # iPeer serves its installer until the users table exists, so the test
+      # site shows a login page only after the database is seeded. The browser
+      # tests load the seed again in their global setup.
       - name: Seed test database
         run: docker compose exec app-test vendor/bin/phing init-test-db
 
@@ -133,6 +136,7 @@ jobs:
         run: docker compose up -d playwright
 
       - name: Install Playwright dependencies
+        id: e2e-install
         run: docker compose exec playwright npm ci
 
       - name: Check the types of the browser tests
@@ -140,6 +144,12 @@ jobs:
 
       - name: Run Playwright tests
         run: docker compose exec playwright npx playwright test
+
+      # Runs after the tests, also when they failed, so a formatting error does
+      # not hide the test results. It needs only the installed dependencies.
+      - name: Check the formatting of the browser tests
+        if: ${{ !cancelled() && steps.e2e-install.outcome == 'success' }}
+        run: docker compose exec playwright npm run format:check
 
       - name: Dump container logs
         if: failure()
