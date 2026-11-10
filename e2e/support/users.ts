@@ -30,6 +30,9 @@ async function findInClassList(page: Page, courseId: string, person: Person): Pr
   // number is unique, so filtering on it leaves the one row even where two
   // people share a full name.
   await page.locator('#table_id_filter input').pressSequentially(person.number);
+  // The table shows 10 rows a page. Until the filter has run, a person on a
+  // later page has no row, which would pass a check that they are not there.
+  await expect(page.locator('#table_id_info')).toContainText('filtered from');
   return page.locator('#table_id tbody tr').filter({ hasText: person.name });
 }
 
@@ -102,69 +105,9 @@ export async function removeTutorFromCourse(
   await expect(goodMessage(page)).toHaveText('The course was updated successfully.');
 }
 
-// 'none' is only a course role: it is how the user edit form unenrols someone.
-export type CourseRole = 'none' | SystemRole;
+// The roles the course selects of the user edit form offer. 'none' unenrols.
+export type CourseRole = 'none' | 'instructor' | 'tutor' | 'student';
 export type SystemRole = 'superadmin' | 'admin' | 'instructor' | 'tutor' | 'student';
-
-export type NewUser = Person & {
-  readonly username: string;
-  readonly firstName: string;
-  readonly lastName: string;
-  readonly role: SystemRole;
-  readonly courseIds: readonly string[];
-};
-
-export function newStudent(
-  username: string,
-  firstName: string,
-  lastName: string,
-  number: string,
-  courseIds: readonly string[]
-): NewUser {
-  return {
-    username,
-    firstName,
-    lastName,
-    name: `${firstName} ${lastName}`,
-    number,
-    role: 'student',
-    courseIds,
-  };
-}
-
-export async function createUser(page: Page, user: NewUser): Promise<string> {
-  await page.goto('/users/add');
-  await page.getByLabel('Username', { exact: true }).fill(user.username);
-  await page.getByLabel('First Name').fill(user.firstName);
-  await page.getByLabel('Last Name').fill(user.lastName);
-  await page.getByLabel('Student Number').fill(user.number);
-  await page.getByLabel('Role', { exact: true }).selectOption({ label: user.role });
-  for (const courseId of user.courseIds) {
-    await page.locator(`#CoursesId${courseId}`).check();
-  }
-  await page.getByRole('button', { name: 'Save', exact: true }).click();
-
-  // iPeer generates the password itself and shows it once, in the message that
-  // confirms the account, so this is the only chance to capture it. The caller
-  // needs it to sign in as the account it has just made.
-  const message = (await goodMessage(page).innerText()).trim();
-  const password = message.match(/Password:\s*(\S+)/)?.[1];
-  if (!password) {
-    throw new Error(`no account created for ${user.username}`);
-  }
-  return password;
-}
-
-// Creates a student account and finds its id through the class list of its
-// first course.
-export async function createStudent(
-  page: Page,
-  user: NewUser
-): Promise<{ id: string; password: string }> {
-  const password = await createUser(page, user);
-  const id = await classListUserId(page, user.courseIds[0], user);
-  return { id, password };
-}
 
 export async function setUserRoles(
   page: Page,

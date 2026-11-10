@@ -88,10 +88,11 @@ export const STUDENTS = {
 } as const;
 
 // A tutor is attached to a course apart from the student enrolments, so the
-// course home page lists them in their own column. Tutor 3 tutors no course
-// that MECH 328 shares, which is why the enrolment specs move them there.
+// course home page lists them in their own column. Tutor 1 and Tutor 2 tutor
+// MECH 328. Tutor 3 tutors APSC 201 and CPSC 101 but not MECH 328, which is
+// why the enrolment specs add them there.
 export const TUTORS = {
-  tutor1: { username: 'tutor1', name: 'Tutor 1', courses: ['mech328'] },
-  tutor2: { username: 'tutor2', name: 'Tutor 2', courses: ['mech328'] },
-  tutor3: { username: 'tutor3', name: 'Tutor 3', courses: ['apsc201', 'cpsc101'] },
+  tutor1: { username: 'tutor1', name: 'Tutor 1' },
+  tutor2: { username: 'tutor2', name: 'Tutor 2' },
+  tutor3: { username: 'tutor3', name: 'Tutor 3' },
 } as const;

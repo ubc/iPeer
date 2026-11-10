@@ -82,7 +82,9 @@ test('the Add User page outside a course offers no enrolment shortcut', async ({
 test('enrolling a user who is neither a student nor a tutor is refused', async ({ page }) => {
   await login(page, USERS.superAdmin);
 
-  await enrolExistingUser(page, COURSES.mech328.id, USERS.superAdmin);
+  // An instructor ranks below the super admin, so only the check that the
+  // user is a student or a tutor can refuse this.
+  await enrolExistingUser(page, COURSES.mech328.id, USERS.instructor1);
   await expect(flashMessage(page)).toHaveText(
     'Error: You do not have permission to enrol this user.'
   );
