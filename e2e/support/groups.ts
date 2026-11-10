@@ -1,10 +1,5 @@
 import { expect, type Page } from '@playwright/test';
 
-export async function deleteGroup(page: Page, groupId: string): Promise<void> {
-  // Used for cleanup, so a group that is already gone is not an error.
-  await page.goto(`/groups/delete/${groupId}`);
-}
-
 export type Student = { readonly name: string; readonly number: string };
 
 async function optionValue(page: Page, listId: string, student: Student): Promise<string> {

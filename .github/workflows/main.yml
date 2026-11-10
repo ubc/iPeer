@@ -113,9 +113,6 @@ jobs:
       - name: Build and startup test containers
         run: ./build/unit-integration-tests/prepare.sh
 
-      - name: Seed test database
-        run: docker compose exec app-test vendor/bin/phing init-test-db
-
       - name: Wait for the test site to serve pages
         run: |
           for i in $(seq 1 30); do

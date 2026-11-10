@@ -1,7 +1,6 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from '../support/test';
 import {
   assignToGroup,
-  deleteGroup,
   openGroupList,
   removeFromGroup,
   type Student,
@@ -27,27 +26,10 @@ const STUDENTS = [
   SEED_STUDENTS.trevor,
 ];
 
-// The groups that a test created. They are removed after the test, also when
-// the test failed, so that every test starts with the seeded course.
-let created = new Set<string>();
-
-test.beforeEach(() => {
-  created = new Set();
-});
-
-test.afterEach(async ({ page }) => {
-  for (const groupId of created) {
-    await deleteGroup(page, groupId);
-  }
-});
-
 async function openGroup(page: Page, name: string): Promise<string> {
   await openGroupList(page, COURSE_ID);
   await page.getByRole('link', { name: new RegExp(`^${name} \\(`) }).click();
-  // Register for cleanup before asserting anything: the group already exists,
-  // so a failed assertion below must not leave it behind for later specs.
   const groupId = idFromUrl(page);
-  created.add(groupId);
   await expect(pageTitle(page)).toContainText(`${COURSE} > Groups > View`);
   return groupId;
 }
@@ -63,9 +45,7 @@ async function createGroup(
   await assignToGroup(page, students);
   await page.getByRole('button', { name: 'Add Group' }).click();
   await expect(goodMessage(page)).toHaveText('The group was added successfully.');
-  const groupId = await openGroup(page, name);
-  created.add(groupId);
-  return groupId;
+  return openGroup(page, name);
 }
 
 test('the Add Group form pre-fills a read-only number and needs a name', async ({ page }) => {
@@ -95,8 +75,7 @@ test('an admin creates a group with the students that were assigned', async ({ p
   await page.getByRole('button', { name: 'Add Group' }).click();
   await expect(goodMessage(page)).toHaveText('The group was added successfully.');
 
-  const groupId = await openGroup(page, 'Amazing Group');
-  created.add(groupId);
+  await openGroup(page, 'Amazing Group');
   await expect(page.getByRole('cell', { name: 'Amazing Group', exact: true })).toBeVisible();
   for (const student of STUDENTS) {
     await expect(page.getByRole('cell', { name: student.name, exact: true })).toBeVisible();

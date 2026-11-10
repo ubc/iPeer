@@ -73,6 +73,8 @@ services:
       - MYSQL_USER=ipeer
       - MYSQL_PASSWORD=ipeer
       - MARIADB_AUTO_UPGRADE=1
+    volumes:
+      - ./docker/db-test-init:/docker-entrypoint-initdb.d:ro
     profiles: [ "test" ]
     networks: [ "test" ]
 
@@ -131,9 +133,19 @@ services:
     command: [ "sleep", "infinity" ]
     volumes:
       - ./e2e:/e2e
+      - ./app/config/sql:/seed:ro
+    ports:
+      - "127.0.0.1:9323:9323" # Playwright UI mode and the HTML report
     environment:
       - BASE_URL=http://web-test
       - CI
+      # Each test starts from the seed data, see e2e/support/db.ts.
+      - E2E_DB_HOST=db-test
+      - E2E_DB_USER=ipeer
+      - E2E_DB_PASSWORD=ipeer
+      - E2E_DB_NAME=ipeer_test
+      - E2E_SEED_DB_NAME=ipeer_seed
+      - E2E_SEED_FILE=/seed/ipeer_samples_data.sql
     depends_on:
       - web-test
     profiles: [ "test" ]

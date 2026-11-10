@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../support/test';
 import { login, logout, nav, pageTitle } from '../support/helpers';
 import { COURSES, FULL_NAMES, STUDENTS, USERS, fullName } from '../support/seed';
 

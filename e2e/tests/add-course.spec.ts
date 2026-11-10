@@ -1,5 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
-import { deleteCourse } from '../support/courses';
+import { expect, test, type Page } from '../support/test';
 import {
   errorMessage,
   flashMessage,
@@ -13,35 +12,13 @@ import { USERS } from '../support/seed';
 
 // Ported from app/tests/cases/system/add_course.test.php.
 
-// The courses a test created. They are removed after the test, also when the
-// test failed: a course that survives makes every later test fail on a
-// duplicate name instead of on its own subject.
-let created = new Set<string>();
-
-test.beforeEach(() => {
-  created = new Set();
-});
-
-test.afterEach(async ({ page }) => {
-  for (const courseId of created) {
-    await page.goto(`/courses/delete/${courseId}`);
-    const confirm = page.getByRole('button', { name: 'Delete Course' });
-    if (await confirm.count()) {
-      await confirm.click();
-    }
-  }
-});
-
 async function openCourse(page: Page, name: string, title: string): Promise<string> {
   await page.goto('/courses');
   const row = page
     .getByRole('row')
     .filter({ has: page.getByRole('cell', { name, exact: true }) });
   await row.getByRole('link', { name: title, exact: true }).click();
-  // Register for cleanup before asserting, so a failure below does not leave
-  // the course behind.
   const courseId = idFromUrl(page);
-  created.add(courseId);
   await expect(pageTitle(page)).toContainText(name);
   return courseId;
 }
@@ -74,13 +51,11 @@ test('an admin adds a course through the Courses tab', async ({ page }) => {
   await page.getByRole('button', { name: 'Save' }).click();
   await expect(goodMessage(page)).toHaveText('Course created!');
 
-  const courseId = await openCourse(page, 'EECE 474 101', 'Project Course');
+  await openCourse(page, 'EECE 474 101', 'Project Course');
   await expect(page.getByRole('link', { name: 'Instructor 1' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Instructor 3' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Tutor 1' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Tutor 3' })).toBeVisible();
-
-  await deleteCourse(page, courseId);
 });
 
 test('the Add Course form refuses an empty name, a duplicate name and an empty person', async ({
@@ -132,8 +107,6 @@ test('an instructor who creates a course becomes its instructor by default', asy
   // instructor1 is in the Applied Science faculty, so its departments are
   // selected for them.
   await expect(page.locator('#DepartmentDepartment')).toHaveValues(['1', '2']);
-
-  await deleteCourse(page, courseId);
 });
 
 test('an inactive course gets limited access and is listed apart', async ({ page }) => {
@@ -189,8 +162,6 @@ test('an inactive course gets limited access and is listed apart', async ({ page
     "xpath=//h2[normalize-space()='Inactive Courses']/following-sibling::div[@class='course']"
   );
   await expect(inactive.filter({ hasText: 'EECE 450 101 - Course To Deactivate' })).toHaveCount(1);
-
-  await deleteCourse(page, courseId);
 });
 
 test('an admin can delete a course', async ({ page }) => {

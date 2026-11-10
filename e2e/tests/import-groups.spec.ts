@@ -1,9 +1,8 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from '../support/test';
 import path from 'path';
 import { expectGroupMembers, openGroupList } from '../support/groups';
 import {
   flashMessage,
-  goodMessage,
   idFromUrl,
   login,
   pageTitle,
@@ -83,9 +82,6 @@ test('a valid CSV creates the listed groups with the listed members', async ({ p
   await page.goto(`/groups/edit/${groupId}`);
   await expect(page.locator('#GroupGroupName')).toHaveValue('Team');
   await expectGroupMembers(page, BY_USERNAME.map((s) => s.number));
-
-  await page.goto(`/groups/delete/${groupId}`);
-  await expect(goodMessage(page)).toHaveText('The group was deleted successfully.');
 });
 
 test('an import reports the students it could not place', async ({ page }) => {
@@ -116,9 +112,6 @@ test('an import reports the students it could not place', async ({ page }) => {
   await expect(page.getByRole('cell', { name: 'Team Supreme', exact: true })).toBeVisible();
   await page.goto(`/groups/edit/${groupId}`);
   await expect(page.locator('#selected_groups option')).toHaveCount(0);
-
-  await page.goto(`/groups/delete/${groupId}`);
-  await expect(goodMessage(page)).toHaveText('The group was deleted successfully.');
 });
 
 test('an import can match students by student number', async ({ page }) => {
@@ -136,7 +129,4 @@ test('an import can match students by student number', async ({ page }) => {
   const groupId = await openGroup(page, COURSES.mech328.id,'Best Team');
   await page.goto(`/groups/edit/${groupId}`);
   await expectGroupMembers(page, BY_NUMBER.map((s) => s.number));
-
-  await page.goto(`/groups/delete/${groupId}`);
-  await expect(goodMessage(page)).toHaveText('The group was deleted successfully.');
 });
