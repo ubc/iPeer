@@ -1,4 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
+import path from 'path';
 import { PASSWORD } from './seed';
 
 export async function login(page: Page, username: string): Promise<void> {
@@ -84,4 +85,9 @@ export function resultsTable(page: Page, heading: string): Locator {
 export function idFromUrl(page: Page): string {
   const parts = new URL(page.url()).pathname.split('/');
   return parts[parts.length - 1];
+}
+
+// The path of a file in e2e/fixtures, for an upload.
+export function fixture(name: string): string {
+  return path.join(__dirname, '..', 'fixtures', name);
 }

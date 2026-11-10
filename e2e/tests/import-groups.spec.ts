@@ -1,13 +1,17 @@
 import { expect, test, type Page } from '../support/test';
-import path from 'path';
 import { expectGroupMembers, openGroupList } from '../support/groups';
-import { flashMessage, idFromUrl, login, pageTitle, resultsTable } from '../support/helpers';
+import {
+  fixture,
+  flashMessage,
+  idFromUrl,
+  login,
+  pageTitle,
+  resultsTable,
+} from '../support/helpers';
 import { COURSES, STUDENTS, USERS } from '../support/seed';
 
 // Ported from app/tests/cases/system/import_groups.test.php.
 // The CSV files are the ones the old tests used.
-
-const fixture = (name: string) => path.join(__dirname, '..', 'fixtures', name);
 
 // Who each CSV in e2e/fixtures names.
 const BY_USERNAME = [STUDENTS.matt, STUDENTS.johnny, STUDENTS.travis];
