@@ -28,18 +28,29 @@ const NEW_STUDENT = { username: 'username11', name: 'New Student', number: '1234
 // oldClass_APSC201.csv lists exactly the students APSC 201 starts with.
 const SEEDED_CLASS_FILE = 'oldClass_APSC201.csv';
 
-async function importUsers(
+type ImportFile = string | { name: string; mimeType: string; buffer: Buffer };
+
+// Submits the import form of the page that is open.
+async function submitImport(
   page: Page,
-  courseId: string,
-  file: string | { name: string; mimeType: string; buffer: Buffer },
+  file: ImportFile,
   removeOldStudents = false
 ): Promise<void> {
-  await page.goto(`/users/import/${courseId}`);
   await page.locator('input[type="file"]').setInputFiles(file);
   if (removeOldStudents) {
     await page.getByLabel('Remove old students').check();
   }
   await page.getByRole('button', { name: 'Import' }).click();
+}
+
+async function importUsers(
+  page: Page,
+  courseId: string,
+  file: ImportFile,
+  removeOldStudents = false
+): Promise<void> {
+  await page.goto(`/users/import/${courseId}`);
+  await submitImport(page, file, removeOldStudents);
 }
 
 test('an import of a file type that is not allowed is refused and creates no user', async ({
@@ -76,8 +87,7 @@ test('a CSV import creates new users, updates existing ones and enrols them all'
   await expect(pageTitle(page)).toContainText(fullName(COURSES.apsc201));
   await page.getByRole('link', { name: 'Import Students from CSV', exact: true }).click();
 
-  await page.locator('input[type="file"]').setInputFiles(fixture('newClass_APSC201.csv'));
-  await page.getByRole('button', { name: 'Import' }).click();
+  await submitImport(page, fixture('newClass_APSC201.csv'));
   await expect(goodMessage(page)).toContainText('Import successful!');
 
   // The summary separates the account the file introduced from the accounts
