@@ -20,19 +20,9 @@ Playwright writes an HTML report to `e2e/playwright-report` after each run. If a
 
 ## The Test Database
 
-Each test starts from the seed data. A test can change any data, and it does not have to remove what it created. A test also does not depend on the tests that ran before it, so you can run one test alone.
+Each test starts from a freshly loaded copy of the seed data. Before each test, the fixture in `support/test.ts` refills `ipeer_test`, which the application uses, from that a fresh copy kept in `ipeer_seed`. See `support/db.ts` and `docker/db-test-init/e2e-seed.sql`. To reset the seed data, run `docker compose up -d --force-recreate --renew-anon-volumes db-test`.
 
-The seed is loaded once per run into a copy, the `ipeer_seed` schema. Before each test, the fixture in `support/test.ts` refills `ipeer_test`, which the application uses, from that copy. `support/db.ts` tells how, and why this is faster than loading the seed file each time.
-
-Specs import `test` and `expect` from `support/test.ts`, not from `@playwright/test`. A test that imports them from `@playwright/test` starts from whatever the test before it left.
-
-`docker/db-test-init/e2e-seed.sql` creates `ipeer_seed` and lets the `ipeer` user use it. MariaDB runs that file only when it creates a new data directory. If `db-test` was created before that file existed, create it again:
-
-```
-docker compose up -d --force-recreate --renew-anon-volumes db-test
-```
-
-`tests/seed.spec.ts` checks that `support/seed.ts` still describes the seed data. If someone changes the seed file, that spec names what moved.
+Specs import `test` and `expect` from `support/test.ts`, not from `@playwright/test`. A test that imports them from `@playwright/test` might fail as the previous test's changes will be visible.
 
 ## Debug a Test
 
