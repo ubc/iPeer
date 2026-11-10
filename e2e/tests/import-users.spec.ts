@@ -47,7 +47,7 @@ test('an import of a file type that is not allowed is refused and creates no use
     mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     buffer: Buffer.from('not a CSV file'),
   });
-  await expect(flashMessage(page)).toContainText('extension is not allowed');
+  await expect(flashMessage(page)).toHaveText('extension is not allowed.');
 
   await expectClassSize(page, COURSES.apsc201.id, COURSES.apsc201.studentCount);
 });

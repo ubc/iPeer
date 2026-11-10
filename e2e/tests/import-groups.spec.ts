@@ -56,7 +56,7 @@ test('an import of a file type that is not allowed is refused', async ({ page })
     mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     buffer: Buffer.from('not a CSV file'),
   });
-  await expect(flashMessage(page)).toContainText('extension is not allowed');
+  await expect(flashMessage(page)).toHaveText('extension is not allowed.');
 
   await openGroupList(page, COURSES.apsc201.id);
   await expect(page.getByRole('link', { name: /^Team \(/ })).toHaveCount(0);

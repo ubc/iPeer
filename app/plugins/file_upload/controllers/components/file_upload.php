@@ -317,7 +317,11 @@ class FileUploadComponent extends CakeObject{
       foreach($this->Uploader->errors as $error){
         $this->errors[] = $error;
       }
-      $this->_error('FileUpload::processFile() - Unable to save temp file to file system.');
+      // the uploader records why it failed (a refused file or a failed move), so
+      // the generic message is only for a failure without a reason
+      if (empty($this->Uploader->errors)) {
+        $this->_error('FileUpload::processFile() - Unable to save temp file to file system.');
+      }
     }
   }
 
