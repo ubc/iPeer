@@ -18,6 +18,9 @@ const STUDENTS = [
 async function openGroup(page: Page, name: string): Promise<string> {
   await openGroupList(page, COURSE_ID);
   await page.getByRole('link', { name: new RegExp(`^${name} \\(`) }).click();
+  // Read the id only once the group page has loaded. The list page URL ends
+  // with the course id, which would look like a group id.
+  await expect(page).toHaveURL(/\/groups\/view\/\d+$/);
   const groupId = idFromUrl(page);
   await expect(pageTitle(page)).toContainText(`${COURSE} > Groups > View`);
   return groupId;

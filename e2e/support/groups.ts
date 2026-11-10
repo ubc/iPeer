@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import type { Person } from './seed';
 
 async function optionValue(page: Page, listId: string, student: Person): Promise<string> {
@@ -14,13 +14,19 @@ async function optionValue(page: Page, listId: string, student: Person): Promise
 }
 
 export async function expectGroupMembers(page: Page, studentNumbers: string[]): Promise<void> {
-  const options = page.locator('#selected_groups option');
-  await expect(options).toHaveCount(studentNumbers.length);
-  for (const studentNo of studentNumbers) {
-    // The student number is unique and is part of every label, so it identifies
-    // the student. A count alone would pass if the wrong students were saved.
-    await expect(options.filter({ hasText: studentNo }), `student ${studentNo}`).toHaveCount(1);
-  }
+  await test.step(
+    `Expect group members ${studentNumbers.length === 0 ? 'none' : studentNumbers.join(', ')}`,
+    async () => {
+      const options = page.locator('#selected_groups option');
+      await expect(options).toHaveCount(studentNumbers.length);
+      for (const studentNo of studentNumbers) {
+        // The student number is unique and is part of every label, so it identifies
+        // the student. A count alone would pass if the wrong students were saved.
+        await expect(options.filter({ hasText: studentNo }), `student ${studentNo}`).toHaveCount(1);
+      }
+    },
+    { box: true }
+  );
 }
 
 export async function assignToGroup(page: Page, students: readonly Person[]): Promise<void> {
@@ -40,12 +46,18 @@ export async function removeFromGroup(page: Page, students: readonly Person[]): 
 }
 
 export async function openGroupList(page: Page, courseId: string): Promise<void> {
-  // iPeer filters the group list by the course that was opened last, so the
-  // course home page comes first.
-  await page.goto(`/courses/home/${courseId}`);
-  await page.getByRole('link', { name: 'List Groups', exact: true }).click();
-  await expect(page).toHaveURL(new RegExp(`/groups/index/${courseId}$`));
-  // The list comes in through AJAX. Its result count appears when the rows are
-  // in place, so a check for a group that must be absent is not premature.
-  await expect(page.locator('#ajaxListDiv .total-result').first()).toBeVisible();
+  await test.step(
+    `Open the group list of course ${courseId}`,
+    async () => {
+      // iPeer filters the group list by the course that was opened last, so the
+      // course home page comes first.
+      await page.goto(`/courses/home/${courseId}`);
+      await page.getByRole('link', { name: 'List Groups', exact: true }).click();
+      await expect(page).toHaveURL(new RegExp(`/groups/index/${courseId}$`));
+      // The list comes in through AJAX. Its result count appears when the rows are
+      // in place, so a check for a group that must be absent is not premature.
+      await expect(page.locator('#ajaxListDiv .total-result').first()).toBeVisible();
+    },
+    { box: true }
+  );
 }

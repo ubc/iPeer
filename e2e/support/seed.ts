@@ -32,8 +32,7 @@ export const FULL_NAMES: Record<keyof typeof USERS, string> = {
 // spec that changes a role to one of those has to pick one of these.
 export const FACULTIES = ['Applied Science', 'Science'] as const;
 
-// studentCount is every enrolment row of the course, so a test that enrols
-// someone twice by mistake makes it disagree.
+// studentCount is the number of students the course home page shows.
 export const COURSES = {
   mech328: {
     id: '1',

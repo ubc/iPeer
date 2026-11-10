@@ -29,6 +29,7 @@ async function openGroup(page: Page, courseId: string, name: string): Promise<st
   await openGroupList(page, courseId);
   await page.getByRole('link', { name: new RegExp(`^${name} \\(`) }).click();
   await expect(pageTitle(page)).toContainText('Groups > View');
+  await expect(page).toHaveURL(/\/groups\/view\/\d+$/);
   return idFromUrl(page);
 }
 

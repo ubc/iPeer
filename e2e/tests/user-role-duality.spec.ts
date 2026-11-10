@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '../support/test';
 import { expectInstructorChoice } from '../support/courses';
 import { expectTabs, login } from '../support/helpers';
-import { COURSES, FACULTIES, STUDENTS, USERS } from '../support/seed';
+import { COURSES, FACULTIES, STUDENTS, USERS, fullName } from '../support/seed';
 import { classListUserId, setUserRoles } from '../support/users';
 
 // Ported from app/tests/cases/system/edit_role.test.php.
@@ -37,9 +37,13 @@ test('a student of one course who is made instructor of another sees both views'
   await page.goto('/home');
   await expect(page.getByRole('heading', { level: 1, name: 'Instructor View' })).toBeVisible();
   // The instructor half lists the course they teach, not the course they study.
+  const instructorHalf = page.locator('.instructorView');
   await expect(
-    page.getByRole('heading', { level: 3, name: 'APSC 201 - Technical Communication' })
+    instructorHalf.getByRole('heading', { level: 3, name: fullName(COURSES.apsc201) })
   ).toBeVisible();
+  await expect(
+    instructorHalf.getByRole('heading', { level: 3, name: fullName(COURSES.mech328) })
+  ).toHaveCount(0);
   await expect(page.getByRole('heading', { level: 1, name: 'Student View' })).toBeVisible();
   // The student half still shows the evaluations they have to do.
   await expect(pendingStudentWork(page)).toContainText('Pending Event(s) Total');

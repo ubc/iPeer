@@ -16,6 +16,8 @@ async function openCourse(page: Page, name: string, title: string): Promise<stri
   await page.goto('/courses');
   const row = page.getByRole('row').filter({ has: page.getByRole('cell', { name, exact: true }) });
   await row.getByRole('link', { name: title, exact: true }).click();
+  // Read the id only once the course page has loaded, not from the list.
+  await expect(page).toHaveURL(/\/courses\/home\/\d+$/);
   const courseId = idFromUrl(page);
   await expect(pageTitle(page)).toContainText(name);
   return courseId;

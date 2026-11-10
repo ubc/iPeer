@@ -1,20 +1,32 @@
-import { expect, type Locator, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { PASSWORD } from './seed';
 
-export async function login(page: Page, username: string, password = PASSWORD): Promise<void> {
-  // Log out first, then load a fresh login form: the form that /logout renders
-  // belongs to the session it has just ended.
-  await page.goto('/logout');
-  await page.goto('/');
-  await page.getByLabel('Username').fill(username);
-  await page.getByLabel('Password').fill(password);
-  await page.getByRole('button', { name: 'Login' }).click();
-  await expect(page.locator('#navigationOuter')).toBeVisible();
+export async function login(page: Page, username: string): Promise<void> {
+  await test.step(
+    `Log in as ${username}`,
+    async () => {
+      // Log out first, then load a fresh login form: the form that /logout renders
+      // belongs to the session it has just ended.
+      await page.goto('/logout');
+      await page.goto('/');
+      await page.getByLabel('Username').fill(username);
+      await page.getByLabel('Password').fill(PASSWORD);
+      await page.getByRole('button', { name: 'Login' }).click();
+      await expect(page.locator('#navigationOuter')).toBeVisible();
+    },
+    { box: true }
+  );
 }
 
 export async function logout(page: Page): Promise<void> {
-  await page.goto('/logout');
-  await expect(page.getByRole('button', { name: 'Login' })).toBeVisible();
+  await test.step(
+    'Log out',
+    async () => {
+      await page.goto('/logout');
+      await expect(page.getByRole('button', { name: 'Login' })).toBeVisible();
+    },
+    { box: true }
+  );
 }
 
 export function nav(page: Page): Locator {
@@ -22,13 +34,19 @@ export function nav(page: Page): Locator {
 }
 
 export async function expectTabs(page: Page, tabs: string[]): Promise<void> {
-  // iPeer builds the tab bar from the permissions of the account, so the tabs
-  // that are absent matter as much as the tabs that are present.
-  const all = ['Home', 'Courses', 'Users', 'Evaluation', 'Admin'];
-  for (const tab of all) {
-    const link = nav(page).getByRole('link', { name: tab, exact: true });
-    await expect(link, `tab ${tab}`).toHaveCount(tabs.includes(tab) ? 1 : 0);
-  }
+  await test.step(
+    `Expect tabs ${tabs.join(', ')}`,
+    async () => {
+      // iPeer builds the tab bar from the permissions of the account, so the tabs
+      // that are absent matter as much as the tabs that are present.
+      const all = ['Home', 'Courses', 'Users', 'Evaluation', 'Admin'];
+      for (const tab of all) {
+        const link = nav(page).getByRole('link', { name: tab, exact: true });
+        await expect(link, `tab ${tab}`).toHaveCount(tabs.includes(tab) ? 1 : 0);
+      }
+    },
+    { box: true }
+  );
 }
 
 export function goodMessage(page: Page): Locator {

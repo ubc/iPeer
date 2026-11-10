@@ -26,7 +26,7 @@ async function enrolTutor3InMech328(page: Page): Promise<void> {
   await expect(goodMessage(page)).toHaveText('User is successfully enrolled.');
 }
 
-test('an admin enrols an existing student and the student joins the class list', async ({
+test('a super admin enrols an existing student and the student joins the class list', async ({
   page,
 }) => {
   await login(page, USERS.superAdmin);
@@ -37,7 +37,7 @@ test('an admin enrols an existing student and the student joins the class list',
   await expectClassSize(page, COURSES.apsc201.id, COURSES.apsc201.studentCount + 1);
 });
 
-test('an admin unenrols a student and the student leaves the class list', async ({ page }) => {
+test('a super admin unenrols a student and the student leaves the class list', async ({ page }) => {
   await login(page, USERS.superAdmin);
   await enrolChrisInApsc201(page);
 
@@ -47,7 +47,7 @@ test('an admin unenrols a student and the student leaves the class list', async 
   await expectClassSize(page, COURSES.apsc201.id, COURSES.apsc201.studentCount);
 });
 
-test('an admin enrols a tutor and the tutor joins the course tutor list', async ({ page }) => {
+test('a super admin enrols a tutor and the tutor joins the course tutor list', async ({ page }) => {
   await login(page, USERS.superAdmin);
 
   await enrolTutor3InMech328(page);
@@ -60,7 +60,7 @@ test('an admin enrols a tutor and the tutor joins the course tutor list', async 
   await expectClassSize(page, COURSES.mech328.id, COURSES.mech328.studentCount);
 });
 
-test('an admin unenrols a tutor from a course', async ({ page }) => {
+test('a super admin unenrols a tutor from a course', async ({ page }) => {
   await login(page, USERS.superAdmin);
   await enrolTutor3InMech328(page);
 
@@ -93,22 +93,19 @@ test('enrolling a user who is neither a student nor a tutor is refused', async (
   await expectCourseTutors(page, COURSES.mech328.id, SEEDED_MECH328_TUTORS);
 });
 
-test('enrolling a student who is already in the course is refused and adds no duplicate', async ({
-  page,
-}) => {
+test('enrolling a student who is already in the course is refused', async ({ page }) => {
   await login(page, USERS.superAdmin);
 
   await enrolExistingUser(page, COURSES.mech328.id, STUDENTS.ed.username);
   await expect(flashMessage(page)).toHaveText('Error: The student is already enrolled.');
 
-  // One row for Ed, and a class size that did not grow.
+  // The database refuses a second enrolment row in any case, so the message is
+  // the check. The class list shows that nothing else changed.
   await expectInClassList(page, COURSES.mech328.id, STUDENTS.ed);
   await expectClassSize(page, COURSES.mech328.id, COURSES.mech328.studentCount);
 });
 
-test('enrolling a tutor who already tutors the course is refused and adds no duplicate', async ({
-  page,
-}) => {
+test('enrolling a tutor who already tutors the course is refused', async ({ page }) => {
   await login(page, USERS.superAdmin);
 
   await enrolExistingUser(page, COURSES.mech328.id, TUTORS.tutor1.username);

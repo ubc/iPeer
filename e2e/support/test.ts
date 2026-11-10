@@ -59,7 +59,10 @@ export const test = base.extend<
       // Only page loads and AJAX calls to iPeer can write data. Other requests
       // are left out: Playwright sends no end event for a font or a script
       // that a navigation interrupted, so they could look open forever.
-      const appOrigin = new URL(baseURL ?? 'http://web-test').origin;
+      if (!baseURL) {
+        throw new Error('baseURL is not set in playwright.config.ts.');
+      }
+      const appOrigin = new URL(baseURL).origin;
       const canWrite = (request: Request) =>
         new URL(request.url()).origin === appOrigin &&
         ['document', 'xhr', 'fetch'].includes(request.resourceType());
