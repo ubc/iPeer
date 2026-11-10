@@ -136,16 +136,20 @@ jobs:
         run: docker compose up -d playwright
 
       - name: Install Playwright dependencies
+        id: e2e-install
         run: docker compose exec playwright npm ci
 
       - name: Check the types of the browser tests
         run: docker compose exec playwright npm run typecheck
 
-      - name: Check the formatting of the browser tests
-        run: docker compose exec playwright npm run format:check
-
       - name: Run Playwright tests
         run: docker compose exec playwright npx playwright test
+
+      # Runs after the tests, also when they failed, so a formatting error does
+      # not hide the test results. It needs only the installed dependencies.
+      - name: Check the formatting of the browser tests
+        if: ${{ !cancelled() && steps.e2e-install.outcome == 'success' }}
+        run: docker compose exec playwright npm run format:check
 
       - name: Dump container logs
         if: failure()

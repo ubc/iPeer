@@ -69,20 +69,25 @@ export async function openTestDatabase(): Promise<TestDatabase> {
 }
 
 export async function resetToSeed({ connection, tables }: TestDatabase): Promise<void> {
-  const seed = mysql.escapeId(SEED_DB());
+  // escapeId(name, true) quotes the whole name, so a dot in it cannot name
+  // another schema.
+  const seed = mysql.escapeId(SEED_DB(), true);
   // DELETE is much faster than TRUNCATE on tables this small, because TRUNCATE
   // creates each table again.
   const copy = tables.flatMap((table) => {
-    const name = mysql.escapeId(table);
+    const name = mysql.escapeId(table, true);
     return [`DELETE FROM ${name}`, `INSERT INTO ${name} SELECT * FROM ${seed}.${name}`];
   });
   await connection.query(
     ['SET foreign_key_checks = 0', ...copy, 'SET foreign_key_checks = 1'].join(';\n')
   );
+  await resetAutoIncrements(connection);
+}
 
-  // DELETE does not reset the AUTO_INCREMENT counters. Put back the ones that a
-  // test moved, so that a test gets the same ids whether it runs alone or after
-  // other tests. Changing a counter is slow, so change only those.
+// DELETE does not reset the AUTO_INCREMENT counters. Put back the ones that a
+// test moved, so that a test gets the same ids whether it runs alone or after
+// other tests. Changing a counter is slow, so change only those.
+async function resetAutoIncrements(connection: Connection): Promise<void> {
   const [moved] = await connection.query<RowDataPacket[]>(
     `SELECT test.table_name AS name, seed.auto_increment AS next_id
          FROM information_schema.tables test
@@ -97,7 +102,8 @@ export async function resetToSeed({ connection, tables }: TestDatabase): Promise
       moved
         .map(
           (row) =>
-            `ALTER TABLE ${mysql.escapeId(String(row.name))} AUTO_INCREMENT = ${Number(row.next_id)}`
+            // this effectively copies the "next" value from the `seed` DB into the main test DB
+            `ALTER TABLE ${mysql.escapeId(String(row.name), true)} AUTO_INCREMENT = ${Number(row.next_id)}`
         )
         .join(';\n')
     );
