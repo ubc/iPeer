@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '../support/test';
-import { assignToGroup, openGroupList, removeFromGroup, type Student } from '../support/groups';
+import { assignToGroup, openGroupList, removeFromGroup } from '../support/groups';
 import { errorMessage, goodMessage, idFromUrl, login, pageTitle } from '../support/helpers';
-import { COURSES, STUDENTS as SEED_STUDENTS, USERS, fullName } from '../support/seed';
+import { COURSES, STUDENTS as SEED_STUDENTS, USERS, fullName, type Person } from '../support/seed';
 
 // Ported from app/tests/cases/system/add_group.test.php.
 
@@ -18,16 +18,15 @@ const STUDENTS = [
 async function openGroup(page: Page, name: string): Promise<string> {
   await openGroupList(page, COURSE_ID);
   await page.getByRole('link', { name: new RegExp(`^${name} \\(`) }).click();
+  // Read the id only once the group page has loaded. The list page URL ends
+  // with the course id, which would look like a group id.
+  await expect(page).toHaveURL(/\/groups\/view\/\d+$/);
   const groupId = idFromUrl(page);
   await expect(pageTitle(page)).toContainText(`${COURSE} > Groups > View`);
   return groupId;
 }
 
-async function createGroup(
-  page: Page,
-  name: string,
-  students: readonly Student[]
-): Promise<string> {
+async function createGroup(page: Page, name: string, students: readonly Person[]): Promise<string> {
   await page.goto(`/courses/home/${COURSE_ID}`);
   await page.getByRole('link', { name: 'Add Group', exact: true }).click();
   await page.locator('#GroupGroupName').fill(name);

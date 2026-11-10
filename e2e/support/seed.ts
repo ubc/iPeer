@@ -4,6 +4,9 @@
 
 export const PASSWORD = 'ipeeripeer';
 
+// How the class list, the group pages and the CSV imports name a student.
+export type Person = { readonly name: string; readonly number: string };
+
 export const USERS = {
   superAdmin: 'root',
   admin: 'admin2',
@@ -25,11 +28,36 @@ export const FULL_NAMES: Record<keyof typeof USERS, string> = {
   student: 'Ed Student',
 };
 
+// iPeer refuses to save an instructor or an admin that has no faculty, so a
+// spec that changes a role to one of those has to pick one of these.
+export const FACULTIES = ['Applied Science', 'Science'] as const;
+
+// studentCount is the number of students the course home page shows.
 export const COURSES = {
-  mech328: { id: '1', name: 'MECH 328', title: 'Mechanical Engineering Design Project' },
-  apsc201: { id: '2', name: 'APSC 201', title: 'Technical Communication' },
-  cpsc101: { id: '3', name: 'CPSC 101', title: 'Connecting with Computer Science' },
-  cpsc404: { id: '4', name: 'CPSC 404', title: 'Advanced Software Engineering' },
+  mech328: {
+    id: '1',
+    name: 'MECH 328',
+    title: 'Mechanical Engineering Design Project',
+    studentCount: 13,
+  },
+  apsc201: {
+    id: '2',
+    name: 'APSC 201',
+    title: 'Technical Communication',
+    studentCount: 15,
+  },
+  cpsc101: {
+    id: '3',
+    name: 'CPSC 101',
+    title: 'Connecting with Computer Science',
+    studentCount: 2,
+  },
+  cpsc404: {
+    id: '4',
+    name: 'CPSC 404',
+    title: 'Advanced Software Engineering',
+    studentCount: 0,
+  },
 } as const;
 
 // The full name is what iPeer shows in page titles and course lists.
@@ -56,4 +84,14 @@ export const STUDENTS = {
   michael: { username: 'redshirt0020', name: 'Michael Student', number: '39823059', courses: ['apsc201'] },
   vanHong: { username: 'redshirt0023', name: 'Van Hong Student', number: '40289059', courses: ['apsc201'] },
   geoff: { username: 'redshirt0026', name: 'Geoff Student', number: '27879030', courses: ['apsc201'] },
+} as const;
+
+// A tutor is attached to a course apart from the student enrolments, so the
+// course home page lists them in their own column. Tutor 1 and Tutor 2 tutor
+// MECH 328. Tutor 3 tutors APSC 201 and CPSC 101 but not MECH 328, which is
+// why the enrolment specs add them there.
+export const TUTORS = {
+  tutor1: { username: 'tutor1', name: 'Tutor 1' },
+  tutor2: { username: 'tutor2', name: 'Tutor 2' },
+  tutor3: { username: 'tutor3', name: 'Tutor 3' },
 } as const;

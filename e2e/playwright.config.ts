@@ -17,7 +17,8 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'chromium',
+      // The whole suite. The browser is a setting of the project, not its subject.
+      name: 'e2e',
       use: { ...devices['Desktop Chrome'] },
     },
   ],
