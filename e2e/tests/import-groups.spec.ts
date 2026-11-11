@@ -1,13 +1,18 @@
 import { expect, test, type Page } from '../support/test';
-import path from 'path';
 import { expectGroupMembers, openGroupList } from '../support/groups';
-import { flashMessage, idFromUrl, login, pageTitle, resultsTable } from '../support/helpers';
+import {
+  fixture,
+  flashMessage,
+  idFromUrl,
+  login,
+  notCsvFile,
+  pageTitle,
+  resultsTable,
+} from '../support/helpers';
 import { COURSES, STUDENTS, USERS } from '../support/seed';
 
 // Ported from app/tests/cases/system/import_groups.test.php.
 // The CSV files are the ones the old tests used.
-
-const fixture = (name: string) => path.join(__dirname, '..', 'fixtures', name);
 
 // Who each CSV in e2e/fixtures names.
 const BY_USERNAME = [STUDENTS.matt, STUDENTS.johnny, STUDENTS.travis];
@@ -47,12 +52,8 @@ test('an import with no file is refused', async ({ page }) => {
 test('an import of a file type that is not allowed is refused', async ({ page }) => {
   await login(page, USERS.instructor2);
 
-  await importCsv(page, COURSES.apsc201.id, {
-    name: 'groups.docx',
-    mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    buffer: Buffer.from('not a CSV file'),
-  });
-  await expect(flashMessage(page)).toContainText('extension is not allowed');
+  await importCsv(page, COURSES.apsc201.id, notCsvFile('groups'));
+  await expect(flashMessage(page)).toHaveText('extension is not allowed.');
 
   await openGroupList(page, COURSES.apsc201.id);
   await expect(page.getByRole('link', { name: /^Team \(/ })).toHaveCount(0);

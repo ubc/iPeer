@@ -282,6 +282,8 @@ class FileUploadComponent extends CakeObject{
     $save_data = $this->__prepareSaveData();
 
     $this->Uploader->file = $this->currentFile;
+    // the uploader keeps the errors of earlier files, so note where this file's start
+    $earlierErrors = count($this->Uploader->errors);
     if($finalFile = $this->Uploader->processFile()){
       $this->finalFiles[] = $finalFile;
       $this->finalFile = $finalFile; //backported.  //finalFile is now depreciated
@@ -314,10 +316,15 @@ class FileUploadComponent extends CakeObject{
     }
     else {
       //add uploader errors to component errors list
-      foreach($this->Uploader->errors as $error){
+      $fileErrors = array_slice($this->Uploader->errors, $earlierErrors);
+      foreach($fileErrors as $error){
         $this->errors[] = $error;
       }
-      $this->_error('FileUpload::processFile() - Unable to save temp file to file system.');
+      // the uploader records why it failed (a refused file or a failed move), so
+      // the generic message is only for a failure without a reason
+      if (empty($fileErrors)) {
+        $this->_error('FileUpload::processFile() - Unable to save temp file to file system.');
+      }
     }
   }
 

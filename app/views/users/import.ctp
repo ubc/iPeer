@@ -35,13 +35,7 @@
 
 <h2><?php __('Import')?></h2>
 
-<?php 
-
-// Force HTTPS 
-if (strpos($formUrl, 'http://') === 0) {
-    $formUrl = preg_replace('/^http:/', 'https:', $formUrl);
-}
-
+<?php
 echo $this->Form->create(null, array('url' => $formUrl, 'type' => 'file'));
 if ($isFileImport) {
     echo $this->Form->input('file', array('type' => 'file', 'name' => 'file'));
