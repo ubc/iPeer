@@ -1435,11 +1435,7 @@ class UsersController extends AppController
      */
     function merge()
     {
-        $searchValue = array(
-            'full_name' => __('Full Name', true),
-            'username' => __('Username', true),
-            'student_no' => __('Student No.', true)
-        );
+        $searchValue = $this->_mergeSearchFields();
         $this->set('title_for_layout', __('Merge Users', true));
         $this->set('searchValue', $searchValue);
         $this->set('secondaryAccounts', array());
@@ -1497,6 +1493,21 @@ class UsersController extends AppController
     }
 
     /**
+     * The fields the merge page can search users by, with their labels.
+     *
+     * @access private
+     * @return array
+     */
+    function _mergeSearchFields()
+    {
+        return [
+            'full_name' => __('Full Name', true),
+            'username' => __('Username', true),
+            'student_no' => __('Student No.', true),
+        ];
+    }
+
+    /**
      * ajax_merge_options
      *
      * @access public
@@ -1509,15 +1520,17 @@ class UsersController extends AppController
         $options = array();
         switch($_GET['action']) {
             case 'account':
-                if ($_GET['value'] == '') {
-                    $options = array();
+                $field = $_GET['field'] ?? '';
+                if ($_GET['value'] == '' ||
+                    !in_array($field, array_keys($this->_mergeSearchFields()), true)) {
+                    $options = [];
                 } else {
                     $options = $this->User->find('all', array(
                         'conditions' => array(
                             'Role.id' => array_keys($this->AccessControl->getViewableRoles()),
-                            'User.'.$_GET['field'].' LIKE' => "%".$_GET['value']."%",
+                            'User.'.$field.' LIKE' => "%".$_GET['value']."%",
                     )));
-                    $options = Set::combine($options, '{n}.User.id', '{n}.User.'.$_GET['field']);
+                    $options = Set::combine($options, '{n}.User.id', '{n}.User.'.$field);
                 }
                 break;
             case 'data':
@@ -1526,7 +1539,7 @@ class UsersController extends AppController
                 $options = array('Username', 'LastName', 'FirstName', 'Role', 'Title', 'Email',
                     'Creator', 'CreateDate', 'Updater', 'UpdateDate');
                 $options = array_combine($options, array_fill(0, 10, ''));
-                if (isset($user)) {
+                if (!empty($user)) {
                     $options['Username'] = $user['User']['username'];
                     $options['LastName'] = $user['User']['last_name'];
                     $options['FirstName'] = $user['User']['first_name'];
