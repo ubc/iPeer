@@ -10,6 +10,8 @@ export type Person = { readonly name: string; readonly number: string };
 export const USERS = {
   superAdmin: 'root',
   admin: 'admin2',
+  // A second account of the admin role, for a merge of two admins.
+  adminAlt: 'admin1',
   instructor1: 'instructor1',
   instructor2: 'instructor2',
   tutor: 'tutor2',
@@ -22,6 +24,7 @@ export const USERS = {
 export const FULL_NAMES: Record<keyof typeof USERS, string> = {
   superAdmin: 'Super Admin',
   admin: 'admin2',
+  adminAlt: 'admin1',
   instructor1: 'Instructor 1',
   instructor2: 'Instructor 2',
   tutor: 'Tutor 2',

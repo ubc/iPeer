@@ -120,4 +120,25 @@ class UsersControllerTestCase extends ExtendedAuthTestCase
         $secondary = $userModel->find('first', array('conditions' => array('User.id' => 6)));
         $this->assertFalse($secondary, 'Secondary account should have been deleted after merge.');
     }
+
+    private function mergeAccountSearch(string $field, string $value): array
+    {
+        $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
+        $_GET = ['action' => 'account', 'field' => $field, 'value' => $value];
+        $result = $this->testAction('/users/ajax_merge', ['fixturize' => true, 'return' => 'vars']);
+        unset($_SERVER['HTTP_X_REQUESTED_WITH']);
+        $_GET = [];
+        return $result['options'];
+    }
+
+    public function testMergeAccountSearchFindsBySearchField()
+    {
+        $options = $this->mergeAccountSearch('username', 'redshirt0001');
+        $this->assertEqual(array_values($options), ['redshirt0001']);
+    }
+
+    public function testMergeAccountSearchIgnoresOtherFields()
+    {
+        $this->assertEqual($this->mergeAccountSearch('password', 'a'), []);
+    }
 }

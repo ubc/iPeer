@@ -309,7 +309,10 @@
  *	));
  *
  */
-    Cache::config('default', array('engine' => 'File'));
+    // Lock the cache files: several requests at once can rewrite one, and a
+    // read during a write gets mixed data. With debug on, the model cache
+    // expires every 10 seconds, so this happens often in development.
+    Cache::config('default', array('engine' => 'File', 'lock' => true));
 
     // additional cache for configuration/sys parameters
     Cache::config('configuration', array(
@@ -318,7 +321,7 @@
         'probability'=> 100, //[optional]
         'path' => CACHE, //[optional] use system tmp directory - remember to use absolute path
         'prefix' => 'configuration_', //[optional]  prefix every cache file with this string
-        'lock' => false, //[optional]  use file locking
+        'lock' => true, //[optional]  use file locking
         'serialize' => true, //[optional]
     ));
 
