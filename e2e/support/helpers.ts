@@ -1,4 +1,4 @@
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, test, type Dialog, type Locator, type Page } from '@playwright/test';
 import path from 'path';
 import { PASSWORD } from './seed';
 
@@ -78,6 +78,29 @@ export async function expectAccessDenied(page: Page): Promise<void> {
     },
     { box: true }
   );
+}
+
+// Runs `act`, which must make the page ask `question` with confirm(). Only that
+// question is accepted: any other dialog is dismissed, so an unexpected
+// confirmation cannot let a destructive action through. Fails when the
+// question does not come.
+export async function withConfirmation(
+  page: Page,
+  question: string,
+  act: () => Promise<void>
+): Promise<void> {
+  const asked: string[] = [];
+  const handler = (dialog: Dialog) => {
+    asked.push(dialog.message());
+    void (dialog.message() === question ? dialog.accept() : dialog.dismiss());
+  };
+  page.on('dialog', handler);
+  try {
+    await act();
+  } finally {
+    page.off('dialog', handler);
+  }
+  expect(asked, 'confirmation questions').toEqual([question]);
 }
 
 export function pageTitle(page: Page): Locator {

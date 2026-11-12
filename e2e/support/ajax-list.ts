@@ -1,7 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
+import { withConfirmation } from './helpers';
 
 // The AJAX list (app/webroot/js/ajaxList.js) is the table on pages such as
-// /simpleevaluations. Its rows come in after the page has loaded.
+// /simpleevaluations. A script on the page draws it from data in the page, and
+// fetches the data again over AJAX when it is stale.
 
 export async function waitForAjaxList(page: Page): Promise<void> {
   // The result count appears when the rows are in place, so a check for a row
@@ -11,8 +13,8 @@ export async function waitForAjaxList(page: Page): Promise<void> {
 
 // Runs an action from the menu that a right-click on a row opens. The row is
 // the one with a link named `rowName`. When the action asks for confirmation,
-// pass the question: the helper accepts only that question, and fails when it
-// does not come.
+// pass the question. Fails when the action does not open a new page, for
+// example because the menu greys it out for this row.
 export async function runAjaxListAction(
   page: Page,
   rowName: string,
@@ -28,18 +30,22 @@ export async function runAjaxListAction(
         .getByRole('link', { name: rowName, exact: true })
         .click({ button: 'right' });
 
-      let question: string | undefined;
-      if (confirmation) {
-        page.once('dialog', (dialog) => {
-          question = dialog.message();
-          void dialog.accept();
-        });
-      }
+      // The script adds the menu to the end of the body, positioned on its own.
+      const menu = page.locator('body > div[style*="position: absolute"]');
+      const item = menu.getByText(action, { exact: true });
+      const opened = page.waitForRequest(
+        (request) => request.isNavigationRequest() && request.frame() === page.mainFrame()
+      );
+      // A failed check below must not also report this wait as unhandled.
+      opened.catch(() => undefined);
+
       // The menu items react to mouse up, which a click sends.
-      await page.getByText(action, { exact: true }).click();
-      if (confirmation) {
-        expect(question, `${action} confirmation`).toBe(confirmation);
+      if (confirmation !== undefined) {
+        await withConfirmation(page, confirmation, () => item.click());
+      } else {
+        await item.click();
       }
+      await opened;
     },
     { box: true }
   );

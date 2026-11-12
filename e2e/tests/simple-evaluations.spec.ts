@@ -8,7 +8,7 @@ import {
   nav,
   pageTitle,
 } from '../support/helpers';
-import { runAjaxListAction } from '../support/ajax-list';
+import { runAjaxListAction, waitForAjaxList } from '../support/ajax-list';
 import { USERS } from '../support/seed';
 
 // Ported from app/tests/cases/system/add_simple.test.php.
@@ -46,14 +46,36 @@ async function fillForm(page: Page, evaluation: SimpleEvaluation): Promise<void>
   await page.getByLabel(evaluation.availability, { exact: true }).check();
 }
 
+// The Evaluation tab lists the templates of the signed-in user.
+async function openEvaluationTab(page: Page): Promise<void> {
+  await page.goto('/evaltools');
+  // Proves the page is the tab, so a template that is absent from it is not
+  // absent because some other page loaded.
+  await expect(page.getByRole('heading', { name: 'My Simple Evaluations' })).toBeVisible();
+}
+
 // Opens a template of the signed-in user from the Evaluation tab, and returns
 // its id.
 async function openFromEvaluationTab(page: Page, name: string): Promise<string> {
-  await page.goto('/evaltools');
+  await openEvaluationTab(page);
   await page.getByRole('link', { name, exact: true }).click();
   // Read the id only once the view page has loaded.
   await expect(page).toHaveURL(/\/simpleevaluations\/view\/\d+$/);
   return idFromUrl(page);
+}
+
+// A save ends on the template list, where the name links to the view page.
+async function idFromList(page: Page, name: string): Promise<string> {
+  await waitForAjaxList(page);
+  const href = await page
+    .locator('#ajaxListDiv')
+    .getByRole('link', { name, exact: true })
+    .getAttribute('href');
+  const id = href?.match(/\/simpleevaluations\/view\/(\d+)$/)?.[1];
+  if (!id) {
+    throw new Error(`no view link for ${name} in the list: ${href}`);
+  }
+  return id;
 }
 
 async function addSimpleEvaluation(page: Page, evaluation: SimpleEvaluation): Promise<string> {
@@ -64,7 +86,7 @@ async function addSimpleEvaluation(page: Page, evaluation: SimpleEvaluation): Pr
       await fillForm(page, evaluation);
       await page.getByRole('button', SAVE).click();
       await expect(goodMessage(page)).toHaveText('The evaluation was added successfully.');
-      return openFromEvaluationTab(page, evaluation.name);
+      return idFromList(page, evaluation.name);
     },
     { box: true }
   );
@@ -166,8 +188,9 @@ test('a copy of a simple evaluation keeps its fields under a new name', async ({
   await page.getByRole('button', SAVE).click();
   await expect(goodMessage(page)).toHaveText('The evaluation was added successfully.');
 
-  const copyId = await openFromEvaluationTab(page, copy.name);
+  const copyId = await idFromList(page, copy.name);
   expect(copyId, 'the copy is a new template').not.toBe(id);
+  await page.goto(`/simpleevaluations/view/${copyId}`);
   await expectView(page, copy);
 });
 
@@ -177,13 +200,16 @@ test('a simple evaluation that no event uses can be deleted', async ({ page }) =
   await deleteFromList(page, PROJECT.name);
   await expect(goodMessage(page)).toHaveText('The evaluation was deleted successfully.');
 
-  await page.goto('/evaltools');
+  await openEvaluationTab(page);
+  await expect(page.getByRole('link', { name: SEEDED.name, exact: true })).toBeVisible();
   await expect(page.getByRole('link', { name: PROJECT.name, exact: true })).toHaveCount(0);
   await page.goto(`/simpleevaluations/view/${id}`);
   await expect(flashMessage(page)).toHaveText('Error: Invalid ID.');
 });
 
-test('a simple evaluation with submissions can be neither deleted nor edited', async ({ page }) => {
+test('a simple evaluation that events use cannot be deleted, and one with submissions cannot be edited', async ({
+  page,
+}) => {
   await deleteFromList(page, SEEDED.name);
   await expect(flashMessage(page)).toContainText(
     'This evaluation is now in use, and can NOT be deleted.'
@@ -198,25 +224,38 @@ test('a simple evaluation with submissions can be neither deleted nor edited', a
   await expect(viewField(page, 'Evaluation Name')).toHaveText(SEEDED.name);
 });
 
-test("an instructor can neither edit nor delete an admin's simple evaluation", async ({ page }) => {
-  await addSimpleEvaluation(page, PROJECT);
+test("an instructor can view an admin's public simple evaluation but can neither edit nor delete it", async ({
+  page,
+}) => {
+  const id = await addSimpleEvaluation(page, PROJECT);
 
   await login(page, USERS.instructor1);
   // The Evaluation tab lists only the templates of the signed-in user.
-  await page.goto('/evaltools');
+  await openEvaluationTab(page);
   await expect(page.getByRole('link', { name: PROJECT.name, exact: true })).toHaveCount(0);
 
+  // The list shows the public templates of other users.
+  await page.goto('/simpleevaluations');
+  await waitForAjaxList(page);
+  await page.locator('#ajaxListDiv').getByRole('link', { name: SEEDED.name, exact: true }).click();
+  await expect(viewField(page, 'Evaluation Name')).toHaveText(SEEDED.name);
+
   // The list greys out Delete for templates the user may not change, so send
-  // the request the menu would send. Delete refuses a GET from another site,
-  // so it comes from the list page.
-  await page.goto(`/simpleevaluations/delete/${SEEDED.id}`, {
+  // the request the menu would send, from the list page. Production can refuse
+  // a delete without a same-origin referer (IPEER_ENFORCE_REFERRER); the test
+  // stack does not, but the request should not depend on that.
+  await page.goto(`/simpleevaluations/delete/${id}`, {
     referer: new URL('/simpleevaluations', page.url()).href,
   });
   await expect(flashMessage(page)).toHaveText(
     'Error: You do not have permission to delete this evaluation'
   );
-  await page.goto(`/simpleevaluations/edit/${SEEDED.id}`);
+  await page.goto(`/simpleevaluations/edit/${id}`);
   await expect(flashMessage(page)).toHaveText(
     'Error: You do not have permission to edit this evaluation'
   );
+
+  // The refusals left the template as it was.
+  await page.goto(`/simpleevaluations/view/${id}`);
+  await expectView(page, PROJECT);
 });

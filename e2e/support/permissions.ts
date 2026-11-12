@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { goodMessage } from './helpers';
+import { goodMessage, withConfirmation } from './helpers';
 
 export const PERMISSION_ACTIONS = ['Create', 'Read', 'Update', 'Delete'] as const;
 
@@ -92,18 +92,12 @@ export async function changePermission(
     `${label} on ${permission} for role ${roleId}`,
     async () => {
       const panel = await openActionPanel(page, roleId, permission);
-      // The editor asks for confirmation. Accept only that question, and fail
-      // when it does not come.
-      let question: string | undefined;
-      page.once('dialog', (dialog) => {
-        question = dialog.message();
-        void dialog.accept();
-      });
-      await panel.getByRole('link', { name: label, exact: true }).click();
-      await expect(goodMessage(page)).toHaveText('Permissions have been updated');
-      expect(question, 'change confirmation').toContain(
-        'Are you sure you want to change the access to'
+      await withConfirmation(
+        page,
+        `Are you sure you want to change the access to ${permission}?`,
+        () => panel.getByRole('link', { name: label, exact: true }).click()
       );
+      await expect(goodMessage(page)).toHaveText('Permissions have been updated');
     },
     { box: true }
   );
