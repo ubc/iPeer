@@ -1,4 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
+import { withConfirmation } from './helpers';
 
 export type MergeAccount = 'Primary' | 'Secondary';
 export type MergeSearchField = 'Full Name' | 'Username' | 'Student No.';
@@ -69,16 +70,10 @@ export async function submitMerge(page: Page): Promise<void> {
   await test.step(
     'Submit the merge',
     async () => {
-      // The form asks for confirmation. Accept only that question, and fail
-      // when it does not come.
-      let question: string | undefined;
-      page.once('dialog', (dialog) => {
-        question = dialog.message();
-        void dialog.accept();
-      });
-      await mergeButton(page).click();
-      expect(question, 'merge confirmation').toContain(
-        'Are you sure you want to merge the two users?'
+      await withConfirmation(
+        page,
+        'Are you sure you want to merge the two users? The merger cannot be undone.',
+        () => mergeButton(page).click()
       );
     },
     { box: true }

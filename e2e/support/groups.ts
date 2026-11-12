@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { waitForAjaxList } from './ajax-list';
 import type { Person } from './seed';
 
 async function optionValue(page: Page, listId: string, student: Person): Promise<string> {
@@ -54,9 +55,7 @@ export async function openGroupList(page: Page, courseId: string): Promise<void>
       await page.goto(`/courses/home/${courseId}`);
       await page.getByRole('link', { name: 'List Groups', exact: true }).click();
       await expect(page).toHaveURL(new RegExp(`/groups/index/${courseId}$`));
-      // The list comes in through AJAX. Its result count appears when the rows are
-      // in place, so a check for a group that must be absent is not premature.
-      await expect(page.locator('#ajaxListDiv .total-result').first()).toBeVisible();
+      await waitForAjaxList(page);
     },
     { box: true }
   );
