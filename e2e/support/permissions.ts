@@ -1,29 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { goodMessage } from './helpers';
 
-// The permissions editor addresses a role by its id, so the id is part of
-// the seed data a spec depends on, not only the name.
-export const ROLES = {
-  superadmin: '1',
-  admin: '2',
-  instructor: '3',
-  tutor: '4',
-  student: '5',
-} as const;
-
-// Two permissions of the instructor role, with the access the seed data gives
-// them. The permissions-editor spec checks these first.
-export const INSTRUCTOR_PERMISSIONS = {
-  permissionsEditor: {
-    name: 'controllers/accesses/view',
-    seeded: { Create: 'Deny', Read: 'Deny', Update: 'Deny', Delete: 'Deny' },
-  },
-  mixedEvaluations: {
-    name: 'controllers/mixevals/index',
-    seeded: { Create: 'Allow', Read: 'Allow', Update: 'Allow', Delete: 'Allow' },
-  },
-} as const;
-
 export const PERMISSION_ACTIONS = ['Create', 'Read', 'Update', 'Delete'] as const;
 
 export type PermissionAction = (typeof PERMISSION_ACTIONS)[number];
@@ -45,8 +22,12 @@ async function filterToPermission(page: Page, permission: string): Promise<Locat
   // The table filters on keyup, which fill() does not produce.
   await page.locator('#table_id_filter input').pressSequentially(permission);
   const rows = page.locator('#table_id tbody tr');
+  // When nothing matches, the table shows one "No matching records" row, so
+  // the row must also hold the permission.
+  const row = rows.filter({ has: page.getByRole('cell', { name: permission, exact: true }) });
   await expect(rows, `rows matching ${permission}`).toHaveCount(1);
-  return rows.first();
+  await expect(row, `row of ${permission}`).toHaveCount(1);
+  return row;
 }
 
 export async function permissionAccess(
@@ -63,7 +44,6 @@ export async function permissionAccess(
       // The name column comes first and the four action columns follow it in the
       // order of PERMISSION_ACTIONS. The id column is in the markup but the table
       // script hides it, so count the action columns from the end of the row.
-      expect(cells, `row of ${permission}`).toContain(permission);
       const access = cells.slice(-PERMISSION_ACTIONS.length).map((text) => text.trim());
       return Object.fromEntries(
         PERMISSION_ACTIONS.map((action, index) => [action, access[index]])
@@ -113,9 +93,18 @@ export async function changePermission(
     `${label} on ${permission} for role ${roleId}`,
     async () => {
       const panel = await openActionPanel(page, roleId, permission);
-      page.once('dialog', (dialog) => dialog.accept());
+      // The editor asks for confirmation. Accept only that question, and fail
+      // when it does not come.
+      let question: string | undefined;
+      page.once('dialog', (dialog) => {
+        question = dialog.message();
+        void dialog.accept();
+      });
       await panel.getByRole('link', { name: label, exact: true }).click();
       await expect(goodMessage(page)).toHaveText('Permissions have been updated');
+      expect(question, 'change confirmation').toContain(
+        'Are you sure you want to change the access to'
+      );
     },
     { box: true }
   );

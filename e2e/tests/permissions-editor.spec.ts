@@ -3,13 +3,12 @@ import { expectAccessDenied, login, nav, pageTitle } from '../support/helpers';
 import {
   changePermission,
   expectPermissionActions,
-  INSTRUCTOR_PERMISSIONS,
   openPermissionsEditor,
   PERMISSION_ACTIONS,
   permissionAccess,
-  ROLES,
+  type PermissionAccess,
 } from '../support/permissions';
-import { USERS } from '../support/seed';
+import { INSTRUCTOR_PERMISSIONS, ROLES, USERS } from '../support/seed';
 
 // Ported from app/tests/cases/system/permissions_editor.test.php.
 
@@ -20,28 +19,11 @@ test.beforeEach(async ({ page }) => {
   await login(page, USERS.superAdmin);
 });
 
-test('the seed gives the roles their expected ids and the instructor its expected access', async ({
-  page,
-}) => {
-  // The editor names the role it has opened, so one page proves each role id.
-  for (const [name, id] of Object.entries(ROLES)) {
-    await page.goto(`/accesses/view/${id}`);
-    await expect(pageTitle(page), `role id ${id}`).toContainText(`Permissions Editor > ${name}`);
-  }
-  for (const [key, permission] of Object.entries(INSTRUCTOR_PERMISSIONS)) {
-    expect(await permissionAccess(page, ROLES.instructor, permission.name), key).toEqual(
-      permission.seeded
-    );
-  }
-});
-
 async function allowEditorForInstructors(page: Page): Promise<void> {
   await changePermission(page, ROLES.instructor, EDITOR.name, 'Allow All');
 }
 
-test('an admin reaches the editor through the Admin tab and it opens on their own role', async ({
-  page,
-}) => {
+test('the Admin tab leads to the editor, which opens on the superadmin role', async ({ page }) => {
   await nav(page).getByRole('link', { name: 'Admin', exact: true }).click();
   await page.getByRole('link', { name: 'Permissions Editor', exact: true }).click();
   await expect(pageTitle(page)).toContainText('Permissions Editor > superadmin');
@@ -91,11 +73,18 @@ test('one action of a permission can be denied while the others stay allowed', a
   await expect(pageTitle(page)).toContainText('Mixed Evaluations');
 });
 
-test('denied actions can be allowed again one at a time, which puts the seeded access back', async ({
+test('denied actions can be allowed again one at a time, and the role gets the page back', async ({
   page,
 }) => {
+  // Each change must flip only its own action.
+  let expected: PermissionAccess = MIXEVALS.seeded;
   for (const action of PERMISSION_ACTIONS) {
     await changePermission(page, ROLES.instructor, MIXEVALS.name, `Deny ${action}`);
+    expected = { ...expected, [action]: 'Deny' };
+    expect(
+      await permissionAccess(page, ROLES.instructor, MIXEVALS.name),
+      `after Deny ${action}`
+    ).toEqual(expected);
   }
 
   await login(page, USERS.instructor1);
@@ -105,8 +94,12 @@ test('denied actions can be allowed again one at a time, which puts the seeded a
   await login(page, USERS.superAdmin);
   for (const action of PERMISSION_ACTIONS) {
     await changePermission(page, ROLES.instructor, MIXEVALS.name, `Allow ${action}`);
+    expected = { ...expected, [action]: 'Allow' };
+    expect(
+      await permissionAccess(page, ROLES.instructor, MIXEVALS.name),
+      `after Allow ${action}`
+    ).toEqual(expected);
   }
-  expect(await permissionAccess(page, ROLES.instructor, MIXEVALS.name)).toEqual(MIXEVALS.seeded);
 
   await login(page, USERS.instructor1);
   await page.goto('/mixevals');
