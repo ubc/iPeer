@@ -98,3 +98,25 @@ export const TUTORS = {
   tutor2: { username: 'tutor2', name: 'Tutor 2' },
   tutor3: { username: 'tutor3', name: 'Tutor 3' },
 } as const;
+
+// The permissions editor addresses a role by its id, so the id is part of
+// the seed data a spec depends on, not only the name.
+export const ROLES = {
+  superadmin: '1',
+  admin: '2',
+  instructor: '3',
+  tutor: '4',
+  student: '5',
+} as const;
+
+// Two permissions of the instructor role, with the access the seed gives them.
+export const INSTRUCTOR_PERMISSIONS = {
+  permissionsEditor: {
+    name: 'controllers/accesses/view',
+    seeded: { Create: 'Deny', Read: 'Deny', Update: 'Deny', Delete: 'Deny' },
+  },
+  mixedEvaluations: {
+    name: 'controllers/mixevals/index',
+    seeded: { Create: 'Allow', Read: 'Allow', Update: 'Allow', Delete: 'Allow' },
+  },
+} as const;
