@@ -74,10 +74,9 @@ export async function expectPermissionActions(
     async () => {
       const panel = await openActionPanel(page, roleId, permission);
       // Each action is offered as its opposite, so the labels name the access the
-      // permission has now as much as what a click would do.
-      for (const label of labels) {
-        await expect(panel.getByRole('link', { name: label, exact: true }), label).toHaveCount(1);
-      }
+      // permission has now as much as what a click would do. The panel always
+      // starts with the two links that change every action.
+      await expect(panel.getByRole('link')).toHaveText(['Allow All', 'Deny All', ...labels]);
     },
     { box: true }
   );
