@@ -51,7 +51,9 @@ test('denying every action of a permission stops that role from reaching the pag
   await expectAccessDenied(page);
 });
 
-test('one action of a permission can be denied while the others stay allowed', async ({ page }) => {
+test('denying one action changes only that action, and the role keeps the page', async ({
+  page,
+}) => {
   await changePermission(page, ROLES.instructor, MIXEVALS.name, 'Deny Create');
 
   expect(await permissionAccess(page, ROLES.instructor, MIXEVALS.name)).toEqual({
