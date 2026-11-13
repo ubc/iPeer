@@ -134,6 +134,22 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->assertEqual($result['event']['Group'][0]['Member'][0]['last_name'], 'Student');
     }
 
+    function testViewOthersEvent() {
+        // instructor2 does not teach MECH 328, the course of event 1
+        $this->login = array(
+            'User' => array(
+                'username' => 'instructor2',
+                'password' => md5('ipeeripeer')
+            )
+        );
+
+        $this->testAction('/events/view/1', array('fixturize' => true, 'method' => 'get'));
+        $this->controller->expectOnce('redirect', array('/home'));
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: That event does not exist or you dont have access to it');
+    }
+
     function testAdd() {
         $result = $this->testAction('/events/add/1', array('return' => 'vars'));
 
@@ -350,7 +366,7 @@ class EventsControllerTest extends ExtendedAuthTestCase {
             '/events/edit/8',
             array('fixturize' => true, 'data' => $data, 'method' => 'post')
         );
-        $this->controller->expectOnce('redirect', array('index'));
+        $this->controller->expectOnce('redirect', array('/home'));
         $model = ClassRegistry::init('Event');
         $event = $model->find('first', array( 'conditions' => array('id' => $data['Event']['id']), 'contain' => array('Group', 'GroupEvent', 'EvaluationSubmission')));
         // data should not be changed

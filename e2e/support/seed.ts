@@ -99,6 +99,22 @@ export const TUTORS = {
   tutor3: { username: 'tutor3', name: 'Tutor 3' },
 } as const;
 
+// The two groups of MECH 328, with the full names of their members. Matt is in
+// both groups, and Tutor 1 is a member of Reapers. The other students of
+// Lazy Engineers are not in STUDENTS, because no spec enrols them.
+export const MECH328_GROUPS = {
+  reapers: {
+    id: '1',
+    name: 'Reapers',
+    members: ['Ed Student', 'Alex Student', 'Matt Student', 'Tutor 1'],
+  },
+  lazyEngineers: {
+    id: '2',
+    name: 'Lazy Engineers',
+    members: ['Hui Student', 'Bowinn Student', 'Joe Student', 'Matt Student'],
+  },
+} as const;
+
 // The permissions editor addresses a role by its id, so the id is part of
 // the seed data a spec depends on, not only the name.
 export const ROLES = {
