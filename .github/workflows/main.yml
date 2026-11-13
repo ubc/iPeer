@@ -118,15 +118,6 @@ jobs:
           cache-from: type=gha,scope=ipeer-image
           cache-to: type=gha,scope=ipeer-image,mode=max,ignore-error=true
 
-      # Composer cache: vendor/ from an earlier run with the same composer.lock,
-      # so the composer install in prepare.sh has little or nothing to download.
-      - name: Cache Composer vendor folder
-        uses: actions/cache@v6.1.0
-        with:
-          path: vendor
-          key: composer-vendor-${{ runner.os }}-${{ hashFiles('composer.json', 'composer.lock') }}
-          restore-keys: composer-vendor-${{ runner.os }}-
-
       - name: Build and startup test containers
         run: ./build/unit-integration-tests/prepare.sh
         env:
@@ -172,24 +163,6 @@ jobs:
           cache-from: type=gha,scope=ipeer-image
           cache-to: type=gha,scope=ipeer-image,mode=max,ignore-error=true
 
-      # Composer cache: vendor/ from an earlier run with the same composer.lock,
-      # so the composer install in prepare.sh has little or nothing to download.
-      - name: Cache Composer vendor folder
-        uses: actions/cache@v6.1.0
-        with:
-          path: vendor
-          key: composer-vendor-${{ runner.os }}-${{ hashFiles('composer.json', 'composer.lock') }}
-          restore-keys: composer-vendor-${{ runner.os }}-
-
-      # npm cache: npm's download cache for the same package-lock.json. npm ci
-      # still deletes and rebuilds node_modules, but without registry downloads.
-      - name: Cache npm downloads
-        uses: actions/cache@v6.1.0
-        with:
-          path: e2e/.npm-cache
-          key: npm-${{ runner.os }}-${{ hashFiles('e2e/package-lock.json') }}
-          restore-keys: npm-${{ runner.os }}-
-
       - name: Build and startup test containers
         run: ./build/unit-integration-tests/prepare.sh
         env:
@@ -219,7 +192,7 @@ jobs:
 
       - name: Install Playwright dependencies
         id: e2e-install
-        run: docker compose exec -e npm_config_cache=/e2e/.npm-cache playwright npm ci --prefer-offline
+        run: docker compose exec playwright npm ci
 
       - name: Check the types of the browser tests
         run: docker compose exec playwright npm run typecheck

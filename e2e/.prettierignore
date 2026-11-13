@@ -4,4 +4,3 @@ test-results/
 blob-report/
 package-lock.json
 fixtures/
-.npm-cache/
