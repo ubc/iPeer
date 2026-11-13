@@ -11,6 +11,26 @@ export async function waitForAjaxList(page: Page): Promise<void> {
   await expect(page.locator('#ajaxListDiv .total-result').first()).toBeVisible();
 }
 
+// The id of the row whose name links to /<controller>/view/<id>. A template
+// save ends on its list, so this reads the new id without another page load.
+export async function idFromAjaxList(
+  page: Page,
+  name: string,
+  controller: string
+): Promise<string> {
+  await waitForAjaxList(page);
+  const href = await page
+    .locator('#ajaxListDiv')
+    .getByRole('link', { name, exact: true })
+    .getAttribute('href');
+  const escaped = controller.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const id = href?.match(new RegExp(`/${escaped}/view/(\\d+)$`))?.[1];
+  if (!id) {
+    throw new Error(`no ${controller} view link for ${name} in the list: ${href}`);
+  }
+  return id;
+}
+
 // Runs an action from the menu that a right-click on a row opens. The row is
 // the one with a link named `rowName`. When the action asks for confirmation,
 // pass the question. Fails when the action does not open a new page, for
