@@ -35,7 +35,7 @@ RUN cd /var/www/html \
 COPY . /var/www/html
 
 RUN cd /var/www/html \
-    && composer run-script --no-dev post-install-cmd \
+    && composer run-script --no-ansi --no-dev --no-interaction --no-plugins post-install-cmd \
     && mkdir -p /var/www/html/app/tmp/cache/persistent /var/www/html/app/tmp/cache/models /var/www/html/app/tmp/logs \
     && chown www-data:www-data -R /var/www/html/app/tmp/cache \
     && chown www-data:www-data -R /var/www/html/app/tmp/logs
