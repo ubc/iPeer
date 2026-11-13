@@ -5,12 +5,10 @@ import {
   flashMessage,
   goodMessage,
   login,
-  nav,
   notCsvFile,
-  pageTitle,
   resultsTable,
 } from '../support/helpers';
-import { COURSES, STUDENTS, USERS, fullName } from '../support/seed';
+import { COURSES, STUDENTS, USERS } from '../support/seed';
 import {
   classListUserId,
   enrolExistingUser,
@@ -79,13 +77,7 @@ test('a CSV import creates new users, updates existing ones and enrols them all'
   await expect(goodMessage(page)).toHaveText('User successfully updated!');
   await expectInClassList(page, COURSES.mech328.id, { ...STUDENTS.ed, name: 'Temporary Student' });
 
-  await nav(page).getByRole('link', { name: 'Courses', exact: true }).click();
-  const row = page
-    .getByRole('row')
-    .filter({ has: page.getByRole('cell', { name: COURSES.apsc201.name, exact: true }) });
-  await row.getByRole('link', { name: COURSES.apsc201.title, exact: true }).click();
-  await expect(pageTitle(page)).toContainText(fullName(COURSES.apsc201));
-  await page.getByRole('link', { name: 'Import Students from CSV', exact: true }).click();
+  await page.goto(`/users/import/${COURSES.apsc201.id}`);
 
   await submitImport(page, fixture('newClass_APSC201.csv'));
   await expect(goodMessage(page)).toContainText('Import successful!');

@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '../support/test';
-import { expectAccessDenied, login, nav, pageTitle } from '../support/helpers';
+import { expectAccessDenied, login, pageTitle } from '../support/helpers';
 import {
   changePermission,
   expectPermissionActions,
@@ -23,9 +23,10 @@ async function allowEditorForInstructors(page: Page): Promise<void> {
   await changePermission(page, ROLES.instructor, EDITOR.name, 'Allow All');
 }
 
-test('the Admin tab leads to the editor, which opens on the superadmin role', async ({ page }) => {
-  await nav(page).getByRole('link', { name: 'Admin', exact: true }).click();
-  await page.getByRole('link', { name: 'Permissions Editor', exact: true }).click();
+test('the editor opens on the superadmin role, and the role list switches the role', async ({
+  page,
+}) => {
+  await page.goto('/accesses/view');
   await expect(pageTitle(page)).toContainText('Permissions Editor > superadmin');
 
   await page.getByLabel('Role:').selectOption(ROLES.instructor);

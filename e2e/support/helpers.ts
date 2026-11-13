@@ -2,29 +2,35 @@ import { expect, test, type Dialog, type Locator, type Page } from '@playwright/
 import path from 'path';
 import { PASSWORD } from './seed';
 
-export async function login(page: Page, username: string): Promise<void> {
-  await test.step(
+// Signs the user in and returns the URL of the page that the login leads to.
+// It does not open that page: the test opens the page it needs next.
+export async function login(page: Page, username: string): Promise<string> {
+  return test.step(
     `Log in as ${username}`,
     async () => {
-      // Log out first, then load a fresh login form: the form that /logout renders
-      // belongs to the session it has just ended.
-      await page.goto('/logout');
-      await page.goto('/');
-      await page.getByLabel('Username').fill(username);
-      await page.getByLabel('Password').fill(PASSWORD);
-      await page.getByRole('button', { name: 'Login' }).click();
-      await expect(page.locator('#navigationOuter')).toBeVisible();
-    },
-    { box: true }
-  );
-}
-
-export async function logout(page: Page): Promise<void> {
-  await test.step(
-    'Log out',
-    async () => {
-      await page.goto('/logout');
-      await expect(page.getByRole('button', { name: 'Login' })).toBeVisible();
+      // Posts the login form without loading it, which is faster than filling
+      // it in. login.spec.ts tests the form itself, and logging out.
+      // Without the cookies, the post starts a new session, so any earlier
+      // user is no longer signed in. The session is bound to the user agent,
+      // and page.request sends the same one as the page.
+      await page.context().clearCookies();
+      const response = await page.request.post('/login', {
+        form: {
+          'data[Guard][username]': username,
+          'data[Guard][password]': PASSWORD,
+          auth_method: 'default',
+        },
+        maxRedirects: 0,
+      });
+      // A successful login redirects away from the login page.
+      expect(response.status(), `login of ${username}`).toBe(302);
+      // The login page itself, also with a notice such as ?notice=inactive,
+      // means the server signed the user out again.
+      const landing = response.headers()['location'] ?? '';
+      expect(landing, `login of ${username}`).toBeTruthy();
+      const path = new URL(landing, response.url()).pathname;
+      expect(path, `login of ${username}`).not.toBe('/login');
+      return landing;
     },
     { box: true }
   );

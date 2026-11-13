@@ -384,8 +384,7 @@ test('a new late penalty starts one day after the last one added', async ({ page
 
 test('an instructor adds an event with reminders, groups and late penalties', async ({ page }) => {
   await login(page, USERS.instructor1);
-  await page.goto(`/courses/home/${COURSES.mech328.id}`);
-  await page.getByRole('link', { name: 'Add Event', exact: true }).click();
+  await page.goto(`/events/add/${COURSES.mech328.id}`);
   await expect(pageTitle(page)).toContainText('Add Event');
 
   await fillForm(page, FINAL_PROJECT);

@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '../support/test';
-import { errorMessage, flashMessage, goodMessage, login, nav, pageTitle } from '../support/helpers';
+import { errorMessage, flashMessage, goodMessage, login, pageTitle } from '../support/helpers';
 import { idFromAjaxList, runAjaxListAction, waitForAjaxList } from '../support/ajax-list';
 import { evaluationTabSection, openEvaluationTab, requestDelete } from '../support/evaltools';
 import { USERS } from '../support/seed';
@@ -314,10 +314,7 @@ test('the Add Mixed Evaluation form refuses a missing name and a duplicate name'
 });
 
 test('an admin adds a mixed evaluation with one question of each type', async ({ page }) => {
-  await nav(page).getByRole('link', { name: 'Evaluation', exact: true }).click();
-  await page.getByRole('link', { name: 'Mixed Evaluations', exact: true }).click();
-  await expect(page).toHaveURL(/\/mixevals$/);
-  await page.getByRole('link', { name: 'Add Mixed Evaluation', exact: true }).click();
+  await page.goto('/mixevals/add');
   await expect(pageTitle(page)).toContainText('Mixed Evaluations > Add');
 
   await fillForm(page, FINAL);

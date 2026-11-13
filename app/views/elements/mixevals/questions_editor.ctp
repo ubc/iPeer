@@ -320,11 +320,13 @@ function upQ(qNum, self_eval) {
     var j = questionIds.indexOf(qNum);
     // make sure not to move topmost question of the section
     if (i != 0) {
-        aboveDiv = jQuery('#question' + questions[i - 1]);
-        thisDiv = jQuery('#question' + qNum);
-        // swap places with the question above us
-        thisDiv.hide('drop', 300, function() {
-            thisDiv.insertBefore(aboveDiv).show('drop', 500);
+        var aboveDiv = jQuery('#question' + questions[i - 1]);
+        var thisDiv = jQuery('#question' + qNum);
+        // swap places with the question above us. Fades do not wrap the
+        // question in another element, so a second move that starts during
+        // the animation cannot lose a question.
+        thisDiv.fadeOut(300, function() {
+            thisDiv.insertBefore(aboveDiv).fadeIn(500);
             reorderQ();
         });
         // make sure the change is reflected in the js arrays
@@ -343,11 +345,11 @@ function downQ(qNum, self_eval) {
     var j = questionIds.indexOf(qNum);
     // make sure not to move bottommost question
     if (i < questions.length - 1) {
-        belowDiv = jQuery('#question' + questions[i + 1]);
-        thisDiv = jQuery('#question' + qNum);
-        // swap places with the question below us
-        thisDiv.hide('drop', 300, function() {
-            thisDiv.insertAfter(belowDiv).show('drop', 500);
+        var belowDiv = jQuery('#question' + questions[i + 1]);
+        var thisDiv = jQuery('#question' + qNum);
+        // swap places with the question below us (see upQ about the fades)
+        thisDiv.fadeOut(300, function() {
+            thisDiv.insertAfter(belowDiv).fadeIn(500);
             reorderQ();
         });
         // make sure the change is reflected in the js array

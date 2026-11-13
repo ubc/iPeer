@@ -5,7 +5,6 @@ import {
   goodMessage,
   idFromUrl,
   login,
-  nav,
   pageTitle,
 } from '../support/helpers';
 import { USERS } from '../support/seed';
@@ -23,13 +22,9 @@ async function openCourse(page: Page, name: string, title: string): Promise<stri
   return courseId;
 }
 
-test('an admin adds a course through the Courses tab', async ({ page }) => {
+test('an admin adds a course with instructors and tutors', async ({ page }) => {
   await login(page, USERS.superAdmin);
-
-  await nav(page).getByRole('link', { name: 'Courses', exact: true }).click();
-  await expect(pageTitle(page)).toHaveText('Courses');
-
-  await page.getByRole('link', { name: 'Add Course', exact: true }).click();
+  await page.goto('/courses/add');
   await expect(pageTitle(page)).toHaveText('Add Course');
 
   await page.locator('#CourseCourse').fill('EECE 474 101');

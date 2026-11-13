@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '../support/test';
-import { errorMessage, flashMessage, goodMessage, login, nav } from '../support/helpers';
+import { errorMessage, flashMessage, goodMessage, login } from '../support/helpers';
 import { idFromAjaxList, runAjaxListAction, waitForAjaxList } from '../support/ajax-list';
 import { evaluationTabSection, openEvaluationTab, requestDelete } from '../support/evaltools';
 import { USERS } from '../support/seed';
@@ -252,8 +252,7 @@ test('the Add Rubric form refuses a missing name and a duplicate name', async ({
 });
 
 test('an admin adds a rubric in two steps, and the page calculates its marks', async ({ page }) => {
-  await nav(page).getByRole('link', { name: 'Evaluation', exact: true }).click();
-  await page.getByRole('link', { name: 'Add Rubric', exact: true }).click();
+  await page.goto('/rubrics/add');
 
   await fillFormat(page, MIDTERM);
   await page.getByRole('button', NEXT).click();

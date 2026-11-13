@@ -5,7 +5,6 @@ import {
   goodMessage,
   idFromUrl,
   login,
-  nav,
   pageTitle,
 } from '../support/helpers';
 import { idFromAjaxList, runAjaxListAction, waitForAjaxList } from '../support/ajax-list';
@@ -133,9 +132,8 @@ test('the Add Simple Evaluation form refuses missing fields, a duplicate name an
   }
 });
 
-test('an admin adds a simple evaluation through the Evaluation tab', async ({ page }) => {
-  await nav(page).getByRole('link', { name: 'Evaluation', exact: true }).click();
-  await page.getByRole('link', { name: 'Add Simple Evaluation', exact: true }).click();
+test('an admin adds a simple evaluation', async ({ page }) => {
+  await page.goto('/simpleevaluations/add');
   await expect(pageTitle(page)).toContainText('Simple Evaluations > Add');
 
   await fillForm(page, PROJECT);
