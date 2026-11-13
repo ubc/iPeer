@@ -137,8 +137,8 @@ jobs:
         with:
           submodules: recursive
 
-      # Not a cache: the Playwright image downloads while the app-test image
-      # builds. "Start Playwright container" waits for an unfinished download.
+      # The Playwright image downloads while the app-test image builds.
+      # "Start Playwright container" waits for an unfinished download.
       - name: Pull Playwright image in the background
         run: docker compose pull --quiet playwright > "$RUNNER_TEMP/playwright-pull.log" 2>&1 &
 
