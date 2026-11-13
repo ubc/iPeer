@@ -350,7 +350,7 @@ class EventsControllerTest extends ExtendedAuthTestCase {
             '/events/edit/8',
             array('fixturize' => true, 'data' => $data, 'method' => 'post')
         );
-        $this->controller->expectOnce('redirect', array('index'));
+        $this->controller->expectOnce('redirect', array('/home'));
         $model = ClassRegistry::init('Event');
         $event = $model->find('first', array( 'conditions' => array('id' => $data['Event']['id']), 'contain' => array('Group', 'GroupEvent', 'EvaluationSubmission')));
         // data should not be changed
