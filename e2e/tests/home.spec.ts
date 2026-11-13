@@ -7,7 +7,7 @@ import { COURSES, USERS, fullName } from '../support/seed';
 // section of the student and tutor home page.
 
 test('a super admin sees every course and the full tab bar', async ({ page }) => {
-  await login(page, USERS.superAdmin);
+  await page.goto(await login(page, USERS.superAdmin));
 
   await expect(pageTitle(page)).toHaveText('Home');
   await expect(page.getByRole('heading', { level: 2, name: 'My Courses' })).toBeVisible();
@@ -22,7 +22,7 @@ test('a super admin sees every course and the full tab bar', async ({ page }) =>
 });
 
 test('an admin sees only their own courses and gets no Admin tab', async ({ page }) => {
-  await login(page, USERS.admin);
+  await page.goto(await login(page, USERS.admin));
 
   await expect(page.getByRole('heading', { level: 2, name: 'My Courses' })).toBeVisible();
   await expect(page.getByRole('heading', { level: 2, name: 'Inactive Courses' })).toBeVisible();
@@ -49,7 +49,7 @@ test('an admin sees only their own courses and gets no Admin tab', async ({ page
 test('an instructor sees only their own course and gets no Users or Admin tab', async ({
   page,
 }) => {
-  await login(page, USERS.instructor2);
+  await page.goto(await login(page, USERS.instructor2));
 
   await expect(page.getByRole('heading', { level: 2, name: 'My Courses' })).toBeVisible();
   await expect(page.getByRole('heading', { level: 2, name: 'Inactive Courses' })).toHaveCount(0);
@@ -68,7 +68,7 @@ test('an instructor sees only their own course and gets no Users or Admin tab', 
 });
 
 test('a tutor lands on the evaluation home and gets no course or admin tabs', async ({ page }) => {
-  await login(page, USERS.tutor);
+  await page.goto(await login(page, USERS.tutor));
 
   await expect(page.getByRole('heading', { level: 2, name: 'Peer Evaluations' })).toBeVisible();
   await expect(sectionHeadings(page, 'Peer Evaluations')).toHaveText(['Due', 'Submitted']);
@@ -79,7 +79,7 @@ test('a tutor lands on the evaluation home and gets no course or admin tabs', as
 test('a student lands on the evaluation home and gets no course or admin tabs', async ({
   page,
 }) => {
-  await login(page, USERS.student);
+  await page.goto(await login(page, USERS.student));
 
   await expect(page.getByRole('heading', { level: 2, name: 'Peer Evaluations' })).toBeVisible();
   await expect(sectionHeadings(page, 'Peer Evaluations')).toHaveText([

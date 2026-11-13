@@ -252,6 +252,7 @@ test('the Add Rubric form refuses a missing name and a duplicate name', async ({
 });
 
 test('an admin adds a rubric in two steps, and the page calculates its marks', async ({ page }) => {
+  await page.goto('/');
   await nav(page).getByRole('link', { name: 'Evaluation', exact: true }).click();
   await page.getByRole('link', { name: 'Add Rubric', exact: true }).click();
 

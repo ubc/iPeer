@@ -314,6 +314,7 @@ test('the Add Mixed Evaluation form refuses a missing name and a duplicate name'
 });
 
 test('an admin adds a mixed evaluation with one question of each type', async ({ page }) => {
+  await page.goto('/');
   await nav(page).getByRole('link', { name: 'Evaluation', exact: true }).click();
   await page.getByRole('link', { name: 'Mixed Evaluations', exact: true }).click();
   await expect(page).toHaveURL(/\/mixevals$/);

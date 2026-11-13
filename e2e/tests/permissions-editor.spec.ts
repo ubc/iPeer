@@ -24,6 +24,7 @@ async function allowEditorForInstructors(page: Page): Promise<void> {
 }
 
 test('the Admin tab leads to the editor, which opens on the superadmin role', async ({ page }) => {
+  await page.goto('/');
   await nav(page).getByRole('link', { name: 'Admin', exact: true }).click();
   await page.getByRole('link', { name: 'Permissions Editor', exact: true }).click();
   await expect(pageTitle(page)).toContainText('Permissions Editor > superadmin');

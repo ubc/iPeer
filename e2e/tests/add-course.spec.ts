@@ -25,6 +25,7 @@ async function openCourse(page: Page, name: string, title: string): Promise<stri
 
 test('an admin adds a course through the Courses tab', async ({ page }) => {
   await login(page, USERS.superAdmin);
+  await page.goto('/');
 
   await nav(page).getByRole('link', { name: 'Courses', exact: true }).click();
   await expect(pageTitle(page)).toHaveText('Courses');
