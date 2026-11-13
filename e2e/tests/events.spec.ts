@@ -238,15 +238,19 @@ async function addEvent(page: Page, courseId: string, event: NewEvent): Promise<
 }
 
 // The value that the event view page shows next to a heading, such as
-// 'Due Date'.
+// 'Due Date'. Only the heading cell is matched, so a value with the same text
+// as a heading cannot select the wrong row.
 function viewField(page: Page, heading: string): Locator {
   return page
     .locator('table.standardtable > tbody > tr')
-    .filter({ has: page.getByText(heading, { exact: true }) })
+    .filter({ has: page.locator('xpath=./th').getByText(heading, { exact: true }) })
     .locator('xpath=./td');
 }
 
 function penaltyLines(penalties: readonly Penalty[]): string[] {
+  if (penalties.length === 0) {
+    return ['No late penalties currently set'];
+  }
   const days = (count: string) => `${count} ${count === '1' ? 'day' : 'days'}`;
   const lines = penalties.map((penalty, index) =>
     index === 0
@@ -485,6 +489,8 @@ test('an event with a single reminder shows a frequency of 7 days', async ({ pag
   // Three days from the release on 2 February is after the due date, so there
   // is one reminder. The form calculates the frequency from the interval
   // between the last two reminders, and with one reminder it shows 7 days.
+  // This checks the current behaviour, not the wanted one: the form should
+  // show the 3 days that were chosen. Update this test when that is fixed.
   const id = await addEvent(page, COURSES.mech328.id, {
     ...PLAIN,
     dates: { ...DATES, due: feb(4) },

@@ -134,6 +134,22 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->assertEqual($result['event']['Group'][0]['Member'][0]['last_name'], 'Student');
     }
 
+    function testViewOthersEvent() {
+        // instructor2 does not teach MECH 328, the course of event 1
+        $this->login = array(
+            'User' => array(
+                'username' => 'instructor2',
+                'password' => md5('ipeeripeer')
+            )
+        );
+
+        $this->testAction('/events/view/1', array('fixturize' => true, 'method' => 'get'));
+        $this->controller->expectOnce('redirect', array('/home'));
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: That event does not exist or you dont have access to it');
+    }
+
     function testAdd() {
         $result = $this->testAction('/events/add/1', array('return' => 'vars'));
 
