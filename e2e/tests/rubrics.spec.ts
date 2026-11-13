@@ -141,7 +141,8 @@ function criterionComment(page: Page, criterion: number, level: number) {
 }
 
 // Fills the texts and weights. Fields that already hold the text are filled
-// again, which does not change them.
+// again, which does not change them, so check what a page kept before calling
+// this.
 async function fillTexts(page: Page, rubric: Rubric): Promise<void> {
   for (const [level, comment] of rubric.levels.entries()) {
     await page.locator(`#RubricsLom${level}LomComment`).fill(comment);
@@ -174,16 +175,11 @@ async function expectMarks(page: Page, rubric: Rubric): Promise<void> {
 }
 
 // Checks every field of the edit form, which shows what was saved.
-async function expectForm(page: Page, rubric: Rubric): Promise<void> {
+// Checks the texts and weights the form holds for each level and criterion.
+async function expectTexts(page: Page, rubric: Rubric): Promise<void> {
   await test.step(
-    `Expect the form of ${rubric.name}`,
+    `Expect the texts of ${rubric.name}`,
     async () => {
-      await expect(page.locator('#name')).toHaveValue(rubric.name);
-      await expect(page.locator('#LOM')).toHaveValue(String(rubric.levels.length));
-      await expect(page.locator('#criteria')).toHaveValue(String(rubric.criteria.length));
-      await expect(page.getByLabel(rubric.availability, { exact: true })).toBeChecked();
-      await expect(page.getByLabel(rubric.viewMode, { exact: true })).toBeChecked();
-      await expect(page.locator('#zero_mark')).toBeChecked({ checked: rubric.zeroMark });
       for (const [level, comment] of rubric.levels.entries()) {
         await expect(page.locator(`#RubricsLom${level}LomComment`)).toHaveValue(comment);
       }
@@ -196,6 +192,22 @@ async function expectForm(page: Page, rubric: Rubric): Promise<void> {
           criterion.weight
         );
       }
+    },
+    { box: true }
+  );
+}
+
+async function expectForm(page: Page, rubric: Rubric): Promise<void> {
+  await test.step(
+    `Expect the form of ${rubric.name}`,
+    async () => {
+      await expect(page.locator('#name')).toHaveValue(rubric.name);
+      await expect(page.locator('#LOM')).toHaveValue(String(rubric.levels.length));
+      await expect(page.locator('#criteria')).toHaveValue(String(rubric.criteria.length));
+      await expect(page.getByLabel(rubric.availability, { exact: true })).toBeChecked();
+      await expect(page.getByLabel(rubric.viewMode, { exact: true })).toBeChecked();
+      await expect(page.locator('#zero_mark')).toBeChecked({ checked: rubric.zeroMark });
+      await expectTexts(page, rubric);
       await expectMarks(page, rubric);
     },
     { box: true }
@@ -266,6 +278,9 @@ test('editing a rubric can add levels and criteria, and recalculates the marks',
   await expect(saveButton(page)).toBeDisabled();
   await page.getByRole('button', { name: 'Preview (Update Format)' }).click();
   await expect(page.locator(`#RubricsLom${FINAL.levels.length - 1}LomComment`)).toBeVisible();
+  // The preview keeps the saved texts and weights where they were, so only the
+  // new fields and the new weights need filling.
+  await expectTexts(page, MIDTERM);
 
   await fillTexts(page, FINAL);
   await expectMarks(page, FINAL);
@@ -285,8 +300,9 @@ test('editing a rubric can remove levels and criteria, and keeps the texts of th
   await fillFormat(page, REDUCED);
   await page.getByRole('button', { name: 'Preview (Update Format)' }).click();
   await expect(page.locator(`#RubricsLom${REDUCED.levels.length}LomComment`)).toHaveCount(0);
-
-  await fillTexts(page, REDUCED);
+  // The preview keeps the texts and weights of the remaining levels and
+  // criteria, so the rubric is saved without filling anything again.
+  await expectTexts(page, REDUCED);
   await expectMarks(page, REDUCED);
   await saveButton(page).click();
   await expect(goodMessage(page)).toHaveText('The rubric evaluation was updated successfully');
