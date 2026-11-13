@@ -87,14 +87,46 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
+    env:
+      # Docker Compose names the app-test image ipeer-app-test with this name.
+      COMPOSE_PROJECT_NAME: ipeer
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4.4.1
+
+      # Docker layer cache: unchanged image layers (apt packages, PHP
+      # extensions) come from the GitHub Actions cache instead of a rebuild.
+      - name: Build app-test image
+        uses: docker/build-push-action@v7.4.0
+        with:
+          context: .
+          file: ./Dockerfile
+          # Must match the app-test build in docker-compose.yml.
+          build-args: |
+            INSTALL_XDEBUG=true
+          tags: ipeer-app-test
+          load: true
+          cache-from: type=gha,scope=app-test
+          cache-to: type=gha,scope=app-test,mode=max
+
+      # Composer cache: vendor/ from an earlier run with the same composer.lock,
+      # so the composer install in prepare.sh has little or nothing to download.
+      - name: Cache Composer vendor folder
+        uses: actions/cache@v6.1.0
+        with:
+          path: vendor
+          key: composer-vendor-${{ runner.os }}-${{ hashFiles('composer.json', 'composer.lock') }}
+          restore-keys: composer-vendor-${{ runner.os }}-
+
       - name: Build and startup test containers
         run: ./build/unit-integration-tests/prepare.sh
+        env:
+          IPEER_APP_TEST_PREBUILT: "1"
 
       - name: Run tests
         run: ./build/unit-integration-tests/run.sh
@@ -104,14 +136,60 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
+    env:
+      # Docker Compose names the app-test image ipeer-app-test with this name.
+      COMPOSE_PROJECT_NAME: ipeer
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
 
+      # Not a cache: the Playwright image downloads while the app-test image
+      # builds. "Start Playwright container" waits for an unfinished download.
+      - name: Pull Playwright image in the background
+        run: docker compose pull --quiet playwright > "$RUNNER_TEMP/playwright-pull.log" 2>&1 &
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4.4.1
+
+      # Docker layer cache: unchanged image layers (apt packages, PHP
+      # extensions) come from the GitHub Actions cache instead of a rebuild.
+      - name: Build app-test image
+        uses: docker/build-push-action@v7.4.0
+        with:
+          context: .
+          file: ./Dockerfile
+          # Must match the app-test build in docker-compose.yml.
+          build-args: |
+            INSTALL_XDEBUG=true
+          tags: ipeer-app-test
+          load: true
+          cache-from: type=gha,scope=app-test
+          cache-to: type=gha,scope=app-test,mode=max
+
+      # Composer cache: vendor/ from an earlier run with the same composer.lock,
+      # so the composer install in prepare.sh has little or nothing to download.
+      - name: Cache Composer vendor folder
+        uses: actions/cache@v6.1.0
+        with:
+          path: vendor
+          key: composer-vendor-${{ runner.os }}-${{ hashFiles('composer.json', 'composer.lock') }}
+          restore-keys: composer-vendor-${{ runner.os }}-
+
+      # npm cache: npm's download cache for the same package-lock.json. npm ci
+      # still deletes and rebuilds node_modules, but without registry downloads.
+      - name: Cache npm downloads
+        uses: actions/cache@v6.1.0
+        with:
+          path: e2e/.npm-cache
+          key: npm-${{ runner.os }}-${{ hashFiles('e2e/package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
+
       - name: Build and startup test containers
         run: ./build/unit-integration-tests/prepare.sh
+        env:
+          IPEER_APP_TEST_PREBUILT: "1"
 
       # iPeer serves its installer until the users table exists, so the test
       # site shows a login page only after the database is seeded. The browser
@@ -137,7 +215,7 @@ jobs:
 
       - name: Install Playwright dependencies
         id: e2e-install
-        run: docker compose exec playwright npm ci
+        run: docker compose exec -e npm_config_cache=/e2e/.npm-cache playwright npm ci --prefer-offline
 
       - name: Check the types of the browser tests
         run: docker compose exec playwright npm run typecheck
