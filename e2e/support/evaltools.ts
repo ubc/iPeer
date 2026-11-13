@@ -23,3 +23,14 @@ export async function evaluationTabSection(page: Page, heading: string): Promise
   await expect(table, `table of ${heading}`).toBeVisible();
   return table;
 }
+
+// Sends the request that Delete in a template list sends, for example to
+// check that the app refuses it. The list greys out Delete for templates the
+// user may not change. Production can refuse a delete without a same-origin
+// referer (IPEER_ENFORCE_REFERRER); the test stack does not, but the request
+// should not depend on that.
+export async function requestDelete(page: Page, controller: string, id: string): Promise<void> {
+  await page.goto(`/${controller}/delete/${id}`, {
+    referer: new URL(`/${controller}`, page.url()).href,
+  });
+}

@@ -9,7 +9,7 @@ import {
   pageTitle,
 } from '../support/helpers';
 import { idFromAjaxList, runAjaxListAction, waitForAjaxList } from '../support/ajax-list';
-import { evaluationTabSection, openEvaluationTab } from '../support/evaltools';
+import { evaluationTabSection, openEvaluationTab, requestDelete } from '../support/evaltools';
 import { USERS } from '../support/seed';
 
 // Ported from app/tests/cases/system/add_simple.test.php.
@@ -227,13 +227,7 @@ test("an instructor can view an admin's public simple evaluation but can neither
   await page.locator('#ajaxListDiv').getByRole('link', { name: SEEDED.name, exact: true }).click();
   await expect(viewField(page, 'Evaluation Name')).toHaveText(SEEDED.name);
 
-  // The list greys out Delete for templates the user may not change, so send
-  // the request the menu would send, from the list page. Production can refuse
-  // a delete without a same-origin referer (IPEER_ENFORCE_REFERRER); the test
-  // stack does not, but the request should not depend on that.
-  await page.goto(`/simpleevaluations/delete/${id}`, {
-    referer: new URL('/simpleevaluations', page.url()).href,
-  });
+  await requestDelete(page, 'simpleevaluations', id);
   await expect(flashMessage(page)).toHaveText(
     'Error: You do not have permission to delete this evaluation'
   );
