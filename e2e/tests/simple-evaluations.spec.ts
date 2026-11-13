@@ -8,7 +8,8 @@ import {
   nav,
   pageTitle,
 } from '../support/helpers';
-import { runAjaxListAction, waitForAjaxList } from '../support/ajax-list';
+import { idFromAjaxList, runAjaxListAction, waitForAjaxList } from '../support/ajax-list';
+import { openEvaluationTab } from '../support/evaltools';
 import { USERS } from '../support/seed';
 
 // Ported from app/tests/cases/system/add_simple.test.php.
@@ -46,14 +47,6 @@ async function fillForm(page: Page, evaluation: SimpleEvaluation): Promise<void>
   await page.getByLabel(evaluation.availability, { exact: true }).check();
 }
 
-// The Evaluation tab lists the templates of the signed-in user.
-async function openEvaluationTab(page: Page): Promise<void> {
-  await page.goto('/evaltools');
-  // Proves the page is the tab, so a template that is absent from it is not
-  // absent because some other page loaded.
-  await expect(page.getByRole('heading', { name: 'My Simple Evaluations' })).toBeVisible();
-}
-
 // Opens a template of the signed-in user from the Evaluation tab, and returns
 // its id.
 async function openFromEvaluationTab(page: Page, name: string): Promise<string> {
@@ -64,18 +57,8 @@ async function openFromEvaluationTab(page: Page, name: string): Promise<string> 
   return idFromUrl(page);
 }
 
-// A save ends on the template list, where the name links to the view page.
-async function idFromList(page: Page, name: string): Promise<string> {
-  await waitForAjaxList(page);
-  const href = await page
-    .locator('#ajaxListDiv')
-    .getByRole('link', { name, exact: true })
-    .getAttribute('href');
-  const id = href?.match(/\/simpleevaluations\/view\/(\d+)$/)?.[1];
-  if (!id) {
-    throw new Error(`no view link for ${name} in the list: ${href}`);
-  }
-  return id;
+function idFromList(page: Page, name: string): Promise<string> {
+  return idFromAjaxList(page, name, 'simpleevaluations');
 }
 
 async function addSimpleEvaluation(page: Page, evaluation: SimpleEvaluation): Promise<string> {
