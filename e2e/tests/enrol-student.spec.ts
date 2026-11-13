@@ -6,6 +6,7 @@ import {
   dropFromClassList,
   enrolExistingUser,
   expectInClassList,
+  insertEnrolment,
   expectNotInClassList,
   removeTutorFromCourse,
   typeExistingUsername,
@@ -37,9 +38,32 @@ test('a super admin enrols an existing student and the student joins the class l
   await expectClassSize(page, COURSES.apsc201.id, COURSES.apsc201.studentCount + 1);
 });
 
-test('a super admin unenrols a student and the student leaves the class list', async ({ page }) => {
+// The insert must give what the form gives, or the tests that use it test
+// something the app cannot make.
+test('an inserted enrolment shows like one made through the form', async ({
+  page,
+  testDatabase,
+}) => {
   await login(page, USERS.superAdmin);
-  await enrolChrisInApsc201(page);
+
+  await insertEnrolment(testDatabase, COURSES.apsc201.id, STUDENTS.chris.username);
+  await expectInClassList(page, COURSES.apsc201.id, STUDENTS.chris);
+  await expectClassSize(page, COURSES.apsc201.id, COURSES.apsc201.studentCount + 1);
+
+  await insertEnrolment(testDatabase, COURSES.mech328.id, TUTORS.tutor3.username);
+  await expectCourseTutors(page, COURSES.mech328.id, [
+    ...SEEDED_MECH328_TUTORS,
+    TUTORS.tutor3.name,
+  ]);
+  await expectClassSize(page, COURSES.mech328.id, COURSES.mech328.studentCount);
+});
+
+test('a super admin unenrols a student and the student leaves the class list', async ({
+  page,
+  testDatabase,
+}) => {
+  await login(page, USERS.superAdmin);
+  await insertEnrolment(testDatabase, COURSES.apsc201.id, STUDENTS.chris.username);
 
   await dropFromClassList(page, COURSES.apsc201.id, STUDENTS.chris);
 
@@ -60,9 +84,9 @@ test('a super admin enrols a tutor and the tutor joins the course tutor list', a
   await expectClassSize(page, COURSES.mech328.id, COURSES.mech328.studentCount);
 });
 
-test('a super admin unenrols a tutor from a course', async ({ page }) => {
+test('a super admin unenrols a tutor from a course', async ({ page, testDatabase }) => {
   await login(page, USERS.superAdmin);
-  await enrolTutor3InMech328(page);
+  await insertEnrolment(testDatabase, COURSES.mech328.id, TUTORS.tutor3.username);
 
   await removeTutorFromCourse(page, COURSES.mech328.id, TUTORS.tutor3.name);
 
