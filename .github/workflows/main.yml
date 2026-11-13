@@ -81,7 +81,7 @@ jobs:
           # Docker layer cache, shared with the test jobs. COMMIT_HASH changes
           # only the last layer, so all earlier layers can come from the cache.
           cache-from: type=gha,scope=ipeer-image
-          cache-to: type=gha,scope=ipeer-image,mode=max
+          cache-to: type=gha,scope=ipeer-image,mode=max,ignore-error=true
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
@@ -116,7 +116,7 @@ jobs:
           tags: ipeer-app-test
           load: true
           cache-from: type=gha,scope=ipeer-image
-          cache-to: type=gha,scope=ipeer-image,mode=max
+          cache-to: type=gha,scope=ipeer-image,mode=max,ignore-error=true
 
       # Composer cache: vendor/ from an earlier run with the same composer.lock,
       # so the composer install in prepare.sh has little or nothing to download.
@@ -170,7 +170,7 @@ jobs:
           tags: ipeer-app-test
           load: true
           cache-from: type=gha,scope=ipeer-image
-          cache-to: type=gha,scope=ipeer-image,mode=max
+          cache-to: type=gha,scope=ipeer-image,mode=max,ignore-error=true
 
       # Composer cache: vendor/ from an earlier run with the same composer.lock,
       # so the composer install in prepare.sh has little or nothing to download.
