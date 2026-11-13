@@ -9,7 +9,7 @@ import {
   pageTitle,
 } from '../support/helpers';
 import { idFromAjaxList, runAjaxListAction, waitForAjaxList } from '../support/ajax-list';
-import { openEvaluationTab } from '../support/evaltools';
+import { evaluationTabSection, openEvaluationTab } from '../support/evaltools';
 import { USERS } from '../support/seed';
 
 // Ported from app/tests/cases/system/add_simple.test.php.
@@ -35,8 +35,8 @@ const SAVE = { name: 'Save', exact: true } as const;
 
 const DELETE_QUESTION = 'Are you sure you want to delete this evaluation permanently?';
 
+// Runs Delete from the template list, which must be the open page.
 async function deleteFromList(page: Page, name: string): Promise<void> {
-  await page.goto('/simpleevaluations');
   await runAjaxListAction(page, name, 'Delete Evaluation', DELETE_QUESTION);
 }
 
@@ -51,14 +51,15 @@ async function fillForm(page: Page, evaluation: SimpleEvaluation): Promise<void>
 // its id.
 async function openFromEvaluationTab(page: Page, name: string): Promise<string> {
   await openEvaluationTab(page);
-  await page.getByRole('link', { name, exact: true }).click();
+  await (await ownSimpleEvaluations(page)).getByRole('link', { name, exact: true }).click();
   // Read the id only once the view page has loaded.
   await expect(page).toHaveURL(/\/simpleevaluations\/view\/\d+$/);
   return idFromUrl(page);
 }
 
-function idFromList(page: Page, name: string): Promise<string> {
-  return idFromAjaxList(page, name, 'simpleevaluations');
+// The table of the signed-in user's templates on the Evaluation tab.
+function ownSimpleEvaluations(page: Page) {
+  return evaluationTabSection(page, 'My Simple Evaluations');
 }
 
 async function addSimpleEvaluation(page: Page, evaluation: SimpleEvaluation): Promise<string> {
@@ -69,7 +70,7 @@ async function addSimpleEvaluation(page: Page, evaluation: SimpleEvaluation): Pr
       await fillForm(page, evaluation);
       await page.getByRole('button', SAVE).click();
       await expect(goodMessage(page)).toHaveText('The evaluation was added successfully.');
-      return idFromList(page, evaluation.name);
+      return idFromAjaxList(page, evaluation.name, 'simpleevaluations');
     },
     { box: true }
   );
@@ -171,7 +172,7 @@ test('a copy of a simple evaluation keeps its fields under a new name', async ({
   await page.getByRole('button', SAVE).click();
   await expect(goodMessage(page)).toHaveText('The evaluation was added successfully.');
 
-  const copyId = await idFromList(page, copy.name);
+  const copyId = await idFromAjaxList(page, copy.name, 'simpleevaluations');
   expect(copyId, 'the copy is a new template').not.toBe(id);
   await page.goto(`/simpleevaluations/view/${copyId}`);
   await expectView(page, copy);
@@ -184,8 +185,9 @@ test('a simple evaluation that no event uses can be deleted', async ({ page }) =
   await expect(goodMessage(page)).toHaveText('The evaluation was deleted successfully.');
 
   await openEvaluationTab(page);
-  await expect(page.getByRole('link', { name: SEEDED.name, exact: true })).toBeVisible();
-  await expect(page.getByRole('link', { name: PROJECT.name, exact: true })).toHaveCount(0);
+  const own = await ownSimpleEvaluations(page);
+  await expect(own.getByRole('link', { name: SEEDED.name, exact: true })).toBeVisible();
+  await expect(own.getByRole('link', { name: PROJECT.name, exact: true })).toHaveCount(0);
   await page.goto(`/simpleevaluations/view/${id}`);
   await expect(flashMessage(page)).toHaveText('Error: Invalid ID.');
 });
@@ -193,6 +195,7 @@ test('a simple evaluation that no event uses can be deleted', async ({ page }) =
 test('a simple evaluation that events use cannot be deleted, and one with submissions cannot be edited', async ({
   page,
 }) => {
+  await page.goto('/simpleevaluations');
   await deleteFromList(page, SEEDED.name);
   await expect(flashMessage(page)).toContainText(
     'This evaluation is now in use, and can NOT be deleted.'
@@ -215,7 +218,8 @@ test("an instructor can view an admin's public simple evaluation but can neither
   await login(page, USERS.instructor1);
   // The Evaluation tab lists only the templates of the signed-in user.
   await openEvaluationTab(page);
-  await expect(page.getByRole('link', { name: PROJECT.name, exact: true })).toHaveCount(0);
+  const own = await ownSimpleEvaluations(page);
+  await expect(own.getByRole('link', { name: PROJECT.name, exact: true })).toHaveCount(0);
 
   // The list shows the public templates of other users.
   await page.goto('/simpleevaluations');

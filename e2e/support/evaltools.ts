@@ -10,10 +10,16 @@ export async function openEvaluationTab(page: Page): Promise<void> {
   await expect(page.getByRole('heading', { name: 'My Simple Evaluations' })).toBeVisible();
 }
 
-// The table under a section heading such as 'My Rubrics Evaluations'. Each
-// heading sits in its own header div, and the table follows that div.
-export function evaluationTabSection(page: Page, heading: string): Locator {
-  return page.locator(
-    `xpath=//div[h2[normalize-space()='${heading}']]/following-sibling::table[1]`
-  );
+// The table of one template type, under a heading such as 'My Rubrics
+// Evaluations'. Fails when the section is missing, so a check that a template
+// is absent from it cannot pass on a page without the section.
+export async function evaluationTabSection(page: Page, heading: string): Promise<Locator> {
+  const header = page
+    .locator('div.evaltool-section-header')
+    .filter({ has: page.getByRole('heading', { name: heading, exact: true }) });
+  await expect(header, `section ${heading}`).toHaveCount(1);
+  // The table follows the header div.
+  const table = header.locator('xpath=following-sibling::table[1]');
+  await expect(table, `table of ${heading}`).toBeVisible();
+  return table;
 }

@@ -23,7 +23,8 @@ export async function idFromAjaxList(
     .locator('#ajaxListDiv')
     .getByRole('link', { name, exact: true })
     .getAttribute('href');
-  const id = href?.match(new RegExp(`/${controller}/view/(\\d+)$`))?.[1];
+  const escaped = controller.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const id = href?.match(new RegExp(`/${escaped}/view/(\\d+)$`))?.[1];
   if (!id) {
     throw new Error(`no ${controller} view link for ${name} in the list: ${href}`);
   }
