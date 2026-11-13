@@ -2,8 +2,8 @@ import { expect, test, type Locator, type Page } from '../support/test';
 import { login, nav, pageTitle } from '../support/helpers';
 import { COURSES, USERS, fullName } from '../support/seed';
 
-// The other specs open the page they test by its URL. This spec checks, once,
-// that the tab bar and the pages under it link to those URLs.
+// Most specs open the page they test by its URL. This spec checks, once, that
+// the tab bar and the pages under it link to those URLs.
 // course-home-links.spec.ts does the same for the links of a course home page.
 
 type Link = {
@@ -20,6 +20,8 @@ type Link = {
 const tabBar = nav;
 // The links below the tab bar have names that the tab bar does not use.
 const content = (page: Page) => page.locator('body');
+// The links under the Evaluation tab to the list of each template type.
+const evaluationMenu = (page: Page) => page.locator('.evaltoolsnav');
 
 async function expectLinks(page: Page, links: readonly Link[]): Promise<void> {
   for (const link of links) {
@@ -28,7 +30,8 @@ async function expectLinks(page: Page, links: readonly Link[]): Promise<void> {
       async () => {
         await page.goto(link.from);
         await link.area(page).getByRole('link', { name: link.name, exact: true }).click();
-        await expect(page).toHaveURL(new RegExp(`${link.to}$`));
+        // A path is resolved against the base URL and must match exactly.
+        await expect(page).toHaveURL(link.to);
         await expect(pageTitle(page)).toContainText(link.title);
       },
       { box: true }
@@ -87,10 +90,46 @@ test('the Evaluation tab links to the Add page of each template type', async ({ 
       area: content,
       name: 'Add Rubric',
       to: '/rubrics/add',
-      title: 'Rubrics',
+      title: 'Rubrics > Add',
     },
     {
       from: '/evaltools',
+      area: content,
+      name: 'Add Mixed Evaluation',
+      to: '/mixevals/add',
+      title: 'Mixed Evaluations > Add',
+    },
+  ]);
+});
+
+test('the Evaluation menu links to the list of each template type, and the lists to Add', async ({
+  page,
+}) => {
+  await expectLinks(page, [
+    {
+      from: '/evaltools',
+      area: evaluationMenu,
+      name: 'Simple Evaluations',
+      to: '/simpleevaluations',
+      title: 'Simple Evaluations',
+    },
+    { from: '/evaltools', area: evaluationMenu, name: 'Rubrics', to: '/rubrics', title: 'Rubrics' },
+    {
+      from: '/evaltools',
+      area: evaluationMenu,
+      name: 'Mixed Evaluations',
+      to: '/mixevals',
+      title: 'Mixed Evaluations',
+    },
+    {
+      from: '/rubrics',
+      area: content,
+      name: 'Add Rubric',
+      to: '/rubrics/add',
+      title: 'Rubrics > Add',
+    },
+    {
+      from: '/mixevals',
       area: content,
       name: 'Add Mixed Evaluation',
       to: '/mixevals/add',

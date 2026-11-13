@@ -11,7 +11,8 @@ export async function login(page: Page, username: string): Promise<string> {
       // Posts the login form without loading it, which is faster than filling
       // it in. login.spec.ts tests the form itself, and logging out.
       // Without the cookies, the post starts a new session, so any earlier
-      // user is no longer signed in.
+      // user is no longer signed in. The session is bound to the user agent,
+      // and page.request sends the same one as the page.
       await page.context().clearCookies();
       const response = await page.request.post('/login', {
         form: {
@@ -19,7 +20,6 @@ export async function login(page: Page, username: string): Promise<string> {
           'data[Guard][password]': PASSWORD,
           auth_method: 'default',
         },
-        headers: { referer: new URL('/login', test.info().project.use.baseURL).href },
         maxRedirects: 0,
       });
       // A successful login redirects away from the login page.
@@ -28,20 +28,9 @@ export async function login(page: Page, username: string): Promise<string> {
       // means the server signed the user out again.
       const landing = response.headers()['location'] ?? '';
       expect(landing, `login of ${username}`).toBeTruthy();
-      const path = new URL(landing, test.info().project.use.baseURL).pathname;
+      const path = new URL(landing, response.url()).pathname;
       expect(path, `login of ${username}`).not.toBe('/login');
       return landing;
-    },
-    { box: true }
-  );
-}
-
-export async function logout(page: Page): Promise<void> {
-  await test.step(
-    'Log out',
-    async () => {
-      await page.goto('/logout');
-      await expect(page.getByRole('button', { name: 'Login' })).toBeVisible();
     },
     { box: true }
   );

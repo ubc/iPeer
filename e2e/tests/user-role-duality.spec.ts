@@ -57,10 +57,10 @@ test('a student of one course who is made instructor of another sees both views'
 
   await login(page, STUDENT.username);
   await page.goto('/home');
+  await expect(pendingStudentWork(page)).toContainText('Pending Event(s) Total');
   // The page is no longer split, so neither half has its heading.
   await expect(page.getByRole('heading', { level: 1, name: 'Instructor View' })).toHaveCount(0);
   await expect(page.getByRole('heading', { level: 1, name: 'Student View' })).toHaveCount(0);
-  await expect(pendingStudentWork(page)).toContainText('Pending Event(s) Total');
   await expectTabs(page, ['Home']);
 });
 
