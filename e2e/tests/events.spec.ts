@@ -10,6 +10,9 @@ import {
 } from '../support/helpers';
 import { idFromAjaxList, runAjaxListAction, waitForAjaxList } from '../support/ajax-list';
 import { COURSES, MECH328_GROUPS, USERS, fullName } from '../support/seed';
+import type { RowDataPacket } from 'mysql2/promise';
+import type { TestDatabase } from '../support/db';
+import { NOW, findId, insertRow, userId } from '../support/insert';
 
 // Ported from app/tests/cases/system/add_event.test.php. The Selenium test also
 // ran the send_emails console command, to check which students get a reminder.
@@ -220,18 +223,121 @@ async function fillForm(page: Page, event: NewEvent): Promise<void> {
   );
 }
 
-// Adds an event through the form and returns its id. The save ends on the
-// event list of the course.
-async function addEvent(page: Page, courseId: string, event: NewEvent): Promise<string> {
+// The id of each evaluation type in event_template_types, and the table of
+// its templates.
+const TEMPLATE_TYPES: Record<TemplateType, { id: number; table: string }> = {
+  SIMPLE: { id: 1, table: 'simple_evaluations' },
+  RUBRIC: { id: 2, table: 'rubrics' },
+  'MIX EVALUATION': { id: 4, table: 'mixevals' },
+};
+
+// Adds whole days to a date such as '2027-02-02 09:00:00'. Like PHP's
+// strtotime('+2 day'), it keeps the time of day.
+function addDays(date: string, days: number): string {
+  const time = new Date(`${date.replace(' ', 'T')}Z`);
+  time.setUTCDate(time.getUTCDate() + days);
+  return time.toISOString().slice(0, 19).replace('T', ' ');
+}
+
+// Writes the rows that a save of the Add Event form writes (see add and
+// setSchedule in events_controller.php), and returns the id of the event.
+async function insertEvent(
+  testDatabase: TestDatabase,
+  courseId: string,
+  event: NewEvent,
+  creator: string = USERS.instructor1
+): Promise<string> {
   return test.step(
-    `Add the event ${event.title}`,
+    `Insert the event ${event.title}`,
     async () => {
-      await page.goto(`/events/add/${courseId}`);
-      await fillForm(page, event);
-      await page.getByRole('button', SUBMIT).click();
-      await expect(goodMessage(page)).toHaveText(ADDED);
-      await expect(page).toHaveURL(new RegExp(`/events/index/${courseId}$`));
-      return idFromAjaxList(page, event.title, 'events');
+      const { connection } = testDatabase;
+      // The first reminder is on the release date only when the release is in
+      // the future. Otherwise the save starts the reminders at the time of the
+      // save, which these rows do not copy.
+      expect(
+        Date.parse(event.dates.releaseBegin.replace(' ', 'T')),
+        'release date'
+      ).toBeGreaterThan(Date.now());
+      const owner = await userId(testDatabase, creator);
+      const type = TEMPLATE_TYPES[event.type];
+      const id = await insertRow(testDatabase, 'events', {
+        title: event.title,
+        course_id: courseId,
+        // The save stores an empty field as NULL.
+        description: event.description || null,
+        event_template_type_id: type.id,
+        template_id: await findId(testDatabase, type.table, 'name', event.template),
+        self_eval: event.selfEval === 'Enabled' ? '1' : '0',
+        com_req: event.comments === 'Enabled' ? 1 : 0,
+        auto_release: 0,
+        enable_details: event.resultMode === 'Detailed' ? 1 : 0,
+        due_date: event.dates.due,
+        release_date_begin: event.dates.releaseBegin,
+        release_date_end: event.dates.releaseEnd,
+        result_release_date_begin: event.dates.resultBegin,
+        result_release_date_end: event.dates.resultEnd,
+        creator_id: owner,
+        created: NOW,
+        updater_id: owner,
+        modified: NOW,
+      });
+
+      // Cake writes only the two keys of each group row. The other columns,
+      // such as the release status 'None', keep their defaults.
+      const groupIds: string[] = [];
+      if (event.allGroups) {
+        const [groups] = await connection.query<RowDataPacket[]>(
+          'SELECT id FROM `groups` WHERE course_id = ? ORDER BY id',
+          [courseId]
+        );
+        groupIds.push(...groups.map((group) => String(group.id)));
+      }
+      for (const groupId of groupIds) {
+        await insertRow(testDatabase, 'group_events', { event_id: id, group_id: groupId });
+      }
+
+      for (const penalty of event.penalties) {
+        await insertRow(testDatabase, 'penalties', {
+          event_id: id,
+          days_late: Number(penalty.days),
+          percent_penalty: Number(penalty.percent),
+        });
+      }
+
+      // One reminder every few days from the release date until the due date,
+      // to every member of the groups. A student in two groups is listed
+      // twice, as the save does.
+      if (event.reminders && groupIds.length > 0) {
+        const [members] = await connection.query<RowDataPacket[]>(
+          'SELECT user_id FROM groups_members WHERE group_id IN (?)',
+          [groupIds]
+        );
+        const [templates] = await connection.query<RowDataPacket[]>(
+          'SELECT id, subject FROM email_templates WHERE name = ?',
+          [event.reminders.template]
+        );
+        expect(templates, `the email template ${event.reminders.template}`).toHaveLength(1);
+        const days = parseInt(event.reminders.every, 10);
+        for (
+          let date = event.dates.releaseBegin;
+          date < event.dates.due;
+          date = addDays(date, days)
+        ) {
+          await insertRow(testDatabase, 'email_schedules', {
+            subject: String(templates[0].subject),
+            // The id of the email template, not its text.
+            content: String(templates[0].id),
+            date,
+            from: owner,
+            to: ['save_reminder', ...members.map((member) => String(member.user_id))].join(';'),
+            course_id: courseId,
+            event_id: id,
+            creator_id: owner,
+            created: NOW,
+          });
+        }
+      }
+      return id;
     },
     { box: true }
   );
@@ -295,6 +401,57 @@ async function openEdit(page: Page, id: string): Promise<void> {
 async function saveEdit(page: Page): Promise<void> {
   await page.getByRole('button', SUBMIT).click();
   await expect(goodMessage(page)).toHaveText(EDITED);
+}
+
+// Checks the view page, the edit form and the reminders of FINAL_PROJECT,
+// which must be the only event with reminders. Opens the view page first.
+async function expectFinalProject(page: Page, id: string): Promise<void> {
+  await test.step(
+    `Expect the event ${FINAL_PROJECT.title}`,
+    async () => {
+      await page.goto(`/events/view/${id}`);
+      await expect(viewField(page, 'Course')).toHaveText(fullName(COURSES.mech328));
+      await expect(viewField(page, 'Event Title')).toHaveText(FINAL_PROJECT.title);
+      await expect(viewField(page, 'Description')).toHaveText(FINAL_PROJECT.description);
+      await expect(viewField(page, 'Evaluation Format')).toHaveText(FINAL_PROJECT.type);
+      await expect(viewField(page, 'Evaluation')).toHaveText(FINAL_PROJECT.template);
+      await expect(viewField(page, 'Allow Self-Evaluation?')).toHaveText('Enable');
+      await expect(viewField(page, 'Require Student Comments?')).toHaveText('Yes');
+      await expect(viewField(page, 'Auto-Release Results?')).toHaveText('Disable');
+      await expect(viewField(page, 'Student Result Mode')).toHaveText('Basic');
+      await expect(viewField(page, 'Due Date')).toContainText(`Feb 9, ${YEAR} 9:00 am`);
+      await expectPenaltiesOnView(page, FINAL_PROJECT.penalties);
+      for (const group of GROUPS) {
+        await expect(
+          viewField(page, 'Groups Assignment').getByRole('cell', { name: group.name, exact: true })
+        ).toBeVisible();
+      }
+
+      // The edit form shows what was saved.
+      await openEdit(page, id);
+      await expect(page.locator('#EventCourseId')).toHaveCount(0);
+      await expect(page.locator('label.course')).toHaveText(fullName(COURSES.mech328));
+      await expect(page.locator('#EventDueDate')).toHaveValue(DATES.due);
+      await expect(page.locator('#EventEmailSchedule')).toHaveValue('2');
+      await expect(page.locator('#GroupGroup')).toHaveValues(ALL_GROUP_IDS);
+      await expectPenaltyInputs(page, FINAL_PROJECT.penalties);
+
+      // A reminder goes to every member of the event's groups.
+      const reminders = await openReminders(page);
+      await expect(reminders).toHaveCount(4);
+      await reminders.first().click();
+      await expect(page.locator('#emailContent')).toContainText(
+        'A evaluation for {{{COURSENAME}}} is made available to you in iPeer'
+      );
+      const recipients = page
+        .locator('table.standardtable tr')
+        .filter({ has: page.getByRole('cell', { name: 'To', exact: true }) })
+        .getByRole('link');
+      await expect(recipients).toHaveCount(GROUP_MEMBERS.length);
+      expect((await recipients.allTextContents()).sort()).toEqual(GROUP_MEMBERS);
+    },
+    { box: true }
+  );
 }
 
 test('the Add Event form refuses a missing title and missing dates', async ({ page }) => {
@@ -399,50 +556,20 @@ test('an instructor adds an event with reminders, groups and late penalties', as
     .click();
   await expect(page).toHaveURL(/\/events\/view\/\d+$/);
   const id = idFromUrl(page);
-  await expect(viewField(page, 'Course')).toHaveText(fullName(COURSES.mech328));
-  await expect(viewField(page, 'Event Title')).toHaveText(FINAL_PROJECT.title);
-  await expect(viewField(page, 'Description')).toHaveText(FINAL_PROJECT.description);
-  await expect(viewField(page, 'Evaluation Format')).toHaveText(FINAL_PROJECT.type);
-  await expect(viewField(page, 'Evaluation')).toHaveText(FINAL_PROJECT.template);
-  await expect(viewField(page, 'Allow Self-Evaluation?')).toHaveText('Enable');
-  await expect(viewField(page, 'Require Student Comments?')).toHaveText('Yes');
-  await expect(viewField(page, 'Auto-Release Results?')).toHaveText('Disable');
-  await expect(viewField(page, 'Student Result Mode')).toHaveText('Basic');
-  await expect(viewField(page, 'Due Date')).toContainText(`Feb 9, ${YEAR} 9:00 am`);
-  await expectPenaltiesOnView(page, FINAL_PROJECT.penalties);
-  for (const group of GROUPS) {
-    await expect(
-      viewField(page, 'Groups Assignment').getByRole('cell', { name: group.name, exact: true })
-    ).toBeVisible();
-  }
-
-  // The edit form shows what was saved.
-  await openEdit(page, id);
-  await expect(page.locator('#EventCourseId')).toHaveCount(0);
-  await expect(page.locator('label.course')).toHaveText(fullName(COURSES.mech328));
-  await expect(page.locator('#EventDueDate')).toHaveValue(DATES.due);
-  await expect(page.locator('#EventEmailSchedule')).toHaveValue('2');
-  await expect(page.locator('#GroupGroup')).toHaveValues(ALL_GROUP_IDS);
-  await expectPenaltyInputs(page, FINAL_PROJECT.penalties);
-
-  // A reminder goes to every member of the event's groups.
-  const reminders = await openReminders(page);
-  await expect(reminders).toHaveCount(4);
-  await reminders.first().click();
-  await expect(page.locator('#emailContent')).toContainText(
-    'A evaluation for {{{COURSENAME}}} is made available to you in iPeer'
-  );
-  const recipients = page
-    .locator('table.standardtable tr')
-    .filter({ has: page.getByRole('cell', { name: 'To', exact: true }) })
-    .getByRole('link');
-  await expect(recipients).toHaveCount(GROUP_MEMBERS.length);
-  expect((await recipients.allTextContents()).sort()).toEqual(GROUP_MEMBERS);
+  await expectFinalProject(page, id);
 });
 
-test('editing an event can remove all of its groups', async ({ page }) => {
+// The insert must give what the form gives, or the tests that use it test
+// something the app cannot make.
+test('an inserted event shows like one added through the form', async ({ page, testDatabase }) => {
   await login(page, USERS.instructor1);
-  const id = await addEvent(page, COURSES.mech328.id, PLAIN);
+  const id = await insertEvent(testDatabase, COURSES.mech328.id, FINAL_PROJECT);
+  await expectFinalProject(page, id);
+});
+
+test('editing an event can remove all of its groups', async ({ page, testDatabase }) => {
+  await login(page, USERS.instructor1);
+  const id = await insertEvent(testDatabase, COURSES.mech328.id, PLAIN);
 
   await openEdit(page, id);
   await expect(page.locator('#GroupGroup')).toHaveValues(ALL_GROUP_IDS);
@@ -458,9 +585,10 @@ test('editing an event can remove all of its groups', async ({ page }) => {
 
 test('a new reminder frequency replaces the reminders, and Disable removes them', async ({
   page,
+  testDatabase,
 }) => {
   await login(page, USERS.instructor1);
-  const id = await addEvent(page, COURSES.mech328.id, {
+  const id = await insertEvent(testDatabase, COURSES.mech328.id, {
     ...PLAIN,
     reminders: { every: '2 Days', template: REMINDER.template },
   });
@@ -483,14 +611,17 @@ test('a new reminder frequency replaces the reminders, and Disable removes them'
   await expect(page.locator('#EventEmailSchedule')).toHaveValue('0');
 });
 
-test('an event with a single reminder shows a frequency of 7 days', async ({ page }) => {
+test('an event with a single reminder shows a frequency of 7 days', async ({
+  page,
+  testDatabase,
+}) => {
   await login(page, USERS.instructor1);
   // Three days from the release on 2 February is after the due date, so there
   // is one reminder. The form calculates the frequency from the interval
   // between the last two reminders, and with one reminder it shows 7 days.
   // This checks the current behaviour, not the wanted one: the form should
   // show the 3 days that were chosen. Update this test when that is fixed.
-  const id = await addEvent(page, COURSES.mech328.id, {
+  const id = await insertEvent(testDatabase, COURSES.mech328.id, {
     ...PLAIN,
     dates: { ...DATES, due: feb(4) },
     reminders: { every: '3 Days', template: REMINDER.template },
@@ -506,7 +637,7 @@ test('a sent reminder stays when the reminders change, and cannot be cancelled',
   testDatabase,
 }) => {
   await login(page, USERS.instructor1);
-  const id = await addEvent(page, COURSES.mech328.id, {
+  const id = await insertEvent(testDatabase, COURSES.mech328.id, {
     ...PLAIN,
     reminders: { every: '2 Days', template: REMINDER.template },
   });
@@ -587,9 +718,9 @@ test('an event with submissions locks its evaluation type and groups, and other 
   await expect(viewField(page, 'Late Penalty')).not.toContainText('100%');
 });
 
-test('an instructor deletes an event after a confirmation page', async ({ page }) => {
+test('an instructor deletes an event after a confirmation page', async ({ page, testDatabase }) => {
   await login(page, USERS.instructor1);
-  const id = await addEvent(page, COURSES.mech328.id, PLAIN);
+  const id = await insertEvent(testDatabase, COURSES.mech328.id, PLAIN);
 
   await page.goto(`/events/view/${id}`);
   await page.getByRole('link', { name: 'Delete Event', exact: true }).click();

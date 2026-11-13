@@ -24,11 +24,23 @@ export async function insertRow(
   return String(result.insertId);
 }
 
-export async function userId({ connection }: TestDatabase, username: string): Promise<string> {
-  const [rows] = await connection.query<RowDataPacket[]>(
-    'SELECT id FROM users WHERE username = ?',
-    [username]
-  );
-  expect(rows, `the user ${username}`).toHaveLength(1);
+// The id of the one row of a table with this value in a column, such as the
+// template with a name.
+export async function findId(
+  { connection }: TestDatabase,
+  table: string,
+  column: string,
+  value: string
+): Promise<string> {
+  const [rows] = await connection.query<RowDataPacket[]>('SELECT id FROM ?? WHERE ?? = ?', [
+    table,
+    column,
+    value,
+  ]);
+  expect(rows, `the ${table} row with ${column} ${value}`).toHaveLength(1);
   return String(rows[0].id);
+}
+
+export function userId(testDatabase: TestDatabase, username: string): Promise<string> {
+  return findId(testDatabase, 'users', 'username', username);
 }
