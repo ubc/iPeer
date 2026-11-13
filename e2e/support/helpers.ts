@@ -24,8 +24,12 @@ export async function login(page: Page, username: string): Promise<string> {
       });
       // A successful login redirects away from the login page.
       expect(response.status(), `login of ${username}`).toBe(302);
+      // The login page itself, also with a notice such as ?notice=inactive,
+      // means the server signed the user out again.
       const landing = response.headers()['location'] ?? '';
-      expect(landing, `login of ${username}`).not.toMatch(/(^|\/login)$/);
+      expect(landing, `login of ${username}`).toBeTruthy();
+      const path = new URL(landing, test.info().project.use.baseURL).pathname;
+      expect(path, `login of ${username}`).not.toBe('/login');
       return landing;
     },
     { box: true }
