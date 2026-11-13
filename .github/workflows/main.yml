@@ -91,9 +91,6 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
-    env:
-      # Docker Compose names the app-test image ipeer-app-test with this name.
-      COMPOSE_PROJECT_NAME: ipeer
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -114,6 +111,8 @@ jobs:
           # build-and-push-image job. Local docker compose keeps Xdebug.
           build-args: |
             INSTALL_XDEBUG=false
+          # Compose's default name for the app-test image, from the checkout
+          # folder (the repository name). prepare.sh fails if it does not match.
           tags: ipeer-app-test
           load: true
           cache-from: type=gha,scope=ipeer-image
@@ -141,9 +140,6 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
-    env:
-      # Docker Compose names the app-test image ipeer-app-test with this name.
-      COMPOSE_PROJECT_NAME: ipeer
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -169,6 +165,8 @@ jobs:
           # build-and-push-image job. Local docker compose keeps Xdebug.
           build-args: |
             INSTALL_XDEBUG=false
+          # Compose's default name for the app-test image, from the checkout
+          # folder (the repository name). prepare.sh fails if it does not match.
           tags: ipeer-app-test
           load: true
           cache-from: type=gha,scope=ipeer-image
