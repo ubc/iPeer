@@ -1,5 +1,12 @@
 import { expect, test, type Page } from '../support/test';
-import { errorMessage, flashMessage, goodMessage, login, nav } from '../support/helpers';
+import {
+  errorMessage,
+  flashMessage,
+  goodMessage,
+  login,
+  nav,
+  setPostedField,
+} from '../support/helpers';
 import { idFromAjaxList, runAjaxListAction, waitForAjaxList } from '../support/ajax-list';
 import { evaluationTabSection, openEvaluationTab, requestDelete } from '../support/evaltools';
 import { USERS } from '../support/seed';
@@ -7,7 +14,18 @@ import { USERS } from '../support/seed';
 // Ported from app/tests/cases/system/add_rubric.test.php.
 
 // The seeded rubric. Root created it, and an event with submissions uses it.
-const SEEDED = { id: '1', name: 'Term Report Evaluation' };
+// The seeded rubric, with the ids and texts of its first level, first
+// criterion and that criterion's first comment.
+const SEEDED = {
+  id: '1',
+  name: 'Term Report Evaluation',
+  levelId: '1',
+  level: 'Poor',
+  criterionId: '1',
+  criterion: 'Participated in Team Meetings',
+  commentId: '1',
+  comment: 'No participation.',
+};
 
 type Criterion = {
   name: string;
@@ -425,4 +443,66 @@ test("an instructor can neither list, view nor copy an admin's private rubric", 
   await expect(flashMessage(page)).toHaveText(
     'Error: You do not have permission to copy this rubric'
   );
+});
+
+// The forms post only the ids of the rubric's own rows. A save that posts any
+// other id is refused.
+const OUT_OF_DATE =
+  'The evaluation was not saved because the form was out of date. Please open it again.';
+
+test('a rubric save that posts the ids of another rubric is refused', async ({ page }) => {
+  const form = page.locator('#frm');
+  const listed = (name: string) =>
+    page.locator('#ajaxListDiv').getByRole('link', { name, exact: true });
+
+  await login(page, USERS.instructor1);
+  const id = await addRubric(page, MIDTERM);
+
+  await page.goto('/rubrics/add');
+  await fillFormat(page, { ...MIDTERM, name: 'Second Rubric' });
+  await page.getByRole('button', NEXT).click();
+  await fillTexts(page, MIDTERM);
+  await setPostedField(form, 'data[Rubric][id]', SEEDED.id);
+  await saveButton(page).click();
+  await expect(flashMessage(page)).toHaveText(OUT_OF_DATE);
+  await waitForAjaxList(page);
+  await expect(listed(MIDTERM.name)).toBeVisible();
+  await expect(listed('Second Rubric')).toHaveCount(0);
+
+  const forged = [
+    ['data[Rubric][id]', SEEDED.id],
+    ['data[RubricsLom][0][id]', SEEDED.levelId],
+    ['data[RubricsCriteria][0][id]', SEEDED.criterionId],
+    ['data[RubricsCriteria][0][RubricsCriteriaComment][0][id]', SEEDED.commentId],
+  ] as const;
+  for (const [field, value] of forged) {
+    await test.step(`Edit with ${field} set to ${value}`, async () => {
+      await page.goto(`/rubrics/edit/${id}`);
+      await page.locator('#RubricsCriteria0Criteria').fill('Changed');
+      await setPostedField(form, field, value);
+      await saveButton(page).click();
+      await expect(flashMessage(page)).toHaveText(OUT_OF_DATE);
+    });
+  }
+  await page.goto(`/rubrics/edit/${id}`);
+  await expectForm(page, MIDTERM);
+
+  await page.goto(`/rubrics/copy/${SEEDED.id}`);
+  await expect(page.locator('#name')).toHaveValue(`Copy of ${SEEDED.name}`);
+  await setPostedField(form, 'data[Rubric][id]', SEEDED.id);
+  await saveButton(page).click();
+  await expect(flashMessage(page)).toHaveText(OUT_OF_DATE);
+  await waitForAjaxList(page);
+  await expect(listed(MIDTERM.name)).toBeVisible();
+  await expect(listed(`Copy of ${SEEDED.name}`)).toHaveCount(0);
+
+  await login(page, USERS.superAdmin);
+  await page.goto(`/rubrics/view/${SEEDED.id}`);
+  await expect(page.locator('#name')).toHaveValue(SEEDED.name);
+  // The view page does not show the texts, but the copy form does.
+  await page.goto(`/rubrics/copy/${SEEDED.id}`);
+  await expect(page.locator('#name')).toHaveValue(`Copy of ${SEEDED.name}`);
+  await expect(page.locator('#RubricsLom0LomComment')).toHaveValue(SEEDED.level);
+  await expect(page.locator('#RubricsCriteria0Criteria')).toHaveValue(SEEDED.criterion);
+  await expect(criterionComment(page, 0, 0)).toHaveValue(SEEDED.comment);
 });

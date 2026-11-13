@@ -101,6 +101,85 @@ class RubricsControllerTest extends ExtendedAuthTestCase {
     
     }
     
+    public function testHasOnlyOwnIdsForANewRubric()
+    {
+        $controller = new RubricsController();
+        $controller->constructClasses();
+        // The forms post empty ids for new rows.
+        $posted = [
+            'Rubric' => ['id' => '', 'name' => 'New'],
+            'RubricsLom' => [['id' => '', 'lom_comment' => 'Low']],
+            'RubricsCriteria' => [[
+                'id' => '',
+                'criteria' => 'Effort',
+                'RubricsCriteriaComment' => [['id' => '', 'criteria_comment' => 'Little']],
+            ]],
+        ];
+
+        $controller->data = $posted;
+        $this->assertTrue($controller->_hasOnlyOwnIds(null));
+        $this->assertFalse(isset($controller->data['Rubric']['id']));
+        $this->assertEqual('Effort', $controller->data['RubricsCriteria'][0]['criteria']);
+
+        $paths = [
+            'Rubric',
+            'RubricsLom.0',
+            'RubricsCriteria.0',
+            'RubricsCriteria.0.RubricsCriteriaComment.0',
+        ];
+        foreach ($paths as $path) {
+            $controller->data = Set::insert($posted, "$path.id", '1');
+            $this->assertFalse($controller->_hasOnlyOwnIds(null), "$path.id");
+        }
+    }
+
+    public function testHasOnlyOwnIdsForAnEditedRubric()
+    {
+        $controller = new RubricsController();
+        $controller->constructClasses();
+        // Seeded rubric 1 has levels 1 to 5, criteria 1 to 3 and comments 1
+        // to 15.
+        $posted = [
+            'Rubric' => ['id' => '1', 'name' => 'Edited'],
+            'RubricsLom' => [
+                ['id' => '5', 'lom_comment' => 'Own level'],
+                ['id' => '', 'lom_comment' => 'New level'],
+            ],
+            'RubricsCriteria' => [[
+                'id' => '3',
+                'criteria' => 'Own criterion',
+                'RubricsCriteriaComment' => [
+                    ['id' => '15', 'criteria_comment' => 'Own comment'],
+                    ['id' => '', 'criteria_comment' => 'New comment'],
+                ],
+            ]],
+        ];
+
+        $controller->data = $posted;
+        $this->assertTrue($controller->_hasOnlyOwnIds(1));
+        $this->assertIdentical(1, $controller->data['Rubric']['id']);
+        $this->assertEqual('5', $controller->data['RubricsLom'][0]['id']);
+
+        $refused = [
+            'another rubric id' => Set::insert($posted, 'Rubric.id', '2'),
+            'an unknown level' => Set::insert($posted, 'RubricsLom.1.id', '999'),
+            'an unknown criterion' => Set::insert($posted, 'RubricsCriteria.0.id', '999'),
+            'an unknown comment' => Set::insert(
+                $posted,
+                'RubricsCriteria.0.RubricsCriteriaComment.1.id',
+                '999'
+            ),
+        ];
+        foreach ($refused as $case => $data) {
+            $controller->data = $data;
+            $this->assertFalse($controller->_hasOnlyOwnIds(1), $case);
+        }
+
+        // The rows of rubric 1 are not the rows of any other rubric.
+        $controller->data = Set::insert($posted, 'Rubric.id', '999');
+        $this->assertFalse($controller->_hasOnlyOwnIds(999));
+    }
+
     function testCopy() {
     
     }

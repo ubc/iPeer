@@ -280,6 +280,17 @@ class SimpleevaluationsController extends AppController
             push(Inflector::humanize(Inflector::underscore($this->action)))
         );
         if (!empty($this->data)) {
+            // A new template has no id yet.
+            if (!in_array($this->data['SimpleEvaluation']['id'] ?? null, [null, ''], true)) {
+                CakeLog::write('warning', sprintf(
+                    'Simple evaluation not saved: user %s, id posted for a new template',
+                    User::get('id')
+                ));
+                $this->Session->setFlash(__('The evaluation was not saved because the form was out of date. Please open it again.', true));
+                $this->redirect('index');
+                return;
+            }
+            unset($this->data['SimpleEvaluation']['id']);
             if ($this->__processForm()) {
                 $this->Session->setFlash(__("The evaluation was added successfully.", true), 'good');
                 $this->redirect('index');

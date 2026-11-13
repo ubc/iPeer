@@ -143,3 +143,23 @@ export function notCsvFile(name: string): { name: string; mimeType: string; buff
     buffer: Buffer.from('not a CSV file'),
   };
 }
+
+// Sets a field that a form posts, and adds it as a hidden input when the form
+// has no field with that name. Lets a test post values that the page does not
+// offer, as a user could with the browser's developer tools.
+export async function setPostedField(form: Locator, name: string, value: string): Promise<void> {
+  await form.evaluate(
+    (element, [fieldName, fieldValue]) => {
+      const formElement = element as HTMLFormElement;
+      let input = formElement.querySelector<HTMLInputElement>(`[name="${CSS.escape(fieldName)}"]`);
+      if (!input) {
+        input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = fieldName;
+        formElement.appendChild(input);
+      }
+      input.value = fieldValue;
+    },
+    [name, value]
+  );
+}

@@ -1,5 +1,13 @@
 import { expect, test, type Locator, type Page } from '../support/test';
-import { errorMessage, flashMessage, goodMessage, login, nav, pageTitle } from '../support/helpers';
+import {
+  errorMessage,
+  flashMessage,
+  goodMessage,
+  login,
+  nav,
+  pageTitle,
+  setPostedField,
+} from '../support/helpers';
 import { idFromAjaxList, runAjaxListAction, waitForAjaxList } from '../support/ajax-list';
 import { evaluationTabSection, openEvaluationTab, requestDelete } from '../support/evaltools';
 import { USERS } from '../support/seed';
@@ -7,8 +15,16 @@ import { USERS } from '../support/seed';
 // Ported from app/tests/cases/system/add_mixeval.test.php.
 
 // The seeded template. Root created it, it is public, and an event with
-// submissions uses it.
-const SEEDED = { id: '1', name: 'Default Mix Evaluation' };
+// submissions uses it. Its first question is a Likert question, and the
+// lowest level of that question is its first descriptor.
+const SEEDED = {
+  id: '1',
+  name: 'Default Mix Evaluation',
+  questionId: '1',
+  questionTitle: 'Participated in Team Meetings',
+  descriptorId: '1',
+  descriptor: 'Lowest',
+};
 
 type Question = {
   type: 'Likert' | 'Sentence' | 'Paragraph' | 'ScoreDropdown';
@@ -610,4 +626,72 @@ test("an instructor can neither list, view nor copy an admin's private mixed eva
   await expect(flashMessage(page)).toHaveText(
     'Error: You do not have permission to copy this evaluation'
   );
+});
+
+// The forms post only the ids of the template's own rows. A save that posts
+// any other id is refused.
+const OUT_OF_DATE =
+  'The evaluation was not saved because the form was out of date. Please open it again.';
+
+test('a mixed evaluation save that posts the ids of another template is refused', async ({
+  page,
+}) => {
+  const own: Mixeval = {
+    name: 'Own Evaluation',
+    availability: 'Private',
+    zeroMark: false,
+    selfEval: false,
+    peer: [likert('Own rating', true, '4')],
+    self: [],
+  };
+  const form = page.locator('form').filter({ has: page.locator('#MixevalName') });
+  const listed = (name: string) =>
+    page.locator('#ajaxListDiv').getByRole('link', { name, exact: true });
+
+  await login(page, USERS.instructor1);
+  const id = await addMixeval(page, own);
+
+  await page.goto('/mixevals/add');
+  await fillForm(page, { ...own, name: 'Second Evaluation' });
+  await setPostedField(form, 'data[Mixeval][id]', SEEDED.id);
+  await page.getByRole('button', SAVE).click();
+  await expect(flashMessage(page)).toHaveText(OUT_OF_DATE);
+  await waitForAjaxList(page);
+  await expect(listed(own.name)).toBeVisible();
+  await expect(listed('Second Evaluation')).toHaveCount(0);
+
+  const forged = [
+    ['data[Mixeval][id]', SEEDED.id],
+    ['data[MixevalQuestion][0][id]', SEEDED.questionId],
+    ['data[MixevalQuestionDesc][0][id]', SEEDED.descriptorId],
+  ] as const;
+  for (const [field, value] of forged) {
+    await test.step(`Edit with ${field} set to ${value}`, async () => {
+      await page.goto(`/mixevals/edit/${id}`);
+      await sectionQuestions(page, 'Peer').nth(0).locator('input[id$="Title"]').fill('Changed');
+      await setPostedField(form, field, value);
+      await page.getByRole('button', SAVE).click();
+      await expect(flashMessage(page)).toHaveText(OUT_OF_DATE);
+    });
+  }
+  await page.goto(`/mixevals/edit/${id}`);
+  await expectForm(page, own);
+
+  await page.goto(`/mixevals/copy/${SEEDED.id}`);
+  await expect(page.locator('#MixevalName')).toHaveValue(`Copy of ${SEEDED.name}`);
+  await setPostedField(form, 'data[Mixeval][id]', SEEDED.id);
+  await page.getByRole('button', SAVE).click();
+  await expect(flashMessage(page)).toHaveText(OUT_OF_DATE);
+  await waitForAjaxList(page);
+  await expect(listed(own.name)).toBeVisible();
+  await expect(listed(`Copy of ${SEEDED.name}`)).toHaveCount(0);
+
+  await login(page, USERS.superAdmin);
+  await page.goto(`/mixevals/view/${SEEDED.id}`);
+  await expect(viewDetail(page, 'Name')).toHaveText(SEEDED.name);
+  const first = page.locator('.MixevalQuestion').first();
+  await expect(first.locator('h3.question-title')).toHaveText(
+    new RegExp(`^1\\. ${SEEDED.questionTitle}`)
+  );
+  await expect(first.locator('tr').first().getByRole('cell').first()).toHaveText(SEEDED.descriptor);
 });

@@ -295,6 +295,11 @@ class RubricsController extends AppController
                 $this->data['Rubric']['view_mode'] = 'student';
             }
             if (isset($this->params['form']['submit'])) {
+                if (!$this->_hasOnlyOwnIds(null)) {
+                    $this->Session->setFlash(__('The evaluation was not saved because the form was out of date. Please open it again.', true));
+                    $this->redirect('index');
+                    return;
+                }
                 if ($this->__processForm()) {
                     $this->Session->setFlash(__('The rubric was added successfully.', true), 'good');
                     $this->redirect('index');
@@ -374,6 +379,11 @@ class RubricsController extends AppController
             if (!empty($this->params['form']['preview'])) {
                 $this->set('data', $this->data);
             } else {
+                if (!$this->_hasOnlyOwnIds((int) $id)) {
+                    $this->Session->setFlash(__('The evaluation was not saved because the form was out of date. Please open it again.', true));
+                    $this->redirect('index');
+                    return;
+                }
                 if ($this->__processForm()) {
                     $this->Session->setFlash(__('The rubric evaluation was updated successfully', true), 'good');
                     $this->redirect('index');
@@ -396,6 +406,97 @@ class RubricsController extends AppController
         $this->set('action', __('Edit Rubric', true));
     }
 
+
+    /**
+     * Checks that the posted ids belong to the rubric being saved. The rubric
+     * id must be the one from the URL (none for a new rubric), and each level,
+     * criterion and criterion comment id must be one of the rubric's own rows.
+     * Empty ids are new rows. Logs a warning when an id does not belong.
+     *
+     * @param int|null $rubricId the id of the rubric, or null for a new one
+     *
+     * @return bool true when every posted id belongs to the rubric
+     */
+    public function _hasOnlyOwnIds(?int $rubricId): bool
+    {
+        $lomIds = $criteriaIds = $commentIds = [];
+        if ($rubricId !== null) {
+            $lomIds = $this->RubricsLom->find('list', [
+                'conditions' => ['rubric_id' => $rubricId],
+                'fields' => ['id'],
+            ]);
+            $criteriaIds = $this->RubricsCriteria->find('list', [
+                'conditions' => ['rubric_id' => $rubricId],
+                'fields' => ['id'],
+            ]);
+            if (!empty($criteriaIds)) {
+                $commentIds = $this->RubricsCriteriaComment->find('list', [
+                    'conditions' => ['criteria_id' => array_values($criteriaIds)],
+                    'fields' => ['id'],
+                ]);
+            }
+        }
+
+        $foreign = [];
+        $postedId = $this->data['Rubric']['id'] ?? null;
+        if (!in_array($postedId, [null, ''], true)
+            && (!is_scalar($postedId) || (string) $postedId !== (string) $rubricId)
+        ) {
+            $foreign['Rubric'] = [$postedId];
+        }
+        $foreign['RubricsLom'] = $this->_foreignIds($this->data['RubricsLom'] ?? null, $lomIds);
+        $criteria = $this->data['RubricsCriteria'] ?? null;
+        $foreign['RubricsCriteria'] = $this->_foreignIds($criteria, $criteriaIds);
+        $foreign['RubricsCriteriaComment'] = [];
+        foreach (is_array($criteria) ? $criteria : [] as $row) {
+            if (is_array($row)) {
+                $foreign['RubricsCriteriaComment'] = array_merge(
+                    $foreign['RubricsCriteriaComment'],
+                    $this->_foreignIds($row['RubricsCriteriaComment'] ?? null, $commentIds)
+                );
+            }
+        }
+        $foreign = array_filter($foreign);
+        if (!empty($foreign)) {
+            CakeLog::write('warning', sprintf(
+                'Rubric not saved: user %s, rubric %s, ids not in the rubric: %s',
+                User::get('id'),
+                $rubricId ?? 'new',
+                json_encode($foreign)
+            ));
+            return false;
+        }
+
+        if ($rubricId === null) {
+            unset($this->data['Rubric']['id']);
+        } else {
+            $this->data['Rubric']['id'] = $rubricId;
+        }
+        return true;
+    }
+
+    /**
+     * Lists the non-empty ids of the rows that are not in $ownIds.
+     *
+     * @param mixed $rows   the posted rows
+     * @param array $ownIds the ids of the rows that may be saved
+     *
+     * @return array the other ids
+     */
+    public function _foreignIds(mixed $rows, array $ownIds): array
+    {
+        $ownIds = array_map('strval', array_values($ownIds));
+        $foreign = [];
+        foreach (is_array($rows) ? $rows : [] as $row) {
+            $id = is_array($row) ? ($row['id'] ?? null) : null;
+            if (!in_array($id, [null, ''], true)
+                && (!is_scalar($id) || !in_array((string) $id, $ownIds, true))
+            ) {
+                $foreign[] = $id;
+            }
+        }
+        return $foreign;
+    }
 
     /**
      * __processForm

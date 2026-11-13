@@ -90,6 +90,27 @@ class SimpleevaluationsControllerTest extends ExtendedAuthTestCase {
     function testAdd(){
     }
 
+    public function testAddDoesNotChangeAnotherTemplate()
+    {
+        $model = ClassRegistry::init('SimpleEvaluation');
+        $before = $model->findById(1);
+
+        $this->testAction('/simpleevaluations/add', [
+            'method' => 'post',
+            'data' => ['SimpleEvaluation' => [
+                'id' => '1',
+                'name' => 'Template with a posted id',
+                'description' => 'Description',
+                'point_per_member' => '10',
+                'availability' => 'private',
+            ]],
+            'return' => 'vars',
+        ]);
+
+        $this->assertEqual($before, $model->findById(1));
+        $this->assertFalse($model->findByName('Template with a posted id'));
+    }
+
     //TODO test saving, redirect
     function testEdit() {
         //    $result = $this->testAction('/simpleevaluations/edit/1', array('connection' => 'test_suite', 'return' => 'vars'));

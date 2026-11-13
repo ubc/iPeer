@@ -7,6 +7,7 @@ import {
   login,
   nav,
   pageTitle,
+  setPostedField,
 } from '../support/helpers';
 import { idFromAjaxList, runAjaxListAction, waitForAjaxList } from '../support/ajax-list';
 import { evaluationTabSection, openEvaluationTab, requestDelete } from '../support/evaltools';
@@ -239,4 +240,31 @@ test("an instructor can view an admin's public simple evaluation but can neither
   // The refusals left the template as it was.
   await page.goto(`/simpleevaluations/view/${id}`);
   await expectView(page, PROJECT);
+});
+
+test('a simple evaluation save that posts the id of another template is refused', async ({
+  page,
+}) => {
+  await login(page, USERS.instructor1);
+  await page.goto('/simpleevaluations/add');
+  await fillForm(page, PROJECT);
+  // The form posts no id for a new template.
+  await setPostedField(
+    page.locator('form').filter({ has: page.locator('#SimpleEvaluationName') }),
+    'data[SimpleEvaluation][id]',
+    SEEDED.id
+  );
+  await page.getByRole('button', SAVE).click();
+  await expect(flashMessage(page)).toHaveText(
+    'The evaluation was not saved because the form was out of date. Please open it again.'
+  );
+  await waitForAjaxList(page);
+  const list = page.locator('#ajaxListDiv');
+  // The public seeded template proves the list has loaded.
+  await expect(list.getByRole('link', { name: SEEDED.name, exact: true })).toBeVisible();
+  await expect(list.getByRole('link', { name: PROJECT.name, exact: true })).toHaveCount(0);
+
+  await login(page, USERS.superAdmin);
+  await page.goto(`/simpleevaluations/view/${SEEDED.id}`);
+  await expect(viewField(page, 'Evaluation Name')).toHaveText(SEEDED.name);
 });

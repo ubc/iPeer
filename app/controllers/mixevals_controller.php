@@ -294,6 +294,11 @@ class MixevalsController extends AppController
 
         // Process form submit
         if (!empty($this->data)) {
+            if (!$this->_hasOnlyOwnIds(null)) {
+                $this->Session->setFlash(__('The evaluation was not saved because the form was out of date. Please open it again.', true));
+                $this->redirect('index');
+                return;
+            }
             $this->_dataSavePrep();
             $this->_transactionalSave();
         }
@@ -305,6 +310,69 @@ class MixevalsController extends AppController
             $this->breadcrumb->push('mixevals')->
             push(Inflector::humanize(Inflector::underscore($this->action)))
         );
+    }
+
+    /**
+     * Checks that the posted ids belong to the mixed evaluation being saved.
+     * The template id must be the one from the URL (none for a new template),
+     * and each question and descriptor id must be one of the template's own
+     * rows. Empty ids are new rows. Logs a warning when an id does not belong.
+     *
+     * @param int|null $mixevalId the id of the template, or null for a new one
+     *
+     * @return bool true when every posted id belongs to the template
+     */
+    public function _hasOnlyOwnIds(?int $mixevalId): bool
+    {
+        $ownIds = ['MixevalQuestion' => [], 'MixevalQuestionDesc' => []];
+        if ($mixevalId !== null) {
+            $ownIds['MixevalQuestion'] = $this->MixevalQuestion->find('list', [
+                'conditions' => ['mixeval_id' => $mixevalId],
+                'fields' => ['id'],
+            ]);
+            if (!empty($ownIds['MixevalQuestion'])) {
+                $ownIds['MixevalQuestionDesc'] = $this->MixevalQuestionDesc->find('list', [
+                    'conditions' => ['question_id' => array_values($ownIds['MixevalQuestion'])],
+                    'fields' => ['id'],
+                ]);
+            }
+        }
+
+        $foreign = [];
+        $postedId = $this->data['Mixeval']['id'] ?? null;
+        if (!in_array($postedId, [null, ''], true)
+            && (!is_scalar($postedId) || (string) $postedId !== (string) $mixevalId)
+        ) {
+            $foreign['Mixeval'] = [$postedId];
+        }
+        foreach ($ownIds as $model => $ids) {
+            $rows = $this->data[$model] ?? [];
+            $ids = array_map('strval', array_values($ids));
+            foreach (is_array($rows) ? $rows : [] as $row) {
+                $id = is_array($row) ? ($row['id'] ?? null) : null;
+                if (!in_array($id, [null, ''], true)
+                    && (!is_scalar($id) || !in_array((string) $id, $ids, true))
+                ) {
+                    $foreign[$model][] = $id;
+                }
+            }
+        }
+        if (!empty($foreign)) {
+            CakeLog::write('warning', sprintf(
+                'Mixed evaluation not saved: user %s, template %s, ids not in the template: %s',
+                User::get('id'),
+                $mixevalId ?? 'new',
+                json_encode($foreign)
+            ));
+            return false;
+        }
+
+        if ($mixevalId === null) {
+            unset($this->data['Mixeval']['id']);
+        } else {
+            $this->data['Mixeval']['id'] = $mixevalId;
+        }
+        return true;
     }
 
     /**
@@ -640,6 +708,11 @@ class MixevalsController extends AppController
 
         // Save changes if there are any
         if (!empty($this->data)) {
+            if (!$this->_hasOnlyOwnIds((int) $id)) {
+                $this->Session->setFlash(__('The evaluation was not saved because the form was out of date. Please open it again.', true));
+                $this->redirect('index');
+                return;
+            }
             $this->_dataSavePrep();
             // This is kind of a hack. Inside _transactionSave, it will call saveAll with 'validate' option
             // equals to 'only' to perform validation.  In turn, the cake library Model's __save function
@@ -718,6 +791,11 @@ class MixevalsController extends AppController
     {
         // Process form submit
         if (!empty($this->data)) {
+            if (!$this->_hasOnlyOwnIds(null)) {
+                $this->Session->setFlash(__('The evaluation was not saved because the form was out of date. Please open it again.', true));
+                $this->redirect('index');
+                return;
+            }
             $this->_dataSavePrep();
             $this->_transactionalSave();
         } else {

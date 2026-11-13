@@ -567,6 +567,92 @@ class MixevalsControllerTest extends ExtendedAuthTestCase {
         }
     }
 
+    public function testHasOnlyOwnIdsForANewTemplate()
+    {
+        $controller = new MixevalsController();
+        $controller->constructClasses();
+        // The forms post empty ids for new rows.
+        $posted = [
+            'Mixeval' => ['id' => '', 'name' => 'New'],
+            'MixevalQuestion' => [['id' => '', 'title' => 'Question']],
+            'MixevalQuestionDesc' => [['descriptor' => 'Low', 'question_index' => 0]],
+        ];
+
+        $controller->data = $posted;
+        $this->assertTrue($controller->_hasOnlyOwnIds(null));
+        $this->assertFalse(isset($controller->data['Mixeval']['id']));
+        $this->assertEqual('Question', $controller->data['MixevalQuestion'][0]['title']);
+
+        foreach (['Mixeval', 'MixevalQuestion.0', 'MixevalQuestionDesc.0'] as $path) {
+            $controller->data = Set::insert($posted, "$path.id", '1');
+            $this->assertFalse($controller->_hasOnlyOwnIds(null), "$path.id");
+        }
+    }
+
+    public function testHasOnlyOwnIdsForAnEditedTemplate()
+    {
+        $controller = new MixevalsController();
+        $controller->constructClasses();
+        // Seeded template 1 has questions 1 to 6; descriptor 6 belongs to
+        // question 2.
+        $posted = [
+            'Mixeval' => ['id' => '1', 'name' => 'Edited'],
+            'MixevalQuestion' => [
+                ['id' => '1', 'title' => 'Own question'],
+                ['id' => '', 'title' => 'New question'],
+            ],
+            'MixevalQuestionDesc' => [
+                ['id' => '6', 'descriptor' => 'Own level', 'question_index' => 0],
+            ],
+        ];
+
+        $controller->data = $posted;
+        $this->assertTrue($controller->_hasOnlyOwnIds(1));
+        $this->assertIdentical(1, $controller->data['Mixeval']['id']);
+        $this->assertEqual('1', $controller->data['MixevalQuestion'][0]['id']);
+        $this->assertEqual('6', $controller->data['MixevalQuestionDesc'][0]['id']);
+
+        $refused = [
+            'another template id' => Set::insert($posted, 'Mixeval.id', '2'),
+            'an unknown question' => Set::insert($posted, 'MixevalQuestion.1.id', '999'),
+            'an unknown descriptor' => Set::insert($posted, 'MixevalQuestionDesc.0.id', '999'),
+        ];
+        foreach ($refused as $case => $data) {
+            $controller->data = $data;
+            $this->assertFalse($controller->_hasOnlyOwnIds(1), $case);
+        }
+
+        // The rows of template 1 are not the rows of any other template.
+        $controller->data = Set::insert($posted, 'Mixeval.id', '999');
+        $this->assertFalse($controller->_hasOnlyOwnIds(999));
+    }
+
+    public function testAddDoesNotChangeAnotherTemplate()
+    {
+        $before = $this->Mixeval->find('first', [
+            'conditions' => ['Mixeval.id' => 1],
+            'contain' => ['MixevalQuestion.MixevalQuestionDesc'],
+        ]);
+        $data = $this->testMixevalData;
+        $data['Mixeval']['name'] = 'Template with posted ids';
+        $data['Mixeval']['id'] = 1;
+        $data['MixevalQuestion'][0]['id'] = 1;
+        $data['MixevalQuestionDesc'][0]['id'] = 1;
+
+        $this->testAction('/mixevals/add', [
+            'method' => 'post',
+            'data' => $data,
+            'return' => 'vars',
+        ]);
+
+        $after = $this->Mixeval->find('first', [
+            'conditions' => ['Mixeval.id' => 1],
+            'contain' => ['MixevalQuestion.MixevalQuestionDesc'],
+        ]);
+        $this->assertEqual($before, $after);
+        $this->assertFalse($this->Mixeval->findByName($data['Mixeval']['name']));
+    }
+
     public function testCopy() {
     }
 
