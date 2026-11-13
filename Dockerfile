@@ -24,11 +24,18 @@ COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
 COPY docker/php.ini /usr/local/etc/php/
 COPY docker/zz-docker-ipeer.conf /usr/local/etc/php-fpm.d/
-COPY . /var/www/html
 COPY docker/docker-entrypoint-php-fpm.sh /
 
+# Install packages before the source is copied, so a code change does not
+# install them again. The scripts need the source and run after it is copied.
+COPY composer.json composer.lock /var/www/html/
 RUN cd /var/www/html \
-    && composer install --no-ansi --no-dev --no-interaction --no-plugins --no-progress --optimize-autoloader \
+    && composer install --no-ansi --no-dev --no-interaction --no-plugins --no-progress --optimize-autoloader --no-scripts
+
+COPY . /var/www/html
+
+RUN cd /var/www/html \
+    && composer run-script --no-dev post-install-cmd \
     && mkdir -p /var/www/html/app/tmp/cache/persistent /var/www/html/app/tmp/cache/models /var/www/html/app/tmp/logs \
     && chown www-data:www-data -R /var/www/html/app/tmp/cache \
     && chown www-data:www-data -R /var/www/html/app/tmp/logs
