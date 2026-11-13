@@ -290,7 +290,7 @@ function insertQ(self_eval) {
     q = q.replace(/-1/g, numQ);
     q = q.replace(/-2/g, self);
     q = q.replace(/-3/g, num);
-    jQuery(q).hide().appendTo(section).fadeIn(600);
+    jQuery(q).hide().appendTo(section).fadeIn(200);
     questionIds.push(numQ);
     if (self_eval) {
         selfQuesIds.push(numQ);
@@ -388,7 +388,7 @@ function reorderQ() {
 function addDesc(numQ) {
     var insert = desc.replace(/-1/g, numQ);
     insert = insert.replace(/-2/g, numDesc);
-    jQuery(insert).hide().appendTo('#DescsDiv' + numQ).fadeIn(350);
+    jQuery(insert).hide().appendTo('#DescsDiv' + numQ).fadeIn(200);
     numDesc++;
 }
 
