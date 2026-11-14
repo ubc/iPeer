@@ -600,10 +600,15 @@ test('turning off Self-Evaluation removes the self-evaluation questions', async 
   await expect(viewDetail(page, 'Self-Evaluation')).toHaveText('Off');
 });
 
-test('a mixed evaluation that no event uses can be deleted', async ({ page, testDatabase }) => {
-  const id = await insertMixeval(testDatabase, PRIVATE);
+test('a mixed evaluation that no event uses can be deleted', async ({ page }) => {
+  // Added through the form, not inserted: PRIVATE has no scale levels, and no
+  // other test saves such a template through the form.
+  await page.goto('/mixevals/add');
+  await fillForm(page, PRIVATE);
+  await page.getByRole('button', SAVE).click();
+  await expect(goodMessage(page)).toHaveText(SAVED);
+  const id = await idFromAjaxList(page, PRIVATE.name, 'mixevals');
 
-  await page.goto('/mixevals');
   await deleteFromList(page, PRIVATE.name);
   await expect(goodMessage(page)).toHaveText('The Mixed Evaluation was removed successfully.');
 

@@ -8,11 +8,11 @@ import {
   pageTitle,
   withConfirmation,
 } from '../support/helpers';
-import { idFromAjaxList, runAjaxListAction, waitForAjaxList } from '../support/ajax-list';
-import { COURSES, MECH328_GROUPS, USERS, fullName } from '../support/seed';
 import type { RowDataPacket } from 'mysql2/promise';
+import { idFromAjaxList, runAjaxListAction, waitForAjaxList } from '../support/ajax-list';
 import type { TestDatabase } from '../support/db';
 import { NOW, findId, insertRow, userId } from '../support/insert';
+import { COURSES, MECH328_GROUPS, USERS, fullName } from '../support/seed';
 
 // Ported from app/tests/cases/system/add_event.test.php. The Selenium test also
 // ran the send_emails console command, to check which students get a reminder.
@@ -306,12 +306,15 @@ async function insertEvent(
 
       // One reminder every few days from the release date until the due date,
       // to every member of the groups. A student in two groups is listed
-      // twice, as the save does.
-      if (event.reminders && groupIds.length > 0) {
-        const [members] = await connection.query<RowDataPacket[]>(
-          'SELECT user_id FROM groups_members WHERE group_id IN (?)',
-          [groupIds]
-        );
+      // twice, as the save does. Like the save, no members means no reminders.
+      const [members] =
+        groupIds.length > 0
+          ? await connection.query<RowDataPacket[]>(
+              'SELECT user_id FROM groups_members WHERE group_id IN (?)',
+              [groupIds]
+            )
+          : [[] as RowDataPacket[]];
+      if (event.reminders && members.length > 0) {
         const [templates] = await connection.query<RowDataPacket[]>(
           'SELECT id, subject FROM email_templates WHERE name = ?',
           [event.reminders.template]

@@ -10,9 +10,15 @@ import type { TestDatabase } from './db';
 type Value = string | number | boolean | null | typeof NOW;
 export type Row = Record<string, Value>;
 
-// The current time of the database server, for the created and modified
-// columns. mysql2 writes the SQL that toSqlString returns without quotes.
-export const NOW = { toSqlString: () => 'NOW()' } as const;
+// The current time for the created and modified columns. The app writes
+// PHP's local time (America/Vancouver, docker/php.ini), not the database
+// clock, so inserted rows show the same time as rows the app saves.
+// mysql2 writes the SQL that toSqlString returns as it is.
+function appTime(): string {
+  // The sv-SE locale formats a date as YYYY-MM-DD HH:MM:SS.
+  return new Date().toLocaleString('sv-SE', { timeZone: 'America/Vancouver' });
+}
+export const NOW = { toSqlString: () => `'${appTime()}'` } as const;
 
 // Inserts one row and returns its id.
 export async function insertRow(
@@ -25,14 +31,15 @@ export async function insertRow(
 }
 
 // The id of the one row of a table with this value in a column, such as the
-// template with a name.
+// template with a name. BINARY makes the comparison exact: the tables ignore
+// case and trailing spaces otherwise.
 export async function findId(
   { connection }: TestDatabase,
   table: string,
   column: string,
   value: string
 ): Promise<string> {
-  const [rows] = await connection.query<RowDataPacket[]>('SELECT id FROM ?? WHERE ?? = ?', [
+  const [rows] = await connection.query<RowDataPacket[]>('SELECT id FROM ?? WHERE BINARY ?? = ?', [
     table,
     column,
     value,
