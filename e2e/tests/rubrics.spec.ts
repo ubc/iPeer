@@ -3,6 +3,8 @@ import { errorMessage, flashMessage, goodMessage, login } from '../support/helpe
 import { idFromAjaxList, runAjaxListAction, waitForAjaxList } from '../support/ajax-list';
 import { evaluationTabSection, openEvaluationTab, requestDelete } from '../support/evaltools';
 import { USERS } from '../support/seed';
+import type { TestDatabase } from '../support/db';
+import { NOW, insertRow, userId } from '../support/insert';
 
 // Ported from app/tests/cases/system/add_rubric.test.php.
 
@@ -214,17 +216,59 @@ async function expectForm(page: Page, rubric: Rubric): Promise<void> {
   );
 }
 
-async function addRubric(page: Page, rubric: Rubric): Promise<string> {
+// Writes the rows that a save of the Add Rubric form writes (see
+// saveAllWithCriteriaComment in models/rubric.php), and returns the id.
+async function insertRubric(
+  testDatabase: TestDatabase,
+  rubric: Rubric,
+  creator: string = USERS.superAdmin
+): Promise<string> {
   return test.step(
-    `Add the rubric ${rubric.name}`,
+    `Insert the rubric ${rubric.name}`,
     async () => {
-      await page.goto('/rubrics/add');
-      await fillFormat(page, rubric);
-      await page.getByRole('button', NEXT).click();
-      await fillTexts(page, rubric);
-      await saveButton(page).click();
-      await expect(goodMessage(page)).toHaveText('The rubric was added successfully.');
-      return idFromAjaxList(page, rubric.name, 'rubrics');
+      const owner = await userId(testDatabase, creator);
+      const id = await insertRow(testDatabase, 'rubrics', {
+        name: rubric.name,
+        zero_mark: rubric.zeroMark,
+        lom_max: rubric.levels.length,
+        criteria: rubric.criteria.length,
+        view_mode: rubric.viewMode.toLowerCase(),
+        availability: rubric.availability.toLowerCase(),
+        template: 'horizontal',
+        creator_id: owner,
+        created: NOW,
+        updater_id: owner,
+        modified: NOW,
+      });
+      const levelIds: string[] = [];
+      for (const [index, comment] of rubric.levels.entries()) {
+        levelIds.push(
+          await insertRow(testDatabase, 'rubrics_loms', {
+            rubric_id: id,
+            lom_num: index + 1,
+            lom_comment: comment,
+          })
+        );
+      }
+      for (const [index, criterion] of rubric.criteria.entries()) {
+        const criterionId = await insertRow(testDatabase, 'rubrics_criterias', {
+          rubric_id: id,
+          criteria_num: index + 1,
+          criteria: criterion.name,
+          multiplier: Number(criterion.weight),
+          // The specs leave Show Marks off.
+          show_marks: 0,
+        });
+        // The comment of each level links to the row of that level.
+        for (const [level, comment] of criterion.comments.entries()) {
+          await insertRow(testDatabase, 'rubrics_criteria_comments', {
+            criteria_id: criterionId,
+            rubrics_loms_id: levelIds[level],
+            criteria_comment: comment,
+          });
+        }
+      }
+      return id;
     },
     { box: true }
   );
@@ -266,10 +310,23 @@ test('an admin adds a rubric in two steps, and the page calculates its marks', a
   await expectForm(page, MIDTERM);
 });
 
+// The insert must give what the form gives, or the tests that use it test
+// something the app cannot make.
+test('an inserted rubric shows like one added through the form', async ({ page, testDatabase }) => {
+  const midtermId = await insertRubric(testDatabase, MIDTERM);
+  await page.goto(`/rubrics/edit/${midtermId}`);
+  await expectForm(page, MIDTERM);
+
+  const finalId = await insertRubric(testDatabase, FINAL);
+  await page.goto(`/rubrics/edit/${finalId}`);
+  await expectForm(page, FINAL);
+});
+
 test('editing a rubric can add levels and criteria, and recalculates the marks', async ({
   page,
+  testDatabase,
 }) => {
-  const id = await addRubric(page, MIDTERM);
+  const id = await insertRubric(testDatabase, MIDTERM);
 
   await page.goto(`/rubrics/edit/${id}`);
   await fillFormat(page, FINAL);
@@ -292,8 +349,9 @@ test('editing a rubric can add levels and criteria, and recalculates the marks',
 
 test('editing a rubric can remove levels and criteria, and keeps the texts of the rest', async ({
   page,
+  testDatabase,
 }) => {
-  const id = await addRubric(page, FINAL);
+  const id = await insertRubric(testDatabase, FINAL);
 
   await page.goto(`/rubrics/edit/${id}`);
   await fillFormat(page, REDUCED);
@@ -316,8 +374,9 @@ test('editing a rubric can remove levels and criteria, and keeps the texts of th
 
 test('a copy of a rubric keeps its format, texts and weights under a new name', async ({
   page,
+  testDatabase,
 }) => {
-  const id = await addRubric(page, FINAL);
+  const id = await insertRubric(testDatabase, FINAL);
 
   await page.goto(`/rubrics/copy/${id}`);
   await expectForm(page, FINAL_COPY);
@@ -330,9 +389,10 @@ test('a copy of a rubric keeps its format, texts and weights under a new name', 
   await expectForm(page, FINAL_COPY);
 });
 
-test('a rubric that no event uses can be deleted', async ({ page }) => {
-  const id = await addRubric(page, MIDTERM);
+test('a rubric that no event uses can be deleted', async ({ page, testDatabase }) => {
+  const id = await insertRubric(testDatabase, MIDTERM);
 
+  await page.goto('/rubrics');
   await deleteFromList(page, MIDTERM.name);
   await expect(goodMessage(page)).toHaveText('The rubric was deleted successfully.');
 
@@ -364,8 +424,9 @@ test('a rubric that events use cannot be deleted, and one with submissions canno
 
 test("an instructor can view and copy an admin's public rubric but can neither edit nor delete it", async ({
   page,
+  testDatabase,
 }) => {
-  const id = await addRubric(page, FINAL);
+  const id = await insertRubric(testDatabase, FINAL);
 
   await login(page, USERS.instructor1);
   // The Evaluation tab lists only the templates of the signed-in user.
@@ -405,8 +466,9 @@ test("an instructor can view and copy an admin's public rubric but can neither e
 
 test("an instructor can neither list, view nor copy an admin's private rubric", async ({
   page,
+  testDatabase,
 }) => {
-  const id = await addRubric(page, MIDTERM);
+  const id = await insertRubric(testDatabase, MIDTERM);
 
   await login(page, USERS.instructor1);
   await page.goto('/rubrics');

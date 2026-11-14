@@ -11,9 +11,9 @@ import {
 import { COURSES, STUDENTS, USERS } from '../support/seed';
 import {
   classListUserId,
-  enrolExistingUser,
   expectInClassList,
   expectNotInClassList,
+  insertEnrolment,
 } from '../support/users';
 
 // Ported from app/tests/cases/system/import_users.test.php.
@@ -106,10 +106,11 @@ test('a CSV import creates new users, updates existing ones and enrols them all'
 
 test('an import that removes old students makes the class list match the file', async ({
   page,
+  testDatabase,
 }) => {
   await login(page, USERS.superAdmin);
 
-  await enrolExistingUser(page, COURSES.apsc201.id, STUDENTS.chris.username);
+  await insertEnrolment(testDatabase, COURSES.apsc201.id, STUDENTS.chris.username);
   await expectInClassList(page, COURSES.apsc201.id, STUDENTS.chris);
 
   await importUsers(page, COURSES.apsc201.id, fixture(SEEDED_CLASS_FILE), true);

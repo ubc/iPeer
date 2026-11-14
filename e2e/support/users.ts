@@ -1,6 +1,9 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
+import type { RowDataPacket } from 'mysql2/promise';
+import type { TestDatabase } from './db';
 import { goodMessage } from './helpers';
-import type { Person } from './seed';
+import { NOW, insertRow, userId } from './insert';
+import { ROLES, USERS, type Person } from './seed';
 
 export function usernameWarning(page: Page): Locator {
   return page.locator('#usernameErr');
@@ -30,6 +33,55 @@ export async function enrolExistingUser(
       await page.goto(`/users/add/${courseId}`);
       await typeExistingUsername(page, username);
       await usernameWarning(page).getByRole('link', { name: 'here' }).click();
+    },
+    { box: true }
+  );
+}
+
+// Writes the row that the enrol link of the Add User form writes (see enrol
+// in users_controller.php, and addStudent and addTutor in models/user.php).
+// Like the app, it enrols a student as a student and a tutor as a tutor.
+export async function insertEnrolment(
+  testDatabase: TestDatabase,
+  courseId: string,
+  username: string,
+  enroller: string = USERS.superAdmin
+): Promise<void> {
+  await test.step(
+    `Insert the enrolment of ${username} in course ${courseId}`,
+    async () => {
+      const user = await userId(testDatabase, username);
+      const [roles] = await testDatabase.connection.query<RowDataPacket[]>(
+        'SELECT role_id FROM roles_users WHERE user_id = ?',
+        [user]
+      );
+      expect(roles, `the role of ${username}`).toHaveLength(1);
+      const role = String(roles[0].role_id);
+      if (role === ROLES.student) {
+        // The UserEnrol model records who made the row.
+        const by = await userId(testDatabase, enroller);
+        await insertRow(testDatabase, 'user_enrols', {
+          course_id: courseId,
+          user_id: user,
+          record_status: 'A',
+          creator_id: by,
+          created: NOW,
+          updater_id: by,
+          modified: NOW,
+        });
+      } else if (role === ROLES.tutor) {
+        // The UserTutor model does not record who made the row.
+        await insertRow(testDatabase, 'user_tutors', {
+          course_id: courseId,
+          user_id: user,
+          created: NOW,
+          modified: NOW,
+        });
+      } else {
+        throw new Error(
+          `${username} is neither a student nor a tutor, so the app does not enrol them.`
+        );
+      }
     },
     { box: true }
   );

@@ -10,6 +10,8 @@ import {
 import { idFromAjaxList, runAjaxListAction, waitForAjaxList } from '../support/ajax-list';
 import { evaluationTabSection, openEvaluationTab, requestDelete } from '../support/evaltools';
 import { USERS } from '../support/seed';
+import type { TestDatabase } from '../support/db';
+import { NOW, insertRow, userId } from '../support/insert';
 
 // Ported from app/tests/cases/system/add_simple.test.php.
 
@@ -61,15 +63,27 @@ function ownSimpleEvaluations(page: Page) {
   return evaluationTabSection(page, 'My Simple Evaluations');
 }
 
-async function addSimpleEvaluation(page: Page, evaluation: SimpleEvaluation): Promise<string> {
+// Writes the row that a save of the Add Simple Evaluation form writes (see
+// __processForm in simpleevaluations_controller.php), and returns the id.
+async function insertSimpleEvaluation(
+  testDatabase: TestDatabase,
+  evaluation: SimpleEvaluation,
+  creator: string = USERS.superAdmin
+): Promise<string> {
   return test.step(
-    `Add the simple evaluation ${evaluation.name}`,
+    `Insert the simple evaluation ${evaluation.name}`,
     async () => {
-      await page.goto('/simpleevaluations/add');
-      await fillForm(page, evaluation);
-      await page.getByRole('button', SAVE).click();
-      await expect(goodMessage(page)).toHaveText('The evaluation was added successfully.');
-      return idFromAjaxList(page, evaluation.name, 'simpleevaluations');
+      const owner = await userId(testDatabase, creator);
+      return insertRow(testDatabase, 'simple_evaluations', {
+        name: evaluation.name,
+        description: evaluation.description,
+        point_per_member: Number(evaluation.points),
+        availability: evaluation.availability.toLowerCase(),
+        creator_id: owner,
+        created: NOW,
+        updater_id: owner,
+        modified: NOW,
+      });
     },
     { box: true }
   );
@@ -144,8 +158,19 @@ test('an admin adds a simple evaluation', async ({ page }) => {
   await expectView(page, PROJECT);
 });
 
-test('editing a simple evaluation saves the new points', async ({ page }) => {
-  const id = await addSimpleEvaluation(page, PROJECT);
+// The insert must give what the form gives, or the tests that use it test
+// something the app cannot make.
+test('an inserted simple evaluation shows like one added through the form', async ({
+  page,
+  testDatabase,
+}) => {
+  await insertSimpleEvaluation(testDatabase, PROJECT);
+  await openFromEvaluationTab(page, PROJECT.name);
+  await expectView(page, PROJECT);
+});
+
+test('editing a simple evaluation saves the new points', async ({ page, testDatabase }) => {
+  const id = await insertSimpleEvaluation(testDatabase, PROJECT);
 
   await page.goto(`/simpleevaluations/edit/${id}`);
   const points = page.locator('#SimpleEvaluationPointPerMember');
@@ -158,8 +183,11 @@ test('editing a simple evaluation saves the new points', async ({ page }) => {
   await expectView(page, { ...PROJECT, points: '72' });
 });
 
-test('a copy of a simple evaluation keeps its fields under a new name', async ({ page }) => {
-  const id = await addSimpleEvaluation(page, PROJECT);
+test('a copy of a simple evaluation keeps its fields under a new name', async ({
+  page,
+  testDatabase,
+}) => {
+  const id = await insertSimpleEvaluation(testDatabase, PROJECT);
 
   await page.goto(`/simpleevaluations/copy/${id}`);
   const copy = { ...PROJECT, name: `Copy of ${PROJECT.name}` };
@@ -176,9 +204,10 @@ test('a copy of a simple evaluation keeps its fields under a new name', async ({
   await expectView(page, copy);
 });
 
-test('a simple evaluation that no event uses can be deleted', async ({ page }) => {
-  const id = await addSimpleEvaluation(page, PROJECT);
+test('a simple evaluation that no event uses can be deleted', async ({ page, testDatabase }) => {
+  const id = await insertSimpleEvaluation(testDatabase, PROJECT);
 
+  await page.goto('/simpleevaluations');
   await deleteFromList(page, PROJECT.name);
   await expect(goodMessage(page)).toHaveText('The evaluation was deleted successfully.');
 
@@ -210,8 +239,9 @@ test('a simple evaluation that events use cannot be deleted, and one with submis
 
 test("an instructor can view an admin's public simple evaluation but can neither edit nor delete it", async ({
   page,
+  testDatabase,
 }) => {
-  const id = await addSimpleEvaluation(page, PROJECT);
+  const id = await insertSimpleEvaluation(testDatabase, PROJECT);
 
   await login(page, USERS.instructor1);
   // The Evaluation tab lists only the templates of the signed-in user.
