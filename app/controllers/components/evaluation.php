@@ -922,8 +922,9 @@ class EvaluationComponent extends CakeObject
         } else {
             $this->GroupEvent->saveField('comment_release_status', 'None');
         } 
-        // if the oldest modified date is after the event's close date
-        if (strtotime($event['Event']['release_date_end']) <= strtotime($eval['EvaluationRubric']['modified'])) {
+        // if the oldest modified date is after the event's close date. A group
+        // with no submissions has nothing to review.
+        if ($eval && strtotime($event['Event']['release_date_end']) <= strtotime($eval['EvaluationRubric']['modified'])) {
             // set group event to reviewed
             $this->GroupEvent->saveField('marked', 'reviewed');
         }

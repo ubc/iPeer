@@ -110,12 +110,16 @@ export function submitButton(page: Page): Locator {
   return page.getByRole('button', { name: 'Submit Evaluation', exact: true });
 }
 
-// Submits the open form, and expects the save to succeed.
-export async function submitEvaluation(page: Page): Promise<void> {
+// Submits the open form, and expects the save to succeed. The rubric form
+// has its own button.
+export async function submitEvaluation(
+  page: Page,
+  button: Locator = submitButton(page)
+): Promise<void> {
   await test.step(
     'Submit the evaluation',
     async () => {
-      await submitButton(page).click();
+      await button.click();
       await expect(goodMessage(page)).toHaveText(SUBMITTED);
       await expect(page).toHaveURL(/\/home(\/index)?\/?$/);
     },
@@ -276,28 +280,49 @@ export async function insertSimpleSubmission(
           ...stamps,
         });
       }
-      await insertRow(testDatabase, 'evaluation_submissions', {
-        event_id: eventId,
-        grp_event_id: groupEvent.id,
-        submitter_id: evaluatorId,
-        submitted: 1,
-        date_submitted: now,
-        ...stamps,
-      });
-
-      // When every member of the group has submitted, the group is ready for
-      // review.
-      await connection.query(
-        `UPDATE group_events SET marked = 'to review'
-          WHERE id = ?
-            AND (SELECT COUNT(*) FROM groups_members WHERE group_id = ?) =
-                (SELECT COUNT(*) FROM evaluation_submissions s
-                   JOIN groups_members m ON m.user_id = s.submitter_id AND m.group_id = ?
-                  WHERE s.grp_event_id = ?)`,
-        [groupEvent.id, groupId, groupId, groupEvent.id]
+      await insertSubmission(
+        testDatabase,
+        eventId,
+        groupId,
+        String(groupEvent.id),
+        evaluatorId,
+        now
       );
     },
     { box: true }
+  );
+}
+
+// Writes the submission of an evaluator, as the Submit button of each form
+// does. When every member of the group has submitted, the group is ready for
+// review.
+async function insertSubmission(
+  testDatabase: TestDatabase,
+  eventId: string,
+  groupId: string,
+  groupEventId: string,
+  evaluatorId: string,
+  now: string
+): Promise<void> {
+  await insertRow(testDatabase, 'evaluation_submissions', {
+    event_id: eventId,
+    grp_event_id: groupEventId,
+    submitter_id: evaluatorId,
+    submitted: 1,
+    date_submitted: now,
+    creator_id: evaluatorId,
+    created: now,
+    updater_id: evaluatorId,
+    modified: now,
+  });
+  await testDatabase.connection.query(
+    `UPDATE group_events SET marked = 'to review'
+      WHERE id = ?
+        AND (SELECT COUNT(*) FROM groups_members WHERE group_id = ?) =
+            (SELECT COUNT(*) FROM evaluation_submissions s
+               JOIN groups_members m ON m.user_id = s.submitter_id AND m.group_id = ?
+              WHERE s.grp_event_id = ?)`,
+    [groupEventId, groupId, groupId, groupEventId]
   );
 }
 
@@ -333,6 +358,239 @@ export async function expectSimpleResult(page: Page, result: SimpleResult): Prom
       await expect(comments).toHaveCount(result.comments?.length ?? 0);
       const shown = (await comments.allTextContents()).map((text) => text.trim()).sort();
       expect(shown, 'comments').toEqual([...(result.comments ?? [])].sort());
+    },
+    { box: true }
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Rubric evaluations: one panel for each member, with a level and a comment for
+// each criterion, and a general comment.
+
+// A level is the column of the rubric, from 1. The comments go with the
+// criteria, in order.
+export type RubricMark = {
+  member: string;
+  levels: readonly number[];
+  comments: readonly string[];
+  general: string;
+};
+
+// The panel of one member. The accordion keeps the closed panels in the page,
+// so a locator in a closed panel finds hidden elements.
+export function rubricPanel(page: Page, member: string): Locator {
+  return page.locator(`#accordion > div.panelName[data-fullname="${member}"]`);
+}
+
+// The accordion changes the class of a header when its panel opens, so the
+// header is found by its id, such as panel6Header.
+export function rubricPanelHeader(page: Page, member: string): Locator {
+  return rubricPanel(page, member).locator('div[id$="Header"]');
+}
+
+// The row of a criterion in the panel of a member, by the text of the
+// criterion.
+function rubricCriterionRow(page: Page, member: string, criterion: number): Locator {
+  return rubricPanel(page, member)
+    .locator('table.standardtable > tbody > tr')
+    .filter({ has: page.locator(`xpath=./th/font[contains(@id, 'criteria${criterion}')]`) });
+}
+
+// The name of a criterion in the panel. The form colours it red when the
+// member has no level for it at a save.
+export function rubricCriterion(page: Page, member: string, criterion: number): Locator {
+  return rubricCriterionRow(page, member, criterion).locator('xpath=./th/font');
+}
+
+export function rubricLevel(page: Page, member: string, criterion: number, level: number): Locator {
+  return rubricCriterionRow(page, member, criterion)
+    .getByRole('radio')
+    .nth(level - 1);
+}
+
+export function rubricComment(page: Page, member: string, criterion: number): Locator {
+  return rubricCriterionRow(page, member, criterion).locator('textarea');
+}
+
+export function rubricGeneralComment(page: Page, member: string): Locator {
+  return rubricPanel(page, member).locator('textarea[name$="gen_comment"]');
+}
+
+export function saveSectionButton(page: Page, member: string): Locator {
+  return rubricPanel(page, member).getByRole('button', { name: 'Save This Section' });
+}
+
+// The submit button of the rubric form has its own text.
+export function submitRubricButton(page: Page): Locator {
+  return page.getByRole('button', { name: 'Submit to Complete the Evaluation', exact: true });
+}
+
+// Opens the panel of a member. The accordion slides the panel open, so the
+// fields can be used only at the end of the animation.
+export async function openRubricPanel(page: Page, member: string): Promise<void> {
+  await test.step(
+    `Open the panel of ${member}`,
+    async () => {
+      const content = rubricPanel(page, member).locator('div.panelContent');
+      if (!(await content.isVisible())) {
+        await rubricPanelHeader(page, member).click();
+      }
+      await expect(rubricGeneralComment(page, member)).toBeVisible();
+      await expect(content).not.toHaveCSS('height', '0px');
+      // The slide ends at the full height of the panel.
+      await expect
+        .poll(async () => (await content.boundingBox())?.height ?? 0)
+        .toBeGreaterThan(400);
+    },
+    { box: true }
+  );
+}
+
+// Fills in the open panel of a member. A level or comment of the mark that is
+// 0 or '' is left as it is.
+export async function fillRubricPanel(page: Page, mark: RubricMark): Promise<void> {
+  await test.step(
+    `Fill in the rubric for ${mark.member}`,
+    async () => {
+      await openRubricPanel(page, mark.member);
+      for (const [index, level] of mark.levels.entries()) {
+        if (level > 0) {
+          await rubricLevel(page, mark.member, index + 1, level).check();
+        }
+      }
+      for (const [index, comment] of mark.comments.entries()) {
+        await fillAndLeave(rubricComment(page, mark.member, index + 1), comment);
+      }
+      await fillAndLeave(rubricGeneralComment(page, mark.member), mark.general);
+    },
+    { box: true }
+  );
+}
+
+// Saves the panel of a member, and expects the message of the save.
+export async function saveRubricSection(page: Page, member: string, message: string) {
+  await test.step(
+    `Save the section of ${member}`,
+    async () => {
+      await saveSectionButton(page, member).click();
+      await expect(page).toHaveURL(/\/evaluations\/makeEvaluation\/\d+\/\d+$/);
+      await expect(page.locator('#flashMessage')).toHaveText(message);
+    },
+    { box: true }
+  );
+}
+
+export async function expectRubricPanel(page: Page, mark: RubricMark): Promise<void> {
+  await test.step(
+    `Expect the rubric values for ${mark.member}`,
+    async () => {
+      await openRubricPanel(page, mark.member);
+      for (const [index, level] of mark.levels.entries()) {
+        const radios = rubricCriterionRow(page, mark.member, index + 1).getByRole('radio');
+        for (let column = 1; column <= (await radios.count()); column++) {
+          const radio = radios.nth(column - 1);
+          await (column === level
+            ? expect(radio, `criterion ${index + 1}`).toBeChecked()
+            : expect(radio, `criterion ${index + 1}`).not.toBeChecked());
+        }
+      }
+      for (const [index, comment] of mark.comments.entries()) {
+        await expect(rubricComment(page, mark.member, index + 1)).toHaveValue(comment);
+      }
+      await expect(rubricGeneralComment(page, mark.member)).toHaveValue(mark.general);
+    },
+    { box: true }
+  );
+}
+
+// Writes the rows that Save This Section for each mark and then Submit write
+// (see saveRubricEvaluation in app/controllers/components/evaluation.php, and
+// completeEvaluationRubric in evaluations_controller.php). With submit false,
+// only the saves: the answers are there, but the evaluator has not submitted.
+export async function insertRubricSubmission(
+  testDatabase: TestDatabase,
+  eventId: string,
+  groupId: string,
+  evaluator: string,
+  marks: readonly RubricMark[],
+  { submit = true }: { submit?: boolean } = {}
+): Promise<void> {
+  await test.step(
+    `Insert the rubric evaluation of ${evaluator}`,
+    async () => {
+      const { connection } = testDatabase;
+      const evaluatorId = await userId(testDatabase, evaluator);
+      const [[groupEvent]] = await connection.query<RowDataPacket[]>(
+        `SELECT group_events.id, events.auto_release, events.template_id
+           FROM group_events JOIN events ON events.id = group_events.event_id
+          WHERE group_events.event_id = ? AND group_events.group_id = ?`,
+        [eventId, groupId]
+      );
+      expect(groupEvent, `group ${groupId} in event ${eventId}`).toBeDefined();
+      const [[rubric]] = await connection.query<RowDataPacket[]>(
+        `SELECT zero_mark, (SELECT COUNT(*) FROM rubrics_loms WHERE rubric_id = rubrics.id) AS loms
+           FROM rubrics WHERE id = ?`,
+        [groupEvent.template_id]
+      );
+      const [criteria] = await connection.query<RowDataPacket[]>(
+        'SELECT multiplier FROM rubrics_criterias WHERE rubric_id = ? ORDER BY criteria_num',
+        [groupEvent.template_id]
+      );
+      const now = appTime();
+      const stamps = {
+        creator_id: evaluatorId,
+        created: now,
+        updater_id: evaluatorId,
+        modified: now,
+      };
+
+      for (const mark of marks) {
+        expect(mark.levels, `levels for ${mark.member}`).toHaveLength(criteria.length);
+        const [members] = await connection.query<RowDataPacket[]>(
+          "SELECT id FROM users WHERE CONCAT(first_name, ' ', last_name) = ?",
+          [mark.member]
+        );
+        expect(members, `the user ${mark.member}`).toHaveLength(1);
+        // The grade of a level, as the save computes it.
+        const grades = mark.levels.map(
+          (level, index) =>
+            ((level - rubric.zero_mark) * Number(criteria[index].multiplier)) /
+            (rubric.loms - rubric.zero_mark)
+        );
+        const rubricRowId = await insertRow(testDatabase, 'evaluation_rubrics', {
+          evaluator: evaluatorId,
+          evaluatee: String(members[0].id),
+          comment: mark.general,
+          score: grades.reduce((sum, grade) => sum + grade, 0),
+          comment_release: groupEvent.auto_release,
+          grade_release: groupEvent.auto_release,
+          grp_event_id: groupEvent.id,
+          event_id: eventId,
+          rubric_id: groupEvent.template_id,
+          ...stamps,
+        });
+        for (const [index, level] of mark.levels.entries()) {
+          await insertRow(testDatabase, 'evaluation_rubric_details', {
+            evaluation_rubric_id: rubricRowId,
+            criteria_number: index + 1,
+            criteria_comment: mark.comments[index],
+            selected_lom: level,
+            grade: grades[index],
+            comment_release: groupEvent.auto_release,
+            ...stamps,
+          });
+        }
+      }
+      if (submit) {
+        await insertSubmission(
+          testDatabase,
+          eventId,
+          groupId,
+          String(groupEvent.id),
+          evaluatorId,
+          now
+        );
+      }
     },
     { box: true }
   );
