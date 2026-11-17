@@ -23,13 +23,13 @@ export async function login(page: Page, username: string): Promise<string> {
         maxRedirects: 0,
       });
       // A successful login redirects away from the login page.
-      expect(response.status(), `login of ${username}`).toBe(302);
+      expect(response.status(), `login of ${username}: status`).toBe(302);
       // The login page itself, also with a notice such as ?notice=inactive,
       // means the server signed the user out again.
       const landing = response.headers()['location'] ?? '';
-      expect(landing, `login of ${username}`).toBeTruthy();
+      expect(landing, `login of ${username}: redirect`).toBeTruthy();
       const path = new URL(landing, response.url()).pathname;
-      expect(path, `login of ${username}`).not.toBe('/login');
+      expect(path, `login of ${username}: not the login page`).not.toBe('/login');
       return landing;
     },
     { box: true }

@@ -80,6 +80,11 @@ export const STUDENTS = {
   johnny: { username: 'redshirt0005', name: 'Johnny Student', number: '81121651', courses: ['apsc201'] },
   travis: { username: 'redshirt0006', name: 'Travis Student', number: '87800283', courses: ['apsc201'] },
   damien: { username: 'redshirt0009', name: 'Damien Student', number: '84188465', courses: ['mech328'] },
+  jennifer: { username: 'redshirt0011', name: 'Jennifer Student', number: '48877031', courses: ['mech328'] },
+  edna: { username: 'redshirt0013', name: 'Edna Student', number: '37116036', courses: ['mech328'] },
+  // redshirt0025 in APSC 201 is also called Jonathan Student, so a class list
+  // check finds this one by student number.
+  jonathan: { username: 'redshirt0015', name: 'Jonathan Student', number: '90938044', courses: ['mech328'] },
   denny: { username: 'redshirt0014', name: 'Denny Student', number: '76035030', courses: ['apsc201'] },
   trevor: { username: 'redshirt0019', name: 'Trevor Student', number: '89947048', courses: ['apsc201'] },
   // redshirt0024 is also called Michael Student, but is in MECH 328, so the
@@ -87,6 +92,8 @@ export const STUDENTS = {
   michael: { username: 'redshirt0020', name: 'Michael Student', number: '39823059', courses: ['apsc201'] },
   vanHong: { username: 'redshirt0023', name: 'Van Hong Student', number: '40289059', courses: ['apsc201'] },
   geoff: { username: 'redshirt0026', name: 'Geoff Student', number: '27879030', courses: ['apsc201'] },
+  bill: { username: 'redshirt0022', name: 'Bill Student', number: '19524032', courses: ['mech328'] },
+  hui: { username: 'redshirt0027', name: 'Hui Student', number: '10186039', courses: ['mech328'] },
 } as const;
 
 // A tutor is attached to a course apart from the student enrolments, so the
@@ -100,8 +107,8 @@ export const TUTORS = {
 } as const;
 
 // The two groups of MECH 328, with the full names of their members. Matt is in
-// both groups, and Tutor 1 is a member of Reapers. The other students of
-// Lazy Engineers are not in STUDENTS, because no spec enrols them.
+// both groups, and Tutor 1 is a member of Reapers. Bowinn and Joe of Lazy
+// Engineers are not in STUDENTS, because no spec enrols or moves them.
 export const MECH328_GROUPS = {
   reapers: {
     id: '1',
