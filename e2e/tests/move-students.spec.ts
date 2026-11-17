@@ -224,6 +224,13 @@ test('a superadmin moves students by username, which also takes them out of thei
       })
       .getByRole('cell', { name: `${STUDENTS.matt.name} (student)`, exact: true })
   ).toBeVisible();
+  // The list comes from the submission record, so check his scores too: 95 to
+  // Ed and 105 to Alex. The order of the columns does not matter here.
+  const mattsMarks = resultsTable(page, 'Evaluation Results', 'h3').locator(
+    `xpath=./tbody/tr/th[1][normalize-space()='${STUDENTS.matt.name}']/following-sibling::td`
+  );
+  await expect(mattsMarks.filter({ hasText: /^\s*95\.00\s*$/ })).toHaveCount(1);
+  await expect(mattsMarks.filter({ hasText: /^\s*105\.00\s*$/ })).toHaveCount(1);
 });
 
 test('a superadmin copies students by student number, which keeps them in the source course', async ({
