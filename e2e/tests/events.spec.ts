@@ -11,6 +11,7 @@ import {
 import type { RowDataPacket } from 'mysql2/promise';
 import { idFromAjaxList, runAjaxListAction, waitForAjaxList } from '../support/ajax-list';
 import type { TestDatabase } from '../support/db';
+import { viewField } from '../support/events';
 import { NOW, findId, insertRow, userId } from '../support/insert';
 import { COURSES, MECH328_GROUPS, USERS, fullName } from '../support/seed';
 
@@ -344,16 +345,6 @@ async function insertEvent(
     },
     { box: true }
   );
-}
-
-// The value that the event view page shows next to a heading, such as
-// 'Due Date'. Only the heading cell is matched, so a value with the same text
-// as a heading cannot select the wrong row.
-function viewField(page: Page, heading: string): Locator {
-  return page
-    .locator('table.standardtable > tbody > tr')
-    .filter({ has: page.locator('xpath=./th').getByText(heading, { exact: true }) })
-    .locator('xpath=./td');
 }
 
 function penaltyLines(penalties: readonly Penalty[]): string[] {
