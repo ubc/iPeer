@@ -8,11 +8,15 @@ import {
   pageTitle,
   withConfirmation,
 } from '../support/helpers';
-import type { RowDataPacket } from 'mysql2/promise';
 import { idFromAjaxList, runAjaxListAction, waitForAjaxList } from '../support/ajax-list';
-import type { TestDatabase } from '../support/db';
-import { viewField } from '../support/events';
-import { NOW, findId, insertRow, userId } from '../support/insert';
+import {
+  insertEvent,
+  type Dates,
+  type NewEvent,
+  type Penalty,
+  type TemplateType,
+  viewField,
+} from '../support/events';
 import { COURSES, MECH328_GROUPS, USERS, fullName } from '../support/seed';
 
 // Ported from app/tests/cases/system/add_event.test.php. The Selenium test also
@@ -39,38 +43,11 @@ const ALL_GROUP_IDS = GROUPS.map((group) => group.id);
 // Each member once: Matt is in both groups.
 const GROUP_MEMBERS = [...new Set(GROUPS.flatMap((group) => group.members))].sort();
 
-type TemplateType = 'SIMPLE' | 'RUBRIC' | 'MIX EVALUATION';
-
 // The template list that the form shows for each type.
 const TEMPLATE_SELECT: Record<TemplateType, string> = {
   SIMPLE: '#EventSimpleEvaluation',
   RUBRIC: '#EventRubric',
   'MIX EVALUATION': '#EventMixeval',
-};
-
-type Penalty = { days: string; percent: string };
-
-type Dates = {
-  releaseBegin: string;
-  due: string;
-  releaseEnd: string;
-  resultBegin: string;
-  resultEnd: string;
-};
-
-type NewEvent = {
-  title: string;
-  description: string;
-  type: TemplateType;
-  template: string;
-  selfEval: 'Enabled' | 'Disabled';
-  comments: 'Enabled' | 'Disabled';
-  resultMode: 'Basic' | 'Detailed';
-  dates: Dates;
-  // The reminder frequency label, such as '2 Days', and the email template.
-  reminders?: { every: string; template: string };
-  allGroups: boolean;
-  penalties: readonly Penalty[];
 };
 
 // The events are in the future, so their release has not started: the edit
@@ -219,129 +196,6 @@ async function fillForm(page: Page, event: NewEvent): Promise<void> {
       for (const penalty of event.penalties) {
         await addPenalty(page, penalty);
       }
-    },
-    { box: true }
-  );
-}
-
-// The id of each evaluation type in event_template_types, and the table of
-// its templates.
-const TEMPLATE_TYPES: Record<TemplateType, { id: number; table: string }> = {
-  SIMPLE: { id: 1, table: 'simple_evaluations' },
-  RUBRIC: { id: 2, table: 'rubrics' },
-  'MIX EVALUATION': { id: 4, table: 'mixevals' },
-};
-
-// Adds whole days to a date such as '2027-02-02 09:00:00'. Like PHP's
-// strtotime('+2 day'), it keeps the time of day.
-function addDays(date: string, days: number): string {
-  const time = new Date(`${date.replace(' ', 'T')}Z`);
-  time.setUTCDate(time.getUTCDate() + days);
-  return time.toISOString().slice(0, 19).replace('T', ' ');
-}
-
-// Writes the rows that a save of the Add Event form writes (see add and
-// setSchedule in events_controller.php), and returns the id of the event.
-async function insertEvent(
-  testDatabase: TestDatabase,
-  courseId: string,
-  event: NewEvent,
-  creator: string = USERS.instructor1
-): Promise<string> {
-  return test.step(
-    `Insert the event ${event.title}`,
-    async () => {
-      const { connection } = testDatabase;
-      // The first reminder is on the release date only when the release is in
-      // the future. Otherwise the save starts the reminders at the time of the
-      // save, which these rows do not copy.
-      expect(
-        Date.parse(event.dates.releaseBegin.replace(' ', 'T')),
-        'release date'
-      ).toBeGreaterThan(Date.now());
-      const owner = await userId(testDatabase, creator);
-      const type = TEMPLATE_TYPES[event.type];
-      const id = await insertRow(testDatabase, 'events', {
-        title: event.title,
-        course_id: courseId,
-        // The save stores an empty field as NULL.
-        description: event.description || null,
-        event_template_type_id: type.id,
-        template_id: await findId(testDatabase, type.table, 'name', event.template),
-        self_eval: event.selfEval === 'Enabled' ? '1' : '0',
-        com_req: event.comments === 'Enabled' ? 1 : 0,
-        auto_release: 0,
-        enable_details: event.resultMode === 'Detailed' ? 1 : 0,
-        due_date: event.dates.due,
-        release_date_begin: event.dates.releaseBegin,
-        release_date_end: event.dates.releaseEnd,
-        result_release_date_begin: event.dates.resultBegin,
-        result_release_date_end: event.dates.resultEnd,
-        creator_id: owner,
-        created: NOW,
-        updater_id: owner,
-        modified: NOW,
-      });
-
-      // Cake writes only the two keys of each group row. The other columns,
-      // such as the release status 'None', keep their defaults.
-      const groupIds: string[] = [];
-      if (event.allGroups) {
-        const [groups] = await connection.query<RowDataPacket[]>(
-          'SELECT id FROM `groups` WHERE course_id = ? ORDER BY id',
-          [courseId]
-        );
-        groupIds.push(...groups.map((group) => String(group.id)));
-      }
-      for (const groupId of groupIds) {
-        await insertRow(testDatabase, 'group_events', { event_id: id, group_id: groupId });
-      }
-
-      for (const penalty of event.penalties) {
-        await insertRow(testDatabase, 'penalties', {
-          event_id: id,
-          days_late: Number(penalty.days),
-          percent_penalty: Number(penalty.percent),
-        });
-      }
-
-      // One reminder every few days from the release date until the due date,
-      // to every member of the groups. A student in two groups is listed
-      // twice, as the save does. Like the save, no members means no reminders.
-      const [members] =
-        groupIds.length > 0
-          ? await connection.query<RowDataPacket[]>(
-              'SELECT user_id FROM groups_members WHERE group_id IN (?)',
-              [groupIds]
-            )
-          : [[] as RowDataPacket[]];
-      if (event.reminders && members.length > 0) {
-        const [templates] = await connection.query<RowDataPacket[]>(
-          'SELECT id, subject FROM email_templates WHERE name = ?',
-          [event.reminders.template]
-        );
-        expect(templates, `the email template ${event.reminders.template}`).toHaveLength(1);
-        const days = parseInt(event.reminders.every, 10);
-        for (
-          let date = event.dates.releaseBegin;
-          date < event.dates.due;
-          date = addDays(date, days)
-        ) {
-          await insertRow(testDatabase, 'email_schedules', {
-            subject: String(templates[0].subject),
-            // The id of the email template, not its text.
-            content: String(templates[0].id),
-            date,
-            from: owner,
-            to: ['save_reminder', ...members.map((member) => String(member.user_id))].join(';'),
-            course_id: courseId,
-            event_id: id,
-            creator_id: owner,
-            created: NOW,
-          });
-        }
-      }
-      return id;
     },
     { box: true }
   );

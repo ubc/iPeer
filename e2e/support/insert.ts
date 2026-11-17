@@ -13,10 +13,11 @@ export type Row = Record<string, Value>;
 // The current time for the created and modified columns. The app writes
 // PHP's local time (America/Vancouver, docker/php.ini), not the database
 // clock, so inserted rows show the same time as rows the app saves.
-// mysql2 writes the SQL that toSqlString returns as it is.
-function appTime(): string {
+// mysql2 writes the SQL that toSqlString returns as it is. With an offset,
+// the time that many milliseconds from now, for dates such as a due date.
+export function appTime(offset = 0): string {
   // The sv-SE locale formats a date as YYYY-MM-DD HH:MM:SS.
-  return new Date().toLocaleString('sv-SE', { timeZone: 'America/Vancouver' });
+  return new Date(Date.now() + offset).toLocaleString('sv-SE', { timeZone: 'America/Vancouver' });
 }
 export const NOW = { toSqlString: () => `'${appTime()}'` } as const;
 
