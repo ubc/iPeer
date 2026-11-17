@@ -102,8 +102,8 @@ const NO_COURSE = 'Error: Course does not exist or you do not have permission to
 
 type Upload = string | { name: string; mimeType: string; buffer: Buffer };
 
-async function importFile(page: Page, file: Upload): Promise<void> {
-  await page.goto(`/events/import/${COURSE.id}`);
+async function importFile(page: Page, file: Upload, courseId: string = COURSE.id): Promise<void> {
+  await page.goto(`/events/import/${courseId}`);
   await page.locator('#ImportEventsFile').setInputFiles(file);
   await page.getByRole('button', { name: 'Import', exact: true }).click();
 }
@@ -137,13 +137,17 @@ function csvFile(rows: readonly (readonly string[])[]): Upload {
   };
 }
 
-async function expectImportFailed(page: Page, message: string): Promise<void> {
+async function expectImportFailed(
+  page: Page,
+  message: string,
+  courseId: string = COURSE.id
+): Promise<void> {
   await test.step(
     'Expect the import to fail',
     async () => {
       // A failed import shows the form again, with the reason.
       await expect(flashMessage(page)).toHaveText(message);
-      await expect(page).toHaveURL(new RegExp(`/events/import/${COURSE.id}$`));
+      await expect(page).toHaveURL(new RegExp(`/events/import/${courseId}$`));
       await expect(page.locator('#ImportEventsFile')).toBeVisible();
     },
     { box: true }
@@ -151,8 +155,14 @@ async function expectImportFailed(page: Page, message: string): Promise<void> {
 }
 
 async function expectNoImportedEvents(page: Page): Promise<void> {
-  await page.goto(`/events/index/${COURSE.id}`);
-  await searchEventList(page, IMPORTED_TEXT, 0);
+  await test.step(
+    'Expect no imported events',
+    async () => {
+      await page.goto(`/events/index/${COURSE.id}`);
+      await searchEventList(page, IMPORTED_TEXT, 0);
+    },
+    { box: true }
+  );
 }
 
 async function expectImportedEvent(page: Page, id: string, event: ImportedEvent): Promise<void> {
@@ -245,11 +255,6 @@ const ERRORS: readonly { name: string; rows: string[][]; message: string }[] = [
     message: 'Event "Bad Event" (on row 1), has an invalid template type "7"',
   },
   {
-    name: 'a group that is not in the course',
-    rows: [row({ Groups: '1;99' })],
-    message: 'Event "Bad Event" (on row 1), has an invalid group of id: "99"',
-  },
-  {
     name: 'a date that is not a date',
     rows: [row({ Due: 'not a date' })],
     message:
@@ -294,6 +299,18 @@ for (const error of ERRORS) {
     await expectImportFailed(page, `Import Failed ${error.message}`);
   });
 }
+
+test('an import of a group from another course is refused', async ({ page }) => {
+  // Group 1 (Reapers) exists, but in MECH 328. Instructor 2 teaches APSC 201.
+  const course = COURSES.apsc201;
+  await login(page, USERS.instructor2);
+  await importFile(page, csvFile([row({ Groups: reapers.id })]), course.id);
+  await expectImportFailed(
+    page,
+    `Import Failed Event "Bad Event" (on row 1), has an invalid group of id: "${reapers.id}"`,
+    course.id
+  );
+});
 
 test('an empty file is refused', async ({ page }) => {
   await login(page, USERS.instructor1);

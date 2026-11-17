@@ -23,9 +23,18 @@ export async function searchEventList(page: Page, title: string, count: number):
       await field.fill(title);
       // The list reads the search text on key up, not on input.
       await field.press('End');
-      await page.locator('#ajaxListDiv').getByRole('button', { name: 'Search' }).first().click();
-      // The count is that of the search, so it proves that the list shows the
-      // search result and not the list before it.
+      // The click cancels the search-after-typing timer and sends one request,
+      // so the rows after this response are those of the search.
+      const searched = page.waitForResponse(
+        (response) =>
+          new URL(response.url()).pathname === '/events/ajaxList' &&
+          response.request().method() === 'POST'
+      );
+      await page
+        .locator('#ajaxListDiv')
+        .getByRole('button', { name: 'Search', exact: true })
+        .click();
+      await searched;
       await expect(page.locator('#ajaxListDiv .total-result').first()).toHaveText(
         count === 0 ? 'No results' : `Total Results: ${count}`
       );
