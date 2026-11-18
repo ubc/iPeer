@@ -39,9 +39,9 @@ foreach($members as $member) {
 }
 ?>
 
-<h3>Group Members</h3>
+<h3 id='group-members'>Group Members</h3>
 
-<table class='standardtable'>
+<table class='standardtable' aria-labelledby='group-members'>
     <tr>
   	    <th><?php __('Name')?></th>
   	    <th><?php __('Student Number')?></th>

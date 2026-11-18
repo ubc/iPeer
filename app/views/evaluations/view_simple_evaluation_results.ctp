@@ -65,9 +65,9 @@ if (!empty($results['Dropped'])) {
 ?>
 </table>
 
-<h3><?php __('Evaluation Results')?></h3>
+<h3 id='evaluation-results'><?php __('Evaluation Results')?></h3>
 <!-- Point Distribution Table -->
-<table class='standardtable'>
+<table class='standardtable' aria-labelledby='evaluation-results'>
 <tr>
     <th rowspan="2"><?php __('Evaluator')?></th>
     <th colspan='<?php echo count($results['evaluatees']);?>'>

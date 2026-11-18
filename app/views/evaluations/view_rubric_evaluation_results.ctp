@@ -31,9 +31,9 @@ if (!empty($notInGroup)) {
 </table>
 
 <!-- Show Evaluation Reuslts - Basic -->
-<h3><?php __('Evaluation Results')?></h3>
+<h3 id='evaluation-results'><?php __('Evaluation Results')?></h3>
 
-<table class='standardtable'>
+<table class='standardtable' aria-labelledby='evaluation-results'>
    <th><?php __('Student Name')?></th>
    <th><?php __('Total') ?>
        : (/<?php echo number_format($rubric['Rubric']['total_marks'], 2); ?>)</th>

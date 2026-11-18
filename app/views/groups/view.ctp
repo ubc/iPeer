@@ -9,8 +9,8 @@
 </tr>
 </table>
 
-<h2>Group Members</h2>
-<table class='standardtable'>
+<h2 id='group-members'>Group Members</h2>
+<table class='standardtable' aria-labelledby='group-members'>
 <tr>
     <th>Name</th>
     <?php if ($emailInterfaceEnabled ?? true): ?><th>Write Email</th><?php endif; ?>

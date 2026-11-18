@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '../support/test';
-import { flashMessage, goodMessage, login, pageTitle, resultsTable } from '../support/helpers';
+import { flashMessage, goodMessage, labelledTable, login, pageTitle } from '../support/helpers';
 import { waitForAjaxList } from '../support/ajax-list';
 import type { TestDatabase } from '../support/db';
 import {
@@ -126,7 +126,7 @@ async function openGroupResults(page: Page, eventId: string): Promise<void> {
 // The table of marks: one row for each evaluator, one column for each
 // evaluated member, then rows such as 'Total'.
 function marksTable(page: Page): Locator {
-  return resultsTable(page, 'Evaluation Results', 'h3');
+  return labelledTable(page, 'Evaluation Results');
 }
 
 // The second header row names the evaluated members.
@@ -390,7 +390,7 @@ test('the results show the late penalties, who did not submit, and who left the 
 
   // The submission details of the group give the days late.
   await page.goto(`/evaluations/viewGroupSubmissionDetails/${eventId}/${GROUP.id}`);
-  const members = resultsTable(page, 'Group Members', 'h3');
+  const members = labelledTable(page, 'Group Members');
   const lateBy = (name: string) =>
     members
       .getByRole('row')

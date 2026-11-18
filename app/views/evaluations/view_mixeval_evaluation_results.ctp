@@ -48,8 +48,8 @@ foreach ($groupByQues as $ques) {
     }
 }
 if (!empty($grades)) { ?>
-    <h3><?php echo __('Self-Evaluation', true) ?></h3>
-    <table class="standardtable">
+    <h3 id='self-evaluation-results'><?php echo __('Self-Evaluation', true) ?></h3>
+    <table class="standardtable" aria-labelledby="self-evaluation-results">
         <tr>
             <th><?php echo __('Question', true) ?></th>
             <th><?php echo __('Average Grade Per Question', true) ?></th>
@@ -63,8 +63,8 @@ if (!empty($grades)) { ?>
     </table>
 <?php } ?>
 
-<h3><?php __('Evaluation Results')?></h3>
-<table class="standardtable">
+<h3 id='evaluation-results'><?php __('Evaluation Results')?></h3>
+<table class="standardtable" aria-labelledby="evaluation-results">
     <tr>
         <th><?php __('Student Name:')?></th>
         <th> <?php __('Total:')?>( /<?php echo number_format($mixeval['Mixeval']['total_marks'], 2)?>)</th>
