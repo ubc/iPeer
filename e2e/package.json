@@ -14,8 +14,8 @@
     "@playwright/test": "1.64.1",
     "@types/node": "26.6.5",
     "mysql2": "3.24.6",
-    "pdfjs-dist": "6.5.438",
     "prettier": "3.9.10",
-    "typescript": "7.0.2"
+    "typescript": "7.0.2",
+    "unpdf": "2.1.0"
   }
 }
