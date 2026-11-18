@@ -46,7 +46,7 @@ There is no browser window to watch while a test runs, which is different from t
 
 A recorded run is more useful than a window, because you can go back to a step and look again.
 
-Normally, a snapshot keeps the scroll position of the page at that step, and checks such as `expect()` do not scroll to the relevant DOM element. To change it so the DOM element is in view, `npm ci` patches the trace viewer to scroll to it via `scripts/trace-viewer-scroll.mjs`. 
+Normally, a snapshot keeps the scroll position of the page at that step, and checks such as `expect()` do not scroll to the relevant DOM element. To change it so the DOM element is in view, `npm ci` patches the trace viewer to scroll to it via `scripts/trace-viewer-scroll.mjs`.
 
 To work on one test, add part of its name:
 
