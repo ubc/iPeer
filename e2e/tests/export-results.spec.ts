@@ -1,8 +1,15 @@
-import { readFileSync } from 'fs';
-import { expect, test, type Page } from '../support/test';
+import { readFile, writeFile } from 'fs/promises';
+import { expect, test, type Locator, type Page } from '../support/test';
 import { flashMessage, login, pageTitle } from '../support/helpers';
 import type { TestDatabase } from '../support/db';
-import { endSubmissions, insertEvent, lateDates, type NewEvent } from '../support/events';
+import {
+  endSubmissions,
+  insertEvent,
+  lateDates,
+  openDates,
+  type NewEvent,
+} from '../support/events';
+import { userId } from '../support/insert';
 import { COURSES, MECH328_GROUPS, STUDENTS, TUTORS, USERS, fullName } from '../support/seed';
 import {
   insertMixevalSubmission,
@@ -11,9 +18,13 @@ import {
 } from '../support/student';
 
 // The export of the results of an event, as a CSV or PDF file. There was no
-// Selenium test for it. The events and the submissions are inserted: Ed
-// submitted after the due date, and the submissions have ended, so Ed's marks
-// to Alex and Matt carry the late penalty of 10%.
+// Selenium test for it. The events and the submissions are inserted.
+//
+// The late penalty of a row depends on the submission of the evaluatee, not
+// of the evaluator. In most tests only Ed submits, on time, and the
+// submissions have ended, so the marks Alex and Matt received carry the
+// penalty for no submission: the top tier, 10%. The simple CSV test covers
+// an on-time, a late and a missing submission.
 
 const GROUP = MECH328_GROUPS.reapers;
 const ED = STUDENTS.ed;
@@ -21,16 +32,18 @@ const ALEX = STUDENTS.alex;
 const MATT = STUDENTS.matt;
 const TUTOR = TUTORS.tutor1.name;
 
+const TITLE = 'Simple Export';
+
 function exportEvent(changes: Partial<NewEvent>): NewEvent {
   return {
-    title: 'Export Evaluation',
+    title: TITLE,
     description: '',
     type: 'SIMPLE',
     template: 'Module 1 Project Evaluation',
     selfEval: 'Disabled',
     comments: 'Disabled',
     resultMode: 'Detailed',
-    dates: lateDates(),
+    dates: openDates(),
     allGroups: true,
     penalties: [{ days: '1', percent: '10' }],
     ...changes,
@@ -44,8 +57,9 @@ async function insertExportEvent(
   return insertEvent(testDatabase, COURSES.mech328.id, exportEvent(changes));
 }
 
-// A small CSV reader: quoted fields may hold commas and doubled quotes. The
-// export ends with an empty line, which is dropped.
+// A small CSV reader: quoted fields may hold commas and doubled quotes. A
+// line break at the end of the file does not start a row. A blank line
+// inside the file is a row with one empty cell, so the checks see it.
 function parseCsv(text: string): string[][] {
   const rows: string[][] = [];
   let row: string[] = [];
@@ -80,7 +94,7 @@ function parseCsv(text: string): string[][] {
     row.push(field);
     rows.push(row);
   }
-  return rows.filter((cells) => cells.some((cell) => cell !== ''));
+  return rows;
 }
 
 async function openExport(page: Page, eventId: string): Promise<void> {
@@ -88,24 +102,31 @@ async function openExport(page: Page, eventId: string): Promise<void> {
   await expect(pageTitle(page)).toContainText('Export Evaluation Results');
 }
 
-// Presses Export and returns the file that the browser saves.
+function exportButton(page: Page): Locator {
+  return page.getByRole('button', { name: 'Export', exact: true });
+}
+
+// Presses Export and returns the CSV file that the browser saves. The file
+// is attached to the test, so it can be opened after the run: in the report,
+// in UI mode, and under test-results.
 async function exportFile(page: Page): Promise<{ name: string; content: Buffer }> {
   return test.step(
     'Export',
     async () => {
       const download = page.waitForEvent('download');
-      await page.getByRole('button', { name: 'Export', exact: true }).click();
+      await exportButton(page).click();
       const file = await download;
+      const name = file.suggestedFilename();
       const path = await file.path();
-      return { name: file.suggestedFilename(), content: readFileSync(path) };
+      await test.info().attach(name, { path });
+      return { name, content: await readFile(path) };
     },
     { box: true }
   );
 }
 
-// The rows of the CSV export, keyed by evaluatee and evaluator, with the
-// columns after them. Rows without an answer are left out: the export lists
-// every pair of members of the group, answered or not.
+// The header and all the rows of the CSV export. The export lists every pair
+// of evaluatee and evaluator in the group, answered or not.
 async function exportCsvRows(page: Page): Promise<{ header: string[]; rows: string[][] }> {
   const { name, content } = await exportFile(page);
   expect(name).toMatch(/\.csv$/);
@@ -113,10 +134,44 @@ async function exportCsvRows(page: Page): Promise<{ header: string[]; rows: stri
   return { header, rows };
 }
 
+// Sends the export form as the Export button does, and returns the answer.
+// The PDF export sends its file inline: a browser with a PDF viewer, such as
+// a headed Chromium, shows it instead of downloading it. So the PDF test
+// posts the form itself, with the cookies of the page.
+async function postExport(page: Page): Promise<Buffer> {
+  return test.step(
+    'Export',
+    async () => {
+      const form = page.locator('form').filter({ has: exportButton(page) });
+      const action = await form.getAttribute('action');
+      expect(action, 'the action of the export form').not.toBeNull();
+      // A checkbox and its hidden field share a name. PHP keeps the last
+      // value, and so does an object.
+      const fields = await form.evaluate((element) =>
+        Object.fromEntries(
+          [...new FormData(element as HTMLFormElement).entries()].map(([key, value]) => [
+            key,
+            String(value),
+          ])
+        )
+      );
+      const response = await page.request.post(action!, { form: fields });
+      expect(response.status()).toBe(200);
+      const content = await response.body();
+      const path = test.info().outputPath('export.pdf');
+      await writeFile(path, content);
+      await test.info().attach('export.pdf', { path });
+      return content;
+    },
+    { box: true }
+  );
+}
+
 // The columns the export always starts with.
 const LEAD = ['Course Name', 'Event', 'Evaluation Type', 'Group Name'];
 const PEOPLE = ['Evaluatee', 'Evaluatee S#', 'Evaluator', 'Evaluator S#'];
 const TOTALS = ['Raw Score', 'Late Penalty', 'Final Score'];
+const EVALUATOR = LEAD.length + PEOPLE.indexOf('Evaluator');
 
 function lead(event: string, type: string): string[] {
   return [COURSES.mech328.name, event, type, GROUP.name];
@@ -129,52 +184,93 @@ function pair(
   return [evaluatee.name, evaluatee.number, evaluator.name, evaluator.number];
 }
 
-// The rows that have an answer: the export also lists every pair of members
-// without one, with empty cells.
-function answered(rows: string[][], firstAnswerColumn: number): string[][] {
-  return rows.filter((row) => (row[firstAnswerColumn] ?? '') !== '');
+// The rows that have an answer. The Raw Score is set only for those; an
+// answer can have empty comments.
+function answered(header: readonly string[], rows: string[][]): string[][] {
+  const score = header.indexOf('Raw Score');
+  expect(score, 'the Raw Score column').toBeGreaterThanOrEqual(0);
+  return rows.filter((row) => (row[score] ?? '') !== '');
 }
 
 // ---------------------------------------------------------------------------
+
+// Moves the submission of a student to an hour before the due date, as if
+// it was made on time. The insert stamps it with the present time.
+async function submitOnTime(
+  testDatabase: TestDatabase,
+  eventId: string,
+  username: string
+): Promise<void> {
+  const submitter = await userId(testDatabase, username);
+  await testDatabase.connection.query(
+    `UPDATE evaluation_submissions s JOIN events e ON e.id = s.event_id
+        SET s.date_submitted = e.due_date - INTERVAL 1 HOUR
+      WHERE s.event_id = ? AND s.submitter_id = ?;
+     UPDATE evaluation_simples s JOIN events e ON e.id = s.event_id
+        SET s.date_submitted = e.due_date - INTERVAL 1 HOUR
+      WHERE s.event_id = ? AND s.evaluator = ?`,
+    [eventId, submitter, eventId, submitter]
+  );
+}
 
 test('the CSV export of a simple evaluation lists each mark with the late penalty', async ({
   page,
   testDatabase,
 }) => {
-  const eventId = await insertExportEvent(testDatabase, { title: 'Simple Export' });
+  // Two tiers, so a late submission and no submission give different
+  // penalties.
+  const eventId = await insertExportEvent(testDatabase, {
+    dates: lateDates(),
+    penalties: [
+      { days: '1', percent: '10' },
+      { days: '2', percent: '20' },
+    ],
+  });
   await insertSimpleSubmission(testDatabase, eventId, GROUP.id, ED.username, [
     { member: ALEX.name, points: 120, comment: 'Did the research, "really" well' },
     { member: MATT.name, points: 80, comment: 'Wrote the report' },
   ]);
+  await insertSimpleSubmission(testDatabase, eventId, GROUP.id, ALEX.username, [
+    { member: ED.name, points: 100, comment: '' },
+    { member: MATT.name, points: 100, comment: 'Kept us on track' },
+  ]);
+  await submitOnTime(testDatabase, eventId, ALEX.username);
   await endSubmissions(testDatabase, eventId);
 
   await login(page, USERS.instructor1);
   await openExport(page, eventId);
   const { header, rows } = await exportCsvRows(page);
   expect(header).toEqual([...LEAD, ...PEOPLE, 'Comment', ...TOTALS]);
-  const lead8 = LEAD.length + PEOPLE.length;
-  expect(answered(rows, lead8)).toEqual([
+  // Ed submitted less than a day late: 10%. Alex submitted on time: none.
+  // Matt did not submit: the top tier, 20%. Alex's answer to Ed has no
+  // comment.
+  expect(answered(header, rows)).toEqual([
+    [...lead(TITLE, 'Simple Evaluation'), ...pair(ED, ALEX), '', '100', '10%', '90'],
     [
-      ...lead('Simple Export', 'Simple Evaluation'),
+      ...lead(TITLE, 'Simple Evaluation'),
       ...pair(ALEX, ED),
       'Did the research, "really" well',
       '120',
-      '10%',
-      '108',
+      '0%',
+      '120',
     ],
+    [...lead(TITLE, 'Simple Evaluation'), ...pair(MATT, ED), 'Wrote the report', '80', '20%', '64'],
     [
-      ...lead('Simple Export', 'Simple Evaluation'),
-      ...pair(MATT, ED),
-      'Wrote the report',
+      ...lead(TITLE, 'Simple Evaluation'),
+      ...pair(MATT, ALEX),
+      'Kept us on track',
+      '100',
+      '20%',
       '80',
-      '10%',
-      '72',
     ],
   ]);
   // Every evaluator of the group has a row for each member they evaluate,
   // also without an answer. The tutor evaluates but is not evaluated.
   expect(rows).toHaveLength(9);
-  expect(rows.filter((row) => row[6] === TUTOR)).toHaveLength(3);
+  expect(rows.filter((row) => row[EVALUATOR] === TUTOR)).toHaveLength(3);
+  for (const row of rows) {
+    expect(row, 'a row as wide as the header').toHaveLength(header.length);
+  }
 });
 
 test('the CSV export of a rubric evaluation has a column for each criterion', async ({
@@ -217,8 +313,7 @@ test('the CSV export of a rubric evaluation has a column for each criterion', as
     'Q3 ( /5)',
     ...TOTALS,
   ]);
-  const lead8 = LEAD.length + PEOPLE.length;
-  expect(answered(rows, lead8)).toEqual([
+  expect(answered(header, rows)).toEqual([
     [
       ...lead('Rubric Export', 'Rubrics Evaluation'),
       ...pair(ALEX, ED),
@@ -279,8 +374,7 @@ test('the CSV export of a mixed evaluation has a column for each question', asyn
     'Q6',
     ...TOTALS,
   ]);
-  const lead8 = LEAD.length + PEOPLE.length;
-  expect(answered(rows, lead8)).toEqual([
+  expect(answered(header, rows)).toEqual([
     [
       ...lead('Mixed Export', 'Mixed Evaluation'),
       ...pair(ALEX, ED),
@@ -311,7 +405,7 @@ test('the CSV export of a mixed evaluation has a column for each question', asyn
 });
 
 test('the export leaves out the columns that are not checked', async ({ page, testDatabase }) => {
-  const eventId = await insertExportEvent(testDatabase, { title: 'Simple Export' });
+  const eventId = await insertExportEvent(testDatabase, {});
   await insertSimpleSubmission(testDatabase, eventId, GROUP.id, ED.username, [
     { member: ALEX.name, points: 120, comment: 'good' },
     { member: MATT.name, points: 80, comment: 'ok' },
@@ -323,7 +417,7 @@ test('the export leaves out the columns that are not checked', async ({ page, te
   await page.getByLabel('Include Course Name').uncheck();
   await page.getByLabel('Include Student Id').uncheck();
   await page.getByLabel('Include Comments').uncheck();
-  const { header } = await exportCsvRows(page);
+  const { header, rows } = await exportCsvRows(page);
   expect(header).toEqual([
     'Event',
     'Evaluation Type',
@@ -332,10 +426,16 @@ test('the export leaves out the columns that are not checked', async ({ page, te
     'Evaluator',
     ...TOTALS,
   ]);
+  // The answered rows lose the same cells. Alex and Matt did not submit, so
+  // their marks carry the penalty for no submission.
+  expect(answered(header, rows)).toEqual([
+    [TITLE, 'Simple Evaluation', GROUP.name, ALEX.name, ED.name, '120', '10%', '108'],
+    [TITLE, 'Simple Evaluation', GROUP.name, MATT.name, ED.name, '80', '10%', '72'],
+  ]);
 });
 
 test('the export needs one field of each coloured group', async ({ page, testDatabase }) => {
-  const eventId = await insertExportEvent(testDatabase, { title: 'Simple Export' });
+  const eventId = await insertExportEvent(testDatabase, {});
 
   await login(page, USERS.instructor1);
   await openExport(page, eventId);
@@ -356,10 +456,11 @@ test('the export needs one field of each coloured group', async ({ page, testDat
   }
   let downloads = 0;
   page.on('download', () => downloads++);
-  await page.getByRole('button', { name: 'Export', exact: true }).click();
+  await exportButton(page).click();
   for (const error of Object.values(errors)) {
     await expect(error).toBeVisible();
   }
+  expect(downloads, 'downloads after the refused export').toBe(0);
 
   await page.getByLabel('Include Event Name').check();
   await page.getByLabel('Include Student Name').check();
@@ -372,7 +473,7 @@ test('the export needs one field of each coloured group', async ({ page, testDat
 });
 
 test('the PDF export gives a PDF file', async ({ page, testDatabase }) => {
-  const eventId = await insertExportEvent(testDatabase, { title: 'Simple Export' });
+  const eventId = await insertExportEvent(testDatabase, {});
   await insertSimpleSubmission(testDatabase, eventId, GROUP.id, ED.username, [
     { member: ALEX.name, points: 120, comment: 'good' },
     { member: MATT.name, points: 80, comment: 'ok' },
@@ -384,8 +485,7 @@ test('the PDF export gives a PDF file', async ({ page, testDatabase }) => {
   await page.getByLabel('Export File Type').selectOption('pdf');
   // The PDF has no columns per student, so the form hides those choices.
   await expect(page.getByLabel('Include Student Name')).toBeHidden();
-  const { name, content } = await exportFile(page);
-  expect(name).toMatch(/\.pdf$/);
+  const content = await postExport(page);
   expect(content.subarray(0, 5).toString('latin1')).toBe('%PDF-');
   expect(content.length).toBeGreaterThan(1000);
 });
@@ -394,7 +494,12 @@ test('the course export lists the evaluation events of the course', async ({
   page,
   testDatabase,
 }) => {
-  await insertExportEvent(testDatabase, { title: 'Simple Export' });
+  await insertExportEvent(testDatabase, {});
+  await insertEvent(
+    testDatabase,
+    COURSES.apsc201.id,
+    exportEvent({ title: 'Other Course Export' })
+  );
 
   await login(page, USERS.instructor1);
   await page.goto(`/courses/home/${COURSES.mech328.id}`);
@@ -402,8 +507,9 @@ test('the course export lists the evaluation events of the course', async ({
   await expect(pageTitle(page)).toHaveText(
     `${fullName(COURSES.mech328)} > Export Evaluation Results`
   );
-  const events = page.getByLabel('Event Name');
-  await expect(events.locator('option', { hasText: 'Simple Export' })).toHaveCount(1);
+  const events = page.getByLabel('Event Name', { exact: true });
+  await expect(events.locator('option', { hasText: TITLE })).toHaveCount(1);
+  await expect(events.locator('option', { hasText: 'Other Course Export' })).toHaveCount(0);
   // Surveys have no results to export.
   await expect(events.locator('option', { hasText: 'Team Creation Survey' })).toHaveCount(0);
 });
@@ -415,4 +521,29 @@ test('an instructor cannot export the results of a course they do not teach', as
     'Error: Course does not exist or you do not have permission to view this course.'
   );
   await expect(page).toHaveURL(/\/courses$/);
+});
+
+// The form lists only the events of the course, but the export checks the
+// posted event again.
+test('an export of an event of another course is refused', async ({ page, testDatabase }) => {
+  const own = await insertExportEvent(testDatabase, {});
+  const other = await insertEvent(
+    testDatabase,
+    COURSES.apsc201.id,
+    exportEvent({ title: 'Other Course Export' })
+  );
+
+  await login(page, USERS.instructor1);
+  await openExport(page, own);
+  // Point the event field at the other event, as a forged form would.
+  await page
+    .locator('#ExportEvalEventId')
+    .evaluate((select, id) => ((select as HTMLSelectElement).options[0].value = id), other);
+  let downloads = 0;
+  page.on('download', () => downloads++);
+  await exportButton(page).click();
+  // The export redirects to the evaluations list, which sets its own error
+  // in place of the export's, so only the start of the message is checked.
+  await expect(flashMessage(page)).toHaveText(/^Error: /);
+  expect(downloads).toBe(0);
 });
