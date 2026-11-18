@@ -70,6 +70,13 @@ export async function submitMerge(page: Page): Promise<void> {
   await test.step(
     'Submit the merge',
     async () => {
+      // A pick loads the details of the account over AJAX. A submit while that
+      // request is open cancels it, and then the browser may never report its
+      // end, so the settledRequests fixture fails the test. jQuery counts a
+      // request as open until its callbacks have run.
+      await page.waitForFunction(
+        () => (window as { jQuery?: { active: number } }).jQuery?.active === 0
+      );
       await withConfirmation(
         page,
         'Are you sure you want to merge the two users? The merger cannot be undone.',
