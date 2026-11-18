@@ -332,6 +332,13 @@ async function insertSubmission(
 // the event shows no details: no Group Average column and no comments.
 // Without comments, the page has no comment table, as when no comment to
 // the student is released.
+// The rating in the Summary table of the results page of a student, such as
+// '13.00' or 'Not Released'. The rubric and mixed results show only the
+// rating; the simple results also show the group average.
+export function rating(page: Page): Locator {
+  return resultsTable(page, 'Summary').getByRole('cell');
+}
+
 export type SimpleResult = {
   rating: string;
   groupAverage?: string;
@@ -800,5 +807,18 @@ export async function insertMixevalSubmission(
       }
     },
     { box: true }
+  );
+}
+
+// The heading of the answers the teammates gave, on the results page of a
+// student. It says what is not released yet.
+export function resultsHeading(page: Page): Locator {
+  return page.locator('#mixeval_result > h2').first();
+}
+
+// The answers to one question on the results page of a student.
+export function resultAnswers(page: Page, question: number): Locator {
+  return page.locator(
+    `xpath=//div[@id='mixeval_result']/h3[starts-with(normalize-space(), '${question}. ')]/following-sibling::ul[1]//li`
   );
 }

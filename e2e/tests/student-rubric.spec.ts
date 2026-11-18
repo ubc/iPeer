@@ -31,6 +31,7 @@ import {
   openEvaluation,
   openResults,
   openRubricPanel,
+  rating,
   rubricComment,
   rubricCriterion,
   rubricLevel,
@@ -192,11 +193,6 @@ function detailCells(evaluator: string, mark: RubricMark): (string | RegExp)[] {
 
 // ---------------------------------------------------------------------------
 // The results page of a student.
-
-// The rating of the Summary table, such as 'Not Released'.
-function rating(page: Page): Locator {
-  return resultsTable(page, 'Summary').getByRole('cell');
-}
 
 function penaltyRating(total: string, deduction: string, final: string): string {
   return `${total} - (${deduction})* = ${final} ( )* : 10% late penalty.`;

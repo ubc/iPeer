@@ -29,6 +29,8 @@ export type NewEvent = {
   selfEval: 'Enabled' | 'Disabled';
   comments: 'Enabled' | 'Disabled';
   resultMode: 'Basic' | 'Detailed';
+  // Off when not given, as on the event form.
+  autoRelease?: 'Enabled' | 'Disabled';
   dates: Dates;
   // The reminder frequency label, such as '2 Days', and the email template.
   reminders?: { every: string; template: string };
@@ -75,6 +77,7 @@ export async function insertEvent(
         ).toBe(true);
       }
       const owner = await userId(testDatabase, creator);
+      const autoRelease = event.autoRelease === 'Enabled';
       const type = TEMPLATE_TYPES[event.type];
       const id = await insertRow(testDatabase, 'events', {
         title: event.title,
@@ -85,7 +88,7 @@ export async function insertEvent(
         template_id: await findId(testDatabase, type.table, 'name', event.template),
         self_eval: event.selfEval === 'Enabled' ? '1' : '0',
         com_req: event.comments === 'Enabled' ? 1 : 0,
-        auto_release: 0,
+        auto_release: autoRelease ? 1 : 0,
         enable_details: event.resultMode === 'Detailed' ? 1 : 0,
         due_date: event.dates.due,
         release_date_begin: event.dates.releaseBegin,
@@ -98,8 +101,9 @@ export async function insertEvent(
         modified: NOW,
       });
 
-      // Cake writes only the two keys of each group row. The other columns,
-      // such as the release status 'None', keep their defaults.
+      // Cake writes the two keys of each group row. Then the save sets the
+      // release status of the groups to 'Auto' with auto-release, or to
+      // 'None', which is also the default.
       const groupIds: string[] = [];
       if (event.allGroups) {
         const [groups] = await connection.query<RowDataPacket[]>(
@@ -109,7 +113,11 @@ export async function insertEvent(
         groupIds.push(...groups.map((group) => String(group.id)));
       }
       for (const groupId of groupIds) {
-        await insertRow(testDatabase, 'group_events', { event_id: id, group_id: groupId });
+        await insertRow(testDatabase, 'group_events', {
+          event_id: id,
+          group_id: groupId,
+          ...(autoRelease && { grade_release_status: 'Auto', comment_release_status: 'Auto' }),
+        });
       }
 
       for (const penalty of event.penalties) {
