@@ -4,9 +4,9 @@ import {
   fixture,
   flashMessage,
   goodMessage,
+  labelledTable,
   login,
   notCsvFile,
-  resultsTable,
 } from '../support/helpers';
 import { COURSES, STUDENTS, USERS } from '../support/seed';
 import {
@@ -87,13 +87,13 @@ test('a CSV import creates new users, updates existing ones and enrols them all'
   // that already existed. Ed is a MECH 328 student the file names, so the
   // import updates him rather than creating him.
   await expect(
-    resultsTable(page, 'User(s) created successfully:', 'h3').getByRole('cell', {
+    labelledTable(page, 'User(s) created successfully:').getByRole('cell', {
       name: NEW_STUDENT.username,
       exact: true,
     })
   ).toBeVisible();
   await expect(
-    resultsTable(page, 'User(s) updated successfully:', 'h3').getByRole('cell', {
+    labelledTable(page, 'User(s) updated successfully:').getByRole('cell', {
       name: STUDENTS.ed.username,
       exact: true,
     })

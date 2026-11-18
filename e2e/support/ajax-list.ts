@@ -50,9 +50,7 @@ export async function runAjaxListAction(
         .getByRole('link', { name: rowName, exact: true })
         .click({ button: 'right' });
 
-      // The script adds the menu to the end of the body, positioned on its own.
-      const menu = page.locator('body > div[style*="position: absolute"]');
-      const item = menu.getByText(action, { exact: true });
+      const item = page.getByRole('menu').getByRole('menuitem', { name: action, exact: true });
       const opened = page.waitForRequest(
         (request) => request.isNavigationRequest() && request.frame() === page.mainFrame()
       );

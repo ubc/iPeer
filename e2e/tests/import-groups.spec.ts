@@ -4,10 +4,10 @@ import {
   fixture,
   flashMessage,
   idFromUrl,
+  labelledTable,
   login,
   notCsvFile,
   pageTitle,
-  resultsTable,
 } from '../support/helpers';
 import { COURSES, STUDENTS, USERS } from '../support/seed';
 import { UPLOAD } from '../support/messages';
@@ -66,9 +66,9 @@ test('a valid CSV creates the listed groups with the listed members', async ({ p
   await importCsv(page, COURSES.apsc201.id, fixture('importGroup.csv'));
   await expect(page.locator('#title')).toHaveText('The group CSV file was processed.');
 
-  const groups = resultsTable(page, 'Groups Created');
+  const groups = labelledTable(page, 'Groups Created');
   await expect(groups.getByRole('cell', { name: 'Team', exact: true })).toBeVisible();
-  const placed = resultsTable(page, 'Students Placed');
+  const placed = labelledTable(page, 'Students Placed');
   for (const student of BY_USERNAME) {
     await expect(placed.getByRole('cell', { name: student.username, exact: true })).toBeVisible();
   }
@@ -93,7 +93,7 @@ test('an import reports the students it could not place', async ({ page }) => {
   await expect(page.locator('#title')).toHaveText('The group CSV file was processed.');
 
   await expect(page.getByRole('heading', { name: 'Students Placed' })).toHaveCount(0);
-  const notPlaced = resultsTable(page, 'Students Not Placed');
+  const notPlaced = labelledTable(page, 'Students Not Placed');
   for (const username of [
     USERS.instructor1,
     STUDENTS.chris.username,
@@ -120,7 +120,7 @@ test('an import can match students by student number', async ({ page }) => {
   await importCsv(page, COURSES.mech328.id, fixture('groupsStudentNo.csv'), 'Student No.');
   await expect(page.locator('#title')).toHaveText('The group CSV file was processed.');
 
-  const placed = resultsTable(page, 'Students Placed');
+  const placed = labelledTable(page, 'Students Placed');
   for (const student of BY_NUMBER) {
     await expect(placed.getByRole('cell', { name: student.number, exact: true })).toBeVisible();
   }

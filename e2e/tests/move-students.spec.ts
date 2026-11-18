@@ -1,7 +1,14 @@
 import { expect, test, type Page } from '../support/test';
 import { expectClassSize } from '../support/courses';
 import type { TestDatabase } from '../support/db';
-import { fixture, flashMessage, login, notCsvFile, resultsTable } from '../support/helpers';
+import {
+  fixture,
+  flashMessage,
+  labelledTable,
+  login,
+  notCsvFile,
+  resultsTable,
+} from '../support/helpers';
 import { COURSES, MECH328_GROUPS, STUDENTS, USERS, fullName } from '../support/seed';
 import { expectInClassList, expectNotInClassList } from '../support/users';
 import type { ResultSetHeader } from 'mysql2/promise';
@@ -114,7 +121,7 @@ async function expectSummary(
   await test.step(
     `Expect ${heading} ${Object.keys(rows).join(', ') || 'none'}`,
     async () => {
-      const table = resultsTable(page, heading, 'h3');
+      const table = labelledTable(page, heading);
       // One header row, then one row for each user. The count rules out a user
       // who is listed but not expected.
       await expect(table.locator('tr')).toHaveCount(Object.keys(rows).length + 1);

@@ -6,33 +6,33 @@ for the results of the import.')?></div><br><center>
 </center>
 <?php
 if (!empty($invalid)) {
-    echo '<h2>'.__('Invalid Entries', true).'</h2>';
+    echo '<h2 id="import-invalid">'.__('Invalid Entries', true).'</h2>';
     echo '<ul><li>'.__('There are more or less than 2 columns.', true).'</li></ul>';
-    echo '<table class="standardtable"><tr><th>'.__('Entry', true).'</th></tr>';
+    echo '<table class="standardtable" aria-labelledby="import-invalid"><tr><th>'.__('Entry', true).'</th></tr>';
     foreach ($invalid as $entry) {
         echo '<tr><td>'.implode(', ', $entry).' ('.count($entry).' columns)</td></tr>';
     }
     echo '</table>';
 }
 if (!empty($groupSuccess)) {
-    echo '<h2>'.__('Groups Created', true).'</h2>';
-    echo '<table class="standardtable"><tr><th>'.__('Name', true).'</th></tr>';
+    echo '<h2 id="import-groups-created">'.__('Groups Created', true).'</h2>';
+    echo '<table class="standardtable" aria-labelledby="import-groups-created"><tr><th>'.__('Name', true).'</th></tr>';
     foreach ($groupSuccess as $group) {
         echo '<tr><td>'.$group.'</td></tr>';
     }
     echo '</table>';
 }
 if (!empty($groupFailure)) {
-    echo '<h2>'.__('Groups that could not be created.', true).'</h2>';
-    echo '<table class="standardtable"><tr><th>'.__('Name', true).'</th></tr>';
+    echo '<h2 id="import-groups-failed">'.__('Groups that could not be created.', true).'</h2>';
+    echo '<table class="standardtable" aria-labelledby="import-groups-failed"><tr><th>'.__('Name', true).'</th></tr>';
     foreach ($groupFailure as $group) {
         echo '<tr><td>'.$group.'</td></tr>';
     }
     echo '</table>';
 }
 if (!empty($memSuccess)) {
-    echo '<h2>'.__('Students Placed', true).'</h2>';
-    echo '<table class="standardtable"><tr><th>'.__('Student', true).'</th>';
+    echo '<h2 id="import-placed">'.__('Students Placed', true).'</h2>';
+    echo '<table class="standardtable" aria-labelledby="import-placed"><tr><th>'.__('Student', true).'</th>';
     echo '<th>'.__('Group', true).'</th></tr>';
     foreach ($memSuccess as $groupName => $group) {
         foreach ($group as $member) {
@@ -43,14 +43,14 @@ if (!empty($memSuccess)) {
     echo '</table>';
 }
 if (!empty($memFailure)) {
-    echo '<h2>'.__('Students Not Placed', true).'</h2>';
+    echo '<h2 id="import-not-placed">'.__('Students Not Placed', true).'</h2>';
     echo '<h3>'.__('Possible Reasons:', true).'</h3>';
     echo '<ul>';
     echo '<li>'.__('The student identifier does not exist in the system. Please add them first.', true).'</li>';
     echo '<li>'.__('The student is not enrolled in the course. Please enrol them first.', true).'</li>';
     echo '<li>'.__('The group was unable to be created or does not exist.', true).'</li>';
     echo '</ul>';
-    echo '<table class="standardtable"><tr><th>'.__('Student', true).'</th>';
+    echo '<table class="standardtable" aria-labelledby="import-not-placed"><tr><th>'.__('Student', true).'</th>';
     echo '<th>'.__('Group', true).'</th></tr>';
     foreach ($memFailure as $groupName => $group) {
         foreach ($group as $member) {
