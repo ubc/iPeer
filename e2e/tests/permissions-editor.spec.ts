@@ -5,7 +5,6 @@ import {
   expectPermissionActions,
   openPermissionsEditor,
   PERMISSION_ACTIONS,
-  permissionAccess,
   type PermissionAccess,
 } from '../support/permissions';
 import { INSTRUCTOR_PERMISSIONS, ROLES, USERS } from '../support/seed';
@@ -55,9 +54,7 @@ test('denying every action of a permission stops that role from reaching the pag
 test('denying one action changes only that action, and the role keeps the page', async ({
   page,
 }) => {
-  await changePermission(page, ROLES.instructor, MIXEVALS.name, 'Deny Create');
-
-  expect(await permissionAccess(page, ROLES.instructor, MIXEVALS.name)).toEqual({
+  expect(await changePermission(page, ROLES.instructor, MIXEVALS.name, 'Deny Create')).toEqual({
     ...MIXEVALS.seeded,
     Create: 'Deny',
   });
@@ -82,10 +79,9 @@ test('denied actions can be allowed again one at a time, and the role gets the p
   // Each change must flip only its own action.
   let expected: PermissionAccess = MIXEVALS.seeded;
   for (const action of PERMISSION_ACTIONS) {
-    await changePermission(page, ROLES.instructor, MIXEVALS.name, `Deny ${action}`);
     expected = { ...expected, [action]: 'Deny' };
     expect(
-      await permissionAccess(page, ROLES.instructor, MIXEVALS.name),
+      await changePermission(page, ROLES.instructor, MIXEVALS.name, `Deny ${action}`),
       `after Deny ${action}`
     ).toEqual(expected);
   }
@@ -96,10 +92,9 @@ test('denied actions can be allowed again one at a time, and the role gets the p
 
   await login(page, USERS.superAdmin);
   for (const action of PERMISSION_ACTIONS) {
-    await changePermission(page, ROLES.instructor, MIXEVALS.name, `Allow ${action}`);
     expected = { ...expected, [action]: 'Allow' };
     expect(
-      await permissionAccess(page, ROLES.instructor, MIXEVALS.name),
+      await changePermission(page, ROLES.instructor, MIXEVALS.name, `Allow ${action}`),
       `after Allow ${action}`
     ).toEqual(expected);
   }
