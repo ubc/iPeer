@@ -3,6 +3,7 @@
   "private": true,
   "description": "Browser tests for iPeer",
   "scripts": {
+    "postinstall": "node scripts/trace-viewer-scroll.mjs",
     "pretest": "npm run typecheck",
     "test": "playwright test",
     "typecheck": "tsc --noEmit",

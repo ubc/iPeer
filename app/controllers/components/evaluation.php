@@ -1323,9 +1323,9 @@ class EvaluationComponent extends CakeObject
         
         // set group event to reviewed if all evaluatees' release status has been modified
         $eval = $this->EvaluationMixevalDetail->find('first', array(
-            'conditions' => array('grp_event_id' => $grpEventId),
+            'conditions' => array('EvaluationMixeval.grp_event_id' => $grpEventId),
             'order' => array('EvaluationMixevalDetail.modified ASC'),
-            'recursive' => -1
+            'recursive' => 0
         ));
         $event = $this->Event->find('first',[
                 'conditions' => array('Event.id' => $eventId),
@@ -1358,8 +1358,9 @@ class EvaluationComponent extends CakeObject
             $this->GroupEvent->saveField('comment_release_status', 'None');
         } 
         
-        // if the oldest modified date is after the event's close date
-        if (strtotime($event['Event']['release_date_end']) <= strtotime($eval['EvaluationMixevalDetail']['modified'])) {
+        // if the oldest modified date is after the event's close date. A group
+        // with no submissions has nothing to review.
+        if ($eval && strtotime($event['Event']['release_date_end']) <= strtotime($eval['EvaluationMixevalDetail']['modified'])) {
             // set group event to reviewed
             $this->GroupEvent->id = $grpEventId;
             $this->GroupEvent->saveField('marked', 'reviewed');
