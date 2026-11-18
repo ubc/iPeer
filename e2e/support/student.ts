@@ -80,7 +80,8 @@ export async function openEvaluation(
       await openHome(page);
       await homeRow(page, section, title, group).getByRole('link', { name: title }).click();
       await expect(page).toHaveURL(/\/evaluations\/makeEvaluation\/\d+\/\d+$/);
-      await expect(page.locator('form#evalForm')).toBeVisible();
+      // The form of each type posts back to the page.
+      await expect(page.locator('form[action*="/makeEvaluation/"]').first()).toBeVisible();
     },
     { box: true }
   );
@@ -576,6 +577,212 @@ export async function insertRubricSubmission(
             criteria_comment: mark.comments[index],
             selected_lom: level,
             grade: grades[index],
+            comment_release: groupEvent.auto_release,
+            ...stamps,
+          });
+        }
+      }
+      if (submit) {
+        await insertSubmission(
+          testDatabase,
+          eventId,
+          groupId,
+          String(groupEvent.id),
+          evaluatorId,
+          now
+        );
+      }
+    },
+    { box: true }
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Mixed evaluations: one set of questions for each member, and a set of
+// self-evaluation questions when the template and the event have them. The
+// questions of the whole template have one numbering.
+
+// An answer: a level from 1 for a Likert question, the points for a score
+// dropdown question, or the text of a sentence or paragraph question. The
+// answers are by question number. A question without an answer is left as
+// it is.
+export type MixevalAnswers = Readonly<Record<number, number | string>>;
+
+// The answers for one member. Self-evaluation answers name the evaluator.
+export type MixevalMark = { member: string; answers: MixevalAnswers; self?: boolean };
+
+export function submitMixevalButton(page: Page): Locator {
+  return page.getByRole('button', { name: 'Submit the Evaluation', exact: true });
+}
+
+// The id of the member that the form uses in the names of its fields. The
+// hidden fields of a member follow the heading with the name.
+async function mixevalMemberId(page: Page, mark: MixevalMark): Promise<string> {
+  const field = mark.self
+    ? page.locator('input[name$="[Self-Evaluation][evaluatee_id]"]')
+    : page.locator(
+        `xpath=//center[h2[normalize-space()='${mark.member}']]` +
+          "/following-sibling::input[contains(@name, '[Evaluation][evaluatee_id]')][1]"
+      );
+  const id = await field.getAttribute('value');
+  if (!id) {
+    throw new Error(`no fields for ${mark.member}`);
+  }
+  return id;
+}
+
+// One question of the form for one member: the title, the instructions and
+// the field.
+export async function mixevalQuestion(
+  page: Page,
+  mark: MixevalMark,
+  question: number
+): Promise<Locator> {
+  const id = await mixevalMemberId(page, mark);
+  return page.locator(`#q_${id}_${question}`).locator('xpath=..');
+}
+
+export async function fillMixevalForm(page: Page, marks: readonly MixevalMark[]): Promise<void> {
+  await test.step(
+    'Fill in the mixed evaluation',
+    async () => {
+      for (const mark of marks) {
+        for (const [num, answer] of Object.entries(mark.answers)) {
+          const question = await mixevalQuestion(page, mark, Number(num));
+          if (typeof answer === 'string') {
+            await question.locator('textarea, input[type="text"]').fill(answer);
+          } else if ((await question.locator('select').count()) > 0) {
+            await question.locator('select').selectOption(String(answer));
+          } else {
+            await question
+              .getByRole('radio')
+              .nth(answer - 1)
+              .check();
+          }
+        }
+      }
+    },
+    { box: true }
+  );
+}
+
+export async function expectMixevalForm(page: Page, marks: readonly MixevalMark[]): Promise<void> {
+  await test.step(
+    'Expect the mixed evaluation values',
+    async () => {
+      for (const mark of marks) {
+        for (const [num, answer] of Object.entries(mark.answers)) {
+          const question = await mixevalQuestion(page, mark, Number(num));
+          const name = `${mark.member} question ${num}`;
+          if (typeof answer === 'string') {
+            await expect(question.locator('textarea, input[type="text"]'), name).toHaveValue(
+              answer
+            );
+          } else if ((await question.locator('select').count()) > 0) {
+            await expect(question.locator('select'), name).toHaveValue(String(answer));
+          } else {
+            await expect(question.getByRole('radio').nth(answer - 1), name).toBeChecked();
+          }
+        }
+      }
+    },
+    { box: true }
+  );
+}
+
+// Writes the rows that a submit of the mixed evaluation form writes (see
+// _makeMixevalEvaluation in evaluations_controller.php, and
+// saveMixevalEvaluation in app/controllers/components/evaluation.php). The
+// submit saves the answers in any case, but it counts as a submission only
+// when every member has an answer to every required question. With submit
+// false, the insert writes the answers alone, as such a submit does.
+export async function insertMixevalSubmission(
+  testDatabase: TestDatabase,
+  eventId: string,
+  groupId: string,
+  evaluator: string,
+  marks: readonly MixevalMark[],
+  { submit = true }: { submit?: boolean } = {}
+): Promise<void> {
+  await test.step(
+    `Insert the mixed evaluation of ${evaluator}`,
+    async () => {
+      const { connection } = testDatabase;
+      const evaluatorId = await userId(testDatabase, evaluator);
+      const [[groupEvent]] = await connection.query<RowDataPacket[]>(
+        `SELECT group_events.id, events.auto_release, events.template_id, mixevals.zero_mark
+           FROM group_events
+           JOIN events ON events.id = group_events.event_id
+           JOIN mixevals ON mixevals.id = events.template_id
+          WHERE group_events.event_id = ? AND group_events.group_id = ?`,
+        [eventId, groupId]
+      );
+      expect(groupEvent, `group ${groupId} in event ${eventId}`).toBeDefined();
+      const [questions] = await connection.query<RowDataPacket[]>(
+        `SELECT question_num, mixeval_question_type_id AS type, required, self_eval, multiplier,
+                (SELECT COUNT(*) FROM mixeval_question_descs d WHERE d.question_id = q.id) AS scale
+           FROM mixeval_questions q WHERE mixeval_id = ? ORDER BY question_num`,
+        [groupEvent.template_id]
+      );
+      const now = appTime();
+      const stamps = {
+        creator_id: evaluatorId,
+        created: now,
+        updater_id: evaluatorId,
+        modified: now,
+      };
+
+      for (const mark of marks) {
+        // The form saves the self-evaluation answers in the same row as the
+        // peer answers of the evaluator to themself. The insert does not
+        // merge them, so the tests fill in the form for self-evaluations.
+        expect(mark.self, `self-evaluation of ${mark.member}`).toBeFalsy();
+        const [members] = await connection.query<RowDataPacket[]>(
+          "SELECT id FROM users WHERE CONCAT(first_name, ' ', last_name) = ?",
+          [mark.member]
+        );
+        expect(members, `the user ${mark.member}`).toHaveLength(1);
+        const section = questions.filter((question) => !!question.self_eval === !!mark.self);
+        // The grade of each Likert and score dropdown answer, as the save
+        // computes it. The score counts the required peer questions.
+        const grades = new Map<number, number>();
+        for (const question of section) {
+          const answer = mark.answers[question.question_num];
+          if (question.type === 1 && typeof answer === 'number') {
+            grades.set(
+              question.question_num,
+              (question.multiplier * (answer - groupEvent.zero_mark)) /
+                (question.scale - groupEvent.zero_mark)
+            );
+          } else if (question.type === 4) {
+            // A dropdown always sends a value, 0 when untouched.
+            grades.set(question.question_num, typeof answer === 'number' ? answer : 0);
+          }
+        }
+        const score = section
+          .filter((question) => question.required && !question.self_eval)
+          .reduce((sum, question) => sum + (grades.get(question.question_num) ?? 0), 0);
+        const mixevalId = await insertRow(testDatabase, 'evaluation_mixevals', {
+          evaluator: evaluatorId,
+          evaluatee: String(members[0].id),
+          score,
+          grade_release: groupEvent.auto_release,
+          grp_event_id: groupEvent.id,
+          event_id: eventId,
+          ...stamps,
+        });
+        for (const question of section) {
+          const answer = mark.answers[question.question_num];
+          const grade = grades.get(question.question_num);
+          if (grade === undefined && (typeof answer !== 'string' || answer === '')) {
+            continue;
+          }
+          await insertRow(testDatabase, 'evaluation_mixeval_details', {
+            evaluation_mixeval_id: mixevalId,
+            question_number: question.question_num,
+            question_comment: typeof answer === 'string' ? answer : null,
+            selected_lom: question.type === 1 ? (answer as number) : 0,
+            grade: grade ?? 0,
             comment_release: groupEvent.auto_release,
             ...stamps,
           });

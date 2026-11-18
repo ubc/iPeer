@@ -12,9 +12,14 @@ import { userId } from '../support/insert';
 import {
   LEFT_GROUP,
   NOT_SUBMITTED,
+  evaluateePanel,
   groupListCell,
   memberList,
+  namedRow,
+  openEvaluateePanel,
   openEventResults,
+  panelHeaders,
+  releaseButton,
 } from '../support/results';
 import { COURSES, MECH328_GROUPS, STUDENTS, TUTORS, USERS, fullName } from '../support/seed';
 import {
@@ -155,12 +160,6 @@ async function openGroupResults(
   await expect(pageTitle(page)).toHaveText(`${fullName(COURSES.mech328)} > ${TITLE} > Results`);
 }
 
-// The row of a table whose first cell is the name, such as an evaluated
-// member or 'Group Average'.
-function namedRow(table: Locator, name: string): Locator {
-  return table.locator(`xpath=./tbody/tr[td[1][normalize-space()='${name}']]`);
-}
-
 // The total of each evaluated member on the Basic page.
 function basicResults(page: Page): Locator {
   return resultsTable(page, 'Evaluation Results', 'h3');
@@ -172,41 +171,10 @@ function detailSummary(page: Page): Locator {
   return page.locator('#evalForm > table.standardtable');
 }
 
-// The panel of an evaluated member on the Detail page, with what each
-// evaluator gave them.
-function evaluateePanel(page: Page, member: string): Locator {
-  return page
-    .locator('#accordion > div.panelName')
-    .filter({ has: page.locator('div[id$="Header"]', { hasText: `Evaluatee: ${member}` }) });
-}
-
-// The accordion changes the class of a header when the panel opens, so the
-// headers are found by their ids, such as panel6Header.
-function panelHeaders(page: Page): Locator {
-  return page.locator('#accordion > div.panelName > div[id$="Header"]');
-}
-
 // The row of one evaluator in the panel of an evaluated member: the evaluator,
 // then a cell for each criterion. The general comment is in the next row.
 function evaluatorRow(page: Page, evaluatee: string, evaluator: string): Locator {
   return namedRow(evaluateePanel(page, evaluatee).locator('table'), evaluator);
-}
-
-// Opens the panel of an evaluated member. Only the first panel is open when
-// the page loads, and the cells of a closed panel are hidden.
-async function openEvaluateePanel(page: Page, member: string): Promise<void> {
-  await test.step(
-    `Open the panel of ${member}`,
-    async () => {
-      const panel = evaluateePanel(page, member);
-      const content = panel.locator('div.panelContent');
-      if (!(await content.isVisible())) {
-        await panel.locator('div[id$="Header"]').click();
-      }
-      await expect(content.locator('table')).toBeVisible();
-    },
-    { box: true }
-  );
 }
 
 // The cells of an evaluator's row for the given marks: the evaluator, then
@@ -220,15 +188,6 @@ function detailCells(evaluator: string, mark: RubricMark): (string | RegExp)[] {
         new RegExp(`^Points: Grade: ${level}\\.00 / 5\\s*Comment: ${mark.comments[index]}$`)
     ),
   ];
-}
-
-// The table with the release buttons of each evaluated member.
-function releaseTable(page: Page): Locator {
-  return resultsTable(page, 'Evaluation Results Release Status', 'h3');
-}
-
-function releaseButton(page: Page, member: string, name: string): Locator {
-  return namedRow(releaseTable(page), member).getByRole('button', { name, exact: true });
 }
 
 // ---------------------------------------------------------------------------

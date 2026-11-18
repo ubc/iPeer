@@ -1,4 +1,4 @@
-import { expect, type Locator, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { waitForAjaxList } from './ajax-list';
 
 // The pages where an instructor reviews the results of an event, for every
@@ -34,4 +34,53 @@ export async function groupListCell(page: Page, group: string, column: string): 
     .filter({ has: page.getByRole('cell', { name: group, exact: true }) })
     .getByRole('cell')
     .nth(index);
+}
+
+// The row of a table whose first cell is the name, such as an evaluated
+// member or 'Group Average'.
+export function namedRow(table: Locator, name: string): Locator {
+  return table.locator(`xpath=./tbody/tr[td[1][normalize-space()='${name}']]`);
+}
+
+// The Detail page of a rubric or mixed evaluation has a panel for each
+// evaluated member, with what each evaluator gave them. The accordion changes
+// the class of a header when the panel opens, so the headers are found by
+// their ids, such as panel6Header.
+export function panelHeaders(page: Page): Locator {
+  return page.locator('#accordion > div.panelName > div[id$="Header"]');
+}
+
+export function evaluateePanel(page: Page, member: string): Locator {
+  return page
+    .locator('#accordion > div.panelName')
+    .filter({ has: page.locator('div[id$="Header"]', { hasText: `Evaluatee: ${member}` }) });
+}
+
+// Opens the panel of an evaluated member. Only the first panel is open when
+// the page loads, and the content of a closed panel is hidden.
+export async function openEvaluateePanel(page: Page, member: string): Promise<void> {
+  await test.step(
+    `Open the panel of ${member}`,
+    async () => {
+      const panel = evaluateePanel(page, member);
+      const content = panel.locator('div.panelContent');
+      if (!(await content.isVisible())) {
+        await panel.locator('div[id$="Header"]').click();
+      }
+      await expect(content).toBeVisible();
+      // The slide ends at the full height of the panel.
+      await expect
+        .poll(async () => (await content.boundingBox())?.height ?? 0)
+        .toBeGreaterThan(400);
+    },
+    { box: true }
+  );
+}
+
+// The release buttons of each evaluated member on the Detail page.
+export function releaseButton(page: Page, member: string, name: string): Locator {
+  const table = page.locator(
+    "xpath=//h3[normalize-space()='Evaluation Results Release Status']/following-sibling::table[1]"
+  );
+  return namedRow(table, member).getByRole('button', { name, exact: true });
 }
