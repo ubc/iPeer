@@ -129,7 +129,8 @@ export function labelledTable(page: Page, name: string): Locator {
 }
 
 // The table that follows a heading, on pages whose tables are not labelled
-// yet (the student result pages).
+// yet: the student and instructor result pages and the group view. Replace
+// it with labelledTable() as those views get labels.
 export function resultsTable(page: Page, heading: string, level: 'h2' | 'h3' = 'h2'): Locator {
   return page.locator(
     `xpath=//${level}[normalize-space()='${heading}']/following-sibling::table[1]`

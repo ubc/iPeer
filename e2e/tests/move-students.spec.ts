@@ -130,7 +130,7 @@ async function expectSummary(
           .locator('tr')
           .filter({ has: page.getByRole('cell', { name: identifier, exact: true }) });
         await expect(row, identifier).toHaveCount(1);
-        await expect(row.locator('td').nth(1), `note for ${identifier}`).toHaveText(note);
+        await expect(row.getByRole('cell'), `row of ${identifier}`).toHaveText([identifier, note]);
       }
     },
     { box: true }

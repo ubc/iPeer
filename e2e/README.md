@@ -39,7 +39,9 @@ The line breaks and spaces of a page, a table cell, or a PDF depend on the marku
 
 ## Selectors
 
-Find elements by role and accessible name where you can, as a user finds them. When a view gives no good name, change the view, not the test: for example, link a table to its heading with `aria-labelledby`, and find it with `labelledTable(page, heading)`. Do not use an XPath or a position, such as `.nth()`, to find an element after another element.
+Find elements by role and accessible name, as a user finds them. If a view gives no good name, change the view, not the test. For example, link a table to its heading with `aria-labelledby`. Then find the table with `labelledTable(page, heading)`.
+
+In new code, do not find an element by its position, such as `.nth()`, or by XPath. Some older helpers still do. Replace them when their views get names.
 
 ## Debug a Test
 
