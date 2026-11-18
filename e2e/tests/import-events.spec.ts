@@ -3,6 +3,7 @@ import { idFromAjaxList } from '../support/ajax-list';
 import { searchEventList, viewField } from '../support/events';
 import { fixture, flashMessage, goodMessage, login, notCsvFile } from '../support/helpers';
 import { COURSES, MECH328_GROUPS, USERS, fullName } from '../support/seed';
+import { ACCESS, EVENT, UPLOAD } from '../support/messages';
 
 // Ported from app/tests/cases/system/import_events.test.php. The old CSV files
 // also imported a survey, which is out of scope, so these files use the other
@@ -97,8 +98,6 @@ const IMPORTED: readonly ImportedEvent[] = [
 // The titles of the imported events all contain this text, and no seeded
 // event does.
 const IMPORTED_TEXT = 'Imported';
-
-const NO_COURSE = 'Error: Course does not exist or you do not have permission to view this course.';
 
 type Upload = string | { name: string; mimeType: string; buffer: Buffer };
 
@@ -205,9 +204,7 @@ test('an instructor imports events, with their settings, dates and groups', asyn
 
   // The file has the header row that the export writes, which the import skips.
   await importFile(page, fixture('events-valid.csv'));
-  await expect(goodMessage(page)).toHaveText(
-    `${IMPORTED.length} event(s) were imported successfully.`
-  );
+  await expect(goodMessage(page)).toHaveText(EVENT.imported(IMPORTED.length));
   await expect(page).toHaveURL(new RegExp(`/events/index/${COURSE.id}$`));
 
   await searchEventList(page, IMPORTED_TEXT, IMPORTED.length);
@@ -324,14 +321,14 @@ test('an empty file is refused', async ({ page }) => {
 test('a file that is not a CSV is refused', async ({ page }) => {
   await login(page, USERS.instructor1);
   await importFile(page, notCsvFile('events'));
-  await expectImportFailed(page, 'extension is not allowed.');
+  await expectImportFailed(page, UPLOAD.wrongExtension);
 });
 
 test('an instructor cannot import events into a course they do not teach', async ({ page }) => {
   // Instructor 2 does not teach MECH 328.
   await login(page, USERS.instructor2);
   await page.goto(`/events/import/${COURSE.id}`);
-  await expect(flashMessage(page)).toHaveText(NO_COURSE);
+  await expect(flashMessage(page)).toHaveText(ACCESS.noCourse);
   await expect(page).toHaveURL(/\/courses$/);
 
   // The upload itself, sent without the form.
@@ -347,7 +344,7 @@ test('an instructor cannot import events into a course they do not teach', async
   });
   expect(response.ok(), 'the refused import').toBe(true);
   expect(response.url()).toMatch(/\/courses$/);
-  expect(await response.text()).toContain(NO_COURSE);
+  expect(await response.text()).toContain(ACCESS.noCourse);
 
   await login(page, USERS.instructor1);
   await expectNoImportedEvents(page);

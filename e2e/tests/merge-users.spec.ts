@@ -13,6 +13,7 @@ import {
 } from '../support/merge';
 import { COURSES, STUDENTS, USERS } from '../support/seed';
 import { expectInClassList, expectNotInClassList } from '../support/users';
+import { USER } from '../support/messages';
 
 // Ported from app/tests/cases/system/merge_users.test.php.
 
@@ -37,7 +38,7 @@ test('merging two accounts of the same role keeps one and moves the enrolments o
   page,
 }) => {
   await mergeByUsername(page, KEPT.username, GONE.username);
-  await expect(goodMessage(page)).toHaveText('The two accounts have successfully merged.');
+  await expect(goodMessage(page)).toHaveText(USER.merged);
 
   await expectInClassList(page, COURSES.apsc201.id, KEPT);
   await expectInClassList(page, COURSES.mech328.id, KEPT);
@@ -77,7 +78,7 @@ test('picking an account shows its details, and a new search clears them', async
 
 test('merging two accounts with different roles is refused', async ({ page }) => {
   await mergeByUsername(page, USERS.instructor1, GONE.username);
-  await expect(flashMessage(page)).toHaveText('Error: The users do not have the same role.');
+  await expect(flashMessage(page)).toHaveText(USER.mergeDifferentRoles);
 
   await expectInClassList(page, COURSES.mech328.id, GONE);
 });
@@ -94,9 +95,7 @@ test('merging the account you are signed in as is refused', async ({ page }) => 
 
   // Both seeded admin accounts, so the role check cannot be what refuses it.
   await mergeByUsername(page, USERS.adminAlt, USERS.admin);
-  await expect(flashMessage(page)).toHaveText(
-    'Error: The secondary account is the currently logged in user.'
-  );
+  await expect(flashMessage(page)).toHaveText(USER.mergeSignedIn);
 
   // The signed-in account is still there.
   await openMergeUsers(page);
@@ -106,9 +105,7 @@ test('merging the account you are signed in as is refused', async ({ page }) => 
 
 test('picking the same account twice is refused', async ({ page }) => {
   await mergeByUsername(page, KEPT.username, KEPT.username);
-  await expect(flashMessage(page)).toHaveText(
-    'Error: No merger needed. The primary and secondary accounts are the same.'
-  );
+  await expect(flashMessage(page)).toHaveText(USER.mergeSameAccount);
 
   await expectInClassList(page, COURSES.apsc201.id, KEPT);
 });

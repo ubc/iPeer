@@ -3,6 +3,7 @@ import type { RowDataPacket } from 'mysql2/promise';
 import type { TestDatabase } from './db';
 import { goodMessage, resultsTable, sectionHeadings } from './helpers';
 import { appTime, insertRow, userId } from './insert';
+import { SUBMISSION } from './messages';
 
 // The student side of a peer evaluation: the evaluation list on the home
 // page, the evaluation form, and the results page. Tutors use the same pages.
@@ -12,8 +13,6 @@ import { appTime, insertRow, userId } from './insert';
 
 // The tables of the Peer Evaluations section of the home page.
 export type HomeSection = 'Due' | 'Submitted' | 'Expired With No Submission';
-
-export const SUBMITTED = 'Your Evaluation was submitted successfully.';
 
 // The table under one heading of the Peer Evaluations section. The Surveys
 // section uses the same headings.
@@ -121,7 +120,7 @@ export async function submitEvaluation(
     'Submit the evaluation',
     async () => {
       await button.click();
-      await expect(goodMessage(page)).toHaveText(SUBMITTED);
+      await expect(goodMessage(page)).toHaveText(SUBMISSION.submitted);
       await expect(page).toHaveURL(/\/home(\/index)?\/?$/);
     },
     { box: true }

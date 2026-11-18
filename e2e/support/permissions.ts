@@ -1,5 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { goodMessage, withConfirmation } from './helpers';
+import { PERMISSIONS } from './messages';
 
 export const PERMISSION_ACTIONS = ['Create', 'Read', 'Update', 'Delete'] as const;
 
@@ -19,8 +20,11 @@ export async function openPermissionsEditor(page: Page, roleId: string): Promise
 }
 
 async function filterToPermission(page: Page, permission: string): Promise<Locator> {
-  // The table filters on keyup, which fill() does not produce.
-  await page.locator('#table_id_filter input').pressSequentially(permission);
+  // The table filters on keyup, which fill() does not produce, so a key
+  // press follows. Typing each character takes about a second per filter.
+  const filter = page.locator('#table_id_filter input');
+  await filter.fill(permission);
+  await filter.press('End');
   const rows = page.locator('#table_id tbody tr');
   // When nothing matches, the table shows one "No matching records" row, so
   // the row must also hold the permission.
@@ -30,31 +34,26 @@ async function filterToPermission(page: Page, permission: string): Promise<Locat
   return row;
 }
 
-export async function permissionAccess(
-  page: Page,
-  roleId: string,
-  permission: string
-): Promise<PermissionAccess> {
-  return test.step(
-    `Read the access of ${permission} for role ${roleId}`,
-    async () => {
-      await openPermissionsEditor(page, roleId);
-      const row = await filterToPermission(page, permission);
-      const cells = await row.getByRole('cell').allInnerTexts();
-      // The name column comes first and the four action columns follow it in the
-      // order of PERMISSION_ACTIONS. The id column is in the markup but the table
-      // script hides it, so count the action columns from the end of the row.
-      const access = cells.slice(-PERMISSION_ACTIONS.length).map((text) => text.trim());
-      return Object.fromEntries(
-        PERMISSION_ACTIONS.map((action, index) => [action, access[index]])
-      ) as PermissionAccess;
-    },
-    { box: true }
-  );
+// The access of a permission, on the open editor page.
+async function readAccess(page: Page, permission: string): Promise<PermissionAccess> {
+  const row = await filterToPermission(page, permission);
+  const cells = await row.getByRole('cell').allInnerTexts();
+  // The name column comes first and the four action columns follow it in the
+  // order of PERMISSION_ACTIONS. The id column is in the markup but the table
+  // script hides it, so count the action columns from the end of the row.
+  const access = cells.slice(-PERMISSION_ACTIONS.length).map((text) => text.trim());
+  return Object.fromEntries(
+    PERMISSION_ACTIONS.map((action, index) => [action, access[index]])
+  ) as PermissionAccess;
 }
 
 async function openActionPanel(page: Page, roleId: string, permission: string): Promise<Locator> {
-  await openPermissionsEditor(page, roleId);
+  // After a change, the app shows the editor of the role again, so it does
+  // not need a new load, unless an action panel is open.
+  const onEditor = new RegExp(`/accesses/view/${roleId}$`).test(page.url());
+  if (!onEditor || (await page.locator('#table_id div.userActionPanel').count()) > 0) {
+    await openPermissionsEditor(page, roleId);
+  }
   const row = await filterToPermission(page, permission);
   // The actions live in a panel that a click on the row opens.
   await row.getByRole('cell').first().click();
@@ -82,13 +81,15 @@ export async function expectPermissionActions(
   );
 }
 
+// Changes a permission, and returns its access as the editor shows it after
+// the save: the app saves the change, then loads the editor of the role again.
 export async function changePermission(
   page: Page,
   roleId: string,
   permission: string,
   label: string
-): Promise<void> {
-  await test.step(
+): Promise<PermissionAccess> {
+  return test.step(
     `${label} on ${permission} for role ${roleId}`,
     async () => {
       const panel = await openActionPanel(page, roleId, permission);
@@ -97,7 +98,9 @@ export async function changePermission(
         `Are you sure you want to change the access to ${permission}?`,
         () => panel.getByRole('link', { name: label, exact: true }).click()
       );
-      await expect(goodMessage(page)).toHaveText('Permissions have been updated');
+      await expect(goodMessage(page)).toHaveText(PERMISSIONS.updated);
+      await expect(page).toHaveURL(new RegExp(`/accesses/view/${roleId}$`));
+      return readAccess(page, permission);
     },
     { box: true }
   );

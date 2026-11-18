@@ -28,6 +28,15 @@ Specs import `test` and `expect` from `support/test.ts`, not from `@playwright/t
 
 A test whose subject is not a form creates its starting data with SQL, through the helpers in `support/insert.ts`, because filling the forms is slow. The insert must write the rows the way the app saves them. Each type that a spec inserts has exactly one self-check test, which inserts the data and checks it with the same expect helpers as the test of the form. The test of the form stays on the form.
 
+## Assertions
+
+The flash messages that the specs check are in `support/messages.ts`, so a change of wording only needs one edit. Most checks compare the whole message. Messages that name test data, such as the row of a failed import, stay next to that data in the spec.
+
+The line breaks and spaces of a page, a table cell, or a PDF depend on the markup and the styles of the document. `support/text.ts` has checks that do not depend on them:
+
+- `expectTextIgnoringSpace(locator, expected)` compares the whole text. Each run of whitespace counts as one space. Use it when you know the whole text.
+- `expectTextInOrder(locator, parts)` and `readInOrder(text)` check parts in order and ignore all whitespace. Each part must start at most 60 characters after the end of the part before it. Use them when other text, such as labels, comes between the parts, for example on a PDF page.
+
 ## Debug a Test
 
 UI mode shows each step of a test, the page before and after the step, and the network traffic. It also runs a test again when you change it. The container serves it on port 9323, which docker-compose.yml publishes to localhost only:

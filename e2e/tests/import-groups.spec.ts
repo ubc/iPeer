@@ -10,6 +10,7 @@ import {
   resultsTable,
 } from '../support/helpers';
 import { COURSES, STUDENTS, USERS } from '../support/seed';
+import { UPLOAD } from '../support/messages';
 
 // Ported from app/tests/cases/system/import_groups.test.php.
 // The CSV files are the ones the old tests used.
@@ -43,7 +44,7 @@ test('an import with no file is refused', async ({ page }) => {
 
   await page.goto(`/groups/import/${COURSES.apsc201.id}`);
   await page.getByRole('button', { name: 'Import' }).click();
-  await expect(flashMessage(page)).toHaveText('Please select a file to upload.');
+  await expect(flashMessage(page)).toHaveText(UPLOAD.noFile);
 
   await openGroupList(page, COURSES.apsc201.id);
   await expect(page.getByRole('link', { name: /^Team \(/ })).toHaveCount(0);
@@ -53,7 +54,7 @@ test('an import of a file type that is not allowed is refused', async ({ page })
   await login(page, USERS.instructor2);
 
   await importCsv(page, COURSES.apsc201.id, notCsvFile('groups'));
-  await expect(flashMessage(page)).toHaveText('extension is not allowed.');
+  await expect(flashMessage(page)).toHaveText(UPLOAD.wrongExtension);
 
   await openGroupList(page, COURSES.apsc201.id);
   await expect(page.getByRole('link', { name: /^Team \(/ })).toHaveCount(0);

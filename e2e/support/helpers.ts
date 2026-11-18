@@ -1,6 +1,7 @@
 import { expect, test, type Dialog, type Locator, type Page } from '@playwright/test';
 import path from 'path';
 import { PASSWORD } from './seed';
+import { ACCESS } from './messages';
 
 // Signs the user in and returns the URL of the page that the login leads to.
 // It does not open that page: the test opens the page it needs next.
@@ -77,9 +78,7 @@ export async function expectAccessDenied(page: Page): Promise<void> {
       // A refused page sends the visitor to the home page with a message that
       // names no permission, so the message and the landing page are all there
       // is to tell a refusal from a working page.
-      await expect(flashMessage(page)).toContainText(
-        'Access to this page is limited to authorized users'
-      );
+      await expect(flashMessage(page)).toContainText(ACCESS.deniedStart);
       await expect(page).toHaveURL(/\/home$/);
     },
     { box: true }

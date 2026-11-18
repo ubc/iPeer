@@ -5,6 +5,7 @@ import { fixture, flashMessage, login, notCsvFile, resultsTable } from '../suppo
 import { COURSES, MECH328_GROUPS, STUDENTS, USERS, fullName } from '../support/seed';
 import { expectInClassList, expectNotInClassList } from '../support/users';
 import type { ResultSetHeader } from 'mysql2/promise';
+import { UPLOAD } from '../support/messages';
 
 // Ported from app/tests/cases/system/mass_move.test.php and
 // app/tests/cases/system/move_student.test.php. The CSV files list the same
@@ -320,7 +321,7 @@ test('a superadmin move from a file that is not a CSV is refused and moves no on
     action: 'Move',
   });
   await page.getByRole('button', { name: 'Submit', exact: true }).click();
-  await expect(flashMessage(page)).toHaveText('extension is not allowed.');
+  await expect(flashMessage(page)).toHaveText(UPLOAD.wrongExtension);
 
   await expectClassSize(page, COURSES.cpsc404.id, 0);
   await expectClassSize(page, COURSES.apsc201.id, COURSES.apsc201.studentCount);
