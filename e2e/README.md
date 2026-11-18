@@ -37,6 +37,12 @@ The line breaks and spaces of a page, a table cell, or a PDF depend on the marku
 - `expectTextIgnoringSpace(locator, expected)` compares the whole text. Each run of whitespace counts as one space. Use it when you know the whole text.
 - `expectTextInOrder(locator, parts)` and `readInOrder(text)` check parts in order and ignore all whitespace. Each part must start at most 60 characters after the end of the part before it. Use them when other text, such as labels, comes between the parts, for example on a PDF page.
 
+## Selectors
+
+Find elements by role and accessible name, as a user finds them. If a view gives no good name, change the view, not the test. For example, link a table to its heading with `aria-labelledby`. Then find the table with `labelledTable(page, heading)`.
+
+In new code, do not find an element by its position, such as `.nth()`, or by XPath. Some older helpers still do. Replace them when their views get names.
+
 ## Debug a Test
 
 UI mode shows each step of a test, the page before and after the step, and the network traffic. It also runs a test again when you change it. The container serves it on port 9323, which docker-compose.yml publishes to localhost only:

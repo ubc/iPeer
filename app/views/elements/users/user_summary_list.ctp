@@ -16,7 +16,7 @@ if (isset($data['id'])) {
 }
 ?>
 
-<table class='standardtable'>
+<table class='standardtable'<?php echo empty($labelledBy) ? '' : " aria-labelledby='" . h($labelledBy) . "'" ?>>
     <tr>
     <?php
     foreach($columns as $k => $v) {

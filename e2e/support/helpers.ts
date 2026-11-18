@@ -122,8 +122,15 @@ export function sectionHeadings(page: Page, section: string): Locator {
   );
 }
 
-// The table that follows a heading, on pages that report the result of an
-// import.
+// A table by its accessible name: the text of the heading that its
+// aria-labelledby points at.
+export function labelledTable(page: Page, name: string): Locator {
+  return page.getByRole('table', { name, exact: true });
+}
+
+// The table that follows a heading, on pages whose tables are not labelled
+// yet: the student and instructor result pages and the group view. Replace
+// it with labelledTable() as those views get labels.
 export function resultsTable(page: Page, heading: string, level: 'h2' | 'h3' = 'h2'): Locator {
   return page.locator(
     `xpath=//${level}[normalize-space()='${heading}']/following-sibling::table[1]`

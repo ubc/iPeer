@@ -2,7 +2,7 @@
     array('identifier' => $identifier, 'note' => $note);
 ?>
 
-<table class='standardtable'>
+<table class='standardtable'<?php echo empty($labelledBy) ? '' : " aria-labelledby='" . h($labelledBy) . "'" ?>>
     <tr>
     <?php
     foreach ($columns as $title) {

@@ -1271,7 +1271,8 @@ AjaxListAction.prototype.renderAction = function (action) {
         }
     }
 
-    var menuItem = new Element("div", {"style": "cursor: default; padding:4px;font-weight: bold;"})
+    var menuItem = new Element("div", {"style": "cursor: default; padding:4px;font-weight: bold;",
+        "class": active ? "ajax-list-menu-item" : "ajax-list-menu-item disabled"})
         .update(action[ACTION_NAME]);
     if (active) {
         menuItem.style.color = AjaxListActionMenuTextEnabledColor;
@@ -1292,7 +1293,7 @@ AjaxListAction.prototype.renderAction = function (action) {
 
 AjaxListAction.prototype.render = function() {
     if (this.actions.length>0) {
-        this.display = new Element("div");
+        this.display = new Element("div", {"class": "ajax-list-menu"});
         this.display.style.backgroundColor = AjaxListActionMenuColor;
         this.display.style.position = "absolute";
         this.display.style.left = this.x + "px";
