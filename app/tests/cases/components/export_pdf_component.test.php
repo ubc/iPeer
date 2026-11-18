@@ -413,7 +413,7 @@ class ExportPdfComponentTestCase extends CakeTestCase
 
         $this->_assertSafe($html);
         $this->_assertHas($html, '<table border="1" align="center">');
-        $this->_assertHas($html, '<th>1 (/5.0 )</th>');
+        $this->_assertHas($html, '<th>1 (/5.0)</th>');
         $this->_assertHas($html, '<tr><td>Ann &quot;Q&quot; O&#039;Neil</td>');
         $this->_assertHas($html, '<td>3.50</td>');
     }

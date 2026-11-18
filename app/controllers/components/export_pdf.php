@@ -463,7 +463,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             //Get the Rubric Criteria number and the multiplier and write it to the table header
             $criteria_num = $criteria['RubricsCriteria']['criteria_num'];
             $multiplier = $criteria['RubricsCriteria']['multiplier'];
-            $rSTBL = $rSTBL.'<th>'.$criteria_num.' (/'.number_format($multiplier, 1).' )</th>';
+            $rSTBL = $rSTBL.'<th>'.$criteria_num.' (/'.number_format($multiplier, 1).')</th>';
         }
         $rSTBL .= $params['include']['final_marks'] ? '<th>Total (/'.number_format($total, 2).')</th>' : '';
         $rSTBL .= '</tr>';

@@ -10,6 +10,7 @@ import {
   type NewEvent,
 } from '../support/events';
 import { userId } from '../support/insert';
+import { pdfPages, readInOrder } from '../support/pdf';
 import { COURSES, MECH328_GROUPS, STUDENTS, TUTORS, USERS, fullName } from '../support/seed';
 import {
   insertMixevalSubmission,
@@ -472,7 +473,37 @@ test('the export needs one field of each coloured group', async ({ page, testDat
   expect(downloads).toBe(1);
 });
 
-test('the PDF export gives a PDF file', async ({ page, testDatabase }) => {
+// Exports the event as a PDF, and returns the text of each page.
+async function exportPdf(page: Page, eventId: string): Promise<string[]> {
+  await openExport(page, eventId);
+  await page.getByLabel('Export File Type').selectOption('pdf');
+  // The PDF has no columns per student, so the form hides those choices.
+  await expect(page.getByLabel('Include Student Name')).toBeHidden();
+  const content = await postExport(page);
+  expect(content.subarray(0, 5).toString('latin1')).toBe('%PDF-');
+  const pages = await pdfPages(content);
+  await test.info().attach('export.pdf.txt', { body: pages.join('\n\n') });
+  return pages;
+}
+
+// The text of one group. Each group starts a page with its 'Group:' label,
+// and can go on over the next pages. The title of the export is above the
+// first group only.
+function groupText(pages: readonly string[], group: string): string {
+  const starts = (text: string) => /^\s*Group:/.test(text);
+  const first = pages.findIndex((text) => text.includes(`Group: ${group}`));
+  expect(first, `the page of ${group}`).toBeGreaterThanOrEqual(0);
+  const next = pages.findIndex((text, index) => index > first && starts(text));
+  return pages.slice(first, next < 0 ? undefined : next).join('\n');
+}
+
+// The other group of the course has no answers.
+const OTHER = MECH328_GROUPS.lazyEngineers.name;
+
+test('the PDF export of a simple evaluation shows the marks and comments', async ({
+  page,
+  testDatabase,
+}) => {
   const eventId = await insertExportEvent(testDatabase, {});
   await insertSimpleSubmission(testDatabase, eventId, GROUP.id, ED.username, [
     { member: ALEX.name, points: 120, comment: 'good' },
@@ -481,13 +512,142 @@ test('the PDF export gives a PDF file', async ({ page, testDatabase }) => {
   await endSubmissions(testDatabase, eventId);
 
   await login(page, USERS.instructor1);
-  await openExport(page, eventId);
-  await page.getByLabel('Export File Type').selectOption('pdf');
-  // The PDF has no columns per student, so the form hides those choices.
-  await expect(page.getByLabel('Include Student Name')).toBeHidden();
-  const content = await postExport(page);
-  expect(content.subarray(0, 5).toString('latin1')).toBe('%PDF-');
-  expect(content.length).toBeGreaterThan(1000);
+  const pages = await exportPdf(page, eventId);
+  readInOrder(pages[0]).expect(['Evaluation Event Detail:', `${COURSES.mech328.name} - ${TITLE}`]);
+  const text = readInOrder(groupText(pages, GROUP.name));
+  text.expect(['Self-Evaluation:', 'No', 'Event Name:', TITLE, 'Evaluation Type:', 'Simple']);
+  text.expect(['Members who have not submitted their evaluations', ALEX.name, MATT.name, TUTOR]);
+  // The marks Ed gave, then the totals of each member evaluated.
+  text.expect(['Members Evaluated', ALEX.name, MATT.name, ED.name, '120.00', '80.00']);
+  text.expect(['Totals', '120.00', '80.00', 'Penalty', '12.00 (10%)', '8.00 (10%)']);
+  text.expect(['Final Mark', '108.00', '72.00', '# of Evaluator(s)', '1', '1']);
+  text.expect(['Average Received', '108.00', '72.00']);
+  text.expect(['Comments', 'Evaluator:', ED.name]);
+  text.expect([`${ALEX.name}:`, 'good', `${MATT.name}:`, 'ok']);
+  readInOrder(groupText(pages, OTHER)).expect(['No Submissions']);
+});
+
+test('the PDF export of a rubric evaluation shows each criterion', async ({
+  page,
+  testDatabase,
+}) => {
+  const eventId = await insertExportEvent(testDatabase, {
+    title: 'Rubric Export',
+    type: 'RUBRIC',
+    template: 'Term Report Evaluation',
+  });
+  await insertRubricSubmission(testDatabase, eventId, GROUP.id, ED.username, [
+    {
+      member: ALEX.name,
+      levels: [5, 4, 4],
+      comments: ['active', 'helpful', 'on time'],
+      general: 'good job',
+    },
+    {
+      member: MATT.name,
+      levels: [3, 4, 5],
+      comments: ['some', 'kind', 'early'],
+      general: 'amazing',
+    },
+  ]);
+  await endSubmissions(testDatabase, eventId);
+
+  await login(page, USERS.instructor1);
+  const pages = await exportPdf(page, eventId);
+  const text = readInOrder(groupText(pages, GROUP.name));
+  text.expect(['Event Name:', 'Rubric Export', 'Evaluation Type:', 'Rubric']);
+  // The average grade of each criterion, of 5, then the total of 15 with
+  // the penalty.
+  text.expect(['Evaluatee', '1 (/5.0)', '2 (/5.0)', '3 (/5.0)', 'Total (/15.00)']);
+  text.expect([ALEX.name, '5.00', '4.00', '4.00', '13.00 - 1.30 = 11.70 (78.00%)']);
+  text.expect([MATT.name, '3.00', '4.00', '5.00', '12.00 - 1.20 = 10.80 (72.00%)']);
+  text.expect(['Group Average', '4.00', '4.00', '4.50', '11.25']);
+  // Then what each member received, criterion by criterion.
+  for (const [member, total, place, grades, comments, general] of [
+    [
+      ALEX.name,
+      '13.00 - 1.30 = 11.70 (78.00%)',
+      'Above',
+      ['5.00', '4.00', '4.00'],
+      ['active', 'helpful', 'on time'],
+      'good job',
+    ],
+    [
+      MATT.name,
+      '12.00 - 1.20 = 10.80 (72.00%)',
+      'Below',
+      ['3.00', '4.00', '5.00'],
+      ['some', 'kind', 'early'],
+      'amazing',
+    ],
+  ] as const) {
+    text.expect(['Evaluatee:', member, 'Number of Evaluators:', '1', 'Final Total:', total]);
+    text.expect([`${place} Group Average`, 'Note: 10% Late Penalty']);
+    text.expect([
+      ED.name,
+      ...grades.flatMap((grade, index) => ['Grade:', `${grade} / 5`, 'Comment:', comments[index]]),
+      'General Comment:',
+      general,
+    ]);
+  }
+  readInOrder(groupText(pages, OTHER)).expect(['Group Average', '0.00', '0.00', '0.00', '0.00']);
+});
+
+test('the PDF export of a mixed evaluation shows each question', async ({ page, testDatabase }) => {
+  const eventId = await insertExportEvent(testDatabase, {
+    title: 'Mixed Export',
+    type: 'MIX EVALUATION',
+    template: 'Default Mix Evaluation',
+  });
+  await insertMixevalSubmission(testDatabase, eventId, GROUP.id, ED.username, [
+    { member: ALEX.name, answers: { 1: 4, 2: 3, 3: 5, 4: 'absolutely', 5: 'definitely' } },
+    { member: MATT.name, answers: { 1: 5, 2: 5, 3: 4, 4: 'yes', 5: 'always', 6: 'very' } },
+  ]);
+  await endSubmissions(testDatabase, eventId);
+
+  await login(page, USERS.instructor1);
+  const pages = await exportPdf(page, eventId);
+  const text = readInOrder(groupText(pages, GROUP.name));
+  text.expect(['Event Name:', 'Mixed Export', 'Evaluation Type:', 'Mix Evaluation']);
+  // The grade of each Likert question, of 1, then the total of 3 with the
+  // penalty.
+  text.expect(['Evaluatee', '1 (/1.0)', '2 (/1.0)', '3 (/1.0)', 'Total (/3.00)']);
+  text.expect([ALEX.name, '0.80', '0.60', '1.00', '2.40 - 0.24 = 2.16 (72.00%)']);
+  text.expect([MATT.name, '1.00', '1.00', '0.80', '2.80 - 0.28 = 2.52 (84.00%)']);
+  text.expect(['Group Average', '0.90', '0.80', '0.90', '2.34']);
+  // Then the answers each member received, question by question. Alex has
+  // no answer to the optional question 6.
+  const questions = [
+    '1. Participated in Team Meetings',
+    '2. Was Helpful and co-operative',
+    '3. Submitted work on time',
+    '4. Produced efficient work?',
+    '5. Contributed?',
+    '6. Easy to work with?',
+  ];
+  for (const [member, total, place, answers] of [
+    [
+      ALEX.name,
+      '2.40 - 0.24 = 2.16 (72.00%)',
+      'Below',
+      ['0.80 / 1', '0.60 / 1', '1.00 / 1', 'absolutely', 'definitely', null],
+    ],
+    [
+      MATT.name,
+      '2.80 - 0.28 = 2.52 (84.00%)',
+      'Above',
+      ['1.00 / 1', '1.00 / 1', '0.80 / 1', 'yes', 'always', 'very'],
+    ],
+  ] as const) {
+    text.expect(['Evaluatee:', member, 'Final Total:', total, `${place} Average`]);
+    text.expect(['Note: 10% Late Penalty']);
+    for (const [index, answer] of answers.entries()) {
+      text.expect(
+        answer === null ? [questions[index], 'N/A'] : [questions[index], `${ED.name}:`, answer]
+      );
+    }
+  }
+  readInOrder(groupText(pages, OTHER)).expect(['Group Average', '0.00', '0.00', '0.00', '0.00']);
 });
 
 test('the course export lists the evaluation events of the course', async ({
