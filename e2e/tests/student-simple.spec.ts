@@ -10,6 +10,13 @@ import {
   type NewEvent,
 } from '../support/events';
 import { userId } from '../support/insert';
+import {
+  LEFT_GROUP,
+  NOT_SUBMITTED,
+  groupListCell,
+  memberList,
+  openEventResults,
+} from '../support/results';
 import { COURSES, MECH328_GROUPS, STUDENTS, TUTORS, USERS, fullName } from '../support/seed';
 import {
   expectOnHome,
@@ -149,16 +156,6 @@ function gradeReleaseButtons(page: Page): Locator {
     .getByRole('button');
 }
 
-// The table of one header such as 'Have not submitted their evaluations'.
-function memberList(page: Page, header: string): Locator {
-  return page
-    .locator('table')
-    .filter({ has: page.getByRole('columnheader', { name: header, exact: true }) });
-}
-
-const NOT_SUBMITTED = 'Have not submitted their evaluations';
-const LEFT_GROUP = 'Left the group, but had submitted or were evaluated';
-
 function evaluatorHeading(page: Page, evaluator: string): Locator {
   return page.getByRole('heading', { level: 3, name: `Evaluator: ${evaluator}`, exact: true });
 }
@@ -183,25 +180,6 @@ async function expectComments(page: Page, evaluator: string, marks: readonly Sim
     },
     { box: true }
   );
-}
-
-// A cell of the group list on the event results page, by its column header.
-async function groupListCell(page: Page, column: string): Promise<Locator> {
-  await waitForAjaxList(page);
-  const table = page.locator('#ajaxListDiv table').filter({ has: page.getByRole('columnheader') });
-  const headers = (await table.getByRole('columnheader').allTextContents()).map((h) => h.trim());
-  const index = headers.indexOf(column);
-  expect(index, `column ${column} in ${headers.join(', ')}`).toBeGreaterThanOrEqual(0);
-  return table
-    .getByRole('row')
-    .filter({ has: page.getByRole('cell', { name: GROUP.name, exact: true }) })
-    .getByRole('cell')
-    .nth(index);
-}
-
-async function openEventResults(page: Page, eventId: string): Promise<void> {
-  await page.goto(`/evaluations/view/${eventId}`);
-  await waitForAjaxList(page);
 }
 
 // ---------------------------------------------------------------------------
@@ -468,9 +446,9 @@ test('the instructor releases one grade and one comment, and each student sees o
   await expect(commentRow(page, ALEX, MATT).getByRole('checkbox')).not.toBeChecked();
 
   await openEventResults(page, eventId);
-  await expect(await groupListCell(page, 'Status')).toHaveText('Reviewed');
-  await expect(await groupListCell(page, 'Grade')).toHaveText('Some Released');
-  await expect(await groupListCell(page, 'Comment')).toHaveText('Some Released');
+  await expect(await groupListCell(page, GROUP.name, 'Status')).toHaveText('Reviewed');
+  await expect(await groupListCell(page, GROUP.name, 'Grade')).toHaveText('Some Released');
+  await expect(await groupListCell(page, GROUP.name, 'Comment')).toHaveText('Some Released');
 
   // The group average counts Matt with the final penalty: 95, 120 and
   // (80 + 105) / 2 less 10%.
@@ -518,7 +496,7 @@ test('the instructor releases and unreleases all comments, then releases all gra
   await openEventResults(page, eventId);
   await page.getByRole('link', { name: 'Release All Grades', exact: true }).click();
   await waitForAjaxList(page);
-  await expect(await groupListCell(page, 'Grade')).toHaveText('Released');
+  await expect(await groupListCell(page, GROUP.name, 'Grade')).toHaveText('Released');
 
   // Matt did not submit by the end, so his rating loses the final penalty.
   await login(page, STUDENTS.matt.username);
@@ -537,10 +515,10 @@ test('an event without details shows the rating only', async ({ page, testDataba
   await openEventResults(page, eventId);
   await page.getByRole('link', { name: 'Release All Grades', exact: true }).click();
   await waitForAjaxList(page);
-  await expect(await groupListCell(page, 'Grade')).toHaveText('Released');
+  await expect(await groupListCell(page, GROUP.name, 'Grade')).toHaveText('Released');
   await page.getByRole('link', { name: 'Release All Comments', exact: true }).click();
   await waitForAjaxList(page);
-  await expect(await groupListCell(page, 'Comment')).toHaveText('Released');
+  await expect(await groupListCell(page, GROUP.name, 'Comment')).toHaveText('Released');
 
   // The comments are released, but the event does not show them.
   await login(page, STUDENTS.alex.username);

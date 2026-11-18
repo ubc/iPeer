@@ -192,8 +192,8 @@ export function lateDates(): Dates {
 // the submissions. Instructors can release grades and comments only after the
 // end, and students see their results only in the results period.
 //
-// Only simple evaluation answers move. A spec for another type of evaluation
-// adds the update of its answer table here.
+// The answers of each type of evaluation move too. Rubric answers have no
+// submission date, only the created and modified dates.
 export async function endSubmissions({ connection }: TestDatabase, eventId: string): Promise<void> {
   await test.step(
     `End the submissions of event ${eventId}`,
@@ -211,6 +211,15 @@ export async function endSubmissions({ connection }: TestDatabase, eventId: stri
                 created = created - INTERVAL @span SECOND,
                 modified = modified - INTERVAL @span SECOND
           WHERE event_id = ?;
+         UPDATE evaluation_rubric_details d
+           JOIN evaluation_rubrics r ON r.id = d.evaluation_rubric_id
+            SET d.created = d.created - INTERVAL @span SECOND,
+                d.modified = d.modified - INTERVAL @span SECOND
+          WHERE r.event_id = ?;
+         UPDATE evaluation_rubrics
+            SET created = created - INTERVAL @span SECOND,
+                modified = modified - INTERVAL @span SECOND
+          WHERE event_id = ?;
          UPDATE events
             SET due_date = due_date - INTERVAL @span SECOND,
                 release_date_begin = release_date_begin - INTERVAL @span SECOND,
@@ -218,7 +227,7 @@ export async function endSubmissions({ connection }: TestDatabase, eventId: stri
                 result_release_date_begin = ?,
                 result_release_date_end = result_release_date_end - INTERVAL @span SECOND
           WHERE id = ?`,
-        [ended, eventId, eventId, eventId, ended, ended, eventId]
+        [ended, eventId, eventId, eventId, eventId, eventId, ended, ended, eventId]
       );
     },
     { box: true }
