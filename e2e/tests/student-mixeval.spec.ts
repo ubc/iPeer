@@ -30,6 +30,9 @@ import {
   mixevalQuestion,
   openEvaluation,
   openResults,
+  rating,
+  resultAnswers,
+  resultsHeading,
   submitEvaluation,
   submitMixevalButton,
   type MixevalMark,
@@ -171,25 +174,8 @@ function panelAnswers(page: Page, member: string, question: number): Locator {
 // ---------------------------------------------------------------------------
 // The results page of a student.
 
-function rating(page: Page): Locator {
-  return resultsTable(page, 'Summary').getByRole('cell');
-}
-
 function penaltyRating(total: string, deduction: string, final: string, percent: string): string {
   return `${total} - (${deduction})* = ${final} ( )* : 10% late penalty. (${percent}%)`;
-}
-
-// The heading of the answers the teammates gave, which says what is not
-// released yet.
-function resultsHeading(page: Page): Locator {
-  return page.locator('#mixeval_result > h2').first();
-}
-
-// The answers to one question on the results page of a student.
-function resultAnswers(page: Page, question: number): Locator {
-  return page.locator(
-    `xpath=//div[@id='mixeval_result']/h3[starts-with(normalize-space(), '${question}. ')]/following-sibling::ul[1]//li`
-  );
 }
 
 // ---------------------------------------------------------------------------
