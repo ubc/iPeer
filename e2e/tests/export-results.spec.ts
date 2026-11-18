@@ -10,6 +10,7 @@ import {
   type NewEvent,
 } from '../support/events';
 import { userId } from '../support/insert';
+import { pdfPages } from '../support/pdf';
 import { COURSES, MECH328_GROUPS, STUDENTS, TUTORS, USERS, fullName } from '../support/seed';
 import {
   insertMixevalSubmission,
@@ -472,7 +473,44 @@ test('the export needs one field of each coloured group', async ({ page, testDat
   expect(downloads).toBe(1);
 });
 
-test('the PDF export gives a PDF file', async ({ page, testDatabase }) => {
+// Exports the event as a PDF, and returns the text of each page.
+async function exportPdf(page: Page, eventId: string): Promise<string[]> {
+  await openExport(page, eventId);
+  await page.getByLabel('Export File Type').selectOption('pdf');
+  // The PDF has no columns per student, so the form hides those choices.
+  await expect(page.getByLabel('Include Student Name')).toBeHidden();
+  const content = await postExport(page);
+  expect(content.subarray(0, 5).toString('latin1')).toBe('%PDF-');
+  const pages = await pdfPages(content);
+  await test.info().attach('export.pdf.txt', { body: pages.join('\n\n') });
+  return pages;
+}
+
+// The text of one group: each group starts a page, and can go on over the
+// next pages. A check must not span a page break, where the footer 'iPeer'
+// comes between.
+function groupText(pages: readonly string[], group: string): string {
+  const first = pages.findIndex((text) => text.includes(`Group: ${group}`));
+  expect(first, `the page of ${group}`).toBeGreaterThanOrEqual(0);
+  const next = pages.findIndex((text, index) => index > first && text.includes('Group: '));
+  return pages.slice(first, next < 0 ? undefined : next).join(' ');
+}
+
+function expectAll(text: string, parts: readonly string[]): void {
+  for (const part of parts) {
+    expect(text).toContain(part);
+  }
+}
+
+// In the PDF tests, only Ed submits. Alex and Matt did not submit, so their
+// marks carry the penalty for no submission, 10%. The other group of the
+// course has no answers.
+const OTHER = MECH328_GROUPS.lazyEngineers.name;
+
+test('the PDF export of a simple evaluation shows the marks and comments', async ({
+  page,
+  testDatabase,
+}) => {
   const eventId = await insertExportEvent(testDatabase, {});
   await insertSimpleSubmission(testDatabase, eventId, GROUP.id, ED.username, [
     { member: ALEX.name, points: 120, comment: 'good' },
@@ -481,13 +519,113 @@ test('the PDF export gives a PDF file', async ({ page, testDatabase }) => {
   await endSubmissions(testDatabase, eventId);
 
   await login(page, USERS.instructor1);
-  await openExport(page, eventId);
-  await page.getByLabel('Export File Type').selectOption('pdf');
-  // The PDF has no columns per student, so the form hides those choices.
-  await expect(page.getByLabel('Include Student Name')).toBeHidden();
-  const content = await postExport(page);
-  expect(content.subarray(0, 5).toString('latin1')).toBe('%PDF-');
-  expect(content.length).toBeGreaterThan(1000);
+  const pages = await exportPdf(page, eventId);
+  expectAll(groupText(pages, GROUP.name), [
+    `Evaluation Event Detail: ${COURSES.mech328.name} - ${TITLE}`,
+    `Event Name: ${TITLE}`,
+    'Evaluation Type: Simple',
+    `Members who have not submitted their evaluations ${ALEX.name} ${MATT.name} ${TUTOR}`,
+    // The marks Ed gave, then the totals of each member evaluated.
+    `Members Evaluated ${ALEX.name} ${MATT.name} ${ED.name} 120.00 80.00`,
+    'Totals 120.00 80.00',
+    'Penalty 12.00 (10%) 8.00 (10%)',
+    'Final Mark 108.00 72.00',
+    '# of Evaluator(s) 1 1',
+    'Average Received 108.00 72.00',
+    `Comments Evaluator: ${ED.name} ${ALEX.name}: good ${MATT.name}: ok`,
+  ]);
+  expect(groupText(pages, OTHER)).toContain('No Submissions');
+});
+
+test('the PDF export of a rubric evaluation shows each criterion', async ({
+  page,
+  testDatabase,
+}) => {
+  const eventId = await insertExportEvent(testDatabase, {
+    title: 'Rubric Export',
+    type: 'RUBRIC',
+    template: 'Term Report Evaluation',
+  });
+  await insertRubricSubmission(testDatabase, eventId, GROUP.id, ED.username, [
+    {
+      member: ALEX.name,
+      levels: [5, 4, 4],
+      comments: ['active', 'helpful', 'on time'],
+      general: 'good job',
+    },
+    {
+      member: MATT.name,
+      levels: [3, 4, 5],
+      comments: ['some', 'kind', 'early'],
+      general: 'amazing',
+    },
+  ]);
+  await endSubmissions(testDatabase, eventId);
+
+  await login(page, USERS.instructor1);
+  const pages = await exportPdf(page, eventId);
+  expectAll(groupText(pages, GROUP.name), [
+    'Event Name: Rubric Export',
+    'Evaluation Type: Rubric',
+    // The average grade of each criterion, of 5, then the total of 15 with
+    // the penalty. The group average is (11.70 + 10.80) / 2.
+    'Evaluatee 1 (/5.0 ) 2 (/5.0 ) 3 (/5.0 ) Total (/15.00)',
+    `${ALEX.name} 5.00 4.00 4.00 13.00 - 1.30 = 11.70 (78.00%)`,
+    `${MATT.name} 3.00 4.00 5.00 12.00 - 1.20 = 10.80 (72.00%)`,
+    'Group Average 4.00 4.00 4.50 11.25',
+    // Then what each member received, criterion by criterion.
+    `Evaluatee: ${ALEX.name} Number of Evaluators: 1 ` +
+      'Final Total: 13.00 - 1.30 = 11.70 (78.00%) - Above Group Average Note: 10% Late Penalty',
+    `${ED.name} Grade : 5.00 / 5 Comment : active Grade : 4.00 / 5 Comment : helpful ` +
+      'Grade : 4.00 / 5 Comment : on time General Comment: good job',
+    `Evaluatee: ${MATT.name} Number of Evaluators: 1 ` +
+      'Final Total: 12.00 - 1.20 = 10.80 (72.00%) - Below Group Average Note: 10% Late Penalty',
+    `${ED.name} Grade : 3.00 / 5 Comment : some Grade : 4.00 / 5 Comment : kind ` +
+      'Grade : 5.00 / 5 Comment : early General Comment: amazing',
+  ]);
+  expect(groupText(pages, OTHER)).toContain('Group Average 0.00 0.00 0.00 0.00');
+});
+
+test('the PDF export of a mixed evaluation shows each question', async ({ page, testDatabase }) => {
+  const eventId = await insertExportEvent(testDatabase, {
+    title: 'Mixed Export',
+    type: 'MIX EVALUATION',
+    template: 'Default Mix Evaluation',
+  });
+  await insertMixevalSubmission(testDatabase, eventId, GROUP.id, ED.username, [
+    { member: ALEX.name, answers: { 1: 4, 2: 3, 3: 5, 4: 'absolutely', 5: 'definitely' } },
+    { member: MATT.name, answers: { 1: 5, 2: 5, 3: 4, 4: 'yes', 5: 'always', 6: 'very' } },
+  ]);
+  await endSubmissions(testDatabase, eventId);
+
+  await login(page, USERS.instructor1);
+  const pages = await exportPdf(page, eventId);
+  expectAll(groupText(pages, GROUP.name), [
+    'Event Name: Mixed Export',
+    'Evaluation Type: Mix Evaluation',
+    // The grade of each Likert question, of 1, then the total of 3 with the
+    // penalty. The group average is (2.16 + 2.52) / 2.
+    'Evaluatee 1 (/1.0) 2 (/1.0) 3 (/1.0) Total (/3.00)',
+    `${ALEX.name} 0.80 0.60 1.00 2.40 - 0.24 = 2.16 (72.00%)`,
+    `${MATT.name} 1.00 1.00 0.80 2.80 - 0.28 = 2.52 (84.00%)`,
+    'Group Average 0.90 0.80 0.90 2.34',
+    // Then the answers each member received, question by question. Alex has
+    // no answer to the optional question 6.
+    `Evaluatee: ${ALEX.name} Final Total: 2.40 - 0.24 = 2.16 (72.00%) - Below Average ` +
+      'Note: 10% Late Penalty',
+    `1. Participated in Team Meetings ${ED.name}: 0.80 / 1 ` +
+      `2. Was Helpful and co-operative ${ED.name}: 0.60 / 1 ` +
+      `3. Submitted work on time ${ED.name}: 1.00 / 1 ` +
+      `4. Produced efficient work? ${ED.name}: absolutely ` +
+      `5. Contributed? ${ED.name}: definitely 6. Easy to work with? N/A`,
+    `Evaluatee: ${MATT.name} Final Total: 2.80 - 0.28 = 2.52 (84.00%) - Above Average`,
+    `1. Participated in Team Meetings ${ED.name}: 1.00 / 1 ` +
+      `2. Was Helpful and co-operative ${ED.name}: 1.00 / 1 ` +
+      `3. Submitted work on time ${ED.name}: 0.80 / 1 ` +
+      `4. Produced efficient work? ${ED.name}: yes ` +
+      `5. Contributed? ${ED.name}: always 6. Easy to work with? ${ED.name}: very`,
+  ]);
+  expect(groupText(pages, OTHER)).toContain('Group Average 0.00 0.00 0.00 0.00');
 });
 
 test('the course export lists the evaluation events of the course', async ({
