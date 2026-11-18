@@ -38,7 +38,7 @@ import {
   type MixevalMark,
 } from '../support/student';
 import { SUBMISSION } from '../support/messages';
-import { expectTextInOrder } from '../support/text';
+import { expectTextIgnoringSpace } from '../support/text';
 
 // Ported from app/tests/cases/system/student_mixeval.test.php. As in
 // student-simple.spec.ts, the event and the submissions are inserted, except
@@ -191,10 +191,10 @@ test('a student answers the questions for each member and submits', async ({
   const penalty = page.locator('#penalty');
   await expect(penalty).toBeHidden();
   await page.getByRole('link', { name: 'Show/Hide Late Penalty Policy' }).click();
-  await expectTextInOrder(penalty, [
-    'From the due date to 1 days(s) late, 10% will be deducted.',
-    '10% is deducted afterwards.',
-  ]);
+  await expectTextIgnoringSpace(
+    penalty,
+    'From the due date to 1 days(s) late, 10% will be deducted. 10% is deducted afterwards.'
+  );
 
   // Each member has the questions, with their instructions, and a star on
   // each required question.

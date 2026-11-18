@@ -3,7 +3,7 @@ import { idFromAjaxList } from '../support/ajax-list';
 import { searchEventList, viewField } from '../support/events';
 import { fixture, flashMessage, goodMessage, login, notCsvFile } from '../support/helpers';
 import { COURSES, MECH328_GROUPS, USERS, fullName } from '../support/seed';
-import { ACCESS, EVENT } from '../support/messages';
+import { ACCESS, EVENT, UPLOAD } from '../support/messages';
 
 // Ported from app/tests/cases/system/import_events.test.php. The old CSV files
 // also imported a survey, which is out of scope, so these files use the other
@@ -321,7 +321,7 @@ test('an empty file is refused', async ({ page }) => {
 test('a file that is not a CSV is refused', async ({ page }) => {
   await login(page, USERS.instructor1);
   await importFile(page, notCsvFile('events'));
-  await expectImportFailed(page, 'extension is not allowed.');
+  await expectImportFailed(page, UPLOAD.wrongExtension);
 });
 
 test('an instructor cannot import events into a course they do not teach', async ({ page }) => {

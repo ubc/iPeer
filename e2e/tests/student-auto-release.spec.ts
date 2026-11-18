@@ -28,7 +28,7 @@ import {
   type RubricMark,
 } from '../support/student';
 import { rubricSectionSaved } from '../support/messages';
-import { expectTextInOrder } from '../support/text';
+import { expectTextIgnoringSpace } from '../support/text';
 
 // With auto-release on, students see their grades and comments in the
 // results period without a release by the instructor. The ports of the
@@ -177,15 +177,14 @@ test('a rubric evaluation with auto-release shows the grades and comments at onc
   // comment. The first cell of the criteria row is not a criterion.
   const rows = received.locator('table').locator('xpath=./tbody/tr[td]');
   await expect(rows).toHaveCount(2);
-  await expectTextInOrder(rows.nth(0), [
-    ...['5.00', '4.00', '4.00'].flatMap((grade, index) => [
-      'Grade:',
-      grade,
-      'Comment:',
-      ['active', 'helpful', 'on time'][index],
-    ]),
-  ]);
-  await expectTextInOrder(rows.nth(1), ['General Comment:', 'good job']);
+  const [toAlex] = marks;
+  await expectTextIgnoringSpace(
+    rows.nth(0).locator('xpath=./td[position() > 1]'),
+    toAlex.comments.map(
+      (comment, index) => `Points: Grade: ${toAlex.levels[index]}.00 Comment: ${comment}`
+    )
+  );
+  await expectTextIgnoringSpace(rows.nth(1), `General Comment: ${toAlex.general}`);
 });
 
 test('a mixed evaluation with auto-release shows the grades and comments at once', async ({

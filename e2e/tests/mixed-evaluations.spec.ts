@@ -5,6 +5,7 @@ import { evaluationTabSection, openEvaluationTab, requestDelete } from '../suppo
 import { insertMixeval, type Mixeval, type Question, type Section } from '../support/mixevals';
 import { USERS } from '../support/seed';
 import { MIXEVAL, noTemplatePermission } from '../support/messages';
+import { expectTextIgnoringSpace } from '../support/text';
 
 // Ported from app/tests/cases/system/add_mixeval.test.php.
 
@@ -518,9 +519,7 @@ test('a mixed evaluation that events use cannot be deleted, and one with submiss
 }) => {
   await page.goto('/mixevals');
   await deleteFromList(page, SEEDED.name);
-  await expect(flashMessage(page)).toContainText(
-    'This evaluation is now in use, and can NOT be deleted.'
-  );
+  await expectTextIgnoringSpace(flashMessage(page), MIXEVAL.inUseNoDelete);
 
   await page.goto(`/mixevals/edit/${SEEDED.id}`);
   await expect(flashMessage(page)).toHaveText(MIXEVAL.inUse(SEEDED.name));

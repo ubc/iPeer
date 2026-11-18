@@ -28,11 +28,14 @@ Specs import `test` and `expect` from `support/test.ts`, not from `@playwright/t
 
 A test whose subject is not a form creates its starting data with SQL, through the helpers in `support/insert.ts`, because filling the forms is slow. The insert must write the rows the way the app saves them. Each type that a spec inserts has exactly one self-check test, which inserts the data and checks it with the same expect helpers as the test of the form. The test of the form stays on the form.
 
-## Checks
+## Assertions
 
-The flash messages that the specs check are in `support/messages.ts`. A check compares the whole message, so it catches a wrong message, and a change of wording needs one edit.
+The flash messages that the specs check are in `support/messages.ts`, so a change of wording only needs one edit. Most checks compare the whole message. Messages that name test data, such as the row of a failed import, stay next to that data in the spec.
 
-The line breaks and spaces of a page, a table cell or a PDF depend on the markup and the styles. For such text, `support/text.ts` checks parts in order and ignores whitespace: `expectTextInOrder(locator, parts)` for an element, and `readInOrder(text)` for text such as a PDF page. Each part must come soon after the one before it, so a label between two parts does not fail the check, but a missing or moved part does. Use an exact `toHaveText()` only when the exact text is what the test checks.
+The line breaks and spaces of a page, a table cell, or a PDF depend on the markup and the styles of the document. `support/text.ts` has checks that do not depend on them:
+
+- `expectTextIgnoringSpace(locator, expected)` compares the whole text. Each run of whitespace counts as one space. Use it when you know the whole text.
+- `expectTextInOrder(locator, parts)` and `readInOrder(text)` check parts in order and ignore all whitespace. Each part must start at most 60 characters after the end of the part before it. Use them when other text, such as labels, comes between the parts, for example on a PDF page.
 
 ## Debug a Test
 

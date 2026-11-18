@@ -5,7 +5,7 @@ import { evaluationTabSection, openEvaluationTab, requestDelete } from '../suppo
 import { USERS } from '../support/seed';
 import type { TestDatabase } from '../support/db';
 import { NOW, insertRow, userId } from '../support/insert';
-import { ACCESS, RUBRIC, noTemplatePermission } from '../support/messages';
+import { ACCESS, RUBRIC, TEMPLATE, noTemplatePermission } from '../support/messages';
 
 // Ported from app/tests/cases/system/add_rubric.test.php.
 
@@ -288,7 +288,7 @@ test('the Add Rubric form refuses a missing name and a duplicate name', async ({
   await page.goto('/rubrics/add');
   await page.getByRole('button', NEXT).click();
   await saveButton(page).click();
-  await expect(flashMessage(page)).toHaveText(RUBRIC.addFailed);
+  await expect(flashMessage(page)).toHaveText(TEMPLATE.addFailed);
   await expect(errorMessage(page)).toHaveText(['Please give the evaluation template a name.']);
 
   await page.locator('#name').fill(SEEDED.name);
@@ -415,7 +415,7 @@ test('a rubric that events use cannot be deleted, and one with submissions canno
   );
 
   await page.goto(`/rubrics/edit/${SEEDED.id}`);
-  await expect(flashMessage(page)).toHaveText(RUBRIC.inUse(SEEDED.name));
+  await expect(flashMessage(page)).toHaveText(TEMPLATE.inUse(SEEDED.name));
 
   await page.goto(`/rubrics/view/${SEEDED.id}`);
   await expect(page.locator('#name')).toHaveValue(SEEDED.name);

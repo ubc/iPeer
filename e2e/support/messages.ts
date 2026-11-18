@@ -1,11 +1,17 @@
-// The flash messages of the app that the specs check, in one place. A check
-// compares the whole message, so it also catches a wrong message, and a change
-// of wording needs one edit here. Grouped by the page that shows them.
+// The flash messages of the app that the specs check, in one place, so a
+// change of wording needs one edit here. A check compares the whole message,
+// so it also catches a wrong message. Grouped by the page that shows them.
+// Messages that name the test data, such as the row of a failed import,
+// stay next to that data in the spec.
 
 // Access and missing records, on many pages.
 export const ACCESS = {
   noCourse: 'Error: Course does not exist or you do not have permission to view this course.',
   invalidId: 'Error: Invalid ID.',
+  noEvent: 'Error: That event does not exist or you dont have access to it',
+  // The message ends with the support email address of the configuration,
+  // so a check compares only this start.
+  deniedStart: 'Access to this page is limited to authorized users',
 } as const;
 
 // A user without the right to a template, by the kind of template and the
@@ -32,6 +38,7 @@ export const GROUP = {
 
 export const USER = {
   updated: 'User successfully updated!',
+  imported: 'Import successful! See below for import details.',
   enrolled: 'User is successfully enrolled.',
   unenrolled: 'Student is successfully unenrolled!',
   alreadyEnrolled: 'Error: The student is already enrolled.',
@@ -56,26 +63,34 @@ export const EVENT = {
   addFailed: 'Add event failed.',
   edited: 'Edit event successful!',
   deleted: 'The event has been deleted successfully.',
-  reminderSent: 'Cannot cancel: Email is already sent.',
   imported: (count: number) => `${count} event(s) were imported successfully.`,
+} as const;
+
+export const EMAIL = {
+  cannotCancelSent: 'Cannot cancel: Email is already sent.',
+} as const;
+
+// The simple evaluation and rubric pages share these messages.
+export const TEMPLATE = {
+  addFailed: 'The evaluation was not added successfully.',
+  inUse: (name: string) =>
+    `Submissions had been made. ${name} cannot be edited. Please make a copy.`,
 } as const;
 
 export const SIMPLE_TEMPLATE = {
   added: 'The evaluation was added successfully.',
-  addFailed: 'The evaluation was not added successfully.',
   updated: 'The simple evaluation was updated successfully.',
   deleted: 'The evaluation was deleted successfully.',
-  inUse: (name: string) =>
-    `Submissions had been made. ${name} cannot be edited. Please make a copy.`,
+  // The app spells 'assosiated' this way.
+  inUseNoDelete:
+    'This evaluation is now in use, and can NOT be deleted. ' +
+    'Please remove all the events assosiated with this evaluation first.',
 } as const;
 
 export const RUBRIC = {
   added: 'The rubric was added successfully.',
-  addFailed: 'The evaluation was not added successfully.',
   updated: 'The rubric evaluation was updated successfully',
   deleted: 'The rubric was deleted successfully.',
-  inUse: (name: string) =>
-    `Submissions had been made. ${name} cannot be edited. Please make a copy.`,
 } as const;
 
 export const MIXEVAL = {
@@ -85,6 +100,9 @@ export const MIXEVAL = {
   invalidId: 'Error: Invalid Mixeval ID.',
   inUse: (name: string) =>
     `${name} cannot be edited now that submissions have been made. Please make a copy.`,
+  inUseNoDelete:
+    'This evaluation is now in use, and can NOT be deleted. ' +
+    'Please remove all the events associated with this evaluation first.',
 } as const;
 
 // The student evaluation forms.

@@ -12,7 +12,8 @@ import { evaluationTabSection, openEvaluationTab, requestDelete } from '../suppo
 import { USERS } from '../support/seed';
 import type { TestDatabase } from '../support/db';
 import { NOW, insertRow, userId } from '../support/insert';
-import { ACCESS, SIMPLE_TEMPLATE, noTemplatePermission } from '../support/messages';
+import { ACCESS, SIMPLE_TEMPLATE, TEMPLATE, noTemplatePermission } from '../support/messages';
+import { expectTextIgnoringSpace } from '../support/text';
 
 // Ported from app/tests/cases/system/add_simple.test.php.
 
@@ -128,7 +129,7 @@ test('the Add Simple Evaluation form refuses missing fields, a duplicate name an
 }) => {
   await page.goto('/simpleevaluations/add');
   await page.getByRole('button', SAVE).click();
-  await expect(flashMessage(page)).toHaveText(SIMPLE_TEMPLATE.addFailed);
+  await expect(flashMessage(page)).toHaveText(TEMPLATE.addFailed);
   await expect(errorMessage(page)).toHaveText([
     'Please give the evaluation template a name.',
     'Please enter a positive integer.',
@@ -225,12 +226,10 @@ test('a simple evaluation that events use cannot be deleted, and one with submis
 }) => {
   await page.goto('/simpleevaluations');
   await deleteFromList(page, SEEDED.name);
-  await expect(flashMessage(page)).toContainText(
-    'This evaluation is now in use, and can NOT be deleted.'
-  );
+  await expectTextIgnoringSpace(flashMessage(page), SIMPLE_TEMPLATE.inUseNoDelete);
 
   await page.goto(`/simpleevaluations/edit/${SEEDED.id}`);
-  await expect(flashMessage(page)).toHaveText(SIMPLE_TEMPLATE.inUse(SEEDED.name));
+  await expect(flashMessage(page)).toHaveText(TEMPLATE.inUse(SEEDED.name));
 
   await page.goto(`/simpleevaluations/view/${SEEDED.id}`);
   await expect(viewField(page, 'Evaluation Name')).toHaveText(SEEDED.name);

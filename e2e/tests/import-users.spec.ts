@@ -81,7 +81,7 @@ test('a CSV import creates new users, updates existing ones and enrols them all'
   await page.goto(`/users/import/${COURSES.apsc201.id}`);
 
   await submitImport(page, fixture('newClass_APSC201.csv'));
-  await expect(goodMessage(page)).toContainText('Import successful!');
+  await expect(goodMessage(page)).toHaveText(USER.imported);
 
   // The summary separates the account the file introduced from the accounts
   // that already existed. Ed is a MECH 328 student the file names, so the
@@ -115,7 +115,7 @@ test('an import that removes old students makes the class list match the file', 
   await expectInClassList(page, COURSES.apsc201.id, STUDENTS.chris);
 
   await importUsers(page, COURSES.apsc201.id, fixture(SEEDED_CLASS_FILE), true);
-  await expect(goodMessage(page)).toContainText('Import successful!');
+  await expect(goodMessage(page)).toHaveText(USER.imported);
 
   // Chris is not in the file, so the import drops him; the students the file
   // does list stay enrolled.

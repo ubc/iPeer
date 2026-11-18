@@ -48,7 +48,12 @@ async function readAccess(page: Page, permission: string): Promise<PermissionAcc
 }
 
 async function openActionPanel(page: Page, roleId: string, permission: string): Promise<Locator> {
-  await openPermissionsEditor(page, roleId);
+  // After a change, the app shows the editor of the role again, so it does
+  // not need a new load, unless an action panel is open.
+  const onEditor = new RegExp(`/accesses/view/${roleId}$`).test(page.url());
+  if (!onEditor || (await page.locator('#table_id div.userActionPanel').count()) > 0) {
+    await openPermissionsEditor(page, roleId);
+  }
   const row = await filterToPermission(page, permission);
   // The actions live in a panel that a click on the row opens.
   await row.getByRole('cell').first().click();

@@ -18,7 +18,7 @@ import {
   viewField,
 } from '../support/events';
 import { COURSES, MECH328_GROUPS, USERS, fullName } from '../support/seed';
-import { ACCESS, EVENT } from '../support/messages';
+import { ACCESS, EMAIL, EVENT } from '../support/messages';
 
 // Ported from app/tests/cases/system/add_event.test.php. The Selenium test also
 // ran the send_emails console command, to check which students get a reminder.
@@ -520,7 +520,7 @@ test('a sent reminder stays when the reminders change, and cannot be cancelled',
     'Cancel Email',
     'Are you sure you want to cancel this email?'
   );
-  await expect(flashMessage(page)).toHaveText(EVENT.reminderSent);
+  await expect(flashMessage(page)).toHaveText(EMAIL.cannotCancelSent);
   await expectReminderCount(page, 1);
 });
 
@@ -616,10 +616,9 @@ test("a superadmin adds an event to any course, and only that course's instructo
   await expect(flashMessage(page)).toHaveText(ACCESS.noCourse);
   await expect(page).toHaveURL(/\/home$/);
 
-  const noEvent = 'Error: That event does not exist or you dont have access to it';
   for (const action of ['view', 'edit', 'delete']) {
     await page.goto(`/events/${action}/${id}`);
-    await expect(flashMessage(page), action).toHaveText(noEvent);
+    await expect(flashMessage(page), action).toHaveText(ACCESS.noEvent);
     await expect(page, action).toHaveURL(/\/home$/);
   }
   // The confirmed delete, sent without the confirmation page. The refusal
@@ -630,7 +629,7 @@ test("a superadmin adds an event to any course, and only that course's instructo
   });
   expect(response.ok(), 'the refused delete').toBe(true);
   expect(response.url()).toMatch(/\/home$/);
-  expect(await response.text()).toContain(noEvent);
+  expect(await response.text()).toContain(ACCESS.noEvent);
 
   // Instructor 2 teaches APSC 201, and the event is still there.
   await login(page, USERS.instructor2);

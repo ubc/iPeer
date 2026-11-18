@@ -44,7 +44,7 @@ import {
   type RubricMark,
 } from '../support/student';
 import { rubricSectionSaved } from '../support/messages';
-import { expectTextInOrder, squash } from '../support/text';
+import { collapse, expectTextIgnoringSpace, expectTextInOrder } from '../support/text';
 
 // Ported from app/tests/cases/system/student_rubric.test.php. As in
 // student-simple.spec.ts, the event and the submissions are inserted, except
@@ -218,8 +218,8 @@ function receivedText(received: Received): string {
 }
 
 // The page shows the evaluations in a random order, so they are compared as
-// sorted lists. The line breaks and spaces of a cell depend on its markup, so
-// they are left out of the compare.
+// sorted lists. The line breaks of a cell depend on its markup, so each run of
+// whitespace counts as one space.
 async function expectReceived(page: Page, expected: readonly Received[]): Promise<void> {
   await test.step(
     'Expect the evaluations from the teammates',
@@ -236,9 +236,9 @@ async function expectReceived(page: Page, expected: readonly Received[]): Promis
           .getByRole('cell')
           .evaluateAll((all) => all.slice(1).map((cell) => (cell as HTMLElement).innerText));
         const general = await rows.nth(index * 2 + 1).innerText();
-        shown.push(squash([...cells, general].join(' | ')));
+        shown.push(collapse([...cells, general].join(' | ')));
       }
-      expect(shown.sort()).toEqual(expected.map((one) => squash(receivedText(one))).sort());
+      expect(shown.sort()).toEqual(expected.map((one) => collapse(receivedText(one))).sort());
     },
     { box: true }
   );
@@ -266,10 +266,10 @@ test('a student rates each member, saves each section and submits', async ({
   const penalty = page.locator('#penalty');
   await expect(penalty).toBeHidden();
   await page.getByRole('link', { name: '( Show/Hide late penalty policy )' }).click();
-  await expectTextInOrder(penalty, [
-    'From the due date to 1 days(s) late, 10% will be deducted.',
-    '10% is deducted afterwards.',
-  ]);
+  await expectTextIgnoringSpace(
+    penalty,
+    'From the due date to 1 days(s) late, 10% will be deducted. 10% is deducted afterwards.'
+  );
   await expect(submitRubricButton(page)).toBeDisabled();
   await expect(rubricPanelHeader(page, ALEX)).toHaveText('Alex Student - (click to expand)');
 
