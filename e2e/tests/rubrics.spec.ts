@@ -5,6 +5,7 @@ import { evaluationTabSection, openEvaluationTab, requestDelete } from '../suppo
 import { USERS } from '../support/seed';
 import type { TestDatabase } from '../support/db';
 import { NOW, insertRow, userId } from '../support/insert';
+import { ACCESS, RUBRIC, noTemplatePermission } from '../support/messages';
 
 // Ported from app/tests/cases/system/add_rubric.test.php.
 
@@ -287,7 +288,7 @@ test('the Add Rubric form refuses a missing name and a duplicate name', async ({
   await page.goto('/rubrics/add');
   await page.getByRole('button', NEXT).click();
   await saveButton(page).click();
-  await expect(flashMessage(page)).toHaveText('The evaluation was not added successfully.');
+  await expect(flashMessage(page)).toHaveText(RUBRIC.addFailed);
   await expect(errorMessage(page)).toHaveText(['Please give the evaluation template a name.']);
 
   await page.locator('#name').fill(SEEDED.name);
@@ -303,7 +304,7 @@ test('an admin adds a rubric in two steps, and the page calculates its marks', a
   await fillTexts(page, MIDTERM);
   await expectMarks(page, MIDTERM);
   await saveButton(page).click();
-  await expect(goodMessage(page)).toHaveText('The rubric was added successfully.');
+  await expect(goodMessage(page)).toHaveText(RUBRIC.added);
 
   const id = await idFromAjaxList(page, MIDTERM.name, 'rubrics');
   await page.goto(`/rubrics/edit/${id}`);
@@ -341,7 +342,7 @@ test('editing a rubric can add levels and criteria, and recalculates the marks',
   await fillTexts(page, FINAL);
   await expectMarks(page, FINAL);
   await saveButton(page).click();
-  await expect(goodMessage(page)).toHaveText('The rubric evaluation was updated successfully');
+  await expect(goodMessage(page)).toHaveText(RUBRIC.updated);
 
   await page.goto(`/rubrics/edit/${id}`);
   await expectForm(page, FINAL);
@@ -362,7 +363,7 @@ test('editing a rubric can remove levels and criteria, and keeps the texts of th
   await expectTexts(page, REDUCED);
   await expectMarks(page, REDUCED);
   await saveButton(page).click();
-  await expect(goodMessage(page)).toHaveText('The rubric evaluation was updated successfully');
+  await expect(goodMessage(page)).toHaveText(RUBRIC.updated);
 
   // The edit form shows the saved rubric: the removed level and criterion are
   // gone, and each remaining text is still at its level.
@@ -381,7 +382,7 @@ test('a copy of a rubric keeps its format, texts and weights under a new name', 
   await page.goto(`/rubrics/copy/${id}`);
   await expectForm(page, FINAL_COPY);
   await saveButton(page).click();
-  await expect(goodMessage(page)).toHaveText('The rubric was added successfully.');
+  await expect(goodMessage(page)).toHaveText(RUBRIC.added);
 
   const copyId = await idFromAjaxList(page, FINAL_COPY.name, 'rubrics');
   expect(copyId, 'the copy is a new rubric').not.toBe(id);
@@ -394,14 +395,14 @@ test('a rubric that no event uses can be deleted', async ({ page, testDatabase }
 
   await page.goto('/rubrics');
   await deleteFromList(page, MIDTERM.name);
-  await expect(goodMessage(page)).toHaveText('The rubric was deleted successfully.');
+  await expect(goodMessage(page)).toHaveText(RUBRIC.deleted);
 
   await openEvaluationTab(page);
   const rubrics = await evaluationTabSection(page, 'My Rubrics Evaluations');
   await expect(rubrics.getByRole('link', { name: SEEDED.name, exact: true })).toBeVisible();
   await expect(rubrics.getByRole('link', { name: MIDTERM.name, exact: true })).toHaveCount(0);
   await page.goto(`/rubrics/view/${id}`);
-  await expect(flashMessage(page)).toHaveText('Error: Invalid ID.');
+  await expect(flashMessage(page)).toHaveText(ACCESS.invalidId);
 });
 
 test('a rubric that events use cannot be deleted, and one with submissions cannot be edited', async ({
@@ -414,9 +415,7 @@ test('a rubric that events use cannot be deleted, and one with submissions canno
   );
 
   await page.goto(`/rubrics/edit/${SEEDED.id}`);
-  await expect(flashMessage(page)).toHaveText(
-    `Submissions had been made. ${SEEDED.name} cannot be edited. Please make a copy.`
-  );
+  await expect(flashMessage(page)).toHaveText(RUBRIC.inUse(SEEDED.name));
 
   await page.goto(`/rubrics/view/${SEEDED.id}`);
   await expect(page.locator('#name')).toHaveValue(SEEDED.name);
@@ -441,22 +440,18 @@ test("an instructor can view and copy an admin's public rubric but can neither e
   await expect(page.locator('#name')).toHaveValue(FINAL.name);
 
   await requestDelete(page, 'rubrics', id);
-  await expect(flashMessage(page)).toHaveText(
-    'Error: You do not have permission to delete this rubric'
-  );
+  await expect(flashMessage(page)).toHaveText(noTemplatePermission('delete', 'rubric'));
   await page.goto(`/rubrics/edit/${id}`);
-  await expect(flashMessage(page)).toHaveText(
-    'Error: You do not have permission to edit this rubric'
-  );
+  await expect(flashMessage(page)).toHaveText(noTemplatePermission('edit', 'rubric'));
 
   // A public rubric can be copied. The copy belongs to the instructor, who can
   // delete it.
   await page.goto(`/rubrics/copy/${id}`);
   await expectForm(page, FINAL_COPY);
   await saveButton(page).click();
-  await expect(goodMessage(page)).toHaveText('The rubric was added successfully.');
+  await expect(goodMessage(page)).toHaveText(RUBRIC.added);
   await deleteFromList(page, FINAL_COPY.name);
-  await expect(goodMessage(page)).toHaveText('The rubric was deleted successfully.');
+  await expect(goodMessage(page)).toHaveText(RUBRIC.deleted);
 
   // The refusals left the original as it was.
   await login(page, USERS.superAdmin);
@@ -479,11 +474,7 @@ test("an instructor can neither list, view nor copy an admin's private rubric", 
   await expect(list.getByRole('link', { name: MIDTERM.name, exact: true })).toHaveCount(0);
 
   await page.goto(`/rubrics/view/${id}`);
-  await expect(flashMessage(page)).toHaveText(
-    'Error: You do not have permission to view this rubric'
-  );
+  await expect(flashMessage(page)).toHaveText(noTemplatePermission('view', 'rubric'));
   await page.goto(`/rubrics/copy/${id}`);
-  await expect(flashMessage(page)).toHaveText(
-    'Error: You do not have permission to copy this rubric'
-  );
+  await expect(flashMessage(page)).toHaveText(noTemplatePermission('copy', 'rubric'));
 });

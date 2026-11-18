@@ -34,6 +34,8 @@ import {
   submitEvaluation,
   type SimpleMark,
 } from '../support/student';
+import { SUBMISSION } from '../support/messages';
+import { expectTextInOrder } from '../support/text';
 
 // Ported from app/tests/cases/system/student_simple.test.php. The event is
 // inserted, because the event form is not the subject here (events.spec.ts
@@ -85,8 +87,6 @@ const TUTOR_MARKS: SimpleMark[] = [
   { member: MATT, points: 100, comment: 'Does his work efficiently' },
 ];
 
-const NEGATIVE_POINTS =
-  'One or more of your group members have negative points. Please use positive numbers.';
 const ALL_FILLED = 'All points are allocated. All comments are filled.';
 
 async function insertSimpleEvent(
@@ -196,10 +196,10 @@ test('a student weighs the members, distributes the points and submits', async (
   const penalty = page.locator('#penalty');
   await expect(penalty).toBeHidden();
   await page.getByRole('link', { name: '( Show/Hide late penalty policy )' }).click();
-  await expect(penalty).toHaveText(
-    'From the due date to 1 days(s) late, 10% will be deducted. 10% is deducted afterwards.',
-    { useInnerText: true }
-  );
+  await expectTextInOrder(penalty, [
+    'From the due date to 1 days(s) late, 10% will be deducted.',
+    '10% is deducted afterwards.',
+  ]);
 
   await expect(submitButton(page)).toBeDisabled();
   await expectSimpleStatus(
@@ -338,7 +338,7 @@ test('negative points are refused', async ({ page, testDatabase }) => {
   await expectSimpleStatus(page, ALL_FILLED);
   await submitButton(page).click();
 
-  await expect(flashMessage(page)).toHaveText(NEGATIVE_POINTS);
+  await expect(flashMessage(page)).toHaveText(SUBMISSION.negativePoints);
   await expect(page).toHaveURL(/\/evaluations\/makeEvaluation\/\d+\/\d+$/);
   await expectOnHome(page, 'Due', TITLE, GROUP.name);
 });

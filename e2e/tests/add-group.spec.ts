@@ -2,6 +2,7 @@ import { expect, test, type Page } from '../support/test';
 import { assignToGroup, openGroupList, removeFromGroup } from '../support/groups';
 import { errorMessage, goodMessage, idFromUrl, login, pageTitle } from '../support/helpers';
 import { COURSES, STUDENTS as SEED_STUDENTS, USERS, fullName, type Person } from '../support/seed';
+import { GROUP } from '../support/messages';
 
 // Ported from app/tests/cases/system/add_group.test.php.
 
@@ -32,7 +33,7 @@ async function createGroup(page: Page, name: string, students: readonly Person[]
   await page.locator('#GroupGroupName').fill(name);
   await assignToGroup(page, students);
   await page.getByRole('button', { name: 'Add Group' }).click();
-  await expect(goodMessage(page)).toHaveText('The group was added successfully.');
+  await expect(goodMessage(page)).toHaveText(GROUP.added);
   return openGroup(page, name);
 }
 
@@ -61,7 +62,7 @@ test('an admin creates a group with the students that were assigned', async ({ p
   await expect(page.locator('#selected_groups option')).toHaveCount(STUDENTS.length);
 
   await page.getByRole('button', { name: 'Add Group' }).click();
-  await expect(goodMessage(page)).toHaveText('The group was added successfully.');
+  await expect(goodMessage(page)).toHaveText(GROUP.added);
 
   await openGroup(page, 'Amazing Group');
   await expect(page.getByRole('cell', { name: 'Amazing Group', exact: true })).toBeVisible();
@@ -90,7 +91,7 @@ test('an admin renames a group and changes its members', async ({ page }) => {
 
   // Saving without a change must not report the name as a duplicate of itself.
   await page.getByRole('button', { name: 'Edit Group' }).click();
-  await expect(goodMessage(page)).toHaveText('The group was updated successfully.');
+  await expect(goodMessage(page)).toHaveText(GROUP.updated);
 
   await page.goto(`/groups/edit/${groupId}`);
   await page.locator('#GroupGroupName').fill('Group To Edit Two');
@@ -98,7 +99,7 @@ test('an admin renames a group and changes its members', async ({ page }) => {
   await assignToGroup(page, [SEED_STUDENTS.michael]);
   await expect(page.locator('#selected_groups option')).toHaveCount(3);
   await page.getByRole('button', { name: 'Edit Group' }).click();
-  await expect(goodMessage(page)).toHaveText('The group was updated successfully.');
+  await expect(goodMessage(page)).toHaveText(GROUP.updated);
 
   await page.goto(`/groups/view/${groupId}`);
   await expect(page.getByRole('cell', { name: 'Group To Edit Two', exact: true })).toBeVisible();
@@ -118,7 +119,7 @@ test('an admin deletes a group and only that group leaves the course group list'
   await createGroup(page, 'Group To Keep', STUDENTS.slice(2));
 
   await page.goto(`/groups/delete/${doomedId}`);
-  await expect(goodMessage(page)).toHaveText('The group was deleted successfully.');
+  await expect(goodMessage(page)).toHaveText(GROUP.deleted);
 
   await openGroupList(page, COURSE_ID);
   await expect(page.getByRole('link', { name: /^Group To Keep \(/ })).toBeVisible();

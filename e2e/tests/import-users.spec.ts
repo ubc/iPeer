@@ -15,6 +15,7 @@ import {
   expectNotInClassList,
   insertEnrolment,
 } from '../support/users';
+import { UPLOAD, USER } from '../support/messages';
 
 // Ported from app/tests/cases/system/import_users.test.php.
 // The CSV files are the ones the old tests used.
@@ -57,7 +58,7 @@ test('an import of a file type that is not allowed is refused and creates no use
   await login(page, USERS.superAdmin);
 
   await importUsers(page, COURSES.apsc201.id, notCsvFile('users'));
-  await expect(flashMessage(page)).toHaveText('extension is not allowed.');
+  await expect(flashMessage(page)).toHaveText(UPLOAD.wrongExtension);
 
   await expectClassSize(page, COURSES.apsc201.id, COURSES.apsc201.studentCount);
 });
@@ -74,7 +75,7 @@ test('a CSV import creates new users, updates existing ones and enrols them all'
   await page.goto(`/users/edit/${edId}`);
   await page.getByLabel('First Name').fill('Temporary');
   await page.getByRole('button', { name: 'Save' }).click();
-  await expect(goodMessage(page)).toHaveText('User successfully updated!');
+  await expect(goodMessage(page)).toHaveText(USER.updated);
   await expectInClassList(page, COURSES.mech328.id, { ...STUDENTS.ed, name: 'Temporary Student' });
 
   await page.goto(`/users/import/${COURSES.apsc201.id}`);

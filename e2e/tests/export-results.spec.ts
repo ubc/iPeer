@@ -10,13 +10,15 @@ import {
   type NewEvent,
 } from '../support/events';
 import { userId } from '../support/insert';
-import { pdfPages, readInOrder } from '../support/pdf';
+import { pdfPages } from '../support/pdf';
+import { readInOrder } from '../support/text';
 import { COURSES, MECH328_GROUPS, STUDENTS, TUTORS, USERS, fullName } from '../support/seed';
 import {
   insertMixevalSubmission,
   insertRubricSubmission,
   insertSimpleSubmission,
 } from '../support/student';
+import { ACCESS } from '../support/messages';
 
 // The export of the results of an event, as a CSV or PDF file. There was no
 // Selenium test for it. The events and the submissions are inserted.
@@ -677,9 +679,7 @@ test('the course export lists the evaluation events of the course', async ({
 test('an instructor cannot export the results of a course they do not teach', async ({ page }) => {
   await login(page, USERS.instructor1);
   await page.goto(`/evaluations/export/course/${COURSES.apsc201.id}`);
-  await expect(flashMessage(page)).toHaveText(
-    'Error: Course does not exist or you do not have permission to view this course.'
-  );
+  await expect(flashMessage(page)).toHaveText(ACCESS.noCourse);
   await expect(page).toHaveURL(/\/courses$/);
 });
 

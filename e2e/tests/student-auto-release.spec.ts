@@ -27,6 +27,8 @@ import {
   type MixevalMark,
   type RubricMark,
 } from '../support/student';
+import { rubricSectionSaved } from '../support/messages';
+import { expectTextInOrder } from '../support/text';
 
 // With auto-release on, students see their grades and comments in the
 // results period without a release by the instructor. The ports of the
@@ -157,11 +159,7 @@ test('a rubric evaluation with auto-release shows the grades and comments at onc
   await openAsEd(page);
   for (const mark of marks) {
     await fillRubricPanel(page, mark);
-    await saveRubricSection(
-      page,
-      mark.member,
-      'Your evaluation has been saved, but you still have to submit the evaluation with the Submit button below.'
-    );
+    await saveRubricSection(page, mark.member, rubricSectionSaved({ submit: true }));
   }
   await submitEvaluation(page, submitRubricButton(page));
   await endSubmissions(testDatabase, eventId);
@@ -179,15 +177,15 @@ test('a rubric evaluation with auto-release shows the grades and comments at onc
   // comment. The first cell of the criteria row is not a criterion.
   const rows = received.locator('table').locator('xpath=./tbody/tr[td]');
   await expect(rows).toHaveCount(2);
-  await expect(rows.nth(0).locator('xpath=./td[position() > 1]')).toHaveText(
-    [
-      'Points: Grade: 5.00 Comment: active',
-      'Points: Grade: 4.00 Comment: helpful',
-      'Points: Grade: 4.00 Comment: on time',
-    ],
-    { useInnerText: true }
-  );
-  await expect(rows.nth(1)).toHaveText('General Comment: good job', { useInnerText: true });
+  await expectTextInOrder(rows.nth(0), [
+    ...['5.00', '4.00', '4.00'].flatMap((grade, index) => [
+      'Grade:',
+      grade,
+      'Comment:',
+      ['active', 'helpful', 'on time'][index],
+    ]),
+  ]);
+  await expectTextInOrder(rows.nth(1), ['General Comment:', 'good job']);
 });
 
 test('a mixed evaluation with auto-release shows the grades and comments at once', async ({

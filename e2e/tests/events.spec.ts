@@ -18,6 +18,7 @@ import {
   viewField,
 } from '../support/events';
 import { COURSES, MECH328_GROUPS, USERS, fullName } from '../support/seed';
+import { ACCESS, EVENT } from '../support/messages';
 
 // Ported from app/tests/cases/system/add_event.test.php. The Selenium test also
 // ran the send_emails console command, to check which students get a reminder.
@@ -102,8 +103,6 @@ const PLAIN: NewEvent = {
 };
 
 const SUBMIT = { name: 'Submit', exact: true } as const;
-const ADDED = 'Add event successful!';
-const EDITED = 'Edit event successful!';
 const GROUPS_REMOVED =
   'You have removed one or more groups from the event. ' +
   'If there are submissions made within the groups, they would be permanently deleted. ' +
@@ -248,7 +247,7 @@ async function openEdit(page: Page, id: string): Promise<void> {
 
 async function saveEdit(page: Page): Promise<void> {
   await page.getByRole('button', SUBMIT).click();
-  await expect(goodMessage(page)).toHaveText(EDITED);
+  await expect(goodMessage(page)).toHaveText(EVENT.edited);
 }
 
 // Checks the view page, the edit form and the reminders of FINAL_PROJECT,
@@ -316,7 +315,7 @@ test('the Add Event form refuses a missing title and missing dates', async ({ pa
   await expect(setting(page, 'Student Result Mode').getByLabel('Detailed')).toBeChecked();
 
   await page.getByRole('button', SUBMIT).click();
-  await expect(flashMessage(page)).toHaveText('Add event failed.');
+  await expect(flashMessage(page)).toHaveText(EVENT.addFailed);
   const dateFormat = 'Must be in Year-Month-Day Hour:Minute:Second format.';
   await expect(errorMessage(page)).toHaveText([
     'Title is required.',
@@ -395,7 +394,7 @@ test('an instructor adds an event with reminders, groups and late penalties', as
   await fillForm(page, FINAL_PROJECT);
   await expect(page.locator('#GroupGroup')).toHaveValues(ALL_GROUP_IDS);
   await page.getByRole('button', SUBMIT).click();
-  await expect(goodMessage(page)).toHaveText(ADDED);
+  await expect(goodMessage(page)).toHaveText(EVENT.added);
 
   await waitForAjaxList(page);
   await page
@@ -423,7 +422,7 @@ test('editing an event can remove all of its groups', async ({ page, testDatabas
   await expect(page.locator('#GroupGroup')).toHaveValues(ALL_GROUP_IDS);
   await page.getByRole('button', { name: 'Unselect All', exact: true }).click();
   await withConfirmation(page, GROUPS_REMOVED, () => page.getByRole('button', SUBMIT).click());
-  await expect(goodMessage(page)).toHaveText(EDITED);
+  await expect(goodMessage(page)).toHaveText(EVENT.edited);
 
   await openEdit(page, id);
   await expect(page.locator('#GroupGroup')).toHaveValues([]);
@@ -521,7 +520,7 @@ test('a sent reminder stays when the reminders change, and cannot be cancelled',
     'Cancel Email',
     'Are you sure you want to cancel this email?'
   );
-  await expect(flashMessage(page)).toHaveText('Cannot cancel: Email is already sent.');
+  await expect(flashMessage(page)).toHaveText(EVENT.reminderSent);
   await expectReminderCount(page, 1);
 });
 
@@ -577,7 +576,7 @@ test('an instructor deletes an event after a confirmation page', async ({ page, 
     `${PLAIN.title} (${fullName(COURSES.mech328)})`
   );
   await page.getByRole('button', { name: 'Delete Event', exact: true }).click();
-  await expect(goodMessage(page)).toHaveText('The event has been deleted successfully.');
+  await expect(goodMessage(page)).toHaveText(EVENT.deleted);
 
   await expect(page).toHaveURL(new RegExp(`/events/index/${COURSES.mech328.id}$`));
   await waitForAjaxList(page);
@@ -604,19 +603,17 @@ test("a superadmin adds an event to any course, and only that course's instructo
   await expect(page.locator('#GroupGroup option')).toHaveCount(0);
   await fillForm(page, event);
   await page.getByRole('button', SUBMIT).click();
-  await expect(goodMessage(page)).toHaveText(ADDED);
+  await expect(goodMessage(page)).toHaveText(EVENT.added);
   await expect(page).toHaveURL(new RegExp(`/events/index/${course.id}$`));
   const id = await idFromAjaxList(page, event.title, 'events');
 
   // Instructor 1 does not teach APSC 201.
   await login(page, USERS.instructor1);
-  const noCourse =
-    'Error: Course does not exist or you do not have permission to view this course.';
   await page.goto(`/events/index/${course.id}`);
-  await expect(flashMessage(page)).toHaveText(noCourse);
+  await expect(flashMessage(page)).toHaveText(ACCESS.noCourse);
   await expect(page).toHaveURL(/\/courses$/);
   await page.goto(`/events/add/${course.id}`);
-  await expect(flashMessage(page)).toHaveText(noCourse);
+  await expect(flashMessage(page)).toHaveText(ACCESS.noCourse);
   await expect(page).toHaveURL(/\/home$/);
 
   const noEvent = 'Error: That event does not exist or you dont have access to it';

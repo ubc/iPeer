@@ -43,6 +43,8 @@ import {
   submitRubricButton,
   type RubricMark,
 } from '../support/student';
+import { rubricSectionSaved } from '../support/messages';
+import { expectTextInOrder, squash } from '../support/text';
 
 // Ported from app/tests/cases/system/student_rubric.test.php. As in
 // student-simple.spec.ts, the event and the submissions are inserted, except
@@ -113,9 +115,6 @@ const TUTOR_MARKS: RubricMark[] = [
   },
   { member: MATT, levels: [4, 3, 5], comments: ['gerbil', 'dog', 'cat'], general: 'pets' },
 ];
-
-const SAVED = 'Your evaluation has been saved';
-const NOT_SUBMITTED_YET = 'you still have to submit the evaluation with the Submit button below';
 
 async function insertRubricEvent(
   testDatabase: TestDatabase,
@@ -219,7 +218,8 @@ function receivedText(received: Received): string {
 }
 
 // The page shows the evaluations in a random order, so they are compared as
-// sorted lists.
+// sorted lists. The line breaks and spaces of a cell depend on its markup, so
+// they are left out of the compare.
 async function expectReceived(page: Page, expected: readonly Received[]): Promise<void> {
   await test.step(
     'Expect the evaluations from the teammates',
@@ -236,9 +236,9 @@ async function expectReceived(page: Page, expected: readonly Received[]): Promis
           .getByRole('cell')
           .evaluateAll((all) => all.slice(1).map((cell) => (cell as HTMLElement).innerText));
         const general = await rows.nth(index * 2 + 1).innerText();
-        shown.push([...cells, general].map((text) => text.replace(/\s+/g, ' ').trim()).join(' | '));
+        shown.push(squash([...cells, general].join(' | ')));
       }
-      expect(shown.sort()).toEqual(expected.map(receivedText).sort());
+      expect(shown.sort()).toEqual(expected.map((one) => squash(receivedText(one))).sort());
     },
     { box: true }
   );
@@ -266,10 +266,10 @@ test('a student rates each member, saves each section and submits', async ({
   const penalty = page.locator('#penalty');
   await expect(penalty).toBeHidden();
   await page.getByRole('link', { name: '( Show/Hide late penalty policy )' }).click();
-  await expect(penalty).toHaveText(
-    'From the due date to 1 days(s) late, 10% will be deducted. 10% is deducted afterwards.',
-    { useInnerText: true }
-  );
+  await expectTextInOrder(penalty, [
+    'From the due date to 1 days(s) late, 10% will be deducted.',
+    '10% is deducted afterwards.',
+  ]);
   await expect(submitRubricButton(page)).toBeDisabled();
   await expect(rubricPanelHeader(page, ALEX)).toHaveText('Alex Student - (click to expand)');
 
@@ -296,16 +296,12 @@ test('a student rates each member, saves each section and submits', async ({
   // With all the levels, the section is saved. The message says what is left
   // to do.
   await rubricLevel(page, ALEX, 2, 5).check();
-  await saveRubricSection(
-    page,
-    ALEX,
-    `${SAVED}, but some comments are missing and ${NOT_SUBMITTED_YET}.`
-  );
+  await saveRubricSection(page, ALEX, rubricSectionSaved({ comments: true, submit: true }));
   await expect(submitRubricButton(page)).toBeDisabled();
 
   await openRubricPanel(page, ALEX);
   await fillAndLeave(rubricComment(page, ALEX, 1), 'participated lots');
-  await saveRubricSection(page, ALEX, `${SAVED}, but ${NOT_SUBMITTED_YET}.`);
+  await saveRubricSection(page, ALEX, rubricSectionSaved({ submit: true }));
   await expect(rubricPanelHeader(page, ALEX)).toHaveText('Alex Student ( Saved )');
   await expectRubricPanel(page, {
     member: ALEX,
@@ -318,7 +314,7 @@ test('a student rates each member, saves each section and submits', async ({
   // each criterion.
   await expect(submitRubricButton(page)).toBeDisabled();
   await fillRubricPanel(page, ED_MARKS[1]);
-  await saveRubricSection(page, MATT, `${SAVED}, but ${NOT_SUBMITTED_YET}.`);
+  await saveRubricSection(page, MATT, rubricSectionSaved({ submit: true }));
   await submitEvaluation(page, submitRubricButton(page));
   await expectOnHome(page, 'Submitted', TITLE, GROUP.name);
 
@@ -351,10 +347,10 @@ test('a student can change a submitted evaluation before the due date', async ({
     ...ED_MARKS[0],
     comments: [ED_MARKS[0].comments[0], '', ED_MARKS[0].comments[2]],
   });
-  await saveRubricSection(page, ALEX, `${SAVED}, but some comments are missing.`);
+  await saveRubricSection(page, ALEX, rubricSectionSaved({ comments: true }));
   await openRubricPanel(page, ALEX);
   await fillAndLeave(rubricComment(page, ALEX, 2), ED_MARKS[0].comments[1]);
-  await saveRubricSection(page, ALEX, `${SAVED}.`);
+  await saveRubricSection(page, ALEX, rubricSectionSaved());
   await expectRubricPanel(page, ED_MARKS[0]);
 
   await login(page, USERS.instructor1);
@@ -532,10 +528,13 @@ test('the results show the late penalties, who did not submit, and who left the 
     `Evaluatee: ${ED}`,
   ]);
   const alex = evaluateePanel(page, ALEX);
-  await expect(alex.locator('div.panelContent')).toContainText(
-    '(Number of Evaluator(s): 2) Final Total: 11.00 - 1.10 = 9.90 (66%) << Below Group Average >> NOTE: 10% Late Penalty',
-    { useInnerText: true }
-  );
+  await expectTextInOrder(alex.locator('div.panelContent'), [
+    '(Number of Evaluator(s): 2)',
+    'Final Total:',
+    '11.00 - 1.10 = 9.90 (66%)',
+    'Below Group Average',
+    'NOTE: 10% Late Penalty',
+  ]);
   await expect(alex.locator('table').getByRole('columnheader')).toHaveText([
     'Evaluator',
     ...CRITERIA.map((criterion, index) => `(${index + 1}) ${criterion}`),

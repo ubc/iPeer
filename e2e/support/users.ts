@@ -4,6 +4,7 @@ import type { TestDatabase } from './db';
 import { goodMessage } from './helpers';
 import { NOW, insertRow, userId } from './insert';
 import { ROLES, USERS, type Person } from './seed';
+import { COURSE, USER } from './messages';
 
 export function usernameWarning(page: Page): Locator {
   return page.locator('#usernameErr');
@@ -156,7 +157,7 @@ export async function dropFromClassList(
       await openClassListRow(page, courseId, person);
       page.once('dialog', (dialog) => dialog.accept());
       await page.getByRole('link', { name: 'Drop', exact: true }).click();
-      await expect(goodMessage(page)).toHaveText('Student is successfully unenrolled!');
+      await expect(goodMessage(page)).toHaveText(USER.unenrolled);
     },
     { box: true }
   );
@@ -197,7 +198,7 @@ export async function removeTutorFromCourse(
       await expect(row).toHaveCount(1);
       await row.getByRole('link', { name: 'X', exact: true }).click();
       await page.getByRole('button', { name: 'Save' }).click();
-      await expect(goodMessage(page)).toHaveText('The course was updated successfully.');
+      await expect(goodMessage(page)).toHaveText(COURSE.updated);
     },
     { box: true }
   );
@@ -236,7 +237,7 @@ export async function setUserRoles(
         await page.locator('#FacultyFaculty').selectOption({ label: roles.faculty });
       }
       await page.getByRole('button', { name: 'Save' }).click();
-      await expect(goodMessage(page)).toHaveText('User successfully updated!');
+      await expect(goodMessage(page)).toHaveText(USER.updated);
     },
     { box: true }
   );

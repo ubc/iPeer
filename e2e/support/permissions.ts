@@ -1,5 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { goodMessage, withConfirmation } from './helpers';
+import { PERMISSIONS } from './messages';
 
 export const PERMISSION_ACTIONS = ['Create', 'Read', 'Update', 'Delete'] as const;
 
@@ -97,7 +98,7 @@ export async function changePermission(
         `Are you sure you want to change the access to ${permission}?`,
         () => panel.getByRole('link', { name: label, exact: true }).click()
       );
-      await expect(goodMessage(page)).toHaveText('Permissions have been updated');
+      await expect(goodMessage(page)).toHaveText(PERMISSIONS.updated);
     },
     { box: true }
   );

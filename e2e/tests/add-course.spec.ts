@@ -8,6 +8,7 @@ import {
   pageTitle,
 } from '../support/helpers';
 import { USERS } from '../support/seed';
+import { COURSE } from '../support/messages';
 
 // Ported from app/tests/cases/system/add_course.test.php.
 
@@ -44,7 +45,7 @@ test('an admin adds a course with instructors and tutors', async ({ page }) => {
   await page.locator('#CourseHomepage').fill('http://www.ece.ubc.ca/course/eece-474');
 
   await page.getByRole('button', { name: 'Save' }).click();
-  await expect(goodMessage(page)).toHaveText('Course created!');
+  await expect(goodMessage(page)).toHaveText(COURSE.created);
 
   await openCourse(page, 'EECE 474 101', 'Project Course');
   await expect(page.getByRole('link', { name: 'Instructor 1' })).toBeVisible();
@@ -60,7 +61,7 @@ test('the Add Course form refuses an empty name, a duplicate name and an empty p
   await page.goto('/courses/add');
 
   await page.getByRole('button', { name: 'Save' }).click();
-  await expect(flashMessage(page)).toHaveText('Add course failed.');
+  await expect(flashMessage(page)).toHaveText(COURSE.createFailed);
   await expect(errorMessage(page)).toHaveText('The course name is required.');
 
   // Add Instructor and Add Tutor with nothing selected must add no row. The
@@ -91,7 +92,7 @@ test('an instructor who creates a course becomes its instructor by default', asy
   await page.locator('#CourseCourse').fill('CPSC 101 101');
   await page.locator('#CourseTitle').fill('Introductory Course to Programming');
   await page.getByRole('button', { name: 'Save' }).click();
-  await expect(goodMessage(page)).toHaveText('Course created!');
+  await expect(goodMessage(page)).toHaveText(COURSE.created);
 
   const courseId = await openCourse(page, 'CPSC 101 101', 'Introductory Course to Programming');
   await page.goto(`/courses/edit/${courseId}`);
@@ -115,7 +116,7 @@ test('an inactive course gets limited access and is listed apart', async ({ page
   await page.locator('#CourseTutors').selectOption({ label: 'Tutor 1' });
   await page.getByRole('link', { name: 'Add Tutor' }).click();
   await page.getByRole('button', { name: 'Save' }).click();
-  await expect(goodMessage(page)).toHaveText('Course created!');
+  await expect(goodMessage(page)).toHaveText(COURSE.created);
 
   const courseId = await openCourse(page, 'EECE 450 101', 'Course To Deactivate');
   await page.goto(`/courses/edit/${courseId}`);
@@ -137,7 +138,7 @@ test('an inactive course gets limited access and is listed apart', async ({ page
   // changes the status, also when the course has no instructor left.
   await page.locator('#status').selectOption('I');
   await page.getByRole('button', { name: 'Save' }).click();
-  await expect(goodMessage(page)).toHaveText('The course was updated successfully.');
+  await expect(goodMessage(page)).toHaveText(COURSE.updated);
 
   // The course home page says the course is inactive and drops the links that
   // change the course.
@@ -166,14 +167,14 @@ test('an admin can delete a course', async ({ page }) => {
   await page.locator('#CourseCourse').fill('EECE 480 101');
   await page.locator('#CourseTitle').fill('Course To Delete');
   await page.getByRole('button', { name: 'Save' }).click();
-  await expect(goodMessage(page)).toHaveText('Course created!');
+  await expect(goodMessage(page)).toHaveText(COURSE.created);
 
   const courseId = await openCourse(page, 'EECE 480 101', 'Course To Delete');
 
   await page.goto(`/courses/delete/${courseId}`);
   await expect(page.locator('#CourseDeleteForm')).toContainText('EECE 480 101 - Course To Delete');
   await page.getByRole('button', { name: 'Delete Course' }).click();
-  await expect(goodMessage(page)).toHaveText('The course was deleted successfully.');
+  await expect(goodMessage(page)).toHaveText(COURSE.deleted);
 
   await page.goto('/courses');
   await expect(page.getByRole('cell', { name: 'EECE 480 101', exact: true })).toHaveCount(0);

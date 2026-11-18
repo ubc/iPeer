@@ -12,6 +12,7 @@ import {
   typeExistingUsername,
   usernameWarning,
 } from '../support/users';
+import { USER } from '../support/messages';
 
 // Ported from app/tests/cases/system/enrol_student.test.php.
 
@@ -19,12 +20,12 @@ const SEEDED_MECH328_TUTORS = [TUTORS.tutor1.name, TUTORS.tutor2.name];
 
 async function enrolChrisInApsc201(page: Page): Promise<void> {
   await enrolExistingUser(page, COURSES.apsc201.id, STUDENTS.chris.username);
-  await expect(goodMessage(page)).toHaveText('User is successfully enrolled.');
+  await expect(goodMessage(page)).toHaveText(USER.enrolled);
 }
 
 async function enrolTutor3InMech328(page: Page): Promise<void> {
   await enrolExistingUser(page, COURSES.mech328.id, TUTORS.tutor3.username);
-  await expect(goodMessage(page)).toHaveText('User is successfully enrolled.');
+  await expect(goodMessage(page)).toHaveText(USER.enrolled);
 }
 
 test('a super admin enrols an existing student and the student joins the class list', async ({
@@ -109,9 +110,7 @@ test('enrolling a user who is neither a student nor a tutor is refused', async (
   // An instructor ranks below the super admin, so only the check that the
   // user is a student or a tutor can refuse this.
   await enrolExistingUser(page, COURSES.mech328.id, USERS.instructor1);
-  await expect(flashMessage(page)).toHaveText(
-    'Error: You do not have permission to enrol this user.'
-  );
+  await expect(flashMessage(page)).toHaveText(USER.noEnrolPermission);
 
   await expectClassSize(page, COURSES.mech328.id, COURSES.mech328.studentCount);
   await expectCourseTutors(page, COURSES.mech328.id, SEEDED_MECH328_TUTORS);
@@ -121,7 +120,7 @@ test('enrolling a student who is already in the course is refused', async ({ pag
   await login(page, USERS.superAdmin);
 
   await enrolExistingUser(page, COURSES.mech328.id, STUDENTS.ed.username);
-  await expect(flashMessage(page)).toHaveText('Error: The student is already enrolled.');
+  await expect(flashMessage(page)).toHaveText(USER.alreadyEnrolled);
 
   // The database refuses a second enrolment row in any case, so the message is
   // the check. The class list shows that nothing else changed.
@@ -133,7 +132,7 @@ test('enrolling a tutor who already tutors the course is refused', async ({ page
   await login(page, USERS.superAdmin);
 
   await enrolExistingUser(page, COURSES.mech328.id, TUTORS.tutor1.username);
-  await expect(flashMessage(page)).toHaveText('Error: The student is already enrolled.');
+  await expect(flashMessage(page)).toHaveText(USER.alreadyEnrolled);
 
   await expectCourseTutors(page, COURSES.mech328.id, SEEDED_MECH328_TUTORS);
 });

@@ -4,6 +4,7 @@ import { idFromAjaxList, runAjaxListAction, waitForAjaxList } from '../support/a
 import { evaluationTabSection, openEvaluationTab, requestDelete } from '../support/evaltools';
 import { insertMixeval, type Mixeval, type Question, type Section } from '../support/mixevals';
 import { USERS } from '../support/seed';
+import { MIXEVAL, noTemplatePermission } from '../support/messages';
 
 // Ported from app/tests/cases/system/add_mixeval.test.php.
 
@@ -102,7 +103,6 @@ const HEADERS: Record<Question['type'], string> = {
 };
 
 const DELETE_QUESTION = 'Are you sure you want to delete this evaluation permanently?';
-const SAVED = 'The mixed evaluation was saved successfully.';
 const SAVE = { name: 'Save', exact: true } as const;
 
 function sectionQuestions(page: Page, section: Section): Locator {
@@ -265,9 +265,7 @@ test('the Add Mixed Evaluation form refuses a missing name and a duplicate name'
 }) => {
   await page.goto('/mixevals/add');
   await page.getByRole('button', SAVE).click();
-  await expect(flashMessage(page)).toHaveText(
-    'Unable to save, please check below for error messages.'
-  );
+  await expect(flashMessage(page)).toHaveText(MIXEVAL.notSaved);
   await expect(errorMessage(page)).toHaveText(['Please enter an evaluation name.']);
 
   await page.locator('#MixevalName').fill(SEEDED.name);
@@ -285,7 +283,7 @@ test('an admin adds a mixed evaluation with one question of each type', async ({
   // Each question is numbered in the order it was added.
   await expectSection(page, 'Peer', FINAL.peer);
   await page.getByRole('button', SAVE).click();
-  await expect(goodMessage(page)).toHaveText(SAVED);
+  await expect(goodMessage(page)).toHaveText(MIXEVAL.saved);
 
   const id = await idFromAjaxList(page, FINAL.name, 'mixevals');
   await page.goto(`/mixevals/edit/${id}`);
@@ -332,7 +330,7 @@ test('a failed save shows the questions again with their scales', async ({ page 
   // The form that came back saves as it is.
   await page.locator('#MixevalName').fill(FINAL.name);
   await page.getByRole('button', SAVE).click();
-  await expect(goodMessage(page)).toHaveText(SAVED);
+  await expect(goodMessage(page)).toHaveText(MIXEVAL.saved);
   const id = await idFromAjaxList(page, FINAL.name, 'mixevals');
   await page.goto(`/mixevals/edit/${id}`);
   await expectForm(page, FINAL);
@@ -373,7 +371,7 @@ test('editing a mixed evaluation can remove, move and add questions and scale le
   await expectSection(page, 'Peer', [COMMENTS, DISTRIBUTED, trimmed, extra]);
 
   await page.getByRole('button', SAVE).click();
-  await expect(goodMessage(page)).toHaveText(SAVED);
+  await expect(goodMessage(page)).toHaveText(MIXEVAL.saved);
 
   await page.goto(`/mixevals/edit/${id}`);
   await expectForm(page, { ...FINAL, peer: [COMMENTS, DISTRIBUTED, trimmed, extra] });
@@ -392,7 +390,7 @@ test('a copy of a mixed evaluation keeps its questions under a new name', async 
   await page.goto(`/mixevals/copy/${id}`);
   await expectForm(page, FINAL_COPY);
   await page.getByRole('button', SAVE).click();
-  await expect(goodMessage(page)).toHaveText(SAVED);
+  await expect(goodMessage(page)).toHaveText(MIXEVAL.saved);
 
   const copyId = await idFromAjaxList(page, FINAL_COPY.name, 'mixevals');
   expect(copyId, 'the copy is a new template').not.toBe(id);
@@ -410,7 +408,7 @@ test('a self-evaluation section numbers its questions apart from the peer questi
   await expectSection(page, 'Peer', WITH_SELF.peer);
   await expectSection(page, 'Self', WITH_SELF.self);
   await page.getByRole('button', SAVE).click();
-  await expect(goodMessage(page)).toHaveText(SAVED);
+  await expect(goodMessage(page)).toHaveText(MIXEVAL.saved);
 
   // The list counts the questions of each section, and the total marks count
   // only the required peer Likert question.
@@ -471,7 +469,7 @@ test('questions move only within their own section', async ({ page, testDatabase
   await expectSection(page, 'Self', [self2, self3, self1]);
 
   await page.getByRole('button', SAVE).click();
-  await expect(goodMessage(page)).toHaveText(SAVED);
+  await expect(goodMessage(page)).toHaveText(MIXEVAL.saved);
   await page.goto(`/mixevals/edit/${id}`);
   await expectForm(page, { ...WITH_SELF, peer: [required, optional], self: [self2, self3, self1] });
 });
@@ -487,7 +485,7 @@ test('turning off Self-Evaluation removes the self-evaluation questions', async 
   await page.locator('#self_eval').uncheck();
   await expect(page.locator('#self-eval-ques')).toBeHidden();
   await page.getByRole('button', SAVE).click();
-  await expect(goodMessage(page)).toHaveText(SAVED);
+  await expect(goodMessage(page)).toHaveText(MIXEVAL.saved);
 
   await page.goto(`/mixevals/edit/${id}`);
   await expectForm(page, { ...WITH_SELF, selfEval: false, self: [] });
@@ -501,18 +499,18 @@ test('a mixed evaluation that no event uses can be deleted', async ({ page }) =>
   await page.goto('/mixevals/add');
   await fillForm(page, PRIVATE);
   await page.getByRole('button', SAVE).click();
-  await expect(goodMessage(page)).toHaveText(SAVED);
+  await expect(goodMessage(page)).toHaveText(MIXEVAL.saved);
   const id = await idFromAjaxList(page, PRIVATE.name, 'mixevals');
 
   await deleteFromList(page, PRIVATE.name);
-  await expect(goodMessage(page)).toHaveText('The Mixed Evaluation was removed successfully.');
+  await expect(goodMessage(page)).toHaveText(MIXEVAL.removed);
 
   await openEvaluationTab(page);
   const own = await evaluationTabSection(page, 'My Mixed Evaluations');
   await expect(own.getByRole('link', { name: SEEDED.name, exact: true })).toBeVisible();
   await expect(own.getByRole('link', { name: PRIVATE.name, exact: true })).toHaveCount(0);
   await page.goto(`/mixevals/view/${id}`);
-  await expect(flashMessage(page)).toHaveText('Error: Invalid Mixeval ID.');
+  await expect(flashMessage(page)).toHaveText(MIXEVAL.invalidId);
 });
 
 test('a mixed evaluation that events use cannot be deleted, and one with submissions cannot be edited', async ({
@@ -525,9 +523,7 @@ test('a mixed evaluation that events use cannot be deleted, and one with submiss
   );
 
   await page.goto(`/mixevals/edit/${SEEDED.id}`);
-  await expect(flashMessage(page)).toHaveText(
-    `${SEEDED.name} cannot be edited now that submissions have been made. Please make a copy.`
-  );
+  await expect(flashMessage(page)).toHaveText(MIXEVAL.inUse(SEEDED.name));
 
   await page.goto(`/mixevals/view/${SEEDED.id}`);
   await expect(viewDetail(page, 'Name')).toHaveText(SEEDED.name);
@@ -550,20 +546,16 @@ test("an instructor can view and copy an admin's public mixed evaluation but can
   await expect(viewDetail(page, 'Name')).toHaveText(FINAL.name);
 
   await requestDelete(page, 'mixevals', id);
-  await expect(flashMessage(page)).toHaveText(
-    'Error: You do not have permission to delete this evaluation'
-  );
+  await expect(flashMessage(page)).toHaveText(noTemplatePermission('delete', 'evaluation'));
   await page.goto(`/mixevals/edit/${id}`);
-  await expect(flashMessage(page)).toHaveText(
-    'Error: You do not have permission to edit this evaluation'
-  );
+  await expect(flashMessage(page)).toHaveText(noTemplatePermission('edit', 'evaluation'));
 
   // A public template can be copied. The copy belongs to the instructor, who
   // can edit and delete it.
   await page.goto(`/mixevals/copy/${id}`);
   await expectForm(page, FINAL_COPY);
   await page.getByRole('button', SAVE).click();
-  await expect(goodMessage(page)).toHaveText(SAVED);
+  await expect(goodMessage(page)).toHaveText(MIXEVAL.saved);
   const copyId = await idFromAjaxList(page, FINAL_COPY.name, 'mixevals');
 
   await page.goto(`/mixevals/edit/${copyId}`);
@@ -572,13 +564,13 @@ test("an instructor can view and copy an admin's public mixed evaluation but can
   // The question leaves the form only when its animation ends.
   await expect(questions).toHaveCount(3);
   await page.getByRole('button', SAVE).click();
-  await expect(goodMessage(page)).toHaveText(SAVED);
+  await expect(goodMessage(page)).toHaveText(MIXEVAL.saved);
   await page.goto(`/mixevals/edit/${copyId}`);
   await expectForm(page, { ...FINAL_COPY, peer: [WORK_ETHIC, COMMENTS, DISTRIBUTED] });
 
   await page.goto('/mixevals');
   await deleteFromList(page, FINAL_COPY.name);
-  await expect(goodMessage(page)).toHaveText('The Mixed Evaluation was removed successfully.');
+  await expect(goodMessage(page)).toHaveText(MIXEVAL.removed);
 
   // The refusals left the original as it was.
   await login(page, USERS.superAdmin);
@@ -601,11 +593,7 @@ test("an instructor can neither list, view nor copy an admin's private mixed eva
   await expect(list.getByRole('link', { name: PRIVATE.name, exact: true })).toHaveCount(0);
 
   await page.goto(`/mixevals/view/${id}`);
-  await expect(flashMessage(page)).toHaveText(
-    'Error: You do not have permission to view this evaluation'
-  );
+  await expect(flashMessage(page)).toHaveText(noTemplatePermission('view', 'evaluation'));
   await page.goto(`/mixevals/copy/${id}`);
-  await expect(flashMessage(page)).toHaveText(
-    'Error: You do not have permission to copy this evaluation'
-  );
+  await expect(flashMessage(page)).toHaveText(noTemplatePermission('copy', 'evaluation'));
 });

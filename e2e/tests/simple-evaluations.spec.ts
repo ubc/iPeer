@@ -12,6 +12,7 @@ import { evaluationTabSection, openEvaluationTab, requestDelete } from '../suppo
 import { USERS } from '../support/seed';
 import type { TestDatabase } from '../support/db';
 import { NOW, insertRow, userId } from '../support/insert';
+import { ACCESS, SIMPLE_TEMPLATE, noTemplatePermission } from '../support/messages';
 
 // Ported from app/tests/cases/system/add_simple.test.php.
 
@@ -127,7 +128,7 @@ test('the Add Simple Evaluation form refuses missing fields, a duplicate name an
 }) => {
   await page.goto('/simpleevaluations/add');
   await page.getByRole('button', SAVE).click();
-  await expect(flashMessage(page)).toHaveText('The evaluation was not added successfully.');
+  await expect(flashMessage(page)).toHaveText(SIMPLE_TEMPLATE.addFailed);
   await expect(errorMessage(page)).toHaveText([
     'Please give the evaluation template a name.',
     'Please enter a positive integer.',
@@ -152,7 +153,7 @@ test('an admin adds a simple evaluation', async ({ page }) => {
 
   await fillForm(page, PROJECT);
   await page.getByRole('button', SAVE).click();
-  await expect(goodMessage(page)).toHaveText('The evaluation was added successfully.');
+  await expect(goodMessage(page)).toHaveText(SIMPLE_TEMPLATE.added);
 
   await openFromEvaluationTab(page, PROJECT.name);
   await expectView(page, PROJECT);
@@ -177,7 +178,7 @@ test('editing a simple evaluation saves the new points', async ({ page, testData
   await expect(points).toHaveValue(PROJECT.points);
   await points.fill('72');
   await page.getByRole('button', SAVE).click();
-  await expect(goodMessage(page)).toHaveText('The simple evaluation was updated successfully.');
+  await expect(goodMessage(page)).toHaveText(SIMPLE_TEMPLATE.updated);
 
   await page.goto(`/simpleevaluations/view/${id}`);
   await expectView(page, { ...PROJECT, points: '72' });
@@ -196,7 +197,7 @@ test('a copy of a simple evaluation keeps its fields under a new name', async ({
   await expect(page.locator('#SimpleEvaluationPointPerMember')).toHaveValue(copy.points);
   await expect(page.getByLabel(copy.availability, { exact: true })).toBeChecked();
   await page.getByRole('button', SAVE).click();
-  await expect(goodMessage(page)).toHaveText('The evaluation was added successfully.');
+  await expect(goodMessage(page)).toHaveText(SIMPLE_TEMPLATE.added);
 
   const copyId = await idFromAjaxList(page, copy.name, 'simpleevaluations');
   expect(copyId, 'the copy is a new template').not.toBe(id);
@@ -209,14 +210,14 @@ test('a simple evaluation that no event uses can be deleted', async ({ page, tes
 
   await page.goto('/simpleevaluations');
   await deleteFromList(page, PROJECT.name);
-  await expect(goodMessage(page)).toHaveText('The evaluation was deleted successfully.');
+  await expect(goodMessage(page)).toHaveText(SIMPLE_TEMPLATE.deleted);
 
   await openEvaluationTab(page);
   const own = await ownSimpleEvaluations(page);
   await expect(own.getByRole('link', { name: SEEDED.name, exact: true })).toBeVisible();
   await expect(own.getByRole('link', { name: PROJECT.name, exact: true })).toHaveCount(0);
   await page.goto(`/simpleevaluations/view/${id}`);
-  await expect(flashMessage(page)).toHaveText('Error: Invalid ID.');
+  await expect(flashMessage(page)).toHaveText(ACCESS.invalidId);
 });
 
 test('a simple evaluation that events use cannot be deleted, and one with submissions cannot be edited', async ({
@@ -229,9 +230,7 @@ test('a simple evaluation that events use cannot be deleted, and one with submis
   );
 
   await page.goto(`/simpleevaluations/edit/${SEEDED.id}`);
-  await expect(flashMessage(page)).toHaveText(
-    `Submissions had been made. ${SEEDED.name} cannot be edited. Please make a copy.`
-  );
+  await expect(flashMessage(page)).toHaveText(SIMPLE_TEMPLATE.inUse(SEEDED.name));
 
   await page.goto(`/simpleevaluations/view/${SEEDED.id}`);
   await expect(viewField(page, 'Evaluation Name')).toHaveText(SEEDED.name);
@@ -256,13 +255,9 @@ test("an instructor can view an admin's public simple evaluation but can neither
   await expect(viewField(page, 'Evaluation Name')).toHaveText(SEEDED.name);
 
   await requestDelete(page, 'simpleevaluations', id);
-  await expect(flashMessage(page)).toHaveText(
-    'Error: You do not have permission to delete this evaluation'
-  );
+  await expect(flashMessage(page)).toHaveText(noTemplatePermission('delete', 'evaluation'));
   await page.goto(`/simpleevaluations/edit/${id}`);
-  await expect(flashMessage(page)).toHaveText(
-    'Error: You do not have permission to edit this evaluation'
-  );
+  await expect(flashMessage(page)).toHaveText(noTemplatePermission('edit', 'evaluation'));
 
   // The refusals left the template as it was.
   await page.goto(`/simpleevaluations/view/${id}`);

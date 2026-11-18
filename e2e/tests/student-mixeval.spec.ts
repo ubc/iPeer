@@ -37,6 +37,8 @@ import {
   submitMixevalButton,
   type MixevalMark,
 } from '../support/student';
+import { SUBMISSION } from '../support/messages';
+import { expectTextInOrder } from '../support/text';
 
 // Ported from app/tests/cases/system/student_mixeval.test.php. As in
 // student-simple.spec.ts, the event and the submissions are inserted, except
@@ -96,8 +98,6 @@ const TUTOR_MARKS: MixevalMark[] = [
   { member: MATT, answers: { 1: 2, 2: 2, 3: 2, 4: 'right', 5: 'left', 6: 'forward' } },
 ];
 
-const SAVED_NOT_SUBMITTED =
-  'Your answers have been saved. Please answer all the required questions before it can be considered submitted.';
 const ANSWER_ALL = 'Please fill in all required questions before resubmitting the evaluation.';
 
 async function insertMixedEvent(
@@ -191,10 +191,10 @@ test('a student answers the questions for each member and submits', async ({
   const penalty = page.locator('#penalty');
   await expect(penalty).toBeHidden();
   await page.getByRole('link', { name: 'Show/Hide Late Penalty Policy' }).click();
-  await expect(penalty).toHaveText(
-    'From the due date to 1 days(s) late, 10% will be deducted. 10% is deducted afterwards.',
-    { useInnerText: true }
-  );
+  await expectTextInOrder(penalty, [
+    'From the due date to 1 days(s) late, 10% will be deducted.',
+    '10% is deducted afterwards.',
+  ]);
 
   // Each member has the questions, with their instructions, and a star on
   // each required question.
@@ -219,7 +219,7 @@ test('a student answers the questions for each member and submits', async ({
   };
   await fillMixevalForm(page, [toAlex, withoutParagraph]);
   await submitMixevalButton(page).click();
-  await expect(flashMessage(page)).toHaveText(SAVED_NOT_SUBMITTED);
+  await expect(flashMessage(page)).toHaveText(SUBMISSION.mixevalSavedNotSubmitted);
   await expect(page).toHaveURL(/\/evaluations\/makeEvaluation\/\d+\/\d+$/);
   await expectMixevalForm(page, [toAlex, withoutParagraph]);
   await expectOnHome(page, 'Due', TITLE, GROUP.name);
