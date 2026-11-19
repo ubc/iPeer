@@ -47,6 +47,7 @@ function makeQ($view, $qType, $i, $qTypes, $selfEval, $quesNum, $required=true)
     $removeLink = $html->link('x', '#',
         array(
             'class' => 'removeQ',
+            'aria-label' => __('Remove question', true),
             'onclick' => "removeQ($i, $selfEval); return false;",
             'escape' => false
         )
@@ -54,6 +55,7 @@ function makeQ($view, $qType, $i, $qTypes, $selfEval, $quesNum, $required=true)
     $upLink = $html->link('▲', '#',
         array(
             'class' => 'upQ',
+            'aria-label' => __('Move question up', true),
             'onclick' => "upQ($i, $selfEval); return false;",
             'escape' => false
         )
@@ -61,6 +63,7 @@ function makeQ($view, $qType, $i, $qTypes, $selfEval, $quesNum, $required=true)
     $downLink = $html->link('▼', '#',
         array(
             'class' => 'downQ',
+            'aria-label' => __('Move question down', true),
             'onclick' => "downQ($i, $selfEval); return false;",
             'escape' => false
         )
@@ -75,10 +78,13 @@ function makeQ($view, $qType, $i, $qTypes, $selfEval, $quesNum, $required=true)
 
     // give an ID to the question number for easy renumbering later on
     $qNum = $html->tag('span', $quesNum . ". ", array('id' => "questionIndex$i"));
+    $qTypeName = $html->tag('span', $qHeader, array('id' => "questionType$i"));
     $requiredTxt = ($qType != 'Likert') ? '' :
         $html->div("help-text", __('Unrequired Likert questions are not counted toward the total rating.', true));
+    // The group is named by the number and the type, such as
+    // '2. Sentence Answer Question', and the name changes with the number.
     $ret = $html->div('MixevalMakeQuestion',
-        $html->tag('h3', "$controls $qNum $qHeader") .
+        $html->tag('h3', "$controls $qNum $qTypeName") .
         $hiddenIdField .
         $form->input("MixevalQuestion.$i.title",
             array("type" => "text", "label" => "Question")) .
@@ -92,7 +98,11 @@ function makeQ($view, $qType, $i, $qTypes, $selfEval, $quesNum, $required=true)
             array('value' => $i + 1)) .
         $qFields
         ,
-        array('id' => "question$i")
+        array(
+            'id' => "question$i",
+            'role' => 'group',
+            'aria-labelledby' => "questionIndex$i questionType$i",
+        )
     );
 
     return $ret;
@@ -136,6 +146,7 @@ function likertFields($view, $i) {
     $ret .= $html->div('',
         $form->label(null, 'Scale', array('class' => 'defLabel')) .
         $form->button("Add", array('type' => 'button',
+            'aria-label' => __('Add scale level', true),
             'onclick' => "addDesc($i);")) .
         $html->div('DescsDiv', $descs, array('id' => "DescsDiv$i"))
     );
@@ -154,14 +165,22 @@ function makeDesc($view, $qNum, $descNum) {
         $hiddenIdField = $form->hidden("MixevalQuestionDesc.$descNum.id");
     }
 
+    // The remove link is named by its own label and the text of the level,
+    // such as 'Remove Good'.
+    $descriptorId = "MixevalQuestionDesc{$descNum}Descriptor";
+    $removeId = "question{$qNum}desc{$descNum}Remove";
     $ret = $html->div('MixevalQuestionDesc',
         $hiddenIdField .
-        $form->text("MixevalQuestionDesc.$descNum.descriptor") .
+        $form->text("MixevalQuestionDesc.$descNum.descriptor",
+            array('id' => $descriptorId, 'aria-label' => __('Scale level', true))) .
         $form->hidden("MixevalQuestionDesc.$descNum.question_index",
             array('value' => $qNum, 'class' => "MixevalQuestionDesc$qNum")) .
         $html->link('x', '#',
             array(
+                'id' => $removeId,
                 'class' => 'removeQ',
+                'aria-label' => __('Remove', true),
+                'aria-labelledby' => "$removeId $descriptorId",
                 'onclick' => "removeDesc($qNum, $descNum); return false;"
             )
         ),
@@ -213,24 +232,28 @@ if (isset($this->data['MixevalQuestionDesc'])) {
 
 
 // peer evaluation questions section
-echo $html->tag('h3', __('Peer Evaluation Questions', true));
+echo "<section aria-labelledby='peer-questions'>";
+echo $html->tag('h3', __('Peer Evaluation Questions', true), array('id' => 'peer-questions'));
 $addQButton = $form->button(__('Add', true),
-    array('type' => 'button', 'onclick' => "insertQ(false);"));
+    array('type' => 'button', 'aria-label' => __('Add question', true),
+    'onclick' => "insertQ(false);"));
 echo $form->input('MixevalQuestionTypePeer', array('after' => $addQButton,
     'options' => $qTypes));
 echo $html->div('', $reloadedQ, array('id' => 'questions', 'class' => 'questions'));
+echo '</section>';
 
 // self evaluation questions section
-echo '<div id="self-eval-ques">';
-echo $html->tag('h3', __('Self-Evaluation Questions', true));
+echo "<section id='self-eval-ques' aria-labelledby='self-questions'>";
+echo $html->tag('h3', __('Self-Evaluation Questions', true), array('id' => 'self-questions'));
 $addQButton = $form->button(__('Add', true),
-    array('type' => 'button', 'onclick' => "insertQ(true);"));
+    array('type' => 'button', 'aria-label' => __('Add question', true),
+    'onclick' => "insertQ(true);"));
 $selfQTypes = $qTypes;
 unset($selfQTypes[4]); // remove score dropdown from self-evaluation
 echo $form->input('MixevalQuestionTypeSelf', array('after' => $addQButton,
     'options' => $selfQTypes));
 echo $html->div('', $reloadedSelfQ, array('id' => 'selfQues', 'class' => 'questions'));
-echo '</div>';
+echo '</section>';
 ?>
 
 <script type="text/javascript">
@@ -386,11 +409,14 @@ function reorderQ() {
 }
 
 // Add a question descriptor, this is used to configure things like scale
-// levels in likert questions
+// levels in likert questions. The new level gets the focus, so the user can
+// type its text at once.
 function addDesc(numQ) {
     var insert = desc.replace(/-1/g, numQ);
     insert = insert.replace(/-2/g, numDesc);
-    jQuery(insert).hide().appendTo('#DescsDiv' + numQ).fadeIn(200);
+    jQuery(insert).hide().appendTo('#DescsDiv' + numQ).fadeIn(200, function() {
+        jQuery(this).find('input[type="text"]').focus();
+    });
     numDesc++;
 }
 

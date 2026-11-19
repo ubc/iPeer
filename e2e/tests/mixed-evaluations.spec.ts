@@ -106,8 +106,59 @@ const HEADERS: Record<Question['type'], string> = {
 const DELETE_QUESTION = 'Are you sure you want to delete this evaluation permanently?';
 const SAVE = { name: 'Save', exact: true } as const;
 
+const SECTION_HEADINGS: Record<Section, string> = {
+  Peer: 'Peer Evaluation Questions',
+  Self: 'Self-Evaluation Questions',
+};
+
+// The questions of a section of the form, with the type list and the button
+// that adds a question.
+function formSection(page: Page, section: Section): Locator {
+  return page.getByRole('region', { name: SECTION_HEADINGS[section], exact: true });
+}
+
+// The same section, also when it is hidden, which a role lookup otherwise
+// leaves out. Without it, toBeHidden() passes for a section that is not there.
+function hiddenSection(page: Page, section: Section): Locator {
+  return page.getByRole('region', {
+    name: SECTION_HEADINGS[section],
+    exact: true,
+    includeHidden: true,
+  });
+}
+
 function sectionQuestions(page: Page, section: Section): Locator {
-  return page.locator(`#${section === 'Peer' ? 'questions' : 'selfQues'} .MixevalMakeQuestion`);
+  return formSection(page, section).getByRole('group');
+}
+
+// A question by the number that the form shows for it. Its name is the number
+// and the type, such as '2. Sentence Answer Question'.
+function sectionQuestion(page: Page, section: Section, number: number): Locator {
+  return formSection(page, section).getByRole('group', { name: new RegExp(`^${number}\\. `) });
+}
+
+function scaleLevels(question: Locator): Locator {
+  return question.getByRole('textbox', { name: 'Scale level', exact: true });
+}
+
+// The texts of the scale levels, from the lowest level to the highest.
+function levelTexts(question: Locator): Promise<string[]> {
+  return scaleLevels(question).evaluateAll((boxes) =>
+    boxes.map((box) => (box as HTMLInputElement).value)
+  );
+}
+
+// Clicks one of the controls in the heading of a question: 'Remove question',
+// 'Move question up' or 'Move question down'.
+async function questionControl(
+  page: Page,
+  section: Section,
+  number: number,
+  control: 'Remove question' | 'Move question up' | 'Move question down'
+): Promise<void> {
+  await sectionQuestion(page, section, number)
+    .getByRole('link', { name: control, exact: true })
+    .click();
 }
 
 // Adds a question at the end of a section and fills it in.
@@ -117,25 +168,25 @@ async function addQuestion(page: Page, section: Section, question: Question): Pr
     async () => {
       const questions = sectionQuestions(page, section);
       const before = await questions.count();
-      const type = page.locator(`#MixevalMixevalQuestionType${section}`);
-      await type.selectOption({ label: question.type });
-      await type.locator('..').getByRole('button', { name: 'Add', exact: true }).click();
+      const form = formSection(page, section);
+      await form.getByRole('combobox').selectOption({ label: question.type });
+      await form.getByRole('button', { name: 'Add question', exact: true }).click();
       await expect(questions).toHaveCount(before + 1);
 
-      const added = questions.nth(before);
-      await added.locator('input[id$="Title"]').fill(question.title);
-      await added.locator('[id$="Instructions"]').fill(question.instructions);
-      await added.locator('input[type="checkbox"][id$="Required"]').setChecked(question.required);
+      const added = sectionQuestion(page, section, before + 1);
+      await added.getByLabel('Question', { exact: true }).fill(question.title);
+      await added.getByLabel('Instructions', { exact: true }).fill(question.instructions);
+      await added.getByLabel('Required', { exact: true }).setChecked(question.required);
       if (question.type === 'Likert') {
-        await added.locator('input[id$="Multiplier"]').fill(question.marks ?? '');
+        await added.getByLabel('Marks', { exact: true }).fill(question.marks ?? '');
         await added
-          .locator('input[type="checkbox"][id$="ShowMarks"]')
+          .getByLabel('Show Marks', { exact: true })
           .setChecked(question.showMarks ?? false);
-        const scale = added.locator('.DescsDiv input[type="text"]');
         for (const [level, descriptor] of (question.scale ?? []).entries()) {
-          await added.getByRole('button', { name: 'Add', exact: true }).click();
-          await expect(scale).toHaveCount(level + 1);
-          await scale.nth(level).fill(descriptor);
+          await added.getByRole('button', { name: 'Add scale level', exact: true }).click();
+          await expect(scaleLevels(added)).toHaveCount(level + 1);
+          // A new level gets the focus.
+          await scaleLevels(added).and(page.locator(':focus')).fill(descriptor);
         }
       }
     },
@@ -144,10 +195,10 @@ async function addQuestion(page: Page, section: Section, question: Question): Pr
 }
 
 async function fillInfo(page: Page, mixeval: Mixeval): Promise<void> {
-  await page.locator('#MixevalName').fill(mixeval.name);
+  await page.getByLabel('Name', { exact: true }).fill(mixeval.name);
   await page.getByLabel(mixeval.availability, { exact: true }).check();
-  await page.locator('#MixevalZeroMark').setChecked(mixeval.zeroMark);
-  await page.locator('#self_eval').setChecked(mixeval.selfEval);
+  await page.getByLabel('Zero Mark', { exact: true }).setChecked(mixeval.zeroMark);
+  await page.getByLabel('Self-Evaluation', { exact: true }).setChecked(mixeval.selfEval);
 }
 
 async function fillForm(page: Page, mixeval: Mixeval): Promise<void> {
@@ -168,35 +219,37 @@ async function expectSection(
   await test.step(
     `Expect the ${section.toLowerCase()} questions`,
     async () => {
-      const questions = sectionQuestions(page, section);
-      await expect(questions, `${section} questions`).toHaveCount(expected.length);
+      // A removed question leaves the form only when its animation ends, and
+      // keeps its old number until then.
+      await expect(sectionQuestions(page, section), `${section} questions`).toHaveCount(
+        expected.length
+      );
       for (const [index, question] of expected.entries()) {
-        const shown = questions.nth(index);
-        const label = `${section} question ${index + 1}`;
-        await expect(shown.locator('span[id^="questionIndex"]'), label).toHaveText(`${index + 1}.`);
-        await expect(shown.locator('h3'), label).toContainText(HEADERS[question.type]);
-        await expect(shown.locator('input[id$="Title"]'), label).toHaveValue(question.title);
-        await expect(shown.locator('[id$="Instructions"]'), label).toHaveValue(
+        const number = index + 1;
+        const shown = sectionQuestion(page, section, number);
+        const label = `${section} question ${number}`;
+        await expect(shown, label).toHaveAccessibleName(`${number}. ${HEADERS[question.type]}`);
+        await expect(shown.getByLabel('Question', { exact: true }), label).toHaveValue(
+          question.title
+        );
+        await expect(shown.getByLabel('Instructions', { exact: true }), label).toHaveValue(
           question.instructions
         );
         await expect(
-          shown.locator('input[type="checkbox"][id$="Required"]'),
+          shown.getByLabel('Required', { exact: true }),
           `${label} required`
         ).toBeChecked({ checked: question.required });
         if (question.type === 'Likert') {
-          await expect(shown.locator('input[id$="Multiplier"]'), `${label} marks`).toHaveValue(
+          await expect(shown.getByLabel('Marks', { exact: true }), `${label} marks`).toHaveValue(
             question.marks ?? ''
           );
           await expect(
-            shown.locator('input[type="checkbox"][id$="ShowMarks"]'),
+            shown.getByLabel('Show Marks', { exact: true }),
             `${label} show marks`
           ).toBeChecked({ checked: question.showMarks ?? false });
-          const scale = shown.locator('.DescsDiv input[type="text"]');
-          const descriptors = question.scale ?? [];
-          await expect(scale, `${label} scale`).toHaveCount(descriptors.length);
-          for (const [level, descriptor] of descriptors.entries()) {
-            await expect(scale.nth(level), `${label} level ${level + 1}`).toHaveValue(descriptor);
-          }
+          await expect
+            .poll(() => levelTexts(shown), { message: `${label} scale` })
+            .toEqual(question.scale ?? []);
         }
       }
     },
@@ -233,10 +286,14 @@ async function expectForm(page: Page, mixeval: Mixeval): Promise<void> {
   await test.step(
     `Expect the form of ${mixeval.name}`,
     async () => {
-      await expect(page.locator('#MixevalName')).toHaveValue(mixeval.name);
+      await expect(page.getByLabel('Name', { exact: true })).toHaveValue(mixeval.name);
       await expect(page.getByLabel(mixeval.availability, { exact: true })).toBeChecked();
-      await expect(page.locator('#MixevalZeroMark')).toBeChecked({ checked: mixeval.zeroMark });
-      await expect(page.locator('#self_eval')).toBeChecked({ checked: mixeval.selfEval });
+      await expect(page.getByLabel('Zero Mark', { exact: true })).toBeChecked({
+        checked: mixeval.zeroMark,
+      });
+      await expect(page.getByLabel('Self-Evaluation', { exact: true })).toBeChecked({
+        checked: mixeval.selfEval,
+      });
       await expectSection(page, 'Peer', mixeval.peer);
       await expectSection(page, 'Self', mixeval.self);
     },
@@ -244,12 +301,11 @@ async function expectForm(page: Page, mixeval: Mixeval): Promise<void> {
   );
 }
 
-// The value the view page shows for a field, such as 'Availability'.
+// The value the view page shows for a field, such as 'Availability'. The value
+// points at its field name with aria-labelledby. Playwright does not give the
+// definition role a name, but getByLabel follows aria-labelledby.
 function viewDetail(page: Page, field: string): Locator {
-  return page
-    .locator('.MixevalView dt')
-    .filter({ hasText: new RegExp(`^${field}$`) })
-    .locator('xpath=following-sibling::dd[1]');
+  return page.getByLabel(field, { exact: true });
 }
 
 // Runs Delete from the template list, which must be the open page.
@@ -269,7 +325,7 @@ test('the Add Mixed Evaluation form refuses a missing name and a duplicate name'
   await expect(flashMessage(page)).toHaveText(MIXEVAL.notSaved);
   await expect(errorMessage(page)).toHaveText(['Please enter an evaluation name.']);
 
-  await page.locator('#MixevalName').fill(SEEDED.name);
+  await page.getByLabel('Name', { exact: true }).fill(SEEDED.name);
   await page.getByRole('button', SAVE).click();
   await expect(errorMessage(page)).toHaveText([
     'Another evaluation already exists with this name.',
@@ -329,7 +385,7 @@ test('a failed save shows the questions again with their scales', async ({ page 
   await expectSection(page, 'Peer', FINAL.peer);
 
   // The form that came back saves as it is.
-  await page.locator('#MixevalName').fill(FINAL.name);
+  await page.getByLabel('Name', { exact: true }).fill(FINAL.name);
   await page.getByRole('button', SAVE).click();
   await expect(goodMessage(page)).toHaveText(MIXEVAL.saved);
   const id = await idFromAjaxList(page, FINAL.name, 'mixevals');
@@ -343,27 +399,27 @@ test('editing a mixed evaluation can remove, move and add questions and scale le
 }) => {
   const id = await insertMixeval(testDatabase, FINAL);
   await page.goto(`/mixevals/edit/${id}`);
-  const questions = sectionQuestions(page, 'Peer');
-
   // Removing a question in the middle renumbers the questions after it.
-  await questions.nth(1).locator('h3 a.removeQ').click();
+  await questionControl(page, 'Peer', 2, 'Remove question');
   await expectSection(page, 'Peer', [WORK_ETHIC, COMMENTS, DISTRIBUTED]);
 
   // The first question cannot move up, and the last cannot move down.
-  await questions.nth(0).locator('h3 a.upQ').click();
-  await questions.nth(2).locator('h3 a.downQ').click();
+  await questionControl(page, 'Peer', 1, 'Move question up');
+  await questionControl(page, 'Peer', 3, 'Move question down');
   await waitForAnimations(page);
   await expectSection(page, 'Peer', [WORK_ETHIC, COMMENTS, DISTRIBUTED]);
 
   // Move the Likert question, with its scale, down one place, then the score
   // dropdown question up one place.
-  await questions.nth(0).locator('h3 a.downQ').click();
+  await questionControl(page, 'Peer', 1, 'Move question down');
   await expectSection(page, 'Peer', [COMMENTS, WORK_ETHIC, DISTRIBUTED]);
-  await questions.nth(2).locator('h3 a.upQ').click();
+  await questionControl(page, 'Peer', 3, 'Move question up');
   await expectSection(page, 'Peer', [COMMENTS, DISTRIBUTED, WORK_ETHIC]);
 
   // Remove the middle scale level. The levels above it move down one.
-  await questions.nth(2).locator('.MixevalQuestionDesc').nth(2).locator('a.removeQ').click();
+  await sectionQuestion(page, 'Peer', 3)
+    .getByRole('link', { name: 'Remove Good', exact: true })
+    .click();
   const trimmed: Question = { ...WORK_ETHIC, scale: ['Poor', 'Fair', 'Very good', 'Excellent'] };
   await expectSection(page, 'Peer', [COMMENTS, DISTRIBUTED, trimmed]);
 
@@ -403,9 +459,9 @@ test('a self-evaluation section numbers its questions apart from the peer questi
   page,
 }) => {
   await page.goto('/mixevals/add');
-  await expect(page.locator('#self-eval-ques')).toBeHidden();
+  await expect(hiddenSection(page, 'Self')).toBeHidden();
   await fillForm(page, WITH_SELF);
-  await expect(page.locator('#self-eval-ques')).toBeVisible();
+  await expect(formSection(page, 'Self')).toBeVisible();
   await expectSection(page, 'Peer', WITH_SELF.peer);
   await expectSection(page, 'Self', WITH_SELF.self);
   await page.getByRole('button', SAVE).click();
@@ -430,8 +486,12 @@ test('a self-evaluation section numbers its questions apart from the peer questi
   const id = await idFromAjaxList(page, WITH_SELF.name, 'mixevals');
   await page.goto(`/mixevals/view/${id}`);
   await expect(viewDetail(page, 'Self-Evaluation')).toHaveText('On');
-  await expect(page.locator('#peer-title')).toHaveText('Peer Evaluation Questions');
-  await expect(page.locator('#self-title')).toHaveText('Self-Evaluation Questions');
+  await expect(
+    page.getByRole('heading', { name: SECTION_HEADINGS.Peer, exact: true })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: SECTION_HEADINGS.Self, exact: true })
+  ).toBeVisible();
   // The preview asks the peer questions once for each of its three sample
   // group members, then asks the self-evaluation questions once.
   const peerTitles = [/^1\. Peer optional\s*$/, /^2\. Peer required\s*\*$/];
@@ -449,24 +509,22 @@ test('questions move only within their own section', async ({ page, testDatabase
   const id = await insertMixeval(testDatabase, WITH_SELF);
   await page.goto(`/mixevals/edit/${id}`);
   await expectForm(page, WITH_SELF);
-  const peer = sectionQuestions(page, 'Peer');
-  const self = sectionQuestions(page, 'Self');
   const [optional, required] = WITH_SELF.peer;
   const [self1, self2, self3] = WITH_SELF.self;
 
   // The ends of each section do not move past it.
-  await peer.nth(0).locator('h3 a.upQ').click();
-  await peer.nth(1).locator('h3 a.downQ').click();
-  await self.nth(0).locator('h3 a.upQ').click();
-  await self.nth(2).locator('h3 a.downQ').click();
+  await questionControl(page, 'Peer', 1, 'Move question up');
+  await questionControl(page, 'Peer', 2, 'Move question down');
+  await questionControl(page, 'Self', 1, 'Move question up');
+  await questionControl(page, 'Self', 3, 'Move question down');
   await waitForAnimations(page);
   await expectForm(page, WITH_SELF);
 
-  await peer.nth(0).locator('h3 a.downQ').click();
+  await questionControl(page, 'Peer', 1, 'Move question down');
   await expectSection(page, 'Peer', [required, optional]);
-  await self.nth(0).locator('h3 a.downQ').click();
+  await questionControl(page, 'Self', 1, 'Move question down');
   await expectSection(page, 'Self', [self2, self1, self3]);
-  await self.nth(1).locator('h3 a.downQ').click();
+  await questionControl(page, 'Self', 2, 'Move question down');
   await expectSection(page, 'Self', [self2, self3, self1]);
 
   await page.getByRole('button', SAVE).click();
@@ -483,8 +541,8 @@ test('turning off Self-Evaluation removes the self-evaluation questions', async 
   await page.goto(`/mixevals/edit/${id}`);
   await expectForm(page, WITH_SELF);
 
-  await page.locator('#self_eval').uncheck();
-  await expect(page.locator('#self-eval-ques')).toBeHidden();
+  await page.getByLabel('Self-Evaluation', { exact: true }).uncheck();
+  await expect(hiddenSection(page, 'Self')).toBeHidden();
   await page.getByRole('button', SAVE).click();
   await expect(goodMessage(page)).toHaveText(MIXEVAL.saved);
 
@@ -558,10 +616,9 @@ test("an instructor can view and copy an admin's public mixed evaluation but can
   const copyId = await idFromAjaxList(page, FINAL_COPY.name, 'mixevals');
 
   await page.goto(`/mixevals/edit/${copyId}`);
-  const questions = sectionQuestions(page, 'Peer');
-  await questions.nth(1).locator('h3 a.removeQ').click();
+  await questionControl(page, 'Peer', 2, 'Remove question');
   // The question leaves the form only when its animation ends.
-  await expect(questions).toHaveCount(3);
+  await expect(sectionQuestions(page, 'Peer')).toHaveCount(3);
   await page.getByRole('button', SAVE).click();
   await expect(goodMessage(page)).toHaveText(MIXEVAL.saved);
   await page.goto(`/mixevals/edit/${copyId}`);
