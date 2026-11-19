@@ -683,8 +683,8 @@ test('an instructor cannot export the results of a course they do not teach', as
   await expect(page).toHaveURL(/\/courses$/);
 });
 
-// The form lists only the events of the course, but the export checks the
-// posted event again.
+// The form lists only the events that the user can export, but the export
+// checks the posted event again.
 test('an export of an event of another course is refused', async ({ page, testDatabase }) => {
   const own = await insertExportEvent(testDatabase, {});
   const other = await insertEvent(
@@ -702,8 +702,8 @@ test('an export of an event of another course is refused', async ({ page, testDa
   let downloads = 0;
   page.on('download', () => downloads++);
   await exportButton(page).click();
-  // The export redirects to the evaluations list, which sets its own error
-  // in place of the export's, so only the start of the message is checked.
-  await expect(flashMessage(page)).toHaveText(/^Error: /);
+  // The same export page comes back with the refusal.
+  await expect(flashMessage(page)).toHaveText(ACCESS.noEvent);
+  await expect(page).toHaveURL(new RegExp(`/evaluations/export/event/${own}$`));
   expect(downloads).toBe(0);
 });
