@@ -64,7 +64,9 @@ if (!empty($notInGroup)) {
 <?php } ?>
 </form>
 
-<?php if ($viewReleaseBtns) { ?>
+<?php
+// Nothing to release when nobody was evaluated
+if ($viewReleaseBtns && !empty($scoreRecords)) { ?>
 <h3 id='release-status'><?php echo __('Evaluation Results Release Status', true) ?></h3>
 <table class="standardtable" aria-labelledby="release-status">
     <?php 

@@ -457,6 +457,25 @@ test('an inserted submission shows like one made through the form', async ({
   );
 });
 
+test('the Detail page of a group where nobody submitted has nothing to release', async ({
+  page,
+  testDatabase,
+}) => {
+  const eventId = await insertRubricEvent(testDatabase);
+  await endSubmissions(testDatabase, eventId);
+
+  await login(page, USERS.instructor1);
+  await openGroupResults(page, eventId, 'Detail');
+  await expect(memberList(page, NOT_SUBMITTED).getByRole('cell')).toContainText([
+    `${MATT} (student)`,
+  ]);
+  // The heading after the release status shows that the whole page loaded.
+  await expect(page.getByRole('heading', { name: 'Evaluation Results', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Evaluation Results Release Status' })
+  ).toHaveCount(0);
+});
+
 test('the results show the late penalties, who did not submit, and who left the group', async ({
   page,
   testDatabase,

@@ -291,14 +291,14 @@ async function waitForAnimations(page: Page): Promise<void> {
 }
 
 // The marks row under a Likert question in the view page preview. It shows
-// only when Show Marks is on.
+// only when Show Marks is on. The preview repeats the questions for three
+// sample members, so the first one stands for all.
 function previewMarks(page: Page, title: string): Locator {
   return page
-    .locator('.MixevalQuestion')
-    .filter({ has: page.locator('h3.question-title', { hasText: title }) })
-    .first()
-    .locator('tr')
-    .nth(2)
+    .getByRole('region', { name: 'Demo Student1', exact: true })
+    .getByRole('group', { name: title })
+    .getByRole('row')
+    .filter({ hasText: /^\s*Mark:/ })
     .getByRole('cell');
 }
 
