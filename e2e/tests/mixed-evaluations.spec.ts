@@ -127,8 +127,11 @@ function hiddenSection(page: Page, section: Section): Locator {
   });
 }
 
+// All the questions of a section, also when the section is hidden. With
+// Self-Evaluation off, the form hides the self-evaluation questions but would
+// still save any that are left in it.
 function sectionQuestions(page: Page, section: Section): Locator {
-  return formSection(page, section).getByRole('group');
+  return hiddenSection(page, section).getByRole('group', { includeHidden: true });
 }
 
 // A question by the number that the form shows for it. Its name is the number
@@ -141,10 +144,11 @@ function scaleLevels(question: Locator): Locator {
   return question.getByRole('textbox', { name: 'Scale level', exact: true });
 }
 
-// The texts of the scale levels, from the lowest level to the highest.
-function levelTexts(question: Locator): Promise<string[]> {
-  return scaleLevels(question).evaluateAll((boxes) =>
-    boxes.map((box) => (box as HTMLInputElement).value)
+// The values of text boxes in the order of the page, such as the scale levels
+// of a question from the lowest to the highest.
+function valuesInOrder(boxes: Locator): Promise<string[]> {
+  return boxes.evaluateAll((elements) =>
+    elements.map((element) => (element as HTMLInputElement).value)
   );
 }
 
@@ -156,9 +160,16 @@ async function questionControl(
   number: number,
   control: 'Remove question' | 'Move question up' | 'Move question down'
 ): Promise<void> {
+  const questions = sectionQuestions(page, section);
+  const before = await questions.count();
   await sectionQuestion(page, section, number)
     .getByRole('link', { name: control, exact: true })
     .click();
+  if (control === 'Remove question') {
+    // A removed question keeps its number until its animation ends, so the
+    // next step could find it instead of the question that takes its number.
+    await expect(questions).toHaveCount(before - 1);
+  }
 }
 
 // Adds a question at the end of a section and fills it in.
@@ -224,6 +235,16 @@ async function expectSection(
       await expect(sectionQuestions(page, section), `${section} questions`).toHaveCount(
         expected.length
       );
+      // The order on the page. The numbers come from the editor's own list,
+      // so a move that changed the list but not the page would still number
+      // the questions as expected. The titles in the tests are unique.
+      await expect
+        .poll(
+          () =>
+            valuesInOrder(sectionQuestions(page, section).getByLabel('Question', { exact: true })),
+          { message: `${section} question order` }
+        )
+        .toEqual(expected.map((question) => question.title));
       for (const [index, question] of expected.entries()) {
         const number = index + 1;
         const shown = sectionQuestion(page, section, number);
@@ -248,7 +269,7 @@ async function expectSection(
             `${label} show marks`
           ).toBeChecked({ checked: question.showMarks ?? false });
           await expect
-            .poll(() => levelTexts(shown), { message: `${label} scale` })
+            .poll(() => valuesInOrder(scaleLevels(shown)), { message: `${label} scale` })
             .toEqual(question.scale ?? []);
         }
       }
@@ -301,11 +322,11 @@ async function expectForm(page: Page, mixeval: Mixeval): Promise<void> {
   );
 }
 
-// The value the view page shows for a field, such as 'Availability'. The value
-// points at its field name with aria-labelledby. Playwright does not give the
-// definition role a name, but getByLabel follows aria-labelledby.
+// The value the view page shows for a field, such as 'Availability'. In the
+// list of details, each value is the <dd> right after the <dt> of its field.
+// ARIA gives a <dd> no name, so the HTML pairing is the link to the field.
 function viewDetail(page: Page, field: string): Locator {
-  return page.getByLabel(field, { exact: true });
+  return page.locator(`dt:text-is("${field}") + dd`);
 }
 
 // Runs Delete from the template list, which must be the open page.
@@ -617,8 +638,6 @@ test("an instructor can view and copy an admin's public mixed evaluation but can
 
   await page.goto(`/mixevals/edit/${copyId}`);
   await questionControl(page, 'Peer', 2, 'Remove question');
-  // The question leaves the form only when its animation ends.
-  await expect(sectionQuestions(page, 'Peer')).toHaveCount(3);
   await page.getByRole('button', SAVE).click();
   await expect(goodMessage(page)).toHaveText(MIXEVAL.saved);
   await page.goto(`/mixevals/edit/${copyId}`);

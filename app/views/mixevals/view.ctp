@@ -1,9 +1,9 @@
 <div class='MixevalView'>
 <dl>
-    <dt id='mixeval-name'><?php __('Name'); ?></dt>
-    <dd aria-labelledby='mixeval-name'><?php echo $mixeval['name']; ?></dd>
-    <dt id='mixeval-availability'><?php __('Availability'); ?></dt>
-    <dd aria-labelledby='mixeval-availability'><?php echo ucfirst($mixeval['availability']); ?></dd>
+    <dt><?php __('Name'); ?></dt>
+    <dd><?php echo $mixeval['name']; ?></dd>
+    <dt><?php __('Availability'); ?></dt>
+    <dd><?php echo ucfirst($mixeval['availability']); ?></dd>
     <dd>
         <span class='help'>
         <?php
@@ -11,26 +11,26 @@
         ?>
         </span>
     </dd>
-    <dt id='mixeval-zero-mark'>Zero Mark</dt>
-    <dd aria-labelledby='mixeval-zero-mark'><?php echo $mixeval['zero_mark'] ? 'On' : 'Off';?></dd>
+    <dt>Zero Mark</dt>
+    <dd><?php echo $mixeval['zero_mark'] ? 'On' : 'Off';?></dd>
     <dd>
         <span class='help'>
         <?php __('Start marks from zero for all Likert questions.')?>
         </span>
     </dd>
-    <dt id='mixeval-self-eval'>Self-Evaluation</dt>
-    <dd aria-labelledby='mixeval-self-eval'><?php echo $mixeval['self_eval'] > 0 ? 'On' : 'Off';?></dd>
+    <dt>Self-Evaluation</dt>
+    <dd><?php echo $mixeval['self_eval'] > 0 ? 'On' : 'Off';?></dd>
     <dd>
         <span class='help'>
         <?php __('Reflective Questions for the evaluator are included.')?>
         </span>
     </dd>
-    <dt id='mixeval-creator'>Creator</dt>
-    <dd aria-labelledby='mixeval-creator'><?php echo $mixeval['creator']; ?></dd>
-    <dt id='mixeval-created'>Created</dt>
-    <dd aria-labelledby='mixeval-created'><?php echo $mixeval['created']; ?></dd>
-    <dt id='mixeval-modified'>Modified</dt>
-    <dd aria-labelledby='mixeval-modified'><?php echo $mixeval['modified']; ?></dd>
+    <dt>Creator</dt>
+    <dd><?php echo $mixeval['creator']; ?></dd>
+    <dt>Created</dt>
+    <dd><?php echo $mixeval['created']; ?></dd>
+    <dt>Modified</dt>
+    <dd><?php echo $mixeval['modified']; ?></dd>
 </dl>
 <?php
 $totalMarks = $mixeval['total_marks'];
