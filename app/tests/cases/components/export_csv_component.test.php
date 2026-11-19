@@ -1,12 +1,15 @@
 <?php
 App::import('Component', 'ExportBaseNew');
 App::import('Component', 'ExportCsv');
+App::import('Component', 'Penalty');
 
 class ExportCsvComponentTestCase extends CakeTestCase
 {
     var $fixtures = array();
 
-    function startCase()
+    // A new component for each test, so no test depends on what another one
+    // set on it.
+    function startTest($method)
     {
         $this->ExportCsv = new ExportCsvComponent();
         // responseModelName is normally set by createCsv(); set it manually so
@@ -69,88 +72,188 @@ class ExportCsvComponentTestCase extends CakeTestCase
         ));
     }
 
-    // -------------------------------------------------------------------------
-    // calcDimensionX – peer eval (peerEval=1)
-    // -------------------------------------------------------------------------
-
-    function testCalcDimensionXBaseCase()
+    function _member($id, $name, $studentNo)
     {
-        $event  = $this->_mixedEvent();
-        $params = $this->_baseParams();
-        $header = $this->ExportCsv->generateHeader($params, $event);
-        $dim    = $this->ExportCsv->calcDimensionX($params, $event);
-        $this->assertEqual($dim, count($header),
-            "calcDimensionX should equal header count without behavioral flags");
+        return [
+            'id'           => $id,
+            'full_name'    => $name,
+            'student_no'   => $studentNo,
+            'GroupsMember' => [],
+            'Role'         => ['name' => 'student'],
+        ];
     }
 
-    function testCalcDimensionXIgnoresExportAll()
+    function _rubricEvent()
     {
-        $event  = $this->_mixedEvent();
-        $params = $this->_baseParams();
-        $header = $this->ExportCsv->generateHeader($params, $event);
+        return [
+            'Event' => [
+                'id'                      => 2,
+                'event_template_type_id'  => 2,
+                'self_eval'               => 0,
+                'title'                   => 'Test Rubric',
+                'template_id'             => 1,
+                'due_date'                => '2000-01-01 00:00:00',
+                'release_date_end'        => '2000-02-01 00:00:00',
+            ],
+            'Course'   => ['course' => 'Test Course'],
+            'Penalty'  => [],
+            'Rubric'   => ['id' => 1],
+            'Question' => [
+                ['criteria_num' => 1, 'multiplier' => 5],
+                ['criteria_num' => 2, 'multiplier' => 5],
+                ['criteria_num' => 3, 'multiplier' => 5],
+            ],
+        ];
+    }
 
+    // An evaluatee and an evaluator in one group.
+    function _pair()
+    {
+        $evaluatee = $this->_member(10, 'Jean-Luc Picard', '55555555');
+        $group = [
+            'Group'  => ['id' => 1, 'group_name' => 'NextGen'],
+            'Member' => [$evaluatee, $this->_member(11, 'Worf', '66666666')],
+        ];
+        return [$evaluatee, $group];
+    }
+
+    // Each row of the grid has as many cells as the header of the section.
+    function _assertRowsMatchHeader($grid, $params, $event, $peerEval, $message)
+    {
+        $headerWidth = count($this->ExportCsv->generateHeader($params, $event, $peerEval));
+        $this->assertFalse(empty($grid), "$message: the grid has rows");
+        foreach ($grid as $i => $row) {
+            $this->assertEqual(count($row), $headerWidth, "$message: row $i");
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Row width: rows without answers are as wide as the header
+    // -------------------------------------------------------------------------
+
+    function testUnansweredRubricRowMatchesHeaderWidth()
+    {
+        $event  = $this->_rubricEvent();
+        $params = $this->_baseParams();
         $params['include']['export_all'] = true;
-        $dim = $this->ExportCsv->calcDimensionX($params, $event);
+        [$evaluatee, $group] = $this->_pair();
 
-        $this->assertEqual($dim, count($header),
-            "export_all flag must not inflate calcDimensionX");
+        $grid = $this->ExportCsv->buildScoreTableByEvaluatee(
+            $params, $group, $evaluatee, $event, [], [], 1
+        );
+
+        // 8 lead columns, 3 criterion comments, the comment, 3 criteria and
+        // the 3 totals.
+        $this->assertEqual(count($this->ExportCsv->generateHeader($params, $event)), 18);
+        $this->_assertRowsMatchHeader($grid, $params, $event, 1, 'unanswered rubric row');
     }
 
-    function testCalcDimensionXIgnoresQuestionTitle()
+    function testUnansweredRowMatchesHeaderWidthWithColumnsUnchecked()
     {
+        // The form posts '0' for an unchecked box.
         $event  = $this->_mixedEvent();
         $params = $this->_baseParams();
-        $dimWithout = $this->ExportCsv->calcDimensionX($params, $event);
+        $params['include']['export_all']   = '1';
+        $params['include']['student_id']   = '0';
+        $params['include']['comments']     = '0';
+        $params['include']['grade_tables'] = '0';
+        $params['include']['final_marks']  = '0';
+        [$evaluatee, $group] = $this->_pair();
 
-        $params['include']['question_title'] = true;
-        $dimWith = $this->ExportCsv->calcDimensionX($params, $event);
+        $grid = $this->ExportCsv->buildScoreTableByEvaluatee(
+            $params, $group, $evaluatee, $event, [], [], 1
+        );
 
-        $this->assertEqual($dimWith, $dimWithout,
-            "question_title flag must not inflate calcDimensionX");
-    }
-
-    function testCalcDimensionXIgnoresBothBehavioralFlags()
-    {
-        $event  = $this->_mixedEvent();
-        $params = $this->_baseParams();
-        $header = $this->ExportCsv->generateHeader($params, $event);
-
-        $params['include']['export_all']     = true;
-        $params['include']['question_title'] = true;
-        $dim = $this->ExportCsv->calcDimensionX($params, $event);
-
-        $this->assertEqual($dim, count($header),
-            "export_all + question_title must not inflate calcDimensionX (was +2 before fix)");
+        // 6 lead columns, the 2 questions, the raw score and the penalty.
+        $this->assertEqual(count($this->ExportCsv->generateHeader($params, $event)), 10);
+        $this->_assertRowsMatchHeader($grid, $params, $event, 1, 'unanswered row, columns unchecked');
     }
 
     // -------------------------------------------------------------------------
-    // calcDimensionX – self eval (peerEval=0)
+    // Answered rubric rows: one cell for each criterion, in criterion order
     // -------------------------------------------------------------------------
 
-    function testCalcDimensionXSelfEvalMatchesHeaderCount()
+    function _answeredRubricRow($params)
     {
-        $event  = $this->_mixedEvent();
+        $event = $this->_rubricEvent();
+        [$evaluatee, $group] = $this->_pair();
+        // Criterion 2 has no answer, and the details are not in order.
+        $responses = [10 => [11 => [
+            'EvaluationRubric'       => ['id' => 1, 'score' => 8, 'comment' => 'general'],
+            'EvaluationRubricDetail' => [
+                ['criteria_number' => 3, 'criteria_comment' => 'third', 'grade' => 3],
+                ['criteria_number' => 1, 'criteria_comment' => 'first', 'grade' => 5],
+            ],
+        ]]];
+        $this->ExportCsv->responseModelName = 'EvaluationRubric';
+        $this->ExportCsv->Penalty = new PenaltyComponent();
+        return $this->ExportCsv->buildScoreTableByEvaluatee(
+            $params, $group, $evaluatee, $event, $responses, [], 1
+        );
+    }
+
+    function testAnsweredRubricRowPutsEachCriterionUnderItsColumn()
+    {
         $params = $this->_baseParams();
+        $grid = $this->_answeredRubricRow($params);
+
+        $this->_assertRowsMatchHeader($grid, $params, $this->_rubricEvent(), 1, 'answered rubric row');
+        // After the 8 lead columns: the criterion comments, the comment, the
+        // grades, then the totals.
+        $this->assertIdentical(array_slice($grid[0], 8, 7), ['first', '', 'third', 'general', 5, '', 3]);
+    }
+
+    function testRubricCriterionCommentsFollowIncludeComments()
+    {
+        $params = $this->_baseParams();
+        $params['include']['comments'] = '0';
+        $header = $this->ExportCsv->generateHeader($params, $this->_rubricEvent());
+        $grid = $this->_answeredRubricRow($params);
+
+        $this->assertFalse(in_array('Q1 Comment', $header));
+        $this->_assertRowsMatchHeader($grid, $params, $this->_rubricEvent(), 1, 'rubric row without comments');
+        $this->assertIdentical(array_slice($grid[0], 8, 3), [5, '', 3]);
+    }
+
+    // -------------------------------------------------------------------------
+    // Self-evaluation section
+    // -------------------------------------------------------------------------
+
+    function testSelfEvaluationHeaderListsTheSelfQuestions()
+    {
+        $event = $this->_mixedEvent();
+        $event['Event']['self_eval'] = 1;
+        $event['Question'][] = [
+            'mixeval_question_type_id' => 1,
+            'self_eval'    => 1,
+            'question_num' => 3,
+            'required'     => 1,
+            'multiplier'   => 8,
+            'title'        => 'Self Grade',
+        ];
+        $params = $this->_baseParams();
+        $params['include']['question_title'] = true;
+        $evaluatee = $this->_member(10, 'Jean-Luc Picard', '55555555');
+        $group = [
+            'Group'  => ['id' => 1, 'group_name' => 'NextGen'],
+            'Member' => [$evaluatee],
+        ];
+        $responses = [10 => [10 => [
+            'EvaluationMixeval'       => ['id' => 1, 'score' => 0],
+            'EvaluationMixevalDetail' => [
+                ['question_number' => 3, 'grade' => 6, 'question_comment' => null],
+            ],
+        ]]];
 
         $header = $this->ExportCsv->generateHeader($params, $event, 0);
-        $dim    = $this->ExportCsv->calcDimensionX($params, $event, 0);
+        $grid = $this->ExportCsv->buildScoreTableByEvaluatee(
+            $params, $group, $evaluatee, $event, $responses, [], 0
+        );
 
-        $this->assertEqual($dim, count($header),
-            "calcDimensionX(peerEval=0) must equal generateHeader(peerEval=0) column count");
-    }
-
-    function testCalcDimensionXPeerVsSelfEvalDifference()
-    {
-        $event  = $this->_mixedEvent();
-        $params = $this->_baseParams();
-
-        $peerHeader = $this->ExportCsv->generateHeader($params, $event, 1);
-        $selfHeader = $this->ExportCsv->generateHeader($params, $event, 0);
-        $peerDim    = $this->ExportCsv->calcDimensionX($params, $event, 1);
-        $selfDim    = $this->ExportCsv->calcDimensionX($params, $event, 0);
-
-        $this->assertEqual($peerDim - $selfDim, count($peerHeader) - count($selfHeader),
-            "Difference between peer and self-eval dimensions must match header difference");
+        $this->_assertRowsMatchHeader($grid, $params, $event, 0, 'self-evaluation row');
+        // The self question with its title, not the peer questions.
+        $this->assertIdentical(array_slice($header, -1), ['Q1 ( /8) Self Grade']);
+        $this->assertIdentical(array_slice($grid[0], -1), [6]);
     }
 
     // -------------------------------------------------------------------------
@@ -207,14 +310,11 @@ class ExportCsvComponentTestCase extends CakeTestCase
             $params, $group, $evaluatee, $event, $responses, array(), 1
         );
 
-        $expectedWidth = $this->ExportCsv->calcDimensionX($params, $event);
-        $headerWidth   = count($this->ExportCsv->generateHeader($params, $event));
+        $headerWidth = count($this->ExportCsv->generateHeader($params, $event));
 
-        $this->assertEqual($expectedWidth, $headerWidth,
-            "calcDimensionX must equal header column count");
         $this->assertFalse(empty($grid),
             "Grid must contain the incomplete row when a partial response exists");
-        $this->assertEqual(count($grid[0]), $expectedWidth,
+        $this->assertEqual(count($grid[0]), $headerWidth,
             "Row from missing_required_question path must be padded to header width");
     }
 

@@ -128,6 +128,14 @@ async function exportFile(page: Page): Promise<{ name: string; content: Buffer }
   );
 }
 
+// Every row has a cell for each column of the header, also a row without
+// answers.
+function expectRowsAsWideAsHeader(header: string[], rows: string[][]): void {
+  for (const [index, row] of rows.entries()) {
+    expect(row, `row ${index + 1} as wide as the header`).toHaveLength(header.length);
+  }
+}
+
 // The header and all the rows of the CSV export. The export lists every pair
 // of evaluatee and evaluator in the group, answered or not.
 async function exportCsvRows(page: Page): Promise<{ header: string[]; rows: string[][] }> {
@@ -271,9 +279,7 @@ test('the CSV export of a simple evaluation lists each mark with the late penalt
   // also without an answer. The tutor evaluates but is not evaluated.
   expect(rows).toHaveLength(9);
   expect(rows.filter((row) => row[EVALUATOR] === TUTOR)).toHaveLength(3);
-  for (const row of rows) {
-    expect(row, 'a row as wide as the header').toHaveLength(header.length);
-  }
+  expectRowsAsWideAsHeader(header, rows);
 });
 
 test('the CSV export of a rubric evaluation has a column for each criterion', async ({
@@ -346,6 +352,7 @@ test('the CSV export of a rubric evaluation has a column for each criterion', as
       '10.8',
     ],
   ]);
+  expectRowsAsWideAsHeader(header, rows);
 });
 
 test('the CSV export of a mixed evaluation has a column for each question', async ({
@@ -405,6 +412,7 @@ test('the CSV export of a mixed evaluation has a column for each question', asyn
       '2.52',
     ],
   ]);
+  expectRowsAsWideAsHeader(header, rows);
 });
 
 test('the export leaves out the columns that are not checked', async ({ page, testDatabase }) => {
@@ -435,6 +443,7 @@ test('the export leaves out the columns that are not checked', async ({ page, te
     [TITLE, 'Simple Evaluation', GROUP.name, ALEX.name, ED.name, '120', '10%', '108'],
     [TITLE, 'Simple Evaluation', GROUP.name, MATT.name, ED.name, '80', '10%', '72'],
   ]);
+  expectRowsAsWideAsHeader(header, rows);
 });
 
 test('the export needs one field of each coloured group', async ({ page, testDatabase }) => {
