@@ -123,8 +123,8 @@ export function sectionHeadings(page: Page, section: string): Locator {
 }
 
 // A table by its accessible name: the text of the heading that its
-// aria-labelledby points at. A table that points at two headings, such as a
-// home page section and its h3, has both texts, as in 'Peer Evaluations Due'.
+// aria-labelledby points at. When two tables of a page share a heading text,
+// as on the home page, find the table inside its named section instead.
 export function labelledTable(page: Page, name: string): Locator {
   return page.getByRole('table', { name, exact: true });
 }

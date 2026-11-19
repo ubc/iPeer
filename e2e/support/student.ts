@@ -15,9 +15,11 @@ import { SUBMISSION } from './messages';
 export type HomeSection = 'Due' | 'Submitted' | 'Expired With No Submission';
 
 // The table under one heading of the Peer Evaluations section. The Surveys
-// section uses the same headings, so the table's name has both.
+// section uses the same headings, so the table is found inside its section.
 export function peerEvaluationTable(page: Page, section: HomeSection): Locator {
-  return labelledTable(page, `Peer Evaluations ${section}`);
+  return page
+    .getByRole('region', { name: 'Peer Evaluations', exact: true })
+    .getByRole('table', { name: section, exact: true });
 }
 
 // The row of an event for one group. A student in two groups of a course has
@@ -50,6 +52,12 @@ export async function expectOnHome(
     `Expect ${title} (${group}) under ${section}`,
     async () => {
       await openHome(page);
+      // Due and Submitted are always there, so a row that is absent from them
+      // is not absent because the table is missing. Expired shows only when
+      // it lists an event.
+      for (const always of ['Due', 'Submitted'] as const) {
+        await expect(peerEvaluationTable(page, always), always).toHaveCount(1);
+      }
       const sections: HomeSection[] = ['Due', 'Submitted', 'Expired With No Submission'];
       for (const other of sections) {
         await expect(homeRow(page, other, title, group), other).toHaveCount(

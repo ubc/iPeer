@@ -26,7 +26,7 @@ else {
 <section aria-labelledby='home-peer'>
 <h2 id='home-peer'>Peer Evaluations</h2>
 <h3 id='home-peer-due'>Due</h3>
-<table class='standardtable' aria-labelledby='home-peer home-peer-due'>
+<table class='standardtable' aria-labelledby='home-peer-due'>
     <tr>
        <th>Event</th>
        <th>Group</th>
@@ -41,7 +41,7 @@ else {
 </table>
 
 <h3 id='home-peer-submitted'>Submitted</h3>
-<table class='standardtable' aria-labelledby='home-peer home-peer-submitted'>
+<table class='standardtable' aria-labelledby='home-peer-submitted'>
     <tr>
         <th>Event</th>
         <th>Result <span class='orangered'>Available</span>/End</th>
@@ -60,7 +60,7 @@ else {
 
 <?php if (!empty($evalExpired)):?>
 <h3 id='home-peer-expired'>Expired With No Submission</h3>
-<table class='standardtable' aria-labelledby='home-peer home-peer-expired'>
+<table class='standardtable' aria-labelledby='home-peer-expired'>
     <tr>
         <th>Event</th>
         <th>Result <span class='orangered'>Available</span>/End</th>
@@ -76,7 +76,7 @@ else {
 <section aria-labelledby='home-survey'>
 <h2 id='home-survey'>Surveys</h2>
 <h3 id='home-survey-due'>Due</h3>
-<table class='standardtable' aria-labelledby='home-survey home-survey-due'>
+<table class='standardtable' aria-labelledby='home-survey-due'>
     <tr>
        <th>Event</th>
        <th>Course</th>
@@ -90,7 +90,7 @@ else {
 </table>
 
 <h3 id='home-survey-submitted'>Submitted</h3>
-<table class='standardtable' aria-labelledby='home-survey home-survey-submitted'>
+<table class='standardtable' aria-labelledby='home-survey-submitted'>
     <tr>
         <th>Event</th>
         <th>Course</th>
@@ -107,7 +107,7 @@ else {
 
 <?php if (!empty($surveyExpired)):?>
 <h3 id='home-survey-expired'>Expired With No Submission</h3>
-<table class='standardtable' aria-labelledby='home-survey home-survey-expired'>
+<table class='standardtable' aria-labelledby='home-survey-expired'>
     <tr>
         <th>Event</th>
         <th>Course</th>
