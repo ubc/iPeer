@@ -94,10 +94,6 @@ services:
       - IPEER_DEBUG=2
       - IPEER_LOG_FORMAT=PrettyLog
       - IPEER_SESSION_SAVE=database
-      - SELENIUM_HOST=selenium-local
-      - SELENIUM_BROWSER=chrome
-      #- SELENIUM_BROWSER=firefox
-      - SERVER_TEST=http://web-test
       #- IPEER_AUTH=Ldap
       #- IPEER_AUTH_LDAP_host=ldap.example.com
       #- IPEER_AUTH_LDAP_port=636

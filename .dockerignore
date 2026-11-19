@@ -9,5 +9,3 @@ app/tmp
 /e2e
 
 # dev/test-only dependencies (via git submodules)
-/vendors/sausage
-/vendors/webdriver
