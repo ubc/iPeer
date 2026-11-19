@@ -7,8 +7,8 @@ $commentReleased = array_sum(Set::extract($evalResult[User::get('id')], '/Evalua
 <!-- Render Event Info table -->
 <?php echo $this->element('evaluations/view_event_info', array('controller'=>'evaluations', 'event'=>$event));?>
 
-<h2><?php __('Summary')?></h2>
-<table class="standardtable">
+<h2 id='results-summary'><?php __('Summary')?></h2>
+<table class="standardtable" aria-labelledby="results-summary">
 <tr>
     <th><?php __('Rating')?></th>
 </tr>

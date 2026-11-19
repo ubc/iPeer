@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import type { RowDataPacket } from 'mysql2/promise';
 import type { TestDatabase } from './db';
-import { goodMessage, resultsTable, sectionHeadings } from './helpers';
+import { goodMessage, labelledTable } from './helpers';
 import { appTime, insertRow, userId } from './insert';
 import { SUBMISSION } from './messages';
 
@@ -15,11 +15,11 @@ import { SUBMISSION } from './messages';
 export type HomeSection = 'Due' | 'Submitted' | 'Expired With No Submission';
 
 // The table under one heading of the Peer Evaluations section. The Surveys
-// section uses the same headings.
+// section uses the same headings, so the table is found inside its section.
 export function peerEvaluationTable(page: Page, section: HomeSection): Locator {
-  return sectionHeadings(page, 'Peer Evaluations')
-    .and(page.getByRole('heading', { level: 3, name: section, exact: true }))
-    .locator('xpath=following-sibling::table[1]');
+  return page
+    .getByRole('region', { name: 'Peer Evaluations', exact: true })
+    .getByRole('table', { name: section, exact: true });
 }
 
 // The row of an event for one group. A student in two groups of a course has
@@ -52,6 +52,12 @@ export async function expectOnHome(
     `Expect ${title} (${group}) under ${section}`,
     async () => {
       await openHome(page);
+      // Due and Submitted are always there, so a row that is absent from them
+      // is not absent because the table is missing. Expired shows only when
+      // it lists an event.
+      for (const always of ['Due', 'Submitted'] as const) {
+        await expect(peerEvaluationTable(page, always), always).toHaveCount(1);
+      }
       const sections: HomeSection[] = ['Due', 'Submitted', 'Expired With No Submission'];
       for (const other of sections) {
         await expect(homeRow(page, other, title, group), other).toHaveCount(
@@ -335,7 +341,7 @@ async function insertSubmission(
 // '13.00' or 'Not Released'. The rubric and mixed results show only the
 // rating; the simple results also show the group average.
 export function rating(page: Page): Locator {
-  return resultsTable(page, 'Summary').getByRole('cell');
+  return labelledTable(page, 'Summary').getByRole('cell');
 }
 
 export type SimpleResult = {
@@ -348,7 +354,7 @@ export async function expectSimpleResult(page: Page, result: SimpleResult): Prom
   await test.step(
     'Expect the simple evaluation result',
     async () => {
-      const summary = resultsTable(page, 'Summary');
+      const summary = labelledTable(page, 'Summary');
       const details = result.groupAverage !== undefined;
       await expect(summary.locator('th')).toHaveText(
         details ? ['Rating', 'Group Average'] : ['Rating']

@@ -113,28 +113,20 @@ export function pageTitle(page: Page): Locator {
   return page.locator('h1.title');
 }
 
+// The h3 headings of a section of a page, such as 'Peer Evaluations' on the
+// home page. The view wraps each such section in a <section> named by its
+// h2, which gives it the region role.
 export function sectionHeadings(page: Page, section: string): Locator {
-  // The student and tutor home pages repeat the same h3 headings in each
-  // section, so a heading belongs to the section whose h2 is closest before it.
-  return page.locator(
-    `xpath=//h2[normalize-space()='${section}']/following-sibling::h3` +
-      `[preceding-sibling::h2[1][normalize-space()='${section}']]`
-  );
+  return page
+    .getByRole('region', { name: section, exact: true })
+    .getByRole('heading', { level: 3 });
 }
 
 // A table by its accessible name: the text of the heading that its
-// aria-labelledby points at.
+// aria-labelledby points at. When two tables of a page share a heading text,
+// as on the home page, find the table inside its named section instead.
 export function labelledTable(page: Page, name: string): Locator {
   return page.getByRole('table', { name, exact: true });
-}
-
-// The table that follows a heading, on pages whose tables are not labelled
-// yet: the student and instructor result pages and the group view. Replace
-// it with labelledTable() as those views get labels.
-export function resultsTable(page: Page, heading: string, level: 'h2' | 'h3' = 'h2'): Locator {
-  return page.locator(
-    `xpath=//${level}[normalize-space()='${heading}']/following-sibling::table[1]`
-  );
 }
 
 export function idFromUrl(page: Page): string {

@@ -65,8 +65,8 @@ if (!empty($notInGroup)) {
 </form>
 
 <?php if ($viewReleaseBtns) { ?>
-<h3><?php echo __('Evaluation Results Release Status', true) ?></h3>
-<table class="standardtable">
+<h3 id='release-status'><?php echo __('Evaluation Results Release Status', true) ?></h3>
+<table class="standardtable" aria-labelledby="release-status">
     <?php 
     echo $html->tableHeaders($this->Evaluation->getReleaseStatusTableHeader()); 
     echo $html->tableCells($this->Evaluation->getReleaseStatusTableButtons($memberList, Set::extract($notInGroup, '/User/id'), $grpEventId, $scoreRecords));

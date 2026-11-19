@@ -1,5 +1,11 @@
 import { expect, test, type Locator, type Page } from '../support/test';
-import { flashMessage, login, pageTitle, resultsTable, withConfirmation } from '../support/helpers';
+import {
+  flashMessage,
+  labelledTable,
+  login,
+  pageTitle,
+  withConfirmation,
+} from '../support/helpers';
 import type { TestDatabase } from '../support/db';
 import {
   endSubmissions,
@@ -162,7 +168,7 @@ async function openGroupResults(
 
 // The total of each evaluated member on the Basic page.
 function basicResults(page: Page): Locator {
-  return resultsTable(page, 'Evaluation Results', 'h3');
+  return labelledTable(page, 'Evaluation Results');
 }
 
 // The Detail page: one row for each evaluated member, with the average of
@@ -563,7 +569,7 @@ test('the results show the late penalties, who did not submit, and who left the 
   // tutor submitted late.
   await openEventResults(page, eventId);
   await page.getByRole('link', { name: '3 Late', exact: true }).click();
-  const members = resultsTable(page, 'Group Members', 'h3');
+  const members = labelledTable(page, 'Group Members');
   const row = (name: string) =>
     members.getByRole('row').filter({ has: page.getByRole('cell', { name, exact: true }) });
   await expect(row(ED).getByRole('cell').nth(3)).toHaveText('1 day(s)');

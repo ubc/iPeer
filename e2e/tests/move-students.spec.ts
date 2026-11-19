@@ -1,14 +1,7 @@
 import { expect, test, type Page } from '../support/test';
 import { expectClassSize } from '../support/courses';
 import type { TestDatabase } from '../support/db';
-import {
-  fixture,
-  flashMessage,
-  labelledTable,
-  login,
-  notCsvFile,
-  resultsTable,
-} from '../support/helpers';
+import { fixture, flashMessage, labelledTable, login, notCsvFile } from '../support/helpers';
 import { COURSES, MECH328_GROUPS, STUDENTS, USERS, fullName } from '../support/seed';
 import { expectInClassList, expectNotInClassList } from '../support/users';
 import type { ResultSetHeader } from 'mysql2/promise';
@@ -160,7 +153,7 @@ async function expectGroupMemberNames(
     `Expect members of ${group.name}: ${names.join(', ') || 'none'}`,
     async () => {
       await page.goto(`/groups/view/${group.id}`);
-      const table = resultsTable(page, 'Group Members');
+      const table = labelledTable(page, 'Group Members');
       await expect(table).toBeVisible();
       // Each member row links to the user. The last row, with the email link
       // for the whole group, does not.
@@ -234,9 +227,11 @@ test('a superadmin moves students by username, which also takes them out of thei
   ).toBeVisible();
   // The list comes from the submission record, so check his scores too: 95 to
   // Ed and 105 to Alex. The order of the columns does not matter here.
-  const mattsMarks = resultsTable(page, 'Evaluation Results', 'h3').locator(
-    `xpath=./tbody/tr/th[1][normalize-space()='${STUDENTS.matt.name}']/following-sibling::td`
-  );
+  // His row starts with a header cell that holds his name.
+  const mattsMarks = labelledTable(page, 'Evaluation Results')
+    .getByRole('row')
+    .filter({ has: page.locator('th').getByText(STUDENTS.matt.name, { exact: true }) })
+    .getByRole('cell');
   await expect(mattsMarks.filter({ hasText: /^\s*95\.00\s*$/ })).toHaveCount(1);
   await expect(mattsMarks.filter({ hasText: /^\s*105\.00\s*$/ })).toHaveCount(1);
 });

@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '../support/test';
-import { flashMessage, login, pageTitle, resultsTable } from '../support/helpers';
+import { flashMessage, labelledTable, login, pageTitle } from '../support/helpers';
 import type { TestDatabase } from '../support/db';
 import {
   endSubmissions,
@@ -152,7 +152,7 @@ async function openGroupResults(
 }
 
 function basicResults(page: Page): Locator {
-  return resultsTable(page, 'Evaluation Results', 'h3');
+  return labelledTable(page, 'Evaluation Results');
 }
 
 // The table on the Detail page with a row for each evaluated member: the
@@ -420,7 +420,7 @@ test('the results show the late penalties, who did not submit, and who left the 
   // tutor submitted late.
   await openEventResults(page, eventId);
   await page.getByRole('link', { name: '3 Late', exact: true }).click();
-  const members = resultsTable(page, 'Group Members', 'h3');
+  const members = labelledTable(page, 'Group Members');
   const row = (name: string) =>
     members.getByRole('row').filter({ has: page.getByRole('cell', { name, exact: true }) });
   await expect(row(ED).getByRole('cell').nth(3)).toHaveText('1 day(s)');
@@ -728,7 +728,7 @@ test('students answer the self-evaluation questions, and tutors do not get them'
 
   await login(page, USERS.instructor1);
   await openGroupResults(page, eventId, 'Basic');
-  const self = resultsTable(page, 'Self-Evaluation', 'h3');
+  const self = labelledTable(page, 'Self-Evaluation');
   await expect(namedRow(self, 'self likert question').getByRole('cell')).toHaveText([
     'self likert question',
     '7.00 / 7',

@@ -138,9 +138,10 @@ else {
 ?>
 
 
-<h2>Peer Evaluations</h2>
-<h3>Due</h3>
-<table class='standardtable'>
+<section aria-labelledby='home-peer'>
+<h2 id='home-peer'>Peer Evaluations</h2>
+<h3 id='home-peer-due'>Due</h3>
+<table class='standardtable' aria-labelledby='home-peer-due'>
     <tr>
        <th>Event</th>
        <th>Group</th>
@@ -156,8 +157,8 @@ else {
     <?php endif; ?>
 </table>
 
-<h3>Submitted</h3>
-<table class='standardtable'>
+<h3 id='home-peer-submitted'>Submitted</h3>
+<table class='standardtable' aria-labelledby='home-peer-submitted'>
     <tr>
         <th>Event</th>
         <th>Result <span class='orangered'>Available</span>/End</th>
@@ -175,8 +176,8 @@ else {
 </table>
 
 <?php if (!empty($evalExpired)):?>
-<h3>Expired With No Submission</h3>
-<table class='standardtable'>
+<h3 id='home-peer-expired'>Expired With No Submission</h3>
+<table class='standardtable' aria-labelledby='home-peer-expired'>
     <tr>
         <th>Event</th>
         <th>Result <span class='orangered'>Available</span>/End</th>
@@ -187,10 +188,12 @@ else {
 <?php echo $html->tableCells($evalExpired); ?>
 </table>
 <?php endif; ?>
+</section>
 
-<h2>Surveys</h2>
-<h3>Due</h3>
-<table class='standardtable'>
+<section aria-labelledby='home-survey'>
+<h2 id='home-survey'>Surveys</h2>
+<h3 id='home-survey-due'>Due</h3>
+<table class='standardtable' aria-labelledby='home-survey-due'>
     <tr>
        <th>Event</th>
        <th>Course</th>
@@ -205,8 +208,8 @@ else {
     <?php endif; ?>
 </table>
 
-<h3>Submitted</h3>
-<table class='standardtable'>
+<h3 id='home-survey-submitted'>Submitted</h3>
+<table class='standardtable' aria-labelledby='home-survey-submitted'>
     <tr>
         <th>Event</th>
         <th>Course</th>
@@ -222,8 +225,8 @@ else {
 </table>
 
 <?php if (!empty($surveyExpired)):?>
-<h3>Expired With No Submission</h3>
-<table class='standardtable'>
+<h3 id='home-survey-expired'>Expired With No Submission</h3>
+<table class='standardtable' aria-labelledby='home-survey-expired'>
     <tr>
         <th>Event</th>
         <th>Course</th>
@@ -232,5 +235,6 @@ else {
 <?php echo $html->tableCells($surveyExpired); ?>
 </table>
 <?php endif; ?>
+</section>
 
 </div>

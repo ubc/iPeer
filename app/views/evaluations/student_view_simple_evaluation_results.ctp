@@ -24,8 +24,8 @@
 </tr>
 </table>
 
-<h2><?php __('Summary')?></h2>
-<table class="standardtable">
+<h2 id='results-summary'><?php __('Summary')?></h2>
+<table class="standardtable" aria-labelledby="results-summary">
 <tr>
     <th width=50%><?php __('Rating')?></th>
     <?php if ($event['Event']['enable_details']) { ?>

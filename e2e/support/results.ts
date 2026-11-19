@@ -1,5 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { waitForAjaxList } from './ajax-list';
+import { labelledTable } from './helpers';
 
 // The pages where an instructor reviews the results of an event, for every
 // type of evaluation.
@@ -79,8 +80,6 @@ export async function openEvaluateePanel(page: Page, member: string): Promise<vo
 
 // The release buttons of each evaluated member on the Detail page.
 export function releaseButton(page: Page, member: string, name: string): Locator {
-  const table = page.locator(
-    "xpath=//h3[normalize-space()='Evaluation Results Release Status']/following-sibling::table[1]"
-  );
+  const table = labelledTable(page, 'Evaluation Results Release Status');
   return namedRow(table, member).getByRole('button', { name, exact: true });
 }
