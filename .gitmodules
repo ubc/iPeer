@@ -4,12 +4,6 @@
 [submodule "app/plugins/extended_test_case"]
 	path = app/plugins/extended_test_case
 	url = https://github.com/jeremyharris/extended_test_case.git
-[submodule "vendors/webdriver"]
-	path = vendors/webdriver
-	url = https://github.com/Element-34/php-webdriver.git
-[submodule "vendors/sausage"]
-	path = vendors/sausage
-	url = https://github.com/jlipps/sausage.git
 [submodule "app/plugins/djjob/vendors"]
 	path = app/plugins/djjob/vendors
 	url = https://github.com/seatgeek/djjob.git

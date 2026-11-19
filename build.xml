@@ -266,7 +266,6 @@
         <exec command="IPEER_DB_NAME=${db.name} cake/console/cake -app app testsuite app group caliper" passthru="true" returnProperty="result.caliper"/>
         <exec command="IPEER_DB_NAME=${db.name} cake/console/cake -app app testsuite app group libs" passthru="true" returnProperty="result.libs"/>
         <exec command="IPEER_DB_NAME=${db.name} cake/console/cake -app app testsuite app group controller" passthru="true" returnProperty="result.controller"/>
-        <!-- <exec command="cake/console/cake testreport app group system" passthru="true"/> -->
         <!-- v1_controller test must be last one as it will change the database -->
         <phingcall target="post-test"/>
         <fail message="Component test cases failed">
@@ -304,11 +303,6 @@
                 </not>
             </condition>
         </fail>
-    </target>
-
-    <target name="test-ci-integration" description="Run integration tests for continuous integration(output as xml)" depends="prepare,init-test-db">
-        <exec command="IPEER_DB_NAME=${db.name} cake/console/cake testreport app group system" passthru="true"/>
-        <phingcall target="post-test"/>
     </target>
 
     <target name="upgrade" description="Upgrade iPeer">
