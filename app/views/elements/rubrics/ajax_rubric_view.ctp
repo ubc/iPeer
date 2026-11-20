@@ -43,7 +43,7 @@ if(!isset($viewMode)){
         </th>
 
         <?php foreach($data['RubricsLom'] as $lom): ?>
-        <?php $mark_value = round( ($criteria['multiplier']/(count($data['RubricsLom']) - ('1' == $zero_mark ? 1 : 0))*($lom['lom_num'] - ('1' == $zero_mark ? 1 : 0))) , 2);?>
+        <?php $mark_value = round(Toolkit::scaleMark($criteria['multiplier'], $lom['lom_num'], count($data['RubricsLom']), $zero_mark), 2);?>
         <td>
             <div class="green"><?php echo (!empty($criteria['RubricsCriteriaComment'][$lom['lom_num']-1]['criteria_comment']) ? h($criteria['RubricsCriteriaComment'][$lom['lom_num']-1]['criteria_comment']) : '')?></div>
             <?php
@@ -141,7 +141,7 @@ if(!isset($viewMode)){
         </th>
 
         <?php foreach($data['RubricsLom'] as $lom): ?>
-        <?php $mark_value = round( ($criteria['multiplier']/(count($data['RubricsLom']) - ('1' == $zero_mark ? 1 : 0))*($lom['lom_num'] - ('1' == $zero_mark ? 1 : 0))) , 2);?>
+        <?php $mark_value = round(Toolkit::scaleMark($criteria['multiplier'], $lom['lom_num'], count($data['RubricsLom']), $zero_mark), 2);?>
         <td>
             <div class="green"><?php echo (!empty($criteria['RubricsCriteriaComment'][$lom['lom_num']-1]['criteria_comment']) ? h($criteria['RubricsCriteriaComment'][$lom['lom_num']-1]['criteria_comment']) : '')?></div>
             <?php
