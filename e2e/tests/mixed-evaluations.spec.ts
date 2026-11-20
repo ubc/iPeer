@@ -414,6 +414,40 @@ test('a failed save shows the questions again with their scales', async ({ page 
   await expectForm(page, FINAL);
 });
 
+// With Zero Mark on, the only level of a one-level scale is the lowest, so it
+// gives 0 and the question can give no marks.
+const ONE_LEVEL: Mixeval = {
+  name: 'One Level Scale',
+  availability: 'Private',
+  zeroMark: true,
+  selfEval: false,
+  peer: [{ ...WORK_ETHIC, scale: ['Only level'] }],
+  self: [],
+};
+
+test('with Zero Mark on, a Likert question needs at least two scale levels', async ({ page }) => {
+  await page.goto('/mixevals/add');
+  await fillForm(page, ONE_LEVEL);
+  await page.getByRole('button', SAVE).click();
+  await expect(flashMessage(page)).toHaveText(MIXEVAL.oneLevelScale);
+  await expectSection(page, 'Peer', ONE_LEVEL.peer);
+
+  // Without Zero Mark, the one level gives all the marks, and the form saves.
+  await page.getByLabel('Zero Mark', { exact: true }).uncheck();
+  await page.getByRole('button', SAVE).click();
+  await expect(goodMessage(page)).toHaveText(MIXEVAL.saved);
+});
+
+// Templates saved before the check above still exist.
+test('an older template with a one-level scale and Zero Mark shows the level with 0 marks', async ({
+  page,
+  testDatabase,
+}) => {
+  const id = await insertMixeval(testDatabase, ONE_LEVEL);
+  await page.goto(`/mixevals/view/${id}`);
+  await expect(previewMarks(page, WORK_ETHIC.title)).toHaveText(['Mark: 0']);
+});
+
 test('editing a mixed evaluation can remove, move and add questions and scale levels', async ({
   page,
   testDatabase,

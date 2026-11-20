@@ -417,6 +417,19 @@ class MixevalsController extends AppController
             return;
         }
 
+        // With Zero Mark on, the lowest level of a scale gets 0 marks, so a
+        // Likert question needs a second level to give any marks.
+        if (!empty($this->data['Mixeval']['zero_mark'])) {
+            $levels = array_count_values(array_map('strval',
+                array_column($this->data['MixevalQuestionDesc'] ?? [], 'question_index')));
+            foreach ($this->data['MixevalQuestion'] ?? [] as $index => $question) {
+                if ($question['mixeval_question_type_id'] == 1 && ($levels[(string) $index] ?? 0) < 2) {
+                    $this->Session->setFlash(__('A Likert question needs at least two scale levels when Zero Mark is on.', true));
+                    return;
+                }
+            }
+        }
+
         $continue = true;
         $this->Mixeval->begin();
 

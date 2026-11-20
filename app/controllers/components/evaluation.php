@@ -690,11 +690,9 @@ class EvaluationComponent extends CakeObject
                         break;
                     }
                 }
-                $grade = isset($form['selected_lom_'.$targetEvaluatee.'_'.$i]) ?
-                    ($form['selected_lom_'.$targetEvaluatee.'_'.$i] - $rubric['Rubric']['zero_mark']) *
-                    ($multiplier/($totalLom - $rubric['Rubric']['zero_mark'])) : "";
-
-                $selectedLom = $form['selected_lom_'.$targetEvaluatee.'_'.$i];
+                $selectedLom = $form['selected_lom_'.$targetEvaluatee.'_'.$i] ?? null;
+                $grade = is_numeric($selectedLom) ?
+                    Toolkit::scaleMark($multiplier, $selectedLom, $totalLom, $rubric['Rubric']['zero_mark']) : "";
                 $evalRubricDetail = $this->EvaluationRubricDetail->getByEvalRubricIdCritera($evalRubricId, $i);
                 if ($evalRubricDetail) {
                     $this->EvaluationRubricDetail->id=$evalRubricDetail['EvaluationRubricDetail']['id'] ;
@@ -727,11 +725,9 @@ class EvaluationComponent extends CakeObject
                     break;
                 }
             }
-            $grade = isset($form['selected_lom_'.$targetEvaluatee.'_'.$targetCriteria]) ?
-                ($form['selected_lom_'.$targetEvaluatee.'_'.$targetCriteria] - $rubric['Rubric']['zero_mark']) *
-                ($multiplier/($totalLom - $rubric['Rubric']['zero_mark'])) : "";
-
-            $selectedLom = $form['selected_lom_'.$targetEvaluatee.'_'.$targetCriteria];
+            $selectedLom = $form['selected_lom_'.$targetEvaluatee.'_'.$targetCriteria] ?? null;
+            $grade = is_numeric($selectedLom) ?
+                Toolkit::scaleMark($multiplier, $selectedLom, $totalLom, $rubric['Rubric']['zero_mark']) : "";
 
             // Set up and save EvaluationRubricDetail
             $evalRubricDetail = $this->EvaluationRubricDetail->getByEvalRubricIdCritera($evalRubricId, $targetCriteria);
@@ -1018,7 +1014,7 @@ class EvaluationComponent extends CakeObject
                         $lom = $key + 1;
                     }
                     $valid_loms[]=$lom;
-                    $valid_grades[]=$multiplier * (($lom - $zero_mark) / ($scale - $zero_mark));
+                    $valid_grades[] = Toolkit::scaleMark($multiplier, $lom, $scale, $zero_mark);
                 }
                 if (!in_array($data[$num]['selected_lom'], $valid_loms)) {
                     return false;
@@ -1090,9 +1086,8 @@ class EvaluationComponent extends CakeObject
                     continue;
                 }
                 if ($ques['mixeval_question_type_id'] == '1') {
+                    // The grade is checked against the scale before the save
                     $evalMixevalDetail['EvaluationMixevalDetail']['selected_lom'] = $data[$num]['selected_lom'];
-                    // Do not grab grade directly as users can edit the HTML to submit illegitimate answers
-                    $grade = $data[$num]['selected_lom'] * ($ques['multiplier']/($ques['scale_level'] - $mixeval['Mixeval']['zero_mark']));
                 } else {
                     // if the question type is 4 - simply grab the grade
                     $evalMixevalDetail['EvaluationMixevalDetail']['grade'] = $data[$num]['grade'];

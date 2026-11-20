@@ -155,6 +155,25 @@ class Toolkit
     }
 
     /**
+     * The marks of one level of a Likert or rubric scale. The highest level
+     * gets the full marks. With Zero Mark on, the lowest level gets 0, so a
+     * scale with only one level gives 0.
+     *
+     * @param float $multiplier the full marks of the question
+     * @param int   $level      the level, from 1
+     * @param int   $levels     the number of levels of the scale
+     * @param bool  $zeroMark   whether Zero Mark is on
+     *
+     * @return float the marks
+     */
+    static function scaleMark(float $multiplier, int $level, int $levels, bool $zeroMark): float
+    {
+        $lowest = $zeroMark ? 1 : 0;
+        $steps = $levels - $lowest;
+        return $steps > 0 ? $multiplier * ($level - $lowest) / $steps : 0.0;
+    }
+
+    /**
      * getSimpleEvalDemoData return demo data for simple evaluation preview
      *
      * @param mixed $points the points assign to the students

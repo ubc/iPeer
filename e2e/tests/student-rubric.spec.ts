@@ -14,7 +14,7 @@ import {
   openDates,
   type NewEvent,
 } from '../support/events';
-import { userId } from '../support/insert';
+import { findId, userId } from '../support/insert';
 import {
   LEFT_GROUP,
   NOT_SUBMITTED,
@@ -328,6 +328,28 @@ test('a student rates each member, saves each section and submits', async ({
   await openGroupResults(page, eventId, 'Basic');
   await expect(namedRow(basicResults(page), ALEX).getByRole('cell')).toHaveText([ALEX, '14.00']);
   await expect(namedRow(basicResults(page), MATT).getByRole('cell')).toHaveText([MATT, '12.00']);
+});
+
+// The rubric editor offers 2 to 10 levels, but the model accepts any number.
+// With Zero Mark on, the one level of a one-level rubric is the lowest, so it
+// gives 0.
+test('the form of a rubric with one level and Zero Mark shows every member', async ({
+  page,
+  testDatabase,
+}) => {
+  const rubricId = await findId(testDatabase, 'rubrics', 'name', rubricEvent().template);
+  await testDatabase.connection.query(
+    `DELETE FROM rubrics_loms WHERE rubric_id = ? AND lom_num > 1;
+     UPDATE rubrics SET lom_max = 1, zero_mark = 1 WHERE id = ?`,
+    [rubricId, rubricId]
+  );
+  await insertRubricEvent(testDatabase);
+  await login(page, STUDENTS.ed.username);
+  await openEvaluation(page, TITLE, GROUP.name);
+
+  // The submit button comes after the sections of all the members.
+  await expect(rubricPanelHeader(page, MATT)).toBeVisible();
+  await expect(submitRubricButton(page)).toBeVisible();
 });
 
 test('a student can change a submitted evaluation before the due date', async ({

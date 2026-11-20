@@ -65,4 +65,23 @@ class ToolkitTestCase extends CakeTestCase
         $result = Toolkit::parseCSV($file);
         $this->assertIdentical(array(array('a\\"b', 'c')), $result);
     }
+
+    function testScaleMarkGoesFromNoneToAllTheMarks()
+    {
+        // Zero Mark off: the lowest of 4 levels gives a quarter.
+        $this->assertIdentical(2.0, Toolkit::scaleMark(8, 1, 4, false));
+        $this->assertIdentical(8.0, Toolkit::scaleMark(8, 4, 4, false));
+        // Zero Mark on: the lowest level gives 0.
+        $this->assertIdentical(0.0, Toolkit::scaleMark(8, 1, 5, true));
+        $this->assertIdentical(4.0, Toolkit::scaleMark(8, 3, 5, true));
+        $this->assertIdentical(8.0, Toolkit::scaleMark(8, 5, 5, true));
+    }
+
+    function testScaleMarkOfAOneLevelScale()
+    {
+        $this->assertIdentical(8.0, Toolkit::scaleMark(8, 1, 1, false));
+        // With Zero Mark on, the only level is the lowest.
+        $this->assertIdentical(0.0, Toolkit::scaleMark(8, 1, 1, true));
+        $this->assertIdentical(0.0, Toolkit::scaleMark(8, 1, 0, false));
+    }
 }

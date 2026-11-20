@@ -394,7 +394,7 @@ class UsersController extends AppController
      * @access public
      * @return void
      */
-    function view($id)
+    function view($id = null)
     {
         if (!User::hasPermission('functions/user')) {
             $this->Session->setFlash(__('Error: You do not have permission to view users', true));
@@ -2137,7 +2137,7 @@ class UsersController extends AppController
      * @return void
      */
 
-    function showEvents($id)
+    function showEvents($id = null)
     {
         $this->redirect('/');
 
