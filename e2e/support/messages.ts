@@ -105,6 +105,11 @@ export const MIXEVAL = {
     'Please remove all the events associated with this evaluation first.',
 } as const;
 
+// The export of evaluation results.
+export const EXPORT = {
+  invalidType: 'Error: Invalid export type',
+} as const;
+
 // The student evaluation forms.
 export const SUBMISSION = {
   submitted: 'Your Evaluation was submitted successfully.',

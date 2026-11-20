@@ -18,7 +18,7 @@ import {
   insertRubricSubmission,
   insertSimpleSubmission,
 } from '../support/student';
-import { ACCESS } from '../support/messages';
+import { ACCESS, EXPORT } from '../support/messages';
 
 // The export of the results of an event, as a CSV or PDF file. There was no
 // Selenium test for it. The events and the submissions are inserted.
@@ -706,4 +706,54 @@ test('an export of an event of another course is refused', async ({ page, testDa
   await expect(flashMessage(page)).toHaveText(ACCESS.noEvent);
   await expect(page).toHaveURL(new RegExp(`/evaluations/export/event/${own}$`));
   expect(downloads).toBe(0);
+});
+
+// A seeded survey of MECH 328, which instructor1 teaches. Surveys have no
+// evaluation results to export.
+const SURVEY_ID = '4';
+
+test('an export of a survey is refused', async ({ page, testDatabase }) => {
+  const own = await insertExportEvent(testDatabase, {});
+
+  await login(page, USERS.instructor1);
+  await openExport(page, own);
+  // Point the event field at the survey, as a forged form would.
+  await page
+    .getByLabel('Event Name', { exact: true })
+    .evaluate((select, id) => ((select as HTMLSelectElement).options[0].value = id), SURVEY_ID);
+  let downloads = 0;
+  page.on('download', () => downloads++);
+  await exportButton(page).click();
+  await expect(flashMessage(page)).toHaveText(ACCESS.noEvent);
+  await expect(page).toHaveURL(new RegExp(`/evaluations/export/event/${own}$`));
+  expect(downloads).toBe(0);
+});
+
+test('an export with an unknown file type is refused', async ({ page, testDatabase }) => {
+  const own = await insertExportEvent(testDatabase, {});
+
+  await login(page, USERS.instructor1);
+  await openExport(page, own);
+  // Change the file type to one the export does not have, as a forged form
+  // would.
+  await page
+    .getByLabel('Export File Type')
+    .evaluate((select) => ((select as HTMLSelectElement).options[0].value = 'xls'));
+  await page.getByLabel('Export File Type').selectOption({ index: 0 });
+  let downloads = 0;
+  page.on('download', () => downloads++);
+  await exportButton(page).click();
+  await expect(flashMessage(page)).toHaveText(EXPORT.invalidType);
+  await expect(page).toHaveURL(new RegExp(`/evaluations/export/event/${own}$`));
+  expect(downloads).toBe(0);
+});
+
+test('an export page of an unknown kind is refused', async ({ page }) => {
+  await login(page, USERS.instructor1);
+  // Only a course or an event has an export page.
+  for (const path of ['/evaluations/export/group/1', '/evaluations/export']) {
+    await page.goto(path);
+    await expect(flashMessage(page), path).toHaveText(EXPORT.invalidType);
+    await expect(page, path).toHaveURL(/\/courses$/);
+  }
 });
