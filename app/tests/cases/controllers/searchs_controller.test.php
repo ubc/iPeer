@@ -10,6 +10,13 @@
 
 App::import('Controller', 'Searchs');
 
+// The events table with no associations, so the test needs only its fixture.
+class SearchSortEvent extends Model
+{
+    public $name = 'SearchSortEvent';
+    public $useTable = 'events';
+}
+
 class SearchsControllerTest extends CakeTestCase {
     var $fixtures = array('app.course', 'app.role', 'app.user', 'app.group',
         'app.roles_user', 'app.event', 'app.event_template_type', 'app.rubrics_lom',
@@ -46,6 +53,30 @@ class SearchsControllerTest extends CakeTestCase {
     }
 
     function endTest($method) {
+    }
+
+    function testSortFieldAcceptsOnlyAFieldOfTheModel() {
+        $controller = new SearchsController();
+        $event = ClassRegistry::init(['class' => 'SearchSortEvent', 'ds' => 'test_suite']);
+
+        $this->assertIdentical('title', $controller->_sortField($event, 'title'));
+        $this->assertIdentical('id', $controller->_sortField($event, 'title, id'));
+        $this->assertIdentical('id', $controller->_sortField($event, 'no_such_field'));
+        $this->assertIdentical('id', $controller->_sortField($event, ['title']));
+    }
+
+    function testSortAndDirectionThatAreNotStringsUseDefaults() {
+        $get = $_GET;
+        $_GET = ['sort' => ['name'], 'direction' => ['desc']];
+        try {
+            $controller = new SearchsController();
+        } finally {
+            $_GET = $get;
+        }
+
+        $this->assertIdentical('id', $controller->sortBy);
+        $this->assertIdentical('asc', $controller->direction);
+        $this->assertIdentical('id ASC', $controller->order);
     }
 
     function testIndex() {

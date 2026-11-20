@@ -180,8 +180,14 @@ class EvaluationsController extends AppController
      */
     function ajaxList()
     {
-        // Set up the list
+        // Set up the list, for an event that the user can open
         $eventId = $this->Session->read("evaluationsControllerEventIdSession");
+        if (empty($eventId) || !$this->Event->getAccessibleEventById($eventId,
+            User::get('id'), User::getCourseFilterPermission())) {
+            $this->Session->setFlash(__('Error: Invalid id or you do not have permission to access this event.', true));
+            $this->redirect('index');
+            return;
+        }
         $this->setUpAjaxList($eventId);
         // Process the request for data
         $this->AjaxList->asyncGet("view");
@@ -195,11 +201,8 @@ class EvaluationsController extends AppController
      */
     function view($eventId = null)
     {
-        // Record the event id into the session
-        if (!empty($eventId) && is_numeric($eventId)) {
-            $this->Session->write("evaluationsControllerEventIdSession", $eventId);
-        } else {
-            // Use last event ID if none was passed with a parameter
+        // Use last event ID if none was passed with a parameter
+        if (empty($eventId) || !is_numeric($eventId)) {
             $eventId = $this->Session->read("evaluationsControllerEventIdSession");
         }
 
@@ -210,6 +213,8 @@ class EvaluationsController extends AppController
             $this->redirect('index');
             return;
         }
+        // Record the event id into the session, for the list of the page
+        $this->Session->write("evaluationsControllerEventIdSession", $eventId);
 
         // Survey Results are on a different page for now
         if ($event['Event']['event_template_type_id'] == 3) {

@@ -10,7 +10,27 @@ class PaginateFaculty extends Model
 }
 
 /**
- * Tests for how Controller::paginate() normalises the requested page.
+ * Model whose paginate() override finds nothing and returns false.
+ */
+class PaginateNothing extends Model
+{
+    public $name = 'PaginateNothing';
+    public $useTable = 'faculties';
+
+    function paginate($conditions, $fields, $order, $limit, $page = 1, $recursive = null, $extra = array())
+    {
+        return false;
+    }
+
+    function paginateCount($conditions = null, $recursive = 0, $extra = array())
+    {
+        return 0;
+    }
+}
+
+/**
+ * Tests for how Controller::paginate() normalises the requested page,
+ * sort and direction.
  *
  * @package app.tests.cases.libs
  */
@@ -81,5 +101,59 @@ class ControllerPaginateTestCase extends CakeTestCase
         $paging = $this->pageFor('1', array('PaginateFaculty.id' => -1));
         $this->assertIdentical(0, $paging['count']);
         $this->assertIdentical(1, $paging['page']);
+    }
+
+    private function orderFor($args)
+    {
+        $this->Controller->passedArgs = $args;
+        $this->Controller->paginate('PaginateFaculty');
+        $paging = $this->Controller->params['paging']['PaginateFaculty'];
+        return $paging['options']['order'] ?? null;
+    }
+
+    function testSortAndDirection()
+    {
+        $this->assertIdentical(['PaginateFaculty.name' => 'desc'], $this->orderFor(['sort' => 'name', 'direction' => 'desc']));
+        $this->assertIdentical(['PaginateFaculty.name' => 'asc'], $this->orderFor(['sort' => 'name', 'direction' => 'sideways']));
+    }
+
+    function testSortThatIsNotAStringIsIgnored()
+    {
+        $this->assertNull($this->orderFor(['sort' => ['name'], 'direction' => 'asc']));
+    }
+
+    function testDirectionThatIsNotAStringIsAsc()
+    {
+        $this->assertIdentical(['PaginateFaculty.name' => 'asc'], $this->orderFor(['sort' => 'name', 'direction' => ['desc']]));
+    }
+
+    function testOrderIsIgnoredWithSortThatIsNotAString()
+    {
+        $this->assertNull($this->orderFor(['sort' => ['name'], 'order' => 'PaginateFaculty.name desc']));
+        $this->assertNull($this->orderFor(['sort' => ['name'], 'order' => ['name' => 'desc']]));
+        $this->assertNull($this->orderFor(['sort' => ['name'], 'order' => ['name' => ['desc']]]));
+    }
+
+    function testOrderThatIsNotAStringIsIgnoredWithoutSort()
+    {
+        $this->assertNull($this->orderFor(['order' => ['name' => 'desc']]));
+    }
+
+    function testOrderWithoutSortIsUsedAsSort()
+    {
+        $this->assertIdentical(['PaginateFaculty.name' => 'desc'], $this->orderFor(['order' => 'name', 'direction' => 'desc']));
+    }
+
+    function testSortWithPropertyThatIsNotAModelIsIgnored()
+    {
+        $this->assertNull($this->orderFor(['sort' => 'name.x']));
+        $this->assertNull($this->orderFor(['sort' => 'validate.x']));
+    }
+
+    function testFalseResultsBecomeEmptyList()
+    {
+        $model = ClassRegistry::init(['class' => 'PaginateNothing', 'ds' => 'test_suite']);
+        $this->assertIdentical([], $this->Controller->paginate($model));
+        $this->assertIdentical(0, $this->Controller->params['paging']['PaginateNothing']['current']);
     }
 }
