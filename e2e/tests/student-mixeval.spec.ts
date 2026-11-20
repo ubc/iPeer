@@ -334,7 +334,9 @@ test('the Detail page of a group where nobody submitted has nothing to release',
     `${MATT} (student)`,
   ]);
   // The heading after the release status shows that the whole page loaded.
-  await expect(page.getByRole('heading', { name: 'Evaluation Results', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Evaluation Results', exact: true })
+  ).toBeVisible();
   await expect(
     page.getByRole('heading', { name: 'Evaluation Results Release Status' })
   ).toHaveCount(0);
