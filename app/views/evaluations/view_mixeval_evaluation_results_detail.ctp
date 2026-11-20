@@ -66,7 +66,10 @@ if (!empty($notInGroup)) {
 </table>
 <!-- end of summary table -->
 
-<?php if ($viewReleaseBtns) { ?>
+<?php
+// Nothing to release when nobody was evaluated
+// (each member has an entry in $evalResult, empty when nobody evaluated them)
+if ($viewReleaseBtns && array_filter((array) $evalResult)) { ?>
 <h3 id='release-status'><?php echo __('Evaluation Results Release Status', true) ?></h3>
 <table class="standardtable" aria-labelledby="release-status">
     <?php 

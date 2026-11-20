@@ -612,12 +612,15 @@ export async function insertRubricSubmission(
 // ---------------------------------------------------------------------------
 // Mixed evaluations: one set of questions for each member, and a set of
 // self-evaluation questions when the template and the event have them. The
-// questions of the whole template have one numbering.
+// form numbers the questions of each section from 1. insertMixevalSubmission()
+// takes the answers by the question_num of the template, which is the same
+// number while the peer questions come first, as in the seeded templates.
 
 // An answer: a level from 1 for a Likert question, the points for a score
 // dropdown question, or the text of a sentence or paragraph question. The
-// answers are by question number. A question without an answer is left as
-// it is.
+// answers are by the number that the form shows for the question. The
+// self-evaluation questions start again at 1. A question without an answer
+// is left as it is.
 export type MixevalAnswers = Readonly<Record<number, number | string>>;
 
 // The answers for one member. Self-evaluation answers name the evaluator.
@@ -627,31 +630,30 @@ export function submitMixevalButton(page: Page): Locator {
   return page.getByRole('button', { name: 'Submit the Evaluation', exact: true });
 }
 
-// The id of the member that the form uses in the names of its fields. The
-// hidden fields of a member follow the heading with the name.
-async function mixevalMemberId(page: Page, mark: MixevalMark): Promise<string> {
-  const field = mark.self
-    ? page.locator('input[name$="[Self-Evaluation][evaluatee_id]"]')
-    : page.locator(
-        `xpath=//center[h2[normalize-space()='${mark.member}']]` +
-          "/following-sibling::input[contains(@name, '[Evaluation][evaluatee_id]')][1]"
-      );
-  const id = await field.getAttribute('value');
-  if (!id) {
-    throw new Error(`no fields for ${mark.member}`);
-  }
-  return id;
+// The questions of the form for one member, a region named by the member,
+// or the self-evaluation questions.
+function mixevalSection(page: Page, mark: MixevalMark): Locator {
+  return page.getByRole('region', {
+    name: mark.self ? 'Self-Evaluation Questions' : mark.member,
+    exact: true,
+  });
 }
 
-// One question of the form for one member: the title, the instructions and
-// the field.
-export async function mixevalQuestion(
-  page: Page,
-  mark: MixevalMark,
-  question: number
-): Promise<Locator> {
-  const id = await mixevalMemberId(page, mark);
-  return page.locator(`#q_${id}_${question}`).locator('xpath=..');
+// One question of the form for one member: a group named by its title, such
+// as '2. Contributed? *', with the instructions and the field.
+export function mixevalQuestion(page: Page, mark: MixevalMark, question: number): Locator {
+  return mixevalSection(page, mark).getByRole('group', { name: new RegExp(`^${question}\\. `) });
+}
+
+// The name of an answer in a failure message, such as 'Alex Student question 2'.
+function mixevalAnswerName(mark: MixevalMark, num: string): string {
+  return `${mark.member}${mark.self ? ' self-evaluation' : ''} question ${num}`;
+}
+
+// The radio button of a Likert level, named by the level and its text, such
+// as 'Level 3: Good'.
+function likertLevel(question: Locator, level: number): Locator {
+  return question.getByRole('radio', { name: new RegExp(`^Level ${level}(:|$)`) });
 }
 
 export async function fillMixevalForm(page: Page, marks: readonly MixevalMark[]): Promise<void> {
@@ -660,16 +662,15 @@ export async function fillMixevalForm(page: Page, marks: readonly MixevalMark[])
     async () => {
       for (const mark of marks) {
         for (const [num, answer] of Object.entries(mark.answers)) {
-          const question = await mixevalQuestion(page, mark, Number(num));
+          const question = mixevalQuestion(page, mark, Number(num));
+          // The question must be there before count() can tell its type.
+          await expect(question, mixevalAnswerName(mark, num)).toBeVisible();
           if (typeof answer === 'string') {
-            await question.locator('textarea, input[type="text"]').fill(answer);
-          } else if ((await question.locator('select').count()) > 0) {
-            await question.locator('select').selectOption(String(answer));
+            await question.getByRole('textbox').fill(answer);
+          } else if ((await question.getByRole('combobox').count()) > 0) {
+            await question.getByRole('combobox').selectOption(String(answer));
           } else {
-            await question
-              .getByRole('radio')
-              .nth(answer - 1)
-              .check();
+            await likertLevel(question, answer).check();
           }
         }
       }
@@ -684,16 +685,15 @@ export async function expectMixevalForm(page: Page, marks: readonly MixevalMark[
     async () => {
       for (const mark of marks) {
         for (const [num, answer] of Object.entries(mark.answers)) {
-          const question = await mixevalQuestion(page, mark, Number(num));
-          const name = `${mark.member} question ${num}`;
+          const question = mixevalQuestion(page, mark, Number(num));
+          const name = mixevalAnswerName(mark, num);
+          await expect(question, name).toBeVisible();
           if (typeof answer === 'string') {
-            await expect(question.locator('textarea, input[type="text"]'), name).toHaveValue(
-              answer
-            );
-          } else if ((await question.locator('select').count()) > 0) {
-            await expect(question.locator('select'), name).toHaveValue(String(answer));
+            await expect(question.getByRole('textbox'), name).toHaveValue(answer);
+          } else if ((await question.getByRole('combobox').count()) > 0) {
+            await expect(question.getByRole('combobox'), name).toHaveValue(String(answer));
           } else {
-            await expect(question.getByRole('radio').nth(answer - 1), name).toBeChecked();
+            await expect(likertLevel(question, answer), name).toBeChecked();
           }
         }
       }
@@ -815,15 +815,26 @@ export async function insertMixevalSubmission(
   );
 }
 
+// A section of the answers on the results page of a student: 'Questions'
+// for the answers the teammates gave, or 'Self-Evaluation'. Its heading adds
+// what is not released yet, such as 'Questions - Grades Not Released Yet'.
+export function resultSection(page: Page, title: 'Questions' | 'Self-Evaluation'): Locator {
+  return page.getByRole('region', { name: new RegExp(`^${title}( - |$)`) });
+}
+
 // The heading of the answers the teammates gave, on the results page of a
 // student. It says what is not released yet.
 export function resultsHeading(page: Page): Locator {
-  return page.locator('#mixeval_result > h2').first();
+  return resultSection(page, 'Questions').getByRole('heading', { level: 2 });
+}
+
+// The answers to one question in a results section, such as the panel of a
+// member on the instructor's Detail page. Each list is named by its question.
+export function questionAnswers(section: Locator, question: number): Locator {
+  return section.getByRole('list', { name: new RegExp(`^${question}\\. `) }).getByRole('listitem');
 }
 
 // The answers to one question on the results page of a student.
 export function resultAnswers(page: Page, question: number): Locator {
-  return page.locator(
-    `xpath=//div[@id='mixeval_result']/h3[starts-with(normalize-space(), '${question}. ')]/following-sibling::ul[1]//li`
-  );
+  return questionAnswers(resultSection(page, 'Questions'), question);
 }

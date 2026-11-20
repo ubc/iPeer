@@ -9,8 +9,15 @@ if (!$gradeReleased && !$commentReleased && $details) {
 }
 $header = $title.$addOn;
 
+// The section is named by its heading, such as 'Questions' or
+// 'Self-Evaluation', and each list of answers by its question.
+$sectionHeadingId = 'mixeval-result-'.$evaluatee.($peer_eval ? '-peer' : '-self');
+// On the instructor's Detail page each evaluatee has a 'Questions' section, so
+// the name also has the panel header, such as 'Evaluatee: Ed Student Questions'.
+$sectionLabels = ($instructorMode && $peer_eval) ? "panel{$evaluatee}Header $sectionHeadingId" : $sectionHeadingId;
+echo "<section aria-labelledby='$sectionLabels'>";
 echo "<div id='mixeval_result'>";
-echo $html->tag('h2', $header);
+echo $html->tag('h2', $header, ['id' => $sectionHeadingId]);
 $qnum = 1;
 if ($details) {
     if ($instructorMode && $viewReleaseBtns) { ?>
@@ -26,13 +33,14 @@ if ($details) {
         }
         $required = (!$ques['required']) ? '' :
             $html->tag('span', '*', array('class' => 'required orangered'));
-        echo $html->tag('h3', "$qnum. $ques[title] $required");
+        $questionHeadingId = "$sectionHeadingId-q$qnum";
+        echo $html->tag('h3', "$qnum. $ques[title] $required", ['id' => $questionHeadingId]);
         $type = $ques['mixeval_question_type_id'];
         $multiplier = $ques['multiplier'];
         $scale = count($ques['MixevalQuestionDesc']);
         $descriptors = Set::combine($ques['MixevalQuestionDesc'], '{n}.scale_level', '{n}.descriptor');
         if (isset($ques['Submissions'])) {
-            echo '<ul>';
+            echo "<ul aria-labelledby='$questionHeadingId'>";
             foreach ($ques['Submissions'] as $num => $sub) {
                 if (in_array($type, array(1, 4)) && !$gradeReleased) {
                     echo '<li>'.__('Grades Not Released Yet', true).'</li>';
@@ -85,7 +93,7 @@ if ($details) {
             }
             echo '</ul>';
         } else {
-            echo '<ul><li>N/A</li></ul>';
+            echo "<ul aria-labelledby='$questionHeadingId'><li>N/A</li></ul>";
         }
         $qnum++;
     }
@@ -101,9 +109,10 @@ if ($details) {
         if ($typeId == '1' || $typeId == '4') {
             $required = (!$ques['required']) ? '' :
                 $html->tag('span', '*', array('class' => 'required orangered'));
-            echo $html->tag('h3', "$qnum. $ques[title] $required");
+            $questionHeadingId = "$sectionHeadingId-q$qnum";
+            echo $html->tag('h3', "$qnum. $ques[title] $required", ['id' => $questionHeadingId]);
             if (isset($ques['Submissions'])) {
-                echo '<ul>';
+                echo "<ul aria-labelledby='$questionHeadingId'>";
                 if (!$gradeReleased) {
                     echo '<li>'.__('Grades Not Released Yet', true).'</li></ul>';
                     continue;
@@ -113,12 +122,13 @@ if ($details) {
                 $text = $ques['self_eval'] ?  'Grade: ' : 'Average: ';
                 echo '<li>'.$text.number_format($average, 2).' / '.$ques['multiplier'].'</li></ul>';
             } else {
-                echo '<ul><li>N/A</li></ul>';
+                echo "<ul aria-labelledby='$questionHeadingId'><li>N/A</li></ul>";
             }
         }
         $qnum++; // increments whether the question has a grade or not - to keep the question numbers constant
     }
-    echo '<br>';
+    echo '</div><br>';
 }
+echo '</section>';
 ?>
 <br>

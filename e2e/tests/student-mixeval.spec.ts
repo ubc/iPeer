@@ -30,8 +30,10 @@ import {
   mixevalQuestion,
   openEvaluation,
   openResults,
+  questionAnswers,
   rating,
   resultAnswers,
+  resultSection,
   resultsHeading,
   submitEvaluation,
   submitMixevalButton,
@@ -166,9 +168,7 @@ function detailSummary(page: Page): Locator {
 // The answers to one question in the panel of an evaluated member, one item
 // for each evaluator.
 function panelAnswers(page: Page, member: string, question: number): Locator {
-  return evaluateePanel(page, member).locator(
-    `xpath=.//h3[starts-with(normalize-space(), '${question}. ')]/following-sibling::ul[1]//li`
-  );
+  return questionAnswers(evaluateePanel(page, member), question);
 }
 
 // ---------------------------------------------------------------------------
@@ -200,13 +200,13 @@ test('a student answers the questions for each member and submits', async ({
   // each required question.
   for (const member of [ALEX, MATT]) {
     const mark = { member, answers: {} };
-    const first = await mixevalQuestion(page, mark, 1);
-    await expect(first.locator('h3')).toHaveText(`1. ${QUESTIONS[0]} *`);
+    const first = mixevalQuestion(page, mark, 1);
+    await expect(first).toHaveAccessibleName(`1. ${QUESTIONS[0]} *`);
     await expect(first.locator('p.help')).toHaveText('Please rate performance.');
-    const fifth = await mixevalQuestion(page, mark, 5);
+    const fifth = mixevalQuestion(page, mark, 5);
     await expect(fifth.locator('p.help')).toHaveText('Please give a paragraph answer.');
-    const sixth = await mixevalQuestion(page, mark, 6);
-    await expect(sixth.locator('h3')).toHaveText(`6. ${QUESTIONS[5]}`);
+    const sixth = mixevalQuestion(page, mark, 6);
+    await expect(sixth).toHaveAccessibleName(`6. ${QUESTIONS[5]}`);
   }
   await expect(page.locator('form span.required')).toHaveCount(10);
 
@@ -319,6 +319,27 @@ test('an inserted submission shows like one made through the form', async ({
     '0.80',
     '2.80 (93.33%)',
   ]);
+});
+
+test('the Detail page of a group where nobody submitted has nothing to release', async ({
+  page,
+  testDatabase,
+}) => {
+  const eventId = await insertMixedEvent(testDatabase);
+  await endSubmissions(testDatabase, eventId);
+
+  await login(page, USERS.instructor1);
+  await openGroupResults(page, eventId, 'Detail');
+  await expect(memberList(page, NOT_SUBMITTED).getByRole('cell')).toContainText([
+    `${MATT} (student)`,
+  ]);
+  // The heading after the release status shows that the whole page loaded.
+  await expect(
+    page.getByRole('heading', { name: 'Evaluation Results', exact: true })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Evaluation Results Release Status' })
+  ).toHaveCount(0);
 });
 
 test('the results show the late penalties, who did not submit, and who left the group', async ({
@@ -554,7 +575,7 @@ test('an event without details shows the rating and the average of each question
   await login(page, STUDENTS.ed.username);
   await openResults(page, TITLE, GROUP.name);
   await expect(rating(page)).toHaveText(penaltyRating('2.60', '0.26', '2.34', '78'));
-  await expect(page.locator('#mixeval_result h3')).toHaveText([
+  await expect(resultSection(page, 'Questions').getByRole('heading', { level: 3 })).toHaveText([
     `1. ${QUESTIONS[0]} *`,
     `2. ${QUESTIONS[1]} *`,
     `3. ${QUESTIONS[2]} *`,
@@ -621,14 +642,18 @@ test('the points of a score dropdown question must add up to 10 for each member'
   // The tutor evaluates the three students: 0 to 30 points each.
   await login(page, TUTORS.tutor1.username);
   await openEvaluation(page, TITLE, GROUP.name);
-  await expect(page.locator('form select')).toHaveCount(3);
-  await expect(page.locator('form select').first().locator('option')).toHaveCount(31);
+  await expect(page.getByRole('group').getByRole('combobox')).toHaveCount(3);
+  await expect(
+    mixevalQuestion(page, { member: ED, answers: {} }, 1).getByRole('option')
+  ).toHaveCount(31);
 
   // Ed evaluates two members: 20 points, 0 to 20 each.
   await login(page, STUDENTS.ed.username);
   await openEvaluation(page, TITLE, GROUP.name);
-  await expect(page.locator('form select')).toHaveCount(2);
-  await expect(page.locator('form select').first().locator('option')).toHaveCount(21);
+  await expect(page.getByRole('group').getByRole('combobox')).toHaveCount(2);
+  await expect(
+    mixevalQuestion(page, { member: ALEX, answers: {} }, 1).getByRole('option')
+  ).toHaveCount(21);
   const question =
     'Please make sure that the total of the grades in the drop-downs equals 20 and then press "Submit" again.';
   for (const points of [0, 11]) {
@@ -707,7 +732,7 @@ test('students answer the self-evaluation questions, and tutors do not get them'
     { member: ED, answers: { 1: 2 } },
     { member: ALEX, answers: { 1: 3 } },
     { member: MATT, answers: { 1: 1 } },
-    { member: ED, self: true, answers: { 2: 2, 3: 'I did great.' } },
+    { member: ED, self: true, answers: { 1: 2, 2: 'I did great.' } },
   ]);
   await submitEvaluation(page, submitMixevalButton(page));
 
@@ -717,7 +742,7 @@ test('students answer the self-evaluation questions, and tutors do not get them'
     { member: ED, answers: { 1: 3 } },
     { member: ALEX, answers: { 1: 3 } },
     { member: MATT, answers: { 1: 2 } },
-    { member: ALEX, self: true, answers: { 2: 2, 3: 'It was amazing.' } },
+    { member: ALEX, self: true, answers: { 1: 2, 2: 'It was amazing.' } },
   ]);
   await submitEvaluation(page, submitMixevalButton(page));
 
@@ -745,26 +770,20 @@ test('students answer the self-evaluation questions, and tutors do not get them'
   await page.getByRole('link', { name: 'Detail', exact: true }).click();
   const selfPanel = page.locator('#panelSelf');
   await expect(selfPanel.locator('#panelSelfHeader')).toHaveText('Self-Evaluation');
-  await expect(
-    selfPanel.locator(
-      "xpath=.//h3[starts-with(normalize-space(), '2. ')]/following-sibling::ul[1]//li"
-    )
-  ).toHaveText([`${ED}:I did great.`, `${ALEX}:It was amazing.`]);
+  await expect(questionAnswers(selfPanel, 2)).toHaveText([
+    `${ED}:I did great.`,
+    `${ALEX}:It was amazing.`,
+  ]);
 
   // The student sees their own self-evaluation in the results.
   await endSubmissions(testDatabase, eventId);
   await login(page, STUDENTS.ed.username);
   await openResults(page, TITLE, GROUP.name);
-  await expect(page.locator('#mixeval_result > h2').last()).toHaveText('Self-Evaluation');
+  const own = resultSection(page, 'Self-Evaluation');
+  await expect(own.getByRole('heading', { level: 2 })).toHaveText('Self-Evaluation');
   // The own answers show, but the sentence answer only after a release of
   // the comments.
-  const ownAnswer = (question: number) =>
-    page
-      .locator('#mixeval_result')
-      .last()
-      .locator(
-        `xpath=./h3[starts-with(normalize-space(), '${question}. ')]/following-sibling::ul[1]//li`
-      );
+  const ownAnswer = (question: number) => questionAnswers(own, question);
   await expect(ownAnswer(1).getByRole('radio', { checked: true })).toHaveAttribute('value', '7.00');
   await expect(ownAnswer(2)).toHaveText(['n/a']);
 });

@@ -65,7 +65,9 @@
 
         if ($mixeval['Mixeval']['peer_question'] > 0 ) {
             foreach($groupMembers as $row): $user = $row['User']; ?>
-                <center><h2><?php echo $user['full_name']?></h2></center>
+                <?php // Each member's questions are a region named by the member. ?>
+                <section aria-labelledby='mixeval-member-<?php echo (int) $user['id'] ?>'>
+                <h2 id='mixeval-member-<?php echo (int) $user['id'] ?>' style='text-align: center'><?php echo h($user['full_name'])?></h2>
                 <?php
                 $params = array('controller'            => 'mixevals',
                                 'zero_mark'             => $mixeval['Mixeval']['zero_mark'],
@@ -77,11 +79,12 @@
                                 'eval'                  => 'Evaluation'
                                 );
                 echo $this->element('mixevals/view_mixeval_details', $params);
-                ?><br>
+                ?></section><br>
             <?php endforeach;
         }?>
 
         <?php if ($mixeval['Mixeval']['self_eval'] > 0 && $event['Event']['self_eval'] && $enrol > 0) { ?>
+        <section aria-labelledby='self-title'>
         <h1 id="self-title" class="title"><?php __("Self-Evaluation Questions")?></h1>
 
         <?php
@@ -90,8 +93,9 @@
             $params['user'] = array('id' => $userId);
             $params['self'] = $self;
             echo $this->element('mixevals/view_mixeval_details', $params);
-        }
-        ?><br>
+        ?>
+        </section>
+        <?php } ?><br>
         <center><?php echo $form->submit(__('Submit the Evaluation', true), array('div' => 'editSection', 'id' => 'submit', 'disabled' => isset($preview) ? 'true':'false')); ?></center>
         <?php echo $form->end(); ?>
         </td>

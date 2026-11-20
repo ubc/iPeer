@@ -20,7 +20,10 @@ foreach ($questions as $ques) {
     $required = (!$ques['MixevalQuestion']['required']) ? '' :
         $html->tag('span', '*', array('class' => 'required orangered floatright'));
     $title = $ques['MixevalQuestion']['title'];
-    $title = $html->tag('h3', "$peerNum. $title $required", array('class' => 'question-title', 'id' => 'q_'.$user['id'].'_'.$num));
+    $questionHeadingId = 'q_'.$user['id'].'_'.$num;
+    $title = $html->tag('h3', "$peerNum. $title $required", ['class' => 'question-title', 'id' => $questionHeadingId]);
+    // Each question is a group named by its title, such as '2. Contributed? *'.
+    $group = ['role' => 'group', 'aria-labelledby' => $questionHeadingId];
     $class = $ques['MixevalQuestion']['required'] ? 'must' : '';
     $peerNum++;
 
@@ -31,7 +34,8 @@ foreach ($questions as $ques) {
             $instruct .
             $form->textarea('EvaluationMixeval.'.$num.'.question_comment',
                 array('default' => $value, 'class' => $class,
-                    'name' => 'data['.$user['id'].'][EvaluationMixeval]['.$num.'][question_comment]'))
+                    'name' => 'data['.$user['id'].'][EvaluationMixeval]['.$num.'][question_comment]')),
+            $group
         );
     } else if ($type == 'Sentence') {
         $value = (isset($details[$num])) ? $details[$num]['question_comment'] : '';
@@ -40,7 +44,8 @@ foreach ($questions as $ques) {
             $instruct .
             $form->input($user['id'].'.EvaluationMixeval.'.$num.'.question_comment',
                 array('label' => false, 'default' => $value, 'type' => 'text', 'class' => $class,
-                    'name' => 'data['.$user['id'].'][EvaluationMixeval]['.$num.'][question_comment]'))
+                    'name' => 'data['.$user['id'].'][EvaluationMixeval]['.$num.'][question_comment]')),
+            $group
         );
     } else if ($type == 'Likert') {
         $highestMark = $ques['MixevalQuestion']['multiplier'];
@@ -61,7 +66,12 @@ foreach ($questions as $ques) {
             if (isset($details[$num])) {
                 $checked = ($details[$num]['selected_lom'] == $desc['scale_level']) ? 'checked' : '';
             }
+            // Named by the level and its text, such as 'Level 3: Good'.
+            $levelName = sprintf(__('Level %d', true), $desc['scale_level']) .
+                ($desc['descriptor'] === '' || $desc['descriptor'] === null ? '' : ': '.$desc['descriptor']);
             $option = "<input type='radio' name=data[$user[id]][EvaluationMixeval][$num][grade] value='$mark' $checked ";
+            // h() gives '' for text that is not valid UTF-8; then the level alone.
+            $option .= "aria-label='".(h($levelName) ?: sprintf(__('Level %d', true), $desc['scale_level']))."' ";
             $option .= "onclick=document.getElementById('selected_lom".$num."_".$user['id']."').value=$desc[scale_level] ";
             $option .= "class='".$class."' />";
             $options[] = $option;
@@ -95,7 +105,8 @@ foreach ($questions as $ques) {
                 $html->tableCells($options) .
                 $html->tableCells($marks)
                 */
-            )
+            ),
+            $group
         );
         $output = $output.$selected;
     } else if ($type == 'ScoreDropdown') {
@@ -109,7 +120,8 @@ foreach ($questions as $ques) {
              $instruct .
             $form->input('dropdown',
                  array('label' => false, 'default' => $value,'options' => range(0, $max), 'class' => $class,
-                'name' => 'data['.$user['id'].'][EvaluationMixeval]['.$num.'][grade]'))
+                'name' => 'data['.$user['id'].'][EvaluationMixeval]['.$num.'][grade]')),
+            $group
         );
     }
 
