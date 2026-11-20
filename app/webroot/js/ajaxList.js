@@ -344,6 +344,8 @@ AjaxList.prototype.renderSelectionMaps = function (div) {
             }
 
             var select = new Element("select");
+            select.setAttribute("aria-label",
+                (column[DESC_COL] !== undefined) ? column[DESC_COL] : column[ID_COL]);
             var thisObject = this;
             var thisColumn = column[ID_COL];
             select.onchange = this.createDelegateForSelectionMap(
@@ -445,6 +447,7 @@ AjaxList.prototype.renderJoinFilters = function (div) {
         div.appendChild(document.createTextNode(text));
 
         var select = new Element("select");
+        select.setAttribute("aria-label", String(filter.description).replace(/:\s*$/, ""));
         var thisObject = this;
         select.onchange = this.createDelegateForJoinFilter(thisObject, filter.id);
 
@@ -486,6 +489,7 @@ AjaxList.prototype.renderJoinFilters = function (div) {
 // Renders the search control itself
 AjaxList.prototype.renderSearchControl = function (div) {
     var select = new Element("select");
+    select.setAttribute("aria-label", "Search column");
     var thisObject = this;
     select.onchange = function () {
         // We need to create a callback for this: direct call
@@ -531,6 +535,7 @@ AjaxList.prototype.renderSearchControl = function (div) {
     }
 
     input.id = "searchInputField";
+    input.setAttribute("aria-label", "Search text");
     var thisObject = this;
     input.onkeyup = function() {  thisObject.changeSearchValue(this.value); }
     div.appendChild(input);
@@ -601,6 +606,7 @@ AjaxList.prototype.renderPageSizes = function (div) {
         var thisPageSize = AvailablePageSizes[i];
         var input = new Element("input");
         input.type = "radio";
+        input.setAttribute("aria-label", thisPageSize + " per page");
         if (this.state.pageSize == thisPageSize) {
             input.checked = "checked";
             if (Prototype.Browser.IE) {
@@ -624,8 +630,11 @@ AjaxList.prototype.renderPageSizes = function (div) {
 AjaxList.prototype.renderSinglePageRadioButton = function (i, pages) {
     pages.appendChild(document.createTextNode(" "));
     var a = document.createElement("a");
+    a.setAttribute("role", "button");
+    a.setAttribute("aria-label", "Page " + i);
     if (this.state.pageShown == i) {
         a.setAttribute('class', 'selected_number');
+        a.setAttribute("aria-current", "page");
     } else {
         a.setAttribute('class', 'ajax_paginate');
         a.style.cursor = "pointer";
@@ -639,8 +648,11 @@ AjaxList.prototype.renderSinglePageRadioButton = function (i, pages) {
 AjaxList.prototype.renderDirectionRadioButton = function (index, pages, totalPages) {
     pages.appendChild(document.createTextNode(" "));
     var text = new Array("<<", "<", ">", ">>");
+    var names = new Array("First page", "Previous page", "Next page", "Last page");
     var a = document.createElement("a");
     a.setAttribute('class', 'ajax_paginate');
+    a.setAttribute("role", "button");
+    a.setAttribute("aria-label", names[index]);
     // first
     if (text[index] == "<<") {
         var i = 1;
@@ -797,6 +809,8 @@ AjaxList.prototype.renderTableHeaders = function (tbody) {
             th.onclick = ajaxListLibrary.createDelegateWithParams(
                 this, this.setSortingColumn, column[ID_COL]);
             th.style.cursor = "pointer";
+            th.setAttribute("aria-sort", (column[ID_COL] != this.state.sortBy) ? "none" :
+                (this.state.sortAsc ? "ascending" : "descending"));
         } else {
             th.style.cursor = "arrow";
         }

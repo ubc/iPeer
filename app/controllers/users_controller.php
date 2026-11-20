@@ -166,6 +166,12 @@ class UsersController extends AppController
         );
 
         $extraFilters = array('User.record_status' => 'A');
+        // Leave out the users who have a role that the user may not see. Users
+        // without a role stay. A subquery, as below, so it needs no join and
+        // keeps the role picked in the list.
+        $roleIds = implode(',', array_map('intval', array_keys($viewableRoles))) ?: '0';
+        $rolesUsers = $this->User->getDataSource()->fullTableName('roles_users');
+        $extraFilters[] = "User.id NOT IN (SELECT user_id FROM $rolesUsers WHERE role_id NOT IN ($roleIds))";
         if (User::hasPermission('controllers/departments') && !User::hasPermission('functions/superadmin')) {
             // faculty admins, filter out the admins and instructors from other department/faculty
             // stupid cakephp doesn't support double habtm query. So using raw query
@@ -214,6 +220,12 @@ class UsersController extends AppController
      */
     function ajaxList()
     {
+        // The same permission as the user list page
+        if (!User::hasPermission('functions/user/index')) {
+            $this->Session->setFlash('You do not have permission to view users.');
+            $this->redirect('/home');
+            return;
+        }
         // Set up the list
         $this->_setUpAjaxList();
         // Process the request for data

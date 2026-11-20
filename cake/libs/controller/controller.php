@@ -1114,15 +1114,24 @@ class Controller extends CakeObject {
 		if (isset($options['show'])) {
 			$options['limit'] = $options['show'];
 		}
+		// A page size from the request has at most 270 rows, as in the lists.
+		// The limits that controllers set in $this->paginate stay as they are.
+		if (isset($options['limit'])) {
+			$options['limit'] = is_numeric($options['limit']) ? min(270, (int) $options['limit']) : 1;
+		}
 
 		if (isset($options['order']) && empty($options['sort'])) {
 			$options['sort'] = $options['order'];
 			unset($options['order']);
 		}
 
+		// sort and direction come from the request; ignore anything that isn't a string
+		if (isset($options['sort']) && !is_string($options['sort'])) {
+			unset($options['sort'], $options['order']);
+		}
 		if (isset($options['sort'])) {
 			$direction = null;
-			if (isset($options['direction'])) {
+			if (isset($options['direction']) && is_string($options['direction'])) {
 				$direction = strtolower($options['direction']);
 			}
 			if ($direction != 'asc' && $direction != 'desc') {
@@ -1146,8 +1155,12 @@ class Controller extends CakeObject {
 				$options['order'][$object->alias . '.' . $field] = $value;
 			} elseif ($correctAlias && $object->hasField($key, true)) {
 				$options['order'][$field] = $value;
-			} elseif (isset($object->{$alias}) && $object->{$alias}->hasField($field)) {
+			} elseif (isset($object->{$alias}) && $object->{$alias} instanceof Model && $object->{$alias}->hasField($field)) {
 				$options['order'][$alias . '.' . $field] = $value;
+			}
+			// No usable sort: keep the default order.
+			if (empty($options['order'])) {
+				unset($options['order']);
 			}
 		}
 		$vars = array('fields', 'order', 'limit', 'page', 'recursive');
@@ -1233,9 +1246,12 @@ class Controller extends CakeObject {
 			}
 			$results = $object->find($type, array_merge($parameters, $extra));
 		}
+		if (!is_array($results)) {
+			$results = [];
+		}
 		$paging = array(
 			'page'		=> $page,
-			'current'	=> @count($results),
+			'current'	=> count($results),
 			'count'		=> $count,
 			'prevPage'	=> ($page > 1),
 			'nextPage'	=> ($count > ($page * $limit)),

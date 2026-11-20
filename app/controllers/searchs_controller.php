@@ -44,8 +44,8 @@ class SearchsController extends AppController
         if ($this->show == 'all') {
             $this->show = 99999999;
         }
-        $this->sortBy = empty($_GET['sort'])? 'id': $_GET['sort'];
-        $this->direction = empty($_GET['direction'])? 'asc': $this->Sanitize->paranoid($_GET['direction']);
+        $this->sortBy = (empty($_GET['sort']) || !is_string($_GET['sort']))? 'id': $_GET['sort'];
+        $this->direction = (empty($_GET['direction']) || !is_string($_GET['direction']))? 'asc': $this->Sanitize->paranoid($_GET['direction']);
         $this->page = empty($_GET['page'])? '1': $this->Sanitize->paranoid($_GET['page']);
         $this->order = $this->sortBy.' '.strtoupper($this->direction);
 
@@ -126,7 +126,7 @@ class SearchsController extends AppController
         $nibble = $this->Search->setEvaluationCondition($this->params);
         //$sticky = $nibble['sticky'];
         $condition = $nibble['condition'];
-        $searchMatrix = $this->formatSearchEvaluation($condition, $this->sortBy, $this->show);
+        $searchMatrix = $this->_formatSearchEvaluation($condition, $this->sortBy, $this->show);
 
         $courses = $searchMatrix;
 
@@ -166,7 +166,7 @@ class SearchsController extends AppController
         $maxPercent = $nibble['maxPercent'];
         $minPercent = $nibble['minPercent'];
 
-        $searchMatrix = $this->formatSearchEvaluationResult($maxPercent, $minPercent, $eventId, $status, $this->show);
+        $searchMatrix = $this->_formatSearchEvaluationResult($maxPercent, $minPercent, $eventId, $status, $this->show);
 
         $eventList = (User::hasRole('superadmin') || User::hasRole('admin')) ?
             $this->Event->find('all', array(
@@ -192,7 +192,7 @@ class SearchsController extends AppController
         $condition = $nibble['condition'];
         $sticky = $nibble['sticky'];
 
-        $searchMatrix = $this->formatSearchInstructor($condition, $this->sortBy, $this->show);
+        $searchMatrix = $this->_formatSearchInstructor($condition, $this->sortBy, $this->show);
 
         $this->set('sticky', $sticky);
         $this->set('data', $searchMatrix);
@@ -226,18 +226,26 @@ class SearchsController extends AppController
      * @access public
      * @return void
      */
-    function formatSearchEvaluation($conditions, $sortBy, $limit)
+    function _formatSearchEvaluation($conditions, $sortBy, $limit)
     {
         $this->paginate = array(
             'conditions' => $conditions,
             'fields' => array('*', '(NOW() >= release_date_begin AND NOW() <= release_date_end) AS is_released'),
-            'order' => 'Event.'.$sortBy,
+            'order' => 'Event.'.$this->_sortField($this->Event, $sortBy),
             'limit' => $limit
         );
 
         return $this->paginate('Event');
     }
 
+
+    /**
+     * The sort field of a search: a field of the model, or the default.
+     */
+    function _sortField(Model $model, $sortBy, string $default = 'id'): string
+    {
+        return (is_string($sortBy) && $model->hasField($sortBy)) ? $sortBy : $default;
+    }
 
     /**
      * This func returns paginated instructor search result
@@ -249,7 +257,7 @@ class SearchsController extends AppController
      * @access public
      * @return void
      */
-    function formatSearchInstructor($conditions, $sortBy, $limit)
+    function _formatSearchInstructor($conditions, $sortBy, $limit)
     {
         if (!isset($conditions['role'])) {
             $conditions['role'] = 'I';
@@ -257,7 +265,7 @@ class SearchsController extends AppController
 
         $this->paginate = array(
             'conditions' => $conditions,
-            'order' => 'User.'.$sortBy,
+            'order' => 'User.'.$this->_sortField($this->User, $sortBy),
             'limit' => $limit
         );
 
@@ -277,7 +285,7 @@ class SearchsController extends AppController
      * @access public
      * @return void
      */
-    function formatSearchEvaluationResult($maxPercent, $minPercent, $eventId, $status, $limit)
+    function _formatSearchEvaluationResult($maxPercent, $minPercent, $eventId, $status, $limit)
     {
         $matrixAry = array();
 

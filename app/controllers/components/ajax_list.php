@@ -80,7 +80,18 @@ class AjaxListComponent extends CakeObject
     public $joinFilters = null;
     public $extraFilters = null;
 
-    public $fields = null;
+    public $fields = [];
+    public $sortBy = null;
+    public $searchBy = null;
+
+    // The values each map column and each join filter accepts, as strings.
+    public $mapValues = [];
+    public $joinFilterValues = [];
+
+    // The largest page size that the list offers (AvailablePageSizes in
+    // ajaxList.js), and the last page that a request can ask for.
+    const MAX_PAGE_SIZE = 270;
+    const MAX_PAGE = 100000;
 
     public $customModelFindFunction = null;
     public $customModelCountFunction = null;
@@ -149,24 +160,59 @@ class AjaxListComponent extends CakeObject
      * @access public
      * @return void
      */
-    function checkState($state)
+    function checkState($sent)
     {
-        if (empty($state->sortBy)) {
-            $state->sortBy = $this->sortBy;
-        }
-        if (empty($state->searchBy)) {
-            $state->searchBy = $this->searchBy;
+        // Only the values of a list state, from what the browser sent.
+        $state = new stdClass();
+        foreach (['sortBy', 'sortAsc', 'searchBy', 'searchValue', 'mapFilterSelections',
+            'joinFilterSelections', 'pageSize', 'pageShown'] as $key) {
+            if (is_object($sent) && property_exists($sent, $key)) {
+                $state->$key = $sent->$key;
+            }
         }
 
-        // Ensure that search objects are strings
-        if (!is_string($state->sortBy)) {
-            $state->sortBy = "";
+        // Sort and search only by the columns of this list.
+        if (!in_array($state->sortBy ?? null, $this->fields, true)) {
+            $state->sortBy = $this->sortBy;
         }
-        if (!is_string($state->searchValue)) {
+        $state->sortAsc = (bool) ($state->sortAsc ?? true);
+        if (!in_array($state->searchBy ?? null, $this->fields, true)) {
+            $state->searchBy = $this->searchBy;
+        }
+        if (!is_string($state->searchValue ?? null)) {
             $state->searchValue = "";
         }
 
+        // Filter only by the map columns and join filters of this list, with
+        // the values that they list.
+        $state->mapFilterSelections = $this->allowedSelections(
+            $state->mapFilterSelections ?? null, $this->mapValues);
+        $state->joinFilterSelections = $this->allowedSelections(
+            $state->joinFilterSelections ?? null, $this->joinFilterValues);
+
+        $pageSize = is_numeric($state->pageSize ?? null) ? (int) $state->pageSize : 20;
+        $pageShown = is_numeric($state->pageShown ?? null) ? (int) $state->pageShown : 1;
+        $state->pageSize = min(self::MAX_PAGE_SIZE, max(1, $pageSize));
+        $state->pageShown = min(self::MAX_PAGE, max(1, $pageShown));
+
         return $state;
+    }
+
+    /**
+     * The selections whose key is in $allowed and whose value is one of the
+     * values that $allowed has for that key.
+     */
+    function allowedSelections($selections, array $allowed): stdClass
+    {
+        $kept = new stdClass();
+        foreach ((is_object($selections) || is_array($selections)) ? (array) $selections : [] as $key => $value) {
+            $key = (string) $key;
+            if (isset($allowed[$key]) && (is_string($value) || is_int($value))
+                && in_array((string) $value, $allowed[$key], true)) {
+                $kept->$key = (string) $value;
+            }
+        }
+        return $kept;
     }
 
     /**
@@ -272,9 +318,9 @@ class AjaxListComponent extends CakeObject
 
                 // Check to make sure we should be considering this value at this time
                 if (!empty($joinFilter['dependsMap']) && !empty($joinFilter['dependsValues'])) {
-                    if (!empty($state->mapFilterSelections)) {
-                        if (!in_array($state->mapFilterSelections->$joinFilter['dependsMap'],
-                            $joinFilter['dependsValues'])) {
+                    if (isset($state->mapFilterSelections->{$joinFilter['dependsMap']})) {
+                        if (!in_array($state->mapFilterSelections->{$joinFilter['dependsMap']},
+                            array_map('strval', (array) $joinFilter['dependsValues']), true)) {
                                 // do not concider at this time
                                 continue;
                         }
@@ -451,14 +497,14 @@ class AjaxListComponent extends CakeObject
         // json_decode will not work properly
         //$json = get_magic_quotes_gpc() ? stripslashes($_POST['json']) : $_POST['json'];  //unused
         // Grab the next state the browser sent over, and save it
-        $state = json_decode(str_replace("\\", "", $_POST['json']));
+        $state = json_decode(str_replace("\\", "", is_string($_POST['json'] ?? null) ? $_POST['json'] : 'null'));
 
         // If not state was sent: fetch it from session.
         if ($state == null) {
             $state = $this->getState();
         } else {
             // Or if state was send, save it to session
-            $this->Session->write($this->sessionVariableName, $state);
+            $this->Session->write($this->sessionVariableName, $this->checkState($state));
         }
 
         // Get the user data for the state.
@@ -466,7 +512,7 @@ class AjaxListComponent extends CakeObject
 
         // Return a different page, depending if we were asked for full page
         //   or just the data.
-        if ($_POST['fullPage'] == "true") {
+        if (($_POST['fullPage'] ?? '') === "true") {
             // Render the index page for a full page  (for ie 6)
             $redirect = $this->controllerName . "/" . $pageForRedirect .
                 (!empty($parameters) ? ("/" . $parameters) : "");
@@ -569,11 +615,23 @@ class AjaxListComponent extends CakeObject
 
         // Generate the fields
         $this->fields = array();
+        $this->mapValues = [];
         for ($i = 0; $i < sizeof($this->columns); $i++) {
             $columnName = $this->columns[$i][0];
             // Leave out emptry and "!"-flagged colums out of queries
             if (!empty($columnName) && $columnName[0] != "!") {
                 array_push($this->fields, $columnName);
+                if (($this->columns[$i][3] ?? null) == 'map' && is_array($this->columns[$i][4] ?? null)) {
+                    $this->mapValues[$columnName] = array_map('strval', array_keys($this->columns[$i][4]));
+                }
+            }
+        }
+
+        $this->joinFilterValues = [];
+        foreach ((array) $joinFilters as $joinFilter) {
+            if (isset($joinFilter['id']) && is_array($joinFilter['list'] ?? null)) {
+                $this->joinFilterValues[(string) $joinFilter['id']] =
+                    array_map('strval', array_keys($joinFilter['list']));
             }
         }
 
