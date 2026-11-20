@@ -164,7 +164,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         }
 
         // add columns for individual criterion comments (Rubrics only)
-        if (isset($event['Rubric'])) {
+        if ($this->isRubric($event) && $params['include']['comments']) {
         	foreach ($event['Question'] as $key => $question) {
         		$header[] = "Q".($key+1)." Comment";
         	}
@@ -178,17 +178,17 @@ Class ExportCsvComponent extends ExportBaseNewComponent
         $num = 1;
         foreach ($event['Question'] as $key => $question) {
             if (isset($question['mixeval_question_type_id'])) {
-                if ($question['self_eval']) {
-                    continue; // skip self-evaluation questions
+                if (!$this->isInSection($question, $peerEval)) {
+                    continue; // skip the questions of the other section
                 }
                 if (in_array($question['mixeval_question_type_id'], array(1, 4))) {
-                   if ($peerEval && $params['include']['question_title']) {
+                   if ($params['include']['question_title']) {
                      $header[] = "Q".$num." ( /".$question['multiplier'].")"." ".$question['title'];
                    } else {
                      $header[] = "Q" . $num . " ( /" . $question['multiplier'] . ")";
                    }
                 } else if (in_array($question['mixeval_question_type_id'], array(2, 3))){
-                   if ($peerEval && $params['include']['question_title']) {
+                   if ($params['include']['question_title']) {
                      $header[] = "Q".$num." ".$question['title'];
                    } else {
                      $header[] = "Q".$num;

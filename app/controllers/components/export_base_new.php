@@ -159,6 +159,33 @@ class ExportBaseNewComponent extends CakeObject
 
 
     /**
+     * Whether a mixed evaluation question belongs to the section: the peer
+     * evaluation section or the self-evaluation section.
+     */
+    public function isInSection(array $question, int|bool $peerEval): bool
+    {
+        return (bool) $question['self_eval'] !== (bool) $peerEval;
+    }
+
+    /**
+     * Whether the event is a rubric evaluation, which has a comment and a
+     * grade column for each criterion.
+     */
+    public function isRubric(array $event): bool
+    {
+        return $event['Event']['event_template_type_id'] == 2;
+    }
+
+    /**
+     * The header of an export section. Only subclasses that use the "**ScoreTable**"
+     * functions need to override/implement it (CSV = yes, PDF = no).
+     */
+    public function generateHeader($params, $event, $peerEval = 1)
+    {
+        throw new LogicException(get_class($this).' does not define an export header');
+    }
+
+    /**
      * buildScoreTableByEvaluatee
      *
      * @param mixed $params    params
@@ -180,7 +207,9 @@ class ExportBaseNewComponent extends CakeObject
         // Fill in grid Results
         $yInc = 0;
 
-        $xDimension = $this->calcDimensionX($params, $event, $peerEval);
+        // Every row of a section is as wide as the header of the section, also
+        // a row without answers, which is padded.
+        $xDimension = count($this->generateHeader($params, $event, $peerEval));
         //$yDimensions = count($group['Member']);
         $grid = array();
 
@@ -241,10 +270,15 @@ class ExportBaseNewComponent extends CakeObject
             }
 
             $response = $responses[$evaluatee['id']][$evaluator['id']];
-                        
-            if ($event['Event']['event_template_type_id'] == 2) {
-                foreach ($response[$this->detailModel[$event['Event']['event_template_type_id']]] as $result) {
-                    array_push($row, $result['criteria_comment']);
+
+            // Rubric: one cell for each criterion, in criterion order, also
+            // for a criterion without an answer.
+            $isRubric = $this->isRubric($event);
+            $criteriaDetails = $isRubric ?
+                Set::combine($response[$this->detailModel[2]] ?? [], '{n}.criteria_number', '{n}') : [];
+            if ($isRubric && $params['include']['comments']) {
+                foreach ($event['Question'] as $criterion) {
+                    $row[] = $criteriaDetails[$criterion['criteria_num']]['criteria_comment'] ?? '';
                 }
             }
 
@@ -253,50 +287,51 @@ class ExportBaseNewComponent extends CakeObject
                 array_push($row, $response[$this->responseModelName]['comment']);
             }
 
-            if ($this->detailModel[$event['Event']['event_template_type_id']] && array_key_exists($this->detailModel[$event['Event']['event_template_type_id']], $response)) {
-                if (in_array($event['Event']['event_template_type_id'], array(1, 2))) {
-                    if ($params['include']['grade_tables']) {
-                        foreach ($response[$this->detailModel[$event['Event']['event_template_type_id']]] as $result) {
-                            array_push($row, $result['grade']);
-                        }
+            if ($isRubric && $params['include']['grade_tables']) {
+                foreach ($event['Question'] as $criterion) {
+                    $row[] = $criteriaDetails[$criterion['criteria_num']]['grade'] ?? '';
+                }
+            }
+
+            // The answers of a mixed evaluation. Simple evaluations have no
+            // detail model, and the rubric details are above.
+            $detailModel = $this->detailModel[$event['Event']['event_template_type_id']];
+            $hasMixedDetails = !$isRubric && $detailModel && array_key_exists($detailModel, $response);
+            if ($hasMixedDetails) {
+                $results = $response[$detailModel];
+                $results = Set::combine($results, '{n}.question_number', '{n}');
+                
+                $missing_required_question = false;
+                
+                foreach ($event['Question'] as $question) {
+                    if (!$this->isInSection($question, $peerEval)) {
+                        continue; // skip questions that don't belong in the desired section
                     }
-                } else {
-                    // mixed evaluation
-                    $results = $response[$this->detailModel[$event['Event']['event_template_type_id']]];
-                    $results = Set::combine($results, '{n}.question_number', '{n}');
-                    
-                    $missing_required_question = false;
-                    
-                    foreach ($event['Question'] as $question) {
-                        if ($question['self_eval'] == $peerEval) {
-                            continue; // skip questions that don't belong in the desired section
-                        }
-                        if ($question['required'] && !isset($results[$question['question_num']])) {
-                            $missing_required_question = true;
-                        }
+                    if ($question['required'] && !isset($results[$question['question_num']])) {
+                        $missing_required_question = true;
                     }
-                    
-                    if ($missing_required_question) {
-                        //skip the rest of output — pad to expected column count
-                        $row += array_fill(count($row), $xDimension - count($row), '');
-                        $grid[] = $row;
-                        $yInc++;
-                        continue;
+                }
+                
+                if ($missing_required_question) {
+                    //skip the rest of output — pad to expected column count
+                    $row += array_fill(count($row), $xDimension - count($row), '');
+                    $grid[] = $row;
+                    $yInc++;
+                    continue;
+                }
+                
+                foreach ($event['Question'] as $question) {
+                    if (!$this->isInSection($question, $peerEval)) {
+                        continue; // skip questions that don't belong in the desired section
                     }
-                    
-                    foreach ($event['Question'] as $question) {
-                        if ($question['self_eval'] == $peerEval) {
-                            continue; // skip questions that don't belong in the desired section
-                        }
-                        if (!isset($results[$question['question_num']])) {
-                            array_push($row, '');
-                        } elseif ($params['include']['grade_tables'] && in_array($question['mixeval_question_type_id'], array(1, 4))) {
-                            array_push($row, $results[$question['question_num']]['grade']);
-                        } elseif ($params['include']['comments'] && in_array($question['mixeval_question_type_id'], array(2, 3))) {
-                            array_push($row, $results[$question['question_num']]['question_comment']);
-                        } else {
-                            array_push($row, 'N/A');
-                        }
+                    if (!isset($results[$question['question_num']])) {
+                        array_push($row, '');
+                    } elseif ($params['include']['grade_tables'] && in_array($question['mixeval_question_type_id'], array(1, 4))) {
+                        array_push($row, $results[$question['question_num']]['grade']);
+                    } elseif ($params['include']['comments'] && in_array($question['mixeval_question_type_id'], array(2, 3))) {
+                        array_push($row, $results[$question['question_num']]['question_comment']);
+                    } else {
+                        array_push($row, 'N/A');
                     }
                 }
             }
@@ -333,67 +368,6 @@ class ExportBaseNewComponent extends CakeObject
         }
 
         return $grid;
-    }
-
-    /**
-     * calcDimensionX
-     *
-     * @param mixed $params   params
-     * @param mixed $event    event
-     * @param int   $peerEval 1 for peer evaluation section, 0 for self-evaluation section
-     *
-     * @access public
-     * @return int number of columns in the export row
-     */
-    public function calcDimensionX($params, $event, $peerEval = 1) {
-        $total = count($params['include']);
-        // Subtract behavioral flags that are part of $params['include'] but don't add columns
-        if (isset($params['include']['export_all'])) {
-            $total--;
-        }
-        if (isset($params['include']['question_title'])) {
-            $total--;
-        }
-        if (4 == $event['Event']['event_template_type_id']) {
-            $commentQuestions = Set::extract($event, '/Question[mixeval_question_type_id=2]');
-            if (isset($params['include']['grade_tables'])) {
-                // question number - 1 as one is counted as grade_tables in include
-                $total += count($event['Question']) - count($commentQuestions) - 1;
-            }
-            if (isset($params['include']['comments'])) {
-                // question number - 1 as one is counted as comments in include
-                $total += count($commentQuestions) - 1;
-            }
-        } elseif (2 == $event['Event']['event_template_type_id']) {
-            if (isset($params['include']['grade_tables'])) {
-                // question number - 1 as one is counted as grade_tables in include
-                $total += count($event['Question']) - 1;
-            }
-        } else {
-            if (isset($params['include']['grade_tables'])) {
-                $total--;
-            }
-        }
-
-        if ($peerEval) {
-            $total += 2; // Raw Score + Late Penalty
-            if (isset($params['include']['student_name'])) {
-                $total++; // second column: Evaluator
-            }
-            if (isset($params['include']['student_id'])) {
-                $total++; // second column: Evaluator S#
-            }
-        } else {
-            // eval_event_type and final_marks columns are skipped in self-eval section
-            if (isset($params['include']['eval_event_type'])) {
-                $total--;
-            }
-            if (isset($params['include']['final_marks'])) {
-                $total--;
-            }
-        }
-
-        return $total;
     }
 
     /*
