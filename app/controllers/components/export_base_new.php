@@ -169,7 +169,7 @@ class ExportBaseNewComponent extends CakeObject
 
     /**
      * Whether the event is a rubric evaluation, which has a comment and a
-     * grade column for each criterion. The header and the rows use this test.
+     * grade column for each criterion.
      */
     public function isRubric(array $event): bool
     {
@@ -177,22 +177,12 @@ class ExportBaseNewComponent extends CakeObject
     }
 
     /**
-     * The header of an export section. The export that builds score tables
-     * (ExportCsv) defines it.
+     * The header of an export section. Only subclasses that use the "**ScoreTable**"
+     * functions need to override/implement it (CSV = yes, PDF = no).
      */
     public function generateHeader($params, $event, $peerEval = 1)
     {
         throw new LogicException(get_class($this).' does not define an export header');
-    }
-
-    /**
-     * The number of columns of a section: every row of a section is as wide
-     * as the header of the section, also a row without answers, which
-     * buildScoreTableByEvaluatee pads.
-     */
-    public function calcDimensionX(array $params, array $event, int|bool $peerEval = 1): int
-    {
-        return count($this->generateHeader($params, $event, $peerEval));
     }
 
     /**
@@ -217,7 +207,9 @@ class ExportBaseNewComponent extends CakeObject
         // Fill in grid Results
         $yInc = 0;
 
-        $xDimension = $this->calcDimensionX($params, $event, $peerEval);
+        // Every row of a section is as wide as the header of the section, also
+        // a row without answers, which is padded.
+        $xDimension = count($this->generateHeader($params, $event, $peerEval));
         //$yDimensions = count($group['Member']);
         $grid = array();
 
@@ -295,15 +287,18 @@ class ExportBaseNewComponent extends CakeObject
                 array_push($row, $response[$this->responseModelName]['comment']);
             }
 
-            if ($isRubric) {
-                if ($params['include']['grade_tables']) {
-                    foreach ($event['Question'] as $criterion) {
-                        $row[] = $criteriaDetails[$criterion['criteria_num']]['grade'] ?? '';
-                    }
+            if ($isRubric && $params['include']['grade_tables']) {
+                foreach ($event['Question'] as $criterion) {
+                    $row[] = $criteriaDetails[$criterion['criteria_num']]['grade'] ?? '';
                 }
-            } elseif ($this->detailModel[$event['Event']['event_template_type_id']] && array_key_exists($this->detailModel[$event['Event']['event_template_type_id']], $response)) {
-                // mixed evaluation (simple evaluations have no detail model)
-                $results = $response[$this->detailModel[$event['Event']['event_template_type_id']]];
+            }
+
+            // The answers of a mixed evaluation. Simple evaluations have no
+            // detail model, and the rubric details are above.
+            $detailModel = $this->detailModel[$event['Event']['event_template_type_id']];
+            $hasMixedDetails = !$isRubric && $detailModel && array_key_exists($detailModel, $response);
+            if ($hasMixedDetails) {
+                $results = $response[$detailModel];
                 $results = Set::combine($results, '{n}.question_number', '{n}');
                 
                 $missing_required_question = false;
