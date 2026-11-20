@@ -47,8 +47,8 @@ class SamlController extends AppController {
 
     public function acs() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            header('Allow: POST');
+            $this->header('HTTP/1.1 405 Method Not Allowed');
+            $this->header('Allow: POST');
             return;
         }
 

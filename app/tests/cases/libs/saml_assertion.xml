@@ -16,7 +16,7 @@
   </saml2:Conditions>
   <saml2:AttributeStatement>
     <saml2:Attribute Name="urn:oid:1.3.6.1.4.1.60.6.1.6">
-      <saml2:AttributeValue>testuser123</saml2:AttributeValue>
+      <saml2:AttributeValue>{{USERNAME}}</saml2:AttributeValue>
     </saml2:Attribute>
   </saml2:AttributeStatement>
 </saml2:Assertion>
