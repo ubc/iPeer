@@ -256,14 +256,14 @@ class EvaluationsController extends AppController
      * @access public
      * @return void
      */
-    function export($type, $id)
+    function export($type = null, $id = null)
     {
         // increase the execution time
         ini_set('max_execution_time', 600);
 
         // $type must be course or event
         if ('course' != $type && 'event' != $type) {
-            $this->Session->setFlash('Error: Invalid export type', true);
+            $this->Session->setFlash(__('Error: Invalid export type', true));
             $this->redirect('/courses');
             return;
         } else if (!is_numeric($id)) {
@@ -322,9 +322,12 @@ class EvaluationsController extends AppController
         if (isset($this->params['form']) && !empty($this->params['form'])) {
             $this->autoRender = false;
 
-            if (!($event = $this->Event->getAccessibleEventById($this->params['form']['event_id'], User::get('id'), User::getCourseFilterPermission(), array('Course' => array('Instructor'), 'GroupEvent', 'EventTemplateType', 'Penalty' => array('order' => array('days_late ASC')))))) {
+            $event = $this->Event->getAccessibleEventById($this->params['form']['event_id'], User::get('id'), User::getCourseFilterPermission(), array('Course' => array('Instructor'), 'GroupEvent', 'EventTemplateType', 'Penalty' => array('order' => array('days_late ASC'))));
+            // Surveys have no evaluation results to export.
+            if (!$event || $event['Event']['event_template_type_id'] == '3') {
                 $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
-                $this->redirect('index');
+                // Go back to the export page. The index action replaces the message.
+                $this->redirect(['action' => 'export', $type, $id]);
                 return;
             }
 
@@ -338,7 +341,9 @@ class EvaluationsController extends AppController
                     $this->ExportPdf->createPdf($this->params['form'], $event);
                     break;
                 default :
-                    throw new Exception("Invalid evaluation selection.");
+                    $this->Session->setFlash(__('Error: Invalid export type', true));
+                    $this->redirect(['action' => 'export', $type, $id]);
+                    return;
             }
             $this->log('Memory Usage for exporting event '.$event['Event']['title'].': '.memory_get_peak_usage(), 'debug');
         } else {
