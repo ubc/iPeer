@@ -38,6 +38,7 @@ export const GROUP = {
 
 export const USER = {
   updated: 'User successfully updated!',
+  notFound: 'Error: This user does not exist',
   imported: 'Import successful! See below for import details.',
   enrolled: 'User is successfully enrolled.',
   unenrolled: 'Student is successfully unenrolled!',
@@ -96,6 +97,7 @@ export const RUBRIC = {
 export const MIXEVAL = {
   saved: 'The mixed evaluation was saved successfully.',
   notSaved: 'Unable to save, please check below for error messages.',
+  oneLevelScale: 'A Likert question needs at least two scale levels when Zero Mark is on.',
   removed: 'The Mixed Evaluation was removed successfully.',
   invalidId: 'Error: Invalid Mixeval ID.',
   inUse: (name: string) =>

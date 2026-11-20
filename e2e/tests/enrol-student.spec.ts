@@ -136,3 +136,16 @@ test('enrolling a tutor who already tutors the course is refused', async ({ page
 
   await expectCourseTutors(page, COURSES.mech328.id, SEEDED_MECH328_TUTORS);
 });
+
+test('the user pages without a user id go to another page', async ({ page }) => {
+  await login(page, USERS.superAdmin);
+
+  await page.goto('/users/view');
+  await expect(page).toHaveURL(/\/users$/);
+  await expect(flashMessage(page)).toHaveText(USER.notFound);
+
+  const events = await page.goto('/users/showEvents');
+  expect(events?.status()).toBe(200);
+  // The home page, at /
+  await expect(page).toHaveURL(/\/(home)?$/);
+});

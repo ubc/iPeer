@@ -106,9 +106,9 @@ if ($viewReleaseBtns && !empty($scoreRecords)) { ?>
                 if ($scaled[$userId] == $groupAve) {
                     echo "&nbsp;&nbsp;((".__("Same Mark as Group Average", true)." ))<br>";
                 } else if ($scaled[$userId] < $groupAve) {
-                    echo "&nbsp;&nbsp;<font color='#cc0033'><< ".__('Below Group Average', true)." >></font><br>";
+                    echo "&nbsp;&nbsp;<font color='#cc0033'>&lt;&lt; ".__('Below Group Average', true)." &gt;&gt;</font><br>";
                 } else if ($scaled[$userId] > $groupAve) {
-                    echo "&nbsp;&nbsp;<font color='#000099'><< ".__('Above Group Average', true)." >></font><br>";
+                    echo "&nbsp;&nbsp;<font color='#000099'>&lt;&lt; ".__('Above Group Average', true)." &gt;&gt;</font><br>";
                 }
                 (isset($penalties[$userId]) && $penalties[$userId] > 0) ? $penaltyNotice = 'NOTE: <font color=\'red\'>'.$penalties[$userId].'% </font>Late Penalty<br>' :
                     $penaltyNotice = '<br>';

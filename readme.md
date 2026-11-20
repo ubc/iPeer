@@ -3,7 +3,7 @@
 iPeer is a peer evaluation app that enables instructors to create forms and rubrics for students to fill out. It is commonly used in Team-Based Learning or project-based courses, where teammates have to evaluate each other's contributions.
 
 > [!IMPORTANT]
-> iPeer was first developed in 2002 and has had many contributors over the decades. However, maintenance and improvements have been sporadic over the last few years. While iPeer is still deployable and usable, up-to-date development documentation is limited. If you are interested in using iPeer for your institution, please contact UBC's CTLT and LTIC departments, and we can provide you with the latest operational recommendations and resources. As of 2026, we are considering rebuilding iPeer on a new platform to address its existing issues and encourage contributions from other institutions.
+> iPeer is currently in maintenance mode with limited support. It was first developed in 2002 and has had many contributors over the decades, but capacity to develop it has been reduced. While iPeer is still deployable and usable, up-to-date user guides and development documentation are limited. If you are interested in using iPeer for your institution, please contact UBC's CTLT and LTIC departments, and we can provide you with operational recommendations and resources. As of 2026, we are considering rebuilding it on top of our internal UBC app platform.
 
 ## Local Development
 
@@ -54,7 +54,20 @@ To run the unit tests on containers:
 - Inside of `/var/www/html`, run the command `vendor/bin/phing test` (for all tests) or `vendor/bin/phing test-single -Dtest.type="..." -Dtest.name="..."`. Examples:
     - `vendor/bin/phing test-single -Dtest.type="case" -Dtest.name="controllers/V1Controller"` (see `./app/tests/cases`)
     - `vendor/bin/phing test-single -Dtest.type="group" -Dtest.name="model"` (see `./app/tests/groups`)
-    
+
+### Running the browser (E2E) tests
+
+The Playwright tests in `e2e/` open the app in a browser and use it as a user does: they log in, fill in forms, and navigate through pages. They run in the `playwright` container, against the `web-test` service and the sample data. To run them all:
+
+```
+./build/unit-integration-tests/prepare.sh
+docker compose up -d playwright
+docker compose exec playwright npm ci
+docker compose exec playwright npm test
+```
+
+See [e2e/README.md](e2e/README.md) for how to run one test, debug a test, and write new tests.
+
 
 ## Configuring Caliper
 

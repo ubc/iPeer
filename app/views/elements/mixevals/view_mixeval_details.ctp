@@ -61,7 +61,7 @@ foreach ($questions as $ques) {
                 // upgraded from pre 3.1, scale_levels are set to 0. So use $key as level, scale_level starts from 1
                 $desc['scale_level'] = $key + 1;
             }
-            $mark = $highestMark * (($desc['scale_level'] - $zero_mark) / ($scale - $zero_mark));
+            $mark = Toolkit::scaleMark($highestMark, $desc['scale_level'], $scale, $zero_mark);
             $checked = '';
             if (isset($details[$num])) {
                 $checked = ($details[$num]['selected_lom'] == $desc['scale_level']) ? 'checked' : '';

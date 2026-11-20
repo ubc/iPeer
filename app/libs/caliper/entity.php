@@ -446,7 +446,8 @@ class CaliperEntity {
             $lom_num = $rubric['zero_mark'] ? $lom['lom_num'] - 1 : $lom['lom_num'];
             // both must be string
             $item_labels[]= "". $lom['lom_comment'];
-            $item_values[]= "". ((float) $question['multiplier'] * $lom_num / $count);
+            // A scale with one level and Zero Mark on gives 0
+            $item_values[]= "". ($count > 0 ? ((float) $question['multiplier'] * $lom_num / $count) : 0.0);
         }
 
         $entity = (new LikertScale( $id ))
@@ -650,7 +651,8 @@ class CaliperEntity {
                 $scale_level = $mixeval['zero_mark'] ? $description['scale_level'] - 1 : $description['scale_level'];
                 // both must be string
                 $item_labels[]= "". $description['descriptor'];
-                $item_values[]= "". ((float) $question['multiplier'] * $scale_level /  $count);
+                // A scale with one level and Zero Mark on gives 0
+                $item_values[]= "". ($count > 0 ? ((float) $question['multiplier'] * $scale_level / $count) : 0.0);
             }
 
             $entity = (new LikertScale( $id ))

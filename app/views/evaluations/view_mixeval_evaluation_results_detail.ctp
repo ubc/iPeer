@@ -132,11 +132,11 @@ if ($viewReleaseBtns && array_filter((array) $evalResult)) { ?>
                 $ave_penaltyAddOn = '';
             $memberAverageAve = number_format(array_sum($scores), 2) * (100-$penalty[$evaluteeId])/100;
             if ($memberAverageAve == $groupAvg) {
-                echo "&nbsp;&nbsp;<< ".__('Same Mark as Group Average', true)." >>";
+                echo "&nbsp;&nbsp;&lt;&lt; ".__('Same Mark as Group Average', true)." &gt;&gt;";
             } else if ($memberAverageAve < $groupAvg) {
-                echo "&nbsp;&nbsp;<font color='#cc0033'><< ".__('Below Group Average', true)." >></font>";
+                echo "&nbsp;&nbsp;<font color='#cc0033'>&lt;&lt; ".__('Below Group Average', true)." &gt;&gt;</font>";
             } else if ($memberAverageAve > $groupAvg) {
-                echo "&nbsp;&nbsp;<font color='#000099'><< ".__('Above Group Average', true)." >></font>";
+                echo "&nbsp;&nbsp;<font color='#000099'>&lt;&lt; ".__('Above Group Average', true)." &gt;&gt;</font>";
             }
             ?> </b><br>
             <?php //echo __("Average Percentage Per Question: ", true);
