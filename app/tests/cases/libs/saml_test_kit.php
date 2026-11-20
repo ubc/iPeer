@@ -93,7 +93,7 @@ class SamlTestKit
         $dir          = __DIR__;
 
         // 1. Load and populate the assertion template
-        $assertionXml = strtr(file_get_contents("$dir/saml_assertion.xml"), [
+        $assertionXml = self::fill("$dir/saml_assertion.xml", [
             '{{ASSERTION_ID}}'    => $assertionId,
             '{{ISSUE_INSTANT}}'   => $issueInstant,
             '{{ISSUER}}'          => $issuer,
@@ -101,11 +101,10 @@ class SamlTestKit
             '{{NOT_BEFORE}}'      => $notBefore,
             '{{NOT_ON_OR_AFTER}}' => $notOnOrAfter,
             '{{ACS_URL}}'         => $recipientUrl,
-            '{{USERNAME}}'        => htmlspecialchars($username, ENT_XML1),
+            '{{USERNAME}}'        => $username,
         ]);
 
-        $assertionDoc = new DOMDocument();
-        $assertionDoc->loadXML($assertionXml);
+        $assertionDoc = self::load($assertionXml);
 
         // 2. Sign the assertion with the IdP key
         self::signNode($assertionDoc->documentElement, $idpPrivKey, $idpCert);
@@ -116,11 +115,14 @@ class SamlTestKit
         //    signature check would still name a real user.
         if ($tamper) {
             $names = $assertionDoc->getElementsByTagNameNS('urn:oasis:names:tc:SAML:2.0:assertion', 'NameID');
+            if ($names->length === 0) {
+                throw new RuntimeException('saml_assertion.xml has no NameID to tamper with');
+            }
             $names->item(0)->textContent = 'tampered_value';
         }
 
         // 4. Load and populate the response wrapper template
-        $responseXml = strtr(file_get_contents("$dir/saml_response.xml"), [
+        $responseXml = self::fill("$dir/saml_response.xml", [
             '{{RESPONSE_ID}}'   => $responseId,
             '{{ISSUE_INSTANT}}' => $issueInstant,
             '{{ISSUER}}'        => $issuer,
@@ -132,8 +134,7 @@ class SamlTestKit
         //    If we instead imported the assertion node into the response document first,
         //    DOMDocument::saveXML($node) would omit xmlns:saml2 (already in scope on the
         //    response root), producing a namespace-invalid encrypted payload.
-        $assertionOnlyDoc = new DOMDocument();
-        $assertionOnlyDoc->loadXML($assertionDoc->saveXML($assertionDoc->documentElement));
+        $assertionOnlyDoc = self::load($assertionDoc->saveXML($assertionDoc->documentElement));
         self::encryptNode($assertionOnlyDoc->documentElement, $this->spCertPem);
         $encDataXml = $assertionOnlyDoc->saveXML($assertionOnlyDoc->documentElement);
 
@@ -145,6 +146,22 @@ class SamlTestKit
         );
 
         return base64_encode($responseXml);
+    }
+
+    // A template with its {{PLACEHOLDER}} tokens replaced by escaped values.
+    private static function fill(string $file, array $values): string
+    {
+        $escaped = array_map(fn($value) => htmlspecialchars($value, ENT_XML1 | ENT_QUOTES), $values);
+        return strtr(file_get_contents($file), $escaped);
+    }
+
+    private static function load(string $xml): DOMDocument
+    {
+        $doc = new DOMDocument();
+        if (!$doc->loadXML($xml)) {
+            throw new RuntimeException('The test SAML XML does not load');
+        }
+        return $doc;
     }
 
     public static function genPrivKey(): string

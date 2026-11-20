@@ -15,18 +15,18 @@ require_once __DIR__ . DS . 'saml_test_kit.php';
  */
 class IPeerSamlResponseTestCase extends CakeTestCase
 {
-    private $kit;
+    private $samlTestKit;
     private $settings;
 
     public function startTest($method)
     {
-        $this->kit      = new SamlTestKit();
-        $this->settings = $this->kit->settings;
+        $this->samlTestKit = new SamlTestKit();
+        $this->settings    = $this->samlTestKit->settings;
     }
 
     public function testHappyPath()
     {
-        $response = new IPeerSamlResponse($this->settings, $this->kit->buildResponse());
+        $response = new IPeerSamlResponse($this->settings, $this->samlTestKit->buildResponse());
         $response->validate();
 
         $attrs = [];
@@ -40,7 +40,7 @@ class IPeerSamlResponseTestCase extends CakeTestCase
     {
         $wrongKey  = SamlTestKit::genPrivKey();
         $wrongCert = SamlTestKit::genCert($wrongKey, 'Unknown IdP');
-        $response  = new IPeerSamlResponse($this->settings, $this->kit->buildResponse([
+        $response  = new IPeerSamlResponse($this->settings, $this->samlTestKit->buildResponse([
             'idpPrivKey' => $wrongKey,
             'idpCert'    => $wrongCert,
         ]));
@@ -56,7 +56,7 @@ class IPeerSamlResponseTestCase extends CakeTestCase
     {
         // Assertion is signed then its content is mutated before encryption;
         // decryption succeeds but signature validation must catch the tampering.
-        $response = new IPeerSamlResponse($this->settings, $this->kit->buildResponse([
+        $response = new IPeerSamlResponse($this->settings, $this->samlTestKit->buildResponse([
             'tamperAfterSign' => true,
         ]));
         try {
@@ -69,7 +69,7 @@ class IPeerSamlResponseTestCase extends CakeTestCase
 
     public function testFailureStatusCode()
     {
-        $response = new IPeerSamlResponse($this->settings, $this->kit->buildResponse([
+        $response = new IPeerSamlResponse($this->settings, $this->samlTestKit->buildResponse([
             'statusCode' => 'urn:oasis:names:tc:SAML:2.0:status:Responder',
         ]));
         try {
@@ -82,7 +82,7 @@ class IPeerSamlResponseTestCase extends CakeTestCase
 
     public function testExpiredAssertion()
     {
-        $response = new IPeerSamlResponse($this->settings, $this->kit->buildResponse([
+        $response = new IPeerSamlResponse($this->settings, $this->samlTestKit->buildResponse([
             'notOnOrAfter' => gmdate('Y-m-d\TH:i:s\Z', time() - SamlTestKit::TIMESTAMP_SKEW),
         ]));
         try {
@@ -95,7 +95,7 @@ class IPeerSamlResponseTestCase extends CakeTestCase
 
     public function testAssertionNotYetValid()
     {
-        $response = new IPeerSamlResponse($this->settings, $this->kit->buildResponse([
+        $response = new IPeerSamlResponse($this->settings, $this->samlTestKit->buildResponse([
             'notBefore' => gmdate('Y-m-d\TH:i:s\Z', time() + SamlTestKit::TIMESTAMP_SKEW),
         ]));
         try {
@@ -108,7 +108,7 @@ class IPeerSamlResponseTestCase extends CakeTestCase
 
     public function testIssuerMismatch()
     {
-        $response = new IPeerSamlResponse($this->settings, $this->kit->buildResponse([
+        $response = new IPeerSamlResponse($this->settings, $this->samlTestKit->buildResponse([
             'issuer' => 'https://evil.example.com',
         ]));
         try {
@@ -121,7 +121,7 @@ class IPeerSamlResponseTestCase extends CakeTestCase
 
     public function testAudienceMismatch()
     {
-        $response = new IPeerSamlResponse($this->settings, $this->kit->buildResponse([
+        $response = new IPeerSamlResponse($this->settings, $this->samlTestKit->buildResponse([
             'audience' => 'https://other-sp.example.com',
         ]));
         try {
@@ -134,7 +134,7 @@ class IPeerSamlResponseTestCase extends CakeTestCase
 
     public function testDestinationMismatch()
     {
-        $response = new IPeerSamlResponse($this->settings, $this->kit->buildResponse([
+        $response = new IPeerSamlResponse($this->settings, $this->samlTestKit->buildResponse([
             'destinationUrl' => 'https://evil.example.com/acs',
         ]));
         try {
@@ -147,7 +147,7 @@ class IPeerSamlResponseTestCase extends CakeTestCase
 
     public function testRecipientMismatch()
     {
-        $response = new IPeerSamlResponse($this->settings, $this->kit->buildResponse([
+        $response = new IPeerSamlResponse($this->settings, $this->samlTestKit->buildResponse([
             'recipientUrl' => 'https://evil.example.com/acs',
         ]));
         try {
@@ -165,7 +165,7 @@ class IPeerSamlResponseTestCase extends CakeTestCase
         putenv('IPEER_SECRET_KEY'); // ensure env var is not set
 
         try {
-            new IPeerSamlResponse($settings, $this->kit->buildResponse());
+            new IPeerSamlResponse($settings, $this->samlTestKit->buildResponse());
             $this->fail('Expected exception not thrown for missing decryption key');
         } catch (Exception $e) {
             $this->assertPattern('/decryption key/i', $e->getMessage());
@@ -186,10 +186,10 @@ class IPeerSamlResponseTestCase extends CakeTestCase
     {
         $settings = $this->settings;
         unset($settings['sp']['privateKeyForDecryption']);
-        putenv('IPEER_SECRET_KEY=' . SamlTestKit::keyBase64($this->kit->spPrivKeyPem));
+        putenv('IPEER_SECRET_KEY=' . SamlTestKit::keyBase64($this->samlTestKit->spPrivKeyPem));
 
         try {
-            $response = new IPeerSamlResponse($settings, $this->kit->buildResponse());
+            $response = new IPeerSamlResponse($settings, $this->samlTestKit->buildResponse());
             $response->validate();
 
             $attrs = [];
