@@ -555,6 +555,102 @@ test('the template search box finds a template by its name or ID', async ({
   await expect(flashMessage(page)).toHaveCount(0);
 });
 
+test('the template search box matches any part of a name, and the arrow keys move through the matches', async ({
+  page,
+  testDatabase,
+}) => {
+  const add = (name: string, creator: string) =>
+    insertSimpleTemplate(
+      testDatabase,
+      name,
+      creator === USERS.instructor1 ? 'private' : 'public',
+      creator
+    );
+  const ids = {
+    lab1: await add('Lab 1 Peer Review', USERS.instructor1),
+    lab2: await add('Lab 2 Peer Review', USERS.instructor1),
+    finalLab: await add('Final Lab Report', USERS.instructor2),
+    safety: await add('Lab Safety Quiz', USERS.instructor2),
+    midterm: await add('Midterm Review', USERS.instructor2),
+  };
+  const label = {
+    lab1: `Lab 1 Peer Review (ID ${ids.lab1})`,
+    lab2: `Lab 2 Peer Review (ID ${ids.lab2})`,
+    finalLab: `Final Lab Report (ID ${ids.finalLab})`,
+    safety: `Lab Safety Quiz (ID ${ids.safety})`,
+    midterm: `Midterm Review (ID ${ids.midterm})`,
+  };
+
+  await login(page, USERS.instructor1);
+  await page.goto(`/events/add/${COURSES.mech328.id}`);
+  const box = templateBox(page);
+  const menu = templateMenu(page);
+  const select = page.locator(TEMPLATE_SELECT.SIMPLE);
+  // the highlighted template: jQuery UI marks its link, and the box names it
+  const highlighted = menu.items.filter({ has: page.locator('a.ui-state-hover') });
+  const expectHighlighted = async (key: keyof typeof ids) => {
+    await expect(highlighted).toHaveText([label[key]]);
+    await expect(box).toHaveAttribute(
+      'aria-activedescendant',
+      `EventSimpleEvaluationSearchOption${ids[key]}`
+    );
+  };
+
+  // a match at the start, in the middle, in any case; own templates first,
+  // each group by name, and each match marked as the template writes it
+  await box.click();
+  await box.pressSequentially('LAB');
+  await expect(menu.headings).toHaveText(['My templates', 'Other templates']);
+  await expect(menu.items).toHaveText([label.lab1, label.lab2, label.finalLab, label.safety]);
+  await expect(menu.items.locator('mark')).toHaveText(['Lab', 'Lab', 'Lab', 'Lab']);
+
+  // a match at the end of a name, in both groups
+  await box.fill('review');
+  await expect(menu.items).toHaveText([label.lab1, label.lab2, label.midterm]);
+  await expect(menu.items.locator('mark')).toHaveText(['Review', 'Review', 'Review']);
+
+  // Down goes from the first match to the next, past the heading of the
+  // other group; Up goes back. The box keeps the typed text.
+  await box.fill('lab');
+  await expect(highlighted).toHaveCount(0);
+  await box.press('ArrowDown');
+  await expectHighlighted('lab1');
+  await box.press('ArrowDown');
+  await expectHighlighted('lab2');
+  await box.press('ArrowDown');
+  await expectHighlighted('finalLab');
+  await box.press('ArrowUp');
+  await expectHighlighted('lab2');
+  await expect(box).toHaveValue('lab');
+
+  // past the last match, and before the first, nothing is highlighted
+  await box.press('ArrowDown');
+  await box.press('ArrowDown');
+  await expectHighlighted('safety');
+  await box.press('ArrowDown');
+  await expect(highlighted).toHaveCount(0);
+  await expect(box).not.toHaveAttribute('aria-activedescendant');
+  await box.press('ArrowDown');
+  await expectHighlighted('lab1');
+  await box.press('ArrowUp');
+  await expect(highlighted).toHaveCount(0);
+  await expect(box).toHaveValue('lab');
+
+  // Enter picks the highlighted template
+  await box.press('ArrowDown');
+  await box.press('ArrowDown');
+  await box.press('ArrowDown');
+  await expectHighlighted('finalLab');
+  await box.press('Enter');
+  await expect(menu.items).toHaveCount(0);
+  await expect(box).toHaveValue(label.finalLab);
+  await expect(select).toHaveValue(ids.finalLab);
+  await expect(page.locator('#prevS')).toHaveAttribute(
+    'href',
+    new RegExp(`/simpleevaluations/view/${ids.finalLab}$`)
+  );
+});
+
 test('Submit with a template search that is not a template opens the list', async ({ page }) => {
   await login(page, USERS.instructor1);
   await page.goto(`/events/add/${COURSES.mech328.id}`);

@@ -2530,14 +2530,40 @@ input.template-typeahead {
     overflow-y: auto;
 }
 
+/* the same padding as the box, so the texts line up */
+.ui-autocomplete .ui-menu-item a {
+    line-height: 1.4;
+    padding: 0.3em 0.5em;
+}
+
+/* A heading of the template list: a band, set apart from the templates.
+   It floats like the jQuery UI 1.8 menu items, which are
+   "float: left; clear: left; width: 100%": a heading in the normal flow would
+   sit behind the floated items above it and colour them with its band. */
 .ui-autocomplete-category {
+    box-sizing: border-box;
+    clear: left;
+    float: left;
+    width: 100%;
+    background: #3d5a73;
+    color: #fff;
+    cursor: default;
+    font-size: 0.8em;
     font-weight: bold;
-    padding: 0.4em 0.4em 0.2em;
+    letter-spacing: 0.05em;
+    margin-top: 0.3em;
+    padding: 0.5em 0.5em 0.4em;
+    text-transform: uppercase;
+}
+
+.ui-autocomplete-category:first-child {
+    margin-top: 0;
 }
 
 /* the part of a template that matches the search */
 .ui-autocomplete mark {
-    background: none;
+    background: #ffe873;
+    border-radius: 2px;
     color: inherit;
     font-weight: bold;
 }

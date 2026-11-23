@@ -116,6 +116,15 @@ var templateTypeahead = (function ($) {
                 return false;
             },
             open: function () {
+                // Give the list the same font as the box. The jQuery UI theme
+                // sets its own font on the list (Lucida Grande, 1.1em), so
+                // without this the templates show larger than the box text.
+                // The box's computed font is copied, not a fixed size,
+                // because each browser draws form fields in its own font.
+                widget.menu.element.css({
+                    fontFamily: input.css('font-family'),
+                    fontSize: input.css('font-size')
+                });
                 // jQuery UI 1.8 marks the list as a menu; it is a list box
                 widget.menu.element.attr('role', 'listbox');
                 widget.menu.element.children('.ui-menu-item').attr('role', 'option');
@@ -146,6 +155,12 @@ var templateTypeahead = (function ($) {
             'aria-controls': id + 'List'
         });
         widget.menu.element.attr('id', id + 'List');
+        // the menu removes its highlight past the first or last template
+        var deactivate = widget.menu.deactivate;
+        widget.menu.deactivate = function () {
+            input.removeAttr('aria-activedescendant');
+            return deactivate.apply(this, arguments);
+        };
 
         // A heading before the first template of each group. The headings
         // have no ui-menu-item class, so the arrow keys skip them.
