@@ -4364,14 +4364,6 @@ msgstr "Autorisations pour la planification d'email."
 msgid "If failed, remove Apache user from \"/etc/at.deny\" or \"/var/at/at.deny\""
 msgstr "En cas d'échec, supprimez l'utilisateur Apache de \"/ etc / at.deny \" ou \"/ var / at / at.deny \""
 
-#: /Users/compass/projects/ipeer/src//install/index.ctp:176
-msgid "PHP LDAP Extension."
-msgstr "Extension PHP LDAP."
-
-#: /Users/compass/projects/ipeer/src//install/index.ctp:177
-msgid "Required if you are planning to use LDAP authentication."
-msgstr "Obligatoire si vous envisagez d'utiliser l'authentification LDAP."
-
 #: /Users/compass/projects/ipeer/src//install/index.ctp:182
 msgid "PHP DOMDocument."
 msgstr "PHP DOMDocument."

@@ -4323,14 +4323,6 @@ msgstr ""
 msgid "Required if you want email functions."
 msgstr ""
 
-#: /Users/compass/projects/ipeer/src//install/index.ctp:146
-msgid "PHP LDAP Extension."
-msgstr ""
-
-#: /Users/compass/projects/ipeer/src//install/index.ctp:147
-msgid "Required if you are planning to use LDAP authentication."
-msgstr ""
-
 #: /Users/compass/projects/ipeer/src//install/index.ctp:152
 msgid "PHP DOMDocument."
 msgstr ""

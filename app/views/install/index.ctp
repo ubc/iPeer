@@ -45,9 +45,6 @@ if (file_exists(APP.DS.'plugins'.DS.'guard'.DS.'config'.DS.'guard_default.php') 
 if (ini_get("sendmail_path")) { // send mail
   $sendmail = $yes;
 }
-// ldap
-$ldap = function_exists('ldap_connect') ? $yes : $no;
-
 // DOMDocment
 $domdoc = (extension_loaded('dom') && class_exists('DOMDocument')) ? $yes : $no;
 
@@ -143,16 +140,11 @@ foreach ($php_recommended_settings as $key => $setting)
     <td width="30%"><?php echo $sendmail ?></td>
   </tr>
   <tr>
-      <td><?php __('PHP LDAP Extension.')?>
-        <div class="help"><?php __('Required if you are planning to use LDAP authentication.')?></div>
-      </td>
-      <td><?php echo $ldap; ?></td>
-  </tr>
-  <tr>
     <td><?php __('PHP DOMDocument.') ?>
         <div class="help"><?php __('Required if you are planning to use TeamMaker.')?></div>
     </td>
     <td><?php echo $domdoc; ?></td>
+  </tr>
 </table>
 
 <h4>Recommended</h4>

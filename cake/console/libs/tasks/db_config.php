@@ -102,7 +102,7 @@ class DbConfigTask extends Shell {
 				}
 			}
 
-			$driver = $this->in('Driver:', array('mssql', 'mysql', 'mysqli', 'oracle', 'postgres', 'sqlite'), 'mysql');
+			$driver = $this->in('Driver:', array('mssql', 'mysql', 'mysqli', 'postgres', 'sqlite'), 'mysql');
 
 			$persistent = $this->in('Persistent Connection?', array('y', 'n'), 'n');
 			if (strtolower($persistent) == 'n') {

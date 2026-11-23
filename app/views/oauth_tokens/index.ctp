@@ -73,6 +73,10 @@ jQuery(document).ready(function() {
      */
     jQuery('#table_id tbody td').live('click', function () {
         var nTr = jQuery(this).parents('tr')[0];
+        // a click inside an open action panel is not on a table row
+        if (!oTable.fnGetData(nTr)) {
+            return;
+        }
         if ( oTable.fnIsOpen(nTr) )
         {
             /* This row is already open - close it */

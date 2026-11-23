@@ -1,51 +1,5 @@
 <?php
 
-// We use json encode and json decode here...
-// Make sure they're defined :-)
-
-// This code will substitute in json_encode and json_decode implemented in PHP.
-// the problem with these functions is that they're slower than PHP 5.2's c implementationss
-if (!function_exists('json_decode') ) {
-    /**
-     * json_decode
-     *
-     * @param mixed $content content
-     * @param bool  $assoc   assoc
-     *
-     * @access public
-     * @return void
-     */
-    function json_decode($content, $assoc=false)
-    {
-        require_once 'vendors/JSON.php';
-        if ($assoc ) {
-            $json = new Services_JSON(SERVICES_JSON_LOOSE_TYPE);
-        } else {
-            $json = new Services_JSON;
-        }
-        return $json->decode($content);
-    }
-
-}
-
-if (!function_exists('json_encode') ) {
-    /**
-     * json_encode
-     *
-     * @param mixed $content
-     *
-     * @access public
-     * @return void
-     */
-    function json_encode($content)
-    {
-        require_once 'vendors/JSON.php';
-        $json = new Services_JSON;
-        return $json->encode($content);
-    }
-
-}
-
 /**
  * AjaxListComponent
  *

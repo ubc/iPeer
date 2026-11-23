@@ -1,6 +1,5 @@
 <?php
 
-//$config['Guard.AuthModule.Name'] = 'Ldap';    // Using LDAP module
 //$config['Guard.AuthModule.Name'] = 'Shibboleth';    // Using Shibboleth module
 $config['Guard.AuthModule.Name'] = getenv('IPEER_AUTH') ? getenv('IPEER_AUTH') : 'Default';     // Using default (build-in) module
 
@@ -19,22 +18,6 @@ $config['Guard.AuthModule.Shibboleth'] = array(
     'loginError'          => 'You have successfully logged in through Shibboleth. But you do not have access this appliction.',
     'loginImageButton'    => '',
     'loginTextButton'     => 'Login',
-);
-
-$config['Guard.AuthModule.Ldap'] = array(
-    'host' => 'ldaps://ldap.school.ca/',
-    'port' => 636,
-    'serviceUsername' => 'uid=USERNAME, ou=Special Users, o=school.ca', // username to connect to LDAP
-    'servicePassword' => 'PASSWORD', // password to connect to LDAP
-    'baseDn' => 'ou=Campus Login, o=school.ca',
-    'usernameField' => 'uid',
-    'attributeSearchFilters' => array(
-//        'uid',
-    ),
-    'attributeMap' => array(
-//        'username' => 'uid',
-    ),
-    'fallbackInternal' => true,
 );
 
 $config['Guard.AuthModule.Cwl'] = array(

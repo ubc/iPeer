@@ -4345,14 +4345,6 @@ msgid ""
 msgstr ""
 "Si no, eliminar el usuario Apache de \"/etc/at.deny\" o \"/var/at/at.deny\""
 
-#: /views/install/index.ctp:176
-msgid "PHP LDAP Extension."
-msgstr "Extensión PHP LDAP."
-
-#: /views/install/index.ctp:177
-msgid "Required if you are planning to use LDAP authentication."
-msgstr "Necesaria si desea utilizar la autenticación LDAP."
-
 #: /views/install/index.ctp:182
 msgid "PHP DOMDocument."
 msgstr "PHP DOMDocument."
