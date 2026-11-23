@@ -156,4 +156,48 @@ class MixevalTestCase extends CakeTestCase
         );
         return $tmp;
     }
+
+    // The seed has one public template, "Default Mix Evaluation" (1),
+    // created by user 1.
+    function testGetBelongingOrPublicListsOwnAndPublicByName()
+    {
+        $zeta = $this->addTemplate('Zeta own', 'private', 2);
+        $alpha = $this->addTemplate('Alpha own', 'public', 2);
+        $hidden = $this->addTemplate('Hidden other', 'private', 3);
+
+        $row = fn ($id, $name, $creator) => ['id' => $id, 'name' => $name, 'creator_id' => $creator];
+        $default = $row(1, 'Default Mix Evaluation', 1);
+
+        // own templates (private too) and others' public ones, sorted by name
+        $this->assertIdentical($this->Mixeval->getBelongingOrPublic(2), [
+            $row($alpha, 'Alpha own', 2),
+            $default,
+            $row($zeta, 'Zeta own', 2),
+        ]);
+        // the included template is listed even when it is another user's
+        // private one
+        $this->assertIdentical($this->Mixeval->getBelongingOrPublic(99, $hidden), [
+            $row($alpha, 'Alpha own', 2),
+            $default,
+            $row($hidden, 'Hidden other', 3),
+        ]);
+        $this->assertIdentical($this->Mixeval->getBelongingOrPublic('x'), []);
+        $this->assertIdentical($this->Mixeval->getBelongingOrPublic(2, 'x'), []);
+
+        $this->Mixeval->deleteAll(['Mixeval.id' => [$zeta, $alpha, $hidden]], false, false);
+    }
+
+    private function addTemplate($name, $availability, $creatorId)
+    {
+        $this->Mixeval->create();
+        $this->Mixeval->save([
+            'name' => $name,
+            'zero_mark' => 0,
+            'availability' => $availability,
+        ], false);
+        $id = (int) $this->Mixeval->id;
+        // Traceable sets the creator to the logged-in user, so set it here
+        $this->Mixeval->updateAll(['creator_id' => $creatorId], ['Mixeval.id' => $id]);
+        return $id;
+    }
 }

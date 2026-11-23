@@ -171,6 +171,7 @@ class Mixeval extends AppModel
      * getBelongingOrPublic
      * Returns the evaluations made by this user, and any other public ones.
      * Optionally include an additional evaluation by id that bypasses ownership and public restrictions.
+     * Sorted by name.
      *
      * Note duplicate in evaluation_base. Unfortunately, evaluation_base
      * causes other problems for some reason, so can't inherit from it, just
@@ -180,27 +181,51 @@ class Mixeval extends AppModel
      * @param mixed $include_id
      *
      * @access public
-     * @return void
+     * @return array Empty when an id is not numeric. For example:
+     *     [
+     *         ['id' => 7, 'name' => 'Lab Rubric', 'creator_id' => 2],
+     *         ['id' => 1, 'name' => 'Term Report Evaluation', 'creator_id' => 1],
+     *     ]
      */
-    function getBelongingOrPublic($user_id, $include_id=NULL)
+    function getBelongingOrPublic($user_id, $include_id = null): array
     {
         if (!is_numeric($user_id)) {
-            return false;
+            return [];
         }
 
         if (!is_null($include_id) && !is_numeric($include_id)) {
-            return false;
+            return [];
         }
 
-        $conditions = array(
+        $conditions = [
             'creator_id' => $user_id,
             'availability' => 'public',
-        );
+        ];
         if (!is_null($include_id)) {
+            // The edit page passes the event's current template, so the
+            // select shows it and keeps it selected even when it is another
+            // user's private template: a co-instructor made the event with
+            // their own template, or the template was public then and is
+            // private now.
             $conditions['id'] = $include_id;
         }
-        $conditions = array('OR' => $conditions);
-        return $this->find('list', array('conditions' => $conditions, 'fields' => array('name'), 'order' => 'name'));
+        $templates = $this->find('all', [
+            'conditions' => ['OR' => $conditions],
+            'fields' => ['id', 'name', 'creator_id'],
+            'order' => 'name ASC',
+            'recursive' => -1,
+        ]);
+
+        $rows = [];
+        foreach ($templates as $template) {
+            $row = $template[$this->alias];
+            $rows[] = [
+                'id' => (int) $row['id'],
+                'name' => $row['name'],
+                'creator_id' => (int) $row['creator_id'],
+            ];
+        }
+        return $rows;
     }
 
     /**

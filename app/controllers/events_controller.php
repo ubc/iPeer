@@ -312,21 +312,22 @@ class EventsController extends AppController
             'eventTemplateTypes',
             $this->EventTemplateType->getEventTemplateTypeList(true)
         );
+        $userId = $this->Auth->user('id');
         $this->set(
             'mixevals',
-            $this->Mixeval->getBelongingOrPublic($this->Auth->user('id'))
+            $this->_templateSelectOptions($this->Mixeval->getBelongingOrPublic($userId), $userId)
         );
         $this->set(
             'simpleEvaluations',
-            $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'))
+            $this->_templateSelectOptions($this->SimpleEvaluation->getBelongingOrPublic($userId), $userId)
         );
         $this->set(
             'surveys',
-            $this->Survey->getBelongingOrPublic($this->Auth->user('id'))
+            $this->_templateSelectOptions($this->Survey->getBelongingOrPublic($userId), $userId)
         );
         $this->set(
             'rubrics',
-            $this->Rubric->getBelongingOrPublic($this->Auth->user('id'))
+            $this->_templateSelectOptions($this->Rubric->getBelongingOrPublic($userId), $userId)
         );
         $emailReminders = array('0'=> 'Disable', '1' => '1 Day', '2'=>'2 Days','3'=>'3 Days','4'=>'4 Days','5'=>'5 Days','6'=>'6 Days','7'=>'7 Days');
         $this->set('emailTemplates', $this->EmailTemplate->getPermittedEmailTemplate(User::get('id'), 'list'));
@@ -590,21 +591,22 @@ class EventsController extends AppController
             $mixevalSelected = $event['Event']['template_id'];
             $this->set('mixevalSelected', $event['Event']['template_id']);
         }
+        $userId = $this->Auth->user('id');
         $this->set(
             'mixevals',
-            $this->Mixeval->getBelongingOrPublic($this->Auth->user('id'), $mixevalSelected)
+            $this->_templateSelectOptions($this->Mixeval->getBelongingOrPublic($userId, $mixevalSelected), $userId)
         );
         $this->set(
             'simpleEvaluations',
-            $this->SimpleEvaluation->getBelongingOrPublic($this->Auth->user('id'), $simpleSelected)
+            $this->_templateSelectOptions($this->SimpleEvaluation->getBelongingOrPublic($userId, $simpleSelected), $userId)
         );
         $this->set(
             'surveys',
-            $this->Survey->getBelongingOrPublic($this->Auth->user('id'), $surveySelected)
+            $this->_templateSelectOptions($this->Survey->getBelongingOrPublic($userId, $surveySelected), $userId)
         );
         $this->set(
             'rubrics',
-            $this->Rubric->getBelongingOrPublic($this->Auth->user('id'), $rubricSelected)
+            $this->_templateSelectOptions($this->Rubric->getBelongingOrPublic($userId, $rubricSelected), $userId)
         );
         $this->set(
             'eventTemplateTypes',
@@ -620,6 +622,42 @@ class EventsController extends AppController
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $event['Course']))->push(array('event' => $event['Event']))->push(__('Edit', true)));
 
         $this->data = $event;
+    }
+
+    /**
+     * The options of a template select, from getBelongingOrPublic().
+     *
+     * @param array $templates [['id' => 7, 'name' => 'Lab Rubric', 'creator_id' => 2], ...]
+     * @param int   $userId    the user who picks a template
+     *
+     * @return array With own templates:
+     *     [
+     *         'My templates' => [7 => 'Lab Rubric (ID 7)'],
+     *         'Other templates' => [1 => 'Term Report Evaluation (ID 1)'],
+     *     ]
+     * With no own templates (no headings):
+     *     [1 => 'Term Report Evaluation (ID 1)']
+     */
+    private function _templateSelectOptions(array $templates, $userId): array
+    {
+        $own = [];
+        $other = [];
+        foreach ($templates as $template) {
+            $label = "{$template['name']} (ID {$template['id']})";
+            if ($template['creator_id'] == $userId) {
+                $own[$template['id']] = $label;
+            } else {
+                $other[$template['id']] = $label;
+            }
+        }
+
+        if (empty($own)) {
+            return $other;
+        }
+        return array_filter([
+            __('My templates', true) => $own,
+            __('Other templates', true) => $other,
+        ]);
     }
 
     /**

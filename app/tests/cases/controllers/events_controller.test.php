@@ -155,10 +155,10 @@ class EventsControllerTest extends ExtendedAuthTestCase {
 
         // make sure the correct course
         $this->assertEqual($result['course_id'], 1);
-        // available evaluations
-        $this->assertEqual($result['rubrics'][1], 'Term Report Evaluation');
-        $this->assertEqual($result['simpleEvaluations'][1], 'Module 1 Project Evaluation');
-        $this->assertEqual($result['mixevals'][1], 'Default Mix Evaluation');
+        // available evaluations: root created the seeded templates
+        $this->assertEqual($result['rubrics']['My templates'][1], 'Term Report Evaluation (ID 1)');
+        $this->assertEqual($result['simpleEvaluations']['My templates'][1], 'Module 1 Project Evaluation (ID 1)');
+        $this->assertEqual($result['mixevals']['My templates'][1], 'Default Mix Evaluation (ID 1)');
         // evauation types
         $this->assertEqual(count($result['eventTemplateTypes']), 4);
         // course list
