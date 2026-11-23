@@ -18,6 +18,8 @@ import {
   viewField,
 } from '../support/events';
 import { COURSES, MECH328_GROUPS, USERS, fullName } from '../support/seed';
+import type { TestDatabase } from '../support/db';
+import { insertRow, userId } from '../support/insert';
 import { ACCESS, EMAIL, EVENT } from '../support/messages';
 
 // Ported from app/tests/cases/system/add_event.test.php. The Selenium test also
@@ -114,6 +116,43 @@ function setting(page: Page, legend: string): Locator {
   return page.getByRole('group', { name: legend, exact: true });
 }
 
+// A template option reads "Name (ID id)". A test that inserts a template does
+// not know its id at the start, so pick the option by its name: exactly the
+// name, then the id.
+async function selectTemplate(select: Locator, name: string): Promise<void> {
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const option = select
+    .locator('option')
+    .filter({ hasText: new RegExp(`^${escaped} \\(ID \\d+\\)$`) });
+  await expect(option, `the template ${name}`).toHaveCount(1);
+  const value = await option.getAttribute('value');
+  if (value === null) {
+    throw new Error(`The option of the template ${name} has no value`);
+  }
+  await select.selectOption(value);
+}
+
+// The option labels of one group of a template list, in page order.
+function templateGroup(select: Locator, group: 'My templates' | 'Other templates'): Locator {
+  return select.locator(`optgroup[label="${group}"] option`);
+}
+
+// A simple evaluation template, inserted for the template list tests.
+async function insertSimpleTemplate(
+  testDatabase: TestDatabase,
+  name: string,
+  availability: 'public' | 'private',
+  creator: string
+): Promise<string> {
+  return insertRow(testDatabase, 'simple_evaluations', {
+    name,
+    description: '',
+    point_per_member: 100,
+    availability,
+    creator_id: await userId(testDatabase, creator),
+  });
+}
+
 // The date fields open a date picker, which writes the current date into an
 // empty field as it opens. Open it first, so the typed date replaces that
 // date, then close it, so it does not cover the next field.
@@ -178,7 +217,7 @@ async function fillForm(page: Page, event: NewEvent): Promise<void> {
       await page.locator('#EventTitle').fill(event.title);
       await page.locator('#EventDescription').fill(event.description);
       await page.locator('#EventEventTemplateTypeId').selectOption({ label: event.type });
-      await page.locator(TEMPLATE_SELECT[event.type]).selectOption({ label: event.template });
+      await selectTemplate(page.locator(TEMPLATE_SELECT[event.type]), event.template);
       await setting(page, 'Self-Evaluation').getByLabel(event.selfEval, { exact: true }).check();
       await setting(page, 'Comments Required').getByLabel(event.comments, { exact: true }).check();
       await setting(page, 'Student Result Mode')
@@ -361,6 +400,63 @@ test('the Add Event form shows the fields of the chosen evaluation type', async 
   await expect(page.locator('#SimpleEvalDiv')).toBeVisible();
   await expect(page.locator('#GroupsDiv')).toBeVisible();
   await expect(page.locator('#penaltyInputs')).toBeVisible();
+});
+
+test('the Add Event form lists the own templates first, then the public templates of others', async ({
+  page,
+  testDatabase,
+}) => {
+  const own = await insertSimpleTemplate(
+    testDatabase,
+    'Zeta Own Template',
+    'private',
+    USERS.instructor1
+  );
+  const shared = await insertSimpleTemplate(
+    testDatabase,
+    'Another Shared Template',
+    'public',
+    USERS.instructor2
+  );
+  await insertSimpleTemplate(testDatabase, 'Hidden Private Template', 'private', USERS.instructor2);
+
+  await login(page, USERS.instructor1);
+  await page.goto(`/events/add/${COURSES.mech328.id}`);
+  const select = page.locator(TEMPLATE_SELECT.SIMPLE);
+
+  await expect(templateGroup(select, 'My templates')).toHaveText([`Zeta Own Template (ID ${own})`]);
+  // sorted by name; another user's private template is not listed
+  await expect(templateGroup(select, 'Other templates')).toHaveText([
+    `Another Shared Template (ID ${shared})`,
+    `${SEEDED.template} (ID ${SEEDED.templateId})`,
+  ]);
+  // the first own template is selected at first, and the preview shows it
+  await expect(select).toHaveValue(own);
+  await expect(page.locator('#prevS')).toHaveAttribute(
+    'href',
+    new RegExp(`/simpleevaluations/view/${own}$`)
+  );
+});
+
+test('the Edit Event form keeps the private template of another user', async ({
+  page,
+  testDatabase,
+}) => {
+  const name = 'Hidden Private Template';
+  const hidden = await insertSimpleTemplate(testDatabase, name, 'private', USERS.instructor2);
+  const id = await insertEvent(testDatabase, COURSES.mech328.id, { ...PLAIN, template: name });
+
+  await login(page, USERS.instructor1);
+  await page.goto(`/events/edit/${id}`);
+  const select = page.locator(TEMPLATE_SELECT.SIMPLE);
+
+  // instructor1 has no own templates, so the list has no headings
+  await expect(select.locator('optgroup')).toHaveCount(0);
+  await expect(select.locator('option')).toHaveText([
+    `${name} (ID ${hidden})`,
+    `${SEEDED.template} (ID ${SEEDED.templateId})`,
+  ]);
+  await expect(select).toHaveValue(hidden);
 });
 
 test('a new late penalty starts one day after the last one added', async ({ page }) => {
