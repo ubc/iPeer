@@ -174,7 +174,7 @@ function makeDesc($view, $qNum, $descNum) {
         $form->text("MixevalQuestionDesc.$descNum.descriptor",
             ['id' => $descriptorId, 'aria-label' => __('Scale level', true)]) .
         $form->hidden("MixevalQuestionDesc.$descNum.question_index",
-            array('value' => $qNum, 'class' => "MixevalQuestionDesc$qNum")) .
+            ['value' => $qNum]) .
         $html->link('x', '#', [
             'id' => $removeId,
             'class' => 'removeQ',
@@ -395,8 +395,6 @@ function reorderQ() {
         var staticId = peerQuesIds[i];
         jQuery("#questionIndex" + staticId).text(i + 1 + '. ');
         jQuery("#MixevalQuestion" + staticId + "QuestionNum").val(j + 1);
-        console.log(".MixevalQuestionDesc" + staticId);
-        jQuery(".MixevalQuestionDesc" + staticId).val(j + 1);
         j++;
     }
     // reorder self evaluation questions
@@ -404,8 +402,6 @@ function reorderQ() {
         var staticId = selfQuesIds[i];
         jQuery("#questionIndex" + staticId).text(i + 1 + '. ');
         jQuery("#MixevalQuestion" + staticId + "QuestionNum").val(j + 1);
-        console.log(".MixevalQuestionDesc" + staticId);
-        jQuery(".MixevalQuestionDesc" + staticId).val(j + 1);
         j++;
     }
 }

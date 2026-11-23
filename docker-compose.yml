@@ -41,9 +41,6 @@ services:
       # - CALIPER_BASE_URL=http://localhost.test.com/
       # - CALIPER_ACTOR_BASE_URL=http://www.ubc.ca/%s
       # - CALIPER_ACTOR_UNIQUE_IDENTIFIER_PARAM=username
-      #- IPEER_AUTH=Ldap
-      #- IPEER_AUTH_LDAP_host=ldap.example.com
-      #- IPEER_AUTH_LDAP_port=636
       # uncomment or use docker-compose override to enable xdebug remote debugging
       #- PHP_IDE_CONFIG=serverName=docker
       #- XDEBUG_MODE=debug
@@ -94,9 +91,6 @@ services:
       - IPEER_DEBUG=2
       - IPEER_LOG_FORMAT=PrettyLog
       - IPEER_SESSION_SAVE=database
-      #- IPEER_AUTH=Ldap
-      #- IPEER_AUTH_LDAP_host=ldap.example.com
-      #- IPEER_AUTH_LDAP_port=636
     depends_on:
       - db-test
     healthcheck:

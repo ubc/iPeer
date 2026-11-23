@@ -6,16 +6,12 @@ ARG INSTALL_XDEBUG=false
 RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests  -y \
         libpng-dev \
         libxml2-dev \
-        libldap2-dev \
-        libldb-dev \
         libzip-dev \
         unzip \
         git \
         ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
-    && ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so \
-    && ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so \
-    && docker-php-ext-install -j$(nproc) xml gd ldap mysqli pdo_mysql zip \
+    && docker-php-ext-install -j$(nproc) xml gd mysqli pdo_mysql zip \
     && pecl install timezonedb \
     && docker-php-ext-enable timezonedb \
     && if [ "$INSTALL_XDEBUG" = "true" ]; then pecl install xdebug && docker-php-ext-enable xdebug; fi

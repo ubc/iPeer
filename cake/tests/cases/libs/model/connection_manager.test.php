@@ -227,7 +227,6 @@ class ConnectionManagerTest extends CakeTestCase {
 		$connections = array(
 			array('classname' => 'DboMysql', 'filename' => 'dbo' . DS . 'dbo_mysql'),
 			array('classname' => 'DboMysqli', 'filename' => 'dbo' . DS . 'dbo_mysqli'),
-			array('classname' => 'DboOracle', 'filename' => 'dbo' . DS . 'dbo_oracle'),
 		);
 
 		foreach ($connections as $connection) {

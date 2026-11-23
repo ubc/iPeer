@@ -7,10 +7,7 @@ app/config/database.php
 app/config/config.local.php
 app/webroot/apc.php
 dist
-build/api/
-build/code-browser/
 build/logs/
-build/pdepend/
 cache.properties
 lint.cache
 tags

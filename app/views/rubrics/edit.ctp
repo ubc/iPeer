@@ -108,10 +108,13 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
 <?php echo $this->Form->end()?>
 
 <script type="text/javascript">
-$('LOM').observe('change', function(event){
-  $('submit-rubric').disable();
-})
-$('criteria').observe('change', function(event){
-  $('submit-rubric').disable();
-})
+// step 1 of Add Rubric has no Save button
+function disableSave() {
+  var save = $('submit-rubric');
+  if (save) {
+    save.disable();
+  }
+}
+$('LOM').observe('change', disableSave);
+$('criteria').observe('change', disableSave);
 </script>

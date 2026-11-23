@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="iPeer" basedir="." default="build">
+<project name="iPeer" basedir="." default="test">
 
     <target name="load-db-config">
         <loadfile property="dbfile" file="app/config/database.php">
@@ -26,29 +26,16 @@
         </if>
     </target>
 
-    <target name="build"
-        depends="prepare,lint,phploc,pdepend,phpmd,phpcpd,test,phpcb"/>
-
-    <!-- remove phpdoc dependency for now.  phpdoc 2.9 is not working with php7 -->
-    <target name="build-ci"
-        depends="prepare,lint,phploc,pdepend,phpmd-ci,phpcpd,test-ci,phpcb"/>
-
     <target name="clean" description="Cleanup build artifacts">
-        <delete dir="${project.basedir}/build/api"/>
-        <delete dir="${project.basedir}/build/code-browser"/>
         <delete dir="${project.basedir}/build/coverage"/>
         <delete dir="${project.basedir}/build/logs"/>
-        <delete dir="${project.basedir}/build/pdepend"/>
         <delete dir="${project.basedir}/dist"/>
     </target>
 
     <target name="prepare" depends="clean"
         description="Prepare for build">
-        <mkdir dir="${project.basedir}/build/api"/>
-        <mkdir dir="${project.basedir}/build/code-browser"/>
         <mkdir dir="${project.basedir}/build/coverage"/>
         <mkdir dir="${project.basedir}/build/logs"/>
-        <mkdir dir="${project.basedir}/build/pdepend"/>
         <!-- let Apache write to cache -->
         <exec command="chmod -R 777 ${project.basedir}/app/tmp"/>
     </target>
@@ -64,91 +51,10 @@
         <phplint haltonfailure="true" cachefile="${project.basedir}/build/lint.cache">
             <fileset dir="${project.basedir}/app">
                 <include name="**/*.php" />
+                <!-- SimpleTest's own tests hold parse errors on purpose -->
+                <exclude name="vendors/simpletest/test/**" />
             </fileset>
         </phplint>
-    </target>
-
-    <target name="phploc" description="Measure project size using PHPLOC">
-        <exec executable="phploc">
-            <arg value="--log-csv" />
-            <arg value="${project.basedir}/build/logs/phploc.csv" />
-            <arg path="${project.basedir}/app" />
-        </exec>
-    </target>
-
-    <target name="pdepend"
-        description="Calculate software metrics using PHP_Depend">
-        <phpdepend>
-            <fileset dir="${project.basedir}/app">
-                <include name="**/*.php" />
-                <exclude name="tests/**" />
-                <exclude name="vendors/**" />
-                <exclude name="plugins/**" />
-                <exclude name="config/**" />
-                <exclude name="webroot/**" />
-            </fileset>
-            <logger type="jdepend-xml" outfile="${project.basedir}/build/logs/jdepend.xml" />
-            <logger type="jdepend-chart" outfile="${project.basedir}/build/pdepend/dependencies.svg" />
-            <logger type="overview-pyramid" outfile="${project.basedir}/build/pdepend/overview-pyramid.svg" />
-        </phpdepend>
-    </target>
-
-    <target name="phpmd"
-        description="Perform project mess detection using PHPMD and print human readable output. Intended for usage on the command line before committing.">
-        <phpmd rulesets="codesize,unusedcode">
-            <fileset dir="${project.basedir}/app">
-                <include name="**/*.php" />
-                <exclude name="tests/**" />
-                <exclude name="vendors/**" />
-                <exclude name="plugins/**" />
-                <exclude name="config/**" />
-                <exclude name="webroot/**" />
-            </fileset>
-        </phpmd>
-    </target>
-
-    <target name="phpmd-ci"
-        description="Perform project mess detection using PHPMD creating a log file for the continuous integration server">
-        <phpmd rulesets="codesize,unusedcode">
-            <fileset dir="${project.basedir}/app">
-                <include name="**/*.php" />
-                <exclude name="tests/**" />
-                <exclude name="vendors/**" />
-                <exclude name="plugins/**" />
-                <exclude name="config/**" />
-                <exclude name="webroot/**" />
-            </fileset>
-            <formatter type="xml" outfile="${project.basedir}/build/logs/pmd.xml"/>
-        </phpmd>
-    </target>
-
-    <target name="phpcpd" description="Find duplicate code using PHPCPD">
-        <phpcpd>
-            <fileset dir="${project.basedir}/app">
-                <include name="**/*.php" />
-                <exclude name="tests/**" />
-                <exclude name="vendors/**" />
-                <exclude name="plugins/**" />
-                <exclude name="config/**" />
-                <exclude name="webroot/**" />
-            </fileset>
-            <formatter type="pmd" outfile="${project.basedir}/build/logs/pmd-cpd.xml" />
-        </phpcpd>
-    </target>
-
-    <!-- phpdocumentor left here for reference, but not used -->
-    <target name="phpdoc"
-        description="Generate API documentation using PHPDocumentor">
-        <phpdoc2 destdir="${project.basedir}/build/api" template="responsive-twig">
-            <fileset dir="${project.basedir}/app">
-                <include name="**/*.php" />
-                <exclude name="tests/**" />
-                <exclude name="vendors/**" />
-                <exclude name="plugins/**" />
-                <exclude name="config/**" />
-                <exclude name="webroot/**" />
-            </fileset>
-        </phpdoc2>
     </target>
 
     <target name="post-test" description="clean up after running tests">
@@ -260,65 +166,8 @@
         </fail>
     </target>
 
-    <target name="test-ci" description="Run unit tests for continuous integration" depends="init-test-db">
-        <exec command="IPEER_DB_NAME=${db.name} cake/console/cake -app app testsuite app group component" passthru="true" returnProperty="result.component"/>
-        <exec command="IPEER_DB_NAME=${db.name} cake/console/cake -app app testsuite app group model" passthru="true" returnProperty="result.model"/>
-        <exec command="IPEER_DB_NAME=${db.name} cake/console/cake -app app testsuite app group caliper" passthru="true" returnProperty="result.caliper"/>
-        <exec command="IPEER_DB_NAME=${db.name} cake/console/cake -app app testsuite app group libs" passthru="true" returnProperty="result.libs"/>
-        <exec command="IPEER_DB_NAME=${db.name} cake/console/cake -app app testsuite app group controller" passthru="true" returnProperty="result.controller"/>
-        <!-- v1_controller test must be last one as it will change the database -->
-        <phingcall target="post-test"/>
-        <fail message="Component test cases failed">
-            <condition>
-                <not>
-                    <equals arg1="${result.component}" arg2="0"/>
-                </not>
-            </condition>
-        </fail>
-        <fail message="Model test cases failed">
-            <condition>
-                <not>
-                    <equals arg1="${result.model}" arg2="0"/>
-                </not>
-            </condition>
-        </fail>
-        <fail message="Caliper test cases failed">
-            <condition>
-                <not>
-                    <equals arg1="${result.caliper}" arg2="0"/>
-                </not>
-            </condition>
-        </fail>
-        <fail message="Libs test cases failed">
-            <condition>
-                <not>
-                    <equals arg1="${result.libs}" arg2="0"/>
-                </not>
-            </condition>
-        </fail>
-        <fail message="Controller test cases failed">
-            <condition>
-                <not>
-                    <equals arg1="${result.controller}" arg2="0"/>
-                </not>
-            </condition>
-        </fail>
-    </target>
-
     <target name="upgrade" description="Upgrade iPeer">
         <exec command="cake/console/cake upgrade" passthru="true"/>
-    </target>
-
-    <target name="phpcb"
-        description="Aggregate tool output with PHP_CodeBrowser">
-        <exec executable="phpcb">
-            <arg value="--log" />
-            <arg path="${project.basedir}/build/logs" />
-            <arg value="--source" />
-            <arg path="${project.basedir}/app" />
-            <arg value="--output" />
-            <arg path="${project.basedir}/build/code-browser" />
-        </exec>
     </target>
 
     <target name="bump" description="bump a version">

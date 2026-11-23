@@ -101,6 +101,10 @@ jQuery(document).ready(function() {
     // event listener for action links
     jQuery('#table_id tbody td').live('click', function() {
         var nTr = jQuery(this).parents('tr')[0];
+        // a click inside an open action panel is not on a table row
+        if (!oTable.fnGetData(nTr)) {
+            return;
+        }
         if (oTable.fnIsOpen(nTr)) {
             oTable.fnClose(nTr);
         } else {
