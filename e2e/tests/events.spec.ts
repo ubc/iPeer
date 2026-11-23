@@ -116,20 +116,41 @@ function setting(page: Page, legend: string): Locator {
   return page.getByRole('group', { name: legend, exact: true });
 }
 
-// A template option reads "Name (ID id)". A test that inserts a template does
-// not know its id at the start, so pick the option by its name: exactly the
-// name, then the id.
-async function selectTemplate(select: Locator, name: string): Promise<void> {
-  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const option = select
-    .locator('option')
-    .filter({ hasText: new RegExp(`^${escaped} \\(ID \\d+\\)$`) });
-  await expect(option, `the template ${name}`).toHaveCount(1);
-  const value = await option.getAttribute('value');
-  if (value === null) {
-    throw new Error(`The option of the template ${name} has no value`);
-  }
-  await select.selectOption(value);
+// The template search box (js/template_typeahead.js) of the shown type. The
+// select behind it is hidden, but it still holds the value that the form
+// posts.
+function templateBox(page: Page): Locator {
+  return page.getByRole('combobox', { name: 'Template', exact: true });
+}
+
+// The open list of the template search box: its templates, and its headings.
+function templateMenu(page: Page): { items: Locator; headings: Locator } {
+  const menu = page.locator('ul.ui-autocomplete:visible');
+  return {
+    items: menu.locator('li.ui-menu-item'),
+    headings: menu.locator('li.ui-autocomplete-category'),
+  };
+}
+
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Type the name of a template into the search box and pick it. A template
+// reads "Name (ID id)", and a test that inserts a template does not know its
+// id at the start, so the pick is by the name: exactly the name, then the id.
+// The hidden select must then hold that id, because the form posts it.
+async function selectTemplate(page: Page, type: TemplateType, name: string): Promise<void> {
+  const box = templateBox(page);
+  const label = new RegExp(`^${escapeRegExp(name)} \\(ID (\\d+)\\)$`);
+  await box.click();
+  await box.pressSequentially(name);
+  const item = templateMenu(page).items.filter({ hasText: label });
+  await expect(item, `the template ${name}`).toHaveCount(1);
+  await item.click();
+  await expect(box).toHaveValue(label);
+  const id = (await box.inputValue()).match(label)?.[1] ?? '';
+  await expect(page.locator(TEMPLATE_SELECT[type])).toHaveValue(id);
 }
 
 // The option labels of one group of a template list, in page order.
@@ -217,7 +238,7 @@ async function fillForm(page: Page, event: NewEvent): Promise<void> {
       await page.locator('#EventTitle').fill(event.title);
       await page.locator('#EventDescription').fill(event.description);
       await page.locator('#EventEventTemplateTypeId').selectOption({ label: event.type });
-      await selectTemplate(page.locator(TEMPLATE_SELECT[event.type]), event.template);
+      await selectTemplate(page, event.type, event.template);
       await setting(page, 'Self-Evaluation').getByLabel(event.selfEval, { exact: true }).check();
       await setting(page, 'Comments Required').getByLabel(event.comments, { exact: true }).check();
       await setting(page, 'Student Result Mode')
@@ -457,6 +478,99 @@ test('the Edit Event form keeps the private template of another user', async ({
     `${SEEDED.template} (ID ${SEEDED.templateId})`,
   ]);
   await expect(select).toHaveValue(hidden);
+  await expect(templateBox(page)).toHaveValue(`${name} (ID ${hidden})`);
+});
+
+test('the template search box finds a template by its name or ID', async ({
+  page,
+  testDatabase,
+}) => {
+  const own = await insertSimpleTemplate(
+    testDatabase,
+    'Zeta Own Template',
+    'private',
+    USERS.instructor1
+  );
+  const shared = await insertSimpleTemplate(
+    testDatabase,
+    'Another Shared Template',
+    'public',
+    USERS.instructor2
+  );
+  const ownLabel = `Zeta Own Template (ID ${own})`;
+  const sharedLabel = `Another Shared Template (ID ${shared})`;
+  const seededLabel = `${SEEDED.template} (ID ${SEEDED.templateId})`;
+
+  await login(page, USERS.instructor1);
+  await page.goto(`/events/add/${COURSES.mech328.id}`);
+  const box = templateBox(page);
+  const menu = templateMenu(page);
+  const select = page.locator(TEMPLATE_SELECT.SIMPLE);
+
+  // one box in place of the select, which shows the selected template
+  await expect(select).toBeHidden();
+  await expect(box).toHaveValue(ownLabel);
+
+  // a click selects the text and shows every template, under the headings
+  await box.click();
+  await expect(menu.headings).toHaveText(['My templates', 'Other templates']);
+  await expect(menu.items).toHaveText([ownLabel, sharedLabel, seededLabel]);
+
+  // the first key replaces the selected text; a name filters the list in any
+  // case, and the list marks the match
+  await box.pressSequentially('shared');
+  await expect(box).toHaveValue('shared');
+  await expect(menu.items).toHaveText([sharedLabel]);
+  await expect(menu.items.locator('mark')).toHaveText(['Shared']);
+  await expect(menu.headings).toHaveText(['Other templates']);
+
+  // Enter on a search, with no template highlighted, does not post the form
+  await box.press('Enter');
+  await expect(box).toHaveValue('shared');
+  await expect(select).toHaveValue(own);
+
+  // pasted text filters too: an ID finds a template. The arrow keys only
+  // highlight it, and Enter picks it.
+  await box.fill(`ID ${SEEDED.templateId})`);
+  await expect(menu.items).toHaveText([seededLabel]);
+  await box.press('ArrowDown');
+  await expect(box).toHaveValue(`ID ${SEEDED.templateId})`);
+  await box.press('Enter');
+  await expect(box).toHaveValue(seededLabel);
+  await expect(select).toHaveValue(SEEDED.templateId);
+  await expect(page.locator('#prevS')).toHaveAttribute(
+    'href',
+    new RegExp(`/simpleevaluations/view/${SEEDED.templateId}$`)
+  );
+
+  // text that matches no template does not change the selection
+  await box.fill('no such template');
+  await expect(menu.items).toHaveCount(0);
+  await page.locator('#EventTitle').click();
+  await expect(box).toHaveValue(seededLabel);
+  await expect(select).toHaveValue(SEEDED.templateId);
+
+  // The form was never posted: the title is empty, so a post would come
+  // back to the same page with an error message.
+  await expect(flashMessage(page)).toHaveCount(0);
+});
+
+test('Submit with a template search that is not a template opens the list', async ({ page }) => {
+  await login(page, USERS.instructor1);
+  await page.goto(`/events/add/${COURSES.mech328.id}`);
+  const box = templateBox(page);
+  const menu = templateMenu(page);
+
+  await box.click();
+  await box.pressSequentially('module');
+  await page.getByRole('button', SUBMIT).click();
+
+  // The form is not posted with the old template, and the user picks one. A
+  // post (the title is empty) would come back with an error message.
+  await expect(box).toBeFocused();
+  await expect(box).toHaveValue('module');
+  await expect(menu.items).toHaveText([`${SEEDED.template} (ID ${SEEDED.templateId})`]);
+  await expect(flashMessage(page)).toHaveCount(0);
 });
 
 test('a new late penalty starts one day after the last one added', async ({ page }) => {

@@ -2517,3 +2517,27 @@ pre code {
     border-radius: 3px;
     font-size: 0.95em;
 }
+
+/* the template search box of the event form (js/template_typeahead.js) */
+input.template-typeahead {
+    width: 30em;
+    max-width: 100%;
+}
+
+.ui-autocomplete {
+    max-height: 20em;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.ui-autocomplete-category {
+    font-weight: bold;
+    padding: 0.4em 0.4em 0.2em;
+}
+
+/* the part of a template that matches the search */
+.ui-autocomplete mark {
+    background: none;
+    color: inherit;
+    font-weight: bold;
+}

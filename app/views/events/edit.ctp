@@ -23,6 +23,7 @@ function checkGroups() {
 
 <?php
 $html->script("jquery-ui-timepicker-addon", array("inline"=>false));
+$html->script("template_typeahead", array("inline"=>false));
 echo $this->Form->create('Event', array('action' => "edit", "onsubmit" => "return checkGroups()"));
 echo '<input type="hidden" name="required" id="required" value="eventId" />';
 echo $this->Form->input('id');
@@ -269,6 +270,17 @@ jQuery("#EventSimpleEvaluation").change(updatePreview);
 jQuery("#EventRubric").change(updatePreview);
 jQuery("#EventSurvey").change(updatePreview);
 jQuery("#EventMixeval").change(updatePreview);
+// One search box for each template list. At DOM ready, so it runs after the
+// rest of this script, and an error in it cannot stop the form's own set-up.
+jQuery(function () {
+    var texts = <?php echo json_encode(array(
+        'label' => __('Template', true),
+        'placeholder' => __('Search by name or ID', true),
+    )); ?>;
+    jQuery.each(['#EventSimpleEvaluation', '#EventRubric', '#EventSurvey', '#EventMixeval'], function (i, id) {
+        templateTypeahead(id, texts);
+    });
+});
 jQuery("#EventEmailSchedule").change(toggleEmailTemplate);
 jQuery("#EventEmailTemplate").change(updateEmailPreview);
 jQuery("input:radio[name=data['Event']['self_eval']]").change(toggleSelfEval);
