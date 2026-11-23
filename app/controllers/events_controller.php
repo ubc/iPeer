@@ -630,13 +630,11 @@ class EventsController extends AppController
      * @param array $templates [['id' => 7, 'name' => 'Lab Rubric', 'creator_id' => 2], ...]
      * @param int   $userId    the user who picks a template
      *
-     * @return array With own templates:
+     * @return array Both groups, also when one is empty. For example:
      *     [
      *         'My templates' => [7 => 'Lab Rubric (ID 7)'],
      *         'Other templates' => [1 => 'Term Report Evaluation (ID 1)'],
      *     ]
-     * With no own templates (no headings):
-     *     [1 => 'Term Report Evaluation (ID 1)']
      */
     private function _templateSelectOptions(array $templates, $userId): array
     {
@@ -651,13 +649,10 @@ class EventsController extends AppController
             }
         }
 
-        if (empty($own)) {
-            return $other;
-        }
-        return array_filter([
+        return [
             __('My templates', true) => $own,
             __('Other templates', true) => $other,
-        ]);
+        ];
     }
 
     /**

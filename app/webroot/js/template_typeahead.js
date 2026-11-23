@@ -14,6 +14,13 @@
 var templateTypeahead = (function ($) {
     var ENTER = 13;
 
+    // The headings (optgroups) of the select, also the empty ones.
+    function groupsOf(select) {
+        return select.find('optgroup').map(function () {
+            return $(this).attr('label');
+        }).get();
+    }
+
     // The options of the select, with the heading (optgroup) of each.
     function itemsOf(select) {
         var items = [];
@@ -44,13 +51,15 @@ var templateTypeahead = (function ($) {
             .append(document.createTextNode(label.slice(at + term.length)));
     }
 
-    // texts: the translated 'label' and 'placeholder' of the box
+    // texts: the translated 'label' and 'placeholder' of the box, and 'empty',
+    // the line under a heading with no templates
     return function (selector, texts) {
         var select = $(selector);
         if (!select.length || !$.fn.autocomplete) {
             return;
         }
         var form = select.closest('form');
+        var groups = groupsOf(select);
         var items = itemsOf(select);
         var term = ''; // the filter of the open list, for the marks
         var selectedText = function () {
@@ -128,7 +137,9 @@ var templateTypeahead = (function ($) {
                 // jQuery UI 1.8 marks the list as a menu; it is a list box
                 widget.menu.element.attr('role', 'listbox');
                 widget.menu.element.children('.ui-menu-item').attr('role', 'option');
-                widget.menu.element.children('.ui-autocomplete-category').attr('role', 'presentation');
+                widget.menu.element
+                    .children('.ui-autocomplete-category, .ui-autocomplete-empty')
+                    .attr('role', 'presentation');
                 input.attr('aria-expanded', 'true');
             },
             close: function () {
@@ -162,15 +173,39 @@ var templateTypeahead = (function ($) {
             return deactivate.apply(this, arguments);
         };
 
-        // A heading before the first template of each group. The headings
-        // have no ui-menu-item class, so the arrow keys skip them.
+        // A heading before the templates of each group. The full list shows
+        // every heading, and a line under a group with no templates; a search
+        // shows only the groups with a match. The headings and lines have no
+        // ui-menu-item class, so the arrow keys skip them.
         widget._renderMenu = function (ul, list) {
             var self = this;
+            var heading = function (group) {
+                $('<li class="ui-autocomplete-category"></li>').text(group).appendTo(ul);
+            };
+            var rest = list;
+            if (term === '') {
+                $.each(groups, function (i, group) {
+                    var inGroup = $.grep(list, function (item) {
+                        return item.group === group;
+                    });
+                    heading(group);
+                    if (!inGroup.length) {
+                        $('<li class="ui-autocomplete-empty"></li>').text(texts.empty).appendTo(ul);
+                    }
+                    $.each(inGroup, function (j, item) {
+                        self._renderItem(ul, item);
+                    });
+                });
+                // options outside the groups, if the select has any
+                rest = $.grep(list, function (item) {
+                    return !item.group;
+                });
+            }
             var group = null;
-            $.each(list, function (i, item) {
+            $.each(rest, function (i, item) {
                 if (item.group && item.group !== group) {
                     group = item.group;
-                    $('<li class="ui-autocomplete-category"></li>').text(group).appendTo(ul);
+                    heading(group);
                 }
                 self._renderItem(ul, item);
             });

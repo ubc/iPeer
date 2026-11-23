@@ -276,6 +276,7 @@ jQuery(function () {
     var texts = <?php echo json_encode(array(
         'label' => __('Template', true),
         'placeholder' => __('Search by name or ID', true),
+        'empty' => __('No templates', true),
     )); ?>;
     jQuery.each(['#EventSimpleEvaluation', '#EventRubric', '#EventSurvey', '#EventMixeval'], function (i, id) {
         templateTypeahead(id, texts);

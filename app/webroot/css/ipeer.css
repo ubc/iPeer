@@ -2560,6 +2560,18 @@ input.template-typeahead {
     margin-top: 0;
 }
 
+/* the line under a heading with no templates; floated like the headings */
+.ui-autocomplete-empty {
+    box-sizing: border-box;
+    clear: left;
+    float: left;
+    width: 100%;
+    color: #666;
+    cursor: default;
+    font-style: italic;
+    padding: 0.3em 0.5em;
+}
+
 /* the part of a template that matches the search */
 .ui-autocomplete mark {
     background: #ffe873;

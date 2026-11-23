@@ -471,14 +471,29 @@ test('the Edit Event form keeps the private template of another user', async ({
   await page.goto(`/events/edit/${id}`);
   const select = page.locator(TEMPLATE_SELECT.SIMPLE);
 
-  // instructor1 has no own templates, so the list has no headings
-  await expect(select.locator('optgroup')).toHaveCount(0);
-  await expect(select.locator('option')).toHaveText([
+  // instructor1 has no own templates: the "My templates" group stays, empty
+  await expect(select.locator('optgroup')).toHaveCount(2);
+  await expect(templateGroup(select, 'My templates')).toHaveCount(0);
+  await expect(templateGroup(select, 'Other templates')).toHaveText([
     `${name} (ID ${hidden})`,
     `${SEEDED.template} (ID ${SEEDED.templateId})`,
   ]);
   await expect(select).toHaveValue(hidden);
-  await expect(templateBox(page)).toHaveValue(`${name} (ID ${hidden})`);
+  const box = templateBox(page);
+  await expect(box).toHaveValue(`${name} (ID ${hidden})`);
+
+  // the full list shows the empty group with a line, which the arrow keys skip
+  const menu = templateMenu(page);
+  await box.click();
+  await expect(menu.headings).toHaveText(['My templates', 'Other templates']);
+  await expect(page.locator('li.ui-autocomplete-empty:visible')).toHaveText(['No templates']);
+  await box.press('ArrowDown');
+  await expect(menu.items.first().locator('a')).toHaveClass(/ui-state-hover/);
+
+  // a search shows only the groups with a match
+  await box.pressSequentially('hidden');
+  await expect(menu.headings).toHaveText(['Other templates']);
+  await expect(page.locator('li.ui-autocomplete-empty:visible')).toHaveCount(0);
 });
 
 test('the template search box finds a template by its name or ID', async ({
