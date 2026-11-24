@@ -163,7 +163,7 @@ class Penalty extends AppModel
         if (0 < $late_diff) {
             $days_late = $late_diff/(24*60*60);
             $penalty = $this->getPenaltyByEventAndDaysLate($eventId, $days_late);
-            return $penalty['Penalty']['percent_penalty'];
+            return $penalty['Penalty']['percent_penalty'] ?? 0;
         } else {
             return 0;
         }

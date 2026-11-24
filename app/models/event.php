@@ -1183,7 +1183,7 @@ class Event extends AppModel
                         if($template['Rubric']['creator_id'] != $userId && $template['Rubric']['availability']!= "public") {
                             return $eventErrorPreamble . "a non-accessible template: " . $templateId;
                         }
-                        $validatedEventCache[2][1] = "hello"; // save in cache
+                        $validatedEventCache[$RubricId][$templateId] = true; // save in cache
                         break;
                     case $SurveyId: // survey
                         $template = $Survey->getSurveyWithQuestionsById($templateId);

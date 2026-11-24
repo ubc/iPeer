@@ -246,4 +246,12 @@ class PenaltyTestCase extends CakeTestCase
     {
         //TODO
     }
+
+    function testGetPenaltyByEventSubmissionAndDueWithNoPenalties()
+    {
+        $this->assertIdentical(
+            $this->Penalty->getPenaltyByEventSubmissionAndDue(999, '2026-01-01 00:00:00', '2026-01-03 00:00:00'),
+            0
+        );
+    }
 }

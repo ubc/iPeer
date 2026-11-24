@@ -443,7 +443,9 @@ class CanvasApiComponent extends CakeObject
                     $saveData['refresh_token'] = $response->refresh_token;
                 }
 
-                $this->UserOauth->saveTokens($this->userId, $this->provider, $saveData);
+                if (!$this->UserOauth->saveTokens($this->userId, $this->provider, $saveData)) {
+                    CakeLog::write('error', "Could not save the {$this->provider} tokens for user {$this->userId}");
+                }
 
                 return array('accessToken' => $response->access_token);
             }

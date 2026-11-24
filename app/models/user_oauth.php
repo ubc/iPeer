@@ -42,11 +42,17 @@ class UserOauth extends AppModel
             return false;
         }
 
-        // first read this record
-        $this->read(null, array('user_id' => $userId, 'provider' => $provider));
+        $existing = $this->find('first', [
+            'conditions' => ['UserOauth.user_id' => $userId, 'UserOauth.provider' => $provider],
+            'fields' => ['UserOauth.id'],
+            'recursive' => -1,
+        ]);
 
-        // then save it
-        $newOauth = array('UserOauth' => $saveData);
+        $this->create();
+        $newOauth = ['UserOauth' => $saveData];
+        if ($existing) {
+            $newOauth['UserOauth']['id'] = $existing['UserOauth']['id'];
+        }
         $newOauth['UserOauth']['user_id'] = $userId;
         $newOauth['UserOauth']['provider'] = $provider;
 
@@ -55,7 +61,7 @@ class UserOauth extends AppModel
             $newOauth['UserOauth']['expires'] = $expiryDateTime->format("Y-m-d H:i:s");
         }
 
-        $this->save($newOauth);
+        return (bool) $this->save($newOauth);
     }
     
     /**
@@ -96,32 +102,5 @@ class UserOauth extends AppModel
     function deleteToken($userId, $provider)
     {
         return $this->deleteAll(array('UserOauth.user_id =' => $userId, 'UserOauth.provider =' => $provider));
-    }
-    
-    /**
-        * Returns a list of fields from the database, and sets the current model
-        * data (Model::$data) with the record found. 
-        * 
-        * This method uses the parent
-        * method unless the $id parameter is an array containing the user_id and provider,
-        * in which case it uses those parameters to retrieve the id first before calling
-        * the parent
-        *
-        * @param mixed $fields String of single fieldname, or an array of fieldnames.
-        * @param mixed $id The ID of the record to read, or an array of fields to retrieve by
-        * @return array Array of database fields, or false if not found
-        * @access public
-        */
-    function read($fields = null, $id = null)
-    {
-        if (is_array($id) && isset($id['user_id']) && isset($id['provider'])) {
-            $oauth = $this->find('first', array(
-                'conditions' => array('UserOauth.user_id =' => $id['user_id'], 'UserOauth.provider =' => $id['provider']),
-                'fields' => $fields
-            ));
-            if ($oauth) $id = $oauth['UserOauth']['id'];
-        }
-
-        return parent::read($fields, $id);
     }
 }

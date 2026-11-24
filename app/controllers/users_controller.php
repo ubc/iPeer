@@ -673,10 +673,16 @@ class UsersController extends AppController
      */
     public function enrol($username, $courseId)
     {
+        if (!$this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission())) {
+            $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
+            $this->redirect('/courses');
+            return;
+        }
+
         $roleId = $this->User->getRoleId($this->Auth->user('id'));
         $user = $this->User->getByUsername($username);
         $userRole = $user['Role']['0']['RolesUser']['role_id'];
-        $enrolled = Set::extract('/Tutor/id', $user) + Set::extract('/Enrolment/id', $user);
+        $enrolled = array_merge(Set::extract('/Tutor/id', $user), Set::extract('/Enrolment/id', $user));
 
         if ($userRole <= $roleId || !in_array($userRole, array(4, 5))) {
             $this->Session->setFlash(__('Error: You do not have permission to enrol this user.', true));
