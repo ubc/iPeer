@@ -684,6 +684,39 @@ test('Submit with a template search that is not a template opens the list', asyn
   await expect(flashMessage(page)).toHaveCount(0);
 });
 
+test('Escape keeps the template, and Submit with a search that matches nothing opens the full list', async ({
+  page,
+}) => {
+  await login(page, USERS.instructor1);
+  await page.goto(`/events/add/${COURSES.mech328.id}`);
+  const box = templateBox(page);
+  const menu = templateMenu(page);
+  const seededLabel = `${SEEDED.template} (ID ${SEEDED.templateId})`;
+
+  // Escape before any search
+  await box.focus();
+  await box.press('Escape');
+  await expect(box).toHaveValue(seededLabel);
+
+  // Escape after a search that the box gave up on leaving does not bring
+  // the search back
+  await box.pressSequentially('module');
+  await box.press('Tab');
+  await expect(box).toHaveValue(seededLabel);
+  await box.focus();
+  await box.press('Escape');
+  await expect(box).toHaveValue(seededLabel);
+
+  // no template contains the search, so the full list opens
+  await box.pressSequentially('xyz');
+  await expect(menu.items).toHaveCount(0);
+  await page.getByRole('button', SUBMIT).click();
+  await expect(box).toBeFocused();
+  await expect(box).toHaveValue('xyz');
+  await expect(menu.items).toHaveText([seededLabel]);
+  await expect(flashMessage(page)).toHaveCount(0);
+});
+
 test('a new late penalty starts one day after the last one added', async ({ page }) => {
   await login(page, USERS.instructor1);
   await page.goto(`/events/add/${COURSES.mech328.id}`);

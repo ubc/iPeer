@@ -89,17 +89,34 @@ var templateTypeahead = (function ($) {
         // picks it; any other text gives way to the selected template.
         function sync() {
             var text = input.val();
-            if (text === selectedText()) {
-                return;
+            if (text !== selectedText()) {
+                var match = exactMatch(text);
+                if (match) {
+                    // change() runs the form's own handlers, such as the
+                    // Preview link update
+                    select.val(match.id).change();
+                } else {
+                    input.val(selectedText());
+                }
             }
-            var match = exactMatch(text);
-            if (match) {
-                // change() runs the form's own handlers, such as the
-                // Preview link update
-                select.val(match.id).change();
-            } else {
-                input.val(selectedText());
-            }
+            remember();
+        }
+
+        // The widget keeps the text of its last search, and Escape writes it
+        // back into the box. Keep it the same as the box text, so Escape does
+        // not bring back an old search or an empty box.
+        function remember() {
+            widget.term = input.val();
+        }
+
+        // Open the list for the box text. When no template contains that
+        // text, open the full list: the widget does not open an empty list.
+        function openList() {
+            var text = input.val().toLowerCase();
+            var found = $.grep(items, function (item) {
+                return item.label.toLowerCase().indexOf(text) !== -1;
+            });
+            input.autocomplete('search', found.length ? input.val() : '');
         }
 
         input.autocomplete({
@@ -122,6 +139,7 @@ var templateTypeahead = (function ($) {
             select: function (event, ui) {
                 input.val(ui.item.label);
                 select.val(ui.item.id).change();
+                remember();
                 return false;
             },
             open: function () {
@@ -134,8 +152,8 @@ var templateTypeahead = (function ($) {
                     fontFamily: input.css('font-family'),
                     fontSize: input.css('font-size')
                 });
-                // jQuery UI 1.8 marks the list as a menu; it is a list box
-                widget.menu.element.attr('role', 'listbox');
+                // jQuery UI 1.8 makes the list a listbox, but its items
+                // menuitems; in a listbox they are options
                 widget.menu.element.children('.ui-menu-item').attr('role', 'option');
                 widget.menu.element
                     .children('.ui-autocomplete-category, .ui-autocomplete-empty')
@@ -157,6 +175,11 @@ var templateTypeahead = (function ($) {
             return;
         }
         select.hide();
+        remember();
+        // nothing to pick: the box says so, as the list cannot open
+        if (!items.length) {
+            input.attr('placeholder', texts.empty);
+        }
 
         // after the widget starts: jQuery UI 1.8 sets role="textbox"
         input.removeAttr('aria-haspopup').attr({
@@ -240,7 +263,7 @@ var templateTypeahead = (function ($) {
         // through the form with Tab does not open it.
         input.bind('click', function () {
             if (!widget.menu.element.is(':visible')) {
-                input.autocomplete('search', input.val());
+                openList();
             }
         });
 
@@ -264,7 +287,7 @@ var templateTypeahead = (function ($) {
             if (exactMatch(input.val())) {
                 sync();
             } else if (!widget.menu.element.is(':visible')) {
-                input.autocomplete('search', input.val());
+                openList();
             }
         });
 
@@ -290,7 +313,7 @@ var templateTypeahead = (function ($) {
             }
             event.preventDefault();
             input.focus();
-            input.autocomplete('search', input.val());
+            openList();
         });
     };
 }(jQuery));
