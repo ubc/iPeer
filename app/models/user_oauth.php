@@ -42,11 +42,17 @@ class UserOauth extends AppModel
             return false;
         }
 
-        // first read this record
-        $this->read(null, array('user_id' => $userId, 'provider' => $provider));
+        $existing = $this->find('first', [
+            'conditions' => ['UserOauth.user_id' => $userId, 'UserOauth.provider' => $provider],
+            'fields' => ['UserOauth.id'],
+            'recursive' => -1,
+        ]);
 
-        // then save it
-        $newOauth = array('UserOauth' => $saveData);
+        $this->create();
+        $newOauth = ['UserOauth' => $saveData];
+        if ($existing) {
+            $newOauth['UserOauth']['id'] = $existing['UserOauth']['id'];
+        }
         $newOauth['UserOauth']['user_id'] = $userId;
         $newOauth['UserOauth']['provider'] = $provider;
 
@@ -55,7 +61,7 @@ class UserOauth extends AppModel
             $newOauth['UserOauth']['expires'] = $expiryDateTime->format("Y-m-d H:i:s");
         }
 
-        $this->save($newOauth);
+        return (bool) $this->save($newOauth);
     }
     
     /**
@@ -119,7 +125,11 @@ class UserOauth extends AppModel
                 'conditions' => array('UserOauth.user_id =' => $id['user_id'], 'UserOauth.provider =' => $id['provider']),
                 'fields' => $fields
             ));
-            if ($oauth) $id = $oauth['UserOauth']['id'];
+            if (!$oauth) {
+                $this->create();
+                return false;
+            }
+            $id = $oauth['UserOauth']['id'];
         }
 
         return parent::read($fields, $id);

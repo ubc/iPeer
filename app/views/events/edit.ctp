@@ -434,7 +434,7 @@ function updatePreview() {
 
 function toggleSelfEval() {
     var eventType = jQuery("#EventEventTemplateTypeId").val();
-    if (eventType = '4') {
+    if (eventType === '4') {
         var templateId = jQuery("#EventMixeval").val();
         var selfEval = jQuery("input:radio[name=data['Event']['self_eval']]:checked").val();
         url = "<?php echo $this->base; ?>/mixevals/view/";

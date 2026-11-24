@@ -500,6 +500,39 @@ class EventTestCase extends CakeTestCase
         $this->Rubric->save($privateRubric);
     }
 
+    function testCsvImportChecksEveryRubric() {
+        // An earlier valid rubric row must not let a later row use a rubric
+        // the user cannot access.
+        $this->Rubric = ClassRegistry::init('Rubric');
+        $this->Rubric->create();
+        $this->Rubric->save(['Rubric' => [
+            'name' => 'Second public rubric', 'zero_mark' => 0, 'lom_max' => 5,
+            'criteria' => 3, 'view_mode' => 'student', 'availability' => 'public',
+            'template' => 'horizontal',
+        ]], false);
+        $publicRubricId = $this->Rubric->id;
+
+        $privateRubric = $this->Rubric->getEvaluation(1);
+        $privateRubric['Rubric']['availability'] = 'private';
+        $this->Rubric->save($privateRubric);
+
+        $row = fn ($title, $rubricId) => [$title, '', '2', (string) $rubricId,
+            '2011-06-16 16:34:49', '2049-07-02 16:34:43', '2050-07-22 16:34:53',
+            '2051-07-04 16:34:43', '2051-07-30 16:34:43', '0', '0', '0', '1'];
+        $result = $this->Event->importEventsByCsv(3, [
+            $row('public-rubric-event', $publicRubricId),
+            $row('private-rubric-event', 1),
+        ], 2);
+
+        $privateRubric['Rubric']['availability'] = 'public';
+        $this->Rubric->save($privateRubric);
+        // No cascade: the cascade sets Event->recursive to -1 and does not
+        // reset it, so later tests get events without their groups.
+        $this->Rubric->delete($publicRubricId, false);
+
+        $this->assertEqual($result, 'Event "private-rubric-event" (on row 2), has a non-accessible template: 1');
+    }
+
     function testCsvImportPassing() {
         // function call: importEventsByCsv($courseId,$events,$userId)
 

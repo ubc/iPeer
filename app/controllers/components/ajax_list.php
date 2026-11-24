@@ -426,9 +426,9 @@ class AjaxListComponent extends CakeObject
 
         $sql .= " ) as aTableForCount";
 
-        list($data) = $this->model->query($sql);
+        $rows = $this->model->query($sql);
 
-        return isset($data[0]['count']) ? $data[0]['count'] : 0;
+        return $rows[0][0]['count'] ?? 0;
     }
 
 

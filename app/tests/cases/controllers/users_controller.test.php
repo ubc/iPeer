@@ -65,6 +65,28 @@ class UsersControllerTestCase extends ExtendedAuthTestCase
     }
 
     /**
+     * A student who is also a tutor in another course must not be enrolled
+     * again in a course they are already in.
+     */
+    public function testEnrolRefusesStudentAlreadyEnrolledWhenAlsoTutor()
+    {
+        $userModel = ClassRegistry::init('User');
+        $userModel->addTutor(7, 4);
+        $user = $userModel->getByUsername('redshirt0003');
+        // The tutor course and this course both have index 0 in their lists.
+        $courseId = Set::extract('/Enrolment/id', $user)[0];
+
+        $this->testAction("/users/enrol/redshirt0003/$courseId", array('fixturize' => true));
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: The student is already enrolled.');
+        $enrolModel = ClassRegistry::init('UserEnrol');
+        $this->assertEqual($enrolModel->find('count', array(
+            'conditions' => array('UserEnrol.user_id' => 7, 'UserEnrol.course_id' => $courseId),
+        )), 1);
+    }
+
+    /**
      * Happy path: merging two students with no shared courses or submissions
      * results in the secondary account being deleted and a success flash message.
      *
