@@ -364,8 +364,6 @@ class AjaxListComponent extends CakeObject
             $count = $this->model->$customModelCountFunction
                 ($conditions, $groupBy, $this->recursive, array($joinTable));
         } else {
-            //$count = $this->betterCount
-            //    ($conditions, $groupBy, array($joinTable));
             $count = $this->model->$customModelFindFunction('count', array('conditions' => $conditions,
             ));
         }
@@ -386,49 +384,6 @@ class AjaxListComponent extends CakeObject
             "timeStamp" => time());
 
         return $result;
-    }
-
-
-
-    /**
-     * betterCount
-     * Find all can't handle joint tables that and GROUP By well,
-     *  so this custom function is its replacement
-     *
-     * @param mixed $conditions conditions
-     * @param mixed $groupBy    group by
-     * @param mixed $joinTable  join table
-     *
-     * @access public
-     * @return void
-     */
-    function betterCount ($conditions, $groupBy, $joinTable)
-    {
-
-        $table = $this->model->table;
-        $name = $this->model->name;
-
-        // Initial Statement
-        $sql  = "SELECT count(*) as count FROM ( SELECT count(*) FROM `$table` as `$name` ";
-
-        // Add table joins
-        for ($i = 0; $i < sizeof($joinTable); $i++) {
-            $sql .= $joinTable[$i] . " ";
-        }
-
-        // add on conditions
-        $sql .= "WHERE " . $conditions;
-
-        // add on the group statement
-        $sql .= $groupBy;
-
-        // And finish up the statement
-
-        $sql .= " ) as aTableForCount";
-
-        $rows = $this->model->query($sql);
-
-        return $rows[0][0]['count'] ?? 0;
     }
 
 

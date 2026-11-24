@@ -103,35 +103,4 @@ class UserOauth extends AppModel
     {
         return $this->deleteAll(array('UserOauth.user_id =' => $userId, 'UserOauth.provider =' => $provider));
     }
-    
-    /**
-        * Returns a list of fields from the database, and sets the current model
-        * data (Model::$data) with the record found. 
-        * 
-        * This method uses the parent
-        * method unless the $id parameter is an array containing the user_id and provider,
-        * in which case it uses those parameters to retrieve the id first before calling
-        * the parent
-        *
-        * @param mixed $fields String of single fieldname, or an array of fieldnames.
-        * @param mixed $id The ID of the record to read, or an array of fields to retrieve by
-        * @return array Array of database fields, or false if not found
-        * @access public
-        */
-    function read($fields = null, $id = null)
-    {
-        if (is_array($id) && isset($id['user_id']) && isset($id['provider'])) {
-            $oauth = $this->find('first', array(
-                'conditions' => array('UserOauth.user_id =' => $id['user_id'], 'UserOauth.provider =' => $id['provider']),
-                'fields' => $fields
-            ));
-            if (!$oauth) {
-                $this->create();
-                return false;
-            }
-            $id = $oauth['UserOauth']['id'];
-        }
-
-        return parent::read($fields, $id);
-    }
 }

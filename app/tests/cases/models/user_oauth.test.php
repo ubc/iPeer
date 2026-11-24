@@ -51,10 +51,4 @@ class UserOauthTestCase extends CakeTestCase
         $this->assertFalse(empty($row['UserOauth']['expires']));
         $this->assertEqual($this->UserOauth->find('count'), 1);
     }
-
-    function testReadByUserAndProviderWithNoRow()
-    {
-        $this->assertFalse($this->UserOauth->read(null, ['user_id' => 5, 'provider' => 'canvas']));
-        $this->assertFalse($this->UserOauth->id);
-    }
 }
