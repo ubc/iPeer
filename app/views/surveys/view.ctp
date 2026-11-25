@@ -1,3 +1,4 @@
+<?php echo $this->element('framework/back_button'); ?>
 <h2>Survey Info</h2>
 <table class="standardtable">
     <tr>
@@ -48,8 +49,4 @@ foreach ($questions as $i => $q) {
     }
 }
 ?>
-</div>
-
-<div class='submit'>
-<input class='center' type="button" name="Back" value="<?php __('Back')?>" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
 </div>

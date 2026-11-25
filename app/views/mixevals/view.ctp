@@ -1,3 +1,4 @@
+<?php echo $this->element('framework/back_button'); ?>
 <div class='MixevalView'>
 <dl>
     <dt><?php __('Name'); ?></dt>
