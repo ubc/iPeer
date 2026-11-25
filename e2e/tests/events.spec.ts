@@ -484,8 +484,11 @@ test('the template preview of each evaluation type has one Back button at the to
     const back = preview.getByRole('button', { name: 'Back', exact: true });
     await expect(back, type).toHaveCount(1);
     await expect(preview.locator('.back-button').getByRole('button'), type).toBeVisible();
+    // Back closes the tab. When the tab closes before the click action ends,
+    // Playwright reports the click as failed, so the close event is the check:
+    // a click that did nothing leaves the tab open, and the wait times out.
     const closed = preview.waitForEvent('close');
-    await back.click();
+    await back.click().catch(() => undefined);
     await closed;
   }
 });
