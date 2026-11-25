@@ -229,7 +229,7 @@ class HomeController extends AppController
      * @param mixed $course_list
      *
      * @access public
-     * @return void
+     * @return array
      */
     function _formatCourseList($course_list)
     {

@@ -483,7 +483,7 @@ class Course extends AppModel
      * @param mixed  $options       options for find
      *
      * @access public
-     * @return void
+     * @return array
      */
     function getByDepartmentIds($departmentIds, $findType = 'all', $options = array())
     {

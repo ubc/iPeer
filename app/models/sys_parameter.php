@@ -39,7 +39,7 @@ class SysParameter extends AppModel
      * @param string $paramCode
      *
      * @access public
-     * @return void
+     * @return array|false
      */
     function findParameter ($paramCode)
     {

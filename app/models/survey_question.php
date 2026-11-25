@@ -163,7 +163,7 @@ class SurveyQuestion extends AppModel
      * @param type_INT $survey_id : survey's id
      *
      * @access public
-     * @return void
+     * @return array
      */
     function reorderQuestions($survey_id)
     {
@@ -206,7 +206,7 @@ class SurveyQuestion extends AppModel
      * @param type_INT $surveyId : survey's id
      *
      * @access public
-     * @return void
+     * @return string|null
      */
     function getLastSurveyQuestionNum($surveyId)
     {

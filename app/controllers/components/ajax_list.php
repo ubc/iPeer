@@ -81,7 +81,7 @@ class AjaxListComponent extends CakeObject
      *
      *
      * @access public
-     * @return void
+     * @return object
      */
     function getState()
     {
@@ -112,7 +112,7 @@ class AjaxListComponent extends CakeObject
      * @param mixed $state
      *
      * @access public
-     * @return void
+     * @return object
      */
     function checkState($sent)
     {
@@ -175,7 +175,7 @@ class AjaxListComponent extends CakeObject
      * @param mixed $data
      *
      * @access public
-     * @return void
+     * @return array
      */
     function formatDates($data)
     {
@@ -206,7 +206,7 @@ class AjaxListComponent extends CakeObject
      * @param mixed $value
      *
      * @access public
-     * @return void
+     * @return bool
      */
     function isSpecialValue($value)
     {
@@ -225,7 +225,7 @@ class AjaxListComponent extends CakeObject
      *
      *
      * @access public
-     * @return void
+     * @return array
      */
     function getListByState()
     {

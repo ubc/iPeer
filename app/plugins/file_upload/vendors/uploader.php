@@ -221,7 +221,7 @@ class Uploader {
   /**
     * Checks if there is a file uploaded
     *
-    * @return void
+    * @return bool
     * @access public
     * @param file array of uploaded file (optional)
     */

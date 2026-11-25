@@ -832,7 +832,7 @@ class GroupsController extends AppController
      * @param mixed $identifier identifier
      *
      * @access public
-     * @return void
+     * @return array
      */
     function _addGroupByImport($lines, $courseId, $update, $identifier, $render=true)
     {

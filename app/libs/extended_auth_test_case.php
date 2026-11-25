@@ -31,7 +31,7 @@ class ExtendedAuthTestCase extends ExtendedTestCase
      * @param array  $params
      *
      * @access public
-     * @return void
+     * @return mixed
      */
     function testAction($url = '', $params = array())
     {

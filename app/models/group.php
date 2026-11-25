@@ -456,7 +456,7 @@ class Group extends AppModel
      * @param mixed $memberId member id
      *
      * @access public
-     * @return void
+     * @return array|false
      */
     function getGroupByGroupIdEventIdMemberId($groupId, $eventId, $memberId)
     {

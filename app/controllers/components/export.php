@@ -79,7 +79,7 @@ class ExportComponent extends CakeObject
      * @param mixed $params
      *
      * @access public
-     * @return void
+     * @return string
      */
     function createHeader($params)
     {
@@ -104,7 +104,7 @@ class ExportComponent extends CakeObject
      * @param mixed $params
      *
      * @access public
-     * @return void
+     * @return string
      */
     function createSubHeader($params)
     {
@@ -129,7 +129,7 @@ class ExportComponent extends CakeObject
      * @param mixed $eventTypeId     event type id
      *
      * @access public
-     * @return void
+     * @return string
      */
     function createBody ($groupEvents, $params, $eventTemplateId, $eventTypeId)
     {
@@ -316,7 +316,7 @@ class ExportComponent extends CakeObject
      * @param bool  $legends legends
      *
      * @access public
-     * @return void
+     * @return string
      */
     function formatBody($data, $params, $legends=null)
     {
@@ -400,7 +400,7 @@ class ExportComponent extends CakeObject
      * buildSubmittedArr
      *
      * @access public
-     * @return void
+     * @return array
      */
     function buildSubmittedArr()
     {

@@ -224,7 +224,7 @@ class SearchsController extends AppController
      * @param int    $limit      the limit per page
      *
      * @access public
-     * @return void
+     * @return array
      */
     function _formatSearchEvaluation($conditions, $sortBy, $limit)
     {
@@ -283,7 +283,7 @@ class SearchsController extends AppController
      * @param unknown_type $limit      the limit per page
      *
      * @access public
-     * @return void
+     * @return array
      */
     function _formatSearchEvaluationResult($maxPercent, $minPercent, $eventId, $status, $limit)
     {

@@ -115,7 +115,7 @@ class Mixeval extends AppModel
      * @param mixed &$data
      *
      * @access public
-     * @return void
+     * @return mixed
      */
     function filter(&$data)
     {

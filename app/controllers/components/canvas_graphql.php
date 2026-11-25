@@ -33,7 +33,7 @@ class CanvasGraphQlComponent extends CanvasApiComponent
      * get full URL to GraphQL (without appending slash). Append API endpoint URI to make a request
      *
      * @access public
-     * @return void
+     * @return string
      */
     public function getGraphQlUrl()
     {

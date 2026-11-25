@@ -450,7 +450,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      * @param mixed $rubric_criteria
      *
      * @access public
-     * @return void
+     * @return string
      */
     function _writeRubricResultsTbl($event, $grp_event_id, $grp_id, $params, $evaluations, $dropped, $names, $rubric_criteria)
     {
@@ -536,7 +536,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
      * @param mixed $rubric_criteria
      *
      * @access private
-     * @return void
+     * @return array
      */               
     function _writeRubricEvalResults($event, $grp_event_id, $grp_id, $params, $evaluations, $dropped, $names, $rubric_criteria)
     {

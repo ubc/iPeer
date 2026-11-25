@@ -317,7 +317,7 @@ class GroupEvent extends AppModel
      * @param mixed $groupEventId group event id
      *
      * @access public
-     * @return void
+     * @return array
      */
     function getGroupMembers($groupEventId)
     {

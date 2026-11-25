@@ -401,7 +401,7 @@ class RubricsController extends AppController
      * __processForm
      *
      * @access protected
-     * @return void
+     * @return bool
      */
     function __processForm()
     {
@@ -535,7 +535,7 @@ class RubricsController extends AppController
      * @param mixed $data data
      *
      * @access private
-     * @return void
+     * @return array
      */
     function _multiMap($data)
     {

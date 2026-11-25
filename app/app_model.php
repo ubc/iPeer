@@ -20,7 +20,7 @@ class AppModel extends Model
      * @param bool $fieldList the list of fields
      *
      * @access public
-     * @return void
+     * @return array|bool
      */
     function save($data = null, $validate = true, $fieldList = array())
     {

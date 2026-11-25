@@ -81,7 +81,7 @@ class HabtamableBehavior extends ModelBehavior
      * @param mixed $query      query
      *
      * @access private
-     * @return void
+     * @return bool
      */
     private function checkHabtmConditions($model_name, $query)
     {

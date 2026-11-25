@@ -266,7 +266,7 @@ class AppController extends Controller
      * @param bool  $bcc          bcc field
      *
      * @access protected
-     * @return void
+     * @return bool
      */
     protected function _sendEmail($content, $subject, $from, $toAddress, $templateName = 'default', $ccAddress = array(), $bcc= array())
     {

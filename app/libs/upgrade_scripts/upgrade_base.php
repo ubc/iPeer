@@ -37,11 +37,12 @@ class UpgradeBase
      * up the actually upgrade function
      *
      * @access public
-     * @return void
+     * @return bool true when the upgrade worked; this base version fails
      */
     public function up()
     {
         trigger_error(__('You need to implemented up() function in the upgrade script.', true));
+        return false;
     }
 
     /**
@@ -131,7 +132,7 @@ class UpgradeBase
      * connectDb
      *
      * @access protected
-     * @return void
+     * @return string|false
      */
     protected function connectDb()
     {
@@ -162,7 +163,7 @@ class UpgradeBase
      * @param mixed $file
      *
      * @access protected
-     * @return void
+     * @return string|false
      */
     protected function applyDelta($file)
     {

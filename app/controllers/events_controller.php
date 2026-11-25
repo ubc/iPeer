@@ -432,7 +432,7 @@ class EventsController extends AppController
      * @param mixed $eventId
      *
      * @access public
-     * @return void
+     * @return array
      */
     function getGroupMembers($eventId)
     {
@@ -1065,7 +1065,7 @@ class EventsController extends AppController
      * @param mixed $data data
      *
      * @access private
-     * @return void
+     * @return array
      */
     function _multiMap($data)
     {

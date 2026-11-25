@@ -249,7 +249,7 @@ class User extends AppModel
      * @param bool $recursive  recursive
      *
      * @access public
-     * @return void
+     * @return mixed
      */
     public function find($conditions = array(), $fields = array(), $order = null, $recursive = null)
     {
@@ -304,7 +304,7 @@ class User extends AppModel
      * @param mixed $contain   models to be included
      *
      * @access public
-     * @return void
+     * @return array
      * */
     function getByUsernames($usernames, $contain = false)
     {
@@ -1131,7 +1131,7 @@ class User extends AppModel
      * @param object $user user object
      *
      * @access public
-     * @return void
+     * @return array|null
      * */
     static function getInstance($user = null)
     {
@@ -1172,7 +1172,7 @@ class User extends AppModel
      * @param mixed $path user info represented by a path
      *
      * @access public
-     * @return void
+     * @return mixed
      * */
     static function get($path)
     {
@@ -1388,7 +1388,7 @@ class User extends AppModel
      *
      * @static
      * @access public
-     * @return void
+     * @return bool
      */
     static function isInstructor()
     {
@@ -1408,7 +1408,7 @@ class User extends AppModel
      *
      * @static
      * @access public
-     * @return void
+     * @return bool
      */
     static function isStudentOrTutor()
     {

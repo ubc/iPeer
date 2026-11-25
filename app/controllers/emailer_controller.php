@@ -497,7 +497,7 @@ class EmailerController extends AppController
      * @param mixed $data data
      *
      * @access private
-     * @return void
+     * @return array
      */
     function _multiMap($data)
     {

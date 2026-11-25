@@ -633,7 +633,7 @@ class SurveysController extends AppController
    * @param mixed $survey
    *
    * @access public
-   * @return void
+   * @return bool
    */
   function surveyAccess($survey)
   {

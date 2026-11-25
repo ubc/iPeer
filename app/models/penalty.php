@@ -69,7 +69,7 @@ class Penalty extends AppModel
      * @param mixed $eventId
      *
      * @access public
-     * @return void
+     * @return array|null
      */
     function getPenaltyFinal($eventId)
     {
@@ -110,7 +110,7 @@ class Penalty extends AppModel
      * @param mixed $daysLate days late
      *
      * @access public
-     * @return void
+     * @return array|null
      */
     function getPenaltyByEventAndDaysLate($eventId, $daysLate)
     {
