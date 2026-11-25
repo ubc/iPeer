@@ -4,6 +4,11 @@ $evaluate = isset($evaluate) ? $evaluate : false;
 $url = $this->action == 'copy' ? 'add' : $this->action;
 ?>
 
+<?php if ($readonly) {
+    // the view page: Back at the top, as on the other template previews
+    echo $this->element('framework/back_button');
+} ?>
+
 <?php echo $this->Form->create('Rubric',
     array('id' => 'frm', 'url' => array('action' => $url),
 ))?>
@@ -77,7 +82,9 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
 <br>
 
 <div style="text-align: center">
+        <?php if (!$readonly): ?>
         <input type="button" name="Back" value="<?php echo __('Back')?>" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
+        <?php endif; ?>
         <?php switch($action) {
           case 'Add Rubric':
             echo $this->Form->submit(__('Next', true), array('Name'=>'preview', 'div' => false));

@@ -462,9 +462,12 @@ test('the Add Event form shows the fields of the chosen evaluation type', async 
   await expect(page.locator('#penaltyInputs')).toBeVisible();
 });
 
-// A Preview link opens the template in a new tab. Back on the preview closes
-// that tab, as the tab has no page to go back to.
-test('the template preview of each evaluation type has a Back button', async ({ page }) => {
+// A Preview link opens the template in a new tab. Each preview has one Back
+// button, in the same place at the top of the page, and Back closes the tab,
+// as the tab has no page to go back to.
+test('the template preview of each evaluation type has one Back button at the top', async ({
+  page,
+}) => {
   await login(page, USERS.instructor1);
   await page.goto(`/events/add/${COURSES.mech328.id}`);
   const previews = [
@@ -478,8 +481,11 @@ test('the template preview of each evaluation type has a Back button', async ({ 
     await page.locator('#EventEventTemplateTypeId').selectOption({ label: type });
     await pickFirstTemplate(page);
     const [preview] = await Promise.all([page.waitForEvent('popup'), page.locator(link).click()]);
+    const back = preview.getByRole('button', { name: 'Back', exact: true });
+    await expect(back, type).toHaveCount(1);
+    await expect(preview.locator('.back-button').getByRole('button'), type).toBeVisible();
     const closed = preview.waitForEvent('close');
-    await preview.getByRole('button', { name: 'Back', exact: true }).click();
+    await back.click();
     await closed;
   }
 });

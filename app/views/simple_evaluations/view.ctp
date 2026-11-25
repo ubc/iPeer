@@ -1,3 +1,4 @@
+<?php echo $this->element('framework/back_button'); ?>
 <form name="frm" id="frm" method="POST" action="<?php echo $html->url(empty($data['SimpleEvaluation']['id'])?'add':'edit') ?>" onSubmit="return validate()">
 <?php echo empty($data['SimpleEvaluation']['id']) ? null : $this->Form->hidden('id'); ?>
 <input type="hidden" name="required" id="required" value="point_per_member" />
@@ -20,14 +21,6 @@
         <td id="availability"><?php __('Availability')?>:</td>
         <td><?php echo $data['SimpleEvaluation']['availability']?></td>
     </tr>
-    <tr>
-      <td colspan="2" align="center">
-        <?php if (!empty($popUp) && $popUp) { ?>
-        <input type="button" name="Close" value="<?php __('Close')?>" onClick="window.close()">
-        <?php } else { ?>
-        <input type="button" name="Back" value="<?php __('Back')?>" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
-        <?php }?>
-    </td>
 </table>
 
 </form>

@@ -1238,6 +1238,12 @@ i {
     font-size: 0.9em;
 }
 
+/* the Back button at the top of a template preview page
+   (elements/framework/back_button.ctp) */
+.back-button {
+    margin-bottom: 1em;
+}
+
 /* the Preview link after the template search box */
 #Events a.template-preview {
     margin-left: 0.75em;
