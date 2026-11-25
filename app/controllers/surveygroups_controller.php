@@ -579,7 +579,7 @@ class SurveyGroupsController extends AppController
      * @param mixed $num_students
      *
      * @access protected
-     * @return void
+     * @return array
      */
     function __makeGroupList($num_students)
     {
@@ -631,7 +631,7 @@ class SurveyGroupsController extends AppController
      * __getTeamMaker
      *
      * @access protected
-     * @return void
+     * @return string
      */
     function __getTeamMaker()
     {

@@ -110,7 +110,7 @@ class ExportBaseNewComponent extends CakeObject
      * @param mixed $peerEval   boolean for self/peer eval
      *
      * @access public
-     * @return void
+     * @return array
      */
     function buildEvaluationScoreTableByGroup($params, $groupEvent, $event, $results, $peerEval)
     {
@@ -141,7 +141,7 @@ class ExportBaseNewComponent extends CakeObject
      * @param mixed $peerEval boolean for self/peer eval
      *
      * @access public
-     * @return void
+     * @return array
      */
     function buildEvaluationScoreTableByEvent($params, $event, $results, $peerEval = 1)
     {
@@ -197,7 +197,7 @@ class ExportBaseNewComponent extends CakeObject
      * @param mixed $peerEval  boolean for self/peer eval
      *
      * @access public
-     * @return void
+     * @return array
      */
     function buildScoreTableByEvaluatee($params, $group, $evaluatee, $event, $responses, $subDate, $peerEval)
     {
@@ -494,7 +494,7 @@ for ($inc=0; $inc<$count($groupMembers); $inc++) {
      * @param mixed $evaluateeId evaluatee id
      *
      * @access public
-     * @return void
+     * @return string
      */
     function buildRubricsResultByEvalatee($params, $grpEventId, $evaluateeId)
     {
@@ -580,7 +580,7 @@ for ($inc=0; $inc<$count($groupMembers); $inc++) {
      * @param mixed $evaluateeId evaluatee id
      *
      * @access public
-     * @return void
+     * @return string
      */
     function buildMixevalResultByEvaluatee($params, $grpEventId, $evaluateeId)
     {

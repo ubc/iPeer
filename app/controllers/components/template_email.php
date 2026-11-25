@@ -63,7 +63,7 @@ class TemplateEmailComponent extends EmailComponent
      * @param mixed $string
      *
      * @access public
-     * @return void
+     * @return bool
      */
     public function hasMergeField($string)
     {
@@ -134,7 +134,7 @@ class TemplateEmailComponent extends EmailComponent
      * @param mixed $string  string to be merged
      *
      * @access public
-     * @return void
+     * @return array
      */
     public function merge($userIds, $string)
     {

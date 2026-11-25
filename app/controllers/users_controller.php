@@ -314,7 +314,7 @@ class UsersController extends AppController
      * __processForm
      *
      * @access protected
-     * @return void
+     * @return bool
      */
     function __processForm()
     {
@@ -1810,7 +1810,7 @@ class UsersController extends AppController
      * @param mixed $secondary secondary account
      *
      * @access private
-     * @return void
+     * @return bool
      */
     private function _updateUserCourse($updated, $primary, $secondary)
     {
@@ -1857,7 +1857,7 @@ class UsersController extends AppController
      * @param mixed $secondary secondary account
      *
      * @access private
-     * @return void
+     * @return bool
      */
     private function _updateEvaluations($updated, $primary, $secondary)
     {
@@ -1903,7 +1903,7 @@ class UsersController extends AppController
      * @param mixed $secondary secondary account
      *
      * @access private
-     * @return void
+     * @return bool
      */
     private function _updateUserId($updated, $primary, $secondary)
     {
@@ -1955,7 +1955,7 @@ class UsersController extends AppController
      * @param mixed $secondary secondary account
      *
      * @access private
-     * @return void
+     * @return bool
      */
     private function _updateTablesWithUserId($updated, $primary, $secondary)
     {
@@ -2060,7 +2060,7 @@ class UsersController extends AppController
      * @param mixed $seconds seconds
      *
      * @access private
-     * @return void
+     * @return string
      */
     private function _formatDueIn($seconds)
     {

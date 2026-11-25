@@ -187,7 +187,7 @@ class ExportHelper2Component extends CakeObject
      * @param mixed $grid
      *
      * @access public
-     * @return void
+     * @return array
      */
     function modifyGrid($grid)
     {

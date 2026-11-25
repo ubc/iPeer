@@ -146,6 +146,14 @@ class CwlModule extends AuthModule {
         }
     }*/
 
+    /**
+     * Send an XML-RPC request to the CWL server.
+     *
+     * @param string $method the XML-RPC method
+     * @param array  $params its parameters
+     *
+     * @return mixed the decoded response, or false on failure
+     */
     function sendRPCRequest($method, $params) {
         $rpcParams = array();
         foreach($params as $param) {

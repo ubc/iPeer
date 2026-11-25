@@ -129,7 +129,9 @@ class SamlControllerTestCase extends ExtendedAuthTestCase {
     // which can still hold the user of an earlier test.
     function afterLogin($controller)
     {
-        return $this->loggedIn ? parent::afterLogin($controller) : true;
+        if ($this->loggedIn) {
+            parent::afterLogin($controller);
+        }
     }
 
     // Posts a SAMLResponse to acs and returns the URL it redirected to, if any.

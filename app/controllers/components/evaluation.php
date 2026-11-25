@@ -666,7 +666,7 @@ class EvaluationComponent extends CakeObject
      * @param mixed $targetCriteria  target criteria
      *
      * @access public
-     * @return void
+     * @return int|float
      */
     function saveNGetEvalutionRubricDetail ($evalRubricId, $rubric, $targetEvaluatee, $form, $viewMode, $auto_release, $targetCriteria=null)
     {
@@ -1059,7 +1059,7 @@ class EvaluationComponent extends CakeObject
      * @param mixed $auto_release  auto_release
      *
      * @access public
-     * @return void
+     * @return int|float|false
      */
     function saveNGetEvaluationMixevalDetail($evalMixevalId, $mixeval, $form, $auto_release)
     {

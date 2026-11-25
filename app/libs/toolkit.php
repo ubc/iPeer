@@ -14,7 +14,7 @@ class Toolkit
      * &getInstance
      *
      * @access public
-     * @return void
+     * @return object
      */
     function &getInstance()
     {
@@ -72,7 +72,7 @@ class Toolkit
      *
      * @static
      * @access public
-     * @return void
+     * @return string
      */
     static function formatDate($timestamp)
     {
@@ -96,7 +96,7 @@ class Toolkit
      *
      * @static
      * @access public
-     * @return void
+     * @return array
      */
     static function parseCSV($file)
     {
@@ -373,7 +373,7 @@ class Toolkit
      * @param mixed $evalResult evel result
      *
      * @access public
-     * @return void
+     * @return array|false
      */
     static function formatRubricEvaluationResultsMatrix($evalResult)
     {

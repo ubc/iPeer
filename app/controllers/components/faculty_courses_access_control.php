@@ -129,7 +129,7 @@ class FacultyCoursesAccessControlComponent extends CakeObject
      * @param mixed $deptId      department id
      *
      * @access public
-     * @return void
+     * @return bool|null
      */
     function getParentsReadPermission($childNodeId, $deptId)
     {
@@ -153,7 +153,7 @@ class FacultyCoursesAccessControlComponent extends CakeObject
      * @param mixed $userId      user id
      *
      * @access protected
-     * @return void
+     * @return bool|null
      */
     function _getParentsAccessPermission($childNodeId, $userId)
     {

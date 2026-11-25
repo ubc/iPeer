@@ -233,7 +233,7 @@ class AuthModule extends CakeObject {
      * getParameters return the paramters defined in configuration
      *
      * @access public
-     * @return void
+     * @return mixed
      */
     function getParameters() {
         return Configure::read('Guard.AuthModule.' . $this->name);

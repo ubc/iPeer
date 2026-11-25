@@ -136,7 +136,7 @@ class OutputComponent extends CakeObject
      * @param mixed &$data
      *
      * @access public
-     * @return void
+     * @return mixed
      */
     function br2nl(&$data)
     {
@@ -157,7 +157,7 @@ class OutputComponent extends CakeObject
      * @param mixed &$data
      *
      * @access public
-     * @return void
+     * @return mixed
      */
     function filter(&$data)
     {

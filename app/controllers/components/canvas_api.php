@@ -51,7 +51,7 @@ class CanvasApiComponent extends CakeObject
      * @param boolean $ext pass true if making a frontend request to canvas
      *
      * @access public
-     * @return void
+     * @return string
      *
      */
     public function getBaseUrl($ext=false)
@@ -70,7 +70,7 @@ class CanvasApiComponent extends CakeObject
      * get full URL to api (without appending slash). Append API endpoint URI to make a request
      *
      * @access public
-     * @return void
+     * @return string
      */
     public function getApiUrl()
     {

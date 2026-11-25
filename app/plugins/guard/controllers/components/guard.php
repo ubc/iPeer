@@ -297,7 +297,7 @@ class GuardComponent extends AuthComponent {
      * authentication module
      *
      * @access public
-     * @return void
+     * @return bool
      */
     function isLoggedIn() {
         return $this->authModule->isLoggedIn();
@@ -395,7 +395,7 @@ class GuardComponent extends AuthComponent {
      * Usually user defined authentication modules are placed in app/libs
      *
      * @access protected
-     * @return void
+     * @return array
      */
     function _getModuleSearchPath() {
         $paths = array_merge(App::path('libs'), App::path('components'));

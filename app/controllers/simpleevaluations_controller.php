@@ -296,7 +296,7 @@ class SimpleevaluationsController extends AppController
      * __processForm
      *
      * @access protected
-     * @return void
+     * @return bool
      */
     function __processForm()
     {

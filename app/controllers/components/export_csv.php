@@ -128,7 +128,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
      * @param mixed $peerEval boolean for self/peer eval
      *
      * @access public
-     * @return void
+     * @return array
      */
     function generateHeader($params, $event, $peerEval = 1)
     {
@@ -269,7 +269,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
      * @param mixed $params
      *
      * @access public
-     * @return void
+     * @return bool
      */
     function checkSimpleEvaluationParams($params)
     {
@@ -290,7 +290,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
      * @param mixed $params
      *
      * @access public
-     * @return void
+     * @return bool
      */
     function checkRubricsEvaluationParams($params)
     {
@@ -311,7 +311,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
      * @param mixed $params
      *
      * @access public
-     * @return void
+     * @return bool
      */
     function checkMixedEvaluationParams($params)
     {
@@ -332,7 +332,7 @@ Class ExportCsvComponent extends ExportBaseNewComponent
      * @param mixed $params
      *
      * @access public
-     * @return void
+     * @return bool
      */
     function checkBasicParamsRequirement($params)
     {

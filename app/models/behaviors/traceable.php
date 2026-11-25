@@ -265,7 +265,7 @@ class TraceableBehavior extends ModelBehavior
      * @param mixed $model
      *
      * @access private
-     * @return void
+     * @return mixed
      */
     private function _getAuthedUserId($model)
     {
@@ -283,7 +283,7 @@ class TraceableBehavior extends ModelBehavior
      * @param mixed $model
      *
      * @access private
-     * @return void
+     * @return array
      */
     private function _buildFieldMap($model)
     {

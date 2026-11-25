@@ -66,7 +66,7 @@ class EvaluationSimple extends EvaluationResponseBase
      * @param bool $includeEvaluator include evaluator
      *
      * @access public
-     * @return void
+     * @return array
      */
     function getResultsByEvaluatee($grpEventId=null, $evaluatee=null, $includeEvaluator=false)
     {
@@ -92,7 +92,7 @@ class EvaluationSimple extends EvaluationResponseBase
      * @param bool $evaluatee  evaluatee
      *
      * @access public
-     * @return void
+     * @return array
      */
     function getReceivedTotalScore($grpEventId=null, $evaluatee=null)
     {
@@ -270,7 +270,7 @@ class EvaluationSimple extends EvaluationResponseBase
      * @param mixed $id
      *
      * @access public
-     * @return void
+     * @return array|false
      */
     function getComment($id)
     {

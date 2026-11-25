@@ -830,9 +830,12 @@ class GroupsController extends AppController
      * @param mixed $courseId   course id
      * @param mixed $update     update
      * @param mixed $identifier identifier
+     * @param bool  $render     render the results page (default), or return the results
      *
      * @access public
-     * @return void
+     * @return array|null the import results when $render is false (an empty
+     *     array when there is nothing to import); null after it renders the
+     *     results page
      */
     function _addGroupByImport($lines, $courseId, $update, $identifier, $render=true)
     {
