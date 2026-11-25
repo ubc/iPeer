@@ -224,7 +224,7 @@ class InstallController extends Controller
      *
      *
      * @access private
-     * @return array|string|false
+     * @return string|false an error message, or false when it worked
      */
     private function configureDatabase($option)
     {
