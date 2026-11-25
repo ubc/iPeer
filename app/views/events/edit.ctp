@@ -441,9 +441,10 @@ function updatePreview() {
 }
 
 // Each Preview link names its template for screen readers, so the link says
-// which template it opens. With no template chosen, there is nothing to
+// which template it opens, and that it opens in a new tab. With no template chosen, there is nothing to
 // preview, so the link is hidden.
 function updatePreviewLinks() {
+    var newTab = <?php echo json_encode(__('(opens in a new tab)', true)); ?>;
     var links = {
         '#prevS': '#EventSimpleEvaluation',
         '#prevR': '#EventRubric',
@@ -452,7 +453,7 @@ function updatePreviewLinks() {
     };
     jQuery.each(links, function (link, select) {
         var name = jQuery(select).find('option:selected').text();
-        jQuery(link).find('.visually-hidden').text(' ' + name);
+        jQuery(link).find('.visually-hidden').text(' ' + name + ' ' + newTab);
         jQuery(link).toggle(!!jQuery(select).val());
     });
 }

@@ -430,7 +430,9 @@ test('the Add Event form shows the fields of the chosen evaluation type', async 
   await pickFirstTemplate(page);
   await expect(page.locator('#prevR')).toHaveAttribute('href', /\/rubrics\/view\/1$/);
   // The link names the template it opens, for screen readers.
-  await expect(page.locator('#prevR')).toHaveAccessibleName(/^Preview .+ \(ID 1\)$/);
+  await expect(page.locator('#prevR')).toHaveAccessibleName(
+    /^Preview .+ \(ID 1\) \(opens in a new tab\)$/
+  );
 
   // The preview of a mixed evaluation shows the self-evaluation questions
   // only when the event enables them.
@@ -613,7 +615,9 @@ test('the template search box finds a template by its name or ID', async ({
     'href',
     new RegExp(`/simpleevaluations/view/${SEEDED.templateId}$`)
   );
-  await expect(page.locator('#prevS')).toHaveAccessibleName(`Preview ${seededLabel}`);
+  await expect(page.locator('#prevS')).toHaveAccessibleName(
+    `Preview ${seededLabel} (opens in a new tab)`
+  );
 
   // text that matches no template does not change the selection
   await box.fill('no such template');
