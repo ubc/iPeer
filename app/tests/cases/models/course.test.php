@@ -277,7 +277,7 @@ class CourseTestCase extends CakeTestCase {
 
     function testGetByDepartments()
     {
-        $this->UserFaculty = Classregistry::init('UserFaculty');
+        $this->UserFaculty = ClassRegistry::init('UserFaculty');
         $this->Course = ClassRegistry::init('Course');
         $this->Department = ClassRegistry::init('Department');
 

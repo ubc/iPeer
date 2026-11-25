@@ -226,15 +226,6 @@
 	$assetTimestamp = in_array($assetTimestamp, array('true', 'false')) ? $assetTimestamp === 'true' : $assetTimestamp;
 	Configure::write('Asset.timestamp', $assetTimestamp);
 /**
- * Compress CSS output by removing comments, whitespace, repeating tags, etc.
- * This requires a/var/cache directory to be writable by the web server for caching.
- * and /vendors/csspp/csspp.php
- *
- * To use, prefix the CSS link URL with '/ccss/' instead of '/css/' or use HtmlHelper::css().
- */
-	//Configure::write('Asset.filter.css', 'css.php');
-
-/**
  * Plug in your own custom JavaScript compressor by dropping a script in your webroot to handle the
  * output, and setting the config below to the name of the script.
  *

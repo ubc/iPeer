@@ -476,7 +476,7 @@ class EmailerController extends AppController
      * @param string $key   key
      * @param mixed  $value value
      *
-     * @return index of searched user
+     * @return int|null index of the user, or null when not found
      */
     function searchByUserId($array, $key, $value)
     {
@@ -489,6 +489,7 @@ class EmailerController extends AppController
                 $i++;
             }
         }
+        return null;
     }
     
     /**

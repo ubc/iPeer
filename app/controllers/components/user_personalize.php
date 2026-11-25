@@ -24,7 +24,7 @@ class UserPersonalizeComponent extends CakeObject
      *
      * @param string $personalizeList used for login method
      *
-     * @return errors
+     * @return void
      */
     function setPersonalizeList($personalizeList='')
     {

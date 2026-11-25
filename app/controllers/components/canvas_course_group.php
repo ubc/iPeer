@@ -71,7 +71,7 @@ class CanvasCourseGroupComponent extends CakeObject
      * @param integer $user_id_to_add this is the Canvas user id of the user to be added to this group
      * @return object returned object
      */
-    public function addUser($_controller, $user_id, $force_auth=false, $user_id_to_add)
+    public function addUser($_controller, $user_id, $force_auth, $user_id_to_add)
     {
         $api = new CanvasApiComponent($user_id);
         $uri = '/groups/' . $this->id . '/memberships';

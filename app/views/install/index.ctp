@@ -19,7 +19,6 @@ $REQPHPVER = '7.2';
 $mysql = $no;
 $configwritable = $no;
 $dbconfig = $no;
-$magicquotes = $yes;
 $guard_plugin = $no;
 
 // Optional requirements init
@@ -32,10 +31,6 @@ if (version_compare(phpversion(), $REQPHPVER) >= 0) {
 }
 if (function_exists('mysqli_connect')) {
   $mysql = $yes;
-}
-if (get_magic_quotes_gpc()) {
-    // magic quotes need to be off or json gets escaped, ref ticket #330
-    $magicquotes = $no;
 }
 if (file_exists(APP.DS.'plugins'.DS.'guard'.DS.'config'.DS.'guard_default.php') || file_exists(CONFIGS.'guard.php')) {
     $guard_plugin = $yes;
@@ -117,10 +112,6 @@ foreach ($php_recommended_settings as $key => $setting)
   <tr>
     <td><?php __('MySQL support')?></td>
     <td><?php echo $mysql; ?></td>
-  </tr>
-  <tr>
-    <td><?php __('magic_quotes_gpc is off ')?></td>
-    <td><?php echo $magicquotes; ?></td>
   </tr>
   <tr>
     <td><?php __('Guard Plugin')?>

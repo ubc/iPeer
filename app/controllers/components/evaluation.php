@@ -604,7 +604,7 @@ class EvaluationComponent extends CakeObject
         $rubric = $this->Rubric->read();
 
         // validate
-        $valid_lom_nums = SET::extract($rubric['RubricsLom'], '/lom_num');
+        $valid_lom_nums = Set::extract($rubric['RubricsLom'], '/lom_num');
         if ($viewMode == 0) {
             for ($i=1; $i <= $rubric['Rubric']['criteria']; $i++) {
                 $selectedLom = $params['form']['selected_lom_'.$targetEvaluatee.'_'.$i];

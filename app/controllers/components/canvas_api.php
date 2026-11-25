@@ -142,7 +142,7 @@ class CanvasApiComponent extends CakeObject
                 $refreshToken = $oauth['UserOauth']['refresh_token'];
             }
             else {
-                err_log('Canvas API: Tried to fetch access tokens using a non-existent refresh token');
+                error_log('Canvas API: Tried to fetch access tokens using a non-existent refresh token');
                 return array('err'=>'Could not retrieve refresh token. Please contact the administrator.');
             }
         }

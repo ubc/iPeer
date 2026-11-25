@@ -52,7 +52,7 @@ class GuardControllerTestCase extends ExtendedAuthTestCase {
     }
 
     // No authentication needed — we are testing the unauthenticated login page
-    function login($controller) {}
+    function login($controller) { return true; }
     function afterLogin($controller) {}
 
     function testForceSamlLoginBlocksDefaultloginBypass() {

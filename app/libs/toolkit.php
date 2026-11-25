@@ -11,61 +11,6 @@
 class Toolkit
 {
     /**
-     * &getInstance
-     *
-     * @access public
-     * @return object
-     */
-    function &getInstance()
-    {
-        static $instance = array();
-        if (!$instance) {
-            $instance[0] =& ClassRegistry::getObject('auth_component');
-            if (false == $instance[0]) {
-                throw new Exception('Could not get auth component!');
-            }
-        }
-        return $instance[0];
-    }
-
-
-    /**
-     * getUser
-     *
-     * @static
-     * @access public
-     * @return void
-     */
-    static function getUser()
-    {
-        $_this =& Toolkit::getInstance();
-        return $_this->user();
-    }
-
-
-    /**
-     * getUserId
-     *
-     * @static
-     * @access public
-     * @return void
-     */
-    static function getUserId()
-    {
-        $_this =& Toolkit::getInstance();
-        $user = $_this->user();
-        return Set::extract($user, 'User.id');
-    }
-
-
-  /*static function getUserGroupId()
-{
-    $_this = Toolkit::getInstance();
-    $user = $_this->user();
-    return Set::extract($user, 'User.user_group_id');
-  }*/
-
-    /**
      * formatDate
      *
      * @param mixed $timestamp
@@ -250,7 +195,6 @@ class Toolkit
                     'due_date' => Toolkit::formatDate(time()+(5*24*60*60)),
                     'description' => 'Preview for rubric evaluation event.',
                     'com_req' => true,
-                    'course_id' => 0,
                 ),
                 'Group' => array(
                     'id' => 0,
@@ -283,7 +227,6 @@ class Toolkit
                     ),
                 ),
             ),
-            'viewData' => array('id' => $data['Rubric']['id']),
             'courseId' => 0,
             'userId' => 1,
             'evaluateeCount' => 3,

@@ -108,7 +108,7 @@ class InstallHelperComponent
         // Commit all queries
         $ret = mysqli_query($mysql, "COMMIT");
         if (!$ret) {
-            return "Unable to commit queries: " . mysql_error();
+            return "Unable to commit queries: " . mysqli_error($mysql);
         }
         mysqli_close($mysql);
         return false;

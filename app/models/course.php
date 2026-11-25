@@ -459,7 +459,7 @@ class Course extends AppModel
      */
     function getByDepartments($departments, $findType)
     {
-        $this->CourseDepartment = Classregistry::init('CourseDepartment');
+        $this->CourseDepartment = ClassRegistry::init('CourseDepartment');
 
         $courses = array();
 
