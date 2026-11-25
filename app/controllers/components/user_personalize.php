@@ -22,7 +22,7 @@ class UserPersonalizeComponent extends CakeObject
     /**
      * Function to set the personalize list
      *
-     * @param string $personalizeList used for login method
+     * @param array $personalizeList Personalize rows, as find('all') returns them
      *
      * @return void
      */
@@ -44,7 +44,9 @@ class UserPersonalizeComponent extends CakeObject
      *
      * @param string $attributeCode used for login method
      *
-     * @return errors
+     * @return array|string|int the stored value; when it is not set, 25 for
+     *     a "Limit.Show" code and "close" for others; an empty array when no
+     *     list is set
      */
     function getPersonalizeValue($attributeCode='')
     {
