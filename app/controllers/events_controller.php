@@ -296,7 +296,10 @@ class EventsController extends AppController
      */
     function add($courseId)
     {
-        $course = $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
+        // a course id that is not a whole number (such as '2abc') does not exist
+        $course = $this->_wholeNumber($courseId) === null
+            ? null
+            : $this->Course->getAccessibleCourseById($courseId, User::get('id'), User::getCourseFilterPermission());
         if (!$course) {
             $this->Session->setFlash(__('Error: Course does not exist or you do not have permission to view this course.', true));
             $this->redirect('/home');
@@ -335,7 +338,10 @@ class EventsController extends AppController
 
         // Try to save the data
         if (!empty($this->data)) {
-            $this->_limitPostedEvent($courseId);
+            if (!$this->_limitPostedEvent($courseId)) {
+                $this->Session->setFlash("Add event failed.");
+                return;
+            }
             // need to set the template_id based on the event_template_type_id
             $typeId = $this->data['Event']['event_template_type_id'];
             if ($typeId == 1) {
@@ -456,8 +462,10 @@ class EventsController extends AppController
      */
     function edit($eventId)
     {
-        // Check whether the course exists
-        if (!($event = $this->Event->getAccessibleEventById($eventId, User::get('id'), User::getCourseFilterPermission(), array('Course', 'Group', 'Penalty')))) {
+        // Check whether the event exists; an id that is not a whole number
+        // (such as '8abc') does not
+        if ($this->_wholeNumber($eventId) === null
+            || !($event = $this->Event->getAccessibleEventById($eventId, User::get('id'), User::getCourseFilterPermission(), array('Course', 'Group', 'Penalty')))) {
             $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
             $this->redirect('/home');
             return;
@@ -479,12 +487,15 @@ class EventsController extends AppController
         }
         $event = $this->Event->getEventById($eventId);
 
-        if (!empty($this->data) && array_key_exists('formLoaded', $this->data)) {
+        $posted = !empty($this->data) && array_key_exists('formLoaded', $this->data);
+        // before any of the changes below: a post with no event changes nothing
+        if ($posted && !$this->_limitPostedEvent($event['Event']['course_id'], $eventId)) {
+            $this->Session->setFlash("Edit event failed.");
+        } else if ($posted) {
             if (!array_key_exists('formLoaded', $this->data)) {
                 $this->Session->setFlash("Edit event failed because the form hasn't finished loading yet.");
                 return;
             }
-            $this->_limitPostedEvent($event['Event']['course_id'], $eventId);
             // need to set the template_id based on the event_template_type_id
             $typeId = $this->data['Event']['event_template_type_id'];
             if ($typeId == 1) {
@@ -634,24 +645,27 @@ class EventsController extends AppController
      * @param int      $courseId the course of the event
      * @param int|null $eventId  the event that is edited, or null for a new event
      *
-     * @return void
+     * @return bool false when the form data has no event (the action must
+     *     not save, nor change anything else)
      */
-    private function _limitPostedEvent($courseId, $eventId = null): void
+    private function _limitPostedEvent($courseId, $eventId = null): bool
     {
+        if (!is_array($this->data['Event'] ?? null)) {
+            $this->data = [];
+            return false;
+        }
         $this->data = array_intersect_key(
             $this->data,
             array_flip(['Event', 'Group', 'Penalty', 'formLoaded'])
         );
-        // The form posts the event as an array; any other shape fails
-        // validation (no event), instead of a PHP error.
-        if (!is_array($this->data['Event'] ?? null)) {
-            $this->data['Event'] = [];
-        }
 
+        // the action checked both ids are whole numbers
+        $courseId = (int) $courseId;
         $this->data['Event']['course_id'] = $courseId;
         if ($eventId === null) {
             unset($this->data['Event']['id']);
         } else {
+            $eventId = (int) $eventId;
             $this->data['Event']['id'] = $eventId;
         }
 
@@ -661,10 +675,14 @@ class EventsController extends AppController
         if (array_key_exists('Group', $this->data)) {
             $posted = $this->data['Group']['Group'] ?? $this->data['Group'];
             $courseGroups = array_keys($this->Group->getGroupsByCourseId($courseId));
-            $this->data['Group'] = ['Group' => array_values(array_filter(
-                (array) $posted,
-                fn ($groupId) => !is_array($groupId) && in_array($groupId, $courseGroups)
-            ))];
+            $groupIds = [];
+            foreach ((array) $posted as $groupId) {
+                $groupId = $this->_wholeNumber($groupId);
+                if (in_array($groupId, $courseGroups, true)) {
+                    $groupIds[] = $groupId;
+                }
+            }
+            $this->data['Group'] = ['Group' => array_values(array_unique($groupIds))];
         }
 
         // Penalties: Cake saves a flat row or a row wrapped in the model name
@@ -673,7 +691,7 @@ class EventsController extends AppController
         // is dropped, so that row makes a new penalty.
         if (!is_array($this->data['Penalty'] ?? null)) {
             unset($this->data['Penalty']);
-            return;
+            return true;
         }
         $ownPenalties = $eventId === null ? [] : array_keys($this->Penalty->find('list', [
             'conditions' => ['Penalty.event_id' => $eventId],
@@ -688,12 +706,33 @@ class EventsController extends AppController
                 continue;
             }
             $row = array_intersect_key($row, $fields);
-            if (isset($row['id']) && (is_array($row['id']) || !in_array($row['id'], $ownPenalties))) {
-                unset($row['id']);
+            if (isset($row['id'])) {
+                $penaltyId = $this->_wholeNumber($row['id']);
+                if (in_array($penaltyId, $ownPenalties, true)) {
+                    $row['id'] = $penaltyId;
+                } else {
+                    unset($row['id']);
+                }
             }
             $penalties[] = $row;
         }
         $this->data['Penalty'] = $penalties;
+
+        return true;
+    }
+
+    /**
+     * An id from the URL or the form as an int, or null when it is not only
+     * digits. A loose compare would also take '1.0', ' 1' or '1e0' as 1,
+     * and MySQL would read '2abc' as 2.
+     *
+     * @param mixed $id the id from the URL or the form
+     *
+     * @return int|null
+     */
+    private function _wholeNumber($id): ?int
+    {
+        return is_scalar($id) && ctype_digit((string) $id) ? (int) $id : null;
     }
 
     /**

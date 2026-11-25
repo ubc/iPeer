@@ -379,6 +379,58 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->assertEqual($penalty['Penalty']['percent_penalty'], 15);
     }
 
+    // A course id that is not a whole number does not exist, even when it
+    // starts with the id of a course the user can reach.
+    function testAddWithACourseIdThatIsNotAWholeNumberFails() {
+        $this->testAction('/events/add/1abc', ['return' => 'vars']);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: Course does not exist or you do not have permission to view this course.');
+    }
+
+    function testEditWithAnEventIdThatIsNotAWholeNumberFails() {
+        $this->testAction('/events/edit/8abc', ['return' => 'vars']);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: That event does not exist or you dont have access to it');
+    }
+
+    // Form data with no event (not an array) is refused before anything is
+    // saved or deleted.
+    function testAddWithNoEventDataFails() {
+        $model = ClassRegistry::init('Event');
+        $before = $model->find('count');
+        $this->login = ['User' => ['username' => 'instructor2']];
+        $this->testAction('/events/add/2', [
+            'fixturize' => true,
+            'method' => 'post',
+            'data' => ['Event' => 'x', 'Group' => ['Group' => '']],
+        ]);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Add event failed.');
+        $this->assertEqual($model->find('count'), $before);
+    }
+
+    function testEditWithNoEventDataFails() {
+        // event 8 has one group (group event 10) with a submission (11)
+        $this->testAction('/events/edit/8', [
+            'fixturize' => true,
+            'method' => 'post',
+            'data' => ['formLoaded' => 'loaded', 'Event' => 'x', 'Group' => ['Group' => '']],
+        ]);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Edit event failed.');
+        $event = ClassRegistry::init('Event')->find('first', [
+            'conditions' => ['Event.id' => 8],
+            'contain' => ['GroupEvent', 'EvaluationSubmission'],
+        ]);
+        $this->assertEqual($event['Event']['title'], 'simple evaluation 4');
+        $this->assertEqual(Set::extract('/GroupEvent/id', $event), [10]);
+        $this->assertEqual(Set::extract('/EvaluationSubmission/id', $event), [11]);
+    }
+
     function testEdit() {
         $result = $this->testAction('/events/edit/1', array('return' => 'vars'));
         $this->assertEqual($result['eventTemplateTypes'][1], 'SIMPLE');
