@@ -35,7 +35,7 @@ class FileUploadHelperTest extends CakeTestCase {
   function testResizeOfAFileThatIsNotAnImage(){
     $resizer = new RResizeImage();
     $resizer->imgFile = __FILE__;
-    $this->assertFalse($resizer->resize_limitwh(10, 10));
+    $this->assertIdentical(false, $resizer->resize_limitwh(10, 10));
   }
 
   function endTest($method){

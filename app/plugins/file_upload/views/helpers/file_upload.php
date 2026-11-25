@@ -393,7 +393,7 @@ class FileUploadHelper extends AppHelper{
 				$image_per = (float)(($imgheight * 100) / $height);
       }
 
-			$this->resize_percentage($image_per,$newfile);
+			return $this->resize_percentage($image_per,$newfile);
 		}
 		 
     /**

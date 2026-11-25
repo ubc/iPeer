@@ -57,6 +57,15 @@ To run the unit tests on containers:
 - From outside the container, use `docker compose exec app-test composer test`.
 - `composer test-db` only loads the sample data, and `composer lint` checks the PHP syntax of `app/`.
 
+### Updating the translation template
+
+To collect the strings for translation into `app/locale/default.pot`, run in the app container:
+
+```
+rm -f app/locale/default.pot
+cake/console/cake i18n extract -app app -merge yes -output app/locale/ -paths app/controllers,app/models,app/views
+```
+
 ### Running the browser (E2E) tests
 
 The Playwright tests in `e2e/` open the app in a browser and use it as a user does: they log in, fill in forms, and navigate through pages. They run in the `playwright` container, against the `web-test` service and the sample data. To run them all:

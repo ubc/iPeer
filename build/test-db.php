@@ -13,7 +13,7 @@ $root = dirname(__DIR__);
 require $root . '/app/config/database.php';
 
 $config = (new DATABASE_CONFIG())->default;
-$database = getenv('IPEER_DB_NAME') !== false ? getenv('IPEER_DB_NAME') : 'ipeer_test';
+$database = getenv('IPEER_DB_NAME') ?: 'ipeer_test';
 $seedFile = $root . '/app/config/sql/ipeer_samples_data.sql';
 
 // The seed file has lines such as "--- START" that MariaDB does not accept as
@@ -22,7 +22,8 @@ $seedFile = $root . '/app/config/sql/ipeer_samples_data.sql';
 $sql = preg_replace('/^--.*$/m', '', file_get_contents($seedFile));
 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-$db = new mysqli($config['host'], $config['login'], $config['password'], $database);
+$port = isset($config['port']) ? (int) $config['port'] : null;
+$db = new mysqli($config['host'], $config['login'], $config['password'], $database, $port);
 
 // multi_query() runs the first statement; each next_result() runs the next one
 // and throws when it fails.

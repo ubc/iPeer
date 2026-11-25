@@ -99,5 +99,5 @@ docker compose exec playwright npx playwright test tests/add-group.spec.ts --rep
 To see how long each test takes, write a JSON report:
 
 ```
-docker compose exec -e PLAYWRIGHT_JSON_OUTPUT_NAME=timings.json playwright npx playwright test --reporter=line,json
+docker compose exec -e PLAYWRIGHT_JSON_OUTPUT_NAME=test-results/timings.json playwright npx playwright test --reporter=line,json
 ```
