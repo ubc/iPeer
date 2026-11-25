@@ -52,7 +52,8 @@ var templateTypeahead = (function ($) {
     }
 
     // texts: the translated 'label' and 'placeholder' of the box, and 'empty',
-    // the line under a heading with no templates
+    // the line under a heading with no templates. The label is used only when
+    // the select has no <label>.
     return function (selector, texts) {
         var select = $(selector);
         if (!select.length || !$.fn.autocomplete) {
@@ -175,6 +176,16 @@ var templateTypeahead = (function ($) {
             return;
         }
         select.hide();
+        // The label of the select now names the box, and the box takes over
+        // the select's required state.
+        var label = $('label[for="' + select.attr('id') + '"]');
+        if (label.length) {
+            label.attr('for', id);
+            input.removeAttr('aria-label');
+        }
+        if (select.attr('aria-required')) {
+            input.attr('aria-required', select.attr('aria-required'));
+        }
         remember();
         // nothing to pick: the box says so, as the list cannot open
         if (!items.length) {

@@ -54,4 +54,7 @@ $params = array('controller'            => 'mixevals',
         <?php echo $this->element('evaluations/mixeval_eval_form', Toolkit::getMixEvalDemoData($mixeval, $selfEval))?>
     </div>
 <?php endif; ?>
+<div style="text-align: center">
+    <input type="button" name="Back" value="<?php __('Back') ?>" onClick="(history.length > 1) ? history.back() : window.close();">
+</div>
 </div>

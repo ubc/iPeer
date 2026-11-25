@@ -24,14 +24,19 @@ function checkGroups() {
 <?php
 $html->script("jquery-ui-timepicker-addon", array("inline"=>false));
 $html->script("template_typeahead", array("inline"=>false));
+// The mark after the label of a field the user must fill. Screen readers
+// skip it, because the field has aria-required.
+$required = ' <span class="required-mark" aria-hidden="true">*</span>';
+
 echo $this->Form->create('Event', array('action' => "edit", "onsubmit" => "return checkGroups()"));
 echo '<input type="hidden" name="required" id="required" value="eventId" />';
 echo $this->Form->input('id');
+echo '<p class="required-note">' . sprintf(__('Fields marked %s are required.', true), '<span class="required-mark">*</span>') . '</p>';
 ?>
 
 <label class="courseLabel"><?php __('Course')?></label>
 <label class="course"><?php echo $event['Course']['full_name'] ?></label>
-<?php echo $this->Form->input('title', array('label' => 'Event Title'));
+<?php echo $this->Form->input('title', ['label' => __('Event Title', true) . $required, 'aria-required' => 'true']);
 echo "<div id='titleWarning' class='red'></div>";
 echo $this->Form->input('description', array('type' => 'textarea'));
 
@@ -57,38 +62,26 @@ if ($lockEvaluationType === true) {
 
 echo $this->Form->input('event_template_type_id');
 
-echo $this->Form->input('SimpleEvaluation',
-    array(
-        'div' => array('id' => 'SimpleEvalDiv'),
-        'label' => $html->link(
-            'Preview', '', array('id' => 'prevS', 'target' => '_blank')),
-        'selected' => $simpleSelected
-    )
-);
-echo $this->Form->input('Rubric',
-    array(
-        'div' => array('id' => 'RubricDiv'),
-        'label' => $html->link(
-            'Preview', '', array('id' => 'prevR', 'target' => '_blank')),
-        'selected'=> $rubricSelected
-    )
-);
-echo $this->Form->input('Survey',
-    array(
-        'div' => array('id' => 'SurveyDiv'),
-        'label' => $html->link(
-            'Preview', '', array('id' => 'prevV', 'target' => '_blank')),
-        'selected' => $surveySelected
-    )
-);
-echo $this->Form->input('Mixeval',
-    array(
-        'div' => array('id' => 'MixevalDiv'),
-        'label' => $html->link(
-            'Preview', '', array('id' => 'prevM', 'target' => '_blank')),
-        'selected' => $mixevalSelected
-    )
-);
+$templateInputs = [
+    'SimpleEvaluation' => ['SimpleEvalDiv', 'prevS', $simpleSelected],
+    'Rubric' => ['RubricDiv', 'prevR', $rubricSelected],
+    'Survey' => ['SurveyDiv', 'prevV', $surveySelected],
+    'Mixeval' => ['MixevalDiv', 'prevM', $mixevalSelected],
+];
+foreach ($templateInputs as $field => [$divId, $previewId, $selected]) {
+    echo $this->Form->input($field, [
+        'div' => ['id' => $divId],
+        'label' => __('Choose Template', true) . $required,
+        'aria-required' => 'true',
+        // updatePreviewNames() puts the template name in the hidden span
+        'after' => $html->link(
+            __('Preview', true) . '<span class="visually-hidden"></span>',
+            '',
+            ['id' => $previewId, 'class' => 'template-preview', 'target' => '_blank', 'escape' => false]
+        ),
+        'selected' => $selected,
+    ]);
+}
 
 if ($lockEvaluationType === true) {
     echo '</div>';
@@ -133,13 +126,14 @@ echo $this->Form->input(
 ); ?>
 <div class='help-text'><?php echo __('Basic view only shows grades. Detailed view shows both grades and comments') ?></div>
 <?php
-echo $this->Form->input('due_date', array('type' => 'text'));
-echo $this->Form->input('release_date_begin', array('label' => 'Evaluation Released From', 'type' => 'text'));
-echo $this->Form->input('release_date_end', array('label' => 'Until', 'type' => 'text'));
+$dateInput = ['type' => 'text', 'aria-required' => 'true'];
+echo $this->Form->input('due_date', $dateInput + ['label' => __('Due Date', true) . $required]);
+echo $this->Form->input('release_date_begin', $dateInput + ['label' => __('Evaluation Released From', true) . $required]);
+echo $this->Form->input('release_date_end', $dateInput + ['label' => __('Until', true) . $required]);
 echo $this->Form->input('result_release_date_begin',
-    array('div' => array('id' => 'ResultReleaseBeginDiv'), 'label' => 'Results Released From', 'type' => 'text'));
+    $dateInput + ['div' => ['id' => 'ResultReleaseBeginDiv'], 'label' => __('Results Released From', true) . $required]);
 echo $this->Form->input('result_release_date_end',
-    array('div' => array('id' => 'ResultReleaseEndDiv'), 'label' => 'Until', 'type' => 'text'));
+    $dateInput + ['div' => ['id' => 'ResultReleaseEndDiv'], 'label' => __('Until', true) . $required]);
 
 $emailRemindersEnabled = ($emailInterfaceEnabled ?? true) && $reminder_enabled;
 if ($emailRemindersEnabled):
@@ -237,7 +231,7 @@ echo '<a class="addPenaltyButton"
     href="#" onclick="addPenaltyInputs(); return false;">Add Penalty</a>';
 echo "</div>";
 
-echo $this->Form->submit();
+echo $this->Form->submit(__('Save', true));
 echo '<input type="hidden" name="data[formLoaded]" id="formLoaded" value="loaded" />';
 echo $this->Form->end();
 
@@ -274,7 +268,7 @@ jQuery("#EventMixeval").change(updatePreview);
 // rest of this script, and an error in it cannot stop the form's own set-up.
 jQuery(function () {
     var texts = <?php echo json_encode(array(
-        'label' => __('Template', true),
+        'label' => __('Choose Template', true),
         'placeholder' => __('Search by name or ID', true),
         'empty' => __('No templates', true),
     )); ?>;
@@ -443,6 +437,22 @@ function updatePreview() {
         url = "<?php echo $this->base; ?>/mixevals/view/";
         prevM.href = url + eventIdToPrev + '/' + selfEval;
     }
+    updatePreviewNames();
+}
+
+// Each Preview link names its template for screen readers, so the link says
+// which template it opens.
+function updatePreviewNames() {
+    var links = {
+        '#prevS': '#EventSimpleEvaluation',
+        '#prevR': '#EventRubric',
+        '#prevV': '#EventSurvey',
+        '#prevM': '#EventMixeval'
+    };
+    jQuery.each(links, function (link, select) {
+        var name = jQuery(select).find('option:selected').text();
+        jQuery(link).find('.visually-hidden').text(' ' + name);
+    });
 }
 
 function toggleSelfEval() {

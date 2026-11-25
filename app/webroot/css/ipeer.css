@@ -498,6 +498,20 @@ a#home, a#home:hover, a#home:active {
     color: red;
 }
 
+/* Text for screen readers only, e.g. the name of an icon-only button. */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
 .green {
     color: green;
 }
@@ -1211,6 +1225,22 @@ i {
 #Events .radio legend {
     margin-top: 0.25em;
     margin-bottom: 0.5em;
+}
+
+/* the mark of a field the user must fill, and the note that explains it */
+#Events .required-mark {
+    color: #c00;
+    font-weight: bold;
+}
+
+#Events .required-note {
+    margin: 0 0 1em 19em;
+    font-size: 0.9em;
+}
+
+/* the Preview link after the template search box */
+#Events a.template-preview {
+    margin-left: 0.75em;
 }
 
 #Events form div.email-help-text, #Events form div.email-temp-help-text {

@@ -104,7 +104,8 @@ const PLAIN: NewEvent = {
   penalties: [],
 };
 
-const SUBMIT = { name: 'Submit', exact: true } as const;
+const ADD_EVENT = { name: 'Add Event', exact: true } as const;
+const SAVE = { name: 'Save', exact: true } as const;
 const GROUPS_REMOVED =
   'You have removed one or more groups from the event. ' +
   'If there are submissions made within the groups, they would be permanently deleted. ' +
@@ -120,7 +121,7 @@ function setting(page: Page, legend: string): Locator {
 // select behind it is hidden, but it still holds the value that the form
 // posts.
 function templateBox(page: Page): Locator {
-  return page.getByRole('combobox', { name: 'Template', exact: true });
+  return page.getByRole('combobox', { name: 'Choose Template', exact: true });
 }
 
 // The open list of the template search box: its templates, and its headings.
@@ -306,7 +307,7 @@ async function openEdit(page: Page, id: string): Promise<void> {
 }
 
 async function saveEdit(page: Page): Promise<void> {
-  await page.getByRole('button', SUBMIT).click();
+  await page.getByRole('button', SAVE).click();
   await expect(goodMessage(page)).toHaveText(EVENT.edited);
 }
 
@@ -374,7 +375,24 @@ test('the Add Event form refuses a missing title and missing dates', async ({ pa
   await expect(setting(page, 'Auto-Release Results').getByLabel('Disabled')).toBeChecked();
   await expect(setting(page, 'Student Result Mode').getByLabel('Detailed')).toBeChecked();
 
-  await page.getByRole('button', SUBMIT).click();
+  // The fields that the user must fill are marked as required.
+  const textbox = (name: string) => page.getByRole('textbox', { name, exact: true });
+  const until = textbox('Until');
+  await expect(until).toHaveCount(2);
+  for (const field of [
+    textbox('Event Title'),
+    templateBox(page),
+    textbox('Due Date'),
+    textbox('Evaluation Released From'),
+    until.first(),
+    textbox('Results Released From'),
+    until.last(),
+  ]) {
+    await expect(field).toHaveAttribute('aria-required', 'true');
+  }
+  await expect(textbox('Description')).not.toHaveAttribute('aria-required');
+
+  await page.getByRole('button', ADD_EVENT).click();
   await expect(flashMessage(page)).toHaveText(EVENT.addFailed);
   const dateFormat = 'Must be in Year-Month-Day Hour:Minute:Second format.';
   await expect(errorMessage(page)).toHaveText([
@@ -396,6 +414,8 @@ test('the Add Event form shows the fields of the chosen evaluation type', async 
   await expect(page.locator('#RubricDiv')).toBeVisible();
   await expect(page.locator('#SimpleEvalDiv')).toBeHidden();
   await expect(page.locator('#prevR')).toHaveAttribute('href', /\/rubrics\/view\/1$/);
+  // The link names the template it opens, for screen readers.
+  await expect(page.locator('#prevR')).toHaveAccessibleName(/^Preview .+ \(ID 1\)$/);
 
   // The preview of a mixed evaluation shows the self-evaluation questions
   // only when the event enables them.
@@ -421,6 +441,27 @@ test('the Add Event form shows the fields of the chosen evaluation type', async 
   await expect(page.locator('#SimpleEvalDiv')).toBeVisible();
   await expect(page.locator('#GroupsDiv')).toBeVisible();
   await expect(page.locator('#penaltyInputs')).toBeVisible();
+});
+
+// A Preview link opens the template in a new tab. Back on the preview closes
+// that tab, as the tab has no page to go back to.
+test('the template preview of each evaluation type has a Back button', async ({ page }) => {
+  await login(page, USERS.instructor1);
+  await page.goto(`/events/add/${COURSES.mech328.id}`);
+  const previews = [
+    ['SIMPLE', '#prevS'],
+    ['RUBRIC', '#prevR'],
+    ['SURVEY', '#prevV'],
+    ['MIX EVALUATION', '#prevM'],
+  ] as const;
+
+  for (const [type, link] of previews) {
+    await page.locator('#EventEventTemplateTypeId').selectOption({ label: type });
+    const [preview] = await Promise.all([page.waitForEvent('popup'), page.locator(link).click()]);
+    const closed = preview.waitForEvent('close');
+    await preview.getByRole('button', { name: 'Back', exact: true }).click();
+    await closed;
+  }
 });
 
 test('the Add Event form lists the own templates first, then the public templates of others', async ({
@@ -557,6 +598,7 @@ test('the template search box finds a template by its name or ID', async ({
     'href',
     new RegExp(`/simpleevaluations/view/${SEEDED.templateId}$`)
   );
+  await expect(page.locator('#prevS')).toHaveAccessibleName(`Preview ${seededLabel}`);
 
   // text that matches no template does not change the selection
   await box.fill('no such template');
@@ -666,7 +708,7 @@ test('the template search box matches any part of a name, and the arrow keys mov
   );
 });
 
-test('Submit with a template search that is not a template opens the list', async ({ page }) => {
+test('Add Event with a template search that is not a template opens the list', async ({ page }) => {
   await login(page, USERS.instructor1);
   await page.goto(`/events/add/${COURSES.mech328.id}`);
   const box = templateBox(page);
@@ -674,7 +716,7 @@ test('Submit with a template search that is not a template opens the list', asyn
 
   await box.click();
   await box.pressSequentially('module');
-  await page.getByRole('button', SUBMIT).click();
+  await page.getByRole('button', ADD_EVENT).click();
 
   // The form is not posted with the old template, and the user picks one. A
   // post (the title is empty) would come back with an error message.
@@ -684,7 +726,7 @@ test('Submit with a template search that is not a template opens the list', asyn
   await expect(flashMessage(page)).toHaveCount(0);
 });
 
-test('Escape keeps the template, and Submit with a search that matches nothing opens the full list', async ({
+test('Escape keeps the template, and Add Event with a search that matches nothing opens the full list', async ({
   page,
 }) => {
   await login(page, USERS.instructor1);
@@ -710,7 +752,7 @@ test('Escape keeps the template, and Submit with a search that matches nothing o
   // no template contains the search, so the full list opens
   await box.pressSequentially('xyz');
   await expect(menu.items).toHaveCount(0);
-  await page.getByRole('button', SUBMIT).click();
+  await page.getByRole('button', ADD_EVENT).click();
   await expect(box).toBeFocused();
   await expect(box).toHaveValue('xyz');
   await expect(menu.items).toHaveText([seededLabel]);
@@ -747,7 +789,7 @@ test('an instructor adds an event with reminders, groups and late penalties', as
 
   await fillForm(page, FINAL_PROJECT);
   await expect(page.locator('#GroupGroup')).toHaveValues(ALL_GROUP_IDS);
-  await page.getByRole('button', SUBMIT).click();
+  await page.getByRole('button', ADD_EVENT).click();
   await expect(goodMessage(page)).toHaveText(EVENT.added);
 
   await waitForAjaxList(page);
@@ -775,7 +817,7 @@ test('editing an event can remove all of its groups', async ({ page, testDatabas
   await openEdit(page, id);
   await expect(page.locator('#GroupGroup')).toHaveValues(ALL_GROUP_IDS);
   await page.getByRole('button', { name: 'Unselect All', exact: true }).click();
-  await withConfirmation(page, GROUPS_REMOVED, () => page.getByRole('button', SUBMIT).click());
+  await withConfirmation(page, GROUPS_REMOVED, () => page.getByRole('button', SAVE).click());
   await expect(goodMessage(page)).toHaveText(EVENT.edited);
 
   await openEdit(page, id);
@@ -956,7 +998,7 @@ test("a superadmin adds an event to any course, and only that course's instructo
   await expect(page.locator('#EventCourseId')).toHaveValue(course.id);
   await expect(page.locator('#GroupGroup option')).toHaveCount(0);
   await fillForm(page, event);
-  await page.getByRole('button', SUBMIT).click();
+  await page.getByRole('button', ADD_EVENT).click();
   await expect(goodMessage(page)).toHaveText(EVENT.added);
   await expect(page).toHaveURL(new RegExp(`/events/index/${course.id}$`));
   const id = await idFromAjaxList(page, event.title, 'events');
