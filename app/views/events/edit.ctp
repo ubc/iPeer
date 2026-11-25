@@ -77,7 +77,7 @@ foreach ($templateInputs as $field => [$divId, $previewId, $selected]) {
         'after' => $html->link(
             __('Preview', true) . '<span class="visually-hidden"></span>',
             '',
-            ['id' => $previewId, 'class' => 'template-preview', 'target' => '_blank', 'escape' => false]
+            ['id' => $previewId, 'class' => 'button template-preview', 'target' => '_blank', 'escape' => false]
         ),
         'selected' => $selected,
     ]);
