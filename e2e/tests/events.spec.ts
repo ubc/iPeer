@@ -344,8 +344,7 @@ async function expectFinalProject(page: Page, id: string): Promise<void> {
 
       // The edit form shows what was saved.
       await openEdit(page, id);
-      await expect(page.locator('#EventCourseId')).toHaveCount(0);
-      await expect(page.locator('label.course')).toHaveText(fullName(COURSES.mech328));
+      await expect(pageTitle(page)).toContainText(fullName(COURSES.mech328));
       await expect(page.locator('#EventDueDate')).toHaveValue(DATES.due);
       await expect(page.locator('#EventEmailSchedule')).toHaveValue('2');
       await expect(page.locator('#GroupGroup')).toHaveValues(ALL_GROUP_IDS);
@@ -373,9 +372,9 @@ test('the Add Event form refuses a missing title and missing dates', async ({ pa
   await login(page, USERS.instructor1);
   await page.goto(`/events/add/${COURSES.mech328.id}`);
 
-  // An instructor can add events only to their own course.
-  await expect(page.locator('#EventCourseId option')).toHaveCount(1);
-  await expect(page.locator('#EventCourseId')).toHaveValue(COURSES.mech328.id);
+  // The page title names the course of the URL; the form has no course field.
+  await expect(pageTitle(page)).toContainText(fullName(COURSES.mech328));
+  await expect(page.locator('#EventCourseId')).toHaveCount(0);
 
   await expect(setting(page, 'Self-Evaluation').getByLabel('Disabled')).toBeChecked();
   await expect(setting(page, 'Comments Required').getByLabel('Disabled')).toBeChecked();
@@ -1016,14 +1015,9 @@ test("a superadmin adds an event to any course, and only that course's instructo
   const event: NewEvent = { ...PLAIN, title: 'Report Peer Evaluation', allGroups: false };
 
   await login(page, USERS.superAdmin);
-  await page.goto(`/events/add/${COURSES.mech328.id}`);
-  // Every active course: CPSC 101 is inactive.
-  await expect(page.locator('#EventCourseId option')).toHaveCount(3);
-  await expect(page.locator(`#EventCourseId option[value="${COURSES.cpsc101.id}"]`)).toHaveCount(0);
-  // Choosing another course opens the form of that course, with its groups.
-  await page.locator('#EventCourseId').selectOption(course.id);
-  await expect(page).toHaveURL(new RegExp(`/events/add/${course.id}$`));
-  await expect(page.locator('#EventCourseId')).toHaveValue(course.id);
+  // The Add Event page of APSC 201 names that course, and lists its groups (none).
+  await page.goto(`/events/add/${course.id}`);
+  await expect(pageTitle(page)).toContainText(fullName(course));
   await expect(page.locator('#GroupGroup option')).toHaveCount(0);
   await fillForm(page, event);
   await page.getByRole('button', ADD_EVENT).click();

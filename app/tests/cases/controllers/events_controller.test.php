@@ -161,13 +161,6 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->assertEqual($result['mixevals']['My templates'][1], 'Default Mix Evaluation (ID 1)');
         // evauation types
         $this->assertEqual(count($result['eventTemplateTypes']), 4);
-        // course list
-        ksort($result['courses']);
-        $this->assertEqual($result['courses'], array(
-            1 => 'MECH 328 - Mechanical Engineering Design Project',
-            2 => 'APSC 201 - Technical Communication',
-            4 => 'CPSC 404 - Advanced Software Engineering',
-        ));
         // group list
         ksort($result['groups']);
         $this->assertEqual($result['groups'], array(
@@ -267,6 +260,125 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->assertEqual($message['message'], 'Error: Course does not exist or you do not have permission to view this course.');
     }
 
+    // A template name that starts or ends with a tab, a line break or a
+    // non-breaking space shows without it in the template list (and so in the
+    // search box).
+    function testAddTrimsTemplateNames() {
+        $mixeval = ClassRegistry::init('Mixeval');
+        $mixeval->create();
+        $mixeval->save(['Mixeval' => [
+            'name' => "\tGroup Participation Evaluation \u{00A0}\r\n",
+            'availability' => 'public',
+            'creator_id' => 1,
+        ]], false);
+        $id = $mixeval->id;
+
+        $result = $this->testAction('/events/add/1', ['return' => 'vars']);
+        $mixeval->delete($id, false);
+
+        // in either group: the test does not depend on who saved it
+        $labels = $result['mixevals']['My templates'] + $result['mixevals']['Other templates'];
+        $this->assertEqual($labels[$id], "Group Participation Evaluation (ID $id)");
+    }
+
+    // The form data names another course, event, groups and penalty; the new
+    // event still goes into the course of the URL, and nothing else changes.
+    function testAddKeepsTheEventInTheCourseOfTheUrl() {
+        // instructor2 teaches course 2 only; the groups 1 and 2, event 8 and
+        // penalty 5 (of event 2) belong to course 1
+        $this->login = ['User' => ['username' => 'instructor2']];
+        $data = [
+            'Event' => [
+                'id' => 8,
+                'course_id' => 1,
+                'title' => 'event of course 2',
+                'description' => '',
+                'event_template_type_id' => 1,
+                'SimpleEvaluation' => 1,
+                'self_eval' => 0,
+                'com_req' => 0,
+                'due_date' => '2012-11-28 00:00:01',
+                'release_date_begin' => '2012-11-20 00:00:01',
+                'release_date_end' => '2012-11-29 00:00:01',
+                'result_release_date_begin' => '2012-11-30 00:00:01',
+                'result_release_date_end' => '2022-12-12 00:00:01',
+                'email_schedule' => 0,
+            ],
+            // groups as a plain list: Cake saves this shape too
+            'Group' => [1, 2],
+            'Penalty' => [['id' => 5, 'days_late' => 1, 'percent_penalty' => 50]],
+            // not part of the form: saveAll() would save it
+            'Course' => ['id' => 1, 'title' => 'renamed'],
+        ];
+        $this->testAction('/events/add/2', ['fixturize' => true, 'data' => $data, 'method' => 'post']);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Add event successful!');
+        $model = ClassRegistry::init('Event');
+        $event = $model->find('first', [
+            'conditions' => ['Event.title' => 'event of course 2'],
+            'contain' => ['Group', 'Penalty'],
+        ]);
+        $this->assertEqual($event['Event']['course_id'], 2);
+        $this->assertNotEqual($event['Event']['id'], 8);
+        $this->assertEqual(count($event['Group']), 0);
+        $this->assertEqual(Set::extract('/Penalty/percent_penalty', $event), [50]);
+
+        $other = $model->find('first', ['conditions' => ['Event.id' => 8], 'contain' => false]);
+        $this->assertEqual($other['Event']['title'], 'simple evaluation 4');
+        $penalty = ClassRegistry::init('Penalty')->findById(5);
+        $this->assertEqual($penalty['Penalty']['event_id'], 2);
+        $this->assertEqual($penalty['Penalty']['percent_penalty'], 15);
+        $course = ClassRegistry::init('Course')->findById(1);
+        $this->assertEqual($course['Course']['title'], 'Mechanical Engineering Design Project');
+    }
+
+    // Groups and penalties in the other shapes that Cake saves: one group id
+    // instead of a list, and a penalty row wrapped in the model name, with a
+    // field the form does not have; a row that is not an array is left out.
+    function testAddWithOtherShapesOfGroupsAndPenalties() {
+        // instructor2 teaches course 2 only; group 1 and penalty 5 (of
+        // event 2) belong to course 1
+        $this->login = ['User' => ['username' => 'instructor2']];
+        $data = [
+            'Event' => [
+                'title' => 'event with other shapes',
+                'description' => '',
+                'event_template_type_id' => 1,
+                'SimpleEvaluation' => 1,
+                'self_eval' => 0,
+                'com_req' => 0,
+                'due_date' => '2012-11-28 00:00:01',
+                'release_date_begin' => '2012-11-20 00:00:01',
+                'release_date_end' => '2012-11-29 00:00:01',
+                'result_release_date_begin' => '2012-11-30 00:00:01',
+                'result_release_date_end' => '2022-12-12 00:00:01',
+                'email_schedule' => 0,
+            ],
+            'Group' => ['Group' => '1'],
+            'Penalty' => [
+                'x',
+                ['Penalty' => ['id' => 5, 'days_late' => 1, 'percent_penalty' => 30, 'event_id' => 2]],
+            ],
+        ];
+        $this->testAction('/events/add/2', ['fixturize' => true, 'data' => $data, 'method' => 'post']);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Add event successful!');
+        $event = ClassRegistry::init('Event')->find('first', [
+            'conditions' => ['Event.title' => 'event with other shapes'],
+            'contain' => ['Group', 'Penalty'],
+        ]);
+        $this->assertEqual($event['Event']['course_id'], 2);
+        $this->assertEqual(count($event['Group']), 0);
+        $this->assertEqual(Set::extract('/Penalty/percent_penalty', $event), [30]);
+        $this->assertNotEqual($event['Penalty'][0]['id'], 5);
+
+        $penalty = ClassRegistry::init('Penalty')->findById(5);
+        $this->assertEqual($penalty['Penalty']['event_id'], 2);
+        $this->assertEqual($penalty['Penalty']['percent_penalty'], 15);
+    }
+
     function testEdit() {
         $result = $this->testAction('/events/edit/1', array('return' => 'vars'));
         $this->assertEqual($result['eventTemplateTypes'][1], 'SIMPLE');
@@ -331,6 +443,52 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         // make sure the GroupEvent id is not shifted
         $submissions = Set::sort($event['EvaluationSubmission'], '{n}.id', 'asc');
         $this->assertEqual($submissions[0]['id'], 11);
+    }
+
+    // The form data names another event, course and penalty; the edit still
+    // changes only the event of the URL, which stays in its course.
+    function testEditKeepsTheEventOfTheUrl() {
+        $data = [
+            'formLoaded' => true,
+            'Event' => [
+                'id' => 1,
+                'course_id' => 2,
+                'title' => 'simple evaluation 4 edited',
+                'description' => '',
+                'event_template_type_id' => 1,
+                'SimpleEvaluation' => 1,
+                'self_eval' => 0,
+                'com_req' => 0,
+                'enable_details' => 0,
+                'auto_release' => 0,
+                'due_date' => '2012-11-28 00:00:01',
+                'release_date_begin' => '2012-11-20 00:00:01',
+                'release_date_end' => '2012-11-29 00:00:01',
+                'result_release_date_begin' => '2012-11-30 00:00:01',
+                'result_release_date_end' => '2022-12-12 00:00:01',
+                'email_schedule' => 0,
+            ],
+            'Group' => ['Group' => [1]],
+            // penalties 1 and 2 belong to event 1; the second row is wrapped in
+            // the model name, which Cake also saves
+            'Penalty' => [
+                ['id' => 1, 'days_late' => 1, 'percent_penalty' => 50],
+                ['Penalty' => ['id' => 2, 'days_late' => 2, 'percent_penalty' => 70]],
+            ],
+        ];
+        $this->testAction('/events/edit/8', ['fixturize' => true, 'data' => $data, 'method' => 'post']);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Edit event successful!');
+        $model = ClassRegistry::init('Event');
+        $edited = $model->find('first', ['conditions' => ['Event.id' => 8], 'contain' => ['Penalty']]);
+        $this->assertEqual($edited['Event']['title'], 'simple evaluation 4 edited');
+        $this->assertEqual($edited['Event']['course_id'], 1);
+        $this->assertEqual(Set::extract('/Penalty/percent_penalty', $edited), [50, 70]);
+
+        $other = $model->find('first', ['conditions' => ['Event.id' => 1], 'contain' => ['Penalty']]);
+        $this->assertEqual($other['Event']['title'], 'Term 1 Evaluation');
+        $this->assertEqual(Set::extract('/Penalty/percent_penalty', $other), [20, 40, 60, 100]);
     }
 
     function testEditOthersEvent() {

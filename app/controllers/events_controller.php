@@ -306,8 +306,6 @@ class EventsController extends AppController
         // Init form variables needed for display
         $this->set('breadcrumb', $this->breadcrumb->push(array('course' => $course['Course']))->push(__('Add Event', true)));
         $this->set('groups', $this->Group->getGroupsByCourseId($courseId));
-        $courseList = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
-        $this->set('courses', $courseList);
         $this->set(
             'eventTemplateTypes',
             $this->EventTemplateType->getEventTemplateTypeList(true)
@@ -337,6 +335,7 @@ class EventsController extends AppController
 
         // Try to save the data
         if (!empty($this->data)) {
+            $this->_limitPostedEvent($courseId);
             // need to set the template_id based on the event_template_type_id
             $typeId = $this->data['Event']['event_template_type_id'];
             if ($typeId == 1) {
@@ -485,6 +484,7 @@ class EventsController extends AppController
                 $this->Session->setFlash("Edit event failed because the form hasn't finished loading yet.");
                 return;
             }
+            $this->_limitPostedEvent($event['Event']['course_id'], $eventId);
             // need to set the template_id based on the event_template_type_id
             $typeId = $this->data['Event']['event_template_type_id'];
             if ($typeId == 1) {
@@ -625,6 +625,78 @@ class EventsController extends AppController
     }
 
     /**
+     * Keep the posted event to the course and the event that the action
+     * checked (from the URL). saveAll() saves every model in the form data,
+     * and the data can name any course, event, group or late penalty. So this
+     * keeps only the data of the event form, sets the course and the event
+     * id, and keeps only the course's groups and the event's own penalties.
+     *
+     * @param int      $courseId the course of the event
+     * @param int|null $eventId  the event that is edited, or null for a new event
+     *
+     * @return void
+     */
+    private function _limitPostedEvent($courseId, $eventId = null): void
+    {
+        $this->data = array_intersect_key(
+            $this->data,
+            array_flip(['Event', 'Group', 'Penalty', 'formLoaded'])
+        );
+        // The form posts the event as an array; any other shape fails
+        // validation (no event), instead of a PHP error.
+        if (!is_array($this->data['Event'] ?? null)) {
+            $this->data['Event'] = [];
+        }
+
+        $this->data['Event']['course_id'] = $courseId;
+        if ($eventId === null) {
+            unset($this->data['Event']['id']);
+        } else {
+            $this->data['Event']['id'] = $eventId;
+        }
+
+        // Cake saves data[Group][Group], or data[Group] when that key is not
+        // set, as one id or a list of ids; keep one shape, with this course's
+        // groups only
+        if (array_key_exists('Group', $this->data)) {
+            $posted = $this->data['Group']['Group'] ?? $this->data['Group'];
+            $courseGroups = array_keys($this->Group->getGroupsByCourseId($courseId));
+            $this->data['Group'] = ['Group' => array_values(array_filter(
+                (array) $posted,
+                fn ($groupId) => !is_array($groupId) && in_array($groupId, $courseGroups)
+            ))];
+        }
+
+        // Penalties: Cake saves a flat row or a row wrapped in the model name
+        // (data[Penalty][0][Penalty][...]), so unwrap each row and keep the
+        // form's fields only. An id that is not one of this event's penalties
+        // is dropped, so that row makes a new penalty.
+        if (!is_array($this->data['Penalty'] ?? null)) {
+            unset($this->data['Penalty']);
+            return;
+        }
+        $ownPenalties = $eventId === null ? [] : array_keys($this->Penalty->find('list', [
+            'conditions' => ['Penalty.event_id' => $eventId],
+        ]));
+        $fields = array_flip(['id', 'days_late', 'percent_penalty']);
+        $penalties = [];
+        foreach ($this->data['Penalty'] as $row) {
+            if (is_array($row) && is_array($row['Penalty'] ?? null)) {
+                $row = $row['Penalty'];
+            }
+            if (!is_array($row)) {
+                continue;
+            }
+            $row = array_intersect_key($row, $fields);
+            if (isset($row['id']) && (is_array($row['id']) || !in_array($row['id'], $ownPenalties))) {
+                unset($row['id']);
+            }
+            $penalties[] = $row;
+        }
+        $this->data['Penalty'] = $penalties;
+    }
+
+    /**
      * The options of a template select, from getBelongingOrPublic().
      *
      * @param array $templates [['id' => 7, 'name' => 'Lab Rubric', 'creator_id' => 2], ...]
@@ -641,7 +713,9 @@ class EventsController extends AppController
         $own = [];
         $other = [];
         foreach ($templates as $template) {
-            $label = "{$template['name']} (ID {$template['id']})";
+            // Some stored names start or end with a tab or a line break. The
+            // search box shows the option text as it is, so trim it.
+            $label = mb_trim($template['name']) . " (ID {$template['id']})";
             if ($template['creator_id'] == $userId) {
                 $own[$template['id']] = $label;
             } else {

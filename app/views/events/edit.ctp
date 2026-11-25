@@ -34,8 +34,6 @@ echo $this->Form->input('id');
 echo '<p class="required-note">' . sprintf(__('Fields marked %s are required.', true), '<span class="required-mark">*</span>') . '</p>';
 ?>
 
-<label class="courseLabel"><?php __('Course')?></label>
-<label class="course"><?php echo $event['Course']['full_name'] ?></label>
 <?php echo $this->Form->input('title', ['label' => __('Event Title', true) . $required, 'aria-required' => 'true']);
 echo "<div id='titleWarning' class='red'></div>";
 echo $this->Form->input('description', array('type' => 'textarea'));
