@@ -13,7 +13,7 @@ echo $this->Form->input('course_id', array('default' => $course_id));
 echo $this->Form->input('title', ['label' => __('Event Title', true) . $required, 'aria-required' => 'true']);
 echo "<div id='titleWarning' class='red'></div>";
 echo $this->Form->input('description', array('type' => 'textarea'));
-echo $this->Form->input('event_template_type_id');
+echo $this->Form->input('event_template_type_id', ['label' => __('Event Type', true) . $required, 'aria-required' => 'true']);
 $templateInputs = [
     'SimpleEvaluation' => ['SimpleEvalDiv', 'prevS'],
     'Rubric' => ['RubricDiv', 'prevR'],
@@ -23,9 +23,11 @@ $templateInputs = [
 foreach ($templateInputs as $field => [$divId, $previewId]) {
     echo $this->Form->input($field, [
         'div' => ['id' => $divId],
-        'label' => __('Choose Template', true) . $required,
+        'label' => __('Event Template', true) . $required,
         'aria-required' => 'true',
-        // updatePreviewNames() puts the template name in the hidden span
+        // no template at first: the user picks one
+        'empty' => true,
+        // updatePreviewLinks() puts the template name in the hidden span
         'after' => $html->link(
             __('Preview', true) . '<span class="visually-hidden"></span>',
             '',
@@ -33,6 +35,9 @@ foreach ($templateInputs as $field => [$divId, $previewId]) {
         ),
     ]);
 }
+// The posted template goes into template_id, which has no field of its own,
+// so its error ("Please select a template.") shows under the template lists.
+echo $this->Form->error('template_id');
 echo $this->Form->input(
     'self_eval',
     array(
@@ -198,7 +203,7 @@ jQuery("#EventMixeval").change(updatePreview);
 // rest of this script, and an error in it cannot stop the form's own set-up.
 jQuery(function () {
     var texts = <?php echo json_encode(array(
-        'label' => __('Choose Template', true),
+        'label' => __('Event Template', true),
         'placeholder' => __('Search by name or ID', true),
         'empty' => __('No templates', true),
     )); ?>;
@@ -358,12 +363,13 @@ function updatePreview() {
         url = "<?php echo $this->base; ?>/mixevals/view/";
         jQuery("#prevM").attr("href", url + eventIdToPrev + '/' + selfEval);
     }
-    updatePreviewNames();
+    updatePreviewLinks();
 }
 
 // Each Preview link names its template for screen readers, so the link says
-// which template it opens.
-function updatePreviewNames() {
+// which template it opens. With no template chosen, there is nothing to
+// preview, so the link is hidden.
+function updatePreviewLinks() {
     var links = {
         '#prevS': '#EventSimpleEvaluation',
         '#prevR': '#EventRubric',
@@ -373,6 +379,7 @@ function updatePreviewNames() {
     jQuery.each(links, function (link, select) {
         var name = jQuery(select).find('option:selected').text();
         jQuery(link).find('.visually-hidden').text(' ' + name);
+        jQuery(link).toggle(!!jQuery(select).val());
     });
 }
 

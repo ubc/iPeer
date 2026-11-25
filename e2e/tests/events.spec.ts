@@ -121,7 +121,7 @@ function setting(page: Page, legend: string): Locator {
 // select behind it is hidden, but it still holds the value that the form
 // posts.
 function templateBox(page: Page): Locator {
-  return page.getByRole('combobox', { name: 'Choose Template', exact: true });
+  return page.getByRole('combobox', { name: 'Event Template', exact: true });
 }
 
 // The open list of the template search box: its templates, and its headings.
@@ -152,6 +152,13 @@ async function selectTemplate(page: Page, type: TemplateType, name: string): Pro
   await expect(box).toHaveValue(label);
   const id = (await box.inputValue()).match(label)?.[1] ?? '';
   await expect(page.locator(TEMPLATE_SELECT[type])).toHaveValue(id);
+}
+
+// Pick the first template in the list of the shown type: the Add Event form
+// starts with no template.
+async function pickFirstTemplate(page: Page): Promise<void> {
+  await templateBox(page).click();
+  await templateMenu(page).items.first().click();
 }
 
 // The option labels of one group of a template list, in page order.
@@ -381,6 +388,7 @@ test('the Add Event form refuses a missing title and missing dates', async ({ pa
   await expect(until).toHaveCount(2);
   for (const field of [
     textbox('Event Title'),
+    page.getByRole('combobox', { name: 'Event Type', exact: true }),
     templateBox(page),
     textbox('Due Date'),
     textbox('Evaluation Released From'),
@@ -392,11 +400,16 @@ test('the Add Event form refuses a missing title and missing dates', async ({ pa
   }
   await expect(textbox('Description')).not.toHaveAttribute('aria-required');
 
+  // No template at first, so there is nothing to preview.
+  await expect(templateBox(page)).toHaveValue('');
+  await expect(page.locator('#prevS')).toBeHidden();
+
   await page.getByRole('button', ADD_EVENT).click();
   await expect(flashMessage(page)).toHaveText(EVENT.addFailed);
   const dateFormat = 'Must be in Year-Month-Day Hour:Minute:Second format.';
   await expect(errorMessage(page)).toHaveText([
     'Title is required.',
+    'Please select a template.',
     dateFormat,
     dateFormat,
     dateFormat,
@@ -413,6 +426,8 @@ test('the Add Event form shows the fields of the chosen evaluation type', async 
   await type.selectOption({ label: 'RUBRIC' });
   await expect(page.locator('#RubricDiv')).toBeVisible();
   await expect(page.locator('#SimpleEvalDiv')).toBeHidden();
+  await expect(page.locator('#prevR')).toBeHidden();
+  await pickFirstTemplate(page);
   await expect(page.locator('#prevR')).toHaveAttribute('href', /\/rubrics\/view\/1$/);
   // The link names the template it opens, for screen readers.
   await expect(page.locator('#prevR')).toHaveAccessibleName(/^Preview .+ \(ID 1\)$/);
@@ -422,6 +437,7 @@ test('the Add Event form shows the fields of the chosen evaluation type', async 
   await type.selectOption({ label: 'MIX EVALUATION' });
   await expect(page.locator('#MixevalDiv')).toBeVisible();
   await expect(page.locator('#RubricDiv')).toBeHidden();
+  await pickFirstTemplate(page);
   await expect(page.locator('#prevM')).toHaveAttribute('href', /\/mixevals\/view\/1\/0$/);
   await setting(page, 'Self-Evaluation').getByLabel('Enabled', { exact: true }).check();
   await expect(page.locator('#prevM')).toHaveAttribute('href', /\/mixevals\/view\/1\/1$/);
@@ -430,6 +446,7 @@ test('the Add Event form shows the fields of the chosen evaluation type', async 
   await expect(page.locator('#ResultReleaseBeginDiv')).toBeVisible();
   await type.selectOption({ label: 'SURVEY' });
   await expect(page.locator('#SurveyDiv')).toBeVisible();
+  await pickFirstTemplate(page);
   await expect(page.locator('#prevV')).toHaveAttribute('href', /\/surveys\/view\/\d+$/);
   await expect(page.locator('#ResultReleaseBeginDiv')).toBeHidden();
   await expect(page.locator('#ResultReleaseEndDiv')).toBeHidden();
@@ -457,6 +474,7 @@ test('the template preview of each evaluation type has a Back button', async ({ 
 
   for (const [type, link] of previews) {
     await page.locator('#EventEventTemplateTypeId').selectOption({ label: type });
+    await pickFirstTemplate(page);
     const [preview] = await Promise.all([page.waitForEvent('popup'), page.locator(link).click()]);
     const closed = preview.waitForEvent('close');
     await preview.getByRole('button', { name: 'Back', exact: true }).click();
@@ -492,12 +510,10 @@ test('the Add Event form lists the own templates first, then the public template
     `Another Shared Template (ID ${shared})`,
     `${SEEDED.template} (ID ${SEEDED.templateId})`,
   ]);
-  // the first own template is selected at first, and the preview shows it
-  await expect(select).toHaveValue(own);
-  await expect(page.locator('#prevS')).toHaveAttribute(
-    'href',
-    new RegExp(`/simpleevaluations/view/${own}$`)
-  );
+  // no template is selected at first, so the user must pick one
+  await expect(select).toHaveValue('');
+  await expect(templateBox(page)).toHaveValue('');
+  await expect(page.locator('#prevS')).toBeHidden();
 });
 
 test('the Edit Event form keeps the private template of another user', async ({
@@ -563,17 +579,16 @@ test('the template search box finds a template by its name or ID', async ({
   const menu = templateMenu(page);
   const select = page.locator(TEMPLATE_SELECT.SIMPLE);
 
-  // one box in place of the select, which shows the selected template
+  // one box in place of the select; no template is selected yet
   await expect(select).toBeHidden();
-  await expect(box).toHaveValue(ownLabel);
+  await expect(box).toHaveValue('');
 
-  // a click selects the text and shows every template, under the headings
+  // a click shows every template, under the headings
   await box.click();
   await expect(menu.headings).toHaveText(['My templates', 'Other templates']);
   await expect(menu.items).toHaveText([ownLabel, sharedLabel, seededLabel]);
 
-  // the first key replaces the selected text; a name filters the list in any
-  // case, and the list marks the match
+  // a name filters the list in any case, and the list marks the match
   await box.pressSequentially('shared');
   await expect(box).toHaveValue('shared');
   await expect(menu.items).toHaveText([sharedLabel]);
@@ -583,7 +598,7 @@ test('the template search box finds a template by its name or ID', async ({
   // Enter on a search, with no template highlighted, does not post the form
   await box.press('Enter');
   await expect(box).toHaveValue('shared');
-  await expect(select).toHaveValue(own);
+  await expect(select).toHaveValue('');
 
   // pasted text filters too: an ID finds a template. The arrow keys only
   // highlight it, and Enter picks it.
@@ -735,19 +750,19 @@ test('Escape keeps the template, and Add Event with a search that matches nothin
   const menu = templateMenu(page);
   const seededLabel = `${SEEDED.template} (ID ${SEEDED.templateId})`;
 
-  // Escape before any search
+  // Escape before any search: still no template
   await box.focus();
   await box.press('Escape');
-  await expect(box).toHaveValue(seededLabel);
+  await expect(box).toHaveValue('');
 
   // Escape after a search that the box gave up on leaving does not bring
   // the search back
   await box.pressSequentially('module');
   await box.press('Tab');
-  await expect(box).toHaveValue(seededLabel);
+  await expect(box).toHaveValue('');
   await box.focus();
   await box.press('Escape');
-  await expect(box).toHaveValue(seededLabel);
+  await expect(box).toHaveValue('');
 
   // no template contains the search, so the full list opens
   await box.pressSequentially('xyz');

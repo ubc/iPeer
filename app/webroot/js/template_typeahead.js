@@ -21,11 +21,16 @@ var templateTypeahead = (function ($) {
         }).get();
     }
 
-    // The options of the select, with the heading (optgroup) of each.
+    // The options of the select, with the heading (optgroup) of each. The
+    // blank option ("no template yet") is not a template: while it is
+    // selected, the box is empty and shows its placeholder.
     function itemsOf(select) {
         var items = [];
         select.find('option').each(function () {
             var option = $(this);
+            if (option.val() === '') {
+                return;
+            }
             var group = option.parent('optgroup');
             items.push({
                 label: option.text(),

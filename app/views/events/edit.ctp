@@ -60,7 +60,7 @@ if ($lockEvaluationType === true) {
     echo '<div style="display:none">'; // hides the following fields
 }
 
-echo $this->Form->input('event_template_type_id');
+echo $this->Form->input('event_template_type_id', ['label' => __('Event Type', true) . $required, 'aria-required' => 'true']);
 
 $templateInputs = [
     'SimpleEvaluation' => ['SimpleEvalDiv', 'prevS', $simpleSelected],
@@ -71,9 +71,9 @@ $templateInputs = [
 foreach ($templateInputs as $field => [$divId, $previewId, $selected]) {
     echo $this->Form->input($field, [
         'div' => ['id' => $divId],
-        'label' => __('Choose Template', true) . $required,
+        'label' => __('Event Template', true) . $required,
         'aria-required' => 'true',
-        // updatePreviewNames() puts the template name in the hidden span
+        // updatePreviewLinks() puts the template name in the hidden span
         'after' => $html->link(
             __('Preview', true) . '<span class="visually-hidden"></span>',
             '',
@@ -268,7 +268,7 @@ jQuery("#EventMixeval").change(updatePreview);
 // rest of this script, and an error in it cannot stop the form's own set-up.
 jQuery(function () {
     var texts = <?php echo json_encode(array(
-        'label' => __('Choose Template', true),
+        'label' => __('Event Template', true),
         'placeholder' => __('Search by name or ID', true),
         'empty' => __('No templates', true),
     )); ?>;
@@ -437,12 +437,13 @@ function updatePreview() {
         url = "<?php echo $this->base; ?>/mixevals/view/";
         prevM.href = url + eventIdToPrev + '/' + selfEval;
     }
-    updatePreviewNames();
+    updatePreviewLinks();
 }
 
 // Each Preview link names its template for screen readers, so the link says
-// which template it opens.
-function updatePreviewNames() {
+// which template it opens. With no template chosen, there is nothing to
+// preview, so the link is hidden.
+function updatePreviewLinks() {
     var links = {
         '#prevS': '#EventSimpleEvaluation',
         '#prevR': '#EventRubric',
@@ -452,6 +453,7 @@ function updatePreviewNames() {
     jQuery.each(links, function (link, select) {
         var name = jQuery(select).find('option:selected').text();
         jQuery(link).find('.visually-hidden').text(' ' + name);
+        jQuery(link).toggle(!!jQuery(select).val());
     });
 }
 
