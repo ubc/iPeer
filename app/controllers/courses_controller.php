@@ -574,7 +574,7 @@ class CoursesController extends AppController
             if ($this->EvaluationSubmission->save($sub) && $this->SurveyInput->saveAll($sInputs)) {
                 $msg = sprintf(__('%s was successfully %s to %s.', true), $student, $action, $to);
             } else {
-                $this->Session->setFlash(sprintf(__('%s was not successfully %s to %s.', true), $student, $action, $from));
+                $this->Session->setFlash(sprintf(__('%s was not successfully %s to %s.', true), $student, $action, $to));
                 $this->redirect('move');
                 return;
             }

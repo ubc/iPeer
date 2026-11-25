@@ -39,8 +39,8 @@ async function loadSeedFile(database: string): Promise<void> {
   try {
     const seedFile = mustEnvValue('E2E_SEED_FILE');
     const seedSql = readFileSync(seedFile, 'utf8');
-    // phing removes comment lines before it sends the file, and the file has
-    // some, such as "--- START", that MariaDB does not accept as comments.
+    // build/test-db.php removes comment lines too, and the file has some, such
+    // as "--- START", that MariaDB does not accept as comments.
     const commentLine = /^--.*$/gm;
     const sql = seedSql.replace(commentLine, '');
     await connection.query(sql);

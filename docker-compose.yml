@@ -11,13 +11,6 @@ services:
       - mysqlDbData:/var/lib/mysql
     ports:
       - "13306:3306"
-  adminer:
-    image: adminer:latest
-    ports:
-      - 8060:8080
-    depends_on:
-      - db
-
   app: &app
     image: ubcctlt/ipeer-app
     build:
