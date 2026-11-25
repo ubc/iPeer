@@ -9,7 +9,6 @@ $required = ' <span class="required-mark" aria-hidden="true">*</span>';
 
 echo $this->Form->create('Event', array('action' => "add/$course_id"));
 echo '<p class="required-note">' . sprintf(__('Fields marked %s are required.', true), '<span class="required-mark">*</span>') . '</p>';
-echo $this->Form->input('course_id', array('default' => $course_id));
 echo $this->Form->input('title', ['label' => __('Event Title', true) . $required, 'aria-required' => 'true']);
 echo "<div id='titleWarning' class='red'></div>";
 echo $this->Form->input('description', array('type' => 'textarea'));
@@ -217,10 +216,6 @@ jQuery("input:radio[name=data['Event']['self_eval']]").change(toggleSelfEval);
 updateEmailPreview();
 toggleEmailTemplate();
 toggleSelfEval();
-// for redirecting to the add event view for the selected course
-changeCourseId();
-// attach event handlers to deal with changes in course selection
-jQuery("#EventCourseId").change(changeCourseId);
 // select all groups
 jQuery("#selectAll").click(function() {
     jQuery("#GroupGroup option").prop('selected', true);
@@ -326,15 +321,6 @@ function toggleEventTemplate() {
         updatePreview();
     }
     jQuery('#emailSchedule').show(); // show email reminder frequency at all times
-}
-
-// redirects user to a new events add view based on the course selected
-function changeCourseId() {
-    var courseId = jQuery("#EventCourseId").val();
-
-    if (courseId != <?php echo $course_id ?>) {
-        window.location.replace("<?php echo $this->base; ?>/events/add/" + courseId);
-    }
 }
 
 // update event id for the preview link
