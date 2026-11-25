@@ -5,7 +5,7 @@ App::import('Config', 'FileUpload.file_upload_settings');
 class FileUploadHelperTest extends CakeTestCase {
   var $FileUpload = null;
 
-  function startTest(){
+  function startTest($method){
     $this->FileUpload = new FileUploadHelper();
     $this->FileUpload->Html = new HtmlHelper();
   }
@@ -32,7 +32,13 @@ class FileUploadHelperTest extends CakeTestCase {
     $this->assertEqual('something/different', $this->FileUpload->settings['uploadDir']);
   }
     
-  function endTest(){
+  function testResizeOfAFileThatIsNotAnImage(){
+    $resizer = new RResizeImage();
+    $resizer->imgFile = __FILE__;
+    $this->assertIdentical(false, $resizer->resize_limitwh(10, 10));
+  }
+
+  function endTest($method){
     unset($this->FileUpload);
   }
 }

@@ -37,11 +37,23 @@ The line breaks and spaces of a page, a table cell, or a PDF depend on the marku
 - `expectTextIgnoringSpace(locator, expected)` compares the whole text. Each run of whitespace counts as one space. Use it when you know the whole text.
 - `expectTextInOrder(locator, parts)` and `readInOrder(text)` check parts in order and ignore all whitespace. Each part must start at most 60 characters after the end of the part before it. Use them when other text, such as labels, comes between the parts, for example on a PDF page.
 
+`pdfPages(content)` in `support/pdf.ts` gives the text of each page of a PDF export. It uses `unpdf`, which has no native system dependencies.
+
 ## Selectors
 
 Find elements by role and accessible name, as a user finds them. If a view gives no good name, change the view, not the test. For example, link a table to its heading with `aria-labelledby`. Then find the table with `labelledTable(page, heading)`.
 
 In new code, do not find an element by its position, such as `.nth()`, or by XPath. Some older helpers still do. Replace them when their views get names.
+
+## Writing Tests
+
+- **Log in:** use `login(page, username)` in `support/helpers.ts`. It posts the login form without an initial form load and returns the landing URL. The test then opens the page it needs by its URL. Only `login.spec.ts` tests the login form and logout. Tests should not share a session, because a session can keep old permissions.
+- **Assertion Helpers:** wrap them in `test.step(..., { box: true })`, so a failure points to the line in the test, not into the helper.
+- **Absence:** before a check that something is not on a page, check something that shows the page is loaded. Otherwise, the check can pass on a page that is still loading. For lists, use `waitForAjaxList(page)` in `support/ajax-list.ts`.
+- **AJAX before a submit:** wait for the page's own requests, for example with `waitForAjaxList(page)` or `page.waitForResponse()`, before you submit a form. A page load can cancel a request that is still running, and Chromium then gives no response and no failure event.
+- **Delete:** use the list menu, or `requestDelete(page, controller, id)` in `support/evaltools.ts`.
+- **Date fields:** click the field first and wait for `#ui-datepicker-div`. The time picker writes the current date into an empty field when it opens.
+- **New checks:** make sure that a new test fails when you remove the code that it checks.
 
 ## Debug a Test
 
@@ -74,4 +86,18 @@ A file, or one test in a file by its line number, also works:
 ```
 docker compose exec playwright npx playwright test tests/add-group.spec.ts
 docker compose exec playwright npx playwright test tests/add-group.spec.ts:<line>
+```
+
+## Check for Flaky Tests
+
+Run a new or changed test several times before you merge it:
+
+```
+docker compose exec playwright npx playwright test tests/add-group.spec.ts --repeat-each=5 --reporter=dot
+```
+
+To see how long each test takes, write a JSON report:
+
+```
+docker compose exec -e PLAYWRIGHT_JSON_OUTPUT_NAME=test-results/timings.json playwright npx playwright test --reporter=line,json
 ```

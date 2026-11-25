@@ -9,7 +9,6 @@ app/webroot/apc.php
 dist
 build/logs/
 cache.properties
-lint.cache
 tags
 .project
 .vagrant

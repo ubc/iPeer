@@ -139,7 +139,7 @@ Mock::generatePartial('RequestHandlerComponent', 'MockRequestHandlerComponent', 
  */
 class ExtendedTestCaseTestCase extends CakeTestCase {
 
-	function startTest() {
+	function startTest($method) {
 		$this->ExtendedTestCase = new ExtendedTestCase();
 		$this->Dummies = new DummiesController();
 		$this->Dummies->constructClasses();
@@ -148,7 +148,7 @@ class ExtendedTestCaseTestCase extends CakeTestCase {
 		$this->ExtendedTestCase->testController = $this->Dummies;
 	}
 
-	function endTest() {
+	function endTest($method) {
 		unset($this->ExtendedTestCase);
 		unset($this->Dummies);
 		ClassRegistry::flush();

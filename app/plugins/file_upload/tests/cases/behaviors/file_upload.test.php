@@ -6,14 +6,14 @@ class TestUpload extends CakeTestModel {
   var $useDbConfig = 'test_suite';
   var $useTable = false;
   
-  function save($data){
+  function save($data = null, $validate = true, $fieldList = []) {
     $this->data = $data;
   }
 }
 
 class FileUploadTest extends CakeTestCase {
 
-  function startTest(){
+  function startTest($method) {
     $this->FileUpload = new FileUploadBehavior();
     $this->Upload = new TestUpload();
   }
@@ -21,7 +21,7 @@ class FileUploadTest extends CakeTestCase {
   
   function testSetupShouldLoadDefaults(){
     $this->FileUpload->setUp($this->Upload);
-    $options = $this->FileUpload->Uploader->options;
+    $options = $this->FileUpload->Uploader[$this->Upload->alias]->options;
     
     $this->assertEqual('Upload', $options['fileModel']);
     $this->assertTrue(strpos($options['uploadDir'], 'webroot/files'));
@@ -44,7 +44,7 @@ class FileUploadTest extends CakeTestCase {
       'fileModel' => 'NotValidModel' //should ignore, and set model name to appropriate model
     );
     $this->FileUpload->setUp($this->Upload, $model_options);
-    $options = $this->FileUpload->Uploader->options;
+    $options = $this->FileUpload->Uploader[$this->Upload->alias]->options;
     
     $this->assertEqual('Upload', $options['fileModel']);
     $this->assertTrue(strpos($options['uploadDir'], 'webroot/uploads'));
@@ -57,7 +57,7 @@ class FileUploadTest extends CakeTestCase {
     $this->assertTrue($options['unique']);
   }
   
-  function endTest(){
+  function endTest($method) {
     unset($this->FileUpload, $this->Upload);
   }
 }

@@ -2,7 +2,6 @@
 .idea
 .data
 build
-build.xml
 Boxfile
 app/tmp
 /vendor/

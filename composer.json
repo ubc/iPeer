@@ -31,15 +31,28 @@
     "tecnickcom/tcpdf": "^6.11"
   },
   "require-dev": {
-    "roave/security-advisories": "dev-master",
-    "phing/phing": "2.*"
+    "roave/security-advisories": "dev-master"
   },
   "scripts": {
       "post-install-cmd": [
           "[ -e app/config/database.php ] || cp app/config/database.php.default app/config/database.php",
           "[ -e app/config/guard.php ] || cp app/plugins/guard/config/guard_default.php app/config/guard.php",
           "mkdir -p app/tmp && chmod 777 app/tmp"
-      ]
+      ],
+      "test-db": [
+          "Composer\\Config::disableProcessTimeout",
+          "php build/test-db.php"
+      ],
+      "test": [
+          "Composer\\Config::disableProcessTimeout",
+          "sh build/test.sh"
+      ],
+      "lint": "find app -name '*.php' -not -path 'app/vendors/simpletest/test/*' -print0 | xargs -0 -n 1 -P 4 sh -c 'php -d display_errors=stderr -l \"$1\" > /dev/null || exit 1' lint"
+  },
+  "scripts-descriptions": {
+      "test-db": "Load the seed data into the test database (ipeer_test unless IPEER_DB_NAME is set).",
+      "test": "Load the seed data and run the unit tests: all groups and the plugin test cases, or one with -- <case|group> <name>.",
+      "lint": "Check the PHP syntax of app/ (SimpleTest's own tests hold parse errors on purpose)."
   },
   "config": {
       "platform": {

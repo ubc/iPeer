@@ -379,7 +379,12 @@ class FileUploadHelper extends AppHelper{
 		 */
 		function resize_limitwh($imgwidth,$imgheight,$newfile=NULL){
 			$image_per = 100;
-			list($width, $height, $type, $attr) = @getimagesize($this->imgFile);
+			// false when the file is missing or is not an image
+			$size = @getimagesize($this->imgFile);
+			if ($size === false) {
+				return false;
+			}
+			[$width, $height] = $size;
 			if($width > $imgwidth && $imgwidth > 0){
 				$image_per = (float)(($imgwidth * 100) / $width);
       }
@@ -388,7 +393,7 @@ class FileUploadHelper extends AppHelper{
 				$image_per = (float)(($imgheight * 100) / $height);
       }
 
-			$this->resize_percentage($image_per,$newfile);
+			return $this->resize_percentage($image_per,$newfile);
 		}
 		 
     /**

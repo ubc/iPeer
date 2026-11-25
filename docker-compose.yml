@@ -11,13 +11,6 @@ services:
       - mysqlDbData:/var/lib/mysql
     ports:
       - "13306:3306"
-  adminer:
-    image: adminer:latest
-    ports:
-      - 8060:8080
-    depends_on:
-      - db
-
   app: &app
     image: ubcctlt/ipeer-app
     build:
@@ -91,6 +84,9 @@ services:
       - IPEER_DEBUG=2
       - IPEER_LOG_FORMAT=PrettyLog
       - IPEER_SESSION_SAVE=database
+      # Composer asks git for the version of this project, and git refuses
+      # the mounted checkout (another owner), which prints a "fatal" line
+      - COMPOSER_ROOT_VERSION=dev-master
     depends_on:
       - db-test
     healthcheck:

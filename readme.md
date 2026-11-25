@@ -51,9 +51,20 @@ To run the unit tests on containers:
 - Start up the special test containers with `docker compose --profile test up -d`
 - Shell into the test container: `docker compose exec -it app-test bash`
 - You may need to reinstall composer dependencies again `composer install`
-- Inside of `/var/www/html`, run the command `vendor/bin/phing test` (for all tests) or `vendor/bin/phing test-single -Dtest.type="..." -Dtest.name="..."`. Examples:
-    - `vendor/bin/phing test-single -Dtest.type="case" -Dtest.name="controllers/V1Controller"` (see `./app/tests/cases`)
-    - `vendor/bin/phing test-single -Dtest.type="group" -Dtest.name="model"` (see `./app/tests/groups`)
+- Inside of `/var/www/html`, run the command `composer test` (for all tests) or `composer test -- <case|group> <name>`. Each run loads the sample data into the `ipeer_test` database first. Examples:
+    - `composer test -- case controllers/events_controller` (see `./app/tests/cases`)
+    - `composer test -- group model` (see `./app/tests/groups`)
+- From outside the container, use `docker compose exec app-test composer test`.
+- `composer test-db` only loads the sample data, and `composer lint` checks the PHP syntax of `app/`.
+
+### Updating the translation template
+
+To collect the strings for translation into `app/locale/default.pot`, run in the app container:
+
+```
+rm -f app/locale/default.pot
+cake/console/cake i18n extract -app app -merge yes -output app/locale/ -paths app/controllers,app/models,app/views
+```
 
 ### Running the browser (E2E) tests
 
