@@ -51,7 +51,7 @@
   },
   "scripts-descriptions": {
       "test-db": "Load the seed data into the test database (ipeer_test unless IPEER_DB_NAME is set).",
-      "test": "Load the seed data and run the unit tests: all groups and the file_upload helper case, or one with -- <case|group> <name>.",
+      "test": "Load the seed data and run the unit tests: all groups and the plugin test cases, or one with -- <case|group> <name>.",
       "lint": "Check the PHP syntax of app/ (SimpleTest's own tests hold parse errors on purpose)."
   },
   "config": {

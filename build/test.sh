@@ -28,13 +28,17 @@ run() {
 if [ $# -eq 2 ]; then
     run app "$1" "$2"
 else
-    # every group runs, also after a failed one
-    for group in component model caliper libs controller; do
-        run app group "$group"
-    done
-    # the only plugin tests that run on PHP 8; the other plugin test files
-    # have not been updated
+    # App tests: the groups in app/tests/groups
+    run app group component
+    run app group model
+    run app group caliper
+    run app group libs
+    run app group controller
+    # Plugin tests: the cases in app/plugins/*/tests/cases
+    run file_upload case behaviors/file_upload
     run file_upload case helpers/file_upload
+    run file_upload case vendors/uploader
+    run extended_test_case case libs/extended_test_case
 fi
 
 # the tests write cache files that the web server must be able to change

@@ -7,7 +7,7 @@ class Upload extends CakeTestModel {
   var $useDbConfig = 'test_suite';
   var $useTable = false;
   
-  function save($data){
+  function save($data = null, $validate = true, $fieldList = []) {
     $this->data = $data;
   }
 }
@@ -18,7 +18,7 @@ class UploadWithCallback extends CakeTestModel {
   var $useDbConfig = 'test_suite';
   var $useTable = false;
   
-  function save($data){
+  function save($data = null, $validate = true, $fieldList = []) {
     $this->data = $data;
   }
   
@@ -33,7 +33,7 @@ class UploadWithFalseCallback extends CakeTestModel {
   var $useDbConfig = 'test_suite';
   var $useTable = false;
   
-  function save($data){
+  function save($data = null, $validate = true, $fieldList = []) {
     $this->data = $data;
   }
   
@@ -54,7 +54,7 @@ class UploaderTest extends CakeTestCase {
     ); 
   }
 
-  function startTest(){
+  function startTest($method) {
     $FileUploadSettings = new FileUploadSettings;
     $this->Uploader = new Uploader($FileUploadSettings->defaults);
   }
@@ -141,7 +141,7 @@ class UploaderTest extends CakeTestCase {
     $this->assertEqual('.sft', $this->Uploader->_ext(array('name' => 'file.sft')));
   }
   
-  function endTest(){
+  function endTest($method) {
     unset($this->Uploader);
   }
 }
