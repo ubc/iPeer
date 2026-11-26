@@ -245,10 +245,10 @@ class User extends AppModel
     /**
      * find
      *
-     * @param mixed            $conditions find type or search conditions
-     * @param array|false|null $fields     find options or fields
-     * @param mixed            $order      result order
-     * @param int|null         $recursive  recursive
+     * @param mixed                    $conditions find type or search conditions
+     * @param array|string|false|null $fields     find options or fields
+     * @param mixed                    $order      result order
+     * @param int|false|null           $recursive  recursive
      *
      * @access public
      * @return mixed

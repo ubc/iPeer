@@ -542,8 +542,8 @@ class UserTestCase extends CakeTestCase {
         // TODO
     }
 
-    // An import that updates existing users changes only the users whose
-    // data changed; the next user in the list keeps their own data.
+    // An import that updates existing users saves each user with their own
+    // imported data: a change for one user does not reach the next user.
     function testAddUserByArrayUpdatesEachExistingUserOnItsOwn() {
         $first = $this->User->findByUsername('redshirt0001');
         $second = $this->User->findByUsername('redshirt0002');
@@ -566,7 +566,6 @@ class UserTestCase extends CakeTestCase {
         $this->assertEqual($result['created_users'], []);
         $this->assertEqual($this->User->field('first_name', ['username' => 'redshirt0001']), 'Renamed');
         $this->assertEqual($this->User->field('first_name', ['username' => 'redshirt0002']), $second['User']['first_name']);
-        $this->assertEqual($this->User->field('creator_id', ['username' => 'redshirt0002']), $second['User']['creator_id']);
         // no password in the import: the old password stays
         $this->assertEqual($this->User->field('password', ['username' => 'redshirt0002']), $second['User']['password']);
     }

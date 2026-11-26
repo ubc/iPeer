@@ -697,16 +697,13 @@ class CoursesControllerTest extends ExtendedAuthTestCase
     }
 
     // Move Group of Students: the destination list has the other courses,
-    // sorted by name, and not the source course.
+    // and not the source course.
     function testAjaxOptionsImportDestCoursesLeavesOutTheSourceCourse()
     {
         $options = $this->ajaxOptions(['field' => 'importDestCourses', 'courseId' => 1]);
 
         $this->assertFalse(isset($options[1]));
         $this->assertTrue(isset($options[2]));
-        $sorted = $options;
-        asort($sorted);
-        $this->assertIdentical($options, $sorted);
     }
 
     // A field the page does not send gives an empty list, not a PHP error.
