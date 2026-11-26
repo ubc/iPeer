@@ -256,7 +256,7 @@ class EvaluationMixeval extends EvaluationResponseBase
      * @param bool $evaluatee  evaluatee
      *
      * @access public
-     * @return void
+     * @return array|false the average score under [0]['received_total_score'], or false
      */
     function getReceivedTotalScore($grpEventId=null, $evaluatee=null)
     {

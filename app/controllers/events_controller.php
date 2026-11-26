@@ -251,18 +251,17 @@ class EventsController extends AppController
             return;
         }
 
-        switch ($event['Event']['event_template_type_id']) {
-        case 1:
-            $modelName = 'SimpleEvaluation';
-            break;
-        case 2:
-            $modelName = 'Rubric';
-            break;
-        case 3:
-            $modelName = 'Survey';
-            break;
-        case 4:
-            $modelName = 'Mixeval';
+        $modelName = match ((int) $event['Event']['event_template_type_id']) {
+            1 => 'SimpleEvaluation',
+            2 => 'Rubric',
+            3 => 'Survey',
+            4 => 'Mixeval',
+            default => null,
+        };
+        if ($modelName === null) {
+            $this->Session->setFlash(__('Error: This event has an unknown evaluation type.', true));
+            $this->redirect('/home');
+            return;
         }
 
         // find the related evaluation

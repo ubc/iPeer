@@ -432,7 +432,7 @@ class EvaluationSimple extends EvaluationResponseBase
                 'group' => 'evaluatee'
             ));
 
-            if (isset($avg)) {
+            if (!empty($avg)) {
                 $i = 0;
                 // Deduct marks if the evaluator submitted a late evaluation.
                 foreach ($avg as $a) {

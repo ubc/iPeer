@@ -37,32 +37,6 @@ class ExportHelper2Component extends CakeObject
     }
 
     /**
-     * getGroupMemberwithoutTutorsHelper
-     *
-     * @param mixed $grpEventId
-     *
-     * @access public
-     * @return void
-     */
-    function getGroupMemberwithoutTutorsHelper($grpEventId)
-    {
-        $this->GroupEvent = ClassRegistry::init('GroupEvent');
-        $this->User = ClassRegistry::init('User');
-
-        $group = $this->GroupEvent->getGroupMembers($grpEventId);
-        $i = 0;
-        foreach ($group as $g) {
-            if (5 == $this->User->getRoleId($g['GroupsMembers']['user_id'])) {
-                $fields = array('id', 'first_name', 'last_name', 'student_no', 'email');
-                $user = $this->User->findUserByidWithFields($g['GroupsMembers']['user_id'], $fields);
-                $groupMembers[$i] = $user;
-                $i++;
-            }
-        }
-        return $groupMembers;
-    }
-
-    /**
      * buildExporterGrid
      *
      * @param mixed $xLim
@@ -278,10 +252,13 @@ class ExportHelper2Component extends CakeObject
 
         $questions = null;
         // $EventType = 2(Rubric) or 4(Mix Eval)
-        $evaluationType == 2 ? ($questions = $this->RubricsCriteria->getCriteria($evaluationId)) &&
-            ($evalType = 'RubricsCriteria') :
-            ($questions = $this->MixevalQuestion->getQuestion($evaluationId, '1')) &&
-            ($evalType = 'MixevalQuestion');
+        if ($evaluationType == 2) {
+            $questions = $this->RubricsCriteria->getCriteria($evaluationId);
+            $evalType = 'RubricsCriteria';
+        } else {
+            $questions = $this->MixevalQuestion->getQuestion($evaluationId, '1');
+            $evalType = 'MixevalQuestion';
+        }
         //Store the $evaluationType
         $questions[0][$evalType]['evaluation_type'] = $evaluationType;
         //$questions['evaluation_type'] = $evaluationType;

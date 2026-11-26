@@ -92,7 +92,10 @@ Class ExportPdfComponent extends ExportBaseNewComponent
         
         $epdf->writeHTML($this->_writeTitle($event, $params), true, false, true, false, '');
         
-        // fetch this data only once
+        // fetch this data only once; each evaluation type uses only its own
+        $rubric_criteria = [];
+        $mixevalQuestionsForTable = [];
+        $mixevalQuestionsForResults = [];
         switch ($event['Event']['event_template_type_id']) {
             case 1:
                 break;
@@ -166,6 +169,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
             // broke the summary table and details section into two switch blocks
             // would be more efficient if the user is filtering out sections
             if ($params['include']['grade_tables']) {
+                $table = '';
                 switch ($event['Event']['event_template_type_id']) {
                     case 1:
                         $table = $this->_writeScoresTbl($event, $grpEventId, $grpId, $params, $evaluations, $unEnrolled, $names);
@@ -182,6 +186,7 @@ Class ExportPdfComponent extends ExportBaseNewComponent
                 }
                 $epdf->writeHTML($table, true, false, true, false, '');
             }
+            $results = [];
             switch($event['Event']['event_template_type_id']) {
                 case 1:
                     $results = $params['include']['comments'] ? $this->_writeComments($evaluations, $names) : array();

@@ -177,9 +177,31 @@ class EvaluationTestCase extends CakeTestCase
     }
 
 
-    function saveNGetEvalutionRubricDetail()
+    /**
+     * A posted criterion number that is not in the rubric (a bad or changed
+     * form) must not save a grade.
+     */
+    function testSaveNGetEvalutionRubricDetailRefusesAnUnknownCriterion()
     {
+        $rubric = ClassRegistry::init('Rubric')->find('first', [
+            'conditions' => ['Rubric.id' => 1], 'recursive' => 1]);
+        $form = [
+            'selected_lom_5_99' => 1,
+            '5selected99' => 1,
+            '5comments' => array_fill(0, 99, ''),
+        ];
 
+        // @: the old code also gave an "undefined variable" warning before
+        // it stopped; this test checks only that it stops and saves nothing
+        $thrown = false;
+        try {
+            @$this->EvaluationComponentTest->saveNGetEvalutionRubricDetail(1, $rubric, 5, $form, 1, 0, 99);
+        } catch (Throwable $e) {
+            $thrown = true;
+        }
+
+        $this->assertTrue($thrown);
+        $this->assertFalse($this->EvaluationRubricDetail->getByEvalRubricIdCritera(1, 99));
     }
     
     /**

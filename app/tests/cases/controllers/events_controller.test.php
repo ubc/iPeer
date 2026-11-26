@@ -134,6 +134,29 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->assertEqual($result['event']['Group'][0]['Member'][0]['last_name'], 'Student');
     }
 
+    // An event row with an evaluation type that does not exist (old or bad
+    // data) shows an error, not a PHP error.
+    function testViewEventWithAnUnknownTypeFails() {
+        $model = ClassRegistry::init('Event');
+        $model->create();
+        $model->save(['Event' => [
+            'title' => 'event with an unknown type',
+            'course_id' => 1,
+            'event_template_type_id' => 9,
+            'template_id' => 1,
+        ]], false);
+
+        $this->testAction("/events/view/{$model->id}", ['return' => 'vars']);
+        // Only the count can be checked: testAction() runs the mock's
+        // constructor again (clears expectations set before it), and an
+        // argument expectation set after the call is never compared. The
+        // flash message below shows which branch ran.
+        $this->controller->expectOnce('redirect');
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: This event has an unknown evaluation type.');
+    }
+
     function testViewOthersEvent() {
         // instructor2 does not teach MECH 328, the course of event 1
         $this->login = array(
