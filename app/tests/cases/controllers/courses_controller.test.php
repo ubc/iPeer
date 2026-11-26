@@ -706,6 +706,79 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->assertTrue(isset($options[2]));
     }
 
+    private function asInstructor2(): void
+    {
+        $this->login = ['User' => ['username' => 'instructor2', 'password' => md5('ipeeripeer')]];
+    }
+
+    // Course 1 has the surveys 4 and 5; 7 and 31 submitted survey 4.
+    function testAjaxOptionsListsTheSurveysAndSubmittersOfAnAccessibleCourse()
+    {
+        $surveys = $this->ajaxOptions(['field' => 'sCourses', 'courseId' => 1]);
+        $this->assertTrue(isset($surveys[4]) && isset($surveys[5]));
+
+        $this->controller = new MockCoursesController();
+        $submitters = $this->ajaxOptions(['field' => 'sSurveys', 'surveyId' => 4]);
+        // The list is sorted by name, so compare the ids in any order.
+        $ids = array_keys($submitters);
+        sort($ids);
+        $this->assertEqual($ids, [7, 31]);
+    }
+
+    // instructor2 does not teach course 1: every list for it is empty.
+    function testAjaxOptionsGivesNothingForACourseTheUserCannotAccess()
+    {
+        foreach ([
+            ['field' => 'sCourses', 'courseId' => 1],
+            ['field' => 'sSurveys', 'surveyId' => 4],
+            ['field' => 'submitters', 'surveyId' => 4, 'courseId' => 1],
+            ['field' => 'dCourses', 'surveyId' => 4, 'courseId' => 1],
+        ] as $get) {
+            $this->controller = new MockCoursesController();
+            $this->asInstructor2();
+            $this->assertIdentical($this->ajaxOptions($get), [], $get['field']);
+        }
+    }
+
+    // A move needs a survey of the source course that the user can access.
+    // instructor2 does not teach course 1, so nothing changes.
+    function testMoveRefusesASurveyOfACourseTheUserCannotAccess()
+    {
+        $this->asInstructor2();
+        $this->testAction('/courses/move', [
+            'fixturize' => true, 'method' => 'post',
+            'data' => ['Course' => [
+                'action' => 1, 'sourceCourses' => 1, 'sourceSurveys' => 4,
+                'submitters' => 7, 'destCourses' => 2, 'destSurveys' => 5,
+            ]],
+        ]);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: Choose the courses, surveys and student from the lists.');
+        $this->assertEqual(ClassRegistry::init('EvaluationSubmission')->field('event_id', ['EvaluationSubmission.id' => 7]), 4);
+    }
+
+    // A move to a survey with another template, or of a student with no
+    // submission, is refused too.
+    function testMoveRefusesASurveyOrStudentThatThePageDoesNotOffer()
+    {
+        foreach ([
+            ['sourceCourses' => 1, 'sourceSurveys' => 4, 'submitters' => 7, 'destCourses' => 1, 'destSurveys' => 5],
+            ['sourceCourses' => 1, 'sourceSurveys' => 4, 'submitters' => 17, 'destCourses' => 2, 'destSurveys' => 5],
+            ['sourceCourses' => 2, 'sourceSurveys' => 4, 'submitters' => 7, 'destCourses' => 1, 'destSurveys' => 5],
+        ] as $data) {
+            $this->controller = new MockCoursesController();
+            $this->testAction('/courses/move', [
+                'fixturize' => true, 'method' => 'post',
+                'data' => ['Course' => ['action' => 1] + $data],
+            ]);
+
+            $message = $this->controller->Session->read('Message.flash');
+            $this->assertEqual($message['message'], 'Error: Choose the courses, surveys and student from the lists.');
+            $this->assertEqual(ClassRegistry::init('EvaluationSubmission')->field('event_id', ['EvaluationSubmission.id' => 7]), 4);
+        }
+    }
+
     // A field the page does not send gives an empty list, not a PHP error.
     function testAjaxOptionsUnknownFieldGivesAnEmptyList()
     {
