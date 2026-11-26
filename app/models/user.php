@@ -245,10 +245,10 @@ class User extends AppModel
     /**
      * find
      *
-     * @param bool $conditions search conditions
-     * @param bool $fields     fields
-     * @param bool $order      result order
-     * @param bool $recursive  recursive
+     * @param mixed            $conditions find type or search conditions
+     * @param array|false|null $fields     find options or fields
+     * @param mixed            $order      result order
+     * @param int|null         $recursive  recursive
      *
      * @access public
      * @return mixed
@@ -698,8 +698,6 @@ class User extends AppModel
                 } else {
                     $temp['password'] = $e['User']['password'];
                 }
-                // don't need creator_id either
-                unset($temp['creator_id']);
 
                 $existings[$key]['User'] = $temp;
             }

@@ -542,8 +542,33 @@ class UserTestCase extends CakeTestCase {
         // TODO
     }
 
-    function testAddUserByArray() {
-        // TODO
+    // An import that updates existing users changes only the users whose
+    // data changed; the next user in the list keeps their own data.
+    function testAddUserByArrayUpdatesEachExistingUserOnItsOwn() {
+        $first = $this->User->findByUsername('redshirt0001');
+        $second = $this->User->findByUsername('redshirt0002');
+        $row = fn($u, $firstName) => [
+            User::IMPORT_USERNAME => $u['User']['username'],
+            User::IMPORT_FIRSTNAME => $firstName,
+            User::IMPORT_LASTNAME => $u['User']['last_name'],
+            User::IMPORT_STUDENT_NO => $u['User']['student_no'],
+            User::IMPORT_EMAIL => $u['User']['email'],
+            User::IMPORT_PASSWORD => '',
+            User::GENERATED_PASSWORD => 'generated',
+        ];
+
+        $result = $this->User->addUserByArray([
+            $row($first, 'Renamed'),
+            $row($second, $second['User']['first_name']),
+        ], true);
+
+        $this->assertEqual(count($result['updated_users']), 2);
+        $this->assertEqual($result['created_users'], []);
+        $this->assertEqual($this->User->field('first_name', ['username' => 'redshirt0001']), 'Renamed');
+        $this->assertEqual($this->User->field('first_name', ['username' => 'redshirt0002']), $second['User']['first_name']);
+        $this->assertEqual($this->User->field('creator_id', ['username' => 'redshirt0002']), $second['User']['creator_id']);
+        // no password in the import: the old password stays
+        $this->assertEqual($this->User->field('password', ['username' => 'redshirt0002']), $second['User']['password']);
     }
 
     function testremoveOldStudents() {

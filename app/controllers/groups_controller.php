@@ -408,6 +408,8 @@ class GroupsController extends AppController
         }
         $this->set('canvasCourses', $canvasCourses);
 
+        $canvasGroupCategories = [];
+
         if (!empty($courseId)) {
 
             // first, look to see if this course has a canvas course associated with it
@@ -439,8 +441,6 @@ class GroupsController extends AppController
                 $this->Course->id = $courseId;
                 $this->Course->save($save_data);
             }
-
-            $canvasGroupCategories = array();
 
             if (!empty($canvasCourseId)) {
 
@@ -699,17 +699,12 @@ class GroupsController extends AppController
                 $this->Session->setFlash(__('Simplified sync is disabled either because you have some members in more than one group or otherwise because you have diffent members in the same Canvas and iPeer groups. Please use advanced mode.', true));
             }
 
-            if (!empty($courseId)) {
-                $formUrl .= DS . $courseId;
-                if (!empty($canvasCourseId)) {
-                    $formUrl .= DS . $canvasCourseId;
-                    if (!empty($canvasGroupCategoryId)) {
-                        $formUrl .= DS . $canvasGroupCategoryId;
-                    }
-                    else {
-                        $formUrl .= DS . 'new';
-                    }
-                }
+            $formUrl .= DS . $courseId . DS . $canvasCourseId;
+            if (!empty($canvasGroupCategoryId)) {
+                $formUrl .= DS . $canvasGroupCategoryId;
+            }
+            else {
+                $formUrl .= DS . 'new';
             }
 
             // Get ready for view
@@ -1119,6 +1114,7 @@ class GroupsController extends AppController
 
                 $canvas_user_key = $this->SysParameter->get('system.canvas_user_key');
 
+                $users = [];
                 foreach ($canvasUsers as $k => $canvasUser) {
                     $users[] = array(
                         User::IMPORT_USERNAME => $canvasUser->$canvas_user_key,
