@@ -147,6 +147,7 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         ]], false);
 
         $this->testAction("/events/view/{$model->id}", ['return' => 'vars']);
+        $this->controller->expectOnce('redirect', ['/home']);
 
         $message = $this->controller->Session->read('Message.flash');
         $this->assertEqual($message['message'], 'Error: This event has an unknown evaluation type.');

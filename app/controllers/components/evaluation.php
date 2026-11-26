@@ -655,6 +655,27 @@ class EvaluationComponent extends CakeObject
 
 
     /**
+     * The total possible grade (multiplier) of one rubric criterion.
+     *
+     * A criterion number that is not in the rubric comes from a bad or
+     * changed form. Stop, so that no grade is saved for it.
+     *
+     * @param array $rubric       rubric with its RubricsCriteria rows
+     * @param mixed $criteriaNum  criterion number
+     *
+     * @return float|int|string
+     */
+    private function _criterionMultiplier($rubric, $criteriaNum)
+    {
+        foreach ($rubric['RubricsCriteria'] as $criteria) {
+            if ($criteria['criteria_num'] == $criteriaNum) {
+                return $criteria['multiplier'];
+            }
+        }
+        throw new InvalidArgumentException("The rubric has no criterion number $criteriaNum.");
+    }
+
+    /**
      * saveNGetEvalutionRubricDetail
      *
      * @param mixed $evalRubricId    eval rubric id
@@ -683,17 +704,9 @@ class EvaluationComponent extends CakeObject
                     $form[$targetEvaluatee."selected$i"] = ($form[$targetEvaluatee."selected$i"] ? $form[$targetEvaluatee."selected$i"] : 0);
                 }
 
-                // get total possible grade for the criteria number ($i)
-                $multiplier = 0;
-                foreach ($rubric['RubricsCriteria'] as $criteria) {
-                    if ($criteria['criteria_num'] == $i) {
-                        $multiplier = $criteria['multiplier'];
-                        break;
-                    }
-                }
                 $selectedLom = $form['selected_lom_'.$targetEvaluatee.'_'.$i] ?? null;
                 $grade = is_numeric($selectedLom) ?
-                    Toolkit::scaleMark($multiplier, $selectedLom, $totalLom, $rubric['Rubric']['zero_mark']) : "";
+                    Toolkit::scaleMark($this->_criterionMultiplier($rubric, $i), $selectedLom, $totalLom, $rubric['Rubric']['zero_mark']) : "";
                 $evalRubricDetail = $this->EvaluationRubricDetail->getByEvalRubricIdCritera($evalRubricId, $i);
                 if ($evalRubricDetail) {
                     $this->EvaluationRubricDetail->id=$evalRubricDetail['EvaluationRubricDetail']['id'] ;
@@ -720,16 +733,9 @@ class EvaluationComponent extends CakeObject
                 $form[$targetEvaluatee."selected$targetCriteria"] = ($form[$targetEvaluatee."selected$targetCriteria"] ? $form[$targetEvaluatee."selected$targetCriteria"] : 0);
             }
 
-            $multiplier = 0;
-            foreach ($rubric['RubricsCriteria'] as $criteria) {
-                if ($criteria['criteria_num'] == $targetCriteria) {
-                    $multiplier = $criteria['multiplier'];
-                    break;
-                }
-            }
             $selectedLom = $form['selected_lom_'.$targetEvaluatee.'_'.$targetCriteria] ?? null;
             $grade = is_numeric($selectedLom) ?
-                Toolkit::scaleMark($multiplier, $selectedLom, $totalLom, $rubric['Rubric']['zero_mark']) : "";
+                Toolkit::scaleMark($this->_criterionMultiplier($rubric, $targetCriteria), $selectedLom, $totalLom, $rubric['Rubric']['zero_mark']) : "";
 
             // Set up and save EvaluationRubricDetail
             $evalRubricDetail = $this->EvaluationRubricDetail->getByEvalRubricIdCritera($evalRubricId, $targetCriteria);
