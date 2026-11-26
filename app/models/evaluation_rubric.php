@@ -41,7 +41,7 @@ class EvaluationRubric extends EvaluationResponseBase
      * @param bool $evaluatee  evaluatee
      *
      * @access public
-     * @return void
+     * @return array|false
      */
     function getEvalRubricByGrpEventIdEvaluatorEvaluatee($grpEventId=null, $evaluator=null, $evaluatee=null)
     {

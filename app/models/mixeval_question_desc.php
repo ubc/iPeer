@@ -35,10 +35,15 @@ class MixevalQuestionDesc extends AppModel
         foreach ($data as $row) {
             if (isset($row['Description'])) {
                 $descriptors =  $row['Description'];
+                $q_id = null;
                 foreach ($question_ids as $question_id) {
                     if ($question_id['MixevalQuestion']['question_num'] == $row['question_num']) {
                         $q_id = $question_id['MixevalQuestion']['id'];
                     }
+                }
+                // no question with this number: its descriptors have nowhere to go
+                if ($q_id === null) {
+                    continue;
                 }
 
                 foreach ($descriptors as $value) {

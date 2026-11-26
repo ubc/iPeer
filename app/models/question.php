@@ -133,6 +133,7 @@ class Question extends AppModel
         $ids = Set::extract('/SurveyQuestion/question_id', $quesIds);
         $order = Set::combine($quesIds, '{n}.SurveyQuestion.question_id', '{n}.SurveyQuestion.number');
         $questions = $this->findAllById($ids);
+        $quesNo = [];
         foreach ($questions as $ques) {
             $quesId = $ques['Question']['id'];
             //$quesNo['SurveyQuestion']['number'] = $order[$ques['Question']['id']];

@@ -684,6 +684,7 @@ class EvaluationComponent extends CakeObject
                 }
 
                 // get total possible grade for the criteria number ($i)
+                $multiplier = 0;
                 foreach ($rubric['RubricsCriteria'] as $criteria) {
                     if ($criteria['criteria_num'] == $i) {
                         $multiplier = $criteria['multiplier'];
@@ -719,6 +720,7 @@ class EvaluationComponent extends CakeObject
                 $form[$targetEvaluatee."selected$targetCriteria"] = ($form[$targetEvaluatee."selected$targetCriteria"] ? $form[$targetEvaluatee."selected$targetCriteria"] : 0);
             }
 
+            $multiplier = 0;
             foreach ($rubric['RubricsCriteria'] as $criteria) {
                 if ($criteria['criteria_num'] == $targetCriteria) {
                     $multiplier = $criteria['multiplier'];
@@ -760,7 +762,7 @@ class EvaluationComponent extends CakeObject
      * @param mixed $userId user id
      *
      * @access public
-     * @return void
+     * @return array|false
      */
     function getStudentViewRubricResultDetailReview ($event, $userId)
     {
@@ -776,6 +778,8 @@ class EvaluationComponent extends CakeObject
 
         $this->User->id = $userId;
 
+        $rubricResult = [];
+        $evalResult = [];
         if ($event['GroupEvent']['id'] && $userId) {
             $rubricResult = $this->EvaluationRubric->getResultsByEvaluator($event['GroupEvent']['id'], $userId);
 

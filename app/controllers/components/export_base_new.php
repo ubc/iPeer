@@ -801,13 +801,14 @@ for ($inc=0; $inc<$count($groupMembers); $inc++) {
         $evaluateeHeaderArray = $this->ExportHelper2->formatEvaluateeHeaderArray($params, $evaluatee['User']);
         $this->ExportHelper2->fillGridHorizonally($grid, $xPosition, 0, $evaluateeHeaderArray);
         // Insert evaluators' comment
-        $eventType == 'S' ? ($evalResults = $this->EvaluationSimple->getResultsByEvaluatee($grpEventId, $evaluateeId, true)) &&
-            ($evalType = 'EvaluationSimple') &&
-            ($commentType = 'comment')
-            :
-            ($evalResults = $this->EvaluationRubric->getResultsByEvaluatee($grpEventId, $evaluateeId, true)) &&
-            ($evalType = 'EvaluationRubric') &&
-            ($commentType = 'comment');
+        if ($eventType == 'S') {
+            $evalResults = $this->EvaluationSimple->getResultsByEvaluatee($grpEventId, $evaluateeId, true);
+            $evalType = 'EvaluationSimple';
+        } else {
+            $evalResults = $this->EvaluationRubric->getResultsByEvaluatee($grpEventId, $evaluateeId, true);
+            $evalType = 'EvaluationRubric';
+        }
+        $commentType = 'comment';
         $yRowPosition = 2;
         for ($i=0; $i<count($groupMembers); $i++) {
             $evaluator = $groupMembers[$i];
