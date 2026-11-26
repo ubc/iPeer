@@ -57,12 +57,12 @@ To run the unit tests on containers:
 - From outside the container, use `docker compose exec app-test composer test`.
 - `composer test-db` only loads the sample data.
 
-### Checking the code
+### Linting the code
 
 Run these in the app container, or from outside with `docker compose exec app-test composer <name>`:
-- `composer syntax` checks that every PHP file and view template in `app/` compiles.
-- `composer analyse` runs PHPStan (settings in `phpstan.neon`). It finds bugs such as unknown classes and methods, wrong arguments and undefined variables. Problems that existed when PHPStan was added are listed in `phpstan-baseline.neon`, so it reports only new ones.
-- `composer check` runs both, then `composer audit --no-dev`, which looks for security advisories in the production packages. CI runs `composer check`.
+- `composer syntax`: syntax check
+- `composer analyse`: runs PHPStan (settings in `phpstan.neon`). It finds bugs such as unknown classes and methods, wrong arguments and undefined variables. Problems that existed when PHPStan was added are listed in `build/phpstan-baseline.neon`, so it reports only new ones. When you fix one of them, remove its entry from the baseline: PHPStan reports an entry that no longer matches an error.
+- `composer check` runs both of the above, then `composer audit --no-dev`, which looks for security advisories in the production packages. CI runs `composer check`.
 
 ### Updating the translation template
 

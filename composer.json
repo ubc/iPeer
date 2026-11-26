@@ -46,6 +46,7 @@
       ],
       "analyse": [
           "Composer\\Config::disableProcessTimeout",
+          "@putenv XDEBUG_MODE=off",
           "phpstan analyse --memory-limit=1G --no-progress"
       ],
       "syntax": "find app \\( -name '*.php' -o -name '*.ctp' \\) -not -path 'app/vendors/simpletest/test/*' -print0 | xargs -0 -n 1 -P 4 sh -c 'php -d display_errors=stderr -l \"$1\" > /dev/null || exit 1' syntax",
@@ -58,7 +59,7 @@
   "scripts-descriptions": {
       "test-db": "Load the seed data into the test database (ipeer_test unless IPEER_DB_NAME is set).",
       "test": "Load the seed data and run the unit tests: all groups and the plugin test cases, or one with -- <case|group> <name>.",
-      "analyse": "Run PHPStan on the app's PHP code (phpstan.neon); existing problems are in phpstan-baseline.neon.",
+      "analyse": "Run PHPStan on the app's PHP code (phpstan.neon); existing problems are in build/phpstan-baseline.neon.",
       "syntax": "Check that every PHP file and view template in app/ compiles (SimpleTest's own tests hold parse errors on purpose).",
       "check": "Run all code checks: syntax, analyse and the security audit of the production packages."
   },
