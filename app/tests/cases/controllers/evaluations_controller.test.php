@@ -329,4 +329,90 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
             $this->assertEqual($this->rubricRelease('comment_release'), $comments, $url);
         }
     }
+
+    private function field(string $model, string $field, int $id)
+    {
+        return ClassRegistry::init($model)->field($field, [$model.'.id' => $id]);
+    }
+
+    function testMarkEventReviewedMarksTheGroupEvent()
+    {
+        $this->testAction('/evaluations/markEventReviewed', [
+            'fixturize' => true,
+            'form' => ['group_event_id' => 3, 'mark_reviewed' => 1],
+        ]);
+
+        $this->assertEqual($this->field('GroupEvent', 'marked', 3), 'reviewed');
+    }
+
+    // instructor2 does not teach course 1, the course of group event 3.
+    function testMarkEventReviewedRefusesAGroupEventOfAnotherCourse()
+    {
+        $this->login = [
+            'User' => ['username' => 'instructor2', 'password' => md5('ipeeripeer')],
+        ];
+        $this->testAction('/evaluations/markEventReviewed', [
+            'fixturize' => true,
+            'form' => ['group_event_id' => 3, 'mark_reviewed' => 1],
+        ]);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], "Error: That event does not exist or you don't have access to it");
+        $this->assertEqual($this->field('GroupEvent', 'marked', 3), 'not reviewed');
+    }
+
+    function testMarkEventReviewedUnknownGroupEventFails()
+    {
+        $this->testAction('/evaluations/markEventReviewed', [
+            'fixturize' => true,
+            'form' => ['group_event_id' => 999, 'mark_reviewed' => 1],
+        ]);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: That group event does not exist.');
+    }
+
+    // Save Changes on the Detail page of group event 3 releases only comments
+    // of that group event. Rubric evaluation 3 (evaluator 7, evaluatee 5) and
+    // its detail 7 are in group event 3; rubric evaluation 1 and its detail 1
+    // are in group event 4.
+    function testSaveChangesReleasesOnlyCommentsOfTheGroupEvent()
+    {
+        $this->testAction('/evaluations/markCommentRelease', [
+            'fixturize' => true,
+            'form' => [
+                'group_event_id' => 3, 'evaluatee' => 5, 'submit' => 'Save Changes',
+                'releaseGeneralCom' => [7], 'releaseComments' => [7, 1],
+            ],
+        ]);
+
+        $this->assertEqual($this->field('EvaluationRubric', 'comment_release', 3), 1);
+        $this->assertEqual($this->field('EvaluationRubricDetail', 'comment_release', 7), 1);
+        $this->assertEqual($this->field('EvaluationRubricDetail', 'comment_release', 1), 0);
+    }
+
+    // Rubric evaluation 1 (evaluator 31, evaluatee 32) is in group event 4,
+    // not in group event 3.
+    function testSaveChangesDoesNotReleaseAGeneralCommentOfAnotherGroupEvent()
+    {
+        $this->testAction('/evaluations/markCommentRelease', [
+            'fixturize' => true,
+            'form' => [
+                'group_event_id' => 3, 'evaluatee' => 32, 'submit' => 'Save Changes',
+                'releaseGeneralCom' => [31],
+            ],
+        ]);
+
+        $this->assertEqual($this->field('EvaluationRubric', 'comment_release', 1), 0);
+    }
+
+    // Simple event 6 has evaluations in group event 7 and none in group
+    // event 8.
+    function testChangeAllGradeReleaseSetsNoneForAGroupEventWithoutEvaluations()
+    {
+        $this->testAction('/evaluations/changeAllGradeRelease/6;1', ['fixturize' => true]);
+
+        $this->assertEqual($this->field('GroupEvent', 'grade_release_status', 7), 'All');
+        $this->assertEqual($this->field('GroupEvent', 'grade_release_status', 8), 'None');
+    }
 }

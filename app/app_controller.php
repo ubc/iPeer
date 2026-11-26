@@ -557,7 +557,8 @@ class AppController extends Controller
             }
         }
 
-        $enforce = (bool) getenv('IPEER_ENFORCE_REFERRER');
+        // "true", "1", "yes" and "on" turn it on; "false", "0" and an empty value do not.
+        $enforce = filter_var(getenv('IPEER_ENFORCE_REFERRER'), FILTER_VALIDATE_BOOLEAN);
         CakeLog::write(
             'warning',
             'CSRF: referer mismatch' . ($enforce ? ' (blocked)' : ' (allowed, enforcement disabled)') .

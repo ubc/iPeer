@@ -125,6 +125,14 @@ class EvaluationTestCase extends CakeTestCase
         $this->assertEqual($result, $expect);
     }
 
+    function testReleaseStatus()
+    {
+        $this->assertEqual($this->EvaluationComponentTest->releaseStatus([]), 'None');
+        $this->assertEqual($this->EvaluationComponentTest->releaseStatus([0, 0]), 'None');
+        $this->assertEqual($this->EvaluationComponentTest->releaseStatus(['1', '0']), 'Some');
+        $this->assertEqual($this->EvaluationComponentTest->releaseStatus([1, 1]), 'All');
+    }
+
     function testFilterString()
     {
         $testString = "HELLO THIS IS A TEST";
