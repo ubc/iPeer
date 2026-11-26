@@ -878,11 +878,11 @@ class EvaluationComponent extends CakeObject
         $evalIds = $this->EvaluationRubric->find('list', array('conditions' => $conditions));
         // update all comment release status that meets the conditions
         $this->EvaluationRubric->updateAll(
-            array('EvaluationRubric.comment_release' => $status, 'EvaluationRubric.modified' => $now, 'EvaluationRubric.updater_id' => $user),
+            array('EvaluationRubric.comment_release' => (int) $status, 'EvaluationRubric.modified' => $now, 'EvaluationRubric.updater_id' => $user),
             array('EvaluationRubric.id' => $evalIds)
         );
         $this->EvaluationRubricDetail->updateAll(
-            array('EvaluationRubricDetail.comment_release' => $status, 'EvaluationRubricDetail.modified' => $now, 'EvaluationRubricDetail.updater_id' => $user),
+            array('EvaluationRubricDetail.comment_release' => (int) $status, 'EvaluationRubricDetail.modified' => $now, 'EvaluationRubricDetail.updater_id' => $user),
             array('EvaluationRubricDetail.evaluation_rubric_id' => $evalIds)
         );
     }
@@ -1304,7 +1304,7 @@ class EvaluationComponent extends CakeObject
         $evalIds = $this->EvaluationMixeval->find('list', array('conditions' => $conditions));
         // update all comment release status that meets the conditions
         $this->EvaluationMixevalDetail->updateAll(
-            array('EvaluationMixevalDetail.comment_release' => $status, 'EvaluationMixevalDetail.modified' => $now, 'EvaluationMixevalDetail.updater_id' => $user),
+            array('EvaluationMixevalDetail.comment_release' => (int) $status, 'EvaluationMixevalDetail.modified' => $now, 'EvaluationMixevalDetail.updater_id' => $user),
             array('EvaluationMixevalDetail.evaluation_mixeval_id' => $evalIds)
         );
     }

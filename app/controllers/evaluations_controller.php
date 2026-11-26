@@ -1807,12 +1807,16 @@ class EvaluationsController extends AppController
      * @access public
      * @return void
      */
-    function markGradeRelease($grpEventId, $releaseStatus, $evaluatee = null)
+    function markGradeRelease($grpEventId = null, $releaseStatus = null, $evaluatee = null)
     {
         // Make sure the present user has permission
         if (!User::hasPermission('functions/evaluation')) {
             $this->Session->setFlash('Error: You do not have permission to release grades', true);
             $this->redirect('/home');
+            return;
+        }
+        $releaseStatus = $this->_releaseStatus($releaseStatus);
+        if ($releaseStatus === null) {
             return;
         }
 
@@ -1823,7 +1827,10 @@ class EvaluationsController extends AppController
             return;
         }
         $eventId = $grpEvent['GroupEvent']['event_id'];
-        $event = $this->Event->findById($eventId);
+        $event = $this->_accessibleEvent($eventId);
+        if (!$event) {
+            return;
+        }
         $this->autoRender = false;
 
         $conditions = array('grp_event_id' => $grpEventId);
@@ -1853,7 +1860,7 @@ class EvaluationsController extends AppController
 
         $evalIds = $this->$model->find('list', array('conditions' => $conditions));
         $this->$model->updateAll(
-            array($model.'.grade_release' => $releaseStatus),
+            array($model.'.grade_release' => (int) $releaseStatus),
             array($model.'.id' => $evalIds)
         );
 
@@ -1879,6 +1886,46 @@ class EvaluationsController extends AppController
 
     }
 
+
+    /**
+     * Read a release status from the URL. Only 0 and 1 are valid; for any
+     * other value, show an error and redirect.
+     *
+     * @param mixed $value the status from the URL
+     *
+     * @return int|null 0 or 1, or null after the redirect
+     */
+    private function _releaseStatus($value): ?int
+    {
+        $status = match ((string) $value) {
+            '0' => 0,
+            '1' => 1,
+            default => null,
+        };
+        if ($status === null) {
+            $this->Session->setFlash(__('Error: The release status must be 0 or 1.', true));
+            $this->redirect('/home');
+        }
+        return $status;
+    }
+
+    /**
+     * Find an event in a course that the user can access. Otherwise show an
+     * error and redirect.
+     *
+     * @param mixed $eventId event id
+     *
+     * @return array|false the event, or false after the redirect
+     */
+    private function _accessibleEvent($eventId)
+    {
+        $event = $this->Event->getAccessibleEventById($eventId, User::get('id'), User::getCourseFilterPermission(), array());
+        if (!$event) {
+            $this->Session->setFlash(__('Error: That event does not exist or you don\'t have access to it', true));
+            $this->redirect('/home');
+        }
+        return $event;
+    }
 
     /**
      * markCommentRelease
@@ -2002,13 +2049,15 @@ class EvaluationsController extends AppController
             return;
         }
 
-        $tok = strtok($param, ';');
-        $eventId = $tok;
-        $releaseStatus = strtok(';');
-        $event = $this->Event->find('first', [
-                'conditions' => array('Event.id' => $eventId),
-                'recursive' => -1,
-        ]);
+        $eventId = strtok($param ?? '', ';');
+        $releaseStatus = $this->_releaseStatus(strtok(';'));
+        if ($releaseStatus === null) {
+            return;
+        }
+        $event = $this->_accessibleEvent($eventId);
+        if (!$event) {
+            return;
+        }
         $groupEventList = $this->GroupEvent->getGroupListByEventId($eventId, true);
         $groupEvents = Set::extract('/GroupEvent/id', $groupEventList);
         switch ($event['Event']['event_template_type_id']) {
@@ -2057,14 +2106,13 @@ class EvaluationsController extends AppController
         }
 
         $this->autoRender = false;
-        $tok = strtok($param, ';');
-        $eventId = $tok;
-        $releaseStatus = strtok(';');
-        $this->Event->id = $eventId;
-        $event = $this->Event->read();
-        if (empty($event)) {
-            $this->Session->setFlash(__('Error: That event does not exist.', true));
-            $this->redirect('/home');
+        $eventId = strtok($param ?? '', ';');
+        $releaseStatus = $this->_releaseStatus(strtok(';'));
+        if ($releaseStatus === null) {
+            return;
+        }
+        $event = $this->_accessibleEvent($eventId);
+        if (!$event) {
             return;
         }
 

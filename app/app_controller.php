@@ -476,6 +476,9 @@ class AppController extends Controller
             'users/resetpassword',
             'users/resetpasswordwithoutemail',
             'departments/delete',
+            'evaluations/changeallcommentrelease',
+            'evaluations/changeallgraderelease',
+            'evaluations/markgraderelease',
             'emailtemplates/delete',
             'faculties/delete',
             'groups/delete',
@@ -500,6 +503,14 @@ class AppController extends Controller
         $stateMutatingMethods = array('POST', 'PUT', 'DELETE', 'PATCH');
         if (in_array($method, $stateMutatingMethods) && !in_array($action, $crossOriginAllowed)) {
             return $this->_requireSameOriginReferer();
+        }
+
+        // A HEAD request must not change data, so these actions do not run for it.
+        if ($method === 'HEAD' && in_array($action, $getRequestsDisallowed)) {
+            $this->header('HTTP/1.1 405 Method Not Allowed');
+            $this->header('Allow: GET');
+            $this->_stop();
+            return false;
         }
 
         if ($method === 'GET' && in_array($action, $getRequestsDisallowed)) {

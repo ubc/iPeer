@@ -166,7 +166,11 @@ async function postExport(page: Page): Promise<Buffer> {
           ])
         )
       );
-      const response = await page.request.post(action!, { form: fields });
+      // The app refuses a POST without a same-origin referer.
+      const response = await page.request.post(action!, {
+        form: fields,
+        headers: { referer: page.url() },
+      });
       expect(response.status()).toBe(200);
       const content = await response.body();
       const path = test.info().outputPath('export.pdf');

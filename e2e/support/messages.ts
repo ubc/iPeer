@@ -23,6 +23,13 @@ export function noTemplatePermission(
   return `Error: You do not have permission to ${action} this ${template}`;
 }
 
+// The Referer check (IPEER_ENFORCE_REFERRER) refused a request.
+export const CSRF = {
+  outsideApp:
+    'iPeer could not complete your request. It looks like your request came from outside the app. ' +
+    'This action must be done from within iPeer.',
+} as const;
+
 export const COURSE = {
   created: 'Course created!',
   createFailed: 'Add course failed.',

@@ -265,7 +265,7 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
         $this->testAction('/evaluations/changeAllGradeRelease/9999;1', ['fixturize' => true]);
 
         $message = $this->controller->Session->read('Message.flash');
-        $this->assertEqual($message['message'], 'Error: That event does not exist.');
+        $this->assertEqual($message['message'], "Error: That event does not exist or you don't have access to it");
     }
 
     function testMarkCommentReleaseUnknownGroupEventFails()
@@ -277,5 +277,56 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
 
         $message = $this->controller->Session->read('Message.flash');
         $this->assertEqual($message['message'], 'Error: That group event does not exist.');
+    }
+
+    function testChangeAllCommentReleaseReleasesTheRubricComments()
+    {
+        $this->testAction('/evaluations/changeAllCommentRelease/2;1', ['fixturize' => true]);
+
+        $this->assertEqual($this->rubricRelease('comment_release'), [1, 1]);
+    }
+
+    // The release status must be 0 or 1. Anything else changes nothing.
+    function testReleaseActionsRefuseABadStatus()
+    {
+        $grades = $this->rubricRelease('grade_release');
+        $comments = $this->rubricRelease('comment_release');
+        foreach ([
+            '/evaluations/markGradeRelease/3/2',
+            '/evaluations/changeAllGradeRelease/2;x',
+            '/evaluations/changeAllCommentRelease/2;1x',
+            '/evaluations/changeAllGradeRelease/2',
+        ] as $url) {
+            $this->controller = new MockEvaluationsController();
+            $this->testAction($url, ['fixturize' => true]);
+
+            $message = $this->controller->Session->read('Message.flash');
+            $this->assertEqual($message['message'], 'Error: The release status must be 0 or 1.', $url);
+            $this->assertEqual($this->rubricRelease('grade_release'), $grades, $url);
+            $this->assertEqual($this->rubricRelease('comment_release'), $comments, $url);
+        }
+    }
+
+    // instructor2 does not teach course 1, the course of event 2.
+    function testReleaseActionsRefuseAnEventOfAnotherCourse()
+    {
+        $grades = $this->rubricRelease('grade_release');
+        $comments = $this->rubricRelease('comment_release');
+        foreach ([
+            '/evaluations/markGradeRelease/3/1',
+            '/evaluations/changeAllGradeRelease/2;1',
+            '/evaluations/changeAllCommentRelease/2;1',
+        ] as $url) {
+            $this->controller = new MockEvaluationsController();
+            $this->login = [
+                'User' => ['username' => 'instructor2', 'password' => md5('ipeeripeer')],
+            ];
+            $this->testAction($url, ['fixturize' => true]);
+
+            $message = $this->controller->Session->read('Message.flash');
+            $this->assertEqual($message['message'], "Error: That event does not exist or you don't have access to it", $url);
+            $this->assertEqual($this->rubricRelease('grade_release'), $grades, $url);
+            $this->assertEqual($this->rubricRelease('comment_release'), $comments, $url);
+        }
     }
 }

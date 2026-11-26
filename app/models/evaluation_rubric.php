@@ -353,7 +353,7 @@ class EvaluationRubric extends EvaluationResponseBase
             'conditions' => array('event_id' => $eventId)
         ));
         
-        $fields = array('EvaluationRubric.grade_release' => $releaseStatus);
+        $fields = array('EvaluationRubric.grade_release' => (int) $releaseStatus);
         $conditions = array('EvaluationRubric.grp_event_id' => $grpEvents);
         return $this->updateAll($fields, $conditions);
     }
