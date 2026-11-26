@@ -178,7 +178,7 @@ class ExtendedAuthTestCase extends ExtendedTestCase
      * @param mixed $controller
      *
      * @access protected
-     * @return boolean if login is successful
+     * @return void
      */
     function logout($controller)
     {

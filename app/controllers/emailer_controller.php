@@ -401,7 +401,9 @@ class EmailerController extends AppController
         $tmp_index = $this->searchByUserId($this->Session->read('email_recipients'), 'id', $this->passedArgs['recipient_id']);
         //Unset the recipient from the session
         $tmp_recipients = $this->Session->read('email_recipients');
-        unset($tmp_recipients[$tmp_index]);
+        if ($tmp_index !== null) {
+            unset($tmp_recipients[$tmp_index]);
+        }
         $this->Session->write('email_recipients', $tmp_recipients);
         $this->ajax = true;
     }
@@ -476,19 +478,20 @@ class EmailerController extends AppController
      * @param string $key   key
      * @param mixed  $value value
      *
-     * @return index of searched user
+     * @return int|null the array key of the user, or null when not found
      */
     function searchByUserId($array, $key, $value)
     {
-        $i = 0;
         if (is_array($array)) {
-            foreach ($array as $subarray) {
-                if ($subarray['User'][$key]==$value) {
-                    return $i;
+            // the key, not the position: after a recipient is removed, the
+            // keys of the recipient list have a gap
+            foreach ($array as $index => $subarray) {
+                if ($subarray['User'][$key] == $value) {
+                    return $index;
                 }
-                $i++;
             }
         }
+        return null;
     }
     
     /**

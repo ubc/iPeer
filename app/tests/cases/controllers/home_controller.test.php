@@ -69,7 +69,7 @@ class HomeControllerTest extends ExtendedAuthTestCase
         // defer logout to end of the test as some of the test need check flash
         // message. After logging out, message is destoryed.
         $this->controller->Auth->logout();
-        unset($this->controller);
+        $this->controller = null;
         ClassRegistry::flush();
     }
 

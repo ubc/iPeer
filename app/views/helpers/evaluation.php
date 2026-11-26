@@ -188,7 +188,7 @@ class EvaluationHelper extends AppHelper
             }
 
             if (!isset($scores[$userId]['total'])) {
-                $user[] = sprintf('%.2 (%.2f%%)', 0, 0);
+                $user[] = sprintf('%.2f (%.2f%%)', 0, 0);
                 $totalAve += 0;
             } else if ($penalties[$userId] > 0) {
                 $penalty = number_format($penalties[$userId]/100 * $scores[$userId]['total'], 2);

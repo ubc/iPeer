@@ -156,4 +156,3 @@ Permission: <?php echo $hasUserModel ? count(User::getPermissions()) : "no user"
 <?php
 } // end if(!constant('DEBUG') == 0)
 ?>
-

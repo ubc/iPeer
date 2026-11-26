@@ -192,6 +192,8 @@ class User extends AppModel
                     'Please select a faculty.');
             }
         }
+        // false would stop the validation; the invalidate() calls above fail it
+        return true;
     }
 
     /* public afterSave($created) {{{ */
@@ -1216,7 +1218,7 @@ class User extends AppModel
      * */
     function getMyCourses()
     {
-        $model = Classregistry::init('Course');
+        $model = ClassRegistry::init('Course');
 
         return $model->getCourseByInstructor(self::get('id'));
     }
@@ -1230,7 +1232,7 @@ class User extends AppModel
      * */
     static function getMyCourseList()
     {
-        $model = Classregistry::init('Course');
+        $model = ClassRegistry::init('Course');
 
         return $model->getListByInstructor(self::get('id'));
     }
@@ -1245,9 +1247,9 @@ class User extends AppModel
      */
     static function getMyDepartmentsCourseList($findType = 'list')
     {
-        $userFaculty = Classregistry::init('UserFaculty');
-        $department = Classregistry::init('Department');
-        $course = Classregistry::init('Course');
+        $userFaculty = ClassRegistry::init('UserFaculty');
+        $department = ClassRegistry::init('Department');
+        $course = ClassRegistry::init('Course');
 
         $uf = $userFaculty->findAllByUserId(User::getCurrentLoggedInUser()['id']);
         $d = $department->getByUserFaculties($uf);

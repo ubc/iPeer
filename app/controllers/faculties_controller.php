@@ -81,7 +81,7 @@ class FacultiesController extends AppController {
      * */
     function add() {
         $this->set('title_for_layout', 'Add Faculty');
-        $this->RolesUser = Classregistry::init('RolesUser');
+        $this->RolesUser = ClassRegistry::init('RolesUser');
 
         $superadmins = $this->RolesUser->find('all', array('conditions' => array('role_id' => 1)));
         $userfac = array();

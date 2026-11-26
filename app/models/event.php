@@ -608,7 +608,7 @@ class Event extends AppModel
      */
     function getUnassignedGroups($event, $assigned_group_ids = null)
     {
-        $group = Classregistry::init('Group');
+        $group = ClassRegistry::init('Group');
 
         if (!is_array($event) || !isset($event['Event']['id'])) {
             return array();

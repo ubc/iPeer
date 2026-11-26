@@ -184,27 +184,6 @@ class Group extends AppModel
     }
 
     /**
-     * Prepares group member data in an array
-     *
-     * @param mixed $lines members
-     *
-     * @return $data data in an array
-     */
-    function prepDataImport($lines=null)
-    {
-        // Loop through import file
-        for ($i = 1; $i < count($lines); $i++) {
-            // Split fields up on line by '
-            $line = @split(',', $lines[$i]);
-
-            $data['member'.$i] = trim($line[0]);
-        }
-        $data['member_count'] = count($lines) - 1;
-
-        return $data;
-    }
-
-    /**
      * Gets last group number in a course
      *
      * @param int $course_id course id

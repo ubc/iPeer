@@ -56,7 +56,7 @@ class FacultiesControllerTestCase extends ExtendedAuthTestCase {
         if (isset($this->controller->Auth)) {
             $this->controller->Auth->logout();
         }
-        unset($this->controller);
+        $this->controller = null;
         ClassRegistry::flush();
     }
 
