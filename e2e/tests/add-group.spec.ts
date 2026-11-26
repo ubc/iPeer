@@ -118,7 +118,8 @@ test('an admin deletes a group and only that group leaves the course group list'
   const doomedId = await createGroup(page, 'Group To Delete', STUDENTS.slice(0, 2));
   await createGroup(page, 'Group To Keep', STUDENTS.slice(2));
 
-  await page.goto(`/groups/delete/${doomedId}`);
+  // The app refuses the delete without a same-origin referer.
+  await page.goto(`/groups/delete/${doomedId}`, { referer: page.url() });
   await expect(goodMessage(page)).toHaveText(GROUP.deleted);
 
   await openGroupList(page, COURSE_ID);
