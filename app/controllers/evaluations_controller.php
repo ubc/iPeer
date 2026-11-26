@@ -478,7 +478,7 @@ class EvaluationsController extends AppController
             $grades = array();
             if (count($scores)) {
 
-                $user_ids = Set::classicExtract($scores, "{n}.$key.evaluatee", $scores);
+                $user_ids = Set::classicExtract($scores, "{n}.$key.evaluatee");
                 $usernames = $this->User->find('list', array('conditions' => array('User.id' => $user_ids), 'fields' => array('User.username')));
                 $canvasUsers = $canvasCourse->getUsers($this, User::get('id'), array(CanvasCourseUserComponent::ENROLLMENT_QUERY_STUDENT));
 
@@ -1005,6 +1005,7 @@ class EvaluationsController extends AppController
             // Student View Mode
             if(isset($this->params['form']['memberIDs'])){
                 // find out whose evaluation is submitted
+                $targetEvaluatee = null;
                 foreach ($this->params['form']['memberIDs'] as $userId) {
                     if (isset($this->params['form'][$userId])) {
                         $targetEvaluatee = $userId;
@@ -1429,6 +1430,7 @@ class EvaluationsController extends AppController
             return;
         }
 
+        $groupEventId = null;
         if ('3' != $event['Event']['event_template_type_id']) {
             // not survey, we need group
             if (!is_numeric($groupId) ||
@@ -1617,6 +1619,8 @@ class EvaluationsController extends AppController
             return;
         }
 
+        $groupEventId = null;
+        $autoRelease = null;
         if ('3' != $event['Event']['event_template_type_id']) {
             // not survey, we need group
             if (!is_numeric($groupId) ||
@@ -1813,6 +1817,11 @@ class EvaluationsController extends AppController
         }
 
         $grpEvent = $this->GroupEvent->findById($grpEventId);
+        if (empty($grpEvent)) {
+            $this->Session->setFlash(__('Error: That group event does not exist.', true));
+            $this->redirect('/home');
+            return;
+        }
         $eventId = $grpEvent['GroupEvent']['event_id'];
         $event = $this->Event->findById($eventId);
         $this->autoRender = false;
@@ -1835,6 +1844,11 @@ class EvaluationsController extends AppController
             $url = '/Detail';
             $model = 'EvaluationMixeval';
             break;
+        default:
+            // a survey
+            $this->Session->setFlash(__('Error: You can release grades only for simple, rubric and mixed evaluations.', true));
+            $this->redirect('/home');
+            return;
         }
 
         $evalIds = $this->$model->find('list', array('conditions' => $conditions));
@@ -1869,12 +1883,10 @@ class EvaluationsController extends AppController
     /**
      * markCommentRelease
      *
-     * @param bool $param
-     *
      * @access public
      * @return void
      */
-    function markCommentRelease($param = null)
+    function markCommentRelease()
     {
         // Make sure the present user has permission
         if (!User::hasPermission('functions/evaluation')) {
@@ -1884,13 +1896,13 @@ class EvaluationsController extends AppController
         }
 
         $this->autoRender = false;
-        if ($param !=null) {
-            $tok = strtok($param, ';');
-            $eventId = $tok;
-        } else {
-            $grpEvent = $this->GroupEvent->findById($this->params['form']['group_event_id']);
-            $eventId = $grpEvent['GroupEvent']['event_id'];
+        $grpEvent = $this->GroupEvent->findById($this->params['form']['group_event_id'] ?? null);
+        if (empty($grpEvent)) {
+            $this->Session->setFlash(__('Error: That group event does not exist.', true));
+            $this->redirect('/home');
+            return;
         }
+        $eventId = $grpEvent['GroupEvent']['event_id'];
 
         // Check whether the event exists or user has permission to access it
         if (!($event = $this->Event->getAccessibleEventById($eventId, User::get('id'), User::getCourseFilterPermission(), array()))) {
@@ -2050,6 +2062,11 @@ class EvaluationsController extends AppController
         $releaseStatus = strtok(';');
         $this->Event->id = $eventId;
         $event = $this->Event->read();
+        if (empty($event)) {
+            $this->Session->setFlash(__('Error: That event does not exist.', true));
+            $this->redirect('/home');
+            return;
+        }
 
         switch ($event['Event']['event_template_type_id']) {
         case 1://simple
@@ -2065,7 +2082,10 @@ class EvaluationsController extends AppController
             $model = 'EvaluationMixeval';
             break;
         default:
-            break;
+            // a survey
+            $this->Session->setFlash(__('Error: You can release grades only for simple, rubric and mixed evaluations.', true));
+            $this->redirect('/home');
+            return;
         }
 
         $grpEventList = $this->GroupEvent->getGroupListByEventId($eventId);
