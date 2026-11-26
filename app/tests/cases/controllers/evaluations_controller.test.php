@@ -206,4 +206,57 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
         $message = $this->controller->Session->read('Message.flash');
         $this->assertNull($message);
     }
+
+    // Seed data: event 2 is a rubric event; group event 3 (group 1) has
+    // the rubric evaluations 3 and 4, with grades and comments unreleased.
+    private function rubricRelease(string $field): array
+    {
+        return array_values(ClassRegistry::init('EvaluationRubric')->find('list', [
+            'conditions' => ['EvaluationRubric.id' => [3, 4]],
+            'fields' => ['EvaluationRubric.id', 'EvaluationRubric.'.$field],
+        ]));
+    }
+
+    function testMarkGradeReleaseReleasesTheRubricGrades()
+    {
+        $this->testAction('/evaluations/markGradeRelease/3/1', ['fixturize' => true]);
+
+        $this->assertEqual($this->rubricRelease('grade_release'), [1, 1]);
+        $this->assertEqual(ClassRegistry::init('GroupEvent')->field('grade_release_status', ['id' => 3]), 'All');
+    }
+
+    function testChangeAllGradeReleaseReleasesTheRubricGrades()
+    {
+        $this->testAction('/evaluations/changeAllGradeRelease/2;1', ['fixturize' => true]);
+
+        $this->assertEqual($this->rubricRelease('grade_release'), [1, 1]);
+    }
+
+    function testMarkCommentReleaseReleasesAllRubricComments()
+    {
+        $this->testAction('/evaluations/markCommentRelease', [
+            'fixturize' => true,
+            'form' => ['group_event_id' => 3, 'submit' => 'Release All Comments'],
+        ]);
+
+        $this->assertEqual($this->rubricRelease('comment_release'), [1, 1]);
+    }
+
+    // A group event that does not exist shows an error, not a PHP error.
+    function testMarkGradeReleaseUnknownGroupEventFails()
+    {
+        $this->testAction('/evaluations/markGradeRelease/999/1', ['fixturize' => true]);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: That group event does not exist.');
+    }
+
+    // A survey (event 4) has no grades to release: an error, not a PHP error.
+    function testChangeAllGradeReleaseForASurveyFails()
+    {
+        $this->testAction('/evaluations/changeAllGradeRelease/4;1', ['fixturize' => true]);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: Grades can be released only for simple, rubric and mixed evaluations.');
+    }
 }
