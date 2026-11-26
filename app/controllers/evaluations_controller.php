@@ -1846,7 +1846,7 @@ class EvaluationsController extends AppController
             break;
         default:
             // a survey
-            $this->Session->setFlash(__('Error: Grades can be released only for simple, rubric and mixed evaluations.', true));
+            $this->Session->setFlash(__('Error: You can release grades only for simple, rubric and mixed evaluations.', true));
             $this->redirect('/home');
             return;
         }
@@ -1896,7 +1896,12 @@ class EvaluationsController extends AppController
         }
 
         $this->autoRender = false;
-        $grpEvent = $this->GroupEvent->findById($this->params['form']['group_event_id']);
+        $grpEvent = $this->GroupEvent->findById($this->params['form']['group_event_id'] ?? null);
+        if (empty($grpEvent)) {
+            $this->Session->setFlash(__('Error: That group event does not exist.', true));
+            $this->redirect('/home');
+            return;
+        }
         $eventId = $grpEvent['GroupEvent']['event_id'];
 
         // Check whether the event exists or user has permission to access it
@@ -2057,6 +2062,11 @@ class EvaluationsController extends AppController
         $releaseStatus = strtok(';');
         $this->Event->id = $eventId;
         $event = $this->Event->read();
+        if (empty($event)) {
+            $this->Session->setFlash(__('Error: That event does not exist.', true));
+            $this->redirect('/home');
+            return;
+        }
 
         switch ($event['Event']['event_template_type_id']) {
         case 1://simple
@@ -2072,8 +2082,8 @@ class EvaluationsController extends AppController
             $model = 'EvaluationMixeval';
             break;
         default:
-            // a survey, or an event that does not exist
-            $this->Session->setFlash(__('Error: Grades can be released only for simple, rubric and mixed evaluations.', true));
+            // a survey
+            $this->Session->setFlash(__('Error: You can release grades only for simple, rubric and mixed evaluations.', true));
             $this->redirect('/home');
             return;
         }

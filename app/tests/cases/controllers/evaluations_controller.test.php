@@ -257,6 +257,25 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
         $this->testAction('/evaluations/changeAllGradeRelease/4;1', ['fixturize' => true]);
 
         $message = $this->controller->Session->read('Message.flash');
-        $this->assertEqual($message['message'], 'Error: Grades can be released only for simple, rubric and mixed evaluations.');
+        $this->assertEqual($message['message'], 'Error: You can release grades only for simple, rubric and mixed evaluations.');
+    }
+
+    function testChangeAllGradeReleaseUnknownEventFails()
+    {
+        $this->testAction('/evaluations/changeAllGradeRelease/9999;1', ['fixturize' => true]);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: That event does not exist.');
+    }
+
+    function testMarkCommentReleaseUnknownGroupEventFails()
+    {
+        $this->testAction('/evaluations/markCommentRelease', [
+            'fixturize' => true,
+            'form' => ['group_event_id' => 999, 'submit' => 'Release All Comments'],
+        ]);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: That group event does not exist.');
     }
 }
