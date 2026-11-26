@@ -758,24 +758,80 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->assertEqual(ClassRegistry::init('EvaluationSubmission')->field('event_id', ['EvaluationSubmission.id' => 7]), 4);
     }
 
-    // A move to a survey with another template, or of a student with no
-    // submission, is refused too.
+    // Adds a survey to a course, as a copy of survey 4 with the template given.
+    private function addSurvey(int $courseId, int $templateId): int
+    {
+        $event = ClassRegistry::init('Event');
+        $survey = $event->find('first', ['conditions' => ['Event.id' => 4], 'recursive' => -1]);
+        unset($survey['Event']['id']);
+        $survey['Event']['course_id'] = $courseId;
+        $survey['Event']['template_id'] = $templateId;
+        $event->create();
+        $event->save($survey, false);
+        return (int) $event->id;
+    }
+
+    private function surveyOfSubmission7()
+    {
+        return ClassRegistry::init('EvaluationSubmission')->field('event_id', ['EvaluationSubmission.id' => 7]);
+    }
+
+    // Survey 4 (course 1) has template 1, and student 7 submitted it.
+    function testMoveMovesASubmissionToASurveyWithTheSameTemplate()
+    {
+        $destSurvey = $this->addSurvey(2, 1);
+        $this->testAction('/courses/move', [
+            'fixturize' => true, 'method' => 'post',
+            'data' => ['Course' => [
+                'action' => 1, 'sourceCourses' => 1, 'sourceSurveys' => 4,
+                'submitters' => 7, 'destCourses' => 2, 'destSurveys' => $destSurvey,
+            ]],
+        ]);
+
+        $this->assertEqual($this->surveyOfSubmission7(), $destSurvey);
+    }
+
+    // Each case changes one field of the valid move above, so each check is
+    // reached on its own.
     function testMoveRefusesASurveyOrStudentThatThePageDoesNotOffer()
     {
+        $sameTemplate = $this->addSurvey(2, 1);
+        $otherTemplate = $this->addSurvey(2, 2);
+        $valid = [
+            'action' => 1, 'sourceCourses' => 1, 'sourceSurveys' => 4,
+            'submitters' => 7, 'destCourses' => 2, 'destSurveys' => $sameTemplate,
+        ];
         foreach ([
-            ['sourceCourses' => 1, 'sourceSurveys' => 4, 'submitters' => 7, 'destCourses' => 1, 'destSurveys' => 5],
-            ['sourceCourses' => 1, 'sourceSurveys' => 4, 'submitters' => 17, 'destCourses' => 2, 'destSurveys' => 5],
-            ['sourceCourses' => 2, 'sourceSurveys' => 4, 'submitters' => 7, 'destCourses' => 1, 'destSurveys' => 5],
-        ] as $data) {
+            'other template' => ['destSurveys' => $otherTemplate],
+            'student with no submission' => ['submitters' => 17],
+            'list of students' => ['submitters' => [7, 31]],
+            'survey of another course' => ['sourceCourses' => 2],
+            'same course' => ['destCourses' => 1, 'destSurveys' => 5],
+        ] as $case => $change) {
             $this->controller = new MockCoursesController();
             $this->testAction('/courses/move', [
                 'fixturize' => true, 'method' => 'post',
-                'data' => ['Course' => ['action' => 1] + $data],
+                'data' => ['Course' => $change + $valid],
             ]);
 
             $message = $this->controller->Session->read('Message.flash');
-            $this->assertEqual($message['message'], 'Error: Choose the courses, surveys and student from the lists.');
-            $this->assertEqual(ClassRegistry::init('EvaluationSubmission')->field('event_id', ['EvaluationSubmission.id' => 7]), 4);
+            $this->assertEqual($message['message'], 'Error: Choose the courses, surveys and student from the lists.', $case);
+            $this->assertEqual($this->surveyOfSubmission7(), 4, $case);
+        }
+    }
+
+    // A list of ids, one accessible and one not, gives nothing: instructor2
+    // teaches course 2, not course 1 (survey 4).
+    function testAjaxOptionsRefusesAListOfIds()
+    {
+        $ownSurvey = $this->addSurvey(2, 1);
+        foreach ([
+            ['field' => 'sCourses', 'courseId' => [2, 1]],
+            ['field' => 'sSurveys', 'surveyId' => [$ownSurvey, 4]],
+        ] as $get) {
+            $this->controller = new MockCoursesController();
+            $this->asInstructor2();
+            $this->assertIdentical($this->ajaxOptions($get), [], $get['field']);
         }
     }
 

@@ -534,8 +534,22 @@ class CoursesController extends AppController
      */
     private function _accessibleCourse($courseId): bool
     {
-        return !empty($courseId) && (bool) $this->Course->getAccessibleCourseById(
+        return $this->_oneId($courseId) && (bool) $this->Course->getAccessibleCourseById(
             $courseId, User::get('id'), User::getCourseFilterPermission());
+    }
+
+    /**
+     * Whether a posted id is one whole number. A list of ids, as a changed
+     * form can send, would pass a check on its first id and then reach the
+     * others.
+     *
+     * @param mixed $id the posted id
+     *
+     * @return bool
+     */
+    private function _oneId($id): bool
+    {
+        return is_scalar($id) && ctype_digit((string) $id) && (int) $id > 0;
     }
 
     /**
@@ -549,7 +563,7 @@ class CoursesController extends AppController
      */
     private function _accessibleSurvey($eventId, $courseId = null)
     {
-        if (empty($eventId)) {
+        if (!$this->_oneId($eventId)) {
             return false;
         }
         $event = $this->Event->getAccessibleEventById($eventId, User::get('id'), User::getCourseFilterPermission(), array());
@@ -576,7 +590,7 @@ class CoursesController extends AppController
             $source = $this->_accessibleSurvey($data['sourceSurveys'] ?? null, $data['sourceCourses'] ?? null);
             $dest = $this->_accessibleSurvey($data['destSurveys'] ?? null, $data['destCourses'] ?? null);
             if (!$source || !$dest || $source['Event']['template_id'] != $dest['Event']['template_id'] ||
-                $data['sourceCourses'] == $data['destCourses'] ||
+                $data['sourceCourses'] == $data['destCourses'] || !$this->_oneId($data['submitters'] ?? null) ||
                 !$this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($data['sourceSurveys'], $data['submitters'] ?? null)) {
                 $this->Session->setFlash(__('Error: Choose the courses, surveys and student from the lists.', true));
                 $this->redirect('move');
@@ -738,9 +752,13 @@ class CoursesController extends AppController
                 $this->_accessibleCourse($data['destCourses'] ?? null) &&
                 $data['sourceCourses'] != $data['destCourses'];
             if ($valid && isset($data['sourceSurveys'])) {
-                $valid = (bool) $this->_accessibleSurvey($data['sourceSurveys'], $data['sourceCourses']);
+                $source = $this->_accessibleSurvey($data['sourceSurveys'], $data['sourceCourses']);
+                $valid = (bool) $source;
                 if ($valid && empty($data['surveyChoices'])) {
-                    $valid = (bool) $this->_accessibleSurvey($data['destSurveys'] ?? null, $data['destCourses']);
+                    // An existing destination survey must have the same
+                    // questions, as in move().
+                    $dest = $this->_accessibleSurvey($data['destSurveys'] ?? null, $data['destCourses']);
+                    $valid = $dest && $dest['Event']['template_id'] == $source['Event']['template_id'];
                 }
             }
             if (!$valid) {
