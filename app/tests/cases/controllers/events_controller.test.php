@@ -147,7 +147,11 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         ]], false);
 
         $this->testAction("/events/view/{$model->id}", ['return' => 'vars']);
-        $this->controller->expectOnce('redirect', ['/home']);
+        // Only the count can be checked: testAction() runs the mock's
+        // constructor again (clears expectations set before it), and an
+        // argument expectation set after the call is never compared. The
+        // flash message below shows which branch ran.
+        $this->controller->expectOnce('redirect');
 
         $message = $this->controller->Session->read('Message.flash');
         $this->assertEqual($message['message'], 'Error: This event has an unknown evaluation type.');
