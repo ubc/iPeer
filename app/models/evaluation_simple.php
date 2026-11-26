@@ -122,7 +122,7 @@ class EvaluationSimple extends EvaluationResponseBase
         //      $sql .= ' AND evaluator = '.$evaluator.' AND evaluatee IN ('.$evaluateeIds.')';
         //    }
         //    return $this->query($sql);
-        $fields = array('EvaluationSimple.release_status' => $releaseStatus);
+        $fields = array('EvaluationSimple.release_status' => (int) $releaseStatus);
         $conditions = array('EvaluationSimple.grp_event_id' => $grpEventId);
         if ($evaluateeIds !=null) {
             $conditions['EvaluationSimple.evaluator'] = $evaluator;
@@ -152,7 +152,7 @@ class EvaluationSimple extends EvaluationResponseBase
             'conditions' => array('event_id' => $eventId)
         ));
         $this->updateAll(
-            array('EvaluationSimple.release_status' => $releaseStatus, 'EvaluationSimple.modified' => $now, 'EvaluationSimple.updater_id' => $userId),
+            array('EvaluationSimple.release_status' => (int) $releaseStatus, 'EvaluationSimple.modified' => $now, 'EvaluationSimple.updater_id' => $userId),
             array('EvaluationSimple.grp_event_id' => $grpEvents)
         );
     }
@@ -177,7 +177,7 @@ class EvaluationSimple extends EvaluationResponseBase
             'conditions' => array('event_id' => $eventId)
         ));
         
-        $fields = array('EvaluationSimple.grade_release' => $releaseStatus);
+        $fields = array('EvaluationSimple.grade_release' => (int) $releaseStatus);
         $conditions = array('EvaluationSimple.grp_event_id' => $grpEvents);
         return $this->updateAll($fields, $conditions);
     }

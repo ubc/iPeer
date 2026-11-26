@@ -355,7 +355,7 @@ class EvaluationMixeval extends EvaluationResponseBase
             'conditions' => array('event_id' => $eventId)
         ));
         
-        $fields = array('EvaluationMixeval.grade_release' => $releaseStatus);
+        $fields = array('EvaluationMixeval.grade_release' => (int) $releaseStatus);
         $conditions = array('EvaluationMixeval.grp_event_id' => $grpEvents);
         return $this->updateAll($fields, $conditions);
     }

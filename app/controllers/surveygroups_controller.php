@@ -486,7 +486,7 @@ class SurveyGroupsController extends AppController
             if (empty($value)) {
                 continue;
             }
-            $data = explode('_', $value);
+            $data = array_map('intval', explode('_', $value));
             if (!$this->SurveyGroupMember->updateAll(
                 array('group_id' => $data[2]),
                 array('user_id' => $data[0], 'group_id' => $data[1]))) {
