@@ -1,0 +1,66 @@
+# -*- mode: yaml -*- vim: set filetype=yaml:
+includes:
+    - build/phpstan-baseline.neon # problems that existed when PHPStan was added
+
+parameters:
+    level: 1 # higher is stricter: https://phpstan.org/user-guide/rule-levels
+    phpVersion: 80500
+    fileExtensions:
+        - php
+        - ctp # view templates
+    paths:
+        - app # app code, views and tests
+    excludePaths:
+        analyse:
+            # third-party code
+            - app/vendors
+            - app/plugins/djjob/vendors
+            - app/tmp
+            # Third-party plugins, left out for now: their own magic (__call
+            # setters, djjob job properties) and old code would add noise.
+            # To do: analyse them too, and fix or ignore what PHPStan finds.
+            - app/plugins/cake_djjob
+            - app/plugins/file_upload
+            - app/plugins/guard
+            # A git-ignored copy of the guard plugin's guard_default.php that
+            # composer install makes.
+            - app/config/guard.php
+    scanDirectories:
+        # CakePHP 1.3 loads classes with App::import(), not with an autoloader, so
+        # PHPStan reads these only to know their classes
+        - cake
+        - app/vendors
+    bootstrapFiles:
+        - build/phpstan-bootstrap.php # CakePHP constants and global functions
+    universalObjectCratesClasses:
+        # Classes that get properties at run time, so PHPStan does not report an
+        # unknown property on them
+        - CakeObject # controllers, models, components, helpers and behaviors get $uses models and $components
+        - SimpleTestCase # tests set their fixtures and helpers as properties
+    ignoreErrors:
+        # PHPStan reads DIRECTORY_SEPARATOR (DS) as "/" or "\", so it also
+        # checks every path built with DS with a "\" in it. iPeer runs on Linux
+        # only, so a path with a "\" is never a real path. A missing file with a
+        # "/" path is still reported.
+        - message: '#^Path in (require|include)(_once)?\(\) "[^"]*\\[^"]*" is not a file or it does not exist\.$#'
+        # Optional local settings: the include is inside if (file_exists(...)).
+        - message: '#^Path in include\(\) "bootstrap\.local\.php" is not a file or it does not exist\.$#'
+          path: app/config/bootstrap.php
+        - message: '#^Path in include\(\) "config\.local\.php" is not a file or it does not exist\.$#'
+          path: app/config/core.php
+        # A view gets its variables from the controller's $this->set(), which
+        # PHPStan cannot follow.
+        - identifier: variable.undefined
+          path: app/*.ctp
+        # CakePHP magic that PHPStan cannot see. Each pattern matches only that
+        # kind of call, so a real unknown class or method is still reported.
+        # Model::__call() finders: findById(), findAllByFacultyId(), ...
+        - message: '#^Call to an undefined method \w+::find(All)?By\w+\(\)\.$#'
+          path: app/*
+        # Methods of the ExtendAssociations behavior (models/behaviors).
+        - message: '#^Call to an undefined method \w+::(habtmAdd|habtmDelete)\(\)\.$#'
+          path: app/models/*
+        # SimpleTest makes the Mock* classes at run time with Mock::generate()
+        # and Mock::generatePartial().
+        - message: '#^Instantiated class Mock\w+ not found\.$#'
+          path: app/tests/*

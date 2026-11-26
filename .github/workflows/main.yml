@@ -119,11 +119,17 @@ jobs:
           cache-to: type=gha,scope=ipeer-image,mode=max,ignore-error=true
 
       - name: Build and startup test containers
+        id: prepare
         run: ./build/unit-integration-tests/prepare.sh
         env:
           IPEER_APP_TEST_PREBUILT: "1"
 
+      - name: Check the code
+        # Syntax, PHPStan and the security audit (composer check).
+        run: docker compose exec -T app-test composer check
+
       - name: Run tests
+        if: ${{ !cancelled() && steps.prepare.outcome == 'success' }} # Runs also when the code check failed, so both results show.
         run: ./build/unit-integration-tests/run.sh
 
 

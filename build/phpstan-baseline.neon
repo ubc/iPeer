@@ -1,0 +1,133 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Cannot unset offset string on bool\.$#'
+			identifier: unset.offset
+			count: 1
+			path: ../app/app_model.php
+
+		-
+			message: '#^Variable \$permission in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: ../app/controllers/accesses_controller.php
+
+		-
+			message: '#^Access to an undefined property frameworkComponent\:\:\$User\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../app/controllers/components/framework.php
+
+		-
+			message: '#^Access to an undefined property InstallHelperComponent\:\:\$SysParameter\.$#'
+			identifier: property.notFound
+			count: 1
+			path: ../app/controllers/components/install_helper.php
+
+		-
+			message: '#^Variable \$ret in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: ../app/controllers/components/password_generator.php
+
+		-
+			message: '#^Variable \$insertedInstructorIds in empty\(\) always exists and is always falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: ../app/controllers/users_controller.php
+
+		-
+			message: '#^Call to an undefined method Event\:\:cascadeRemove\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: ../app/models/event.php
+
+		-
+			message: '#^Variable \$tmp in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: ../app/models/response.php
+
+		-
+			message: '#^Variable \$course_ids in empty\(\) is never defined\.$#'
+			identifier: empty.variable
+			count: 1
+			path: ../app/models/user_enrol.php
+
+		-
+			message: '#^Instantiated class MockRequestHandlerComponent not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: ../app/plugins/extended_test_case/tests/cases/libs/extended_test_case.test.php
+
+		-
+			message: '#^Cannot unset offset ''@context'' on array\{id\: ''http\://test\.ipeer…'', type\: ''LikertScale'', scalePoints\: 5, itemLabels\: array\{''Lowest'', '''', ''Middle'', '''', ''Highest''\}, itemValues\: array\{''0\.2'', ''0\.4'', ''0\.6'', ''0\.8'', ''1''\}\}\.$#'
+			identifier: unset.offset
+			count: 3
+			path: ../app/tests/cases/caliper/event_mixeval_hooks.test.php
+
+		-
+			message: '#^Variable \$generated might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: ../app/tests/cases/caliper/event_mixeval_hooks.test.php
+
+		-
+			message: '#^Cannot unset offset ''@context'' on array\{id\: ''http\://test\.ipeer…'', type\: ''LikertScale'', extensions\: array\{comments\: array\{''No participation\.'', ''Little…'', ''Some participation\.'', ''Good participation\.'', ''Great participation\.''\}\}, scalePoints\: 5, itemLabels\: array\{''Poor'', ''Below Average'', ''Average'', ''Above Average'', ''Excellent''\}, itemValues\: array\{''1'', ''2'', ''3'', ''4'', ''5''\}\}\.$#'
+			identifier: unset.offset
+			count: 1
+			path: ../app/tests/cases/caliper/event_rubric_hooks.test.php
+
+		-
+			message: '#^Cannot unset offset ''@context'' on array\{id\: ''http\://test\.ipeer…'', type\: ''LikertScale'', extensions\: array\{comments\: array\{\}\}, scalePoints\: 5, itemLabels\: array\{''Poor'', ''Below Average'', ''Average'', ''Above Average'', ''Excellent''\}, itemValues\: array\{''1'', ''2'', ''3'', ''4'', ''5''\}\}\.$#'
+			identifier: unset.offset
+			count: 2
+			path: ../app/tests/cases/caliper/event_rubric_hooks.test.php
+
+		-
+			message: '#^Cannot unset offset ''@context'' on array\{id\: ''http\://test\.ipeer…'', type\: ''NumericScale'', extensions\: array\{point_per_member\: ''100''\}, minValue\: 0\.0, maxValue\: 200\.0, step\: 1\.0\}\.$#'
+			identifier: unset.offset
+			count: 1
+			path: ../app/tests/cases/caliper/event_simple_evaulation_hooks.test.php
+
+		-
+			message: '#^Cannot unset offset ''@context'' on array\{id\: ''http\://test\.ipeer…'', type\: ''Questionnaire'', name\: ''Survey, all Q types'', extensions\: array\{availability\: ''public''\}, dateCreated\: mixed, dateModified\: mixed, items\: array\{array\{id\: ''http\://test\.ipeer…'', type\: ''QuestionnaireItem''\}, array\{id\: ''http\://test\.ipeer…'', type\: ''QuestionnaireItem''\}, array\{id\: ''http\://test\.ipeer…'', type\: ''QuestionnaireItem''\}, array\{id\: ''http\://test\.ipeer…'', type\: ''QuestionnaireItem''\}\}\}\.$#'
+			identifier: unset.offset
+			count: 1
+			path: ../app/tests/cases/caliper/event_survey_hooks.test.php
+
+		-
+			message: '#^Cannot unset offset ''@context'' on array\{id\: ''http\://test\.ipeer…'', type\: ''Questionnaire'', name\: ''Survey, all Q types'', extensions\: array\{event_template_type_id\: ''3'', template_id\: ''2'', self_eval\: ''1'', com_req\: ''1'', auto_release\: ''0'', enable_details\: ''1'', record_status\: ''A'', due_date\: mixed, \.\.\.\}, dateCreated\: mixed, dateModified\: mixed, isPartOf\: mixed, items\: array\{array\{id\: ''http\://test\.ipeer…'', type\: ''QuestionnaireItem''\}, array\{id\: ''http\://test\.ipeer…'', type\: ''QuestionnaireItem''\}, array\{id\: ''http\://test\.ipeer…'', type\: ''QuestionnaireItem''\}, array\{id\: ''http\://test\.ipeer…'', type\: ''QuestionnaireItem''\}\}\}\.$#'
+			identifier: unset.offset
+			count: 1
+			path: ../app/tests/cases/caliper/event_survey_hooks.test.php
+
+		-
+			message: '#^Cannot unset offset ''@context'' on array\{id\: ''http\://test\.ipeer…'', type\: ''Questionnaire'', name\: ''Survey, all Q types'', extensions\: array\{availability\: ''public''\}, dateCreated\: mixed, dateModified\: mixed, items\: array\{array\{id\: ''http\://test\.ipeer…'', type\: ''QuestionnaireItem''\}, array\{id\: ''http\://test\.ipeer…'', type\: ''QuestionnaireItem''\}, array\{id\: ''http\://test\.ipeer…'', type\: ''QuestionnaireItem''\}, array\{id\: ''http\://test\.ipeer…'', type\: ''QuestionnaireItem''\}\}\}\.$#'
+			identifier: unset.offset
+			count: 1
+			path: ../app/tests/cases/caliper/survey_hooks.test.php
+
+		-
+			message: '#^Variable \$nullInputs in empty\(\) is never defined\.$#'
+			identifier: empty.variable
+			count: 1
+			path: ../app/tests/cases/models/evaluation_rubric.test.php
+
+		-
+			message: '#^Variable \$nullInputs in empty\(\) is never defined\.$#'
+			identifier: empty.variable
+			count: 2
+			path: ../app/tests/cases/models/evaluation_simple.test.php
+
+		-
+			message: '#^Variable \$dataSource in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: ../app/views/elements/global/debug.ctp
+
+		-
+			message: '#^Variable \$data in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: ../app/views/rubrics/edit.ctp

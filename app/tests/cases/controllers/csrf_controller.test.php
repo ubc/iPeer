@@ -2,13 +2,15 @@
 App::import('Controller', 'Departments');
 App::import('Lib', 'ExtendedAuthTestCase');
 
-// Mock _stop and header so the test process survives redirects.
-// redirect() is overridden in the subclass to capture the URL.
-Mock::generatePartial('DepartmentsController', 'MockCsrfBaseController', array('_stop', 'header'));
-
-class MockCsrfController extends MockCsrfBaseController {
+// _stop and header do nothing, so the test process survives redirects.
+// redirect() stores the URL.
+class MockCsrfController extends DepartmentsController {
     var $autoRender = false;
     var $redirectUrl = null;
+
+    function _stop($status = 0) {}
+
+    function header($status) {}
 
     function redirect($url, $status = null, $exit = true) {
         // Only store the first redirect. In real dispatch, redirect() calls
