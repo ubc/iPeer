@@ -1363,9 +1363,17 @@ class EvaluationComponent extends CakeObject
         $details = Set::extract('/EvaluationMixevalDetail/comment_release', $details);
 
         $this->GroupEvent->id = $grpEventId;
-        // An evaluation with no comment questions has no comments to release:
-        // keep showing 'All', as before.
-        $this->GroupEvent->saveField('comment_release_status', empty($questions) ? 'All' : $this->releaseStatus($details));
+        // No evaluations: 'None', as for the other types. Evaluations with no
+        // comment rows (no comment questions, or all left blank) have nothing to
+        // release: 'All', as before.
+        if (empty($evalIds)) {
+            $commentStatus = 'None';
+        } else if (empty($details)) {
+            $commentStatus = 'All';
+        } else {
+            $commentStatus = $this->releaseStatus($details);
+        }
+        $this->GroupEvent->saveField('comment_release_status', $commentStatus);
         
         // if the oldest modified date is after the event's close date. A group
         // with no submissions has nothing to review.

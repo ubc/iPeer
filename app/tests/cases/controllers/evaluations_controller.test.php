@@ -472,13 +472,32 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
             'form' => ['group_event_id' => 3],
         ]);
 
-        // Group 1 has 4 members, event 2 has no self-evaluation, and only
-        // member 7 submitted.
+        // Group 1 has 4 members, and only member 7 submitted.
         $this->assertEqual($this->field('GroupEvent', 'marked', 3), 'not reviewed');
     }
 
-    // When all 3 peers submitted, Mark Not Reviewed gives 'to review'.
+    // When all 4 members of group 1 submitted, Mark Not Reviewed gives
+    // 'to review'. With one submission missing, it does not.
     function testMarkEventNotReviewedWithAllSubmissionsGivesToReview()
+    {
+        $submission = ClassRegistry::init('EvaluationSubmission');
+        foreach ([5, 6, 35] as $userId) {
+            $submission->create();
+            $submission->save(['EvaluationSubmission' => [
+                'event_id' => 2, 'grp_event_id' => 3, 'submitter_id' => $userId,
+                'submitted' => 1, 'date_submitted' => '2012-07-13 11:00:00', 'record_status' => 'A',
+            ]]);
+        }
+
+        $this->testAction('/evaluations/markEventReviewed', [
+            'fixturize' => true,
+            'form' => ['group_event_id' => 3],
+        ]);
+
+        $this->assertEqual($this->field('GroupEvent', 'marked', 3), 'to review');
+    }
+
+    function testMarkEventNotReviewedWithASubmissionMissingGivesNotReviewed()
     {
         $submission = ClassRegistry::init('EvaluationSubmission');
         foreach ([5, 6] as $userId) {
@@ -494,6 +513,23 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
             'form' => ['group_event_id' => 3],
         ]);
 
-        $this->assertEqual($this->field('GroupEvent', 'marked', 3), 'to review');
+        $this->assertEqual($this->field('GroupEvent', 'marked', 3), 'not reviewed');
+    }
+
+    // A survey (event 4) has no comments to release. The seed has no group
+    // event for a survey, so the test adds one.
+    function testMarkCommentReleaseForASurveyFails()
+    {
+        $groupEvent = ClassRegistry::init('GroupEvent');
+        $groupEvent->create();
+        $groupEvent->save(['GroupEvent' => ['group_id' => 1, 'event_id' => 4, 'marked' => 'not reviewed']]);
+        $groupEventId = $groupEvent->id;
+        $this->testAction('/evaluations/markCommentRelease', [
+            'fixturize' => true,
+            'form' => ['group_event_id' => $groupEventId, 'submit' => 'Release All Comments'],
+        ]);
+
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Error: You can release comments only for simple, rubric and mixed evaluations.');
     }
 }

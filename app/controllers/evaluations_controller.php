@@ -1786,9 +1786,9 @@ class EvaluationsController extends AppController
             //Get Members whom completed evaluation
             $numOfCompletedCount = $this->EvaluationSubmission->numCountInGroupCompleted($groupEventId);
             //Check to see if all members are completed this evaluation
-            $numMembers=$event['Event']['self_eval'] ?
-                $this->GroupsMembers->find('count', array('conditions' => array('group_id' => $groupId))) :
-                $this->GroupsMembers->find('count', array('conditions' => array('group_id' => $groupId))) - 1;
+            // Every member submits once, with or without self-evaluation, so
+            // compare with all members, as the submit actions do.
+            $numMembers = $this->GroupsMembers->find('count', array('conditions' => array('group_id' => $groupId)));
 
             ($numOfCompletedCount == $numMembers) ? $completeStatus = 1:$completeStatus = 0;
             if ($completeStatus) {
@@ -1961,7 +1961,7 @@ class EvaluationsController extends AppController
 
         switch ($event['Event']['event_template_type_id']) {
         case "1":
-            $groupId =  $this->params['form']['group_id'];
+            $groupId = $grpEvent['GroupEvent']['group_id'];
 
             if (isset($this->params['form']['evaluator_ids'])) {
                 $groupEventId = $this->params['form']['group_event_id'];
@@ -2028,6 +2028,11 @@ class EvaluationsController extends AppController
             //$this->Evaluation->markMixedEvalReviewed($eventId, $groupEventId);
             $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
             break;
+        default:
+            // a survey
+            $this->Session->setFlash(__('Error: You can release comments only for simple, rubric and mixed evaluations.', true));
+            $this->redirect('/home');
+            return;
         }
 
     }

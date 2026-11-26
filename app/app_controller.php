@@ -445,7 +445,8 @@ class AppController extends Controller
 
     /**
      * Checks the HTTP Referer header as a lightweight CSRF mitigation if
-     * `IPEER_ENFORCE_REFERRER` is set to true.
+     * `IPEER_ENFORCE_REFERRER` is set. "false", "0", "no", "off" or an empty value
+     * turn the check off; any other value turns it on.
      *
      * An absent Referer is treated the same as a cross-origin one (rejected).
      *
