@@ -1784,9 +1784,8 @@ class EvaluationsController extends AppController
         //if not all members submitted, then it should be 'not reviewed'
         else if ($reviewStatus == "mark_not_reviewed") {
             //Get Members whom completed evaluation
-            $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupEventId);
+            $numOfCompletedCount = $this->EvaluationSubmission->numCountInGroupCompleted($groupEventId);
             //Check to see if all members are completed this evaluation
-            $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
             $numMembers=$event['Event']['self_eval'] ?
                 $this->GroupsMembers->find('count', array('conditions' => array('group_id' => $groupId))) :
                 $this->GroupsMembers->find('count', array('conditions' => array('group_id' => $groupId))) - 1;
@@ -1800,7 +1799,8 @@ class EvaluationsController extends AppController
                 $this->GroupEvent->save($groupEvent);
             }
         }
-        $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId);
+        $detail = ($this->params['form']['display_format'] ?? '') === 'Detail' ? '/Detail' : '';
+        $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId.$detail);
     }
 
 
@@ -1947,6 +1947,9 @@ class EvaluationsController extends AppController
             $this->redirect('/home');
             return;
         }
+        // From here on, use only the group event that was loaded and checked,
+        // also if the form posted a list of ids.
+        $this->params['form']['group_event_id'] = $grpEvent['GroupEvent']['id'];
         $eventId = $grpEvent['GroupEvent']['event_id'];
 
         // Check whether the event exists or user has permission to access it

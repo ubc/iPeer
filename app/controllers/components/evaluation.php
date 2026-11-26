@@ -1275,11 +1275,16 @@ class EvaluationComponent extends CakeObject
             array('EvaluationMixevalDetail.evaluation_mixeval_id' => $evalIds)
         );
         
-        //release the selected comments
+        //release the selected comments, only of evaluations in this group event.
+        // The Self-Evaluation panel posts evaluatee 0, so this is not limited to
+        // the evaluatee.
         $evalDetailIds = isset($params['releaseComments']) ? $params['releaseComments'] : array();
+        $groupEvalIds = $this->EvaluationMixeval->find('list', array(
+            'conditions' => array('grp_event_id' => $grpEventId)
+        ));
         $this->EvaluationMixevalDetail->updateAll(
             array('EvaluationMixevalDetail.comment_release' => 1, 'EvaluationMixevalDetail.modified' => $now, 'EvaluationMixevalDetail.updater_id' => $user),
-            array('EvaluationMixevalDetail.id' => $evalDetailIds, 'EvaluationMixevalDetail.evaluation_mixeval_id' => $evalIds)
+            array('EvaluationMixevalDetail.id' => $evalDetailIds, 'EvaluationMixevalDetail.evaluation_mixeval_id' => $groupEvalIds)
         );
     }
     
@@ -1358,7 +1363,9 @@ class EvaluationComponent extends CakeObject
         $details = Set::extract('/EvaluationMixevalDetail/comment_release', $details);
 
         $this->GroupEvent->id = $grpEventId;
-        $this->GroupEvent->saveField('comment_release_status', $this->releaseStatus($details));
+        // An evaluation with no comment questions has no comments to release:
+        // keep showing 'All', as before.
+        $this->GroupEvent->saveField('comment_release_status', empty($questions) ? 'All' : $this->releaseStatus($details));
         
         // if the oldest modified date is after the event's close date. A group
         // with no submissions has nothing to review.

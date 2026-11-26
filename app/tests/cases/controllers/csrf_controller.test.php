@@ -186,4 +186,19 @@ class CsrfControllerTestCase extends ExtendedAuthTestCase {
         $this->assertEqual($this->controller->headers, array('HTTP/1.1 405 Method Not Allowed', 'Allow: GET'));
         $this->assertNull($this->controller->redirectUrl);
     }
+
+    function testCrossOriginRefererAllowedWhenSetToFalse() {
+        putenv('IPEER_ENFORCE_REFERRER=false');
+        $_SERVER['HTTP_REFERER'] = 'http://other.com/url';
+        $this->testAction('/departments/index', array('method' => 'post'));
+        $this->assertNull($this->controller->redirectUrl);
+    }
+
+    // A value that is not a known boolean keeps the check on.
+    function testCrossOriginRefererBlockedWhenSetToAnUnknownValue() {
+        putenv('IPEER_ENFORCE_REFERRER=enabled');
+        $_SERVER['HTTP_REFERER'] = 'http://other.com/url';
+        $this->testAction('/departments/index', array('method' => 'post'));
+        $this->assertEqual($this->controller->redirectUrl, '/home');
+    }
 }

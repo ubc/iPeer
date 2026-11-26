@@ -415,4 +415,85 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
         $this->assertEqual($this->field('GroupEvent', 'grade_release_status', 7), 'All');
         $this->assertEqual($this->field('GroupEvent', 'grade_release_status', 8), 'None');
     }
+
+    // A list of group event ids reaches only the first one, the one that was
+    // checked. Detail 1 is in group event 4.
+    function testSaveChangesUsesOnlyTheCheckedGroupEvent()
+    {
+        $this->testAction('/evaluations/markCommentRelease', [
+            'fixturize' => true,
+            'form' => [
+                'group_event_id' => [3, 4], 'evaluatee' => 5, 'submit' => 'Save Changes',
+                'releaseComments' => [7, 1],
+            ],
+        ]);
+
+        $this->assertEqual($this->field('EvaluationRubricDetail', 'comment_release', 7), 1);
+        $this->assertEqual($this->field('EvaluationRubricDetail', 'comment_release', 1), 0);
+    }
+
+    // Mixed event 3: evaluation 1 (evaluatee 5) is in group event 5,
+    // evaluation 3 in group event 6. Detail 1 belongs to evaluation 1,
+    // detail 13 to evaluation 3.
+    function testMixedSaveChangesReleasesOnlyCommentsOfTheGroupEvent()
+    {
+        $this->testAction('/evaluations/markCommentRelease', [
+            'fixturize' => true,
+            'form' => [
+                'group_event_id' => 5, 'evaluatee' => 5, 'submit' => 'Save Changes',
+                'releaseComments' => [1, 13],
+            ],
+        ]);
+
+        $this->assertEqual($this->field('EvaluationMixevalDetail', 'comment_release', 1), 1);
+        $this->assertEqual($this->field('EvaluationMixevalDetail', 'comment_release', 13), 0);
+    }
+
+    // The Self-Evaluation panel posts evaluatee 0.
+    function testMixedSaveChangesOfTheSelfEvaluationPanelReleasesTheComments()
+    {
+        $this->testAction('/evaluations/markCommentRelease', [
+            'fixturize' => true,
+            'form' => [
+                'group_event_id' => 5, 'evaluatee' => 0, 'submit' => 'Save Changes',
+                'releaseComments' => [6],
+            ],
+        ]);
+
+        $this->assertEqual($this->field('EvaluationMixevalDetail', 'comment_release', 6), 1);
+    }
+
+    function testMarkEventNotReviewedUnmarksTheGroupEvent()
+    {
+        ClassRegistry::init('GroupEvent')->updateAll(['marked' => "'reviewed'"], ['GroupEvent.id' => 3]);
+
+        $this->testAction('/evaluations/markEventReviewed', [
+            'fixturize' => true,
+            'form' => ['group_event_id' => 3],
+        ]);
+
+        // Group 1 has 4 members, event 2 has no self-evaluation, and only
+        // member 7 submitted.
+        $this->assertEqual($this->field('GroupEvent', 'marked', 3), 'not reviewed');
+    }
+
+    // When all 3 peers submitted, Mark Not Reviewed gives 'to review'.
+    function testMarkEventNotReviewedWithAllSubmissionsGivesToReview()
+    {
+        $submission = ClassRegistry::init('EvaluationSubmission');
+        foreach ([5, 6] as $userId) {
+            $submission->create();
+            $submission->save(['EvaluationSubmission' => [
+                'event_id' => 2, 'grp_event_id' => 3, 'submitter_id' => $userId,
+                'submitted' => 1, 'date_submitted' => '2012-07-13 11:00:00', 'record_status' => 'A',
+            ]]);
+        }
+
+        $this->testAction('/evaluations/markEventReviewed', [
+            'fixturize' => true,
+            'form' => ['group_event_id' => 3],
+        ]);
+
+        $this->assertEqual($this->field('GroupEvent', 'marked', 3), 'to review');
+    }
 }
