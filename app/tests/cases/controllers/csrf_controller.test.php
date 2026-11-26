@@ -7,10 +7,13 @@ App::import('Lib', 'ExtendedAuthTestCase');
 class MockCsrfController extends DepartmentsController {
     var $autoRender = false;
     var $redirectUrl = null;
+    var $headers = array();
 
     function _stop($status = 0) {}
 
-    function header($status) {}
+    function header($status) {
+        $this->headers[] = $status;
+    }
 
     function redirect($url, $status = null, $exit = true) {
         // Only store the first redirect. In real dispatch, redirect() calls
@@ -27,6 +30,7 @@ class MockCsrfController extends DepartmentsController {
     // the full dispatch cycle (which would kill the process via missingAction
     // for non-existent actions).
     function checkCsrfRefererForTest($action) {
+        $this->params['controller'] = 'departments';
         $this->params['action'] = $action;
         return $this->_checkCsrfReferer();
     }
@@ -171,4 +175,15 @@ class CsrfControllerTestCase extends ExtendedAuthTestCase {
         $this->assertNull($this->controller->redirectUrl);
     }
 
+    // A HEAD request to a state-changing GET action gets a 405 and the action
+    // does not run, even from the same origin.
+    function testHeadToAStateChangingGetActionIsRefused() {
+        $_SERVER['HTTP_HOST'] = 'localhost';
+        $_SERVER['HTTP_REFERER'] = 'http://localhost/departments';
+        $_SERVER['REQUEST_METHOD'] = 'HEAD';
+        $result = $this->controller->checkCsrfRefererForTest('delete');
+        $this->assertFalse($result);
+        $this->assertEqual($this->controller->headers, array('HTTP/1.1 405 Method Not Allowed', 'Allow: GET'));
+        $this->assertNull($this->controller->redirectUrl);
+    }
 }

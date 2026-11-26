@@ -505,6 +505,14 @@ class AppController extends Controller
             return $this->_requireSameOriginReferer();
         }
 
+        // A HEAD request must not change data, so these actions do not run for it.
+        if ($method === 'HEAD' && in_array($action, $getRequestsDisallowed)) {
+            $this->header('HTTP/1.1 405 Method Not Allowed');
+            $this->header('Allow: GET');
+            $this->_stop();
+            return false;
+        }
+
         if ($method === 'GET' && in_array($action, $getRequestsDisallowed)) {
             return $this->_requireSameOriginReferer();
         }

@@ -1807,7 +1807,7 @@ class EvaluationsController extends AppController
      * @access public
      * @return void
      */
-    function markGradeRelease($grpEventId, $releaseStatus = null, $evaluatee = null)
+    function markGradeRelease($grpEventId = null, $releaseStatus = null, $evaluatee = null)
     {
         // Make sure the present user has permission
         if (!User::hasPermission('functions/evaluation')) {

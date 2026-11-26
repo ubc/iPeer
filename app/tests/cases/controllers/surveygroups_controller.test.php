@@ -76,4 +76,36 @@ class SurveygroupsControllerTest extends ExtendedAuthTestCase {
         $result = $this->testAction('/surveygroups/index/1', array('return' => 'contents'));
     }
 
+    private function surveyGroupOf(int $userId)
+    {
+        return ClassRegistry::init('SurveyGroupMember')->field('group_id', ['user_id' => $userId, 'group_set_id' => 3]);
+    }
+
+    // Group set 3 has the survey groups 5, 6 and 7. User 17 is in group 5.
+    function testChangeGroupSetMovesAMember()
+    {
+        $this->testAction('/surveygroups/changegroupset', [
+            'fixturize' => true, 'method' => 'post',
+            'data' => ['group_set_id' => 3, 'move' => ['17_5_6']],
+        ]);
+
+        $this->assertEqual($this->surveyGroupOf(17), 6);
+    }
+
+    // A move to a group outside the group set, or a value that is not three
+    // ids, changes nothing.
+    function testChangeGroupSetRefusesABadMove()
+    {
+        foreach (['17_5_1', '17_5_x', '17_5', '21_5_6_7'] as $move) {
+            $this->controller = new MockSurveyGroupsController();
+            $this->testAction('/surveygroups/changegroupset', [
+                'fixturize' => true, 'method' => 'post',
+                'data' => ['group_set_id' => 3, 'move' => ['17_5_6', $move]],
+            ]);
+
+            $message = $this->controller->Session->read('Message.flash');
+            $this->assertEqual($message['message'], 'Group set change failed.', $move);
+            $this->assertEqual($this->surveyGroupOf(17), 5, $move);
+        }
+    }
 }

@@ -482,17 +482,32 @@ class SurveyGroupsController extends AppController
             return;
         }
 
-        foreach ($this->data['move'] as $value) {
+        // Each move is "userId_fromGroupId_toGroupId". Both groups must be in
+        // this group set. Check all moves before the first change.
+        $groupIds = Set::extract('/SurveyGroup/id', $group_set);
+        $moves = array();
+        foreach ($this->data['move'] ?? array() as $value) {
             if (empty($value)) {
                 continue;
             }
-            $data = array_map('intval', explode('_', $value));
+            $ids = explode('_', $value);
+            if (count($ids) !== 3 || !ctype_digit(implode('', $ids)) ||
+                !in_array($ids[1], $groupIds) || !in_array($ids[2], $groupIds)) {
+                $this->Session->setFlash(__('Group set change failed.', true));
+                $this->redirect('index/'.$event['Event']['course_id']);
+                return;
+            }
+            $moves[] = array_map('intval', $ids);
+        }
+
+        foreach ($moves as [$userId, $fromGroupId, $toGroupId]) {
             if (!$this->SurveyGroupMember->updateAll(
-                array('group_id' => $data[2]),
-                array('user_id' => $data[0], 'group_id' => $data[1]))) {
+                array('group_id' => $toGroupId),
+                array('user_id' => $userId, 'group_id' => $fromGroupId))) {
 
                 $this->Session->setFlash(__('Group set change failed.', true));
                 $this->redirect('index/'.$event['Event']['course_id']);
+                return;
             }
         }
 

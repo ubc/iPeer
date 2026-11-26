@@ -292,9 +292,9 @@ class EvaluationControllerTest extends ExtendedAuthTestCase
         $grades = $this->rubricRelease('grade_release');
         $comments = $this->rubricRelease('comment_release');
         foreach ([
-            '/evaluations/markGradeRelease/3/1,comment_release=1',
-            '/evaluations/changeAllGradeRelease/2;1,comment_release=1',
-            '/evaluations/changeAllCommentRelease/2;1,grade_release=1',
+            '/evaluations/markGradeRelease/3/2',
+            '/evaluations/changeAllGradeRelease/2;x',
+            '/evaluations/changeAllCommentRelease/2;1x',
             '/evaluations/changeAllGradeRelease/2',
         ] as $url) {
             $this->controller = new MockEvaluationsController();
