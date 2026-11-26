@@ -625,6 +625,7 @@ class CoursesController extends AppController
             $this->cakeError('error404');
         }
 
+        $options = [];
         switch($_GET['field']) {
             case 'sCourses':
                 $options = $this->Event->getActiveSurveyEvents($_GET['courseId'], 'list');
@@ -681,6 +682,7 @@ class CoursesController extends AppController
             $fieldText = ($field == 'student_no') ? __('student number', true) : __('username', true);
 
             // create a copy of the source survey else grab destSurveys id
+            $destEventId = null;
             if (isset($data['sourceSurveys'])) {
                 if ($data['surveyChoices']) {
                     $event = $this->Event->findById($data['sourceSurveys']);
@@ -725,6 +727,8 @@ class CoursesController extends AppController
             }
             // enrol student
             foreach ($users as $user) {
+                $sub = null;
+                $destSub = null;
                 $identifier = $user['User'][$field];
                 // enrol student to destination course if not already enrolled
                 if (!in_array($user['User']['id'], $destEnrolled)) {

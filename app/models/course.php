@@ -217,33 +217,6 @@ class Course extends AppModel
     }
 
     /**
-     * prepData
-     *
-     * @param bool $data data
-     *
-     * @access public
-     * @return void
-     */
-    function prepData($data=null)
-    {
-        if (empty($data['data']['Course']['record_status'])) {
-            $data['data']['Course']['record_status'] = $data['form']['record_status'];
-        }
-
-        if (!empty($data['form']['self_enroll'])) {
-            $data['data']['Course']['self_enroll'] = "on";
-        } else {
-            $data['data']['Course']['self_enroll'] = "off";
-        }
-
-        for ($i=1; $i<=$data['data']['Course']['count']; $i++) {
-            $data['data']['Course']['instructor_id'.$i] = isset($data['form']['instructor_id'.$i])? $data['form']['instructor_id'.$i] : '';
-        }
-
-        return $data;
-    }
-
-    /**
      * Get course name by id
      *
      * @param unknown_type $id course id

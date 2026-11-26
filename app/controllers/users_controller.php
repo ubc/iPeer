@@ -530,7 +530,7 @@ class UsersController extends AppController
      * The relations as defined for some reason puts these related tables
      * deep in the array.
      *
-     * @param array $courses - the form data from the course selection
+     * @param array|null $courses - the form data from the course selection
      * element
      * @param int $wantedRole - the role id of the role of the user being
      * created

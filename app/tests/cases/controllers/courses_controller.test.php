@@ -683,6 +683,35 @@ class CoursesControllerTest extends ExtendedAuthTestCase
         $this->assertEqual($message['message'], 'Error: Course does not exist or you do not have permission to view this course.');
     }
 
+    private function ajaxOptions(array $get): array|null
+    {
+        $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
+        $_GET = $get;
+        try {
+            $result = $this->testAction('/courses/ajax_options', ['fixturize' => true, 'return' => 'vars']);
+        } finally {
+            unset($_SERVER['HTTP_X_REQUESTED_WITH']);
+            $_GET = [];
+        }
+        return $result['options'];
+    }
+
+    // Move Group of Students: the destination list has the other courses,
+    // and not the source course.
+    function testAjaxOptionsImportDestCoursesLeavesOutTheSourceCourse()
+    {
+        $options = $this->ajaxOptions(['field' => 'importDestCourses', 'courseId' => 1]);
+
+        $this->assertFalse(isset($options[1]));
+        $this->assertTrue(isset($options[2]));
+    }
+
+    // A field the page does not send gives an empty list, not a PHP error.
+    function testAjaxOptionsUnknownFieldGivesAnEmptyList()
+    {
+        $this->assertIdentical($this->ajaxOptions(['field' => 'unknown']), []);
+    }
+
     function testLogout()
     {
         $this->testAction('/courses/index', array('return' => 'vars'));
