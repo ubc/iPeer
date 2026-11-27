@@ -303,17 +303,19 @@ function insertQ(self_eval) {
         return "";
     }
     var section = self_eval ? '#selfQues' : '#questions';
+    // Not "self": that name is the window object.
+    var selfFlag;
     if (self_eval) {
-        self = 1;
+        selfFlag = 1;
         num = numPeer;
         numPeer++;
     } else {
-        self = 0;
+        selfFlag = 0;
         num = numSelf;
         numSelf++;
     }
     q = q.replace(/-1/g, numQ);
-    q = q.replace(/-2/g, self);
+    q = q.replace(/-2/g, selfFlag);
     q = q.replace(/-3/g, num);
     jQuery(q).hide().appendTo(section).fadeIn(200);
     questionIds.push(numQ);
@@ -328,6 +330,11 @@ function insertQ(self_eval) {
 
 // Remove a question
 function removeQ(qNum, self_eval) {
+    // A second click while the question fades out must not remove another
+    // question: indexOf() gives -1 and splice(-1) removes the last one.
+    if (questionIds.indexOf(qNum) < 0) {
+        return;
+    }
     var target = jQuery('#question' + qNum);
     target.addClass('remove');
     target.hide('blind', 600, function() { target.remove(); });

@@ -74,7 +74,7 @@ if ($viewReleaseBtns && array_filter((array) $evalResult)) { ?>
 <table class="standardtable" aria-labelledby="release-status">
     <?php 
     echo $html->tableHeaders($this->Evaluation->getReleaseStatusTableHeader()); 
-    echo $html->tableCells($this->Evaluation->getReleaseStatusTableButtons($memberList, Set::extract($notInGroup, '/User/id'), $grpEventId, $status));
+    echo $html->tableCells($this->Evaluation->getReleaseStatusTableButtons($memberList, $notInGroup ?: [], $grpEventId, $status));
     ?>
 </table>
 <?php } ?>

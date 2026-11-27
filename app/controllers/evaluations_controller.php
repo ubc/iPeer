@@ -330,7 +330,7 @@ class EvaluationsController extends AppController
             $event = $this->Event->getAccessibleEventById($this->params['form']['event_id'], User::get('id'), User::getCourseFilterPermission(), array('Course' => array('Instructor'), 'GroupEvent', 'EventTemplateType', 'Penalty' => array('order' => array('days_late ASC'))));
             // Surveys have no evaluation results to export.
             if (!$event || $event['Event']['event_template_type_id'] == '3') {
-                $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
+                $this->Session->setFlash(__("Error: That event does not exist or you don't have access to it", true));
                 // Go back to the export page. The index action replaces the message.
                 $this->redirect(['action' => 'export', $type, $id]);
                 return;
@@ -1750,7 +1750,7 @@ class EvaluationsController extends AppController
     {
         // Make sure the present user has permission
         if (!User::hasPermission('functions/evaluation')) {
-            $this->Session->setFlash('Error: You do not have permission to mark events reviewed', true);
+            $this->Session->setFlash(__('Error: You do not have permission to mark events reviewed', true));
             $this->redirect('/home');
             return;
         }
@@ -1818,7 +1818,7 @@ class EvaluationsController extends AppController
     {
         // Make sure the present user has permission
         if (!User::hasPermission('functions/evaluation')) {
-            $this->Session->setFlash('Error: You do not have permission to release grades', true);
+            $this->Session->setFlash(__('Error: You do not have permission to release grades', true));
             $this->redirect('/home');
             return;
         }
@@ -1935,7 +1935,7 @@ class EvaluationsController extends AppController
     {
         // Make sure the present user has permission
         if (!User::hasPermission('functions/evaluation')) {
-            $this->Session->setFlash('Error: You do not have permission to release comments', true);
+            $this->Session->setFlash(__('Error: You do not have permission to release comments', true));
             $this->redirect('/home');
             return;
         }
@@ -2050,7 +2050,7 @@ class EvaluationsController extends AppController
     {
         // Make sure the present user has permission
         if (!User::hasPermission('functions/evaluation')) {
-            $this->Session->setFlash('Error: You do not have permission to change comment release statuses', true);
+            $this->Session->setFlash(__('Error: You do not have permission to change comment release statuses', true));
             $this->redirect('/home');
             return;
         }
@@ -2106,7 +2106,7 @@ class EvaluationsController extends AppController
     {
         // Make sure the present user has permission
         if (!User::hasPermission('functions/evaluation')) {
-            $this->Session->setFlash('Error: You do not have permission to change grade release statuses', true);
+            $this->Session->setFlash(__('Error: You do not have permission to change grade release statuses', true));
             $this->redirect('/home');
             return;
         }
@@ -2171,14 +2171,14 @@ class EvaluationsController extends AppController
     {
         // Make sure the present user has permission
         if (!User::hasPermission('controllers/evaluations/viewevaluationresults')) {
-            $this->Session->setFlash('Error: You do not have permission to view submission details', true);
+            $this->Session->setFlash(__('Error: You do not have permission to view submission details', true));
             $this->redirect('/home');
             return;
         }
 
         // check whether $eventId and $groupId are numeric
         if (!is_numeric($eventId) || !is_numeric($groupId) || !($event = $this->Event->getEventById($eventId))) {
-            $this->Session->setFlash('Error: Invalid Id', true);
+            $this->Session->setFlash(__('Error: Invalid Id', true));
             $this->redirect('index');
             return;
         }

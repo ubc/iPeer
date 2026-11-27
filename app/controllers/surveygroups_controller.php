@@ -280,7 +280,7 @@ class SurveyGroupsController extends AppController
         $eventId = $this->data['event_id'];
 
         if (!($event = $this->Event->getAccessibleEventById($eventId, User::get('id'), User::getCourseFilterPermission()))) {
-            $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
+            $this->Session->setFlash(__("Error: That event does not exist or you don't have access to it", true));
             $this->redirect('/home');
             return;
         }
@@ -333,7 +333,7 @@ class SurveyGroupsController extends AppController
         ));
         $event_id = $group_set['SurveyGroupSet']['survey_id'];
         if (!($event = $this->Event->getAccessibleEventById($event_id, User::get('id'), User::getCourseFilterPermission()))) {
-            $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
+            $this->Session->setFlash(__("Error: That event does not exist or you don't have access to it", true));
             $this->redirect('/home');
             return;
         }
@@ -367,7 +367,7 @@ class SurveyGroupsController extends AppController
         ));
         $event_id = $group_set['SurveyGroupSet']['survey_id'];
         if (!($event = $this->Event->getAccessibleEventById($event_id, User::get('id'), User::getCourseFilterPermission()))) {
-            $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
+            $this->Session->setFlash(__("Error: That event does not exist or you don't have access to it", true));
             $this->redirect('/home');
             return;
         }
@@ -399,7 +399,7 @@ class SurveyGroupsController extends AppController
         ));
         $event_id = $group_set['SurveyGroupSet']['survey_id'];
         if (!($event = $this->Event->getAccessibleEventById($event_id, User::get('id'), User::getCourseFilterPermission()))) {
-            $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
+            $this->Session->setFlash(__("Error: That event does not exist or you don't have access to it", true));
             $this->redirect('/home');
             return;
         }
@@ -477,7 +477,7 @@ class SurveyGroupsController extends AppController
         ));
         $event_id = $group_set['SurveyGroupSet']['survey_id'];
         if (!($event = $this->Event->getAccessibleEventById($event_id, User::get('id'), User::getCourseFilterPermission()))) {
-            $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
+            $this->Session->setFlash(__("Error: That event does not exist or you don't have access to it", true));
             $this->redirect('/home');
             return;
         }

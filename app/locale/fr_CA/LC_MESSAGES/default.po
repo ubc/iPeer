@@ -645,12 +645,6 @@ msgstr "Erreur: Id invalide"
 msgid "Export Evaluation Results"
 msgstr "Résultats de l'évaluation d'exportation"
 
-#: /Users/compass/projects/ipeer/src//evaluations_controller.php:322
-#: /Users/compass/projects/ipeer/src//events_controller.php294;502;718
-#: /Users/compass/projects/ipeer/src//surveygroups_controller.php281;334;368;400;478
-msgid "Error: That event does not exist or you dont have access to it"
-msgstr "Erreur: Cet événement n'existe pas ou vous n'avez pas accès à celui-ci"
-
 #: /Users/compass/projects/ipeer/src//evaluations_controller.php439;698;1004
 msgid "Error: Evaluation is unavailable"
 msgstr "Erreur: l'évaluation est indisponible"

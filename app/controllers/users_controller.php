@@ -566,7 +566,7 @@ class UsersController extends AppController
     public function add($courseId = null)
     {
         if (!User::hasPermission('functions/user')) {
-            $this->Session->setFlash('Error: You do not have permission to add users', true);
+            $this->Session->setFlash(__('Error: You do not have permission to add users', true));
             $this->redirect('/home');
         }
 
@@ -1771,7 +1771,7 @@ class UsersController extends AppController
     private function _checkResetPasswordPermission($userId, $courseId)
     {
         if (!User::hasPermission('functions/user')) {
-            $this->Session->setFlash('Error: You do not have permission to reset passwords', true);
+            $this->Session->setFlash(__('Error: You do not have permission to reset passwords', true));
             $this->redirect('/home');
         }
 
@@ -1784,7 +1784,7 @@ class UsersController extends AppController
 
         $role = $this->User->getRoleName($userId);
         if (!User::hasPermission('functions/user/'.$role)) {
-            $this->Session->setFlash('Error: You do not have permission to reset the password for this user.', true);
+            $this->Session->setFlash(__('Error: You do not have permission to reset the password for this user.', true));
             if (is_null($courseId)) {
                 $this->redirect('index');
             } else {

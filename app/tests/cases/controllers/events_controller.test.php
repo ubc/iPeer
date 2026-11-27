@@ -170,7 +170,7 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->controller->expectOnce('redirect', array('/home'));
 
         $message = $this->controller->Session->read('Message.flash');
-        $this->assertEqual($message['message'], 'Error: That event does not exist or you dont have access to it');
+        $this->assertEqual($message['message'], "Error: That event does not exist or you don't have access to it");
     }
 
     function testAdd() {
@@ -415,7 +415,7 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->testAction('/events/edit/8abc', ['return' => 'vars']);
 
         $message = $this->controller->Session->read('Message.flash');
-        $this->assertEqual($message['message'], 'Error: That event does not exist or you dont have access to it');
+        $this->assertEqual($message['message'], "Error: That event does not exist or you don't have access to it");
     }
 
     // Form data with no event (not an array) is refused before anything is
@@ -616,7 +616,7 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->assertEqual($submissions[0]['id'], 11);
 
         $message = $this->controller->Session->read('Message.flash');
-        $this->assertEqual($message['message'], 'Error: That event does not exist or you dont have access to it');
+        $this->assertEqual($message['message'], "Error: That event does not exist or you don't have access to it");
     }
 
     function testDelete() {
@@ -656,6 +656,6 @@ class EventsControllerTest extends ExtendedAuthTestCase {
         $this->assertEqual($found['Event']['id'], 1);
 
         $message = $this->controller->Session->read('Message.flash');
-        $this->assertEqual($message['message'], 'Error: That event does not exist or you dont have access to it');
+        $this->assertEqual($message['message'], "Error: That event does not exist or you don't have access to it");
     }
 }

@@ -9,7 +9,7 @@
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
 <meta name="MSSmartTagsPreventParsing" content="true" />
 
-<!--link rel="shortcut icon" href="favicon.ico" type="image/x-icon"-->
+<link rel="shortcut icon" href="/img/favicon.png" type="image/png" />
 <style type="text/css">
 html,body {
   padding: 0px;

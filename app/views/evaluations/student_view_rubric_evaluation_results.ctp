@@ -105,7 +105,7 @@
     echo "</tr>";
     foreach ($rubric['RubricsCriteria'] as $ques) {
         echo "<tr>";
-        echo "<td width=50%>".$ques['criteria']."</th>";
+        echo "<td width=50%>".$ques['criteria']."</td>";
         echo "<td width=50%>".number_format($grades[$ques['criteria_num']], 2)."</td>";
         echo "</tr>";
     }
