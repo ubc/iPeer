@@ -728,6 +728,9 @@ class CoursesControllerTest extends ExtendedAuthTestCase
     // instructor2 does not teach course 1: every list for it is empty.
     function testAjaxOptionsGivesNothingForACourseTheUserCannotAccess()
     {
+        // A template-1 survey in course 2, so 'submitters' would list course 2
+        // for survey 4 without the access check.
+        $this->addSurvey(2, 1);
         foreach ([
             ['field' => 'sCourses', 'courseId' => 1],
             ['field' => 'sSurveys', 'surveyId' => 4],
@@ -744,12 +747,13 @@ class CoursesControllerTest extends ExtendedAuthTestCase
     // instructor2 does not teach course 1, so nothing changes.
     function testMoveRefusesASurveyOfACourseTheUserCannotAccess()
     {
+        $destSurvey = $this->addSurvey(2, 1);
         $this->asInstructor2();
         $this->testAction('/courses/move', [
             'fixturize' => true, 'method' => 'post',
             'data' => ['Course' => [
                 'action' => 1, 'sourceCourses' => 1, 'sourceSurveys' => 4,
-                'submitters' => 7, 'destCourses' => 2, 'destSurveys' => 5,
+                'submitters' => 7, 'destCourses' => 2, 'destSurveys' => $destSurvey,
             ]],
         ]);
 
@@ -797,6 +801,7 @@ class CoursesControllerTest extends ExtendedAuthTestCase
     {
         $sameTemplate = $this->addSurvey(2, 1);
         $otherTemplate = $this->addSurvey(2, 2);
+        $sameCourse = $this->addSurvey(1, 1);
         $valid = [
             'action' => 1, 'sourceCourses' => 1, 'sourceSurveys' => 4,
             'submitters' => 7, 'destCourses' => 2, 'destSurveys' => $sameTemplate,
@@ -805,8 +810,10 @@ class CoursesControllerTest extends ExtendedAuthTestCase
             'other template' => ['destSurveys' => $otherTemplate],
             'student with no submission' => ['submitters' => 17],
             'list of students' => ['submitters' => [7, 31]],
-            'survey of another course' => ['sourceCourses' => 2],
-            'same course' => ['destCourses' => 1, 'destSurveys' => 5],
+            'survey of another course' => ['sourceCourses' => 3],
+            'same course' => ['destCourses' => 1, 'destSurveys' => $sameCourse],
+            'no source course' => ['sourceCourses' => null],
+            'no destination course' => ['destCourses' => null],
         ] as $case => $change) {
             $this->controller = new MockCoursesController();
             $this->testAction('/courses/move', [
@@ -824,10 +831,13 @@ class CoursesControllerTest extends ExtendedAuthTestCase
     // teaches course 2, not course 1 (survey 4).
     function testAjaxOptionsRefusesAListOfIds()
     {
+        // find('first') returns the lowest id, the accessible survey, so a
+        // check on that row alone would let the other survey through.
         $ownSurvey = $this->addSurvey(2, 1);
+        $otherSurvey = $this->addSurvey(1, 1);
         foreach ([
             ['field' => 'sCourses', 'courseId' => [2, 1]],
-            ['field' => 'sSurveys', 'surveyId' => [$ownSurvey, 4]],
+            ['field' => 'sSurveys', 'surveyId' => [$ownSurvey, $otherSurvey]],
         ] as $get) {
             $this->controller = new MockCoursesController();
             $this->asInstructor2();

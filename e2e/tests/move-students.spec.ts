@@ -392,3 +392,37 @@ test('an instructor cannot move students into or out of a course they do not tea
   await expectClassSize(page, COURSES.apsc201.id, COURSES.apsc201.studentCount);
   await expectClassSize(page, COURSES.mech328.id, COURSES.mech328.studentCount);
 });
+
+// The superadmin can access every course, so these refusals come from the
+// other checks: the identifier must be one of the two the form offers, and
+// the source survey must be in the source course (seed survey 4 is in
+// MECH 328).
+test('a move with an identifier or survey that the form does not offer is refused', async ({
+  page,
+  baseURL,
+}) => {
+  await login(page, USERS.superAdmin);
+  const csv = await readFile(fixture('massMove.csv'));
+
+  for (const [name, fields] of [
+    ['identifier', { 'data[Course][identifiers]': 'first_name' }],
+    ['survey', { 'data[Course][identifiers]': 'username', 'data[Course][sourceSurveys]': '4' }],
+  ] as const) {
+    const response = await page.request.post('/courses/import', {
+      multipart: {
+        file: { name: 'massMove.csv', mimeType: 'text/csv', buffer: csv },
+        'data[Course][sourceCourses]': COURSES.apsc201.id,
+        'data[Course][destCourses]': COURSES.cpsc404.id,
+        'data[Course][surveyChoices]': '1',
+        'data[Course][action]': '1',
+        ...fields,
+      },
+      headers: { referer: new URL('/courses/import', baseURL).href },
+    });
+    expect(response.ok(), name).toBe(true);
+    expect(await response.text(), name).toContain(COURSE.importRefused);
+  }
+
+  await expectClassSize(page, COURSES.cpsc404.id, 0);
+  await expectClassSize(page, COURSES.apsc201.id, COURSES.apsc201.studentCount);
+});
