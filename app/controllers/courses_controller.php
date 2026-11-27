@@ -526,6 +526,70 @@ class CoursesController extends AppController
     }
 
     /**
+     * Whether the user can access the course.
+     *
+     * @param mixed $courseId course id
+     *
+     * @return bool
+     */
+    private function _accessibleCourse($courseId): bool
+    {
+        return $this->_oneId($courseId) && (bool) $this->Course->getAccessibleCourseById(
+            $courseId, User::get('id'), User::getCourseFilterPermission());
+    }
+
+    /**
+     * Whether a posted id is one whole number. A list of ids, as a changed
+     * form can send, would pass a check on its first id and then reach the
+     * others.
+     *
+     * @param mixed $id the posted id
+     *
+     * @return bool
+     */
+    private function _oneId($id): bool
+    {
+        return is_scalar($id) && ctype_digit((string) $id) && (int) $id > 0;
+    }
+
+    /**
+     * Find a survey event that the user can access, optionally only in one
+     * course.
+     *
+     * @param mixed $eventId  event id
+     * @param mixed $courseId the course the survey must be in, or null for any
+     *
+     * @return array|false the event, or false
+     */
+    private function _accessibleSurvey($eventId, $courseId = null)
+    {
+        if (!$this->_oneId($eventId)) {
+            return false;
+        }
+        $event = $this->Event->getAccessibleEventById($eventId, User::get('id'), User::getCourseFilterPermission(), []);
+        if (!$event || $event['Event']['event_template_type_id'] != 3 ||
+            ($courseId !== null && $event['Event']['course_id'] != $courseId)) {
+            return false;
+        }
+        return $event;
+    }
+
+    /**
+     * Log a refused move or import. A form only offers valid choices, so a
+     * refusal means a changed form. The values are not logged.
+     *
+     * @param string $action 'move' or 'import'
+     *
+     * @return void
+     */
+    private function _logRefusedChoice(string $action): void
+    {
+        CakeLog::write('warning', sprintf(
+            'Courses: refused a %s with a course, survey or student that the page does not offer. User: %s',
+            $action, User::get('id')));
+    }
+
+    /**
      * move
      *
      * @access public
@@ -536,6 +600,26 @@ class CoursesController extends AppController
         if (!empty($this->data)) {
             $data = $this->data['Course'];
             $move = $data['action'];
+
+            // The courses, surveys and student must be ones this page offers:
+            // two different courses, a survey in each with the same template,
+            // and a student who submitted the source survey.
+            $valid = $this->_accessibleCourse($data['sourceCourses'] ?? null) &&
+                $this->_accessibleCourse($data['destCourses'] ?? null) &&
+                $data['sourceCourses'] != $data['destCourses'];
+            if ($valid) {
+                $source = $this->_accessibleSurvey($data['sourceSurveys'] ?? null, $data['sourceCourses']);
+                $dest = $this->_accessibleSurvey($data['destSurveys'] ?? null, $data['destCourses']);
+                $valid = $source && $dest && $source['Event']['template_id'] == $dest['Event']['template_id'] &&
+                    $this->_oneId($data['submitters'] ?? null) &&
+                    $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter($data['sourceSurveys'], $data['submitters']);
+            }
+            if (!$valid) {
+                $this->_logRefusedChoice('move');
+                $this->Session->setFlash(__('Error: Choose the courses, surveys and student from the lists.', true));
+                $this->redirect('move');
+                return;
+            }
 
             $destSub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter(
                 $data['destSurveys'], $data['submitters']);
@@ -587,7 +671,9 @@ class CoursesController extends AppController
                 }
             }
 
-            if ($move) {
+            // removeStudent() with no enrolment would delete the last saved
+            // enrolment, the one in the destination course.
+            if ($move && $this->Course->getAccessibleCourseById($data['sourceCourses'], $data['submitters'], Course::FILTER_PERMISSION_ENROLLED)) {
                 $this->Course->id = $data['sourceCourses'];
                 $from = $this->Course->field('full_name');
                 if (!$this->User->removeStudent($data['submitters'], $data['sourceCourses'])) {
@@ -627,29 +713,45 @@ class CoursesController extends AppController
 
         $options = [];
         switch($_GET['field']) {
+            // Each list is for a course or survey that the user can access;
+            // anything else gives an empty list.
             case 'sCourses':
-                $options = $this->Event->getActiveSurveyEvents($_GET['courseId'], 'list');
+                if ($this->_accessibleCourse($_GET['courseId'] ?? null)) {
+                    $options = $this->Event->getActiveSurveyEvents($_GET['courseId'], 'list');
+                }
                 break;
             case 'sSurveys':
-                $sub = $this->EvaluationSubmission->findAllByEventId($_GET['surveyId']);
-                $options = $this->User->getFullNames(Set::extract('/EvaluationSubmission/submitter_id', $sub));
+                if ($this->_accessibleSurvey($_GET['surveyId'] ?? null)) {
+                    $sub = $this->EvaluationSubmission->findAllByEventId($_GET['surveyId']);
+                    $options = $this->User->getFullNames(Set::extract('/EvaluationSubmission/submitter_id', $sub));
+                }
                 break;
             case 'submitters':
-                $event = $this->Event->findById($_GET['surveyId']);
+                $event = $this->_accessibleSurvey($_GET['surveyId'] ?? null);
+                if (!$event) {
+                    break;
+                }
                 $destCourses = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
                 $destEvents = $this->Event->getSurveyByCourseIdTemplateId(array_keys($destCourses),
                     $event['Event']['template_id'], 'all');
                 $options = $this->Course->getCourseList(array_unique(Set::extract('/Event/course_id', $destEvents)));
-                unset($options[$_GET['courseId']]); //remove source course
+                if ($this->_oneId($_GET['courseId'] ?? null)) {
+                    unset($options[$_GET['courseId']]); //remove source course
+                }
                 break;
             case 'dCourses':
-                $event = $this->Event->findById($_GET['surveyId']);
+                $event = $this->_accessibleSurvey($_GET['surveyId'] ?? null);
+                if (!$event || !$this->_accessibleCourse($_GET['courseId'] ?? null)) {
+                    break;
+                }
                 $options = $this->Event->getSurveyByCourseIdTemplateId(
                     $_GET['courseId'], $event['Event']['template_id']);
                 break;
             case 'importDestCourses':
                 $options = $this->Course->getAccessibleCourses(User::get('id'), User::getCourseFilterPermission(), 'list');
-                unset($options[$_GET['courseId']]); // remove source course
+                if ($this->_oneId($_GET['courseId'] ?? null)) {
+                    unset($options[$_GET['courseId']]); // remove source course
+                }
                 break;
         }
 
@@ -674,9 +776,32 @@ class CoursesController extends AppController
                 return;
             }
 
+            $data = $this->data['Course'];
+            // The courses and surveys must be ones this page offers.
+            $valid = $this->_accessibleCourse($data['sourceCourses'] ?? null) &&
+                $this->_accessibleCourse($data['destCourses'] ?? null) &&
+                $data['sourceCourses'] != $data['destCourses'] &&
+                in_array($data['identifiers'] ?? null, ['student_no', 'username'], true);
+            if ($valid && isset($data['sourceSurveys'])) {
+                $source = $this->_accessibleSurvey($data['sourceSurveys'], $data['sourceCourses']);
+                $valid = (bool) $source;
+                if ($valid && empty($data['surveyChoices'])) {
+                    // An existing destination survey must have the same
+                    // questions, as in move().
+                    $dest = $this->_accessibleSurvey($data['destSurveys'] ?? null, $data['destCourses']);
+                    $valid = $dest && $dest['Event']['template_id'] == $source['Event']['template_id'];
+                }
+            }
+            if (!$valid) {
+                $this->_logRefusedChoice('import');
+                $this->FileUpload->removeFile($uploadFile);
+                $this->Session->setFlash(__('Error: Choose the courses and surveys from the lists.', true));
+                $this->redirect('import');
+                return;
+            }
+
             $students = Toolkit::parseCSV($uploadFile);
             $identifiers = Set::extract('/'.Course::IDENTIFIER, $students);
-            $data = $this->data['Course'];
             $move = $data['action'];
             $field = $data['identifiers'];
             $fieldText = ($field == 'student_no') ? __('student number', true) : __('username', true);
@@ -742,7 +867,7 @@ class CoursesController extends AppController
                     $sub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter(
                         $data['sourceSurveys'], $user['User']['id']);
                     $destSub = $this->EvaluationSubmission->getEvalSubmissionByEventIdSubmitter(
-                        $data['destSurveys'], $user['User']['id']);
+                        $destEventId, $user['User']['id']);
                     if ($sub && empty($destSub)) {
                         $inputs = $this->SurveyInput->getByEventIdUserId(
                             $data['sourceSurveys'], $user['User']['id']);

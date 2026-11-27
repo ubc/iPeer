@@ -5,7 +5,8 @@ import { fixture, flashMessage, labelledTable, login, notCsvFile } from '../supp
 import { COURSES, MECH328_GROUPS, STUDENTS, USERS, fullName } from '../support/seed';
 import { expectInClassList, expectNotInClassList } from '../support/users';
 import type { ResultSetHeader } from 'mysql2/promise';
-import { UPLOAD } from '../support/messages';
+import { readFile } from 'fs/promises';
+import { COURSE, UPLOAD } from '../support/messages';
 
 // Ported from app/tests/cases/system/mass_move.test.php and
 // app/tests/cases/system/move_student.test.php. The CSV files list the same
@@ -352,6 +353,75 @@ test('a superadmin move from a blank CSV moves no one', async ({ page }) => {
   await expect(page.getByRole('heading', { name: TRANSFERRED })).toBeVisible();
   await expectNoFailures(page);
   await expectSummary(page, TRANSFERRED, {});
+
+  await expectClassSize(page, COURSES.cpsc404.id, 0);
+  await expectClassSize(page, COURSES.apsc201.id, COURSES.apsc201.studentCount);
+});
+
+// The form lists only the courses that the user teaches. A request with
+// another course, as a changed form would send, is refused before anyone
+// moves. Instructor 2 teaches APSC 201 only.
+test('an instructor cannot move students into or out of a course they do not teach', async ({
+  page,
+  baseURL,
+}) => {
+  await login(page, USERS.instructor2);
+  const csv = await readFile(fixture('massMove.csv'));
+
+  for (const [from, to] of [
+    [COURSES.apsc201, COURSES.cpsc404],
+    [COURSES.mech328, COURSES.apsc201],
+  ]) {
+    const response = await page.request.post('/courses/import', {
+      multipart: {
+        file: { name: 'massMove.csv', mimeType: 'text/csv', buffer: csv },
+        'data[Course][identifiers]': 'username',
+        'data[Course][sourceCourses]': from.id,
+        'data[Course][destCourses]': to.id,
+        'data[Course][action]': '1',
+      },
+      // The app refuses a POST without a same-origin referer.
+      headers: { referer: new URL('/courses/import', baseURL).href },
+    });
+    expect(response.ok(), `${from.name} to ${to.name}`).toBe(true);
+    expect(await response.text(), `${from.name} to ${to.name}`).toContain(COURSE.importRefused);
+  }
+
+  await login(page, USERS.superAdmin);
+  await expectClassSize(page, COURSES.cpsc404.id, 0);
+  await expectClassSize(page, COURSES.apsc201.id, COURSES.apsc201.studentCount);
+  await expectClassSize(page, COURSES.mech328.id, COURSES.mech328.studentCount);
+});
+
+// The superadmin can access every course, so these refusals come from the
+// other checks: the identifier must be one of the two the form offers, and
+// the source survey must be in the source course (seed survey 4 is in
+// MECH 328).
+test('a move with an identifier or survey that the form does not offer is refused', async ({
+  page,
+  baseURL,
+}) => {
+  await login(page, USERS.superAdmin);
+  const csv = await readFile(fixture('massMove.csv'));
+
+  for (const [name, fields] of [
+    ['identifier', { 'data[Course][identifiers]': 'first_name' }],
+    ['survey', { 'data[Course][identifiers]': 'username', 'data[Course][sourceSurveys]': '4' }],
+  ] as const) {
+    const response = await page.request.post('/courses/import', {
+      multipart: {
+        file: { name: 'massMove.csv', mimeType: 'text/csv', buffer: csv },
+        'data[Course][sourceCourses]': COURSES.apsc201.id,
+        'data[Course][destCourses]': COURSES.cpsc404.id,
+        'data[Course][surveyChoices]': '1',
+        'data[Course][action]': '1',
+        ...fields,
+      },
+      headers: { referer: new URL('/courses/import', baseURL).href },
+    });
+    expect(response.ok(), name).toBe(true);
+    expect(await response.text(), name).toContain(COURSE.importRefused);
+  }
 
   await expectClassSize(page, COURSES.cpsc404.id, 0);
   await expectClassSize(page, COURSES.apsc201.id, COURSES.apsc201.studentCount);

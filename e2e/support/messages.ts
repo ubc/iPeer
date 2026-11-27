@@ -35,6 +35,8 @@ export const COURSE = {
   createFailed: 'Add course failed.',
   updated: 'The course was updated successfully.',
   deleted: 'The course was deleted successfully.',
+  // Move Group of Students with a course or survey that the form does not offer.
+  importRefused: 'Error: Choose the courses and surveys from the lists.',
 } as const;
 
 export const GROUP = {
