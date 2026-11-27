@@ -84,7 +84,7 @@ if(!isset($viewMode)){
         <?php if (!$evaluate): ?>
         <td colspan="<?php echo $LOM_num+1?>" align="right"><?php __('Total Marks')?>: <?php echo $data['Rubric']['total_marks']?></td>
         <?php else: ?>
-        <td colspan="<?php echo $LOM_num+2?>" align="center" class="tableheader2"><?php echo __('General Comments').$reqCom ?><br>
+        <td colspan="<?php echo $LOM_num+2?>" align="center" class="tableheader2"><?php echo __('General Comments', true).$reqCom ?><br>
             <textarea cols="80" rows="2" name="<?php echo $userId?>gen_comment"
                 class="char-limited"
                 maxlength="5000"

@@ -3,7 +3,7 @@
 <ul>
     <li><?php echo __('All fields are mandatory.', true) ?></li>
     <li><?php echo __('When all fields are filled, the Submit button will become available.', true) ?></li>
-    <li><?php echo __('If the source course does not have a survey, the source survey and destination survey fields are not required.') ?></li>
+    <li><?php echo __('If the source course does not have a survey, the source survey and destination survey fields are not required.', true) ?></li>
     <li><?php echo __('You can choose to import into a duplicate of the source survey or choose an existing survey.', true) ?></li>
     <li><?php echo __('The conditions below must be met for the move to be successful.', true) ?></li>
 </ul>

@@ -8,6 +8,7 @@
   <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
   <meta http-equiv="Content-Language" content="en" />
   <link rel="shortcut icon" href="/img/favicon.png" type="image/png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <?php
   // CSS files
   echo $html->css('datepicker');

@@ -8,7 +8,7 @@
 export const ACCESS = {
   noCourse: 'Error: Course does not exist or you do not have permission to view this course.',
   invalidId: 'Error: Invalid ID.',
-  noEvent: 'Error: That event does not exist or you dont have access to it',
+  noEvent: "Error: That event does not exist or you don't have access to it",
   // The message ends with the support email address of the configuration,
   // so a check compares only this start.
   deniedStart: 'Access to this page is limited to authorized users',

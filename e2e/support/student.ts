@@ -444,6 +444,10 @@ export async function openRubricPanel(page: Page, member: string): Promise<void>
   await test.step(
     `Open the panel of ${member}`,
     async () => {
+      // The inline Rico.Accordion script hides the closed panels. Before it
+      // runs, a panel can look open, the click is skipped, and the script
+      // then closes it.
+      await page.waitForLoadState('load');
       const content = rubricPanel(page, member).locator('div.panelContent');
       if (!(await content.isVisible())) {
         await rubricPanelHeader(page, member).click();

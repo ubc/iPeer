@@ -246,7 +246,7 @@ class EventsController extends AppController
     function view ($eventId)
     {
         if (!($event = $this->Event->getAccessibleEventById($eventId, User::get('id'), User::getCourseFilterPermission(), array('Course', 'Group.Member', 'EventTemplateType', 'Penalty' => array('order' => array('days_late ASC')))))) {
-            $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
+            $this->Session->setFlash(__("Error: That event does not exist or you don't have access to it", true));
             $this->redirect('/home');
             return;
         }
@@ -465,7 +465,7 @@ class EventsController extends AppController
         // (such as '8abc') does not
         if ($this->_wholeNumber($eventId) === null
             || !($event = $this->Event->getAccessibleEventById($eventId, User::get('id'), User::getCourseFilterPermission(), array('Course', 'Group', 'Penalty')))) {
-            $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
+            $this->Session->setFlash(__("Error: That event does not exist or you don't have access to it", true));
             $this->redirect('/home');
             return;
         }
@@ -892,7 +892,7 @@ class EventsController extends AppController
     {
         // Check whether the event exists and user has access
         if (!($event = $this->Event->getAccessibleEventById($eventId, User::get('id'), User::getCourseFilterPermission(), array('Course', 'Group', 'Penalty')))) {
-            $this->Session->setFlash(__('Error: That event does not exist or you dont have access to it', true));
+            $this->Session->setFlash(__("Error: That event does not exist or you don't have access to it", true));
             $this->redirect('/home');
             return;
         }

@@ -6,7 +6,7 @@
     <title>iPeer - <?php echo $title_for_layout; ?></title>
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
     <meta http-equiv="Content-Language" content="en" />
-    <!--link rel="shortcut icon" href="favicon.ico" type="image/x-icon"-->
+    <link rel="shortcut icon" href="/img/favicon.png" type="image/png" />
     <?php
     // CSS files
     echo $html->css('ipeer');

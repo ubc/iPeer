@@ -643,12 +643,6 @@ msgstr ""
 msgid "Export Evaluation Results"
 msgstr ""
 
-#: /Users/compass/projects/ipeer/src//evaluations_controller.php:322
-#: /Users/compass/projects/ipeer/src//events_controller.php:294;502;726
-#: /Users/compass/projects/ipeer/src//surveygroups_controller.php:281;334;368;400;478
-msgid "Error: That event does not exist or you dont have access to it"
-msgstr ""
-
 #: /Users/compass/projects/ipeer/src//evaluations_controller.php:439;698;1004
 msgid "Error: Evaluation is unavailable"
 msgstr ""

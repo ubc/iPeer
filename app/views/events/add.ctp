@@ -74,7 +74,7 @@ echo $this->Form->input(
         'default' => '1'
     )
 ); ?>
-<div class='help-text'><?php echo __('Basic view only shows grades. Detailed view shows both grades and comments') ?></div>
+<div class='help-text'><?php echo __('Basic view only shows grades. Detailed view shows both grades and comments', true) ?></div>
 <?php
 $dateInput = ['type' => 'text', 'aria-required' => 'true'];
 echo $this->Form->input('due_date', $dateInput + ['label' => __('Due Date', true) . $required]);

@@ -66,7 +66,7 @@ if (isset($course_list['I']))
 ?>
 
 <?php if (empty($course_list)):?>
-    <?php echo __('You do not have any courses.') ?>
+    <?php echo __('You do not have any courses.', true) ?>
 <?php endif; ?>
 
 <?php __('Please use "course" tab for complete list of courses.') ?>

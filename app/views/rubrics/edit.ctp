@@ -68,14 +68,14 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
 </div>
 <div id="showCriteria" style="border:1px solid black; display:none; width:80%; margin-left:auto; margin-right:auto;">
     <div style="margin: 0.5em; text-align:center;">
-    <?php echo __('<strong>Criteria Example</strong><br><br>'); ?>
+    <?php echo __('<strong>Criteria Example</strong><br><br>', true); ?>
     <?php echo $html->image('rubric/Sort_by_Criteria.jpg', array('width'=>'100%')); ?>
     </div>
 </div>
 <br>
 <div id="showStudent" style="border:1px solid black; display:none; width:80%; margin-left:auto; margin-right:auto;">
     <div style="margin: 0.5em; text-align:center;">
-    <?php echo __('<strong>Student Example</strong><br><br>'); ?>
+    <?php echo __('<strong>Student Example</strong><br><br>', true); ?>
     <?php echo $html->image('rubric/Sort_by_Student.jpg', array('width'=>'100%')); ?>
     </div>
 </div>
@@ -83,7 +83,7 @@ $url = $this->action == 'copy' ? 'add' : $this->action;
 
 <div style="text-align: center">
         <?php if (!$readonly): ?>
-        <input type="button" name="Back" value="<?php echo __('Back')?>" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
+        <input type="button" name="Back" value="<?php echo __('Back', true)?>" onClick="javascript:(history.length > 1) ? history.back() : window.close();">
         <?php endif; ?>
         <?php switch($action) {
           case 'Add Rubric':

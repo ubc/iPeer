@@ -128,7 +128,7 @@ class SysParametersController extends AppController
     {
         // Make sure the present user has permission
         if (!User::hasPermission('controllers/sysparameters')) {
-            $this->Session->setFlash('You do not have permission to view system parameters', true);
+            $this->Session->setFlash(__('You do not have permission to view system parameters', true));
             $this->redirect('/home');
         }
         // Set up the list

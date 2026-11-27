@@ -1263,7 +1263,7 @@ AjaxListAction.prototype.renderAction = function (action) {
 
             // Grab the cell of interest's value
             var split = map.split(".", 2);
-            cell = this.entry[split[0]][split[1]];
+            var cell = this.entry[split[0]][split[1]];
 
             var values = restrictions[map];
 
@@ -1276,7 +1276,7 @@ AjaxListAction.prototype.renderAction = function (action) {
                 // Otherwise look for the default value entry, and follow that.
                 if (values["!default"] !== undefined) {
                     if (!values["!default"]) {
-                        active = false;;
+                        active = false;
                     }
                 } else {
                     active = false;
@@ -1299,7 +1299,7 @@ AjaxListAction.prototype.renderAction = function (action) {
 
     } else {
         menuItem.style.color = AjaxListActionMenuTextDisabledColor;
-        menuItem.onclick = "return false;";
+        menuItem.onclick = function() { return false; };
     }
     this.display.appendChild(menuItem);
 }

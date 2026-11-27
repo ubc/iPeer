@@ -149,3 +149,25 @@ test('the Admin tab links to the permissions editor', async ({ page }) => {
     },
   ]);
 });
+
+test('the tab of the current page is marked, also on the pages under it', async ({ page }) => {
+  // On the tab's own page the link is the current page ('page'); on the
+  // other pages under the tab it is the current section ('true').
+  const pages = [
+    { path: '/home', tab: 'Home', current: 'page' },
+    { path: `/courses/home/${COURSES.apsc201.id}`, tab: 'Courses', current: 'true' },
+    { path: '/users', tab: 'Users', current: 'page' },
+    { path: '/rubrics', tab: 'Evaluation', current: 'true' },
+    { path: '/sysparameters', tab: 'Admin', current: 'true' },
+  ];
+  for (const { path, tab, current } of pages) {
+    await test.step(`${path} marks ${tab}`, async () => {
+      await page.goto(path);
+      await expect(tabBar(page).getByRole('link', { name: tab, exact: true })).toHaveAttribute(
+        'aria-current',
+        current
+      );
+      await expect(tabBar(page).locator('[aria-current]')).toHaveCount(1);
+    });
+  }
+});

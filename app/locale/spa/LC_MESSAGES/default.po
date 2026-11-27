@@ -649,12 +649,6 @@ msgstr "Error: Id no válido"
 msgid "Export Evaluation Results"
 msgstr "Exportar los resultados de la evaluación"
 
-#: /controllers/evaluations_controller.php:321
-#: /controllers/events_controller.php:286;494;710
-#: /controllers/surveygroups_controller.php:281;334;368;400;478
-msgid "Error: That event does not exist or you dont have access to it"
-msgstr "Error: El evento no existe o no tiene acceso a él"
-
 #: /controllers/evaluations_controller.php:438;697;999
 msgid "Error: Evaluation is unavailable"
 msgstr "Error: Evaluación no disponible"

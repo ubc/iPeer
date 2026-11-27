@@ -63,6 +63,10 @@ export async function openEvaluateePanel(page: Page, member: string): Promise<vo
   await test.step(
     `Open the panel of ${member}`,
     async () => {
+      // The inline Rico.Accordion script hides the closed panels. Before it
+      // runs, a panel can look open, the click is skipped, and the script
+      // then closes it.
+      await page.waitForLoadState('load');
       const panel = evaluateePanel(page, member);
       const content = panel.locator('div.panelContent');
       if (!(await content.isVisible())) {

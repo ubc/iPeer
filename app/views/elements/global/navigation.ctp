@@ -10,11 +10,15 @@
  */
 
 function generateTab ($view, $url, $activeControllers, $name) {
-  // Generate the HTML
-  $current = ($view->params['url']['url'] == $url) ?
-    "id='current'" : "";
+  // The tab is current on its own URL and on the pages of its controllers.
+  // On its own URL the link is the current page; on the other pages of its
+  // controllers it is the current section.
+  $isPage = ($view->params['url']['url'] ?? '') == $url;
+  $isSection = in_array($view->params['controller'] ?? '', $activeControllers, true);
+  $current = ($isPage || $isSection) ? "id='current'" : "";
+  $ariaCurrent = $isPage ? " aria-current='page'" : ($isSection ? " aria-current='true'" : "");
   $url = $view->webroot . $view->theme . $url;
-  echo "<li $current><a href='$url'>$name</a></li>";
+  echo "<li $current><a href='$url'$ariaCurrent>$name</a></li>";
 }
 
 if (User::isLoggedIn()) {
@@ -59,7 +63,7 @@ if (User::isLoggedIn()) {
     // Admin Tab
     if (User::hasPermission('adminpage')) {
         generateTab($this, 'pages/admin',
-            array('pages/admin'),
+            array('pages', 'faculties', 'departments', 'sysparameters', 'accesses'),
             __('Admin',true));
     }
 
