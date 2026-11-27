@@ -17,7 +17,7 @@ class EventTestCase extends CakeTestCase
         'app.penalty', 'app.simple_evaluation', 'app.rubric', 'app.rubrics_lom',
         'app.rubrics_criteria', 'app.rubrics_criteria_comment', 'app.mixeval',
         'app.mixeval_question', 'app.mixeval_question_type', 'mixeval_question_desc',
-        'app.survey_input', 'app.oauth_token', 'app.evaluation_rubric',
+        'app.survey_input', 'app.evaluation_rubric',
         'app.evaluation_rubric_detail', 'app.evaluation_mixeval_detail',
         'app.evaluation_mixeval', 'app.sys_parameter'
     );

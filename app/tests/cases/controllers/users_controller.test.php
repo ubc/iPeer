@@ -21,11 +21,11 @@ class UsersControllerTestCase extends ExtendedAuthTestCase
         'app.evaluation_rubric', 'app.evaluation_rubric_detail',
         'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
         'app.user_faculty', 'app.department', 'app.sys_parameter',
-        'app.oauth_token', 'app.rubric', 'app.rubrics_criteria',
+        'app.rubric', 'app.rubrics_criteria',
         'app.rubrics_criteria_comment', 'app.rubrics_lom',
         'app.simple_evaluation', 'app.survey_input', 'app.mixeval_question',
         'app.mixeval_question_desc', 'app.mixeval', 'app.mixeval_question_type',
-        'app.oauth_client', 'app.user_oauths', 'app.email_schedule',
+        'app.user_oauths', 'app.email_schedule',
         'app.email_template',
     );
 

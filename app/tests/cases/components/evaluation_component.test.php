@@ -19,7 +19,7 @@ class EvaluationTestCase extends CakeTestCase
         'app.user_enrol', 'app.groups_member', 'app.survey', 'app.mixeval', 'app.mixevals_question', 'app.mixevals_question_desc',
         'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
         'app.evaluation_simple', 'app.faculty', 'app.user_faculty',
-        'app.department', 'app.course_department', 'app.oauth_token', 'app.sys_parameter',
+        'app.department', 'app.course_department', 'app.sys_parameter',
         'app.user_tutor', 'app.simple_evaluation'
     );
 

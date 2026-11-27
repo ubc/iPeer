@@ -16,7 +16,7 @@ class UsersController extends AppController
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'FileUpload.FileUpload');
     public $uses = array('User', 'UserEnrol', 'Personalize', 'Course',
         'SysParameter', 'Role', 'Group', 'UserFaculty',
-        'Department', 'CourseDepartment', 'OauthClient', 'OauthToken',
+        'Department', 'CourseDepartment',
         'UserCourse', 'UserTutor', 'Faculty', 'UserFaculty', 'EmailTemplate', 'EvaluationMixevalDetail',
         'EvaluationRubricDetail', 'EventTemplateType', 'Event', 'Faculty', 'GroupEvent',
         'Mixeval', 'Rubric', 'SimpleEvaluation', 'SysParameter', 'Survey', 'EvaluationMixeval',
@@ -331,20 +331,6 @@ class UsersController extends AppController
                 }
                 $this->Session->setFlash(__('Failed to save.</br>', true).$errorMsg);
                 return false;
-            }
-
-            if (isset($this->data['OauthClient'])) {
-                if (!($this->OauthClient->saveAll($this->data['OauthClient']))) {
-                    $this->Session->setFlash(__('Failed to save.</br>', true));
-                    return false;
-                }
-            }
-
-            if (isset($this->data['OauthToken'])) {
-                if (!($this->OauthToken->saveAll($this->data['OauthToken']))) {
-                    $this->Session->setFlash(__('Failed to save.</br>', true));
-                    return false;
-                }
             }
         }
 
@@ -960,15 +946,8 @@ class UsersController extends AppController
         } else {
             $isStudent = false;
         }
-        $oAuthClient = $this->OauthClient->find('all', array('conditions' => array('OauthClient.user_id' => $id)));
-        $oAuthToken = $this->OauthToken->find('all', array('conditions' => array('OauthToken.user_id' => $id)));
-
-        $enabled = array('0' => 'Disabled', '1' => 'Enabled');
         $this->data = $this->User->read(null, $id);
         $this->Output->br2nl($this->data);
-        $this->set('clients', $oAuthClient);
-        $this->set('tokens', $oAuthToken);
-        $this->set('enabled', $enabled);
         $this->set('is_student', $isStudent);
         $this->set('data', $this->data);
         $this->set('title_for_layout', __('Edit Profile', true));
@@ -1934,15 +1913,6 @@ class UsersController extends AppController
                 $conditions
             );
         }
-
-        $updated = $updated && $this->OauthClient->updateAll(
-            array('OauthClient.user_id' => $primary),
-            array('OauthClient.user_id' => $secondary)
-        );
-        $updated = $updated && $this->OauthToken->updateAll(
-            array('OauthToken.user_id' => $primary),
-            array('OauthToken.user_id' => $secondary)
-        );
 
         return $updated;
     }

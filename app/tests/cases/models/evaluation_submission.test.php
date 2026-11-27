@@ -13,7 +13,7 @@ class EvaluationSubmissionTestCase extends CakeTestCase
         'app.user_enrol', 'app.groups_member', 'app.survey',
         'app.evaluation_simple', 'app.user_faculty', 'app.course_department',
         'app.department', 'app.faculty', 'app.sys_parameter', 'app.user_tutor',
-        'app.penalty', 'app.survey_input', 'app.oauth_token', 'app.evaluation_rubric',
+        'app.penalty', 'app.survey_input', 'app.evaluation_rubric',
         'app.evaluation_rubric_detail', 'app.evaluation_mixeval',
         'app.evaluation_mixeval_detail'
     );

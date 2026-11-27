@@ -25,7 +25,7 @@ use caliper\CaliperHooks;
 class AppController extends Controller
 {
     public $startpage  = 'pages';
-    public $uses       = array('User', 'SysParameter', 'OauthToken');
+    public $uses       = array('User', 'SysParameter');
     public $components = array('Session', 'Output',
         'userPersonalize', 'framework', 'Guard.Guard', 'Acl',
         'AccessControl', 'TemplateEmail');
@@ -36,17 +36,6 @@ class AppController extends Controller
     public $validTZ;
     public $emailInterfaceEnabled = true;
     public $teamMakerEnabled = true;
-
-    /**
-     * if this request has session transfer data
-     */
-    public $isSessionTransfer = false;
-
-    /**
-     * session transfer data
-     */
-    public $sessionTransferData = array();
-
 
     /**
      * __construct constructor function
@@ -116,18 +105,6 @@ class AppController extends Controller
             Configure::write('Config.language', $locale);
         } else {
             Configure::write('Config.language', 'eng');
-        }
-
-        // if we have a session transfered to us
-        if ($this->_hasSessionTransferData()) {
-            $this->log('Using session transfer data for login', 'info');
-            if ($this->_authenticateWithSessionTransferData()) {
-                if (method_exists($this, '_afterLogin')) {
-                    $this->_afterLogin(false);
-                }
-            } else {
-                $this->Session->setFlash($this->Auth->loginError, $this->Auth->flashElement, array(), 'auth');
-            }
         }
 
         // store user in the singleton for global access
@@ -379,55 +356,6 @@ class AppController extends Controller
     {
         CaliperHooks::app_controller_after_logout($this);
         $this->Session->destroy();
-    }
-
-    /**
-     * hasSessionTransferData
-     *
-     * @access public
-     * @return boolean
-     */
-    function _hasSessionTransferData()
-    {
-        $params = $this->params['url'];
-        if (isset($params['username']) && isset($params['timestamp']) && isset($params['token']) && isset($params['signature'])) {
-            $this->isSessionTransfer = true;
-            $this->sessionTransferData = $params;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * authenticateWithSessionTransferData
-     *
-     * @access public
-     * @return boolean
-     */
-    function _authenticateWithSessionTransferData()
-    {
-        // valid signature first
-        $message = $this->sessionTransferData['username'].$this->sessionTransferData['timestamp'].$this->sessionTransferData['token'];
-        $secret = $this->OauthToken->getTokenSecret($this->sessionTransferData['token']);
-        $signature = base64_encode(hash_hmac('sha1', $message, $secret, true));
-        if ($signature != $this->sessionTransferData['signature']) {
-            $this->log('Invalid signature! Expect '.$signature.', Got '.$this->sessionTransferData['signature']);
-
-            return false;
-        }
-
-        // find the userId by username and use it to login
-        $userId = $this->User->field('id', array('username' => $this->sessionTransferData['username']));
-        if (!$this->Auth->login($userId)) {
-            $this->log('Invalid username '.$this->sessionTransferData['username'].' from session transfer.', 'info');
-            return false;
-        }
-
-        $this->log('User '.$this->sessionTransferData['username'].' is logged in with session transfer.', 'info');
-
-        return true;
     }
 
     public static function logControllerAction($controller) {
