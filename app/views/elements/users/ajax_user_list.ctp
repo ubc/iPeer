@@ -57,6 +57,7 @@
                   endif;
             ?>
             <?php
+                  if ($localPasswordsEnabled ?? true)
                   echo $html->link(
                                     $html->image('icons/key_email.gif',array('border'=>'0','alt'=>'Reset password', 'title'=>__('Reset ', true).$user['full_name'].__("'s password", true))),
                                     "/users/resetPassword/".$user['id'],

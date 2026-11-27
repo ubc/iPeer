@@ -5,7 +5,7 @@ import { ACCESS } from './messages';
 
 // Signs the user in and returns the URL of the page that the login leads to.
 // It does not open that page: the test opens the page it needs next.
-export async function login(page: Page, username: string): Promise<string> {
+export async function login(page: Page, username: string, password = PASSWORD): Promise<string> {
   return test.step(
     `Log in as ${username}`,
     async () => {
@@ -18,7 +18,7 @@ export async function login(page: Page, username: string): Promise<string> {
       const response = await page.request.post('/login', {
         form: {
           'data[Guard][username]': username,
-          'data[Guard][password]': PASSWORD,
+          'data[Guard][password]': password,
           auth_method: 'default',
         },
         maxRedirects: 0,

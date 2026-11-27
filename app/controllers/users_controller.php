@@ -433,10 +433,11 @@ class UsersController extends AppController
         if (!$isDisabled && User::hasPermission('functions/user/' . $role, 'delete')) {
             $bottomActionButtons[] = ['url' => '/users/delete/' . $id, 'label' => __('Delete User', true), 'class' => 'delete-button'];
         }
-        if (User::hasPermission('functions/user') && $this->emailInterfaceEnabled) {
+        $localPasswords = !$this->Auth->isForceSamlLogin();
+        if ($localPasswords && User::hasPermission('functions/user') && $this->emailInterfaceEnabled) {
             $bottomActionButtons[] = ['url' => '/users/resetPassword/' . $id, 'label' => __('Reset Password', true), 'class' => 'edit-button', 'confirmationMessage' => __("Are you sure you want to reset this user's password?", true)];
         }
-        if (User::hasPermission('controllers/users/resetpasswordwithoutemail')) {
+        if ($localPasswords && User::hasPermission('controllers/users/resetpasswordwithoutemail')) {
             $bottomActionButtons[] = ['url' => '/users/resetPasswordWithoutEmail/' . $id, 'label' => __('Reset Password Without Email', true), 'class' => 'edit-button', 'confirmationMessage' => __("Are you sure you want to reset this user's password without sending an email?", true)];
         }
         $this->set('bottomActionButtons', $bottomActionButtons);
@@ -912,46 +913,170 @@ class UsersController extends AppController
      */
     function editProfile()
     {
-        // No security checks here, since we're editing the logged-in user
-        $id = $this->Auth->user('id');
-
-        $this->set('viewPage', false);
-        if (!empty($this->data)) {
-            $this->data['User']['id'] = $id;
-
-            if (!empty($this->data['User']['temp_password'])) {
-                $user = $this->User->findUserByidWithFields($id, array('password'));
-                if (Security::hash($this->data['User']['old_password'], null, true) === $user['password']) {
-                    if ($this->data['User']['temp_password']==$this->data['User']['confirm_password']) {
-                        $this->data['User']['password'] = Security::hash($this->data['User']['temp_password'], null, true);
-                    } else {
-                        $this->Session->setFlash(__("New passwords do not match", true));
-                        $this->redirect('editProfile/'.$id);
-                    }
-                } else {
-                    $this->Session->setFlash(__("Old password is incorrect", true));
-                    $this->redirect('editProfile/'.$id);
-                }
-            } else {
-                unset($this->data['User']['temp_password']);
-            }
-
-            if ($this->__processForm()) {
-                $this->__setSessionData($this->data['User']);
-                $this->Session->setFlash((__("Your Profile Has Been Updated Successfully.", true)), 'good');
-            }
-        }
-        if (in_array($this->User->getRoleName($id), array("student", "tutor"))) {
-            $isStudent = true;
+        // The logged-in user edits only their own row, and only the fields
+        // that _profileFields() allows.
+        $id = (int) $this->Auth->user('id');
+        $isStudent = in_array($this->User->getRoleName($id), ['student', 'tutor'], true);
+        $samlOnly = $this->Auth->isForceSamlLogin();
+        if ($samlOnly) {
+            // With SAML-only sign-in, only staff can edit their profile (however, some fields may be overridden by SAML).
+            // Students and tutors cannot, as we'll fetch their fields from the SAML properties.
+            $canEdit = !$isStudent;
         } else {
-            $isStudent = false;
+            // Local passwords are used, so all users can edit their profile.
+            $canEdit = true;
         }
+
+        if (!empty($this->data)) {
+            if (!$canEdit) {
+                CakeLog::write('warning', "Profile edit refused for user $id: the profile is read-only");
+                $this->Session->setFlash(__('You cannot change your profile.', true));
+                $this->redirect('editProfile');
+                return;
+            }
+            $this->_saveProfile($id, $isStudent, !$samlOnly);
+        }
+
         $this->data = $this->User->read(null, $id);
         $this->Output->br2nl($this->data);
         $this->set('is_student', $isStudent);
+        $this->set('canEdit', $canEdit);
+        $this->set('studentNumberEditable', $canEdit && $isStudent && $this->_studentNumberEditable());
         $this->set('data', $this->data);
         $this->set('title_for_layout', __('Edit Profile', true));
-        return;
+    }
+
+    /**
+     * Save the allowed profile fields of the logged-in user, and the new
+     * password when one was given.
+     *
+     * @param int  $id            the logged-in user
+     * @param bool $isStudent     student or tutor
+     * @param bool $passwordAllowed false when local passwords are not used
+     *
+     * @return bool true when saved, or when no field changed
+     */
+    private function _saveProfile(int $id, bool $isStudent, bool $passwordAllowed): bool
+    {
+        $posted = $this->data['User'] ?? [];
+        $allowed = $this->_profileFields($isStudent);
+        $stored = $this->User->findUserByidWithFields($id, $allowed);
+        // Save only the changed fields, so that an old stored value that
+        // fails validation does not block other changes.
+        $fields = [];
+        foreach ($allowed as $field) {
+            if (isset($posted[$field]) && is_string($posted[$field])
+                && $posted[$field] !== (string) ($stored[$field] ?? '')) {
+                $fields[$field] = $posted[$field];
+            }
+        }
+
+        $newPassword = $posted['temp_password'] ?? '';
+        if ($passwordAllowed && is_string($newPassword) && $newPassword !== '') {
+            $error = $this->_checkNewPassword($id, $posted);
+            if ($error !== null) {
+                CakeLog::write('login', "Password change refused for user $id: $error");
+                $this->Session->setFlash($error);
+                $this->redirect('editProfile');
+                return false;
+            }
+            $fields['password'] = Security::hash($newPassword, null, true);
+        }
+
+        if (empty($fields)) {
+            $this->Session->setFlash(__("Your Profile Has Been Updated Successfully.", true), 'good');
+            return true;
+        }
+        $this->Output->filter($fields);
+        $fields['id'] = $id;
+        // Traceable sets updater_id in beforeSave; the field list must allow it.
+        $fieldList = [...array_keys($fields), 'updater_id'];
+        if (!$this->User->save(['User' => $fields], true, $fieldList)) {
+            $errorMsg = implode("\n", $this->User->invalidFields());
+            $this->Session->setFlash(__('Failed to save.</br>', true).$errorMsg);
+            return false;
+        }
+
+        // Read the saved row again so that the header shows the new name.
+        // Auth::identify() looks up an id only when it is a string.
+        if ($this->Auth->login((string) $id)) {
+            User::store($this->Auth->user());
+        }
+        $user = $this->User->findById($id);
+        $this->__setSessionData($user['User']);
+        if (isset($fields['password'])) {
+            CakeLog::write('login', "User $id changed their password");
+            $this->_renewSession();
+        }
+        $this->Session->setFlash(__("Your Profile Has Been Updated Successfully.", true), 'good');
+        return true;
+    }
+
+    /**
+     * Give the session a new id after a password change. The old id stops
+     * working, so a copy of it cannot be used any more. The session data
+     * stays.
+     *
+     * @return void
+     */
+    function _renewSession()
+    {
+        $this->Session->renew();
+    }
+
+    /**
+     * The User fields that a user can change on their own profile.
+     *
+     * @param bool $isStudent student or tutor
+     *
+     * @return string[]
+     */
+    private function _profileFields(bool $isStudent): array
+    {
+        $fields = ['first_name', 'last_name', 'email'];
+        if (!$isStudent) {
+            $fields[] = 'title';
+        } elseif ($this->_studentNumberEditable()) {
+            $fields[] = 'student_no';
+        }
+        return $fields;
+    }
+
+    /**
+     * @return bool true when system.student_number lets students change
+     * their student number
+     */
+    private function _studentNumberEditable(): bool
+    {
+        return ClassRegistry::init('SysParameter')->get('system.student_number') === true;
+    }
+
+    /**
+     * Check the old password and the new password of a profile save.
+     *
+     * @param int   $id     the logged-in user
+     * @param array $posted the posted User fields
+     *
+     * @return string|null the error message, or null when the change is valid
+     */
+    private function _checkNewPassword(int $id, array $posted): ?string
+    {
+        $old = $posted['old_password'] ?? '';
+        $new = $posted['temp_password'];
+        $confirm = $posted['confirm_password'] ?? '';
+        $user = $this->User->findUserByidWithFields($id, ['password']);
+        $stored = (string) ($user['password'] ?? '');
+
+        if (!is_string($old) || $stored === '' || !hash_equals($stored, Security::hash($old, null, true))) {
+            return __("Old password is incorrect", true);
+        }
+        if (!is_string($confirm) || $new !== $confirm) {
+            return __("New passwords do not match", true);
+        }
+        if (mb_strlen($new) < 6) {
+            return __('The new password must have at least 6 characters.', true);
+        }
+        return null;
     }
 
 
@@ -1105,6 +1230,9 @@ class UsersController extends AppController
      */
     function resetPassword($userId, $courseId = null)
     {
+        if ($this->_refuseWithoutLocalPasswords()) {
+            return;
+        }
         // checks the user's permissions
         $user_data = $this->_checkResetPasswordPermission($userId, $courseId);
 
@@ -1143,6 +1271,9 @@ class UsersController extends AppController
      */
     public function resetPasswordWithoutEmail($userId, $courseId = null)
     {
+        if ($this->_refuseWithoutLocalPasswords()) {
+            return;
+        }
         // checks the user's permissions
         $this->_checkResetPasswordPermission($userId, $courseId);
 
@@ -1610,6 +1741,22 @@ class UsersController extends AppController
         $this->Session->write('ipeerSession.username', $userData['username']);
         $this->Session->write('ipeerSession.fullname', $userData['first_name'].' '.$userData['last_name']);
         $this->Session->write('ipeerSession.email', $userData['email']);
+    }
+
+    /**
+     * With SAML-only sign-in, local passwords are never used: refuse the
+     * password reset actions.
+     *
+     * @return bool true when the action is refused
+     */
+    private function _refuseWithoutLocalPasswords(): bool
+    {
+        if (!$this->Auth->isForceSamlLogin()) {
+            return false;
+        }
+        $this->Session->setFlash(__('Passwords are not used: users sign in with SAML.', true));
+        $this->redirect('/home');
+        return true;
     }
 
     /**

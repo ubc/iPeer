@@ -74,6 +74,7 @@ function fnFormatDetails ( oTable, nTr )
     sOut += '</div></a>';
     <?php endif; ?>
 
+    <?php if ($localPasswordsEnabled ?? true): ?>
     sOut += '<a href="<?php echo $this->base; ?>/users/resetPassword/'+aData[0]+'/<?php echo $courseId?>" onclick="return resetConfirmed()">';
     sOut += '<div style="cursor: default; padding: 4px; font-weight: bold; color: black;">Reset Password';
     sOut += '</div></a>';
@@ -83,6 +84,7 @@ function fnFormatDetails ( oTable, nTr )
         sOut += '<div style="cursor: default; padding: 4px; font-weight: bold; color: black;">Reset Password Without Email';
         sOut += '</div></a>';
     <?php } ?>
+    <?php endif; ?>
 
     sOut += '<a href="<?php echo $this->base; ?>/users/delete/'+aData[0]+'/<?php echo $courseId?>" onclick="return dropConfirmed(&quot;'+aData[2]+'&quot;)">';
     sOut += '<div style="cursor: default; padding: 4px; font-weight: bold; color: black;">Drop';
