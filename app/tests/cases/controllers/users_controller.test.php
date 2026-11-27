@@ -21,11 +21,11 @@ class UsersControllerTestCase extends ExtendedAuthTestCase
         'app.evaluation_rubric', 'app.evaluation_rubric_detail',
         'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
         'app.user_faculty', 'app.department', 'app.sys_parameter',
-        'app.oauth_token', 'app.rubric', 'app.rubrics_criteria',
+        'app.rubric', 'app.rubrics_criteria',
         'app.rubrics_criteria_comment', 'app.rubrics_lom',
         'app.simple_evaluation', 'app.survey_input', 'app.mixeval_question',
         'app.mixeval_question_desc', 'app.mixeval', 'app.mixeval_question_type',
-        'app.oauth_client', 'app.user_oauths', 'app.email_schedule',
+        'app.user_oauths', 'app.email_schedule',
         'app.email_template',
     );
 
@@ -180,5 +180,32 @@ class UsersControllerTestCase extends ExtendedAuthTestCase
     public function testMergeAccountSearchIgnoresOtherFields()
     {
         $this->assertEqual($this->mergeAccountSearch('password', 'a'), []);
+    }
+
+    /**
+     * The profile form saves only the profile fields of the signed-in user.
+     */
+    public function testEditProfileSavesOnlyTheProfileFields()
+    {
+        $this->login = ['User' => ['username' => 'redshirt0001']];
+
+        $this->testAction('/users/editProfile', ['fixturize' => true, 'data' => [
+            'User' => ['first_name' => 'Edd', 'username' => 'renamed',
+                'student_no' => '1', 'password' => 'x'],
+            'Role' => ['Role' => [1]],
+            'Enrolment' => ['Enrolment' => [2]],
+        ]]);
+
+        $user = ClassRegistry::init('User')->find('first', [
+            'conditions' => ['User.id' => 5], 'recursive' => -1]);
+        $this->assertEqual($user['User']['first_name'], 'Edd');
+        $this->assertEqual($user['User']['username'], 'redshirt0001');
+        $this->assertEqual($user['User']['student_no'], '65498451');
+        $this->assertNotEqual($user['User']['password'], 'x');
+        $roles = ClassRegistry::init('RolesUser')->find('list', [
+            'conditions' => ['RolesUser.user_id' => 5], 'fields' => ['RolesUser.role_id']]);
+        $this->assertEqual(array_values($roles), [5]);
+        $this->assertEqual(ClassRegistry::init('UserEnrol')->find('count', [
+            'conditions' => ['UserEnrol.user_id' => 5, 'UserEnrol.course_id' => 2]]), 0);
     }
 }

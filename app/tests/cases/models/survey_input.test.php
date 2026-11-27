@@ -14,7 +14,7 @@ class SurveyInputTestCase extends CakeTestCase
         'app.rubrics_criteria', 'app.rubrics_criteria_comment',
         'app.survey_input', 'app.survey', 'app.faculty', 'app.user_faculty',
         'app.department', 'app.course_department', 'app.evaluation_simple',
-        'app.user_tutor', 'app.penalty', 'app.oauth_token', 'app.evaluation_rubric',
+        'app.user_tutor', 'app.penalty', 'app.evaluation_rubric',
         'app.evaluation_rubric_detail', 'app.evaluation_mixeval_detail',
         'app.evaluation_mixeval', 'app.sys_parameter'
     );

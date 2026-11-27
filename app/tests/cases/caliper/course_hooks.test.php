@@ -34,7 +34,7 @@ class CaliperCourseHooksTest extends CaliperAuthTestCase
         'app.evaluation_rubric', 'app.evaluation_rubric_detail',
         'app.evaluation_mixeval', 'app.evaluation_mixeval_detail',
         'app.user_faculty', 'app.department', 'app.sys_parameter',
-        'app.oauth_token', 'app.rubric', 'app.rubrics_criteria',
+        'app.rubric', 'app.rubrics_criteria',
         'app.rubrics_criteria_comment', 'rubrics_lom',
         'app.survey_input',
     );

@@ -16,7 +16,7 @@ class UsersController extends AppController
     public $helpers = array('Html', 'Ajax', 'Javascript', 'Time', 'FileUpload.FileUpload');
     public $uses = array('User', 'UserEnrol', 'Personalize', 'Course',
         'SysParameter', 'Role', 'Group', 'UserFaculty',
-        'Department', 'CourseDepartment', 'OauthClient', 'OauthToken',
+        'Department', 'CourseDepartment',
         'UserCourse', 'UserTutor', 'Faculty', 'UserFaculty', 'EmailTemplate', 'EvaluationMixevalDetail',
         'EvaluationRubricDetail', 'EventTemplateType', 'Event', 'Faculty', 'GroupEvent',
         'Mixeval', 'Rubric', 'SimpleEvaluation', 'SysParameter', 'Survey', 'EvaluationMixeval',
@@ -331,20 +331,6 @@ class UsersController extends AppController
                 }
                 $this->Session->setFlash(__('Failed to save.</br>', true).$errorMsg);
                 return false;
-            }
-
-            if (isset($this->data['OauthClient'])) {
-                if (!($this->OauthClient->saveAll($this->data['OauthClient']))) {
-                    $this->Session->setFlash(__('Failed to save.</br>', true));
-                    return false;
-                }
-            }
-
-            if (isset($this->data['OauthToken'])) {
-                if (!($this->OauthToken->saveAll($this->data['OauthToken']))) {
-                    $this->Session->setFlash(__('Failed to save.</br>', true));
-                    return false;
-                }
             }
         }
 
@@ -930,8 +916,9 @@ class UsersController extends AppController
         $id = $this->Auth->user('id');
 
         $this->set('viewPage', false);
+        $isStudent = in_array($this->User->getRoleName($id), ['student', 'tutor']);
         if (!empty($this->data)) {
-            $this->data['User']['id'] = $id;
+            $this->data = $this->_postedProfile($id, $isStudent);
 
             if (!empty($this->data['User']['temp_password'])) {
                 $user = $this->User->findUserByidWithFields($id, array('password'));
@@ -946,33 +933,44 @@ class UsersController extends AppController
                     $this->Session->setFlash(__("Old password is incorrect", true));
                     $this->redirect('editProfile/'.$id);
                 }
-            } else {
-                unset($this->data['User']['temp_password']);
             }
+            unset($this->data['User']['old_password'], $this->data['User']['temp_password'],
+                $this->data['User']['confirm_password']);
 
             if ($this->__processForm()) {
-                $this->__setSessionData($this->data['User']);
+                $saved = $this->User->find('first', [
+                    'conditions' => ['User.id' => $id], 'recursive' => -1]);
+                $this->__setSessionData($saved['User']);
                 $this->Session->setFlash((__("Your Profile Has Been Updated Successfully.", true)), 'good');
             }
         }
-        if (in_array($this->User->getRoleName($id), array("student", "tutor"))) {
-            $isStudent = true;
-        } else {
-            $isStudent = false;
-        }
-        $oAuthClient = $this->OauthClient->find('all', array('conditions' => array('OauthClient.user_id' => $id)));
-        $oAuthToken = $this->OauthToken->find('all', array('conditions' => array('OauthToken.user_id' => $id)));
-
-        $enabled = array('0' => 'Disabled', '1' => 'Enabled');
         $this->data = $this->User->read(null, $id);
         $this->Output->br2nl($this->data);
-        $this->set('clients', $oAuthClient);
-        $this->set('tokens', $oAuthToken);
-        $this->set('enabled', $enabled);
         $this->set('is_student', $isStudent);
         $this->set('data', $this->data);
         $this->set('title_for_layout', __('Edit Profile', true));
         return;
+    }
+
+    /**
+     * The fields of the profile form, for the logged-in user only: the name,
+     * email and title fields and the password fields.
+     */
+    private function _postedProfile(int $id, bool $isStudent): array
+    {
+        $fields = ['first_name', 'last_name', 'email',
+            'old_password', 'temp_password', 'confirm_password'];
+        if (!$isStudent) {
+            $fields[] = 'title';
+        }
+        $user = ['id' => $id];
+        foreach ($fields as $field) {
+            $value = $this->data['User'][$field] ?? null;
+            if (is_scalar($value)) {
+                $user[$field] = (string) $value;
+            }
+        }
+        return ['User' => $user];
     }
 
 
@@ -1934,15 +1932,6 @@ class UsersController extends AppController
                 $conditions
             );
         }
-
-        $updated = $updated && $this->OauthClient->updateAll(
-            array('OauthClient.user_id' => $primary),
-            array('OauthClient.user_id' => $secondary)
-        );
-        $updated = $updated && $this->OauthToken->updateAll(
-            array('OauthToken.user_id' => $primary),
-            array('OauthToken.user_id' => $secondary)
-        );
 
         return $updated;
     }

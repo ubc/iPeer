@@ -3,7 +3,7 @@ App::import('Model', 'Access');
 
 class AccessTestCase extends CakeTestCase {
     public $name = 'Access';
-    public $fixtures = array('app.access', 'app.oauth_token', 'app.sys_parameter',
+    public $fixtures = array('app.access', 'app.sys_parameter',
         'app.user', 'app.evaluation_submission', 'app.event', 'app.event_template_type',
         'app.course', 'app.group', 'app.group_event', 'app.evaluation_simple',
         'app.survey_input', 'app.survey_group_member', 'app.survey_group_set',
