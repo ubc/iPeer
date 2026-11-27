@@ -445,7 +445,8 @@ class AppController extends Controller
 
     /**
      * Checks the HTTP Referer header as a lightweight CSRF mitigation if
-     * `IPEER_ENFORCE_REFERRER` is set to true.
+     * `IPEER_ENFORCE_REFERRER` is set. "false", "0", "no", "off" or an empty value
+     * turn the check off; any other value turns it on.
      *
      * An absent Referer is treated the same as a cross-origin one (rejected).
      *
@@ -557,7 +558,11 @@ class AppController extends Controller
             }
         }
 
-        $enforce = (bool) getenv('IPEER_ENFORCE_REFERRER');
+        // "false", "0", "no", "off" and an empty value turn it off. Any other
+        // value turns it on, so a typo does not turn the check off.
+        $enforceSetting = getenv('IPEER_ENFORCE_REFERRER');
+        $enforce = $enforceSetting !== false && $enforceSetting !== ''
+            && filter_var($enforceSetting, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== false;
         CakeLog::write(
             'warning',
             'CSRF: referer mismatch' . ($enforce ? ' (blocked)' : ' (allowed, enforcement disabled)') .

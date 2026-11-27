@@ -140,16 +140,8 @@ class EvaluationComponent extends CakeObject
         $event = $this->Event->findById($eventId);
         $status = $this->EvaluationSimple->findAllByGrpEventId($grpEventId);
         $status = Set::extract('/EvaluationSimple/release_status', $status);
-        $all = array_product($status);
-        $some = array_sum($status);
         $this->GroupEvent->id = $grpEventId;
-        if ($all) {
-            $this->GroupEvent->saveField('comment_release_status', 'All');
-        } else if ($some) {
-            $this->GroupEvent->saveField('comment_release_status', 'Some');
-        } else {
-            $this->GroupEvent->saveField('comment_release_status', 'None');
-        }
+        $this->GroupEvent->saveField('comment_release_status', $this->releaseStatus($status));
         
         // if the oldest modified date is after the event's close date. A group
         // with no submissions has nothing to review.
@@ -212,6 +204,26 @@ class EvaluationComponent extends CakeObject
         }
 
         return $days;
+    }
+
+    /**
+     * The release status of a group event from the release flags of its
+     * evaluations: 'All' when every flag is set, 'Some' when at least one is
+     * set, else 'None'. A group event with no evaluations is 'None'.
+     *
+     * @param array $flags the grade_release or comment_release values (0 or 1)
+     *
+     * @return string 'All', 'Some' or 'None'
+     */
+    function releaseStatus(array $flags): string
+    {
+        if (empty($flags)) {
+            return 'None';
+        }
+        if (array_product($flags)) {
+            return 'All';
+        }
+        return array_sum($flags) ? 'Some' : 'None';
     }
 
     /**
@@ -842,13 +854,13 @@ class EvaluationComponent extends CakeObject
         $genComment = isset($params['releaseGeneralCom']) ? $params['releaseGeneralCom'] : array();
         $this->EvaluationRubric->updateAll(
             array('EvaluationRubric.comment_release' => 1, 'EvaluationRubric.modified' => $now, 'EvaluationRubric.updater_id' => $user),
-            array('EvaluationRubric.evaluatee' => $evaluatee, 'EvaluationRubric.evaluator' => $genComment)
+            array('EvaluationRubric.id' => $evalRubrIds, 'EvaluationRubric.evaluator' => $genComment)
         );
         // release detailed comments
         $detailComment = isset($params['releaseComments']) ? $params['releaseComments'] : array();
         $this->EvaluationRubricDetail->updateAll(
             array('EvaluationRubricDetail.comment_release' => 1, 'EvaluationRubricDetail.modified' => $now, 'EvaluationRubricDetail.updater_id' => $user),
-            array('EvaluationRubricDetail.id' => $detailComment)
+            array('EvaluationRubricDetail.id' => $detailComment, 'EvaluationRubricDetail.evaluation_rubric_id' => $evalRubrIds)
         );
     }
     
@@ -919,15 +931,8 @@ class EvaluationComponent extends CakeObject
         $event = $this->Event->findById($eventId);
 
         $this->GroupEvent->id = $grpEventId;
-        $all = array_product($gen) * array_product($detail);
-        $some = array_sum($gen) + array_sum($detail);
-        if ($all) {
-            $this->GroupEvent->saveField('comment_release_status', 'All');
-        } else if ($some) {
-            $this->GroupEvent->saveField('comment_release_status', 'Some');
-        } else {
-            $this->GroupEvent->saveField('comment_release_status', 'None');
-        } 
+        $this->GroupEvent->saveField('comment_release_status',
+            $this->releaseStatus(array_merge(array_values($gen), array_values($detail))));
         // if the oldest modified date is after the event's close date. A group
         // with no submissions has nothing to review.
         if ($eval && strtotime($event['Event']['release_date_end']) <= strtotime($eval['EvaluationRubric']['modified'])) {
@@ -1270,11 +1275,16 @@ class EvaluationComponent extends CakeObject
             array('EvaluationMixevalDetail.evaluation_mixeval_id' => $evalIds)
         );
         
-        //release the selected comments
+        //release the selected comments, only of evaluations in this group event.
+        // The Self-Evaluation panel posts evaluatee 0, so this is not limited to
+        // the evaluatee.
         $evalDetailIds = isset($params['releaseComments']) ? $params['releaseComments'] : array();
+        $groupEvalIds = $this->EvaluationMixeval->find('list', array(
+            'conditions' => array('grp_event_id' => $grpEventId)
+        ));
         $this->EvaluationMixevalDetail->updateAll(
             array('EvaluationMixevalDetail.comment_release' => 1, 'EvaluationMixevalDetail.modified' => $now, 'EvaluationMixevalDetail.updater_id' => $user),
-            array('EvaluationMixevalDetail.id' => $evalDetailIds)
+            array('EvaluationMixevalDetail.id' => $evalDetailIds, 'EvaluationMixevalDetail.evaluation_mixeval_id' => $groupEvalIds)
         );
     }
     
@@ -1353,15 +1363,17 @@ class EvaluationComponent extends CakeObject
         $details = Set::extract('/EvaluationMixevalDetail/comment_release', $details);
 
         $this->GroupEvent->id = $grpEventId;
-        $all = array_product($details);
-        $some = array_sum($details);
-        if ($all) {
-            $this->GroupEvent->saveField('comment_release_status', 'All');
-        } else if ($some) {
-            $this->GroupEvent->saveField('comment_release_status', 'Some');
+        // No evaluations: 'None', as for the other types. Evaluations with no
+        // comment rows (no comment questions, or all left blank) have nothing to
+        // release: 'All', as before.
+        if (empty($evalIds)) {
+            $commentStatus = 'None';
+        } else if (empty($details)) {
+            $commentStatus = 'All';
         } else {
-            $this->GroupEvent->saveField('comment_release_status', 'None');
-        } 
+            $commentStatus = $this->releaseStatus($details);
+        }
+        $this->GroupEvent->saveField('comment_release_status', $commentStatus);
         
         // if the oldest modified date is after the event's close date. A group
         // with no submissions has nothing to review.

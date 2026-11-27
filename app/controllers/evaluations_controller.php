@@ -1756,17 +1756,24 @@ class EvaluationsController extends AppController
         }
 
         $this->autoRender = false;
-        $eventId = $this->params['form']['event_id'];
-        $groupId =  $this->params['form']['group_id'];
-        $groupEventId = $this->params['form']['group_event_id'];
         $reviewStatus = isset($this->params['form']['mark_reviewed'])? "mark_reviewed" : "mark_not_reviewed";
 
-        //Get the target event
-        $this->Event->id = $eventId;
-        $event = $this->Event->read();
-
+        // The event and group come from the posted group event, and the user
+        // must have access to that event.
+        $groupEvent = $this->GroupEvent->findById($this->params['form']['group_event_id'] ?? null);
+        if (empty($groupEvent)) {
+            $this->Session->setFlash(__('Error: That group event does not exist.', true));
+            $this->redirect('/home');
+            return;
+        }
+        $groupEventId = $groupEvent['GroupEvent']['id'];
+        $eventId = $groupEvent['GroupEvent']['event_id'];
+        $groupId = $groupEvent['GroupEvent']['group_id'];
+        $event = $this->_accessibleEvent($eventId);
+        if (!$event) {
+            return;
+        }
         $this->GroupEvent->id = $groupEventId;
-        $groupEvent = $this->GroupEvent->read();
         // if marking peer evaluations as reviewed/not reviewed
         if ($reviewStatus == "mark_reviewed") {
             $groupEvent['GroupEvent']['marked'] ='reviewed';
@@ -1777,12 +1784,11 @@ class EvaluationsController extends AppController
         //if not all members submitted, then it should be 'not reviewed'
         else if ($reviewStatus == "mark_not_reviewed") {
             //Get Members whom completed evaluation
-            $memberCompletedNo = $this->EvaluationSubmission->numCountInGroupCompleted($groupEventId);
+            $numOfCompletedCount = $this->EvaluationSubmission->numCountInGroupCompleted($groupEventId);
             //Check to see if all members are completed this evaluation
-            $numOfCompletedCount = $memberCompletedNo[0][0]['count'];
-            $numMembers=$event['Event']['self_eval'] ?
-                $this->GroupsMembers->find('count', array('conditions' => array('group_id' => $groupId))) :
-                $this->GroupsMembers->find('count', array('conditions' => array('group_id' => $groupId))) - 1;
+            // Every member submits once, with or without self-evaluation, so
+            // compare with all members, as the submit actions do.
+            $numMembers = $this->GroupsMembers->find('count', array('conditions' => array('group_id' => $groupId)));
 
             ($numOfCompletedCount == $numMembers) ? $completeStatus = 1:$completeStatus = 0;
             if ($completeStatus) {
@@ -1793,7 +1799,8 @@ class EvaluationsController extends AppController
                 $this->GroupEvent->save($groupEvent);
             }
         }
-        $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId);
+        $detail = ($this->params['form']['display_format'] ?? '') === 'Detail' ? '/Detail' : '';
+        $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId.$detail);
     }
 
 
@@ -1869,16 +1876,7 @@ class EvaluationsController extends AppController
             'conditions' => array($model.'.grp_event_id' => $grpEventId),
             'fields' => $model.'.grade_release'
         ));
-        $all = array_product($evals);
-        $some = array_sum($evals);
-
-        if ($all) {
-            $grpEvent['GroupEvent']['grade_release_status'] = 'All';
-        } else if ($some) {
-            $grpEvent['GroupEvent']['grade_release_status'] = 'Some';
-        } else {
-            $grpEvent['GroupEvent']['grade_release_status'] = 'None';
-        }
+        $grpEvent['GroupEvent']['grade_release_status'] = $this->Evaluation->releaseStatus($evals);
 
         $this->GroupEvent->save($grpEvent);
 
@@ -1949,6 +1947,9 @@ class EvaluationsController extends AppController
             $this->redirect('/home');
             return;
         }
+        // From here on, use only the group event that was loaded and checked,
+        // also if the form posted a list of ids.
+        $this->params['form']['group_event_id'] = $grpEvent['GroupEvent']['id'];
         $eventId = $grpEvent['GroupEvent']['event_id'];
 
         // Check whether the event exists or user has permission to access it
@@ -1960,7 +1961,7 @@ class EvaluationsController extends AppController
 
         switch ($event['Event']['event_template_type_id']) {
         case "1":
-            $groupId =  $this->params['form']['group_id'];
+            $groupId = $grpEvent['GroupEvent']['group_id'];
 
             if (isset($this->params['form']['evaluator_ids'])) {
                 $groupEventId = $this->params['form']['group_event_id'];
@@ -2027,6 +2028,11 @@ class EvaluationsController extends AppController
             //$this->Evaluation->markMixedEvalReviewed($eventId, $groupEventId);
             $this->redirect('viewEvaluationResults/'.$eventId.'/'.$groupId.'/Detail');
             break;
+        default:
+            // a survey
+            $this->Session->setFlash(__('Error: You can release comments only for simple, rubric and mixed evaluations.', true));
+            $this->redirect('/home');
+            return;
         }
 
     }
@@ -2143,16 +2149,7 @@ class EvaluationsController extends AppController
                 'conditions' => array('grp_event_id' => $grpEvent['GroupEvent']['id']),
                 'fields' => $model.'.grade_release'
             ));
-            $all = array_product($evals);
-            $some = array_sum($evals);
-
-            if ($all) {
-                $grpEvent['GroupEvent']['grade_release_status'] = 'All';
-            } else if ($some) {
-                $grpEvent['GroupEvent']['grade_release_status'] = 'Some';
-            } else {
-                $grpEvent['GroupEvent']['grade_release_status'] = 'None';
-            }
+            $grpEvent['GroupEvent']['grade_release_status'] = $this->Evaluation->releaseStatus($evals);
 
             $this->GroupEvent->save($grpEvent);
         }
