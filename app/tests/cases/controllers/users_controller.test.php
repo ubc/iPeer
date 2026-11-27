@@ -4,7 +4,8 @@ App::import('Lib', 'ExtendedAuthTestCase');
 
 Mock::generatePartial('UsersController',
     'MockUsersController',
-    array('isAuthorized', 'render', 'redirect', '_stop', 'header'));
+    // _renewSession sets a cookie, which fails after the test output starts.
+    array('isAuthorized', 'render', 'redirect', '_stop', 'header', '_renewSession'));
 
 class UsersControllerTestCase extends ExtendedAuthTestCase
 {
@@ -52,6 +53,8 @@ class UsersControllerTestCase extends ExtendedAuthTestCase
 
     public function endTest($method)
     {
+        putenv('SAML_SETTINGS'); // clear any SAML flags at the end of any test
+        putenv('FORCE_SAML_LOGIN');
         if (isset($this->controller->Auth)) {
             $this->controller->Auth->logout();
         }
@@ -180,5 +183,198 @@ class UsersControllerTestCase extends ExtendedAuthTestCase
     public function testMergeAccountSearchIgnoresOtherFields()
     {
         $this->assertEqual($this->mergeAccountSearch('password', 'a'), []);
+    }
+
+    private function forceSamlLogin()
+    {
+        putenv('SAML_SETTINGS={}');
+        putenv('FORCE_SAML_LOGIN=true');
+    }
+
+    private function loginAs($username)
+    {
+        $this->login = ['User' => ['username' => $username, 'password' => md5('ipeeripeer')]];
+    }
+
+    private function postProfile(array $user)
+    {
+        $this->testAction('/users/editProfile', [
+            'fixturize' => true, 'method' => 'post', 'data' => ['User' => $user],
+        ]);
+    }
+
+    private function storedUser($id)
+    {
+        return ClassRegistry::init('User')->find('first', [
+            'conditions' => ['User.id' => $id], 'recursive' => -1,
+        ])['User'];
+    }
+
+    /**
+     * Hash a password the way the app does. AppController::beforeFilter()
+     * sets the hash type and salt, so a test must not depend on an earlier
+     * request for them.
+     */
+    private function hashPassword($password)
+    {
+        $salt = getenv('IPEER_SECURITY_SALT');
+        Security::setHash($salt ? 'sha256' : 'md5');
+        Configure::write('Security.salt', $salt ?: '');
+        return Security::hash($password, null, true);
+    }
+
+    private function setPassword($id, $password)
+    {
+        ClassRegistry::init('User')->updateAll(
+            ['User.password' => "'" . $this->hashPassword($password) . "'"],
+            ['User.id' => $id]
+        );
+    }
+
+    /**
+     * A profile save changes only the allowed fields of the logged-in user.
+     */
+    public function testEditProfileSavesOnlyAllowedFields()
+    {
+        $this->loginAs('redshirt0001');
+        $this->testAction('/users/editProfile', [
+            'fixturize' => true, 'method' => 'post',
+            'data' => [
+                'User' => [
+                    'id' => 1, 'first_name' => 'Edna', 'username' => 'root2',
+                    'record_status' => 'I', 'title' => 'Dr', 'student_no' => '111',
+                ],
+                'Role' => ['Role' => [1]],
+                'Enrolment' => ['Enrolment' => [1, 2]],
+            ],
+        ]);
+
+        $student = $this->storedUser(5);
+        $this->assertEqual($student['first_name'], 'Edna');
+        $this->assertEqual($student['username'], 'redshirt0001');
+        $this->assertEqual($student['record_status'], 'A');
+        $this->assertNull($student['title']);
+        // system.student_number is true in the fixtures.
+        $this->assertEqual($student['student_no'], '111');
+        $this->assertEqual(ClassRegistry::init('User')->getRoleName(5), 'student');
+        $this->assertEqual(ClassRegistry::init('RolesUser')->find('count', [
+            'conditions' => ['RolesUser.user_id' => 5],
+        ]), 1);
+        $this->assertEqual($this->storedUser(1)['username'], 'root');
+        $this->assertEqual($this->controller->Session->read('Auth.User.first_name'), 'Edna');
+        // The header of the same page reads the stored user.
+        $this->assertEqual(User::get('full_name'), 'Edna Student');
+    }
+
+    public function testEditProfileKeepsStudentNumberWhenParameterIsOff()
+    {
+        $param = ClassRegistry::init('SysParameter');
+        $param->updateAll(['SysParameter.parameter_value' => "'false'"],
+            ['SysParameter.parameter_code' => 'system.student_number']);
+        Cache::delete('system.student_number', 'configuration');
+
+        $this->loginAs('redshirt0001');
+        $this->postProfile(['first_name' => 'Ed', 'student_no' => '111']);
+
+        $this->assertEqual($this->storedUser(5)['student_no'], '65498451');
+        $param->updateAll(['SysParameter.parameter_value' => "'true'"],
+            ['SysParameter.parameter_code' => 'system.student_number']);
+        Cache::delete('system.student_number', 'configuration');
+    }
+
+    public function testEditProfileChangesPasswordWithOldPassword()
+    {
+        $this->setPassword(2, 'oldsecret');
+        $this->loginAs('instructor1');
+        // The form posts every field. The stored email fails validation,
+        // but it is unchanged, so it does not block the password change.
+        $this->postProfile([
+            'first_name' => 'Instructor', 'last_name' => '1', 'title' => 'Instructor',
+            'email' => 'instructor1@email', 'old_password' => 'oldsecret',
+            'temp_password' => 'newsecret', 'confirm_password' => 'newsecret',
+        ]);
+
+        $this->assertEqual($this->storedUser(2)['password'], $this->hashPassword('newsecret'));
+    }
+
+    public function testEditProfileRefusesBadPasswordChanges()
+    {
+        $this->setPassword(2, 'oldsecret');
+        $before = $this->storedUser(2)['password'];
+        $attempts = [
+            'Old password is incorrect' =>
+                ['old_password' => 'wrong', 'temp_password' => 'newsecret', 'confirm_password' => 'newsecret'],
+            'New passwords do not match' =>
+                ['old_password' => 'oldsecret', 'temp_password' => 'newsecret', 'confirm_password' => 'other1'],
+            'The new password must have at least 6 characters.' =>
+                ['old_password' => 'oldsecret', 'temp_password' => 'short', 'confirm_password' => 'short'],
+        ];
+        foreach ($attempts as $expected => $attempt) {
+            $this->loginAs('instructor1');
+            $this->postProfile(['first_name' => 'Changed'] + $attempt);
+            $message = $this->controller->Session->read('Message.flash');
+            $this->assertEqual($message['message'], $expected);
+            $user = $this->storedUser(2);
+            $this->assertEqual($user['password'], $before);
+            $this->assertEqual($user['first_name'], 'Instructor');
+        }
+    }
+
+    /**
+     * With SAML-only sign-in, a student cannot change their profile.
+     */
+    public function testEditProfileIsReadOnlyForStudentsWithSaml()
+    {
+        $this->forceSamlLogin();
+        $this->loginAs('redshirt0001');
+        $this->postProfile(['first_name' => 'Edna', 'email' => 'x@example.com']);
+
+        $student = $this->storedUser(5);
+        $this->assertEqual($student['first_name'], 'Ed');
+        $this->assertEqual($student['email'], '');
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'You cannot change your profile.');
+    }
+
+    /**
+     * With SAML-only sign-in, staff can change their profile but not their
+     * password.
+     */
+    public function testEditProfileIgnoresPasswordWithSaml()
+    {
+        $this->forceSamlLogin();
+        $this->setPassword(2, 'oldsecret');
+        $before = $this->storedUser(2)['password'];
+        $this->loginAs('instructor1');
+        $this->postProfile([
+            'first_name' => 'Ina', 'old_password' => 'oldsecret',
+            'temp_password' => 'newsecret', 'confirm_password' => 'newsecret',
+        ]);
+
+        $user = $this->storedUser(2);
+        $this->assertEqual($user['first_name'], 'Ina');
+        $this->assertEqual($user['password'], $before);
+    }
+
+    public function testResetPasswordIsRefusedWithSaml()
+    {
+        $this->forceSamlLogin();
+        $before = $this->storedUser(5)['password'];
+        $this->testAction('/users/resetPasswordWithoutEmail/5', ['fixturize' => true]);
+        $this->testAction('/users/resetPassword/5', ['fixturize' => true]);
+
+        $this->assertEqual($this->storedUser(5)['password'], $before);
+        $message = $this->controller->Session->read('Message.flash');
+        $this->assertEqual($message['message'], 'Passwords are not used: users sign in with SAML.');
+    }
+
+    public function testViewHidesPasswordResetWithSaml()
+    {
+        $this->forceSamlLogin();
+        $result = $this->testAction('/users/view/5', ['fixturize' => true, 'return' => 'vars']);
+
+        $urls = array_column($result['bottomActionButtons'], 'url');
+        $this->assertFalse(in_array('/users/resetPassword/5', $urls));
+        $this->assertFalse(in_array('/users/resetPasswordWithoutEmail/5', $urls));
     }
 }

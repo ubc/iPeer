@@ -190,6 +190,11 @@ class AppController extends Controller
             $this->set('ipeerCommitHash', htmlspecialchars($commitHash));
         }
 
+        // With SAML-only sign-in, local passwords are never used, so the
+        // profile page and the user lists hide the password fields and the
+        // reset links.
+        $this->set('localPasswordsEnabled', !$this->Auth->isForceSamlLogin());
+
         parent::beforeRender();
     }
 

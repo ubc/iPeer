@@ -59,6 +59,11 @@ export const USER = {
   mergeSameAccount: 'Error: No merger needed. The primary and secondary accounts are the same.',
 } as const;
 
+export const PROFILE = {
+  updated: 'Your Profile Has Been Updated Successfully.',
+  oldPasswordIncorrect: 'Old password is incorrect',
+} as const;
+
 export const PERMISSIONS = {
   updated: 'Permissions have been updated',
 } as const;
