@@ -38,15 +38,6 @@ if (IS_INSTALLED) {
   // to tell the user that an install was successful.
   Router::connect('/install/install5', array(
     'controller' => 'install', 'action' => 'install5'));
-  // Connect url to groups api
-  Router::connect(
-    '/:controller/courses/:course_id/groups/:group_id',
-    array('action' => 'groups', 'group_id' => null),
-    array(
-      'course_id' => '[0-9]+',
-      'group_id' => '[0-9]+'
-    )
-  );
   Router::connect('/install/*', array('controller' => 'install'));
   // Connect default index page to the home controller
   Router::connect('/', array('controller' => 'home', 'action' => 'index'));
@@ -78,45 +69,6 @@ if (IS_INSTALLED) {
 
   Router::connect('/loginout/loginByCWL', array('plugin' => 'guard', 'controller' => 'guard',
     'action' => 'logout'));
-  // Connect url to groups api
-  Router::connect('/:controller/courses/:course_id/groups/:group_id',
-    array('action' => 'groups', 'group_id' => null),
-    array('course_id' => '[0-9]+', 'group_id' => '[0-9]+'));
-  // Connect url to events api
-  Router::connect('/:controller/courses/:course_id/events/:event_id',
-    array('action' => 'events', 'event_id' => null),
-    array('course_id' => '[0-9]+', 'event_id' => '[0-9]+'));
-  // Connect to course enrolment
-  Router::connect('/:controller/courses/:course_id/users',
-    array('action' => 'enrolment'),
-    array('course_id' => '[0-9]+'));
-  // Connect url to grades api
-  Router::connect('/:controller/events/:event_id/grades/:username',
-    array('action' => 'grades', 'username' => null),
-    array('event_id' => '[0-9]+', 'username' => '.+'));
-  // Connect url to departments api
-  Router::connect('/:controller/courses/:course_id/departments/:department_id',
-    array('action'=> 'courseDepartments'),
-    array('course_id' => '[0-9]+', 'department_id' => '[0-9]+'));
-  // Connect url to users/events api with filters
-  Router::connect('/:controller/users/:username/events/sub/:sub/results/:results',
-    array('action' => 'userEvents'),
-    array('sub' => '[0-1]', 'results' => '[0-1]'));
-  // connect url to users/events/course api with filters
-  Router::connect('/:controller/courses/:course_id/users/:username/events/sub/:sub/results/:results',
-    array('action' => 'userEvents'),
-    array('course_id' => '[0-9]+', 'sub' => '[0-1]', 'results' => '[0-1]'));
-  // Connect url to users/events api
-  Router::connect('/:controller/users/:username/events',
-    array('action' => 'userEvents'));
-  // connect url to users/events/course api
-  Router::connect('/:controller/courses/:course_id/users/:username/events',
-    array('action' => 'userEvents'),
-    array('course_id' => '[0-9]+'));
-  // connect url to groups/1/users api, for manipulating groupmembers
-  Router::connect('/:controller/groups/:group_id/users/:username',
-    array('action' => 'groupMembers', 'username' => null),
-    array('group_id' => '[0-9]+', 'username' => '.+'));
 } else {
   // Note, order of routes specified matters. If install didn't come first
   // the /* directive would just redirect every page to the index page

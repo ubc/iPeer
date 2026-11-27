@@ -24,24 +24,6 @@ if (User::hasPermission('controllers/departments')) {
     echo '</li>';
 }
 
-if (User::hasPermission('functions/user/superadmin')) {
-    echo "<li>";
-        echo $this->Html->link(
-            __('OAuth Client Credentials',true),
-            array('controller' => 'oauthclients')
-        );
-    echo "</li>";
-}
-
-if (User::hasPermission('functions/user/superadmin')) {
-    echo "<li>";
-        echo $this->Html->link(
-            __('OAuth Token Credentials',true),
-            array('controller' => 'oauthtokens')
-        );
-    echo "</li>";
-}
-
 // System Parameters
 if (User::hasPermission('controllers/sysparameters')) {
     echo '<li>';

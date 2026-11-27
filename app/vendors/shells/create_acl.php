@@ -532,10 +532,6 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Surveygroups');
         $this->Acl->allow($role, 'controllers/Users');
         $this->Acl->allow($role, 'controllers/guard/guard/logout');
-        $this->Acl->allow($role, 'controllers/Oauthclients/add');
-        $this->Acl->allow($role, 'controllers/Oauthclients/delete');
-        $this->Acl->allow($role, 'controllers/Oauthtokens/add');
-        $this->Acl->allow($role, 'controllers/Oauthtokens/delete');
         $this->Acl->deny($role, 'controllers/Users/merge');
         $this->Acl->allow($role, 'controllers/Users/showEvents');
         $this->Acl->deny($role, 'controllers/Users/resetPasswordWithoutEmail');
@@ -600,10 +596,6 @@ class CreateAclShell extends Shell
         $this->Acl->allow($role, 'controllers/Evaluations/studentViewEvaluationResult');
         $this->Acl->allow($role, 'controllers/Evaluations/completeEvaluationRubric');
         $this->Acl->allow($role, 'controllers/Users/editProfile');
-        $this->Acl->allow($role, 'controllers/Oauthclients/add');
-        $this->Acl->allow($role, 'controllers/Oauthclients/delete');
-        $this->Acl->allow($role, 'controllers/Oauthtokens/add');
-        $this->Acl->allow($role, 'controllers/Oauthtokens/delete');
         $this->Acl->deny($role, 'functions');
         $this->Acl->allow($role, 'functions/viewstudentresults');
         $this->Acl->deny($role, 'functions/viewemailaddresses');
